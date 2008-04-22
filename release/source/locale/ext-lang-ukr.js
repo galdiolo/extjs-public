@@ -1,12 +1,4 @@
-/*
- * Ext JS Library 2.1
- * Copyright(c) 2006-2008, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
-/*
+﻿/*
  * Ukrainian translation
  * By zlatko (utf-8 encoding)
  * 3 October 2007

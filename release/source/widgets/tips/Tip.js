@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.1
+ * Ext JS Library 2.0.2
  * Copyright(c) 2006-2008, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -84,22 +84,17 @@ tip.showAt([50,100]);
     showAt : function(xy){
         Ext.Tip.superclass.show.call(this);
         if(this.measureWidth !== false && (!this.initialConfig || typeof this.initialConfig.width != 'number')){
-            this.doAutoWidth();
+            var bw = this.body.getTextWidth();
+            if(this.title){
+                bw = Math.max(bw, this.header.child('span').getTextWidth(this.title));
+            }
+            bw += this.getFrameWidth() + (this.closable ? 20 : 0) + this.body.getPadding("lr");
+            this.setWidth(bw.constrain(this.minWidth, this.maxWidth));
         }
         if(this.constrainPosition){
             xy = this.el.adjustForConstraints(xy);
         }
         this.setPagePosition(xy[0], xy[1]);
-    },
-
-    // protected
-    doAutoWidth : function(){
-        var bw = this.body.getTextWidth();
-        if(this.title){
-            bw = Math.max(bw, this.header.child('span').getTextWidth(this.title));
-        }
-        bw += this.getFrameWidth() + (this.closable ? 20 : 0) + this.body.getPadding("lr");
-        this.setWidth(bw.constrain(this.minWidth, this.maxWidth));
     },
 
     /**

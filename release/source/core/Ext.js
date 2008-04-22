@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.1
+ * Ext JS Library 2.0.2
  * Copyright(c) 2006-2008, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -7,7 +7,7 @@
  */
 
 
-Ext = {version: '2.1'};
+Ext = {version: '2.0.1'};
 
 // for old browsers
 window["undefined"] = window["undefined"];
@@ -187,15 +187,20 @@ Ext.addBehaviors({
          * Extends one class with another class and optionally overrides members with the passed literal. This class
          * also adds the function "override()" to the class that can be used to override
          * members on an instance.
-         * * <p>
-         * This function also supports a 2-argument call in which the subclass's constructor is
-         * not passed as an argument. In this form, the parameters are as follows:</p><p>
+         * @param {Function} subclass The class inheriting the functionality
+         * @param {Function} superclass The class being extended
+         * @param {Object} overrides (optional) A literal with members which are copied into the subclass's
+         * prototype, and are therefore shared between all instances of the new class.
+         * @return {Function} The subclass constructor.
+         * <p>
+         * This function also supports a 2 argument call in which the subclass's constructor is
+         * not passed as an argument. In this form, the parameters as as follows:</p><p>
          * <div class="mdetail-params"><ul>
          * <li><code>superclass</code>
          * <div class="sub-desc">The class being extended</div></li>
          * <li><code>overrides</code>
          * <div class="sub-desc">A literal with members which are copied into the subclass's
-         * prototype, and are therefore shared among all instances of the new class.<p>
+         * prototype, and are therefore shared between all instance of the new class.<p>
          * This may contain a special member named <tt><b>constructor</b></tt>. This is used
          * to define the constructor of the new class, and is returned. If this property is
          * <i>not</i> specified, a constructor is generated and returned which just calls the
@@ -211,16 +216,11 @@ Ext.addBehaviors({
         },
 
         yourMethod: function() {
-            // etc.
+            // etc.  
         }
     });
 </code></pre>
          * </p>
-         * @param {Function} subclass The class inheriting the functionality
-         * @param {Function} superclass The class being extended
-         * @param {Object} overrides (optional) A literal with members which are copied into the subclass's
-         * prototype, and are therefore shared between all instances of the new class.
-         * @return {Function} The subclass constructor.
          * @method extend
          */
         extend : function(){
@@ -380,7 +380,7 @@ Company.data.CustomStore = function(config) { ... }
          * @param {Object} scope
          */
         each : function(array, fn, scope){
-            if(!Ext.isArray(array)){
+            if(typeof array.length == "undefined" || typeof array == "string"){
                 array = [array];
             }
             for(var i = 0, len = array.length; i < len; i++){
@@ -499,10 +499,6 @@ Company.data.CustomStore = function(config) { ... }
             }
         },
 
-        /**
-         * Removes a DOM node from the document.  The body node will be ignored if passed in.
-         * @param {HTMLElement} node The node to remove
-         */
         removeNode : isIE ? function(){
             var d;
             return function(n){
@@ -576,20 +572,10 @@ Company.data.CustomStore = function(config) { ... }
             return Ext.isEmpty(v, allowBlank) ? defaultValue : v;
         },
 
-        /**
-         * Returns true if the passed object is a JavaScript array, otherwise false.
-         * @param {Object} The object to test
-         * @return {Boolean}
-         */
 		isArray : function(v){
 			return v && typeof v.pop == 'function';
 		},
 
-		/**
-         * Returns true if the passed object is a JavaScript date object, otherwise false.
-         * @param {Object} The object to test
-         * @return {Boolean}
-         */
 		isDate : function(v){
 			return v && typeof v.getFullYear == 'function';
 		},
@@ -621,11 +607,11 @@ Company.data.CustomStore = function(config) { ... }
         /** @type Boolean */
         isAir : isAir,
 
-	    /**
-	     * By default, Ext intelligently decides whether floating elements should be shimmed. If you are using flash,
-	     * you may want to set this to true.
-	     * @type Boolean
-	     */
+    /**
+     By default, Ext intelligently decides whether floating elements should be shimmed. If you are using flash,
+     you may want to set this to true.
+     @type Boolean
+     */
         useShims : ((isIE && !isIE7) || (isGecko && isMac))
     });
 
@@ -644,26 +630,8 @@ Ext.ns("Ext", "Ext.util", "Ext.grid", "Ext.dd", "Ext.tree", "Ext.data",
 Ext.apply(Function.prototype, {
      /**
      * Creates a callback that passes arguments[0], arguments[1], arguments[2], ...
-     * Call directly on any function. Example: <code>myFunction.createCallback(arg1, arg2)</code>
-     * Will create a function that is bound to those 2 args. <b>If a specific scope is required in the
-     * callback, use {@link #createDelegate} instead.</b> The function returned by createCallback always
-     * executes in the window scope.
-     * <p>This method is required when you want to pass arguments to a callback function.  If no arguments
-     * are needed, you can simply pass a reference to the function as a callback (e.g., callback: myFn).  
-     * However, if you tried to pass a function with arguments (e.g., callback: myFn(arg1, arg2)) the function
-     * would simply execute immediately when the code is parsed. Example usage:
-     * <pre><code>
-var sayHi = function(name){
-    alert('Hi, ' + name);
-}
-
-// clicking the button alerts "Hi, Fred"
-new Ext.Button({
-    text: 'Say Hi',
-    renderTo: Ext.getBody(),
-    handler: sayHi.createCallback('Fred')
-});
-</code></pre>
+     * Call directly on any function. Example: <code>myFunction.createCallback(myarg, myarg2)</code>
+     * Will create a function that is bound to those 2 args.
      * @return {Function} The new function
     */
     createCallback : function(/*args...*/){
@@ -677,28 +645,8 @@ new Ext.Button({
 
     /**
      * Creates a delegate (callback) that sets the scope to obj.
-     * Call directly on any function. Example: <code>this.myFunction.createDelegate(this, [arg1, arg2])</code>
-     * Will create a function that is automatically scoped to obj so that the <tt>this</tt> variable inside the
-     * callback points to obj. Example usage:
-     * <pre><code>
-var sayHi = function(name){
-    // Note this use of "this.text" here.  This function expects to
-    // execute within a scope that contains a text property.  In this
-    // example, the "this" variable is pointing to the btn object that
-    // was passed in createDelegate below.
-    alert('Hi, ' + name + '. You clicked the "' + this.text + '" button.');
-}
-
-var btn = new Ext.Button({
-    text: 'Say Hi',
-    renderTo: Ext.getBody()
-});
-
-// This callback will execute in the scope of the
-// button instance. Clicking the button alerts 
-// "Hi, Fred. You clicked the "Say Hi" button."
-btn.on('click', sayHi.createDelegate(btn, ['Fred']));
-</code></pre>
+     * Call directly on any function. Example: <code>this.myFunction.createDelegate(this)</code>
+     * Will create a function that is automatically scoped to this.
      * @param {Object} obj (optional) The object for which the scope is set
      * @param {Array} args (optional) Overrides arguments for the call. (Defaults to the arguments passed by the caller)
      * @param {Boolean/Number} appendArgs (optional) if True args are appended to call args instead of overriding,
@@ -722,24 +670,7 @@ btn.on('click', sayHi.createDelegate(btn, ['Fred']));
     },
 
     /**
-     * Calls this function after the number of millseconds specified, optionally in a specific scope. Example usage:
-     * <pre><code>
-var sayHi = function(name){
-    alert('Hi, ' + name);
-}
-
-// executes immediately:
-sayHi('Fred');
-
-// executes after 2 seconds:
-sayHi.defer(2000, this, ['Fred']);
-
-// this syntax is sometimes useful for deferring 
-// execution of an anonymous function:
-(function(){
-    alert('Anonymous');
-}).defer(100);
-</code></pre>
+     * Calls this function after the number of millseconds specified.
      * @param {Number} millis The number of milliseconds for the setTimeout call (if 0 the function is executed immediately)
      * @param {Object} obj (optional) The object for which the scope is set
      * @param {Array} args (optional) Overrides arguments for the call. (Defaults to the arguments passed by the caller)
@@ -755,24 +686,10 @@ sayHi.defer(2000, this, ['Fred']);
         fn();
         return 0;
     },
-    
     /**
      * Create a combined function call sequence of the original function + the passed function.
      * The resulting function returns the results of the original function.
-     * The passed fcn is called with the parameters of the original function. Example usage:
-     * <pre><code>
-var sayHi = function(name){
-    alert('Hi, ' + name);
-}
-
-sayHi('Fred'); // alerts "Hi, Fred"
-
-var sayGoodbye = sayHi.createSequence(function(name){
-    alert('Bye, ' + name);
-});
-
-sayGoodbye('Fred'); // both alerts show
-</code></pre>
+     * The passed fcn is called with the parameters of the original function
      * @param {Function} fcn The function to sequence
      * @param {Object} scope (optional) The scope of the passed fcn (Defaults to scope of original function or window)
      * @return {Function} The new function
@@ -790,25 +707,10 @@ sayGoodbye('Fred'); // both alerts show
     },
 
     /**
-     * Creates an interceptor function. The passed fcn is called before the original one. If it returns false, 
-     * the original one is not called. The resulting function returns the results of the original function.
-     * The passed fcn is called with the parameters of the original function. Example usage:
-     * <pre><code>
-var sayHi = function(name){
-    alert('Hi, ' + name);
-}
-
-sayHi('Fred'); // alerts "Hi, Fred"
-
-// create a new function that validates input without
-// directly modifying the original function:
-var sayHiToFriend = sayHi.createInterceptor(function(name){
-    return name == 'Brian';
-});
-
-sayHiToFriend('Fred');  // no alert
-sayHiToFriend('Brian'); // alerts "Hi, Brian"
-</code></pre>
+     * Creates an interceptor function. The passed fcn is called before the original one. If it returns false, the original one is not called.
+     * The resulting function returns the results of the original function.
+     * The passed fcn is called with the parameters of the original function.
+     * @addon
      * @param {Function} fcn The function to call before the original
      * @param {Object} scope (optional) The scope of the passed fcn (Defaults to scope of original function or window)
      * @return {Function} The new function
@@ -874,8 +776,8 @@ var s = String.leftPad('123', 5, '0');
      * token must be unique, and must increment in the format {0}, {1}, etc.  Example usage:
      * <pre><code>
 var cls = 'my-class', text = 'Some text';
-var s = String.format('&lt;div class="{0}">{1}&lt;/div>', cls, text);
-// s now contains the string: '&lt;div class="my-class">Some text&lt;/div>'
+var s = String.format('<div class="{0}">{1}</div>', cls, text);
+// s now contains the string: '<div class="my-class">Some text</div>'
 </code></pre>
      * @param {String} string The tokenized string to be formatted
      * @param {String} value1 The value to replace token {0}

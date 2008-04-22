@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.1
+ * Ext JS Library 2.0.2
  * Copyright(c) 2006-2008, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -34,13 +34,10 @@ grid             Ext.grid.GridPanel
 paging           Ext.PagingToolbar
 panel            Ext.Panel
 progress         Ext.ProgressBar
-propertygrid     Ext.grid.PropertyGrid
-slider           Ext.Slider
 splitbutton      Ext.SplitButton
-statusbar        Ext.StatusBar
 tabpanel         Ext.TabPanel
 treepanel        Ext.tree.TreePanel
-viewport         Ext.Viewport
+viewport         Ext.ViewPort
 window           Ext.Window
 
 Toolbar components
@@ -64,7 +61,6 @@ field            Ext.form.Field
 fieldset         Ext.form.FieldSet
 hidden           Ext.form.Hidden
 htmleditor       Ext.form.HtmlEditor
-label            Ext.form.Label
 numberfield      Ext.form.NumberField
 radio            Ext.form.Radio
 textarea         Ext.form.TextArea
@@ -255,12 +251,6 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
      * @cfg {String} cls
      * An optional extra CSS class that will be added to this component's Element (defaults to '').  This can be
      * useful for adding customized styles to the component or any of its children using standard CSS rules.
-     */
-    /**
-     * @cfg {String} overCls
-     * An optional extra CSS class that will be added to this component's Element when the mouse moves
-     * over the Element, and removed when the mouse moves out. (defaults to '').  This can be
-     * useful for adding customized "active" or "hover" styles to the component or any of its children using standard CSS rules.
      */
     /**
      * @cfg {String} style
@@ -573,9 +563,6 @@ Ext.Foo = Ext.extend(Ext.Bar, {
             if(this.allowDomMove !== false){
                 ct.dom.insertBefore(this.el.dom, position);
             }
-            if(this.overCls) {
-                this.el.addClassOnOver(this.overCls);
-            }   
         }
     },
 
@@ -887,23 +874,6 @@ alert(t.getXTypes());  // alerts 'component/box/field/textfield'
             this.findParentBy(function(p){
                 return p.constructor.xtype === xtype;
             });
-    },
-
-    // internal function for auto removal of assigned event handlers on destruction
-    mon : function(item, ename, fn, scope, opt){
-        if(!this.mons){
-            this.mons = [];
-            this.on('beforedestroy', function(){
-                for(var i= 0, len = this.mons.length; i < len; i++){
-                    var m = this.mons[i];
-                    m.item.un(m.ename, m.fn, m.scope);
-                }
-            }, this);
-        }
-        this.mons.push({
-            item: item, ename: ename, fn: fn, scope: scope
-        });
-        item.on(ename, fn, scope, opt);
     }
 });
 

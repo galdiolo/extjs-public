@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.1
+ * Ext JS Library 2.0.2
  * Copyright(c) 2006-2008, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -244,8 +244,6 @@ Ext.tree.TreeNodeUI.prototype = {
     // private
     onCheckChange : function(){
         var checked = this.checkbox.checked;
-		// fix for IE6
-		this.checkbox.defaultChecked = checked;
         this.node.attributes.checked = checked;
         this.fireEvent('checkchange', this.node, checked);
     },
@@ -299,7 +297,6 @@ Ext.tree.TreeNodeUI.prototype = {
         var cb = this.checkbox;
         if(cb){
             cb.checked = (value === undefined ? !cb.checked : value);
-            this.onCheckChange();
         }
     },
 
@@ -464,8 +461,6 @@ Ext.tree.TreeNodeUI.prototype = {
         var index = 3;
         if(cb){
             this.checkbox = cs[3];
-			// fix for IE6
-			this.checkbox.defaultChecked = this.checkbox.checked;			
             index++;
         }
         this.anchor = cs[index];

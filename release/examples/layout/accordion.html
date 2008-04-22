@@ -31,33 +31,23 @@
         Ext.onReady(function() {
 
             var item1 = new Ext.Panel({
-                title: 'Accordion Item 1',
-                html: '&lt;empty panel&gt;',
-                cls:'empty'
+                title: 'Accordion Item 1'
             });
 
             var item2 = new Ext.Panel({
-                title: 'Accordion Item 2',
-                html: '&lt;empty panel&gt;',
-                cls:'empty'
+                 title: 'Accordion Item 2'
             });
 
             var item3 = new Ext.Panel({
-                title: 'Accordion Item 3',
-                html: '&lt;empty panel&gt;',
-                cls:'empty'
+                 title: 'Accordion Item 3'
             });
 
             var item4 = new Ext.Panel({
-                title: 'Accordion Item 4',
-                html: '&lt;empty panel&gt;',
-                cls:'empty'
+                 title: 'Accordion Item 4'
             });
 
             var item5 = new Ext.Panel({
-                title: 'Accordion Item 5',
-                html: '&lt;empty panel&gt;',
-                cls:'empty'
+                 title: 'Accordion Item 5'
             });
 
             var accordion = new Ext.Panel({
@@ -66,6 +56,7 @@
                 split:true,
                 width: 210,
                 layout:'accordion',
+                defaults: {html: '&lt;empty panel&gt;', cls:'empty'},
                 items: [item1, item2, item3, item4, item5]
             });
 
@@ -84,6 +75,6 @@
     </script>
 </head>
 <body>
-<script type="text/javascript" src="../shared/examples.js"></script><!-- EXAMPLES -->
+<script type="text/javascript" src="../examples.js"></script><!-- EXAMPLES -->
 </body>
 </html>
