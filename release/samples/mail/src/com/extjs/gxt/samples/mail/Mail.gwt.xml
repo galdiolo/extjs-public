@@ -1,0 +1,5 @@
+<module>
+  <inherits name='com.extjs.gxt.samples.resources.Resources' />
+  <stylesheet src="Mail.css" />
+  <entry-point class='com.extjs.gxt.samples.mail.client.Mail'/>
+</module>
