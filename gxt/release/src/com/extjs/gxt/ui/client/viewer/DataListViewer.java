@@ -29,7 +29,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class DataListViewer extends StructuredViewer implements Checkable {
 
-  private DataList<DataListItem> dataList;
+  private DataList dataList;
   private ArrayList<CheckStateListener> checkChangeListener;
 
   @Override
@@ -166,13 +166,11 @@ public class DataListViewer extends StructuredViewer implements Checkable {
       return;
     }
     List<Object> selectedElements = elementSelection.toList();
-    int ct = dataList.getItemCount();
-    for (int i = 0; i < ct; i++) {
-      DataListItem item = dataList.getItem(i);
+    for (DataListItem item : dataList.getItems()) {
       Object itemElement = item.getData();
       if (selectedElements.contains(itemElement)) {
-        dataList.select(i);
-      } 
+        dataList.select(item);
+      }
     }
   }
 
@@ -197,7 +195,7 @@ public class DataListViewer extends StructuredViewer implements Checkable {
   @Override
   protected List<Object> getSelectedFromWidget() {
     List<Object> selection = new ArrayList<Object>();
-    for (DataListItem item : dataList.getSelection()) {
+    for (DataListItem item : dataList.getSelectedItems()) {
       selection.add(getElementFromItem(item));
     }
     return selection;

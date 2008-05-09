@@ -71,10 +71,11 @@ public class SplitBar extends BoxComponent {
   static {
     shim = new Html();
     shim.shim = true;
-    shim.setStyleName("my-splitbar-shim");
+    shim.setStyleName("x-splitbar-shim");
     shim.setSize("2000", "2000");
     shim.setStyleAttribute("position", "absolute");
     RootPanel.get().add(shim);
+    shim.el.setStyleAttribute("opacity", 0);
     shim.setVisible(false);
     attachedBars = new ArrayList<SplitBar>();
 
@@ -93,43 +94,13 @@ public class SplitBar extends BoxComponent {
     delayedTask.delay(400);
   }
 
-  /**
-   * The minimum size of the resize widget (defaults to 10).
-   */
-  public int minSize = 10;
-
-  /**
-   * The maximum size of the resize widget (defaults to 2000).
-   */
-  public int maxSize = 2000;
-
-  /**
-   * The width of drag proxy during resizing (defaults to 2).
-   */
-  public int barWidth = 2;
-
-  /**
-   * The width of the drag handles (defaults to 5).
-   */
-  public int handleWidth = 5;
-
-  /**
-   * True to update the size of the the resize widget after a drag operation
-   * using a proxy (defaults to true).
-   */
-  public boolean autoSize = true;
-
-  /**
-   * Sets the amount of pixels the bar should be offset to the top (defaults to
-   * 0).
-   */
-  public int yOffset = 0;
-
-  /**
-   * The amount of pixels the bar should be offset to the left (defaults to 0).
-   */
-  public int xOffset = 0;
-
+  private boolean autoSize = true;
+  private int yOffset = 0;
+  private int xOffset = 0;
+  private int minSize = 10;
+  private int maxSize = 2000;
+  private int handleWidth = 5;
+  private int barWidth = 2;
   private El resizeEl;
   private BoxComponent resizeWidget;
   private BoxComponent containerWidget;
@@ -149,6 +120,8 @@ public class SplitBar extends BoxComponent {
     this.region = style;
     this.resizeWidget = resizeWidget;
     this.resizeEl = resizeWidget.el;
+    
+    super.shim = true;
 
     listener = new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent ce) {
@@ -237,12 +210,46 @@ public class SplitBar extends BoxComponent {
   }
 
   /**
+   * Returns the bar width.
+   * 
+   * @return the bar width
+   */
+  public int getBarWidth() {
+    return barWidth;
+  }
+
+  /**
    * Returns the split bar's draggable instance.
    * 
    * @return the draggable instance
    */
   public Draggable getDraggable() {
     return draggable;
+  }
+
+  /**
+   * Returns the handle width.
+   * 
+   * @return the handle width
+   */
+  public int getHandleWidth() {
+    return handleWidth;
+  }
+
+  /**
+   * Returns the maxiumum size.
+   * 
+   * @return the max size
+   */
+  public int getMaxSize() {
+    return maxSize;
+  }
+
+  /**
+   * @return the minSize
+   */
+  public int getMinSize() {
+    return minSize;
   }
 
   /**
@@ -255,6 +262,33 @@ public class SplitBar extends BoxComponent {
   }
 
   /**
+   * Returns the x offset.
+   * 
+   * @return the xOffset the x offset value
+   */
+  public int getXOffset() {
+    return xOffset;
+  }
+
+  /**
+   * Returns the y offset.
+   * 
+   * @return the y offset
+   */
+  public int getYOffset() {
+    return yOffset;
+  }
+
+  /**
+   * Returns the auto size state.
+   * 
+   * @return true if auto size is enabled
+   */
+  public boolean isAutoSize() {
+    return autoSize;
+  }
+
+  /**
    * Removes the split bar from the resize widget.
    */
   public void release() {
@@ -262,6 +296,71 @@ public class SplitBar extends BoxComponent {
     resizeWidget.removeListener(Events.Detach, listener);
     resizeWidget.removeListener(Events.Resize, listener);
     RootPanel.get().remove(this);
+  }
+
+  /**
+   * True to update the size of the the resize widget after a drag operation
+   * using a proxy (defaults to true).
+   * 
+   * @param autoSize the auto size state
+   */
+  public void setAutoSize(boolean autoSize) {
+    this.autoSize = autoSize;
+  }
+
+  /**
+   * Sets the width of drag proxy during resizing (defaults to 2).
+   * 
+   * @param barWidth the bar width
+   */
+  public void setBarWidth(int barWidth) {
+    this.barWidth = barWidth;
+  }
+
+  /**
+   * Sets the width of the drag handles (defaults to 5).
+   * 
+   * @param handleWidth the handle width
+   */
+  public void setHandleWidth(int handleWidth) {
+    this.handleWidth = handleWidth;
+  }
+
+  /**
+   * Sets the maximum size of the resize widget (defaults to 2000).
+   * 
+   * @param maxSize the maximum size
+   */
+  public void setMaxSize(int maxSize) {
+    this.maxSize = maxSize;
+  }
+
+  /**
+   * Sets he minimum size of the resize widget (defaults to 10).
+   * 
+   * @param minSize the minimum size
+   */
+  public void setMinSize(int minSize) {
+    this.minSize = minSize;
+  }
+
+  /**
+   * The amount of pixels the bar should be offset to the left (defaults to 0).
+   * 
+   * @param xOffset the xOffset to set
+   */
+  public void setXOffset(int xOffset) {
+    this.xOffset = xOffset;
+  }
+
+  /**
+   * Sets the amount of pixels the bar should be offset to the top (defaults to
+   * 0).
+   * 
+   * @param yOffset the yOffset to set
+   */
+  public void setYOffset(int yOffset) {
+    this.yOffset = yOffset;
   }
 
   public void sync() {
@@ -282,16 +381,18 @@ public class SplitBar extends BoxComponent {
 
     switch (region) {
       case SOUTH:
-        el.setBounds(x + yOffset, y + h + xOffset, w, handleWidth, false);
+        el.setBounds(x + getYOffset(), y + h + getXOffset(), w, getHandleWidth(), false);
         break;
       case WEST:
-        el.setBounds(x - barWidth + yOffset, y + xOffset, handleWidth, h, false);
+        el.setBounds(x - getBarWidth() + getYOffset(), y + getXOffset(),
+            getHandleWidth(), h, false);
         break;
       case NORTH:
-        el.setBounds(x + yOffset, y - barWidth + xOffset, w, handleWidth, false);
+        el.setBounds(x + getYOffset(), y - getBarWidth() + getXOffset(), w,
+            getHandleWidth(), false);
         break;
       case EAST:
-        el.setBounds(x + w + yOffset, y + xOffset, handleWidth, h, false);
+        el.setBounds(x + w + getYOffset(), y + getXOffset(), getHandleWidth(), h, false);
         break;
     }
 
@@ -321,21 +422,21 @@ public class SplitBar extends BoxComponent {
     switch (region) {
       case NORTH: {
         be.size = height - diffY;
-        if (autoSize) {
+        if (isAutoSize()) {
           resizeEl.setY(y).setHeight(height);
         }
         break;
       }
       case SOUTH: {
         be.size = height + diffY;
-        if (autoSize) {
+        if (isAutoSize()) {
           resizeWidget.setHeight(diffY);
         }
         break;
       }
       case WEST: {
         be.size = width - diffX;
-        if (autoSize) {
+        if (isAutoSize()) {
           el.setX(x);
           resizeWidget.setWidth(width - diffX);
         }
@@ -343,7 +444,7 @@ public class SplitBar extends BoxComponent {
       }
       case EAST: {
         be.size = width + diffX;
-        if (autoSize) {
+        if (isAutoSize()) {
           resizeWidget.setWidth(diffX);
         }
         break;
@@ -360,15 +461,15 @@ public class SplitBar extends BoxComponent {
   private void onStartDrag(DragEvent de) {
     // adjust width of proxy
     if (region == LayoutRegion.WEST || region == LayoutRegion.EAST) {
-      de.width = barWidth;
+      de.width = getBarWidth();
     } else {
-      de.height = barWidth;
+      de.height = getBarWidth();
     }
-    
+
     SplitBarEvent se = new SplitBarEvent(this);
     se.dragEvent = de;
     fireEvent(Events.DragStart, se);
-    
+
     shim.setVisible(true);
     shim.show();
     shim.el.makePositionable(true);
@@ -403,11 +504,11 @@ public class SplitBar extends BoxComponent {
       size = resizeEl.getHeight();
     }
 
-    int c1 = size - minSize;
-    if (size < minSize) {
+    int c1 = size - getMinSize();
+    if (size < getMinSize()) {
       c1 = 0;
     }
-    int c2 = Math.max(maxSize - size, 0);
+    int c2 = Math.max(getMaxSize() - size, 0);
     if (v) {
       draggable.constrainVertical = true;
       draggable.setXConstraint(region == LayoutRegion.WEST ? c2 : c1,

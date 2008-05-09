@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.ui.client.widget.tips;
 
-
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
@@ -15,6 +14,7 @@ import com.extjs.gxt.ui.client.util.Point;
 import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.ToolButton;
+import com.extjs.gxt.ui.client.widget.Shadow.ShadowPosition;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.RootPanel;
 
@@ -27,37 +27,12 @@ import com.google.gwt.user.client.ui.RootPanel;
  */
 public class Tip extends ContentPanel {
 
-  /**
-   * True to render a close tool button into the tooltip header (defaults to
-   * false).
-   */
-  public boolean closable;
-
-  /**
-   * Width in pixels of the tip (defaults to DEFAULT). Width will be ignored if it
-   * exceeds the bounds of {@link #minWidth} or {@link #maxWidth}. The maximum
-   * supported value is 500.
-   */
-  public int width = Style.DEFAULT;
-
-  /**
-   * The minimum width of the tip in pixels (defaults to 40).
-   */
-  public int minWidth = 40;
-
-  /**
-   * The maximum width of the tip in pixels (defaults to 300). The maximum
-   * supported value is 500.
-   */
-  public int maxWidth = 300;
-
-  /**
-   * True or "sides" for the default effect, "frame" for 4-way shadow, and
-   * "drop" for bottom-right shadow (defaults to "sides").
-   */
-  public String shadowPosition = "sides";
-
   protected int quickShowInterval = 250;
+
+  private ShadowPosition shadowPosition = ShadowPosition.SIDES;
+  private int minWidth = 40;
+  private int maxWidth = 300;
+  private boolean closable;
 
   /**
    * Creates a new tip instance.
@@ -66,17 +41,82 @@ public class Tip extends ContentPanel {
     frame = true;
     baseStyle = "x-tip";
     shim = true;
-    autoHeight = true;
-    shadow = true;
+    setAutoHeight(true);
+    setShadow(true);
   }
 
   /**
-   * Shows this tip at the specified position.
+   * Returns the maximum width.
    * 
-   * @param point the position
+   * @return the max width
    */
-  public void showAt(Point point) {
-    showAt(point.x, point.y);
+  public int getMaxWidth() {
+    return maxWidth;
+  }
+
+  /**
+   * Returns the minimum width.
+   * 
+   * @return the minimum width
+   */
+  public int getMinWidth() {
+    return minWidth;
+  }
+
+  /**
+   * Returns the shadow position.
+   * 
+   * @return the shadow position
+   */
+  public ShadowPosition getShadowPosition() {
+    return shadowPosition;
+  }
+
+  /**
+   * Returns true if the tip is closable.
+   * 
+   * @return the closable state
+   */
+  public boolean isClosable() {
+    return closable;
+  }
+
+  /**
+   * True to render a close tool button into the tooltip header (defaults to
+   * false).
+   * 
+   * @param closable the closable state
+   */
+  public void setClosable(boolean closable) {
+    this.closable = closable;
+  }
+
+  /**
+   * Sets he maximum width of the tip in pixels (defaults to 300). The maximum
+   * supported value is 500.
+   * 
+   * @param maxWidth the max width
+   */
+  public void setMaxWidth(int maxWidth) {
+    this.maxWidth = maxWidth;
+  }
+
+  /**
+   * Sets the minimum width of the tip in pixels (defaults to 40).
+   * 
+   * @param minWidth the min width
+   */
+  public void setMinWidth(int minWidth) {
+    this.minWidth = minWidth;
+  }
+
+  /**
+   * Sets the shadow position (defauts to SIDES).
+   * 
+   * @param shadowPosition the shadow position
+   */
+  public void setShadowPosition(ShadowPosition shadowPosition) {
+    this.shadowPosition = shadowPosition;
   }
 
   /**
@@ -91,34 +131,44 @@ public class Tip extends ContentPanel {
     updateContent();
     el.setVisibility(true);
     el.setVisible(true);
-    if (width == Style.DEFAULT) {
+    if (attachSize.width == Style.DEFAULT) {
       Element body = getElement("body");
       int bw = fly(body).getTextWidth() + 10;
       if (title != null) {
         bw = Math.max(bw, head.el.child("span").getTextWidth());
       }
-      bw += getFrameWidth() + (closable ? 20 : 0) + fly(body).getPadding("lr");
-      setWidth(Util.constrain(bw, minWidth, maxWidth));
+      bw += getFrameWidth() + (isClosable() ? 20 : 0) + fly(body).getPadding("lr");
+      setWidth(Util.constrain(bw, getMinWidth(), getMaxWidth()));
     }
     Point p = new Point(x, y);
     p = el.adjustForConstraints(p);
     setPagePosition(p.x, p.y);
   }
-  
-  protected void updateContent() {
-    
+
+  /**
+   * Shows this tip at the specified position.
+   * 
+   * @param point the position
+   */
+  public void showAt(Point point) {
+    showAt(point.x, point.y);
   }
 
+  @Override
   protected void onRender(Element parent, int pos) {
-    if (closable) {
-      header = true;
-      head.addTool(new ToolButton("my-tool-close", new SelectionListener() {
+    if (isClosable()) {
+      setHeaderVisible(true);
+      head.addTool(new ToolButton("x-tool-close", new SelectionListener() {
         public void componentSelected(ComponentEvent ce) {
           hide();
         }
       }));
     }
     super.onRender(parent, pos);
+  }
+
+  protected void updateContent() {
+
   }
 
 }

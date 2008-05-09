@@ -43,7 +43,6 @@ public class BorderLayout extends Layout {
 
   protected Map<LayoutRegion, SplitBar> splitBars;
   private Listener collapseListener;
-  private int containerHeight, containerWidth;
   private int minimumSize = 100;
   private BoxComponent north, south;
   private BoxComponent west, east, center;
@@ -94,8 +93,6 @@ public class BorderLayout extends Layout {
     Rectangle rect = target.getBounds();
     int w = rect.width;
     int h = rect.height;
-    containerWidth = w;
-    containerHeight = h;
     int centerW = w, centerH = h, centerY = 0, centerX = 0;
 
     north = getRegionWidget(LayoutRegion.NORTH);
@@ -309,23 +306,23 @@ public class BorderLayout extends Layout {
                   if (data.maxSize > 0) {
                     max = Math.min(max, data.maxSize);
                   }
-                  fBar.minSize = min;
-                  fBar.maxSize = max;
+                  fBar.setMinSize(min);
+                  fBar.setMaxSize(max);
                   break;
                 }
                 case EAST: {
                   int min = Math.max(minimumSize, data.minSize);
                   int max = west.getOffsetWidth() + center.getOffsetWidth() - minimumSize;
                   max = Math.min(data.maxSize, max);
-                  fBar.minSize = min;
-                  fBar.maxSize = max;
+                  fBar.setMinSize(min);
+                  fBar.setMaxSize(max);
                   break;
                 }
                 case NORTH:
                   int max = south.getOffsetHeight() + center.getOffsetHeight()
                       - minimumSize;
                   max = Math.min(max, data.maxSize);
-                  fBar.maxSize = max;
+                  fBar.setMaxSize(max);
                   break;
                 case SOUTH:
                   // TODO
@@ -338,25 +335,15 @@ public class BorderLayout extends Layout {
       component.setData("splitBar", bar);
 
       bar.addListener(Events.DragStart, splitBarListener);
-      bar.minSize = data.minSize;
-      bar.maxSize = data.maxSize == 0 ? bar.maxSize : data.maxSize;
-      bar.autoSize = false;
+      bar.setMinSize(data.minSize);
+      bar.setMaxSize(data.maxSize == 0 ? bar.getMaxSize() : data.maxSize);
+      bar.setAutoSize(false);
       bar.addListener(Events.Resize, new Listener<SplitBarEvent>() {
         public void handleEvent(SplitBarEvent sbe) {
           if (sbe.size < 1) {
             return;
           }
-          if (data.size < 1.1) {
-            float size = 0;
-            if (region == LayoutRegion.SOUTH || region == LayoutRegion.NORTH) {
-              size = containerHeight;
-            } else {
-              size = containerWidth;
-            }
-            data.size = sbe.size / size;
-          } else {
-            data.size = sbe.size;
-          }
+          data.size = sbe.size;
           Component c = sbe.splitBar.getResizeWidget();
           Map<String, Object> state = c.getState();
           state.put("size", data.size);

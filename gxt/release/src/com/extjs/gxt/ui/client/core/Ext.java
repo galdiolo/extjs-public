@@ -643,7 +643,26 @@ class Ext {
                      }
                      return null;
                  };
-         }(),  
+         }(), 
+          getStyleSize : function(){
+              var w, h, d = this.dom, s = d.style;
+              if(s.width && s.width != 'auto'){
+                  w = parseInt(s.width, 10);
+                  if($wnd.Ext.isBorderBox){
+                     w -= this.getFrameWidth('lr');
+                  }
+              }
+              if(s.height && s.height != 'auto'){
+                  h = parseInt(s.height, 10);
+                  if($wnd.Ext.isBorderBox){
+                     h -= this.getFrameWidth('tb');
+                  }
+              }
+              return {width: w || this.getWidth(true), height: h || this.getHeight(true)};
+      
+          },
+
+
           getTop : function(local) {
               if(!local){
                   return this.getY();
@@ -768,44 +787,54 @@ class Ext {
               return this;
           },
           
-         setVisibilityMode : function(visMode){
-             this.visibilityMode = visMode;
+           setOpacity : function(opacity){
+                  var s = this.dom.style;
+                  if(Ext.isIE){
+                      s.zoom = 1;
+                      s.filter = (s.filter || '').replace(/alpha\([^\)]*\)/gi,"") +
+                                 (opacity == 1 ? "" : " alpha(opacity=" + opacity * 100 + ")");
+                  }else{
+                      s.opacity = opacity;
+                  }
+              return this;
+          },
+          
+          
+          
+          setVisibilityMode : function(visMode){
+               this.visibilityMode = visMode;
+               return this;
+          },
+          setY : function(y){
+              D.setY(this.dom, y);
+              return this;
+          },
+          setX : function(x){
+              D.setX(this.dom, x);
+              return this;
+          },
+          setXY : function(pos){
+             D.setXY(this.dom, pos);
              return this;
-         },
-        setY : function(y){
-            D.setY(this.dom, y);
-            return this;
-        },
-        setX : function(x){
-            D.setX(this.dom, x);
-            return this;
-        },
-        setXY : function(pos){
-           D.setXY(this.dom, pos);
-           return this;
-        },
-        
-        
-         setStyle : function(prop, value){
-             if(typeof prop == "string"){
-                 var camel;
-                 if(!(camel = propCache[prop])){
-                     camel = propCache[prop] = prop.replace(camelRe, camelFn);
-                 }
-                 if(camel == 'opacity') {
-                     this.setOpacity(value);
-                 }else{
-                     this.dom.style[camel] = value;
-                 }
-             }else{
-                 for(var style in prop){
-                     if(typeof prop[style] != "function"){
-                        this.setStyle(style, prop[style]);
-                     }
-                 }
-             }
-             return this;
-         },
+          },
+          
+                  
+          setStyle : function(prop, value){
+               if(typeof prop == "string"){
+                   if(prop == 'opacity') {
+                       this.setOpacity(value);
+                   }else{
+                       this.dom.style[prop] = value;
+                   }
+               }else{
+                   for(var style in prop){
+                       if(typeof prop[style] != "function"){
+                          this.setStyle(style, prop[style]);
+                       }
+                   }
+               }
+               return this;
+          },
         
         translatePoints : function(el, x, y){
             var dom = el.dom;

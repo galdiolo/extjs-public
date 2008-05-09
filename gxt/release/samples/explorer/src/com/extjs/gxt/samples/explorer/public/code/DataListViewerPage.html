@@ -81,14 +81,14 @@ public class DataListViewerPage extends Container implements EntryPoint {
     setLayout(layout);
 
     DataList list = new DataList();
-    list.flat = true;
-    list.selectionMode = SelectionMode.MULTI;
+    list.setFlatStyle(true);
+    list.setSelectionMode(SelectionMode.MULTI);
 
     ContentPanel panel = new ContentPanel();
-    panel.frame = true;
-    panel.collapsible = true;
-    panel.animCollapse = false;
-    panel.buttonAlign = HorizontalAlignment.CENTER;
+    panel.setFrame(true);
+    panel.setCollapsible(true);
+    panel.setAnimCollapse(false);
+    panel.setButtonAlign(HorizontalAlignment.CENTER);
     panel.setIconStyle("icon-list");
     panel.setHeading("DataListViewer Demo");
     panel.setLayout(new FitLayout());

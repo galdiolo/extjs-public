@@ -20,7 +20,8 @@ import com.google.gwt.user.client.ui.KeyboardListener;
 /**
  * Convenient helper class to process a component's key events.
  */
-public class KeyNav extends Observable implements Listener<ComponentEvent> {
+public class KeyNav<E extends ComponentEvent> extends Observable implements
+    Listener<E> {
 
   private static int keyEvent;
   private Component component;
@@ -130,126 +131,131 @@ public class KeyNav extends Observable implements Listener<ComponentEvent> {
     }
     if (ce.type == keyEvent) {
       int code = ce.getKeyCode();
-      ComponentEvent c = new ComponentEvent(component, ce.event);
-      c.component = component;
-      c.event = ce.event;
+
+      E e = (E) ce;
+
+      onKeyPress(e);
 
       switch (code) {
         case KeyboardListener.KEY_ALT:
-          onAlt(c);
+          onAlt(e);
           break;
         case KeyboardListener.KEY_BACKSPACE:
-          onBackspace(c);
+          onBackspace(e);
           break;
         case KeyboardListener.KEY_CTRL:
-          onControl(c);
+          onControl(e);
           break;
         case KeyboardListener.KEY_DELETE:
-          onDelete(c);
+          onDelete(e);
           break;
         case KeyboardListener.KEY_DOWN:
-          onDown(c);
+          onDown(e);
           break;
         case KeyboardListener.KEY_END:
-          onEnd(c);
+          onEnd(e);
           break;
         case KeyboardListener.KEY_ENTER:
-          onEnter(c);
+          onEnter(e);
           break;
         case KeyboardListener.KEY_ESCAPE:
-          onEsc(c);
+          onEsc(e);
           break;
         case KeyboardListener.KEY_HOME:
-          onHome(c);
+          onHome(e);
           break;
         case KeyboardListener.KEY_LEFT:
-          onLeft(c);
+          onLeft(e);
           break;
         case KeyboardListener.KEY_PAGEDOWN:
-          onPageDown(c);
+          onPageDown(e);
           break;
         case KeyboardListener.KEY_PAGEUP:
-          onPageUp(c);
+          onPageUp(e);
           break;
         case KeyboardListener.KEY_SHIFT:
-          onShift(c);
+          onShift(e);
           break;
         case KeyboardListener.KEY_TAB:
-          onTab(c);
+          onTab(e);
           break;
         case KeyboardListener.KEY_RIGHT:
-          onRight(c);
+          onRight(e);
           break;
         case KeyboardListener.KEY_UP:
-          onUp(c);
+          onUp(e);
           break;
       }
 
-      fireEvent(code, c);
+      fireEvent(code, e);
     }
   }
 
-  public void onAlt(ComponentEvent ce) {
+  public void onKeyPress(E ce) {
 
   }
 
-  public void onBackspace(ComponentEvent ce) {
+  public void onAlt(E ce) {
 
   }
 
-  public void onControl(ComponentEvent ce) {
+  public void onBackspace(E ce) {
 
   }
 
-  public void onDelete(ComponentEvent ce) {
+  public void onControl(E ce) {
 
   }
 
-  public void onDown(ComponentEvent ce) {
+  public void onDelete(E ce) {
 
   }
 
-  public void onEnd(ComponentEvent ce) {
+  public void onDown(E ce) {
 
   }
 
-  public void onEnter(ComponentEvent ce) {
+  public void onEnd(E ce) {
 
   }
 
-  public void onEsc(ComponentEvent ce) {
+  public void onEnter(E ce) {
 
   }
 
-  public void onHome(ComponentEvent ce) {
+  public void onEsc(E ce) {
 
   }
 
-  public void onLeft(ComponentEvent ce) {
+  public void onHome(E ce) {
 
   }
 
-  public void onPageDown(ComponentEvent ce) {
+  public void onLeft(E ce) {
 
   }
 
-  public void onPageUp(ComponentEvent ce) {
+  public void onPageDown(E ce) {
 
   }
 
-  public void onRight(ComponentEvent ce) {
+  public void onPageUp(E ce) {
 
   }
 
-  public void onShift(ComponentEvent ce) {
+  public void onRight(E ce) {
 
   }
 
-  public void onTab(ComponentEvent ce) {
+  public void onShift(E ce) {
 
   }
 
-  public void onUp(ComponentEvent ce) {
+  public void onTab(E ce) {
+
+  }
+
+  public void onUp(E ce) {
 
   }
 

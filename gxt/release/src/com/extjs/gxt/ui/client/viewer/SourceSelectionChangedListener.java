@@ -7,6 +7,9 @@
  *******************************************************************************/
 package com.extjs.gxt.ui.client.viewer;
 
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
+
 public class SourceSelectionChangedListener implements SelectionChangedListener {
 
   private SelectionProvider provider;
@@ -15,11 +18,16 @@ public class SourceSelectionChangedListener implements SelectionChangedListener 
     this.provider = provider;
   }
 
-  public void selectionChanged(SelectionChangedEvent event) {
+  public void selectionChanged(final SelectionChangedEvent event) {
     SelectionProvider eventProvider = event.getSelectionProvider();
     if (eventProvider != provider) {
       if (provider.getSelection().getFirstElement() != eventProvider.getSelection().getFirstElement()) {
-        provider.setSelection(event.getSelection());
+        DeferredCommand.addCommand(new Command() {
+          public void execute() {
+            provider.setSelection(event.getSelection());
+          }
+        });
+       
       }
     }
   }

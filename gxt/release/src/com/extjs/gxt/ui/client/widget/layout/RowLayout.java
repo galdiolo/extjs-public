@@ -11,11 +11,10 @@
  *******************************************************************************/
 package com.extjs.gxt.ui.client.widget.layout;
 
-
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.core.El;
-import com.extjs.gxt.ui.client.util.Rectangle;
+import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.Layout;
@@ -40,7 +39,7 @@ public class RowLayout extends Layout {
    * </p>
    */
   public Orientation type = Orientation.VERTICAL;
-  
+
   /**
    * The number of pixels of margin that will be placed along the edges of the
    * layout (default is 0).
@@ -78,15 +77,16 @@ public class RowLayout extends Layout {
   @Override
   protected void onLayout(Container container, El target) {
     super.onLayout(container, target);
+    target.makePositionable();
 
-    Rectangle rect = target.getLayoutBounds();
+    Size s = target.getStyleSize();
 
     int size = container.getItemCount();
 
-    int height = rect.height - (2 * margin);
-    int width = rect.width - (2 * margin);
-    int top = rect.y += margin;
-    int left = rect.x += margin;
+    int height = s.height - (2 * margin);
+    int width = s.width - (2 * margin);
+    int top = margin;
+    int left = margin;
     left -= target.getScrollLeft();
     top -= target.getScrollTop();
 
@@ -107,7 +107,7 @@ public class RowLayout extends Layout {
     for (int i = 0; i < size; i++) {
       Component c = container.getItem(i);
       if (!c.isVisible()) continue;
-      
+
       c.el.makePositionable(true);
 
       RowData data = (RowData) c.getData();
@@ -187,7 +187,8 @@ public class RowLayout extends Layout {
         fw = -1;
       }
 
-      setBounds(c, left, top, fw, fh);
+      c.el.setLeftTop(left, top);
+      setSize(c, fw, fh);
 
       if (type == Orientation.VERTICAL) {
         top = top + h + spacing;

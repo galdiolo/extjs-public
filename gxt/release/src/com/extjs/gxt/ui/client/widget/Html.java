@@ -16,12 +16,7 @@ import com.google.gwt.user.client.Element;
  */
 public class Html extends BoxComponent {
 
-  /**
-   * The HTML tag name that will wrap the text (defaults to 'div'). For inline
-   * behavior set the tag name to 'span'.
-   */
-  public String tagName = "div";
-
+  private String tagName = "div";
   private String html;
 
   /**
@@ -64,9 +59,26 @@ public class Html extends BoxComponent {
   @Override
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
-    setElement(DOM.createElement(tagName), target, index);
+    setElement(DOM.createElement(getTagName()), target, index);
     if (html != null) {
       setHtml(html);
     }
+  }
+
+  /**
+   * The HTML tag name that will wrap the text (defaults to 'div'). For inline
+   * behavior set the tag name to 'span'.
+   * 
+   * @param tagName the new tag name
+   */
+  public void setTagName(String tagName) {
+    this.tagName = tagName;
+  }
+
+  /**
+   * @return the tagName
+   */
+  public String getTagName() {
+    return tagName;
   }
 }

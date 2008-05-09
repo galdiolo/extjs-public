@@ -17,7 +17,6 @@ import com.extjs.gxt.ui.client.widget.tree.Tree;
 import com.extjs.gxt.ui.client.widget.tree.TreeItem;
 import com.extjs.gxt.ui.client.widget.tree.TreeItemUI;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Event;
 
 /**
  * A item in a <code>TreeTable</code>. All events are bubbled to the item's
@@ -26,108 +25,118 @@ import com.google.gwt.user.client.Event;
  * <dl>
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>BeforeAdd</b> : TreeTableEvent(treeTable, item, index)<br>
+ * <dd><b>BeforeAdd</b> : TreeTableEvent(treeTable, item, child, index)<br>
  * <div>Fires before a item is added or inserted. Listeners can set the
  * <code>doit</code> field to <code>false</code> to cancel the action.</div>
  * <ul>
- * <li>widget : this</li>
- * <li>item : the item being added</li>
+ * <li>treeTable : the tree table</li>
+ * <li>item : this</li>
+ * <li>child : the item being added</li>
  * <li>index : the index at which the item will be added</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>BeforeRemove</b> : TreeTableEvent(widget, item)<br>
+ * <dd><b>BeforeRemove</b> : TreeTableEvent(treeTable, item, child)<br>
  * <div>Fires before a item is removed. Listeners can set the <code>doit</code>
  * field to <code>false</code> to cancel the action.</div>
  * <ul>
- * <li>widget : this</li>
- * <li>item : the item being removed</li>
+ * <li>treeTable : this</li>
+ * <li>item : this</li>
+ * <li>child : the item being removed</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>BeforeExpand</b> : TreeTableEvent(widget, item)<br>
+ * <dd><b>BeforeExpand</b> : TreeTableEvent(treeTable, item)<br>
  * <div>Fires before a item is expanded. Listeners can set the <code>doit</code>
  * field to <code>false</code> to cancel the expand.</div>
  * <ul>
- * <li>widget : this</li>
- * <li>item : the item being expanded</li>
+ * <li>treeTable : this</li>
+ * <li>item : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>BeforeCollapse</b> : TreeTableEvent(widget, item)<br>
+ * <dd><b>BeforeCollapse</b> : TreeTableEvent(treeTable, item)<br>
  * <div>Fires before a item is collapsed. Listeners can set the
  * <code>doit</code> field to <code>false</code> to cancel the collapse.</div>
  * <ul>
- * <li>widget : this</li>
- * <li>item : the item being expanded</li>
+ * <li>treeTable : this</li>
+ * <li>item : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Add</b> : TreeTableEvent(widget, item, index)<br>
+ * <dd><b>Add</b> : TreeTableEvent(treeTable, item, index)<br>
  * <div>Fires after a item has been added or inserted.</div>
  * <ul>
- * <li>widget : this</li>
- * <li>item : the item that was added</li>
+ * <li>treeTable : the tree table</li>
+ * <li>item : this</li>
+ * <li>child : the item that was added</li>
  * <li>index : the index at which the item will be added</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Remove</b> : TreeEvent(item, child)<br>
+ * <dd><b>Remove</b> : TreeEvent(treeTable, item, child)<br>
  * <div>Fires after a item has been removed.</div>
  * <ul>
- * <li>widget : this</li>
- * <li>item : the item being removed</li>
+ * <li>treeTable : the tree table</li>
+ * <li>item : this</li>
+ * <li>child : the item being removed</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Expand</b> : TreeEvent(item)<br>
+ * <dd><b>Expand</b> : TreeEvent(treeTable, item)<br>
  * <div>Fires after a item has been expanded.</div>
  * <ul>
  * <li>item : the item being expanded</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Collapse</b> : TreeEvent(item)<br>
+ * <dd><b>Collapse</b> : TreeEvent(treeTable, item)<br>
  * <div>Fires ater a item is collapsed.</div>
  * <ul>
- * <li>item : the item being collapsed</li>
+ * <li>treeTable : the tree table</li>
+ * <li>item : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>CheckChange</b> : TreeTableEvent(item)<br>
+ * <dd><b>CheckChange</b> : TreeTableEvent(treeTable, item)<br>
  * <div>Fires after a check state change.</div>
  * <ul>
+ * <li>treeTable : the tree table</li>
  * <li>item : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>CellClick</b> : TreeTableEvent(item, columnIndex)<br>
+ * <dd><b>CellClick</b> : TreeTableEvent(treeTable, item, columnIndex)<br>
  * <div>Fires after a cell has been clicked.</div>
  * <ul>
+ * <li>treeTable : the tree table</li>
  * <li>item : this</li>
  * <li>columnIndex : cell column index</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>CellDoubleClick</b> : RowDoubleClick(item, columnIndex)<br>
+ * <dd><b>CellDoubleClick</b> : RowDoubleClick(treeTable, item, columnIndex)<br>
  * <div>Fires after a cell has been double clicked.</div>
  * <ul>
+ * <li>treeTable : the tree table</li>
  * <li>item : this</li>
  * <li>columnIndex : cell column index</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>RowClick</b> : (item, index)<br>
+ * <dd><b>RowClick</b> : (treeTable, item, index)<br>
  * <div>Fires after a cell has been clicked.</div>
  * <ul>
+ * <li>treeTable : the tree table</li>
  * <li>item : this</li>
  * <li>columnIndex : cell column index</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>RowDoubleClick</b> : TreeTableEvent(item, columnIndex)<br>
+ * <dd><b>RowDoubleClick</b> : TreeTableEvent(treeTable, item, columnIndex)<br>
  * <div>Fires after a cell has been double clicked.</div>
  * <ul>
+ * <li>treeTable : the treet table</li>
  * <li>item : this</li>
  * <li>columnIndex : cell column index</li>
  * </ul>
@@ -207,34 +216,8 @@ public class TreeTableItem extends TreeItem {
   }
 
   public void onComponentEvent(ComponentEvent ce) {
-    if (ce.component != this) {
-      return;
-    }
-    TreeTableEvent tte = new TreeTableEvent(treeTable);
-    tte.item = this;
-    tte.event = ce.event;
-    switch (ce.type) {
-      case Event.ONMOUSEOVER:
-        tree.fireEvent(Events.MouseOver, tte);
-        break;
-      case Event.ONMOUSEDOWN:
-        tree.fireEvent(Events.MouseDown, tte);
-        break;
-      case Event.ONKEYDOWN:
-        tree.fireEvent(Events.KeyDown, tte);
-        break;
-      case Event.ONMOUSEOUT:
-        tree.fireEvent(Events.MouseOut, tte);
-        break;
-      case Event.ONCLICK:
-        tree.fireEvent(Events.Click, tte);
-        break;
-      case Event.ONDBLCLICK:
-        tree.fireEvent(Events.DoubleClick, tte);
-        break;
-    }
     if (ui != null) {
-      getUI().getListener().handleEvent(tte);
+      getUI().handleEvent((TreeTableEvent)ce);
     }
 
 //    if (cellToolTip != null) {
@@ -242,13 +225,13 @@ public class TreeTableItem extends TreeItem {
 //    }
 
     switch (ce.type) {
-      case Events.Click:
+      case Events.OnClick:
         onClick(ce);
         break;
-      case Events.DoubleClick:
+      case Events.OnDoubleClick:
         onDoubleClick(ce);
         break;
-      case Events.MouseOver:
+      case Events.OnMouseOver:
         onMouseOver(ce);
         break;
     }

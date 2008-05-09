@@ -245,6 +245,7 @@ public abstract class Component extends Widget {
    * The state id (defaults to null).
    */
   protected String stateId;
+  protected boolean hasListeners;
 
   private Map<String, Object> state;
   private ToolTipConfig toolTipConfig;
@@ -264,7 +265,6 @@ public abstract class Component extends Widget {
   private boolean destroyed;
   private boolean disableEvents;
   private boolean hasBrowserListener;
-  private boolean hasListeners;
 
   /**
    * Creates a new component..
@@ -464,6 +464,15 @@ public abstract class Component extends Widget {
   }
 
   /**
+   * Returns the component's border state.
+   * 
+   * @return true if borders are visisble
+   */
+  public boolean getBorders() {
+    return borders > 0;
+  }
+
+  /**
    * Returns the application defined data associated with the component, or
    * <code>null</code> if it has not been set.
    */
@@ -518,6 +527,18 @@ public abstract class Component extends Widget {
    */
   public String getItemId() {
     return itemId != null ? itemId : getId();
+  }
+
+  /**
+   * Returns the component's state.
+   * 
+   * @return the state
+   */
+  public Map<String, Object> getState() {
+    if (state == null) {
+      state = new HashMap<String, Object>();
+    }
+    return state;
   }
 
   /**
@@ -590,24 +611,6 @@ public abstract class Component extends Widget {
     return rendered && el.isVisible();
   }
 
-  public void onAttach() {
-    // added to a gwt panel, not rendered
-    if (!rendered) {
-      // render and swap the proxy element
-      Element parent = DOM.getParent(dummy);
-      int index = DOM.getChildIndex(parent, dummy);
-      DOM.removeChild(parent, dummy);
-      render(parent, index);
-    }
-    if (disableTextSelection > 0) {
-      el.disableTextSelection(disableTextSelection == 1);
-    }
-    if (disableContextMenu > 0) {
-      el.disableContextMenu(disableContextMenu == 1);
-    }
-    super.onAttach();
-  }
-
   /**
    * Components delegate event handling to
    * {@link #onComponentEvent(ComponentEvent)}. Sublcasses should not override.
@@ -618,9 +621,16 @@ public abstract class Component extends Widget {
     if (disabled || disableEvents) {
       return;
     }
+    
+    int type = DOM.eventGetType(event);
+    
+    // hack to receive keyboard events in safari
+    if (GXT.isSafari && type == Event.ONCLICK && focusable) {
+      focus();
+    }
 
-    ComponentEvent ce = new ComponentEvent(this, event);
-    ce.component = this;
+    ComponentEvent ce = createComponentEvent(event);
+    ce.event = event;
 
     // browser event listeners can cancel event
     if (hasBrowserListener && !fireEvent(Events.BrowserEvent, ce)) {
@@ -628,7 +638,7 @@ public abstract class Component extends Widget {
     }
 
     // dom event type
-    ce.type = DOM.eventGetType(event);
+    ce.type = type;
 
     // listeners can cancel event
     if (hasListeners && !fireEvent(ce.type, ce)) {
@@ -697,6 +707,7 @@ public abstract class Component extends Widget {
    */
   public void removeListener(int eventType, EventListener listener) {
     observable.removeListener(eventType, listener);
+    hasListeners = observable.eventTable != null && observable.eventTable.size() > 0;
   }
 
   /**
@@ -707,6 +718,7 @@ public abstract class Component extends Widget {
    */
   public void removeListener(int eventType, Listener listener) {
     observable.removeListener(eventType, listener);
+    hasListeners = observable.eventTable != null && observable.eventTable.size() > 0;
   }
 
   /**
@@ -824,6 +836,21 @@ public abstract class Component extends Widget {
     afterRender();
 
     fireEvent(Events.Render);
+  }
+
+  /**
+   * Saves the component's current state.
+   */
+  public void saveState() {
+    if (state != null) {
+      ComponentEvent ce = new ComponentEvent(this);
+      ce.state = state;
+      if (fireEvent(Events.BeforeStateSave, ce)) {
+        String sid = stateId != null ? stateId : getId();
+        StateManager.set(sid, state);
+        fireEvent(Events.StateSave, ce);
+      }
+    }
   }
 
   /**
@@ -965,7 +992,7 @@ public abstract class Component extends Widget {
     if (toolTipConfig == null) {
       toolTipConfig = new ToolTipConfig();
     }
-    toolTipConfig.text = text;
+    toolTipConfig.setText(text);
     setToolTip(toolTipConfig);
   }
 
@@ -1070,6 +1097,10 @@ public abstract class Component extends Widget {
     fireEvent(Events.Blur);
   }
 
+  protected ComponentEvent createComponentEvent(Event event) {
+    return new ComponentEvent(this, event);
+  }
+
   protected void createStyles(String baseStyle) {
 
   }
@@ -1100,18 +1131,6 @@ public abstract class Component extends Widget {
     return focusEl == null ? el : focusEl;
   }
 
-  /**
-   * Returns the component's state.
-   * 
-   * @return the state
-   */
-  public Map<String, Object> getState() {
-    if (state == null) {
-      state = new HashMap<String, Object>();
-    }
-    return state;
-  }
-
   protected void initState() {
     String sid = stateId != null ? stateId : getId();
     state = StateManager.getMap(sid);
@@ -1123,6 +1142,25 @@ public abstract class Component extends Widget {
         fireEvent(Events.StateRestore, ce);
       }
     }
+  }
+
+  @Override
+  protected void onAttach() {
+    // added to a gwt panel, not rendered
+    if (!rendered) {
+      // render and swap the proxy element
+      Element parent = DOM.getParent(dummy);
+      int index = DOM.getChildIndex(parent, dummy);
+      DOM.removeChild(parent, dummy);
+      render(parent, index);
+    }
+    if (disableTextSelection > 0) {
+      el.disableTextSelection(disableTextSelection == 1);
+    }
+    if (disableContextMenu > 0) {
+      el.disableContextMenu(disableContextMenu == 1);
+    }
+    super.onAttach();
   }
 
   protected void onDestroy() {
@@ -1208,21 +1246,6 @@ public abstract class Component extends Widget {
   }
 
   /**
-   * Saves the component's current state.
-   */
-  public void saveState() {
-    if (state != null) {
-      ComponentEvent ce = new ComponentEvent(this);
-      ce.state = state;
-      if (fireEvent(Events.BeforeStateSave, ce)) {
-        String sid = stateId != null ? stateId : getId();
-        StateManager.set(sid, state);
-        fireEvent(Events.StateSave, ce);
-      }
-    }
-  }
-
-  /**
    * Sets the component's context menu.
    * 
    * @param menu the context menu
@@ -1241,19 +1264,19 @@ public abstract class Component extends Widget {
   }
 
   private native void clearElemenet() /*-{
-            this.@com.google.gwt.user.client.ui.UIObject::element = null;
-          }-*/;
+      this.@com.google.gwt.user.client.ui.UIObject::element = null;
+    }-*/;
 
   private native Element createHiddenInput() /*-{
-            var input = $doc.createElement('input');
-            input.type = 'text';
-            input.style.opacity = 0;
-            input.style.zIndex = -1;
-            input.style.height = '1px';
-            input.style.width = '1px';
-            input.style.overflow = 'hidden';
-            input.style.position = 'absolute';
-            return input;
-          }-*/;
+      var input = $doc.createElement('input');
+      input.type = 'text';
+      input.style.opacity = 0;
+      input.style.zIndex = -1;
+      input.style.height = '1px';
+      input.style.width = '1px';
+      input.style.overflow = 'hidden';
+      input.style.position = 'absolute';
+      return input;
+    }-*/;
 
 }

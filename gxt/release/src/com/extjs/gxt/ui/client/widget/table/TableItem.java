@@ -86,11 +86,11 @@ public class TableItem extends Component {
 //      cellToolTip.handleEvent(be);
     }
     switch (ce.type) {
-      case Event.ONCLICK:
-        onClick(ce);
-        break;
       case Event.ONDBLCLICK:
         onDoubleClick(ce);
+        break;
+      case Event.ONCLICK:
+        onClick(ce);
         break;
       case Event.ONMOUSEOVER:
         onMouseOver(ce);
@@ -249,7 +249,7 @@ public class TableItem extends Component {
     el.insertInto(target, index);
   }
 
-  protected void setSelected(boolean select) {
+  protected void onSelectChange(boolean select) {
     table.getView().onSelectItem(this, select);
   }
 

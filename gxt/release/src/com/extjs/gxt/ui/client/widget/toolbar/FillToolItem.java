@@ -12,6 +12,7 @@ import com.google.gwt.user.client.Element;
 
 public class FillToolItem extends ToolItem {
   
+  @Override
   protected void onRender(Element target, int index) {
     setElement(DOM.createDiv());
     el.insertInto(target, index);

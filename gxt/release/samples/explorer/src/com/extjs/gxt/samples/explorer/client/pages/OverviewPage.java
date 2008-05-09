@@ -12,17 +12,23 @@ import com.extjs.gxt.ui.client.store.Record;
 import com.extjs.gxt.ui.client.store.Store;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.DataView;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.ui.Widget;
 
 public class OverviewPage extends Container {
 
   private DataView dataView;
-  
+
+  public OverviewPage() {
+    setData("layout", new FitLayout());
+  }
+
   @Override
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
     
+    setScrollMode(Scroll.AUTO);
+
     ExplorerModel model = (ExplorerModel) Registry.get("model");
     Store store = new Store();
     store.add(model.getEntries());
@@ -34,27 +40,21 @@ public class OverviewPage extends Container {
     sb.append("</div>");
 
     dataView = new DataView();
-    dataView.itemSelector = ".sample-box";
-    dataView.overStyle = "sample-over";
-    dataView.selectStyle = "none";
+    dataView.setItemSelector(".sample-box");
+    dataView.setOverStyle("sample-over");
+    dataView.setSelectStyle("none");
     dataView.setBorders(false);
     dataView.setStore(store);
     dataView.setTemplate(sb.toString());
     dataView.addListener(Events.SelectionChange, new Listener<DataViewEvent>() {
       public void handleEvent(DataViewEvent be) {
         Record record = (Record) dataView.getSelection().get(0);
-        Entry entry = (Entry)record.getModel();
+        Entry entry = (Entry) record.getModel();
         Explorer.showPage(entry);
       }
     });
 
     add(dataView);
-    
-    Widget p = getParent();
-    if (p instanceof Container) {
-      Container ct = (Container) p;
-      ct.setScrollMode(Scroll.AUTO);
-    }
 
   }
 }

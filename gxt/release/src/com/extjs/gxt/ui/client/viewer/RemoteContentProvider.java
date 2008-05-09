@@ -15,8 +15,8 @@ import com.extjs.gxt.ui.client.data.DataCallback;
  * A <code>IStructuredContentProvider</code> implementation that supports the
  * remote loading of data and paging.
  */
-public abstract class RemoteContentProvider<I, E> extends BaseLoader<BaseLoadConfig>
-    implements StructuredContentProvider<I, E> {
+public abstract class RemoteContentProvider<I, E, C extends BaseLoadConfig> extends
+    BaseLoader<C> implements StructuredContentProvider<I, E> {
 
   protected Viewer viewer;
 
@@ -40,6 +40,6 @@ public abstract class RemoteContentProvider<I, E> extends BaseLoader<BaseLoadCon
    * Subclasses must implement and return the loaded data to the
    * callback.setResult
    */
-  protected abstract void loadData(BaseLoadConfig config, DataCallback callback);
+  protected abstract void loadData(C config, DataCallback callback);
 
 }

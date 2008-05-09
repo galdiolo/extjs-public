@@ -21,8 +21,6 @@ import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.RootPanel;
 
 public class AppView extends View {
@@ -50,18 +48,12 @@ public class AppView extends View {
     createCenter();
 
     RootPanel.get().add(viewport);
-    DeferredCommand.addCommand(new Command() {
-      public void execute() {
-        viewport.layout();
-      }
-    });
-   
   }
 
   private void createCenter() {
     centerPanel = new ContentPanel();
-    centerPanel.border = false;
-    centerPanel.header = false;
+    centerPanel.setBorders(false);
+    centerPanel.setHeaderVisible(false);
     centerPanel.setLayout(new FitLayout());
 
     BorderLayoutData data = new BorderLayoutData(LayoutRegion.CENTER);

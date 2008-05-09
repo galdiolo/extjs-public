@@ -32,14 +32,26 @@ public interface ChangeEventSource {
    * 
    * @param listener the listener to add
    */
-  public void addChangeListener(ChangeListener listener);
+  public void addChangeListener(ChangeListener... listener);
 
   /**
    * Removes a change listener.
    * 
    * @param listener the listener to remove
    */
-  public void removeChangeListener(ChangeListener listener);
+  public void removeChangeListener(ChangeListener... listener);
+
+  /**
+   * Removes all change listeners.
+   */
+  public void removeChangeListeners();
+
+  /**
+   * Sets whether change events are fired.
+   * 
+   * @param silent true to disable change event, otherwise false
+   */
+  public void setSilent(boolean silent);
 
   /**
    * Notifies listeners of the given change event.

@@ -13,16 +13,21 @@ import java.util.List;
 import com.extjs.gxt.samples.mail.client.AppEvents;
 import com.extjs.gxt.samples.resources.client.Folder;
 import com.extjs.gxt.samples.resources.client.MailItem;
-import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.Style.SelectionMode;
-import com.extjs.gxt.ui.client.event.BaseEvent;
-import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.mvc.AppEvent;
 import com.extjs.gxt.ui.client.mvc.Controller;
 import com.extjs.gxt.ui.client.mvc.View;
+import com.extjs.gxt.ui.client.viewer.DefaultSelection;
+import com.extjs.gxt.ui.client.viewer.ModelCellLabelProvider;
+import com.extjs.gxt.ui.client.viewer.ModelContentProvider;
+import com.extjs.gxt.ui.client.viewer.SelectionChangedEvent;
+import com.extjs.gxt.ui.client.viewer.SelectionChangedListener;
+import com.extjs.gxt.ui.client.viewer.TableViewer;
+import com.extjs.gxt.ui.client.viewer.TableViewerColumn;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
+import com.extjs.gxt.ui.client.widget.table.RowSelectionModel;
 import com.extjs.gxt.ui.client.widget.table.Table;
 import com.extjs.gxt.ui.client.widget.table.TableColumn;
 import com.extjs.gxt.ui.client.widget.table.TableColumnModel;
@@ -30,7 +35,8 @@ import com.extjs.gxt.ui.client.widget.table.TableItem;
 
 public class MailListView extends View {
 
-  private Table table;
+  private Table<RowSelectionModel> table;
+  private TableViewer viewer;
   private Folder folder;
 
   public MailListView(Controller controller) {
@@ -53,23 +59,14 @@ public class MailListView extends View {
 
       if (folder != f) {
         folder = f;
-        table.removeAll();
-        for (int i = 0; i < f.getChildCount(); i++) {
-          MailItem m = (MailItem) f.getChild(i);
-          Object[] values = new Object[3];
-          values[0] = m.getSender();
-          values[1] = m.getEmail();
-          values[2] = m.getSubject();
-          TableItem item = new TableItem(values);
-          item.setData(m);
-          table.add(item);
-        }
-        if (table.getItemCount() > 0) {
-          table.select(0);
+        viewer.setInput(folder);
+        if (folder.getChildCount() > 0) {
+          viewer.setSelection(new DefaultSelection(f.getChild(0)));
         }
       } else {
-        if (table.getSelection().size() > 0) {
-          TableItem item = table.getSelection().get(0);
+
+        TableItem item = table.getSelectionModel().getSelectedItem();
+        if (item != null) {
           MailItem mail = (MailItem) item.getData();
           showMailItem(mail);
         }
@@ -87,19 +84,29 @@ public class MailListView extends View {
     TableColumnModel cm = new TableColumnModel(columns);
 
     table = new Table(cm);
-    table.selectionMode = SelectionMode.MULTI;
+    table.setSelectionModel(new RowSelectionModel(SelectionMode.MULTI));
     table.setBorders(false);
 
-    table.addListener(Events.SelectionChange, new Listener() {
-
-      public void handleEvent(BaseEvent be) {
-        if (table.getSelection().size() > 0) {
-          TableItem item = table.getSelection().get(0);
-          MailItem mail = (MailItem) item.getData();
-          showMailItem(mail);
+    viewer = new TableViewer(table);
+    viewer.setContentProvider(new ModelContentProvider());
+    viewer.addSelectionListener(new SelectionChangedListener() {
+      public void selectionChanged(SelectionChangedEvent event) {
+        MailItem m = (MailItem) event.getSelection().getFirstElement();
+        if (m != null) {
+          showMailItem(m);
         }
       }
     });
+
+    TableViewerColumn col = viewer.getViewerColumn(0);
+    col.setLabelProvider(new ModelCellLabelProvider());
+
+    col = viewer.getViewerColumn(1);
+    col.setLabelProvider(new ModelCellLabelProvider());
+
+    col = viewer.getViewerColumn(2);
+    col.setLabelProvider(new ModelCellLabelProvider());
+
   }
 
   private void showMailItem(MailItem item) {

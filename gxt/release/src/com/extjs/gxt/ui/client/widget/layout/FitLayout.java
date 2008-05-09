@@ -8,7 +8,7 @@
 package com.extjs.gxt.ui.client.widget.layout;
 
 import com.extjs.gxt.ui.client.core.El;
-import com.extjs.gxt.ui.client.util.Rectangle;
+import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.Layout;
@@ -29,17 +29,19 @@ public class FitLayout extends Layout {
 
   @Override
   protected void onLayout(Container container, El target) {
-    Rectangle rect = target.getLayoutBounds();
+    Size s = target.getStyleSize();
     Component a = activeItem != null ? activeItem : container.getItem(0);
     if (a == null) return;
 
     if (renderAll) {
       super.onLayout(container, target);
-      setItemSize(a, rect.width, rect.height);
+      setItemSize(a, s.width, s.height);
     } else {
-      setItemSize(a, rect.width, rect.height);
+      setItemSize(a, s.width, s.height);
       if (!a.isRendered()) {
         renderComponent(a, 0, target);
+      } else {
+        target.insertChild(a.getElement(), 0);
       }
     }
   }

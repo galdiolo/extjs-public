@@ -20,7 +20,6 @@ import com.google.gwt.user.client.Element;
  * href="http://www.w3.org/TR/2005/WD-css3-selectors-20051215/#selectors">CSS3
  * selectors spec</a>, along with some custom selectors and basic XPath.
  * </p>
- * </p>
  * <p>
  * All selectors, attribute filters and pseudos below can be combined infinitely
  * in any order. For example "div.foo:nth-child(odd)[@foo=bar].bar:first" would

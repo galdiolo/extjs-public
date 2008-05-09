@@ -64,18 +64,16 @@ public class TableColumnUI extends BoxComponent {
     header = table.getTableHeader();
   }
 
-  public void onComponentEvent(ComponentEvent ce) {
-    switch (ce.type) {
-      case Event.ONMOUSEOVER:
-        onMouseOver(ce);
-        break;
-      case Event.ONMOUSEOUT:
-        onMouseOut(ce);
-        break;
-      case Event.ONCLICK:
-        header.onColumnClick(this);
-        break;
+  public String getAlignment() {
+    String align = "left";
+    if (column != null) {
+      if (column.getAlignment() == HorizontalAlignment.CENTER) {
+        align = "center";
+      } else if (column.getAlignment() == HorizontalAlignment.RIGHT) {
+        align = "right";
+      }
     }
+    return align;
   }
 
   public void onBrowserEvent(Event event) {
@@ -91,7 +89,7 @@ public class TableColumnUI extends BoxComponent {
     }
   }
 
-  protected void onColumnResize(SplitBarEvent sbe) {
+  public void onColumnResize(SplitBarEvent sbe) {
     if (sbe.size < 1) {
       return;
     }
@@ -106,49 +104,33 @@ public class TableColumnUI extends BoxComponent {
     }
   }
 
-  protected void onMouseMove(BaseEvent be) {
+  public void onComponentEvent(ComponentEvent ce) {
+    switch (ce.type) {
+      case Event.ONMOUSEOVER:
+        onMouseOver(ce);
+        break;
+      case Event.ONMOUSEOUT:
+        onMouseOut(ce);
+        break;
+      case Event.ONCLICK:
+        header.onColumnClick(this);
+        break;
+    }
+  }
+
+  public void onMouseMove(BaseEvent be) {
     header.onColumnMouseMove(this, be);
   }
 
-  protected void onMouseOut(BaseEvent be) {
+  public void onMouseOut(BaseEvent be) {
     removeStyleName("my-tbl-col-over");
   }
 
-  protected void onMouseOver(BaseEvent be) {
+  public void onMouseOver(BaseEvent be) {
     addStyleName("my-tbl-col-over");
   }
 
-  @Override
-  protected void onRender(Element target, int index) {
-    String[] params = null;
-    if (end) {
-      params = new String[] {"", ""};
-    } else {
-      params = new String[] {getAlignment(), column.getText()};
-    }
-    String s = Format.substitute(html, (Object[]) params);
-    setElement(XDOM.create(s), target, index);
-    // TODO: remove hardcoded height
-    el.setHeight(24);
-
-    if (!end && column.isResizable()) {
-      splitBar = header.createSplitBar(LayoutRegion.EAST, this);
-      splitBar.handleWidth = 5;
-      splitBar.xOffset = -2;
-      splitBar.autoSize = false;
-      splitBar.addListener(Events.Resize, new Listener<SplitBarEvent>() {
-        public void handleEvent(SplitBarEvent ce) {
-          onColumnResize(ce);
-        }
-      });
-      splitBar.addListener(Events.DragStart, splitBarListener);
-      splitBar.addListener(Events.DragEnd, splitBarListener);
-    }
-
-    sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS);
-  }
-
-  protected void onSortChange(SortDir sortDir) {
+  public void onSortChange(SortDir sortDir) {
     Element td = DOM.getParent(getElement());
     switch (sortDir) {
       case ASC:
@@ -166,21 +148,39 @@ public class TableColumnUI extends BoxComponent {
     }
   }
 
-  protected void onTextChange(String text) {
+  public void onTextChange(String text) {
     El textEl = el.selectNode(".my-tbl-col-text");
     textEl.setInnerHtml(text);
   }
 
-  private String getAlignment() {
-    String align = "left";
-    if (column != null) {
-      if (column.getAlignment() == HorizontalAlignment.CENTER) {
-        align = "center";
-      } else if (column.getAlignment() == HorizontalAlignment.RIGHT) {
-        align = "right";
-      }
+  @Override
+  protected void onRender(Element target, int index) {
+    String[] params = null;
+    if (end) {
+      params = new String[] {"", ""};
+    } else {
+      params = new String[] {getAlignment(), column.getText()};
     }
-    return align;
+    String s = Format.substitute(html, (Object[]) params);
+    setElement(XDOM.create(s), target, index);
+    // TODO: remove hardcoded height
+    el.setHeight(24);
+
+    if (!end && column.isResizable()) {
+      splitBar = header.createSplitBar(LayoutRegion.EAST, this);
+      splitBar.setHandleWidth(5);
+      splitBar.setXOffset(-2);
+      splitBar.setAutoSize(false);
+      splitBar.addListener(Events.Resize, new Listener<SplitBarEvent>() {
+        public void handleEvent(SplitBarEvent ce) {
+          onColumnResize(ce);
+        }
+      });
+      splitBar.addListener(Events.DragStart, splitBarListener);
+      splitBar.addListener(Events.DragEnd, splitBarListener);
+    }
+
+    sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS);
   }
 
 }

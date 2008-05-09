@@ -17,6 +17,7 @@ import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.data.BaseTreeModel;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.event.TreeEvent;
 import com.extjs.gxt.ui.client.viewer.CellLabelProvider;
 import com.extjs.gxt.ui.client.viewer.ModelLabelProvider;
 import com.extjs.gxt.ui.client.viewer.ModelTreeContentProvider;
@@ -78,8 +79,8 @@ public class TreeTableViewerPage extends Container implements EntryPoint {
     TreeTableColumnModel cm = new TreeTableColumnModel(columns);
 
     final TreeTable table = new TreeTable(cm);
-    table.animate = false;
-    table.itemImageStyle = "icon-music";
+    table.setAnimate(false);
+    table.setItemIconStyle("icon-music");
 
     final TreeTableViewer viewer = new TreeTableViewer(table);
     viewer.setContentProvider(new ModelTreeContentProvider());
@@ -129,9 +130,9 @@ public class TreeTableViewerPage extends Container implements EntryPoint {
     TextMenuItem remove = new TextMenuItem();
     remove.setText("Remove Selected");
     remove.setIconStyle("icon-delete");
-    remove.addSelectionListener(new SelectionListener() {
-      public void componentSelected(ComponentEvent ce) {
-        TreeTableItem item = (TreeTableItem) table.getSelectedItem();
+    remove.addSelectionListener(new SelectionListener<TreeEvent>() {
+      public void componentSelected(TreeEvent ce) {
+        TreeTableItem item = (TreeTableItem) ce.selectedItem;
         if (item != null) {
           item.getParentItem().remove(item);
         }
@@ -143,10 +144,10 @@ public class TreeTableViewerPage extends Container implements EntryPoint {
     viewer.setInput(folder);
 
     ContentPanel panel = new ContentPanel();
-    panel.frame = true;
-    panel.collapsible = true;
-    panel.animCollapse = false;
-    panel.buttonAlign = HorizontalAlignment.CENTER;
+    panel.setFrame(true);
+    panel.setCollapsible(true);
+    panel.setAnimCollapse(false);
+    panel.setButtonAlign(HorizontalAlignment.CENTER);
     panel.setIconStyle("icon-table");
     panel.setHeading("TreeTableViewer Demo");
     panel.setLayout(new FitLayout());

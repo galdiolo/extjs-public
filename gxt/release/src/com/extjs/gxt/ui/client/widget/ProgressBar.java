@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
-
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.core.CompositeElement;
@@ -41,31 +40,10 @@ import com.google.gwt.user.client.Timer;
  */
 public class ProgressBar extends Component {
 
-  /**
-   * The progress bar text (defaults to "").
-   */
-  public String text = "";
-
-  /**
-   * The length of time in milliseconds that the progress bar should run before
-   * resetting itself (defaults to DEFAULT, in which case it will run
-   * indefinitely until reset is called)
-   */
-  public int duration = Style.DEFAULT;
-
-  /**
-   * The length of time in milliseconds between each progress update (defaults
-   * to 300 ms).
-   */
-  public int interval = 300;
-
-  /**
-   * The number of progress update segments to display within the progress bar
-   * (defaults to 10). If the bar reaches the end and is still updating, it will
-   * automatically wrap back to the beginning.
-   */
-  public int increment = 10;
-
+  private String text = "";
+  private int duration = Style.DEFAULT;
+  private int interval = 300;
+  private int increment = 10;
   private El progressBar;
   private El textTopElem, textBackElem;
   private CompositeElement textEl;
@@ -91,14 +69,23 @@ public class ProgressBar extends Component {
     if (timer == null) {
       timer = new Timer() {
         public void run() {
-          int inc = increment;
+          int inc = getIncrement();
           updateProgress(((((i++ + inc) % inc) + 1) * (100 / inc)) * .01, null);
         }
       };
     }
-    timer.scheduleRepeating(interval);
+    timer.scheduleRepeating(getInterval());
     running = true;
     return this;
+  }
+
+  /**
+   * Returns the bar's increment value.
+   * 
+   * @return the increment the increment
+   */
+  public int getIncrement() {
+    return increment;
   }
 
   /**
@@ -131,6 +118,17 @@ public class ProgressBar extends Component {
     }
     running = false;
     return this;
+  }
+
+  /**
+   * The number of progress update segments to display within the progress bar
+   * (defaults to 10). If the bar reaches the end and is still updating, it will
+   * automatically wrap back to the beginning.
+   * 
+   * @param increment the new increment
+   */
+  public void setIncrement(int increment) {
+    this.increment = increment;
   }
 
   /**
@@ -199,6 +197,45 @@ public class ProgressBar extends Component {
     if (text != null) {
       updateText(text);
     }
+  }
+
+  /**
+   * Sets the length of time in milliseconds between each progress update
+   * (defaults to 300 ms).
+   * 
+   * @param interval the interval to set
+   */
+  public void setInterval(int interval) {
+    this.interval = interval;
+  }
+
+  /**
+   * Returns the bar's interval value.
+   * 
+   * @return the interval in millseconds
+   */
+  public int getInterval() {
+    return interval;
+  }
+
+  /**
+   * The length of time in milliseconds that the progress bar should run before
+   * resetting itself (defaults to DEFAULT, in which case it will run
+   * indefinitely until reset is called)
+   * 
+   * @param duration the duration in milliseconds
+   */
+  public void setDuration(int duration) {
+    this.duration = duration;
+  }
+
+  /**
+   * Returns the duration.
+   * 
+   * @return the duration
+   */
+  public int getDuration() {
+    return duration;
   }
 
 }

@@ -81,7 +81,7 @@ public class SplitButton extends Button {
       template = new Template(sb.toString());
     }
 
-    setElement(template.create(text, type, baseStyle), target, index);
+    setElement(template.create(text, getType(), baseStyle), target, index);
 
     buttonEl = el.selectNode(buttonSelector);
     arrowBtnTable = el.child(arrowSelector).dom;
@@ -114,9 +114,9 @@ public class SplitButton extends Button {
       el.setWidth("auto");
       tbl.setWidth("auto");
 
-      if (minWidth != Style.DEFAULT) {
-        if ((tbl.getWidth() + fly(tbl2).getWidth()) < minWidth) {
-          tbl.setWidth(minWidth - fly(tbl2).getWidth());
+      if (getMinWidth() != Style.DEFAULT) {
+        if ((tbl.getWidth() + fly(tbl2).getWidth()) < getMinWidth()) {
+          tbl.setWidth(getMinWidth() - fly(tbl2).getWidth());
         }
       }
       el.setWidth(tbl.getWidth() + fly(tbl2).getWidth());

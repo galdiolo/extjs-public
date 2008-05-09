@@ -80,7 +80,6 @@ public class PagingTableViewerPage extends Container implements EntryPoint {
     // create the column model
     TableColumnModel cm = new TableColumnModel(columns);
     Table table = new Table(cm);
-    table.horizontalScroll = true;
 
     final RemoteContentProvider cp = new RemoteContentProvider() {
 
@@ -128,10 +127,10 @@ public class PagingTableViewerPage extends Container implements EntryPoint {
     toolBar.bind(cp);
 
     ContentPanel panel = new ContentPanel();
-    panel.frame = true;
-    panel.collapsible = true;
-    panel.animCollapse = false;
-    panel.buttonAlign = HorizontalAlignment.CENTER;
+    panel.setFrame(true);
+    panel.setCollapsible(true);
+    panel.setAnimCollapse(false);
+    panel.setButtonAlign(HorizontalAlignment.CENTER);
     panel.setIconStyle("icon-table");
     panel.setHeading("Paging TableViewer");
     panel.setLayout(new FitLayout());

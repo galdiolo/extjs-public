@@ -105,7 +105,7 @@ public class FormLayout extends AnchorLayout {
   private void renderField(Field field, int index, El target) {
     if (field != null && !field.isRendered()) {
 
-      fieldTemplate.append(target.dom, field.getId(), field.fieldLabel, labelStyle,
+      fieldTemplate.append(target.dom, field.getId(), field.getFieldLabel(), labelStyle,
           elementStyle, labelSeperator, hideLabels ? "x-hide-label" : "",
           "x-form-clear-left");
 

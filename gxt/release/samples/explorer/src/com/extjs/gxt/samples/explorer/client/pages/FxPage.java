@@ -17,7 +17,7 @@ import com.extjs.gxt.ui.client.widget.Button;
 import com.extjs.gxt.ui.client.widget.ButtonBar;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
-import com.extjs.gxt.ui.client.widget.VerticalPanel;
+import com.extjs.gxt.ui.client.widget.layout.FillLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Element;
@@ -26,25 +26,21 @@ import com.google.gwt.user.client.ui.RootPanel;
 public class FxPage extends Container implements EntryPoint {
 
   private ContentPanel cp;
-  
+
   public void onModuleLoad() {
     RootPanel.get().add(this);
+  }
+
+  public FxPage() {
+    setData("layout", new FillLayout());
   }
 
   @Override
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
 
-    VerticalPanel vp = new VerticalPanel();
-    vp.spacing = 10;
-
-    cp = new ContentPanel();
-    cp.collapsible = true;
-    cp.setHeading("FX Demo");
-    cp.setIconStyle("icon-text");
-    cp.addText(TestData.DUMMY_TEXT_SHORT);
-
-    cp.setWidth(200);
+    setLayout(new FlowLayout(false));
+    setSize("100%", "100%");
 
     ButtonBar buttonBar = new ButtonBar();
     buttonBar.add(new Button("Slide In / Out", new SelectionListener() {
@@ -77,11 +73,25 @@ public class FxPage extends Container implements EntryPoint {
       }
     }));
 
-    vp.add(buttonBar);
-    vp.add(cp);
+    buttonBar.add(new Button("Reset", new SelectionListener() {
+      public void componentSelected(ComponentEvent ce) {
+        cp.setPosition(10, 10);
+      }
+    }));
 
-    setLayout(new FlowLayout());
-    add(vp);
+    buttonBar.setPosition(10, 10);
+
+    cp = new ContentPanel();
+    cp.setCollapsible(true);
+    cp.setHeading("FX Demo");
+    cp.setIconStyle("icon-text");
+    cp.addText(TestData.DUMMY_TEXT_SHORT);
+    cp.setPosition(10, 10);
+    cp.setWidth(200);
+
+    add(buttonBar);
+    add(cp);
+    
   }
 
 }

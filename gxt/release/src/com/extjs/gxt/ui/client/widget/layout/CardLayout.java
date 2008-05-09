@@ -8,7 +8,7 @@
 package com.extjs.gxt.ui.client.widget.layout;
 
 import com.extjs.gxt.ui.client.core.El;
-import com.extjs.gxt.ui.client.util.Rectangle;
+import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.Layout;
@@ -47,7 +47,9 @@ public class CardLayout extends Layout {
         activeItem.setVisible(false);
       }
       activeItem = component;
-      activeItem.setVisible(true);
+      if (activeItem != null) {
+        activeItem.setVisible(true);
+      }
     }
   }
 
@@ -62,7 +64,7 @@ public class CardLayout extends Layout {
   protected void onLayout(Container container, El target) {
     super.onLayout(container, target);
 
-    Rectangle rect = target.getLayoutBounds();
+    Size s = target.getStyleSize();
 
     if (activeItem == null && container.getItemCount() > 0) {
       setActiveItem(container.getItem(0));
@@ -73,7 +75,7 @@ public class CardLayout extends Layout {
       Component child = container.getItem(i);
       child.setVisible(activeItem == child);
       if (activeItem == child) {
-        setSize(child, rect.width, rect.height);
+        setSize(child, s.width, s.height);
       }
     }
   }

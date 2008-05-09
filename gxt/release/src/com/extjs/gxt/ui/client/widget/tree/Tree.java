@@ -13,12 +13,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.extjs.gxt.ui.client.GXT;
-import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.TreeEvent;
-import com.extjs.gxt.ui.client.widget.BoxComponent;
+import com.extjs.gxt.ui.client.widget.AbstractContainer;
+import com.extjs.gxt.ui.client.widget.Items;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -74,70 +73,55 @@ import com.google.gwt.user.client.Event;
  * </ul>
  * </dd>
  * 
- * <dd><b>Remove</b> : TreeEvent(item, child)<br>
+ * <dd><b>Remove</b> : TreeEvent(tree, item, child)<br>
  * <div>Fires after a item has been removed.</div>
  * <ul>
- * <li>item : this</li>
+ * <li>tree : this</li>
+ * <li>item : item</li>
  * <li>child : the item being removed</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Expand</b> : TreeEvent(item)<br>
+ * <dd><b>SelectionChange</b> : TreeEvent(tree, selectedItem, selected)<br>
+ * <div>Fires after a item has been removed.</div>
+ * <ul>
+ * <li>tree : this</li>
+ * <li>selectedItem : selection single select</li>
+ * <li>selected : selection multi select</li>
+ * </ul>
+ * </dd>
+ * 
+ * <dd><b>Expand</b> : TreeEvent(tree, item)<br>
  * <div>Fires after a item has been expanded.</div>
  * <ul>
  * <li>item : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Collapse</b> : TreeEvent(item)<br>
+ * <dd><b>Collapse</b> : TreeEvent(tree, item)<br>
  * <div>Fires ater a item is collapsed.</div>
  * <ul>
  * <li>item : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>CheckChange</b> : TreeEvent(item)<br>
+ * <dd><b>CheckChange</b> : TreeEvent(tree, item)<br>
  * <div>Fires after a check state change.</div>
  * <ul>
  * <li>item : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>ContextMenu</b> : ComponentEvent(component)<br>
+ * <dd><b>ContextMenu</b> : TreeEvent(tree)<br>
  * <div>Fires before the tree's context menu is shown.</div>
  * <ul>
  * <li>component : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>MouseOver</b> : TreeEvent(item, event)<br>
- * <div>Fires when the mouse is over an item.</div>
+ * <dd><b>KeyPress</b> : TreeEvent(tree, event)<br>
+ * <div>Fires when a key is pressed.</div>
  * <ul>
- * <li>item : active item</li>
- * <li>event : dom event</li>
- * </ul>
- * </dd>
- * 
- * <dd><b>MouseOut</b> : TreeEvent(item, event)<br>
- * <div>Fires when the mouse leaves an item.</div>
- * <ul>
- * <li>item : active item</li>
- * <li>event : dom event</li>
- * </ul>
- * </dd>
- * 
- * <dd><b>MouseDown</b> : TreeEvent(item, event)<br>
- * <div>Fires when the mouse is pressed.</div>
- * <ul>
- * <li>item : active item</li>
- * <li>event : dom event</li>
- * </ul>
- * </dd>
- * 
- * <dd><b>KeyDown</b> : TreeEvent(item, event)<br>
- * <div>Fires when the key is pressed.</div>
- * <ul>
- * <li>item : the active item</li>
  * <li>event : dom event</li>
  * </ul>
  * </dd>
@@ -147,7 +131,7 @@ import com.google.gwt.user.client.Event;
  * <dd>.my-tree-item-text span (the tree item text)</dd>
  * </dl>
  */
-public class Tree extends BoxComponent {
+public class Tree<S extends TreeSelectionModel> extends AbstractContainer<TreeItem> {
 
   /**
    * Check cascade enum.
@@ -163,70 +147,17 @@ public class Tree extends BoxComponent {
     PARENT, LEAF, BOTH;
   }
 
-  /**
-   * Sets the tree selection mode (defaults to SINGLE). Valid values are SINGLE
-   * and MULTI.
-   */
-  public SelectionMode selectionMode = SelectionMode.SINGLE;
-
-  /**
-   * True to animate tree item expand and collapse (defaults to true).
-   */
-  public boolean animate = true;
-
-  /**
-   * True for a check box tree (defaults to false).
-   */
-  public boolean checkable;
-
-  /**
-   * The global icon style for leaf tree items (defaults to null). Individual
-   * tree items can override this value by setting the the item's icon style.
-   */
-  public String itemImageStyle;
-
-  /**
-   * The global icon style for tree items with children (defaults to
-   * 'tree-folder'). Individual tree items can override this value by setting
-   * the the item's icon style.
-   */
-  public String nodeImageStyle = "tree-folder";
-
-  /**
-   * The global icon style for expanded tree items (defaults to
-   * 'tree-folder-open'). Individual tree items can override this value by
-   * setting the the item's icon style.
-   */
-  public String openNodeImageStyle = "tree-folder-open";
-
-  /**
-   * Sets which tree items will display a check box (defaults to BOTH).
-   * <p>
-   * Valid values are:
-   * <ul>
-   * <li>BOTH - both nodes and leafs</li>
-   * <li>PARENT - only nodes with children</li>
-   * <li>LEAF - only leafs</li>
-   * </ul>
-   */
-  public CheckNodes checkNodes = CheckNodes.BOTH;
-
-  /**
-   * Sets the cascading behavior for check tree (defaults to PARENTS).
-   * <p>
-   * Valid values are:
-   * <ul>
-   * <li>NONE - no cascading</li>
-   * <li>PARENTS - cascade to parents</li>
-   * <li>CHILDREN - cascade to children</li>
-   * </ul>
-   */
-  public CheckCascade checkStyle = CheckCascade.PARENTS;
-
   protected TreeItem root;
-  protected TreeSelectionModel sm;
+  protected S sm;
   protected boolean isViewer;
-
+  private String openNodeIconStyle = "tree-folder-open";
+  private String nodeIconStyle = "tree-folder";
+  private String itemStyle = "my-treeitem";
+  private String itemImageStyle;
+  private CheckCascade checkStyle = CheckCascade.PARENTS;
+  private CheckNodes checkNodes = CheckNodes.BOTH;
+  private boolean animate = true;
+  private boolean checkable;
   private int indentWidth = 18;
   private Map<String, TreeItem> nodeHash;
 
@@ -234,10 +165,13 @@ public class Tree extends BoxComponent {
    * Creates a new single select tree.
    */
   public Tree() {
+    attachChildren = false;
+    baseStyle = "my-tree";
     focusable = true;
     createRootItem();
     root.root = true;
     nodeHash = new HashMap<String, TreeItem>();
+    setSelectionModel((S) new SingleTreeSelectionModel());
   }
 
   /**
@@ -245,22 +179,6 @@ public class Tree extends BoxComponent {
    */
   public void collapseAll() {
     root.setExpanded(false, true);
-  }
-
-  /**
-   * Deselects a item.
-   * 
-   * @param item the item to be deselected
-   */
-  public void deselect(TreeItem item) {
-    getSelectionModel().deselect(item);
-  }
-
-  /**
-   * Deselects all selections.
-   */
-  public void deselectAll() {
-    getSelectionModel().deselectAll();
   }
 
   /**
@@ -312,7 +230,7 @@ public class Tree extends BoxComponent {
    * @return the matching tree item or <code>null</code> if no match
    */
   public TreeItem findItem(Element element) {
-    El elem = fly(element).findParent(".my-treeitem", 15);
+    El elem = fly(element).findParent("." + itemStyle, 15);
     if (elem != null) {
       String id = elem.getId();
       if (id != null && !id.equals("")) {
@@ -339,6 +257,24 @@ public class Tree extends BoxComponent {
   }
 
   /**
+   * Returns true if animations are enabled.
+   * 
+   * @return the animate state
+   */
+  public boolean getAnimate() {
+    return animate;
+  }
+
+  /**
+   * Returns true if check boxs are enabled.
+   * 
+   * @return the checkbox state
+   */
+  public boolean getCheckable() {
+    return checkable;
+  }
+
+  /**
    * Returns a list of id's for all checked items.
    * 
    * @return the list of checked id's
@@ -355,6 +291,25 @@ public class Tree extends BoxComponent {
     return list;
   }
 
+  /**
+   * Returns the child nodes value.
+   * 
+   * @return the child nodes value
+   */
+  public CheckNodes getCheckNodes() {
+    return checkNodes;
+  }
+
+  /**
+   * The check style value.
+   * 
+   * @return the check style
+   */
+  public CheckCascade getCheckStyle() {
+    return checkStyle;
+  }
+
+  @Override
   public Menu getContextMenu() {
     // made public
     return super.getContextMenu();
@@ -380,6 +335,33 @@ public class Tree extends BoxComponent {
   }
 
   /**
+   * Returns the item icon style.
+   * 
+   * @return the icon style
+   */
+  public String getItemIconStyle() {
+    return itemImageStyle;
+  }
+
+  /**
+   * Returns the node icon style.
+   * 
+   * @return the icon style
+   */
+  public String getNodeIconStyle() {
+    return nodeIconStyle;
+  }
+
+  /**
+   * Returns the open node icon style.
+   * 
+   * @return the icon style
+   */
+  public String getOpenNodeIconStyle() {
+    return openNodeIconStyle;
+  }
+
+  /**
    * Returns the tree's root item.
    * 
    * @return the root item
@@ -389,93 +371,74 @@ public class Tree extends BoxComponent {
   }
 
   /**
-   * Returns the selected item.
-   * 
-   * @return the selected item or <code>null</code> if no selection
-   */
-  public TreeItem getSelectedItem() {
-    return getSelectionModel().getSelected();
-  }
-
-  /**
-   * Returns an array of selected items.
-   * 
-   * @return the selected items
-   */
-  public List<TreeItem> getSelection() {
-    ArrayList<TreeItem> sel = new ArrayList<TreeItem>();
-    if (sm == null) {
-      return sel;
-    }
-    if (sm != null && sm instanceof MultiSelectionModel) {
-      sel.addAll(sm.getSelection());
-    } else {
-      TreeItem item = getSelectedItem();
-      if (item != null) {
-        sel.add(item);
-      }
-    }
-    return sel;
-  }
-
-  /**
-   * Returns the selection mode.
-   * 
-   * @return the selection mode
-   */
-  public SelectionMode getSelectionMode() {
-    return selectionMode;
-  }
-
-  /**
    * Returns the tree's selection model.
    * 
    * @return the selection model
    */
-  public TreeSelectionModel getSelectionModel() {
-    if (sm == null) {
-      if (selectionMode == SelectionMode.SINGLE) {
-        sm = new TreeSelectionModel();
-      } else {
-        sm = new MultiSelectionModel();
-      }
-    }
+  public S getSelectionModel() {
     return sm;
   }
 
+  @Override
   public void onComponentEvent(ComponentEvent ce) {
-
-  }
-
-  public void onBrowserEvent(Event event) {
-    int type = DOM.eventGetType(event);
-
-    // hack to receive keyboard events in safari
-    if (GXT.isSafari && type == Event.ONKEYDOWN) {
-      if (sm.getSelected() != null) {
-        TreeEvent te = new TreeEvent(this);
-        te.event = event;
-        sm.onKeyDown(te);
-        return;
-      }
-    }
-
-    if (type == Event.ONMOUSEUP) {
-      if (DOM.eventGetButton(event) == Event.BUTTON_RIGHT
-          || (GXT.isMac && DOM.eventGetCtrlKey(event))) {
-        super.onBrowserEvent(event);
-        return;
-      }
-    }
-
-    if (!disabled) {
-      TreeItem item = findItem(DOM.eventGetTarget(event));
-      if (item != null) {
-        item.onBrowserEvent(event);
-      }
+    super.onComponentEvent(ce);
+    TreeEvent te = (TreeEvent) ce;
+    if (te.item != null) {
+      te.item.onComponentEvent(te);
     }
   }
 
+  /**
+   * Sets whether expand /collapse should be animated (defaults to true).
+   * 
+   * @param animate the animate state
+   */
+  public void setAnimate(boolean animate) {
+    this.animate = animate;
+  }
+
+  /**
+   * Sets whether checkboxes are used in the tree.
+   * 
+   * @param checkable true for checkboxes
+   */
+  public void setCheckable(boolean checkable) {
+    this.checkable = checkable;
+  }
+
+  /**
+   * Sets which tree items will display a check box (defaults to BOTH).
+   * <p>
+   * Valid values are:
+   * <ul>
+   * <li>BOTH - both nodes and leafs</li>
+   * <li>PARENT - only nodes with children</li>
+   * <li>LEAF - only leafs</li>
+   * </ul>
+   * 
+   * @param checkNodes the child nodes value
+   */
+  public void setCheckNodes(CheckNodes checkNodes) {
+    this.checkNodes = checkNodes;
+  }
+
+  /**
+   * Sets the cascading behavior for check tree (defaults to PARENTS).
+   * <p>
+   * Valid values are:
+   * <ul>
+   * <li>NONE - no cascading</li>
+   * <li>PARENTS - cascade to parents</li>
+   * <li>CHILDREN - cascade to children</li>
+   * </ul>
+   * 
+   * @param checkStyle the child style
+   */
+  public void setCheckStyle(CheckCascade checkStyle) {
+    this.checkStyle = checkStyle;
+  }
+
+  @Override
   public void setContextMenu(Menu menu) {
     super.setContextMenu(menu);
   }
@@ -490,39 +453,51 @@ public class Tree extends BoxComponent {
   }
 
   /**
-   * Sets the selection to the tree items. The current selection is cleared
-   * before the new items are selected. If the tree is single-select then all
-   * items are ignored.
+   * Sets the global icon style for leaf tree items. Individual tree items can
+   * override this value by setting the the item's icon style.
    * 
-   * 
-   * @param selected the items to select
+   * @param itemImageStyle the image style
    */
-  public void setSelection(List selected) {
-    if (getSelectionModel() instanceof MultiSelectionModel) {
-      ((MultiSelectionModel) sm).selectItems(selected);
-    }
+  public void setItemIconStyle(String itemImageStyle) {
+    this.itemImageStyle = itemImageStyle;
   }
 
   /**
-   * Sets the selection to the item. The current selection is cleared before the
-   * new items are selected.
+   * The global icon style for tree items with children (defaults to
+   * 'tree-folder'). Individual tree items can override this value by setting
+   * the the item's icon style.
    * 
-   * @param item the item to select
+   * @param nodeIconStyle the node icon style
    */
-  public void setSelection(TreeItem item) {
-    getSelectionModel().select(item);
+  public void setNodeIconStyle(String nodeIconStyle) {
+    this.nodeIconStyle = nodeIconStyle;
   }
 
   /**
-   * Sets the selection mode for the list. Calling after the tree has been
-   * rendered will have no effect.
+   * Sets the global icon style for expanded tree items (defaults to
+   * 'tree-folder-open'). Individual tree items can override this value by
+   * setting the the item's icon style.
    * 
-   * @param selectionMode the selection mode
+   * @param openNodeIconStyle the open node icon style
    */
-  public void setSelectionMode(SelectionMode selectionMode) {
-    if (!isRendered()) {
-      this.selectionMode = selectionMode;
+  public void setOpenNodeIconStyle(String openNodeIconStyle) {
+    this.openNodeIconStyle = openNodeIconStyle;
+  }
+
+  public void setSelectionModel(S sm) {
+    assert sm != null;
+    if (this.sm != null) {
+      this.sm.bind(null);
     }
+    this.sm = sm;
+    sm.bind(this);
+  }
+
+  @Override
+  protected ComponentEvent createComponentEvent(Event event) {
+    TreeEvent te = new TreeEvent(this, findItem(DOM.eventGetTarget(event)));
+    te.event = event;
+    return te;
   }
 
   protected void createRootItem() {
@@ -530,27 +505,10 @@ public class Tree extends BoxComponent {
     root.tree = this;
   }
 
-  protected void initSelectionModel() {
-    if (selectionMode == SelectionMode.MULTI) {
-      sm = new MultiSelectionModel();
-    } else {
-      sm = new TreeSelectionModel();
-    }
-    sm.init(this);
-  }
-
+  @Override
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
     setElement(DOM.createDiv(), target, index);
-    setStyleName("my-tree");
-
-    if (selectionMode == SelectionMode.MULTI) {
-      sm = new MultiSelectionModel();
-    } else {
-      sm = new TreeSelectionModel();
-    }
-
-    this.sm.init(this);
 
     root.render(getElement());
 
@@ -559,19 +517,15 @@ public class Tree extends BoxComponent {
     }
 
     disableTextSelection(true);
-    sinkEvents(Event.ONCLICK | Event.ONDBLCLICK | Event.KEYEVENTS | Event.MOUSEEVENTS);
+    el.addEventsSunk(Event.ONCLICK | Event.ONDBLCLICK | Event.KEYEVENTS
+        | Event.MOUSEEVENTS);
   }
 
+  @Override
   protected void onRightClick(ComponentEvent ce) {
     TreeItem item = findItem(ce.getTarget());
-    if (selectionMode == SelectionMode.SINGLE) {
-      if (item != null) {
-        setSelection(item);
-      }
-    } else {
-      if (item != null && !sm.isSelected(item)) {
-        setSelection(item);
-      }
+    if (item != null) {
+      sm.doSelect(new Items(item));
     }
     super.onRightClick(ce);
   }

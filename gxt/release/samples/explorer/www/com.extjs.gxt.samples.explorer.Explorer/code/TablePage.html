@@ -58,6 +58,7 @@ import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.table.CellRenderer;
 import com.extjs.gxt.ui.client.widget.table.DateTimeCellRenderer;
 import com.extjs.gxt.ui.client.widget.table.NumberCellRenderer;
+import com.extjs.gxt.ui.client.widget.table.RowSelectionModel;
 import com.extjs.gxt.ui.client.widget.table.Table;
 import com.extjs.gxt.ui.client.widget.table.TableColumn;
 import com.extjs.gxt.ui.client.widget.table.TableColumnModel;
@@ -124,8 +125,8 @@ public class TablePage extends Container implements EntryPoint {
     TableColumnModel cm = new TableColumnModel(columns);
 
     Table tbl = new Table(cm);
-    tbl.selectionMode = SelectionMode.MULTI;
-    tbl.horizontalScroll = true;
+    tbl.setSelectionModel(new RowSelectionModel(SelectionMode.MULTI));
+    tbl.setHorizontalScroll(true);
 
     List<Stock> stocks = TestData.getStocks();
     for (int i = 0; i < stocks.size(); i++) {
@@ -142,10 +143,10 @@ public class TablePage extends Container implements EntryPoint {
     }
 
     ContentPanel panel = new ContentPanel();
-    panel.collapsible = true;
-    panel.frame = true;
-    panel.animCollapse = false;
-    panel.buttonAlign = HorizontalAlignment.CENTER;
+    panel.setCollapsible(true);
+    panel.setFrame(true);
+    panel.setAnimCollapse(false);
+    panel.setButtonAlign(HorizontalAlignment.CENTER);
     panel.setIconStyle("icon-table");
     panel.setHeading("Table Demo");
     panel.setLayout(new FitLayout());

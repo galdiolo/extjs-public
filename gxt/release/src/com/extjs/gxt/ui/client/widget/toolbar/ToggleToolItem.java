@@ -86,7 +86,7 @@ public class ToggleToolItem extends TextToolItem {
 
   @Override
   protected void onRender(Element target, int index) {
-    toggleButton.pressed = pressed;
+    toggleButton.toggle(pressed);
     super.onRender(target, index);
   }
   

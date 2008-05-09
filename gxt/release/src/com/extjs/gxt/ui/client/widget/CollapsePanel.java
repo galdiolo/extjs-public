@@ -42,7 +42,7 @@ public class CollapsePanel extends ContentPanel {
   public CollapsePanel(ContentPanel panel, BorderLayoutData data) {
     this.panel = panel;
     this.parentData = data;
-    this.collapsed = true;
+    this.collapse();
   }
 
   /**
@@ -54,6 +54,7 @@ public class CollapsePanel extends ContentPanel {
     return panel;
   }
 
+  @Override
   public void onComponentEvent(ComponentEvent ce) {
     super.onComponentEvent(ce);
     if (!ce.within(collapseBtn.getElement())) {
@@ -96,16 +97,19 @@ public class CollapsePanel extends ContentPanel {
     }
   }
 
+  @Override
   protected void doAttachChildren() {
     super.doAttachChildren();
     collapseBtn.onAttach();
   }
 
+  @Override
   protected void doDetachChildren() {
     super.doDetachChildren();
     WidgetHelper.doDetach(collapseBtn);
   }
 
+  @Override
   protected void onExpand() {
     panel.getHeader().show();
   }
@@ -124,6 +128,7 @@ public class CollapsePanel extends ContentPanel {
     }
   }
 
+  @Override
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
     el.removeChildren();
@@ -182,7 +187,7 @@ public class CollapsePanel extends ContentPanel {
     popup.getIgnoreList().add(collapseBtn.getElement());
     popup.setStyleName("x-layout-popup");
     popup.setLayout(new FillLayout(4));
-    popup.shadow = true;
+    popup.setShadow(true);
     int hh = fly(el.firstChild().dom).getHeight();
     panel.getHeader().hide();
     panel.body.addStyleName("x-panel-popup-body");

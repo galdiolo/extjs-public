@@ -31,17 +31,26 @@ import com.google.gwt.user.client.Element;
  */
 public class CheckBox extends Field {
 
-  /**
-   * The text that appears beside the checkbox (defaults to null).
-   */
-  public String boxLabel;
-
   protected boolean checked;
   protected El wrap, input;
 
+  /**
+   * The text that appears beside the checkbox (defaults to null).
+   */
+  private String boxLabel;
+
   @Override
   public void clearInvalid() {
+    // do nothing
+  }
 
+  public String getBoxLabel() {
+    return boxLabel;
+  }
+
+  @Override
+  public Object getValue() {
+    return checked;
   }
 
   /**
@@ -54,17 +63,28 @@ public class CheckBox extends Field {
   }
 
   /**
+   * The text that appears beside the checkbox.
+   * 
+   * @param boxLabel the box label
+   */
+  public void setBoxLabel(String boxLabel) {
+    this.boxLabel = boxLabel;
+  }
+
+  /**
    * Sets the chekced state.
    * 
    * @param checked <code>true</code> to check, <code>false</code> otherwise
    */
   public void setChecked(boolean checked) {
+    this.checked = checked;
     setValue(String.valueOf(checked));
   }
 
-  public void setValue(String value) {
-    if (value != null
-        && (value.toLowerCase().equals("true") || value.toLowerCase().equals("on"))) {
+  @Override
+  public void setValue(Object value) {
+    String v = value != null ? value.toString().toLowerCase() : null;
+    if (v != null && (v.equals("true") || v.equals("on"))) {
       checked = true;
     } else {
       checked = false;
@@ -72,6 +92,7 @@ public class CheckBox extends Field {
     if (rendered) {
       input.setElementAttribute("checked", checked);
     }
+    super.setValue(String.valueOf(checked));
     FieldEvent fe = new FieldEvent(this);
     fe.checked = checked;
     fireEvent(Events.Change, fe);
@@ -80,6 +101,16 @@ public class CheckBox extends Field {
   @Override
   protected El getInputEl() {
     return input;
+  }
+
+  @Override
+  protected El getStyleEl() {
+    return input;
+  }
+
+  @Override
+  protected void initValue() {
+
   }
 
   @Override
@@ -93,11 +124,6 @@ public class CheckBox extends Field {
     if (value != checked) {
       setChecked(value);
     }
-  }
-
-  @Override
-  protected El getStyleEl() {
-    return input;
   }
 
   @Override
@@ -116,16 +142,20 @@ public class CheckBox extends Field {
     wrap.appendChild(input.dom);
     setElement(wrap.dom, target, index);
 
-    if (boxLabel != null) {
+    if (getBoxLabel() != null) {
       Element div = DOM.createDiv();
       fly(div).setStyleName("x-form-cb-label");
-      fly(div).setInnerHtml(boxLabel);
+      fly(div).setInnerHtml(getBoxLabel());
       wrap.appendChild(div);
     }
 
     super.onRender(target, index);
 
     focusStyle = null;
+
+    if (checked) {
+      setValue(true);
+    }
   }
 
   @Override

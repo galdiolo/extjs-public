@@ -14,22 +14,33 @@ import com.extjs.gxt.ui.client.mvc.Controller;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 
-
 public class TaskController extends Controller {
 
+  protected TaskFolderView folderView;
+
   public TaskController() {
+    registerEventTypes(AppEvents.Init);
     registerEventTypes(AppEvents.NavTasks);
   }
-  
+
+  @Override
+  public void initialize() {
+    super.initialize();
+    folderView = new TaskFolderView(this);
+  }
+
   public void handleEvent(AppEvent event) {
+    if (event.type == AppEvents.Init) {
+      forwardToView(folderView, event);
+    }
     if (event.type == AppEvents.NavTasks) {
-      ContentPanel center = (ContentPanel)Registry.get("center");
+      ContentPanel center = (ContentPanel) Registry.get("center");
       center.setHeading("Tasks");
       center.removeAll();
-      
-      Container south = (Container)Registry.get("south");
+
+      Container south = (Container) Registry.get("south");
       south.removeAll();
     }
   }
-  
+
 }

@@ -45,28 +45,6 @@ import com.extjs.gxt.ui.client.util.Size;
 public class BoxComponent extends Component {
 
   /**
-   * True to use height:'auto', false to use fixed height (defaults to false).
-   */
-  public boolean autoHeight;
-
-  /**
-   * True to use width:'auto', false to use fixed width (defaults to false).
-   */
-  public boolean autoWidth;
-
-  /**
-   * True to defer height calculations to an external component, false to allow
-   * this component to set its own height (defaults to false).
-   */
-  public boolean deferHeight;
-
-  /**
-   * True to enable a shadow that will be displayed behind the component
-   * (defaults to false).
-   */
-  public boolean shadow = false;
-
-  /**
    * True to adjust sizes for box model issues to ensure actual size matches set
    * size.
    */
@@ -84,10 +62,15 @@ public class BoxComponent extends Component {
    */
   protected Layer layer;
 
+  protected Size attachSize = new Size(-1, -1);
+
+  private boolean shadow = false;
+  private boolean deferHeight;
+  private boolean autoHeight;
+  private boolean autoWidth;
   private String width, height;
   private int left = Style.DEFAULT, top = Style.DEFAULT;
   private int pageX = Style.DEFAULT, pageY = Style.DEFAULT;
-  protected Size attachSize = new Size(-1, -1);
   private boolean boxReady;
 
   /**
@@ -100,30 +83,6 @@ public class BoxComponent extends Component {
    */
   public Rectangle getBounds(boolean local) {
     return el.getBounds(local);
-  }
-
-  /**
-   * Returns the component's current position. The component must be attached to
-   * return page coordinates.
-   * 
-   * @param local true to return the element's left and top rather than page
-   *            coordinates
-   * @return the position
-   */
-  public Point getPosition(boolean local) {
-    if (local) {
-      return new Point(el.getLeft(true), el.getTop(true));
-    }
-    return el.getXY();
-  }
-
-  /**
-   * Returns the component's size.
-   * 
-   * @return the size
-   */
-  public Size getSize() {
-    return el.getSize();
   }
 
   /**
@@ -146,6 +105,39 @@ public class BoxComponent extends Component {
   }
 
   /**
+   * Returns the component's current position. The component must be attached to
+   * return page coordinates.
+   * 
+   * @param local true to return the element's left and top rather than page
+   *            coordinates
+   * @return the position
+   */
+  public Point getPosition(boolean local) {
+    if (local) {
+      return new Point(el.getLeft(true), el.getTop(true));
+    }
+    return el.getXY();
+  }
+
+  /**
+   * Returns true if the shadow is enabled.
+   * 
+   * @return the shadow the shadow state
+   */
+  public boolean getShadow() {
+    return shadow;
+  }
+
+  /**
+   * Returns the component's size.
+   * 
+   * @return the size
+   */
+  public Size getSize() {
+    return el.getSize();
+  }
+
+  /**
    * Returns the component's width.
    * 
    * @return the width
@@ -164,8 +156,50 @@ public class BoxComponent extends Component {
     return el.getWidth(content);
   }
 
+  /**
+   * @return the autoHeight
+   */
+  public boolean isAutoHeight() {
+    return autoHeight;
+  }
+
+  /**
+   * @return the autoWidth
+   */
+  public boolean isAutoWidth() {
+    return autoWidth;
+  }
+
+  /**
+   * Returns true if the height is being deferred
+   * 
+   * @return the defer heigh state
+   */
+  public boolean isDeferHeight() {
+    return deferHeight;
+  }
+
+  @Override
   public void recalculate() {
     onResize(getOffsetWidth(), getOffsetHeight());
+  }
+
+  /**
+   * Sets the component's auto height value (defaults to false).
+   * 
+   * @param autoHeight true to enable auto height
+   */
+  public void setAutoHeight(boolean autoHeight) {
+    this.autoHeight = autoHeight;
+  }
+
+  /**
+   * True to use width:'auto', false to use fixed width (defaults to false).
+   * 
+   * @param autoWidth the auto width state
+   */
+  public void setAutoWidth(boolean autoWidth) {
+    this.autoWidth = autoWidth;
   }
 
   /**
@@ -193,6 +227,16 @@ public class BoxComponent extends Component {
   }
 
   /**
+   * True to defer height calculations to an external component, false to allow
+   * this component to set its own height (defaults to false).
+   * 
+   * @param deferHeight true to defer height
+   */
+  public void setDeferHeight(boolean deferHeight) {
+    this.deferHeight = deferHeight;
+  }
+
+  /**
    * Sets the component's height. This method fires the <i>Resize</i> event.
    * element.
    * 
@@ -217,17 +261,6 @@ public class BoxComponent extends Component {
    * instead, use {@link #setPosition}. This method fires the <i>Move</i>
    * event.
    * 
-   * @param point the new location
-   */
-  public void setPagePosition(Point point) {
-    setPagePosition(point.x, point.y);
-  }
-
-  /**
-   * Sets the page XY position of the component. To set the left and top
-   * instead, use {@link #setPosition}. This method fires the <i>Move</i>
-   * event.
-   * 
    * @param x the x coordinate
    * @param y the y coordinate
    */
@@ -243,10 +276,23 @@ public class BoxComponent extends Component {
     }
     el.setXY(pageX, pageY);
     onPosition(pageX, pageY);
-    BoxComponentEvent ce = new BoxComponentEvent(this);
-    ce.x = pageX;
-    ce.y = pageY;
-    fireEvent(Events.Move, ce);
+    if (hasListeners) {
+      BoxComponentEvent ce = new BoxComponentEvent(this);
+      ce.x = pageX;
+      ce.y = pageY;
+      fireEvent(Events.Move, ce);
+    }
+  }
+
+  /**
+   * Sets the page XY position of the component. To set the left and top
+   * instead, use {@link #setPosition}. This method fires the <i>Move</i>
+   * event.
+   * 
+   * @param point the new location
+   */
+  public void setPagePosition(Point point) {
+    setPagePosition(point.x, point.y);
   }
 
   /**
@@ -281,6 +327,7 @@ public class BoxComponent extends Component {
     El pel = getPositionEl();
 
     if (ax != Style.DEFAULT || ay != Style.DEFAULT) {
+      pel.makePositionable();
       if (ax != Style.DEFAULT && ay != Style.DEFAULT) {
         pel.setLeftTop(ax, ay);
       } else if (ax != Style.DEFAULT) {
@@ -297,6 +344,16 @@ public class BoxComponent extends Component {
   }
 
   /**
+   * True to enable a shadow that will be displayed behind the component
+   * (defaults to false).
+   * 
+   * @param shadow true to enable the shadow
+   */
+  public void setShadow(boolean shadow) {
+    this.shadow = shadow;
+  }
+
+  /**
    * Sets the width and height of the component. This method fires the <i>Resize</i>
    * event.
    * 
@@ -305,11 +362,11 @@ public class BoxComponent extends Component {
    */
   public void setSize(int width, int height) {
     if (width != Style.DEFAULT) {
-      autoWidth = false;
+      setAutoWidth(false);
       attachSize.width = width;
     }
     if (height != Style.DEFAULT) {
-      autoHeight = false;
+      setAutoHeight(false);
       attachSize.height = height;
     }
 
@@ -317,23 +374,25 @@ public class BoxComponent extends Component {
       return;
     }
 
-    if (autoWidth) {
+    if (isAutoWidth()) {
       setStyleAttribute("width", "auto");
     } else if (attachSize.width != Style.DEFAULT) {
       el.setWidth(attachSize.width, adjustSize);
     }
-    if (autoHeight) {
+    if (isAutoHeight()) {
       setStyleAttribute("height", "auto");
     } else if (attachSize.height != Style.DEFAULT) {
       el.setHeight(attachSize.height, adjustSize);
     }
-    
+
     onResize(width, height);
-    
-    BoxComponentEvent ce = new BoxComponentEvent(this);
-    ce.width = width;
-    ce.height = height;
-    fireEvent(Events.Resize, ce);
+
+    if (hasListeners) {
+      BoxComponentEvent ce = new BoxComponentEvent(this);
+      ce.width = width;
+      ce.height = height;
+      fireEvent(Events.Resize, ce);
+    }
   }
 
   /**
@@ -351,22 +410,25 @@ public class BoxComponent extends Component {
       return;
     }
 
-    if (autoWidth) {
+    if (isAutoWidth()) {
       el.setWidth("auto");
     } else if (!width.equals(Style.UNDEFINED)) {
       el.setWidth(width);
     }
-    if (autoHeight) {
+    if (isAutoHeight()) {
       el.setHeight("auto");
     } else if (!height.equals(Style.UNDEFINED)) {
       el.setHeight(height);
     }
 
     onResize(getOffsetWidth(), getOffsetHeight());
-    BoxComponentEvent be = new BoxComponentEvent(this);
-    be.width = getOffsetWidth();
-    be.height = getOffsetHeight();
-    fireEvent(Events.Resize, be);
+    
+    if (hasListeners) {
+      BoxComponentEvent be = new BoxComponentEvent(this);
+      be.width = getOffsetWidth();
+      be.height = getOffsetHeight();
+      fireEvent(Events.Resize, be);
+    }
   }
 
   /**
@@ -393,9 +455,9 @@ public class BoxComponent extends Component {
     super.afterRender();
     boxReady = true;
 
-    if (shadow || shim) {
+    if (getShadow() || shim) {
       layer = new Layer(getElement());
-      layer.enableShadow(shadow);
+      layer.enableShadow(getShadow());
       layer.enableShim();
       el = layer;
     }

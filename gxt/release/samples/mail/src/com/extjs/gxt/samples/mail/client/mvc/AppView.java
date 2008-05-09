@@ -20,7 +20,7 @@ import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Viewport;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
-import com.extjs.gxt.ui.client.widget.layout.FillLayout;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -45,8 +45,9 @@ public class AppView extends View {
     westData.margins = new Margins(5, 0, 5, 5);
 
     west = new ContentPanel();
+    west.setLayoutOnChange(true);
     west.setHeading("GXT Mail Demo");
-    west.setLayout(new FillLayout());
+    west.setLayout(new FitLayout());
     createNavigation();
 
     viewport.add(west, westData);
@@ -56,11 +57,11 @@ public class AppView extends View {
     main.setLayout(layout);
 
     center = new ContentPanel();
-    center.setLayout(new FillLayout());
+    center.setLayout(new FitLayout());
 
     Container south = new Container();
     south.setBorders(true);
-    south.setLayout(new FillLayout());
+    south.setLayout(new FitLayout());
 
     BorderLayoutData centerData = new BorderLayoutData(LayoutRegion.CENTER);
     centerData.margins = new Margins(0, 0, 5, 0);

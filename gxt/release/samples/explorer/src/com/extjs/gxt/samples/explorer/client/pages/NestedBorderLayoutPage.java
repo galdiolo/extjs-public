@@ -11,7 +11,7 @@ import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
-import com.extjs.gxt.ui.client.widget.layout.AccordianLayout;
+import com.extjs.gxt.ui.client.widget.layout.AccordionLayout;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Element;
@@ -30,7 +30,7 @@ public class NestedBorderLayoutPage extends Container implements EntryPoint {
     setLayout(new BorderLayout());
 
     ContentPanel west = new ContentPanel();
-    west.setLayout(new AccordianLayout());
+    west.setLayout(new AccordionLayout());
     west.setHeading("West");
     
     Html html = new Html(TestData.DUMMY_TEXT_SHORT);

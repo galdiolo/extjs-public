@@ -124,7 +124,7 @@ public class DomEvent extends BaseEvent {
   public El getTargetEl() {
     if (event != null) {
       if (el == null) {
-        el = new El(target);
+        el = new El(getTarget());
       }
       return el;
     }

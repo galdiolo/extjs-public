@@ -17,6 +17,7 @@ import com.extjs.gxt.ui.client.event.PreviewEvent;
 import com.extjs.gxt.ui.client.util.BaseEventPreview;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.widget.AbstractContainer;
+import com.extjs.gxt.ui.client.widget.Shadow.ShadowPosition;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -99,32 +100,13 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class Menu extends AbstractContainer<MenuItem> {
 
-  /**
-   * The {@link El#alignTo} anchor position value to use for submenus of this
-   * menu (defaults to "tl-tr-?").
-   */
-  public String subMenuAlign = "tl-tr-?";
-
-  /**
-   * The default {@link El#alignTo} anchor position value for this menu relative
-   * to its element of origin (defaults to "tl-bl?").
-   */
-  public String defaultAlign = "tl-bl?";
-
-  /**
-   * True or "sides" for the default effect, "frame" for 4-way shadow, and
-   * "drop" for bottom-right shadow (defaults to "sides")
-   */
-  public String shadowPosition = "sides";
-
-  /**
-   * The minimum width of the menu in pixels (defaults to 120).
-   */
-  public int minWidth = 120;
-
   KeyNav keyNav;
   MenuItem parentItem;
-
+  
+  private String subMenuAlign = "tl-tr-?";
+  private String defaultAlign = "tl-bl?";
+  private ShadowPosition shadowPosition = ShadowPosition.SIDES;
+  private int minWidth = 120;
   private MenuItem activeItem;
   private Menu parentMenu;
   private boolean showing;
@@ -138,7 +120,7 @@ public class Menu extends AbstractContainer<MenuItem> {
    */
   public Menu() {
     baseStyle = "x-menu";
-    shadow = true;
+    setShadow(true);
     attachChildren = false;
     eventPreview = new BaseEventPreview() {
       @Override
@@ -147,6 +129,7 @@ public class Menu extends AbstractContainer<MenuItem> {
         return true;
       }
     };
+    eventPreview.setAutoHideCancelEvent(false);
   }
 
   /**
@@ -159,12 +142,48 @@ public class Menu extends AbstractContainer<MenuItem> {
   }
 
   /**
+   * Returns the default alignment.
+   * 
+   * @return the default align
+   */
+  public String getDefaultAlign() {
+    return defaultAlign;
+  }
+
+  /**
+   * Returns the menu's minimum width.
+   * 
+   * @return the width
+   */
+  public int getMinWidth() {
+    return minWidth;
+  }
+
+  /**
    * Returns the menu's parent item.
    * 
    * @return the parent item
    */
   public MenuItem getParentItem() {
     return parentItem;
+  }
+
+  /**
+   * Returns the shadow position.
+   * 
+   * @return the shadow position
+   */
+  public ShadowPosition getShadowPosition() {
+    return shadowPosition;
+  }
+
+  /**
+   * Returns the sub menu alignment.
+   * 
+   * @return the alignment
+   */
+  public String getSubMenuAlign() {
+    return subMenuAlign;
   }
 
   /**
@@ -214,7 +233,7 @@ public class Menu extends AbstractContainer<MenuItem> {
     me.index = index;
     if (fireEvent(Events.BeforeAdd, me)) {
       item.parentMenu = this;
-      items.add(index, item);
+      super.insert(item, index);
       if (rendered) {
         renderItem(item, index);
       }
@@ -227,6 +246,7 @@ public class Menu extends AbstractContainer<MenuItem> {
     return showing;
   }
 
+  @Override
   public void onComponentEvent(ComponentEvent ce) {
     super.onComponentEvent(ce);
     switch (ce.type) {
@@ -251,7 +271,7 @@ public class Menu extends AbstractContainer<MenuItem> {
     MenuEvent me = new MenuEvent(this);
     me.item = item;
     if (fireEvent(Events.BeforeRemove, me)) {
-      items.remove(item);
+      super.remove(item);
       fireEvent(Events.Remove, me);
       return true;
     }
@@ -266,6 +286,44 @@ public class Menu extends AbstractContainer<MenuItem> {
     for (int i = 0; i < size; i++) {
       remove(getItem(0));
     }
+  }
+
+  /**
+   * Sets the default {@link El#alignTo} anchor position value for this menu
+   * relative to its element of origin (defaults to "tl-bl?").
+   * 
+   * @param defaultAlign the default align
+   */
+  public void setDefaultAlign(String defaultAlign) {
+    this.defaultAlign = defaultAlign;
+  }
+
+  /**
+   * Sets he minimum width of the menu in pixels (defaults to 120).
+   * 
+   * @param minWidth the min width
+   */
+  public void setMinWidth(int minWidth) {
+    this.minWidth = minWidth;
+  }
+
+  /**
+   * Sets the shadow position (defaults to SIDES).
+   * 
+   * @param shadowPosition the position
+   */
+  public void setShadowPosition(ShadowPosition shadowPosition) {
+    this.shadowPosition = shadowPosition;
+  }
+
+  /**
+   * The {@link El#alignTo} anchor position value to use for submenus of this
+   * menu (defaults to "tl-tr-?").
+   * 
+   * @param subMenuAlign the sub alignment
+   */
+  public void setSubMenuAlign(String subMenuAlign) {
+    this.subMenuAlign = subMenuAlign;
   }
 
   /**
@@ -294,7 +352,7 @@ public class Menu extends AbstractContainer<MenuItem> {
   }
 
   public Menu show(Widget widget) {
-    return show(widget.getElement(), defaultAlign);
+    return show(widget.getElement(), getDefaultAlign());
   }
 
   /**
@@ -322,6 +380,11 @@ public class Menu extends AbstractContainer<MenuItem> {
   protected void afterRender() {
     super.afterRender();
     autoWidth();
+  }
+
+  @Override
+  protected ComponentEvent createComponentEvent(Event event) {
+    return new MenuEvent(this);
   }
 
   protected void createStyles(String baseStyle) {
@@ -362,7 +425,7 @@ public class Menu extends AbstractContainer<MenuItem> {
 
       public void onUp(ComponentEvent be) {
         if (tryActivate(indexOf(activeItem) - 1, -1) == null) {
-          tryActivate(items.size() - 1, -1);
+          tryActivate(getItemCount() - 1, -1);
         }
       }
     };
@@ -374,7 +437,7 @@ public class Menu extends AbstractContainer<MenuItem> {
     renderAll();
 
     // add menu to ignore list
-    eventPreview.ignoreList.add(getElement());
+    eventPreview.getIgnoreList().add(getElement());
 
     autoWidth();
     el.addEventsSunk(Event.ONCLICK | Event.MOUSEEVENTS | Event.KEYEVENTS);
@@ -410,11 +473,11 @@ public class Menu extends AbstractContainer<MenuItem> {
   private void autoWidth() {
     if (rendered) {
       if (GXT.isIE) {
-        el.setWidth(minWidth);
+        el.setWidth(getMinWidth());
         getWidth();
         el.setWidth(fly(ul).getWidth() + el.getFrameWidth("lr"));
       } else {
-        setWidth(minWidth);
+        setWidth(getMinWidth());
       }
     }
   }
@@ -447,7 +510,7 @@ public class Menu extends AbstractContainer<MenuItem> {
   }
 
   private MenuItem tryActivate(int start, int step) {
-    for (int i = start, len = items.size(); i >= 0 && i < len; i += step) {
+    for (int i = start, len = getItemCount(); i >= 0 && i < len; i += step) {
       MenuItem item = getItem(i);
       if (item.isEnabled() && item.canActivate) {
         setActiveItem(item, false);

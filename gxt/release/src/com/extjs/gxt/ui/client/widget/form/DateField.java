@@ -51,7 +51,6 @@ public class DateField extends TriggerField {
   private Date minValue;
   private Date maxValue;
   private DateMenu menu;
-  private Date date = new Date();
 
   /**
    * Creates a new date field.
@@ -66,7 +65,7 @@ public class DateField extends TriggerField {
    * @return the date
    */
   public Date getDate() {
-    return date;
+    return (Date) getValue();
   }
 
   /**
@@ -93,7 +92,6 @@ public class DateField extends TriggerField {
    * @param date the new date
    */
   public void setDate(Date date) {
-    this.date = date;
     setValue(format.format(date));
   }
 
@@ -126,7 +124,19 @@ public class DateField extends TriggerField {
         }
       });
     }
-    menu.getDatePicker().setValue(getDate(), true);
+    DatePicker picker = menu.getDatePicker();
+    
+    Object v = getValue();
+    Date d = null;
+    if (v instanceof Date) {
+      d = (Date)v;
+    } else {
+      d = new Date();
+    }
+    picker.setValue(d);
+    picker.setMinDate(minValue);
+    picker.setMaxDate(maxValue);
+
     menu.show(wrap.dom, "tl-bl?");
   }
 
@@ -137,6 +147,48 @@ public class DateField extends TriggerField {
 
     }
     return null;
+  }
+
+  @Override
+  public void setValue(Object value) {
+    Date d = null;
+    if (value instanceof Date) {
+      d = (Date) value;
+    } else if (value instanceof String) {
+      d = parseDate((String) value);
+    }
+    if (d != null) {
+      super.setValue(format.format(d));
+    } else {
+      setValue(value);
+    }
+
+  }
+
+  @Override
+  protected void onBlur(ComponentEvent ce) {
+    String v = getRawValue();
+    try {
+      Date d = format.parse(v);
+      setValue(d);
+    } catch (Exception e) {
+
+    }
+    super.onBlur(ce);
+  }
+
+  @Override
+  public Object getValue() {
+    if (value != null && value instanceof Date) {
+      return value;
+    }
+
+    try {
+      return format.parse(super.getValue().toString());
+    } catch (Exception e) {
+
+    }
+    return "";
   }
 
   @Override

@@ -49,13 +49,13 @@ public class DataListPage extends Container implements EntryPoint {
     Listener l = new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent ce) {
         DataList l = (DataList) ce.component;
-        int count = l.getSelection().size();
+        int count = l.getSelectedItems().size();
         Info.display("Selection Changed", "There are {0} items selected", "" + count);
       }
     };
 
     final DataList list = new DataList();
-    list.selectionMode = SelectionMode.MULTI;
+    list.setSelectionMode(SelectionMode.MULTI);
     list.setBorders(false);
     list.addListener(Events.SelectionChange, l);
     list.setWidth(190);
@@ -84,9 +84,8 @@ public class DataListPage extends Container implements EntryPoint {
     remove.setIconStyle("icon-delete");
     remove.addSelectionListener(new SelectionListener() {
       public void componentSelected(ComponentEvent ce) {
-        List<DataListItem> selected = list.getSelection();
-        while (selected.size() > 0) {
-          list.remove(selected.get(0));
+        for (DataListItem item : list.getSelectedItems()) {
+          list.remove(item);
         }
       }
     });
@@ -107,14 +106,14 @@ public class DataListPage extends Container implements EntryPoint {
 
     
     ContentPanel frame = new ContentPanel();
-    frame.frame = true;
-    frame.collapsible = true;
-    frame.animCollapse = true;
+    frame.setFrame(true);
+    frame.setCollapsible(true);
+    frame.setAnimCollapse(false);
     frame.setHeading("Framed List");
     frame.setSize(210, 200);
     
     final DataList list2 = new DataList();
-    list2.flat = true;
+    list2.setFlatStyle(true);
     
     list2.addListener(Events.SelectionChange, l);
     stocks = TestData.getStocks();
@@ -139,7 +138,9 @@ public class DataListPage extends Container implements EntryPoint {
     }));
     buttonBar.add(new Button("Select Last", new SelectionListener() {
       public void componentSelected(ComponentEvent ce) {
-        list2.select(list2.getItemCount() - 1);
+        int idx = list2.getItemCount() - 1;
+        list2.select(idx, idx);
+        list2.scrollIntoView(getItem(idx));
       }
     }));
 

@@ -76,30 +76,30 @@ public class FormPanelPage extends Container implements EntryPoint {
     super.onRender(parent, pos);
 
     FormPanel panel = new FormPanel();
-    panel.frame = true;
-    panel.fieldWidth = 210;
-    panel.labelWidth = 100;
-    panel.buttonAlign = HorizontalAlignment.CENTER;
+    panel.setFrame(true);
+    panel.setFieldWidth(210);
+    panel.setLabelWidth(100);
+    panel.setButtonAlign(HorizontalAlignment.CENTER);
     panel.setHeading("Simple Form");
     panel.setIconStyle("icon-form");
     panel.setWidth(400);
     panel.setStyleAttribute("padding", "20");
 
     TextField text = new TextField();
-    text.fieldLabel = "Name";
+    text.setFieldLabel("Name");
     text.setEmptyText("Enter your full name");
     text.setAllowBlank(false);
     text.setMinLength(4);
     panel.add(text);
 
     NumberField number = new NumberField();
-    number.fieldLabel = "Age";
+    number.setFieldLabel("Age");
     number.setEmptyText("Enter your age");
     number.setAllowBlank(false);
     panel.add(number);
 
     text = new TextField();
-    text.fieldLabel = "Email";
+    text.setFieldLabel("Email");
     panel.add(text);
 
     List<Stock> stocks = TestData.getStocks();
@@ -113,48 +113,50 @@ public class FormPanelPage extends Container implements EntryPoint {
     store.add(stocks);
 
     ComboBox combo = new ComboBox();
-    combo.fieldLabel = "Company";
-    combo.displayField = "name";
+    combo.setFieldLabel("Company");
+    combo.setDisplayField("name");
     combo.setWidth(210);
     combo.setStore(store);
     panel.add(combo);
 
     DateField date = new DateField();
-    date.fieldLabel = "Birthday";
+    date.setFieldLabel("Birthday");
     date.setWidth(210);
     panel.add(date);
 
     TimeField time = new TimeField();
-    time.fieldLabel = "Time";
+    time.setFieldLabel("Time");
     time.setWidth(200);
     panel.add(time);
 
     CheckBox check1 = new CheckBox();
-    check1.boxLabel = "Classical";
+    check1.setBoxLabel("Classical");
 
     CheckBox check2 = new CheckBox();
-    check2.boxLabel = "Rock";
+    check2.setBoxLabel("Rock");
+    check2.setChecked(true);
 
     CheckBox check3 = new CheckBox();
-    check3.boxLabel = "Blue";
+    check3.setBoxLabel("Blue");
 
     CheckBoxGroup checkGroup = new CheckBoxGroup();
-    checkGroup.fieldLabel = "Music";
+    checkGroup.setFieldLabel("Music");
     checkGroup.add(check1);
     checkGroup.add(check2);
     checkGroup.add(check3);
     panel.add(checkGroup);
 
     Radio radio = new Radio();
-    radio.name = "radio";
-    radio.fieldLabel = "Red";
-
+    radio.setName("radio");
+    radio.setFieldLabel("Red");
+    radio.setValue(true);
+    
     Radio radio2 = new Radio();
-    radio2.name = "radio";
-    radio2.fieldLabel = "Blue";
+    radio2.setName("radio");
+    radio2.setFieldLabel("Blue");
 
     RadioGroup radioGroup = new RadioGroup("test");
-    radioGroup.fieldLabel = "Favorite Color";
+    radioGroup.setFieldLabel("Favorite Color");
     radioGroup.add(radio);
     radioGroup.add(radio2);
     panel.add(radioGroup);

@@ -17,35 +17,25 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * Abstract base class for any {@link BoxComponent} that can contain other
+ * <p/>Abstract base class for any {@link BoxComponent} that can contain other
  * components. Containers handle the basic behavior of containing components,
  * namely managing, attaching, and detaching the child widgets.
- * <p>
- * When children are added to a container they are not physcially added to the
+ * 
+ * <p/>When children are added to a container they are not physcially added to the
  * DOM of the container. Subclasses are responsible for connecting the child
  * components.
- * </p>
  * 
  * @param <T> the child component type
  */
 public abstract class AbstractContainer<T extends Component> extends BoxComponent {
 
   /**
-   * True to the automatically destroy any child component when removed from the
-   * container (defaults to false).
-   */
-  public boolean autoDestroy;
-
-  /**
-   * True to have the container's direct childrens attach state updated by the
-   * container (defaults to true).
+   * True to attach the container's children (defaults to true).
    */
   protected boolean attachChildren = true;
 
-  /**
-   * The container's children.
-   */
-  protected List<T> items;
+  private List<T> items;
+  private boolean autoDestroy;
 
   /**
    * Creates a new container.
@@ -64,7 +54,7 @@ public abstract class AbstractContainer<T extends Component> extends BoxComponen
   }
 
   /**
-   * Returns the component whose element or child element matches the given
+   * Returns the component whose element, or child element, matches the given
    * element.
    * 
    * @param elem the element
@@ -77,6 +67,17 @@ public abstract class AbstractContainer<T extends Component> extends BoxComponen
       }
     }
     return null;
+  }
+  
+  /**
+   * Scrolls the item into view.
+   * 
+   * @param item the item
+   */
+  public void scrollIntoView(T item) {
+    if (rendered) {
+      item.el.scrollIntoView(el.dom, false);
+    }
   }
 
   /**
@@ -135,6 +136,15 @@ public abstract class AbstractContainer<T extends Component> extends BoxComponen
   }
 
   /**
+   * Returns true if children are destroyed when removed from the container.
+   * 
+   * @return the autoDestroy the auto destroy state
+   */
+  public boolean isAutoDestroy() {
+    return autoDestroy;
+  }
+
+  /**
    * Returns an iterator over the container's children.
    * 
    * @return an iterator
@@ -152,7 +162,7 @@ public abstract class AbstractContainer<T extends Component> extends BoxComponen
   public boolean remove(T component) {
     if (attachChildren) {
       if (component.getParent() != this) {
-        return false;
+        throw new RuntimeException("component is not a child of this container");
       }
       orphan(component);
     }
@@ -167,10 +177,20 @@ public abstract class AbstractContainer<T extends Component> extends BoxComponen
 
     items.remove(component);
 
-    if (autoDestroy) {
+    if (isAutoDestroy()) {
       component.destroy();
     }
     return true;
+  }
+
+  /**
+   * True to the automatically destroy any child component when removed from the
+   * container (defaults to false).
+   * 
+   * @param autoDestroy the autoDestroy to set
+   */
+  public void setAutoDestroy(boolean autoDestroy) {
+    this.autoDestroy = autoDestroy;
   }
 
   /**
@@ -225,13 +245,7 @@ public abstract class AbstractContainer<T extends Component> extends BoxComponen
   }
 
   private native void setParent(Widget parent, Widget child) /*-{
-      child.@com.google.gwt.user.client.ui.Widget::parent = parent;
-    }-*/;
-
-  @Override
-  public String toString() {
-    return "count: " + getItemCount() + " " + el != null ? el.toString()
-        : super.toString();
-  }
+        child.@com.google.gwt.user.client.ui.Widget::parent = parent;
+      }-*/;
 
 }

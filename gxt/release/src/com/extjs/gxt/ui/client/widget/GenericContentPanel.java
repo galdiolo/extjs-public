@@ -80,117 +80,27 @@ import com.google.gwt.user.client.ui.Widget;
  * <li>component : this</li>
  * </ul>
  * </dd>
+ * 
+ * @param <T> the child type
  */
 public class GenericContentPanel<T extends Component> extends Container<T> {
 
-  /**
-   * True to render the panel with custom rounded borders, false to render with
-   * plain 1px square borders (defaults to false).
-   */
-  public boolean frame;
-
-  /**
-   * True to display the borders of the panel's body element, false to hide them
-   * (defaults to true). By default, the border is a 2px wide inset border, but
-   * this can be further altered by setting {@link #bodyBorder} to false.
-   */
-  public boolean border = true;
-
-  /**
-   * True to display an interior border on the body element of the panel, false
-   * to hide it (defaults to true). This only applies when {@link #border} ==
-   * true. If border == true and bodyBorder == false, the border will display as
-   * a 1px wide inset border, giving the entire body element an inset
-   * appearance.
-   */
-  public boolean bodyBorder = true;
-
-  /**
-   * Custom CSS styles to be applied to the body element in the format expected
-   * by {@link El#applyStyles} (defaults to null).
-   */
-  public String bodyStyle;
-
-  /**
-   * True to make the panel collapsible and have the expand/collapse toggle
-   * button automatically rendered into the header tool button area, false to
-   * keep the panel statically sized with no button (defaults to false).
-   */
-  public boolean collapsible;
-
-  /**
-   * True to render the panel collapsed, false to render it expanded (defaults
-   * to false).
-   */
-  public boolean collapsed;
-
-  /**
-   * True to hide the expand/collapse toggle button when {@link #collapsible} =
-   * true, false to display it (defaults to false).
-   */
-  public boolean hideCollapseTool;
-
-  /**
-   * True to allow expanding and collapsing the panel (when {@link #collapsible} =
-   * true) by clicking anywhere in the header bar, false to allow it only by
-   * clicking to tool button (defaults to false).
-   */
-  public boolean titleCollapse;
-
-  /**
-   * True to use overflow:'auto' on the panel's body element and show scroll
-   * bars automatically when necessary, false to clip any overflowing content
-   * (defaults to false).
-   */
-  public boolean autoScroll;
-
-  /**
-   * True to create the header element explicitly, false to skip creating it. By
-   * default, when header is not specified, if a {@link #title} is set the
-   * header will be created automatically, otherwise it will not. If a title is
-   * set but header is explicitly set to false, the header will not be rendered.
-   */
-  public boolean header = true;
-
-  /**
-   * True to create the footer element explicitly, false to skip creating it. By
-   * default, when footer is not specified, if one or more buttons have been
-   * added to the panel the footer will be created automatically, otherwise it
-   * will not.
-   */
-  public boolean footer;
-
-  /**
-   * True to enable dragging of this Panel (defaults to false).
-   */
-  public boolean draggable;
-
-  /**
-   * True to animate the transition when the panel is collapsed, false to skip
-   * the animation (defaults to true).
-   */
-  public boolean animCollapse = true;
-
-  /**
-   * The alignment of any buttons added to this panel (defaults to RIGHT).
-   * <p>
-   * Valid values are:
-   * <ul>
-   * <li>HorizontalAlignment.LEFT</li>
-   * <li>HorizontalAlignment.CENTER</li>
-   * <li>HorizontalAlignment.RIGHT</li>
-   * </ul>
-   * </p>
-   */
-  public HorizontalAlignment buttonAlign = HorizontalAlignment.RIGHT;
-
+  protected boolean frame;
   protected Header head;
   protected ButtonBar buttonBar;
   protected El body, bwrap;
   protected String title;
 
+  private String bodyStyle;
+  private boolean headerVisible = true;
+  private boolean collapsed, hideCollapseTool;
+  private boolean footer, titleCollapse;
+  private HorizontalAlignment buttonAlign = HorizontalAlignment.RIGHT;
+  private boolean animCollapse = true;
   private String expandTool = "x-tool-plus";
   private String collapseTool = "x-tool-minus";
+  private boolean collapsible;
+  private boolean borderStyle = true, bodyBorder = true;
   private Component topComponent;
   private Component bottomComponent;
   private boolean animating;
@@ -210,7 +120,7 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
   public GenericContentPanel() {
     super();
     baseStyle = "x-panel";
-    autoHeight = true;
+    setAutoHeight(true);
     buttonBar = new ButtonBar();
     head = new Header();
   }
@@ -230,11 +140,15 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
    * after collapsing.
    */
   public void collapse() {
-    if (collapsible && !collapsed && !animating) {
-      ComponentEvent ce = new ComponentEvent(this);
-      if (fireEvent(Events.BeforeCollapse, ce)) {
-        onCollapse();
+    if (rendered) {
+      if (collapsible && !collapsed && !animating) {
+        ComponentEvent ce = new ComponentEvent(this);
+        if (fireEvent(Events.BeforeCollapse, ce)) {
+          onCollapse();
+        }
       }
+    } else {
+      collapsed = true;
     }
   }
 
@@ -244,7 +158,7 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
    * expanding.
    */
   public void expand() {
-    if (rendered && collapsible && collapsed) {
+    if (rendered && getCollapsible() && isCollapsed()) {
       ComponentEvent ce = new ComponentEvent(this);
       if (fireEvent(Events.BeforeExpand, ce)) {
         removeStyleName(collapseStyle);
@@ -254,12 +168,75 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
   }
 
   /**
+   * Returns true if animation is enabled for expand / collapse.
+   * 
+   * @return the animCollapse true for animations
+   */
+  public boolean getAnimCollapse() {
+    return animCollapse;
+  }
+
+  /**
+   * Returns true if the body border is enabled.
+   * 
+   * @return the body border state
+   */
+  public boolean getBodyBorder() {
+    return bodyBorder;
+  }
+
+  /**
+   * Returns the body style.
+   * 
+   * @return the body style
+   */
+  public String getBodyStyle() {
+    return bodyStyle;
+  }
+
+  /**
+   * Returns true if borders are enabled.
+   * 
+   * @return the boder state
+   */
+  public boolean getBorder() {
+    return bodyBorder;
+  }
+
+  /**
+   * Returns the panel's bottom component.
+   * 
+   * @return the bottom component
+   */
+  public Component getBottomComponent() {
+    return bottomComponent;
+  }
+
+  /**
+   * Returns the panel's button alignment.
+   * 
+   * @return the button alignment
+   */
+  public HorizontalAlignment getButtonAlign() {
+    return buttonAlign;
+  }
+
+  /**
    * Returns the panel's button bar.
    * 
    * @return the button bar
    */
   public ButtonBar getButtonBar() {
     return buttonBar;
+  }
+
+  /**
+   * Returns true if the panel is collapsible.
+   * 
+   * @return the collapsible state
+   */
+  public boolean getCollapsible() {
+    return collapsible;
   }
 
   /**
@@ -287,11 +264,20 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
     return null;
   }
 
-  public Widget getWidget(String field) {
-    if ("collapseBtn".equals(field)) {
-      return collapseBtn;
-    }
-    return null;
+  /**
+   * @return the footer
+   */
+  public boolean getFooter() {
+    return footer;
+  }
+
+  /**
+   * Returns true if framing is enabled.
+   * 
+   * @return the frame state
+   */
+  public boolean getFrame() {
+    return frame;
   }
 
   /**
@@ -369,8 +355,16 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
     return this.getSize().width - this.getFrameWidth();
   }
 
+  @Override
   public El getLayoutTarget() {
     return body;
+  }
+
+  /**
+   * @return the titleCollapse
+   */
+  public boolean getTitleCollapse() {
+    return titleCollapse;
   }
 
   /**
@@ -383,18 +377,20 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
   }
 
   /**
-   * Adds the content from the given url.
+   * Returns the panels top component.
    * 
-   * @param url the url
-   * @return the new frame instance
+   * @return the top component
    */
-  public Frame setUrl(String url) {
-    Frame f = new Frame(url);
-    fly(f.getElement()).setStyleAttribute("frameBorder", "0");
-    f.setSize("100%", "100%");
-    removeAll();
-    add(new WidgetComponent(f));
-    return f;
+  public Component getTopComponent() {
+    assert !rendered : "method call only be called before the component is rendered";
+    return topComponent;
+  }
+
+  public Widget getWidget(String field) {
+    if ("collapseBtn".equals(field)) {
+      return collapseBtn;
+    }
+    return null;
   }
 
   /**
@@ -403,14 +399,108 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
    * @return the expand state
    */
   public boolean isExpanded() {
-    return !collapsed;
+    return !isCollapsed();
   }
 
+  /**
+   * Returns true if the header is visible.
+   * 
+   * @return the header visible state
+   */
+  public boolean isHeaderVisible() {
+    return headerVisible;
+  }
+
+  /**
+   * Returns true if the collapse tool is hidden.
+   * 
+   * @return the hide collapse tool state
+   */
+  public boolean isHideCollapseTool() {
+    return hideCollapseTool;
+  }
+
+  @Override
   public void onComponentEvent(ComponentEvent ce) {
     super.onComponentEvent(ce);
     if (ce.type == Event.ONCLICK) {
       onClick(ce);
     }
+  }
+
+  /**
+   * @param animCollapse the animCollapse to set
+   */
+  public void setAnimCollapse(boolean animCollapse) {
+    this.animCollapse = animCollapse;
+  }
+
+  /**
+   * True to display an interior border on the body element of the panel, false
+   * to hide it (defaults to true). This only applies when
+   * {@link #setBodyBorder(boolean)} == true. If border == true and bodyBorder ==
+   * false, the border will display as a 1px wide inset border, giving the
+   * entire body element an inset appearance.
+   * 
+   * @param bodyBorder the body border state
+   */
+  public void setBodyBorder(boolean bodyBorder) {
+    this.bodyBorder = bodyBorder;
+  }
+
+  /**
+   * Custom CSS styles to be applied to the body element in the format expected
+   * by {@link El#applyStyles}.
+   * 
+   * @param bodyStyle the body style
+   */
+  public void setBodyStyle(String bodyStyle) {
+    this.bodyStyle = bodyStyle;
+  }
+
+  /**
+   * True to display the borders of the panel's body element, false to hide them
+   * (defaults to true). By default, the border is a 2px wide inset border, but
+   * this can be further altered by setting {@link #setBodyBorder(boolean)} to
+   * false.
+   * 
+   * @param show the border style state
+   */
+  public void setBorder(boolean show) {
+    this.borderStyle = show;
+  }
+
+  /**
+   * Sets the panel's bottom component. The component's natural height will be
+   * used and will not be changed by the panel.
+   * 
+   * @param bottomComponent the bottom component
+   */
+  public void setBottomComponent(Component bottomComponent) {
+    assert !rendered : "method call only be called before the component is rendered";
+    this.bottomComponent = bottomComponent;
+  }
+
+  /**
+   * Sets the button alignment of any buttons added to this panel (defaults to
+   * RIGHT).
+   * 
+   * @param buttonAlign the button alignment
+   */
+  public void setButtonAlign(HorizontalAlignment buttonAlign) {
+    this.buttonAlign = buttonAlign;
+  }
+
+  /**
+   * True to make the panel collapsible and have the expand/collapse toggle
+   * button automatically rendered into the header tool button area, false to
+   * keep the panel statically sized with no button (defaults to false,
+   * pre-render).
+   * 
+   * @param collapsible the collapsible to set
+   */
+  public void setCollapsible(boolean collapsible) {
+    this.collapsible = collapsible;
   }
 
   /**
@@ -427,15 +517,38 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
   }
 
   /**
-   * Sets the header's icon style.
+   * True to create the footer element explicitly, false to skip creating it (pre-render). By
+   * default, when footer is not specified, if one or more buttons have been
+   * added to the panel the footer will be created automatically, otherwise it
+   * will not.
    * 
-   * @param iconStyle the icon style
+   * @param footer the footer state
    */
-  public void setIconStyle(String iconStyle) {
-    this.iconStyle = iconStyle;
-    if (rendered) {
-      head.setIconStyle(iconStyle);
-    }
+  public void setFooter(boolean footer) {
+    this.footer = footer;
+  }
+
+  /**
+   * True to render the panel with custom rounded borders, false to render with
+   * plain 1px square borders (defaults to false, pre-render).
+   * 
+   * @param frame true to use the frame style
+   */
+  public void setFrame(boolean frame) {
+    this.frame = frame;
+  }
+
+  /**
+   * True to create the header element explicitly, false to skip creating it. By
+   * default, when header is not specified, if a {@link #setHeading(String)} is
+   * set the header will be created automatically, otherwise it will not. If a
+   * title is set but header is explicitly set to false, the header will not be
+   * rendered.
+   * 
+   * @param headerVisible true to show the header
+   */
+  public void setHeaderVisible(boolean headerVisible) {
+    this.headerVisible = headerVisible;
   }
 
   /**
@@ -448,6 +561,63 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
     if (head != null) {
       head.setText(text);
     }
+  }
+
+  /**
+   * Sets whether the collapse tool should be displayed when the panel is
+   * collapsible.
+   * 
+   * @param hideCollapseTool true if the tool is hidden
+   */
+  public void setHideCollapseTool(boolean hideCollapseTool) {
+    this.hideCollapseTool = hideCollapseTool;
+  }
+
+  /**
+   * Sets the header's icon style.
+   * 
+   * @param iconStyle the icon style
+   */
+  public void setIconStyle(String iconStyle) {
+    this.iconStyle = iconStyle;
+    if (rendered) {
+      head.setIconStyle(iconStyle);
+    }
+  }
+
+  /**
+   * True to allow expanding and collapsing the panel (when {@link #collapsible} =
+   * true) by clicking anywhere in the header bar, false to allow it only by
+   * clicking to tool button (defaults to false).
+   * 
+   * @param titleCollapse the titleCollapse to set
+   */
+  public void setTitleCollapse(boolean titleCollapse) {
+    this.titleCollapse = titleCollapse;
+  }
+
+  /**
+   * Sets the panel's top component.
+   * 
+   * @param topComponent the component
+   */
+  public void setTopComponent(Component topComponent) {
+    this.topComponent = topComponent;
+  }
+
+  /**
+   * Adds the content from the given url.
+   * 
+   * @param url the url
+   * @return the new frame instance
+   */
+  public Frame setUrl(String url) {
+    Frame f = new Frame(url);
+    fly(f.getElement()).setStyleAttribute("frameBorder", "0");
+    f.setSize("100%", "100%");
+    removeAll();
+    add(new WidgetComponent(f));
+    return f;
   }
 
   protected void afterCollapse() {
@@ -469,6 +639,7 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
     fireEvent(Events.Resize, ce);
   }
 
+  @Override
   protected void afterRender() {
     super.afterRender();
     if (title != null) {
@@ -494,11 +665,12 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
     collapseStyle = baseStyle + "-collapse";
   }
 
+  @Override
   protected void doAttachChildren() {
     super.doAttachChildren();
     if (head != null) head.onAttach();
-    if (footer && buttonBar != null) {
-      if (buttonBar.getButtonCount() > 0) {
+    if (getFooter() && buttonBar != null) {
+      if (buttonBar.getItemCount() > 0) {
         buttonBar.onAttach();
       }
     }
@@ -506,6 +678,7 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
     if (bottomComponent != null) bottomComponent.onAttach();
   }
 
+  @Override
   protected void doDetachChildren() {
     super.doDetachChildren();
     if (head != null) WidgetHelper.doDetach(head);
@@ -517,7 +690,7 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
   }
 
   protected void initTools() {
-    if (collapsible) {
+    if (getCollapsible()) {
       collapseBtn = new ToolButton(collapseTool);
       collapseBtn.addListener(Events.Select, new Listener<ComponentEvent>() {
         public void handleEvent(ComponentEvent ce) {
@@ -537,7 +710,7 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
 
   protected void onCollapse() {
     collapseBtn.changeStyle(expandTool);
-    if (animCollapse && !animating) {
+    if (getAnimCollapse() && !animating) {
       animating = true;
       bwrap.slideOut(Direction.UP, 300, new Listener<FxEvent>() {
         public void handleEvent(FxEvent fe) {
@@ -552,7 +725,7 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
 
   protected void onExpand() {
     collapseBtn.changeStyle(collapseTool);
-    if (animCollapse && !animating) {
+    if (getAnimCollapse() && !animating) {
       animating = true;
       bwrap.slideIn(Direction.DOWN, 300, new Listener<FxEvent>() {
         public void handleEvent(FxEvent fe) {
@@ -565,12 +738,13 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
     }
   }
 
+  @Override
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
 
-    if (buttonBar.getButtonCount() > 0) {
-      buttonBar.buttonAlign = buttonAlign;
-      footer = true;
+    if (buttonBar.getItemCount() > 0) {
+      buttonBar.setButtonAlign(getButtonAlign());
+      setFooter(true);
     }
 
     if (frame) {
@@ -578,7 +752,7 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
       DomHelper.insertHtml("afterBegin", el.dom, s);
 
       head.baseStyle = headerStyle;
-      head.textStyle = headerTextStyle;
+      head.setTextStyle(headerTextStyle);
       initTools();
       head.render(el.dom);
       el.subChild(3).appendChild(head.getElement());
@@ -601,7 +775,7 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
       El e = fly(bw).lastChild().firstChild().firstChild();
       foot = e.createChild("<div class=" + footerStyle + "></div>");
 
-      if (!header) {
+      if (!isHeaderVisible()) {
         head.setVisible(false);
         body.addStyleName(bodStyle + "-noheader");
         if (tbar != null) {
@@ -611,7 +785,7 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
 
     } else {
       head.baseStyle = headerStyle;
-      head.textStyle = headerTextStyle;
+      head.setTextStyle(headerTextStyle);
       initTools();
       head.render(el.dom);
       bwrap = el.createChild("<div class=" + bwrapStyle + "></div>");
@@ -625,7 +799,7 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
       tbar.setVisible(false);
       bbar.setVisible(false);
 
-      if (!header) {
+      if (!isHeaderVisible()) {
         head.setVisible(false);
         body.addStyleName(bodStyle + "-noheader");
         if (tbar != null) {
@@ -639,7 +813,7 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
       head.setText(t);
     }
 
-    if (footer && buttonBar.getButtonCount() > 0) {
+    if (footer && buttonBar.getItemCount() > 0) {
       buttonBar.render(foot.dom);
     }
 
@@ -647,7 +821,7 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
       bwrap.lastChild().addStyleName("x-panel-nofooter");
     }
 
-    if (!border) {
+    if (!borderStyle) {
       el.addStyleName(baseStyle + "-noborder");
       body.addStyleName(bodStyle + "-noborder");
       if (head != null) {
@@ -666,10 +840,10 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
     }
 
     if (bodyStyle != null) {
-      body.applyStyles(bodyStyle);
+      body.applyStyles(getBodyStyle());
     }
 
-    if (header) {
+    if (isHeaderVisible()) {
       head.disableTextSelection(true);
     }
 
@@ -687,15 +861,17 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
       head.setStyleAttribute("cursor", "pointer");
       el.addEventsSunk(Event.ONCLICK);
     }
+
   }
 
+  @Override
   protected void onResize(final int width, final int height) {
-    if (autoWidth) {
+    if (isAutoWidth()) {
       body.setWidth("auto");
     } else if (width != -1) {
       body.setWidth(width - getFrameWidth(), true);
     }
-    if (autoHeight) {
+    if (isAutoHeight()) {
       body.setHeight("auto");
     } else if (height != -1) {
       body.setHeight(height - getFrameHeight(), true);
@@ -704,42 +880,12 @@ public class GenericContentPanel<T extends Component> extends Container<T> {
   }
 
   /**
-   * Returns the panels top component.
+   * Returns true if the panel is collapsed.
    * 
-   * @return the top component
+   * @return the collapsed state
    */
-  public Component getTopComponent() {
-    assert !rendered : "method call only be called before the component is rendered";
-    return topComponent;
-  }
-
-  /**
-   * Sets the panel's top component.
-   * 
-   * @param topComponent
-   */
-  public void setTopComponent(Component topComponent) {
-    this.topComponent = topComponent;
-  }
-
-  /**
-   * Returns the panel's bottom component.
-   * 
-   * @return the bottom component
-   */
-  public Component getBottomComponent() {
-    return bottomComponent;
-  }
-
-  /**
-   * Sets the panel's bottom component. The component's natural height will be
-   * used and will not be changed by the panel.
-   * 
-   * @param bottomComponent the bottom component
-   */
-  public void setBottomComponent(Component bottomComponent) {
-    assert !rendered : "method call only be called before the component is rendered";
-    this.bottomComponent = bottomComponent;
+  private boolean isCollapsed() {
+    return collapsed;
   }
 
 }

@@ -23,6 +23,14 @@ public class TabItem extends Container {
 
     public String text, iconStyle;
 
+    public String getIconStyle() {
+      return iconStyle;
+    }
+
+    public String getText() {
+      return text;
+    }
+
     @Override
     public void onComponentEvent(ComponentEvent ce) {
       super.onComponentEvent(ce);
@@ -31,8 +39,8 @@ public class TabItem extends Container {
       }
     }
 
-    public String getText() {
-      return text;
+    public void setIconStyle(String iconStyle) {
+      this.iconStyle = iconStyle;
     }
 
     public void setText(String text) {
@@ -40,18 +48,6 @@ public class TabItem extends Container {
       if (rendered) {
         el.child(".x-tab-strip-text").setInnerHtml(text);
       }
-    }
-
-    public String getIconStyle() {
-      return iconStyle;
-    }
-
-    public void setIconStyle(String iconStyle) {
-      this.iconStyle = iconStyle;
-    }
-
-    protected void onRender(Element target, int pos) {
-      tabPanel.onItemRender(TabItem.this, target, pos);
     }
 
     protected void onClick(ComponentEvent ce) {
@@ -66,22 +62,18 @@ public class TabItem extends Container {
       tabPanel.onItemOver(TabItem.this, true);
     }
 
+    protected void onRender(Element target, int pos) {
+      tabPanel.onItemRender(TabItem.this, target, pos);
+    }
+
   }
-
-  /**
-   * True to make tab item closable (defaults to false).
-   */
-  public boolean closable;
-
-  /**
-   * Optional style name that is added to the item's text element (defaults to
-   * null).
-   */
-  public String textStyle;
 
   Template template;
   TabPanel tabPanel;
   HeaderItem header;
+
+  private String textStyle;
+  private boolean closable;
 
   /**
    * Creates a new tab item.
@@ -135,6 +127,24 @@ public class TabItem extends Container {
   }
 
   /**
+   * Returns true if the item can be closed.
+   * 
+   * @return the closable the close state
+   */
+  public boolean isClosable() {
+    return closable;
+  }
+
+  /**
+   * Sets whether the tab may be closed (defaults to false).
+   * 
+   * @param closable the closabable state
+   */
+  public void setClosable(boolean closable) {
+    this.closable = closable;
+  }
+
+  /**
    * Sets the item's icon style.
    * 
    * @param iconStyle the icon style
@@ -166,10 +176,28 @@ public class TabItem extends Container {
     add(new WidgetComponent(f));
     return f;
   }
-  
+
   @Override
   public String toString() {
     return el != null ? el.toString() : super.toString();
+  }
+
+  /**
+   * Sets the style name to be applied to the item's text element.
+   * 
+   * @param textStyle the style name
+   */
+  public void setTextStyle(String textStyle) {
+    this.textStyle = textStyle;
+  }
+
+  /**
+   * Returns the item's text style name.
+   * 
+   * @return the style name
+   */
+  public String getTextStyle() {
+    return textStyle;
   }
 
 }

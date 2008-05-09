@@ -16,26 +16,39 @@ import java.util.List;
 public class ChangeEventSupport implements ChangeEventSource {
 
   protected List<ChangeListener> listeners;
+  protected boolean silent;
 
-  public void addChangeListener(ChangeListener listener) {
+  public void addChangeListener(ChangeListener... listener) {
     if (listeners == null) {
       listeners = new ArrayList<ChangeListener>();
     }
-    listeners.add(listener);
+    for (int i = 0; i < listener.length; i++) {
+      listeners.add(listener[i]);
+    }
   }
 
   public void notify(ChangeEvent event) {
-    if (listeners != null) {
+    if (!silent && listeners != null) {
       for (ChangeListener listener : listeners) {
         listener.modelChanged(event);
       }
     }
   }
 
-  public void removeChangeListener(ChangeListener listener) {
+  public void removeChangeListener(ChangeListener... listener) {
     if (listeners != null) {
-      listeners.remove(listener);
+      for (int i = 0; i < listener.length; i++) {
+        listeners.remove(listener[i]);
+      }
     }
+  }
+
+  public void setSilent(boolean silent) {
+    this.silent = silent;
+  }
+
+  public void removeChangeListeners() {
+    listeners.clear();
   }
 
 }

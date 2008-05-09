@@ -1,3 +1,10 @@
+/*
+ * Ext GWT - Ext for GWT
+ * Copyright(c) 2007, 2008, Ext JS, LLC.
+ * licensing@extjs.com
+ * 
+ * http://extjs.com/license
+ */
 /*******************************************************************************
  * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
@@ -11,113 +18,141 @@
  *******************************************************************************/
 package com.extjs.gxt.ui.client.util;
 
-import java.util.ArrayList;
 import java.util.EventListener;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 
 import com.extjs.gxt.ui.client.event.BaseEvent;
-import com.extjs.gxt.ui.client.event.BaseTypedListener;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.TypedListener;
 
 /**
  * Maps listeners by event type.
  */
 public class EventTable {
+  int[] types;
+  Listener[] listeners;
+  int level;
 
-  private HashMap<Integer, List<Listener>> map;
-
-  /**
-   * Returns <code>true</code> if the event table has any listeners for the
-   * given event type.
-   * 
-   * @param eventType the event type
-   * @return the listener state
-   */
-  public boolean hasListener(int eventType) {
-    if (map == null) {
-      return false;
-    }
-    List<Listener> list = map.get(eventType);
-    return (list != null && list.size() > 0);
-  }
-
-  /**
-   * Hooks the listener by the given event type and element.
-   * 
-   * @param eventType the event type
-   * @param listener the listener to be added
-   */
   public void hook(int eventType, Listener listener) {
-    if (map == null) {
-      map = new HashMap<Integer, List<Listener>>();
+    if (types == null) types = new int[4];
+    if (listeners == null) listeners = new Listener[4];
+    int length = types.length, index = length - 1;
+    while (index >= 0) {
+      if (types[index] != 0) break;
+      --index;
     }
-    List<Listener> listeners = map.get(eventType);
-    if (listeners == null) {
-      listeners = new ArrayList<Listener>();
-      map.put(eventType, listeners);
+    index++;
+    if (index == length) {
+      int[] newTypes = new int[length + 4];
+      System.arraycopy(types, 0, newTypes, 0, length);
+      types = newTypes;
+      Listener[] newListeners = new Listener[length + 4];
+      System.arraycopy(listeners, 0, newListeners, 0, length);
+      listeners = newListeners;
     }
-    if (!listeners.contains(listener)) {
-      listeners.add(listener);
+    types[index] = eventType;
+    listeners[index] = listener;
+  }
+
+  public boolean hooks(int eventType) {
+    if (types == null) return false;
+    for (int i = 0; i < types.length; i++) {
+      if (types[i] == eventType) return true;
+    }
+    return false;
+  }
+
+  public boolean sendEvent(BaseEvent event) {
+    if (types == null) return true;
+
+    level += level >= 0 ? 1 : -1;
+    try {
+      for (int i = 0; i < types.length; i++) {
+        if (types[i] == event.type) {
+          Listener listener = listeners[i];
+          if (listener != null) listener.handleEvent(event);
+        }
+      }
+      return event.doit;
+    } finally {
+      boolean compact = level < 0;
+      level -= level >= 0 ? 1 : -1;
+      if (compact && level == 0) {
+        int index = 0;
+        for (int i = 0; i < types.length; i++) {
+          if (types[i] != 0) {
+            types[index] = types[i];
+            listeners[index] = listeners[i];
+            index++;
+          }
+        }
+        for (int i = index; i < types.length; i++) {
+          types[i] = 0;
+          listeners[i] = null;
+        }
+      }
     }
 
   }
 
-  /**
-   * Removes all mapped listeners.
-   */
-  public void removeAllListeners() {
-    map = null;
+  public int size() {
+    if (types == null) return 0;
+    int count = 0;
+    for (int i = 0; i < types.length; i++) {
+      if (types[i] != 0) count++;
+    }
+    return count;
   }
 
-  /**
-   * Sends the event to any registered listeners.
-   * 
-   * @param be the base event
-   * @return <code>true</code> if event was cancelled by any listeners
-   */
-  public boolean sendEvent(BaseEvent be) {
-    if (map == null) return true;
-    List<Listener> list = map.get(be.type);
-    if (list == null) return true;
-    for (int i = list.size() - 1; i >= 0; i--) {
-      list.get(i).handleEvent(be);
+  void remove(int index) {
+    if (level == 0) {
+      int end = types.length - 1;
+      System.arraycopy(types, index + 1, types, index, end - index);
+      System.arraycopy(listeners, index + 1, listeners, index, end - index);
+      index = end;
+    } else {
+      if (level > 0) level = -level;
     }
-    return be.doit;
+    types[index] = 0;
+    listeners[index] = null;
+  }
+
+  public void unhook(int eventType, Listener listener) {
+    if (types == null) return;
+    for (int i = 0; i < types.length; i++) {
+      if (types[i] == eventType && listeners[i] == listener) {
+        remove(i);
+        return;
+      }
+    }
   }
 
   public void unhook(int eventType, EventListener listener) {
-    if (map == null) return;
-    List list = (List) map.get(eventType);
-    if (list == null) return;
-    Iterator<Listener> iter = list.iterator();
-    while (iter.hasNext()) {
-      Listener l = iter.next();
-      if (l instanceof BaseTypedListener) {
-        if (((BaseTypedListener) l).getEventListener() == listener) {
-          iter.remove();
+    if (types == null) return;
+    for (int i = 0; i < types.length; i++) {
+      if (types[i] == eventType) {
+        if (listeners[i] instanceof TypedListener) {
+          TypedListener typedListener = (TypedListener) listeners[i];
+          if (typedListener.getEventListener() == listener) {
+            remove(i);
+            return;
+          }
         }
       }
     }
   }
 
-  /**
-   * Unhooks the given listener for the given event type.
-   * 
-   * @param eventType the event type
-   * @param listener the listener to be removed
-   */
-  public void unhook(int eventType, Listener listener) {
-    if (map == null) return;
-    List<Listener> list = map.get(eventType);
-    if (list == null) return;
-    Iterator<Listener> iter = list.iterator();
-    while (iter.hasNext()) {
-      Listener l = iter.next();
-      if (l == listener) {
-        iter.remove();
-      }
-    }
+  public void removeAllListeners() {
+    types = null;
+    listeners = null;
+    level = 0;
   }
+
+  public boolean hasListener(int type) {
+    if (types == null) return false;
+    for (int i = 0; i < types.length; i++) {
+      if (types[i] == type) return true;
+    }
+    return false;
+  }
+
 }

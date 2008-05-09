@@ -7,11 +7,14 @@
  */
 package com.extjs.gxt.ui.client;
 
+import java.util.Map;
+
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.fx.FxStyle;
 import com.extjs.gxt.ui.client.messages.MyMessages;
 import com.extjs.gxt.ui.client.state.CookieProvider;
 import com.extjs.gxt.ui.client.state.StateManager;
+import com.extjs.gxt.ui.client.util.CSS;
 import com.extjs.gxt.ui.client.util.Theme;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.DOM;
@@ -103,7 +106,12 @@ public class GXT {
    * @return the theme id
    */
   public static String getThemeId() {
-    return StateManager.getString("theme");
+    Map map = StateManager.getMap("theme");
+    if (map != null) {
+      return map.get("id").toString();
+    } else {
+      return null;
+    }
   }
 
   /**
@@ -171,20 +179,30 @@ public class GXT {
     if (isLinux) {
       cls += " ext-linux";
     }
-    
+
     CookieProvider provider = new CookieProvider("/", null, null, false);
     StateManager.setProvider(provider);
 
-    String themeId = StateManager.getString("theme");
-    if (themeId == null || themeId.equals("")) {
-      themeId = defaultTheme.getId();
+    Map theme = StateManager.getMap("theme");
+    if (theme != null) {
+      String themeId = theme.get("id").toString();
+      String fileName = theme.get("file").toString();
+      CSS.addStyleSheet(themeId, "css/" + fileName);
+
+      cls += " x-theme-" + themeId;
     }
-    
-    cls += " x-theme-" + themeId;
 
     El.fly(XDOM.getBody()).setStyleName(cls);
-    initInternal(themeId);
+
+    initInternal();
   }
+
+  private static native void initInternal() /*-{
+
+     $wnd.Ext = {};
+     
+     @com.extjs.gxt.ui.client.core.Ext::load()();
+   }-*/;
 
   /**
    * Changes the theme. A theme's stylehseets should be given a class = to the
@@ -195,32 +213,12 @@ public class GXT {
    * @param theme the new theme name.
    */
   public static void switchTheme(Theme theme) {
-    StateManager.set("theme", theme.getId());
+    StateManager.set("theme", theme.asMap());
     XDOM.reload();
   }
 
-  private static native void initInternal(String themeId) /*-{
-     var links = $doc.getElementsByTagName('link');
-     for (var i = 0; i < links.length; i++) {
-       var link = links[i];
-       var href = link.href;
-       href = href.substring(href.lastIndexOf('/') + 1, href.length);
-       if (href == 'gxt-all.css' || href == 'ext-all.css') {
-         continue;
-       }
-       if (link.className != themeId && link.className != '') {
-         link.setAttribute('disabled', true);
-         link.parentNode.removeChild(link);
-       }
-
-     }
-     $wnd.Ext = {};
-     
-     @com.extjs.gxt.ui.client.core.Ext::load()();
-   }-*/;
-
   private static native boolean isSecure() /*-{
-     return $wnd.location.href.toLowerCase().indexOf("https") === 0;
-   }-*/;
+       return $wnd.location.href.toLowerCase().indexOf("https") === 0;
+     }-*/;
 
 }

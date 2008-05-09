@@ -45,6 +45,15 @@ public class FlowLayout extends Layout {
   }
 
   /**
+   * Creates a new flow layout.
+   * 
+   * @param removePostioning true to remove positioning on child components
+   */
+  public FlowLayout(boolean removePostioning) {
+    this.removePositioning = removePostioning;
+  }
+
+  /**
    * Creates a new layout instance with the given margin.
    * 
    * @param margin the margin

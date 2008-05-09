@@ -39,35 +39,45 @@ import com.google.gwt.user.client.Element;
  */
 public class CheckMenuItem extends Item {
 
-  /**
-   * The default CSS class to use for radio group check items (defaults to
-   * "x-menu-group-item"),
-   */
-  public String groupStyle = "x-menu-group-item";
+  private String groupStyle = "x-menu-group-item";
+  private boolean checked;
+  private String group;
 
   /**
-   * True to initialize this checkbox as checked (defaults to false). Note that
-   * if this checkbox is part of a radio group (group = true) only the last item
-   * in the group that is initialized with checked = true will be rendered as
-   * checked.
+   * Creates a new check menu item.
    */
-  public boolean checked;
-
-  /**
-   * All check items with the same group name will automatically be grouped into
-   * a single-select radio button group (defaults to null).
-   */
-  public String group;
-
   public CheckMenuItem() {
     hideOnClick = true;
     itemStyle = "x-menu-item x-menu-check-item";
     canActivate = true;
   }
 
+  /**
+   * Creates a new check menu item.
+   * 
+   * @param text the text
+   */
   public CheckMenuItem(String text) {
     this();
     setText(text);
+  }
+
+  /**
+   * Returns the group name.
+   * 
+   * @return the name
+   */
+  public String getGroup() {
+    return group;
+  }
+
+  /**
+   * Returns the group style.
+   * 
+   * @return the group style
+   */
+  public String getGroupStyle() {
+    return groupStyle;
   }
 
   /**
@@ -83,10 +93,9 @@ public class CheckMenuItem extends Item {
    * Set the checked state of this item.
    * 
    * @param checked the new checked state
-   * @return this
    */
-  public CheckMenuItem setChecked(boolean checked) {
-    return setChecked(checked, false);
+  public void setChecked(boolean checked) {
+    setChecked(checked, false);
   }
 
   /**
@@ -94,9 +103,12 @@ public class CheckMenuItem extends Item {
    * 
    * @param state the new checked state
    * @param supressEvent true to prevent the checkchange event from firing
-   * @return this
    */
-  public CheckMenuItem setChecked(boolean state, boolean supressEvent) {
+  public void setChecked(boolean state, boolean supressEvent) {
+    if (!rendered) {
+      this.checked = state;
+      return;
+    }
     MenuEvent me = new MenuEvent(parentMenu);
     me.item = this;
     if (fireEvent(Events.BeforeCheckChange, me)) {
@@ -108,14 +120,33 @@ public class CheckMenuItem extends Item {
         fireEvent(Events.CheckChange, me);
       }
     }
-    return this;
+  }
+
+  /**
+   * All check items with the same group name will automatically be grouped into
+   * a single-select radio button group (defaults to null).
+   * 
+   * @param group the group
+   */
+  public void setGroup(String group) {
+    this.group = group;
+  }
+
+  /**
+   * The default CSS class to use for radio group check items (defaults to
+   * "x-menu-group-item").
+   * 
+   * @param groupStyle the group style
+   */
+  public void setGroupStyle(String groupStyle) {
+    this.groupStyle = groupStyle;
   }
 
   protected void onClick(ComponentEvent ce) {
-    if (!disabled && group == null) {
+    if (!disabled && getGroup() == null) {
       setChecked(!checked);
     }
-    if (!disabled && !checked && group != null) {
+    if (!disabled && !checked && getGroup() != null) {
       setChecked(!checked);
       onRadioClick(ce);
     }
@@ -135,10 +166,11 @@ public class CheckMenuItem extends Item {
     }
   }
 
+  @Override
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
-    if (group != null) {
-      el.addStyleName(groupStyle);
+    if (getGroup() != null) {
+      el.addStyleName(getGroupStyle());
     }
     if (checked) {
       setChecked(true, true);

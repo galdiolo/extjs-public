@@ -15,7 +15,6 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.TreeEvent;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Event;
 
 /**
  * A item in a <code>Tree</code>. All events are bubbled to the item's parent
@@ -105,7 +104,6 @@ import com.google.gwt.user.client.Event;
 public class TreeItem extends Component {
 
   protected Tree tree;
-
   protected boolean root, expanded, checked;
   protected TreeItemUI ui;
   protected boolean childrenRendered;
@@ -143,14 +141,6 @@ public class TreeItem extends Component {
     insert(item, getItemCount());
   }
 
-  public boolean fireEvent(int type, TreeEvent te) {
-    boolean result = super.fireEvent(type, te);
-    if (tree != null && result) {
-      return tree.fireEvent(type, te);
-    }
-    return result;
-  }
-
   /**
    * Returns the item's first child.
    * 
@@ -160,8 +150,13 @@ public class TreeItem extends Component {
     return getItem(0);
   }
 
+  /**
+   * Returns the item's container element.
+   * 
+   * @return the container
+   */
   public Element getContainer() {
-    return root ? getElement() : ui.containerEl;
+    return root ? getElement() : ui.containerEl.dom;
   }
 
   /**
@@ -252,6 +247,11 @@ public class TreeItem extends Component {
     return text;
   }
 
+  /**
+   * Returns the item's text style.
+   * 
+   * @return the text style
+   */
   public String getTextStyle() {
     return textStyle;
   }
@@ -309,7 +309,7 @@ public class TreeItem extends Component {
       }
 
       if (rendered && !root) {
-        ui.updateJoint();
+        ui.updateJointStyle();
         ui.onIconStyleChange(getIconStyle());
       }
       fireEvent(Events.Add, te);
@@ -357,33 +357,9 @@ public class TreeItem extends Component {
   }
 
   public void onComponentEvent(ComponentEvent ce) {
-    TreeEvent te = new TreeEvent(tree);
-    te.item = this;
-    te.event = ce.event;
-
-    switch (ce.type) {
-      case Event.ONMOUSEOVER:
-        tree.fireEvent(Events.MouseOver, te);
-        break;
-      case Event.ONMOUSEDOWN:
-        tree.fireEvent(Events.MouseDown, te);
-        break;
-      case Event.ONKEYDOWN:
-        tree.fireEvent(Events.KeyDown, te);
-        break;
-      case Event.ONMOUSEOUT:
-        ce.type = Events.MouseOut;
-        tree.fireEvent(Events.MouseOut, te);
-        break;
-      case Event.ONCLICK:
-        tree.fireEvent(Events.Click, te);
-        break;
-      case Event.ONDBLCLICK:
-        tree.fireEvent(Events.DoubleClick, te);
-        break;
-    }
+    // delegate event handling to ui
     if (ui != null) {
-      ui.getListener().handleEvent(te);
+      ui.handleEvent((TreeEvent) ce);
     }
   }
 
@@ -400,9 +376,6 @@ public class TreeItem extends Component {
     te.item = this;
     te.child = item;
     if (fireEvent(Events.BeforeRemove, te)) {
-      if (tree.getSelectionModel() != null) {
-        tree.getSelectionModel().deselect(item);
-      }
       children.remove(item);
       tree.unregisterItem(item);
       item.tree = null;
@@ -412,7 +385,6 @@ public class TreeItem extends Component {
       }
       fireEvent(Events.Remove, te);
     }
-
   }
 
   /**
@@ -436,7 +408,7 @@ public class TreeItem extends Component {
     if (rendered) {
       ui.onCheckChange(checked);
       if (checked) {
-        switch (tree.checkStyle) {
+        switch (tree.getCheckStyle()) {
           case PARENTS:
             TreeItem p = getParentItem();
             while (p != null && !p.root) {
@@ -452,7 +424,7 @@ public class TreeItem extends Component {
         }
 
       } else {
-        switch (tree.checkStyle) {
+        switch (tree.getCheckStyle()) {
           case PARENTS:
             clearCheckChildren(this);
             break;
@@ -486,15 +458,14 @@ public class TreeItem extends Component {
       expandOnRender = expanded;
       return;
     }
-    
+
     if (expanded && root) {
       this.expanded = false;
     } else if (!expanded && root) {
       this.expanded = true;
     }
-    
-    TreeEvent te = new TreeEvent(tree);
-    te.item = this;
+
+    TreeEvent te = new TreeEvent(tree, this);
 
     if (expanded) {
       if (!this.expanded && !isLeaf()) {
@@ -570,9 +541,13 @@ public class TreeItem extends Component {
     }
   }
 
+  /**
+   * Sets the item's text style.
+   * @param style the text style
+   */
   public void setTextStyle(String style) {
     this.textStyle = style;
-    if (isRendered()) {
+    if (rendered) {
       getUI().onTextStyleChange(textStyle);
     }
   }
@@ -582,6 +557,18 @@ public class TreeItem extends Component {
    */
   public void toggle() {
     setExpanded(!isExpanded());
+  }
+
+  public String toString() {
+    return "tree: " + text != null ? text : "" + " " + el;
+  }
+
+  protected boolean fireEvent(int type, TreeEvent te) {
+    boolean result = super.fireEvent(type, te);
+    if (tree != null && result) {
+      return tree.fireEvent(type, te);
+    }
+    return result;
   }
 
   /**
@@ -660,10 +647,6 @@ public class TreeItem extends Component {
       TreeItem item = getItem(i);
       item.setExpanded(true, deep);
     }
-  }
-  
-  public String toString() {
-    return "tree: " + text != null ? text : "" + " " + el;
   }
 
 }

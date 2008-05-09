@@ -22,12 +22,6 @@ import com.extjs.gxt.ui.client.widget.Component;
 public class MenuItem extends Component {
 
   /**
-   * The CSS class to use when the item becomes activated (defaults to
-   * "x-menu-item-active").
-   */
-  public String activeStyle = "x-menu-item-active";
-
-  /**
    * True if this item can be visually activated (defaults to false).
    */
   protected boolean canActivate;
@@ -44,13 +38,10 @@ public class MenuItem extends Component {
   protected Menu parentMenu;
 
   /**
-   * Returns the item's containing menu.
-   * 
-   * @return the menu
+   * The CSS class to use when the item becomes activated (defaults to
+   * "x-menu-item-active").
    */
-  public Menu getParentMenu() {
-    return parentMenu;
-  }
+  private String activeStyle = "x-menu-item-active";
 
   /**
    * Adds a selection listener.
@@ -63,6 +54,15 @@ public class MenuItem extends Component {
   }
 
   /**
+   * Returns the active style.
+   * 
+   * @return the style
+   */
+  public String getActiveStyle() {
+    return activeStyle;
+  }
+
+  /**
    * Returns the hide on click state.
    * 
    * @return the hide on click state
@@ -72,12 +72,31 @@ public class MenuItem extends Component {
   }
 
   /**
+   * Returns the item's containing menu.
+   * 
+   * @return the menu
+   */
+  public Menu getParentMenu() {
+    return parentMenu;
+  }
+
+  /**
    * Removes a previously added listener.
    * 
    * @param listener the listener to be removed
    */
   public void removeSelectionListener(SelectionListener listener) {
     removeListener(Events.Select, listener);
+  }
+
+  /**
+   * The CSS class to use when the item becomes activated (defaults to
+   * "x-menu-item-active").
+   * 
+   * @param activeStyle the active style
+   */
+  public void setActiveStyle(String activeStyle) {
+    this.activeStyle = activeStyle;
   }
 
   /**
@@ -95,7 +114,7 @@ public class MenuItem extends Component {
       return;
     }
     El li = el.getParent();
-    li.addStyleName(activeStyle);
+    li.addStyleName(getActiveStyle());
     MenuEvent me = new MenuEvent(parentMenu);
     me.item = this;
     fireEvent(Events.Activate, me);
@@ -103,7 +122,7 @@ public class MenuItem extends Component {
 
   protected void deactivate() {
     El li = el.getParent();
-    li.removeStyleName(activeStyle);
+    li.removeStyleName(getActiveStyle());
     MenuEvent me = new MenuEvent(parentMenu);
     me.item = this;
     fireEvent(Events.Deactivate, me);

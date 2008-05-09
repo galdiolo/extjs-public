@@ -29,16 +29,11 @@ import com.google.gwt.user.client.ui.Widget;
 public class HtmlContainer<T extends Component> extends AbstractContainer<T> {
 
   /**
-   * The HTML tag used for the component (defaults to 'div').
-   */
-  public String tagName = "div";
-
-  /**
    * The method used when requesting remote content (defaults to
    * RequestBuilder.GET). Only applies when specifying a {@link #setUrl(String)}.
    */
   public Method httpMethod = RequestBuilder.GET;
-
+  
   /**
    * True to defer remote requests until the component is rendered (defauls to
    * false).
@@ -49,21 +44,18 @@ public class HtmlContainer<T extends Component> extends AbstractContainer<T> {
    * The request data to be used in remote calls (defaults to null).
    */
   public String requestData;
-
   private Element elem;
   private String html;
+  private String tagName = "div";
   private String url;
   private RequestBuilder requestBuilder;
   private RequestCallback callback;
-  private HtmlSource htmlSource;
-
   /**
    * Creates a new container.
    */
   public HtmlContainer() {
     attachChildren = false;
   }
-
   /**
    * Creates a new container.
    * 
@@ -92,15 +84,6 @@ public class HtmlContainer<T extends Component> extends AbstractContainer<T> {
   }
 
   /**
-   * Creates a new container.
-   * 
-   * @param htmlSource the html source
-   */
-  public HtmlContainer(HtmlSource htmlSource) {
-    this.htmlSource = htmlSource;
-  }
-
-  /**
    * Adds a component to this Container. Fires the <i>BeforeAdd</i> event
    * before adding, then fires the <i>Add</i> event after the component has
    * been added.
@@ -122,6 +105,13 @@ public class HtmlContainer<T extends Component> extends AbstractContainer<T> {
       }
       fireEvent(Events.Add, hce);
     }
+  }
+
+  /**
+   * @return the tagName
+   */
+  public String getTagName() {
+    return tagName;
   }
 
   /**
@@ -154,15 +144,13 @@ public class HtmlContainer<T extends Component> extends AbstractContainer<T> {
   }
 
   /**
-   * Sets the container's inner html.
+   * The HTML tag name that will wrap the text (defaults to 'div'). For inline
+   * behavior set the tag name to 'span'.
    * 
-   * @param htmlSource the HtmlSource
+   * @param tagName the new tag name
    */
-  public void setHtmlSource(HtmlSource htmlSource) {
-    this.htmlSource = htmlSource;
-    if (rendered) {
-      setHtml(htmlSource.getHtml());
-    }
+  public void setTagName(String tagName) {
+    this.tagName = tagName;
   }
 
   /**
@@ -202,14 +190,12 @@ public class HtmlContainer<T extends Component> extends AbstractContainer<T> {
         setHtml(html);
       } else if (url != null && deferDownload) {
         requestData();
-      } else if (htmlSource != null) {
-        setHtml(htmlSource.getHtml());
       }
     }
   }
 
   protected void renderAll() {
-    for (Component c : items) {
+    for (Component c : getItems()) {
       renderItem(c, (String) c.getData("selector"));
     }
   }

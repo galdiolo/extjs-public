@@ -1,15 +1,22 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <title>Ext GWT Release Notes</title>
     <style>
       body {
-        background-color: white;
-        color: black;
         font-family: Arial, sans-serif;
         font-size: small;
         margin: 20px;
+      }
+      h1 {
+		font-family:verdana,arial,sans-serif;
+		font-size:22px;
+		font-weight:bold;
+		letter-spacing:-1px;
+		margin:7px 0pt;
+      }
+      li a {
+      
       }
       li {
         margin-bottom: 0.5em;
@@ -23,19 +30,45 @@
     </style>
   </head>
   <body>
-    <h1>GXT Library Release Notes</h1>
+    <h1>Ext GWT Library Release Notes</h1>
     <ul>
-      <li><a href="#Release_Notes_Current">Release 1.0</a></li>
+      <li><a href="#Release_Notes_Current">Release 1.0 Beta 2</a></li>
     </ul>
-    <hr/>
-    <h2><a name="Release_Notes_Current">Release Notes for 1.0</a></h2>
+    <h2><a name="Release_Notes_Current">Release Notes 1.0 Beta 2</a></h2>
     <h3>General Changes</h3>
     <ul>
-    	<li></li>
+    	<li><b>Public fields</b> - Public fields have been removed and replaced with getters and setters. This was the <a href="http://extjs.com/forum/showthread.php?t=33443">communities preference</a>.</li>
+    	<li><b>SelectionModel</b> - The selection model code was refactored for Table, Tree, and List. <i>SelectionModel</i> is a new interface that all selection models implement.</li>
+    	<li><b>SelectionService</b> - Allows selection providers (all viewers) to register with service. Any listeners are notified of any selections by a registered provider.</li>
+    	<li><b>Menu</b> - Menu and all menu items are fully implemented, including sub menu support.</li>
+    	<li><b>Themes</b> - There is a new themes module that includes the Slate theme. It is only necessary to add ext-all.css to your host page html. Other stylesheets are added dynamically.</li>
+    	<li><b>State</b> - Restore and save state added to component. Map support added to StateManager (serialize and deserialize a map from a cookie).</li>
+    	<li><b>HtmlContainer</b> - New container that can be built from static markup, a remote url, an existing element, or element id. Child components can then be inserted into the container using CSS selectors to control the insert location (panel.add(button, "td:first-child";). This allows easy use of complex HTML layouts designed outside of GWT.</li>
+    	<li><b>Events</b> - New fine-grained event hierarchy. For example: BaseEvent -> DomEvent -> ComponentEvent -> TreeEvent. Listener interface is now generic.</li>
     </ul>
-    <h3>Bug Fixes and Enhancements</h3>
+    <h3>Bug Fixes</h3>
 	<ul>
-		<li></li>
+		<li>AccordionLayout typo from AccordianLayout</li>
+		<li>TabItem content not visible after closing then re-opening a tab</li>
+		<li>Beta 1 was complied with 1.6 bytecode</li>
+		<li>Wrong "inherits" entry in setup.txt (com.extjs.gxt.ui.GXT)</li>
+		<li>TableLayout verticalalign should be valign</li>
+		<li>Tree Click events are fired twice</li>
+		<li>NPE from Table.setSelectionModel</li>
+		<li>Error trying to set style attribute (opacity)</li>
+		<li>Corrupted tab scrolling/navigation in Explorer</li>
+		<li>focus() on textfield does not work</li>
+		<li>CenterLayout was centering content in centered component</li>
+		<li>DatePicker Locale (constants.months changed to constants.standaloneMonths)</li>
+		<li>DatePicker right border of selected box hidden in IE</li>
+		<li>Fixed onBlur validation in NumberField</li>
+		<li>Vertical lines fix in table</li>
+		<li>Fields do not validate on blur</li>
+		<li>DateField dropdown not updated based on text field changes</li>
+		<li>Exception in paging table viewer</li>
+		<li>ComboBox Store cannot be changed</li>
+		<li>TabPanel bug when closing last open tab</li>
+		<li>ComboBox not scrolling into view with key nav</li>
 	</ul>
   </body>
 </html>

@@ -8,6 +8,7 @@
 package com.extjs.gxt.ui.client.core;
 
 import com.extjs.gxt.ui.client.util.Point;
+import com.extjs.gxt.ui.client.util.Size;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -133,6 +134,22 @@ class XElement extends JavaScriptObject {
    */
   public final native String getStyleName() /*-{
     return this.dom.className;
+  }-*/;
+  
+  public final native Size getStyleSize() /*-{
+    var s = this.getStyleSize();
+    return @com.extjs.gxt.ui.client.util.Size::newInstance(II)(s.width, s.height);
+  }-*/;
+  
+  /**
+   * Sets a style attribute.
+   * 
+   * @param attr the attribute name
+   * @param value the int value
+   * @return this
+   */
+  public final native XElement setStyleAttribute(String attr, Object value) /*-{
+    return this.setStyle(attr, value);
   }-*/;
   
   /**

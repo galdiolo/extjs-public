@@ -30,6 +30,9 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
  * objects which provide input data for Components such as the {@link ComboBox}
  * and {@link DataView DataView}
  * 
+ * </p>
+ * This class is not fully implemented. Please review the source code.
+ * 
  * <dt><b>Events:</b></dt>
  * 
  * <dd><b>DataChange</b> : StoreEvent(store)<br>
@@ -102,19 +105,31 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
  * </dd>
  * </dt>
  */
-public class Store<C extends BaseLoadConfig> extends Observable implements Loader {
+public class Store<C extends LoadConfig> extends Observable implements Loader {
 
   /**
-   * 
+   * DataChange event type.
    */
   public static final int DataChanged = 1100;
 
+  /**
+   * Add event type.
+   */
   public static final int Add = 1110;
 
+  /**
+   * Remove event type.
+   */
   public static final int Remove = 1120;
 
+  /**
+   * Update event type.
+   */
   public static final int Update = 1130;
 
+  /**
+   * Clear event type.
+   */
   public static final int Clear = 1140;
 
   /**
@@ -132,22 +147,19 @@ public class Store<C extends BaseLoadConfig> extends Observable implements Loade
     return models;
   }
 
-  public boolean reuseLoadConfig = false;
-
   protected DataProxy<C> dataProxy;
-  
   protected DataReader reader;
   protected int offset = 0;
   protected int limit = 50;
   C lastLoadConfig;
-  
+
+  private boolean reuseLoadConfig = false;
   private boolean remoteSort;
   private SortInfo sortInfo;
   private int totalCount;
   private List<Record> items = new ArrayList<Record>();
   private List<Record> modified = new ArrayList<Record>();
   private List<StoreFilter> filters;
-  private LoadConfig lastOptions;
 
   /**
    * Creates a new store.
@@ -180,6 +192,11 @@ public class Store<C extends BaseLoadConfig> extends Observable implements Loade
     return insert(item, getCount());
   }
 
+  /**
+   * Adds a filter to the store.
+   * 
+   * @param filter the store filter to add
+   */
   public void addFilter(StoreFilter filter) {
     if (filters == null) {
       filters = new ArrayList<StoreFilter>();
@@ -187,6 +204,11 @@ public class Store<C extends BaseLoadConfig> extends Observable implements Loade
     filters.add(filter);
   }
 
+  /**
+   * Adds a store listener.
+   * 
+   * @param listener the listener to add
+   */
   public void addStoreListener(StoreListener listener) {
     TypedListener tl = new TypedListener(listener);
     addListener(Store.BeforeLoad, tl);
@@ -391,9 +413,9 @@ public class Store<C extends BaseLoadConfig> extends Observable implements Loade
   public boolean isFiltered() {
     return filters != null && filters.size() > 0;
   }
-  
+
   public void load() {
-    C config = (reuseLoadConfig && lastLoadConfig != null) ? lastLoadConfig
+    C config = (isReuseLoadConfig() && lastLoadConfig != null) ? lastLoadConfig
         : newLoadConfig();
     final C loadConfig = prepareLoadConfig(config);
     LoadEvent evt = new LoadEvent(this, loadConfig, null);
@@ -405,13 +427,13 @@ public class Store<C extends BaseLoadConfig> extends Observable implements Loade
       });
     }
   }
-  
+
   public void load(int offset, int limit) {
     this.offset = offset;
     this.limit = limit;
     load();
   }
-  
+
   /**
    * Loads the Record cache.
    * 
@@ -440,13 +462,13 @@ public class Store<C extends BaseLoadConfig> extends Observable implements Loade
   public void rejectChanges() {
 
   }
-  
+
   /**
    * Reloads the Record cache from the configured Proxy using the configured
    * Reader and the options from the last load operation performed.
    */
   public void reload() {
-    load(lastOptions);
+    load(lastLoadConfig);
   }
 
   /**
@@ -555,7 +577,7 @@ public class Store<C extends BaseLoadConfig> extends Observable implements Loade
   }
 
   protected void loadData(C config, DataCallback callback) {
-    
+
   }
 
   /**
@@ -582,8 +604,8 @@ public class Store<C extends BaseLoadConfig> extends Observable implements Loade
   protected C prepareLoadConfig(C config) {
     config.setOffset(offset);
     config.setLimit(limit);
-//    config.setSortField(sortField);
-//    config.setSortDir(sortDir);
+    // config.setSortField(sortField);
+    // config.setSortDir(sortDir);
     return config;
   }
 
@@ -607,6 +629,14 @@ public class Store<C extends BaseLoadConfig> extends Observable implements Loade
 
   private void storeOptions(LoadConfig options) {
 
+  }
+
+  public void setReuseLoadConfig(boolean reuseLoadConfig) {
+    this.reuseLoadConfig = reuseLoadConfig;
+  }
+
+  public boolean isReuseLoadConfig() {
+    return reuseLoadConfig;
   }
 
 }

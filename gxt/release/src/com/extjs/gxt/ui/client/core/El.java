@@ -865,7 +865,7 @@ public class El {
    * @return the parent
    */
   public El getParent() {
-    return fly(DOM.getParent(dom));
+    return new El(DOM.getParent(dom));
   }
 
   /**
@@ -954,6 +954,15 @@ public class El {
    */
   public String getStyleName() {
     return DOM.getElementProperty(dom, "className");
+  }
+  
+  /**
+   * Returns the element's size, using style attribute before offsets.
+   * 
+   * @return the size
+   */
+  public Size getStyleSize() {
+    return XElement.fly(dom).getStyleSize();
   }
 
   /**
@@ -1083,7 +1092,7 @@ public class El {
    */
   public boolean hasStyleName(String style) {
     String cls = DOM.getElementProperty(dom, "className");
-    return cls.indexOf(" " + style + " ") != -1 ? true : false;
+    return (" " + cls + " ").indexOf(" " + style + " ") != -1 ? true : false;
   }
 
   /**
@@ -1134,6 +1143,14 @@ public class El {
     DOM.insertChild(dom, child, index);
     return this;
   }
+  
+  public El insertChild(Element[] children, int index) {
+    for (int i = children.length - 1; i >= 0; i--) {
+      DOM.insertChild(dom, children[i], index);
+    }
+    return this;
+  }
+
 
   /**
    * Inserts an element as the first child.
@@ -1218,6 +1235,13 @@ public class El {
   public El insertSibling(Element[] elems, String where) {
     for (int i = 0; i < elems.length; i++) {
       insertSibling(elems[i], where);
+    }
+    return this;
+  }
+  
+  public El insertFirst(Element[] elems) {
+    for (int i = 0; i < elems.length; i++) {
+      DOM.appendChild(dom, elems[i]);
     }
     return this;
   }
@@ -1893,11 +1917,24 @@ public class El {
    * @param value the int value
    * @return this
    */
-  public El setStyleAttribute(String attr, int value) {
-    DOM.setIntStyleAttribute(dom, attr, value);
+  public El setStyleAttribute(String attr, Object value) {
+    XElement.fly(dom).setStyleAttribute(attr, value);
     return this;
   }
-
+  
+  /**
+   * Sets the element's size using style attributes.
+   * 
+   * @param width the width
+   * @param height the height
+   * @return this
+   */
+  public El setStyleSize(int width, int height) {
+    setStyleAttribute("width", width);
+    setStyleAttribute("height", height);
+    return this;
+  }
+  
   /**
    * Sets the element's style attribute.
    * 
@@ -1906,7 +1943,7 @@ public class El {
    * @return this
    */
   public El setStyleAttribute(String attr, String value) {
-    DOM.setStyleAttribute(dom, attr, value == null ? "" : value);
+    XElement.fly(dom).setStyleAttribute(attr, value);
     return this;
   }
 
@@ -1935,6 +1972,17 @@ public class El {
       removeStyleName(style);
     }
     return this;
+  }
+  
+  /**
+   * Sets the element's tab index.
+   * 
+   * @param index the tab index
+   * @return this
+   */
+  public El setTabIndex(int index) {
+    DOM.setElementPropertyInt(dom, "tabIndex", index);
+    return null;
   }
 
   /**

@@ -40,6 +40,7 @@ public class AdapterToolItem extends ToolItem {
     return widget;
   }
 
+  @Override
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
     if (widget instanceof Component) {
@@ -48,11 +49,13 @@ public class AdapterToolItem extends ToolItem {
     setElement(widget.getElement(), target, index);
   }
 
+  @Override
   protected void doAttachChildren() {
     super.doAttachChildren();
     WidgetHelper.doAttach(widget);
   }
 
+  @Override
   protected void doDetachChildren() {
     super.doDetachChildren();
     WidgetHelper.doDetach(widget);

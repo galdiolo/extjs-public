@@ -16,12 +16,7 @@ import com.google.gwt.user.client.Element;
  */
 public class Text extends BoxComponent {
 
-  /**
-   * The HTML tag name that will wrap the text (defaults to 'div'). For inline
-   * behavior set the tag name to 'span'.
-   */
-  public String tagName = "div";
-
+  private String tagName = "div";
   private String text;
 
   /**
@@ -41,15 +36,10 @@ public class Text extends BoxComponent {
   }
 
   /**
-   * Sets the text.
-   * 
-   * @param text the new text
+   * @return the tagName
    */
-  public void setText(String text) {
-    this.text = text;
-    if (rendered) {
-      DOM.setInnerText(getElement(), text);
-    }
+  public String getTagName() {
+    return tagName;
   }
 
   /**
@@ -61,10 +51,32 @@ public class Text extends BoxComponent {
     return text;
   }
 
+  /**
+   * The HTML tag name that will wrap the text (defaults to 'div', pre-render). For inline
+   * behavior set the tag name to 'span'.
+   * 
+   * @param tagName the tag name
+   */
+  public void setTagName(String tagName) {
+    this.tagName = tagName;
+  }
+
+  /**
+   * Sets the text.
+   * 
+   * @param text the new text
+   */
+  public void setText(String text) {
+    this.text = text;
+    if (rendered) {
+      DOM.setInnerText(getElement(), text);
+    }
+  }
+
   @Override
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
-    setElement(DOM.createElement(tagName), target, index);
+    setElement(DOM.createElement(getTagName()), target, index);
 
     if (text != null) {
       setText(text);

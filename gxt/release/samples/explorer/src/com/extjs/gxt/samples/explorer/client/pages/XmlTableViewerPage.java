@@ -60,7 +60,6 @@ public class XmlTableViewerPage extends Container implements EntryPoint {
     // create the column model
     TableColumnModel cm = new TableColumnModel(columns);
     final Table table = new Table(cm);
-    table.horizontalScroll = true;
 
     final TableViewer viewer = new TableViewer(table);
     viewer.setContentProvider(new ModelContentProvider());
@@ -99,10 +98,10 @@ public class XmlTableViewerPage extends Container implements EntryPoint {
     });
 
     ContentPanel panel = new ContentPanel();
-    panel.frame = true;
-    panel.collapsible = true;
-    panel.animCollapse = false;
-    panel.buttonAlign = HorizontalAlignment.CENTER;
+    panel.setFrame(true);
+    panel.setCollapsible(true);
+    panel.setAnimCollapse(false);
+    panel.setButtonAlign(HorizontalAlignment.CENTER);
     panel.setIconStyle("icon-table");
     panel.setHeading("XML TableViewer Demo");
     panel.setLayout(new FitLayout());

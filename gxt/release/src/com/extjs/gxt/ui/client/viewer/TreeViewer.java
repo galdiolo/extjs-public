@@ -20,8 +20,10 @@ import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.TreeEvent;
 import com.extjs.gxt.ui.client.widget.Component;
+import com.extjs.gxt.ui.client.widget.Items;
 import com.extjs.gxt.ui.client.widget.tree.Tree;
 import com.extjs.gxt.ui.client.widget.tree.TreeItem;
+import com.extjs.gxt.ui.client.widget.tree.TreeSelectionModel;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 
@@ -34,11 +36,11 @@ import com.google.gwt.user.client.Element;
  * 
  * @see TreeViewer
  */
-public class TreeViewer extends Viewer<TreeContentProvider> implements Checkable,
+public class TreeViewer<S extends TreeSelectionModel> extends Viewer<TreeContentProvider> implements Checkable,
     BaseTreeViewer {
 
   protected boolean checkable;
-  private Tree tree;
+  private Tree<S> tree;
   private List<CheckStateListener> checkChangeListener;
   private boolean caching = true;
   private boolean force;
@@ -48,7 +50,7 @@ public class TreeViewer extends Viewer<TreeContentProvider> implements Checkable
    * 
    * @param tree the underlying tree widget
    */
-  public TreeViewer(Tree tree) {
+  public TreeViewer(Tree<S> tree) {
     this.tree = tree;
     preventRender = false;
     hookWidget(tree);
@@ -62,7 +64,7 @@ public class TreeViewer extends Viewer<TreeContentProvider> implements Checkable
     }
     filterItems(tree.getRootItem());
   }
-  
+
   private void filterItems(TreeItem item) {
     if (item.isRoot() || isOrDecendantSelected(null, item.getData())) {
       item.setVisible(true);
@@ -193,7 +195,7 @@ public class TreeViewer extends Viewer<TreeContentProvider> implements Checkable
    */
   public void select(Object element) {
     TreeItem item = findItem(element);
-    tree.getSelectionModel().select(item);
+    doSelect(tree.getSelectionModel(), new Items(item));
   }
 
   /**
@@ -262,13 +264,15 @@ public class TreeViewer extends Viewer<TreeContentProvider> implements Checkable
 
   public void setSelection(Selection selection, boolean reveal) {
     List<Object> selected = selection.toList();
-    tree.getSelectionModel().deselectAll();
+    List<TreeItem> items = new ArrayList<TreeItem>();
     for (TreeItem item : tree.getAllItems()) {
-      Object itemElement = getElementFromItem(item);
-      if (selected.contains(itemElement)) {
-        tree.getSelectionModel().select(item);
+      Object elem = getElementFromItem(item);
+      if (selected.contains(elem)) {
+        items.add(item);
       }
     }
+
+    doSelect(tree.getSelectionModel(), new Items(items));
   }
 
   public void update() {
@@ -294,7 +298,7 @@ public class TreeViewer extends Viewer<TreeContentProvider> implements Checkable
 
   protected List<Object> getSelectedFromWidget() {
     ArrayList<Object> elems = new ArrayList<Object>();
-    for (TreeItem item : tree.getSelection()) {
+    for (TreeItem item : tree.getSelectionModel().doGetSelectedItems()) {
       elems.add(getElementFromItem(item));
     }
     return elems;
@@ -382,8 +386,8 @@ public class TreeViewer extends Viewer<TreeContentProvider> implements Checkable
   }
 
   private native void clearChildrenRendered(TreeItem item) /*-{
-      item.@com.extjs.gxt.ui.client.widget.tree.TreeItem::childrenRendered = false;
-    }-*/;
+        item.@com.extjs.gxt.ui.client.widget.tree.TreeItem::childrenRendered = false;
+      }-*/;
 
   private List<Object> filterChildren(TreeItem parent, List<Object> elems) {
     List<Object> temp = new ArrayList<Object>();
@@ -410,8 +414,8 @@ public class TreeViewer extends Viewer<TreeContentProvider> implements Checkable
   }
 
   private native void init(Tree tree) /*-{
-   tree.@com.extjs.gxt.ui.client.widget.tree.Tree::isViewer = true;
-  }-*/;
+     tree.@com.extjs.gxt.ui.client.widget.tree.Tree::isViewer = true;
+    }-*/;
 
   private void internalAdd(TreeItem parent, Object element, int position) {
     parent.setLeaf(false);
@@ -449,7 +453,6 @@ public class TreeViewer extends Viewer<TreeContentProvider> implements Checkable
     return false;
   }
 
-  
   private void loadChildren(final TreeItem item, boolean expand) {
     // if there is an async call out for my children already, I want to make
     // sure that I don't make another call and load the same items twice
@@ -496,7 +499,7 @@ public class TreeViewer extends Viewer<TreeContentProvider> implements Checkable
               item.setLeaf(true);
             }
             if (item.isRendered()) {
-              item.getUI().updateJoint();
+              item.getUI().updateJointStyle();
             }
           }
         });
@@ -535,9 +538,14 @@ public class TreeViewer extends Viewer<TreeContentProvider> implements Checkable
     List<Object> list = new ArrayList<Object>();
     Element p = parent.getContainer();
     for (int i = 0; i < parent.getItemCount(); i++) {
-      TreeItem item = parent.getItem(i);
-      DOM.removeChild(p, item.getElement());
-      list.add(getElementFromItem(item));
+      try {
+        TreeItem item = parent.getItem(i);
+        DOM.removeChild(p, item.getElement());
+        list.add(getElementFromItem(item));
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
     }
 
     sortElements(list);
@@ -558,5 +566,9 @@ public class TreeViewer extends Viewer<TreeContentProvider> implements Checkable
     item.setIconStyle(lp.getIconStyle(elem));
     item.setTextStyle(lp.getTextStyle(elem));
   }
+
+  private native void doSelect(TreeSelectionModel sm, Items items) /*-{
+     sm.@com.extjs.gxt.ui.client.widget.tree.TreeSelectionModel::doSelect(Lcom/extjs/gxt/ui/client/widget/Items;)(items);
+   }-*/;
 
 }

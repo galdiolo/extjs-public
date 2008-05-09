@@ -18,9 +18,11 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.TreeEvent;
 import com.extjs.gxt.ui.client.widget.Component;
+import com.extjs.gxt.ui.client.widget.Items;
 import com.extjs.gxt.ui.client.widget.table.TableColumn;
 import com.extjs.gxt.ui.client.widget.tree.Tree;
 import com.extjs.gxt.ui.client.widget.tree.TreeItem;
+import com.extjs.gxt.ui.client.widget.tree.TreeSelectionModel;
 import com.extjs.gxt.ui.client.widget.treetable.TreeTable;
 import com.extjs.gxt.ui.client.widget.treetable.TreeTableItem;
 import com.google.gwt.user.client.DOM;
@@ -122,14 +124,16 @@ public class TreeTableViewer extends Viewer<TreeContentProvider> implements Chec
     filterItems(treeTable.getRootItem());
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see com.extjs.gxt.ui.client.viewer.Viewer#findItem(java.lang.Object)
    */
   public TreeTableItem findItem(Object element) {
     for (TreeItem item : treeTable.getAllItems()) {
       Object itemElement = item.getData();
       if (getComparer().equals(element, itemElement)) {
-        return (TreeTableItem)item;
+        return (TreeTableItem) item;
       }
     }
     return null;
@@ -249,7 +253,7 @@ public class TreeTableViewer extends Viewer<TreeContentProvider> implements Chec
    */
   public void select(Object element) {
     TreeTableItem item = findItem(element);
-    treeTable.getSelectionModel().select(item);
+    doSelect(treeTable.getSelectionModel(), new Items(item));
   }
 
   /**
@@ -311,18 +315,19 @@ public class TreeTableViewer extends Viewer<TreeContentProvider> implements Chec
       return;
     }
     List<Object> selected = selection.toList();
-    treeTable.getSelectionModel().deselectAll();
+    List<TreeItem> items = new ArrayList<TreeItem>();
     for (TreeItem item : treeTable.getAllItems()) {
-      Object elem = item.getData();
+      Object elem = getElementFromItem(item);
       if (selected.contains(elem)) {
-        treeTable.getSelectionModel().select(item);
+        items.add(item);
       }
     }
+    doSelect(treeTable.getSelectionModel(), new Items(items));
   }
 
   public void update() {
     for (TreeItem item : treeTable.getAllItems()) {
-      updateInternal((TreeTableItem)item);
+      updateInternal((TreeTableItem) item);
     }
   }
 
@@ -339,8 +344,8 @@ public class TreeTableViewer extends Viewer<TreeContentProvider> implements Chec
 
   protected List<Object> getSelectedFromWidget() {
     ArrayList<Object> elems = new ArrayList<Object>();
-    for (TreeItem item : treeTable.getSelection()) {
-      elems.add((Object) item.getData());
+    for (TreeItem item : treeTable.getSelectionModel().doGetSelectedItems()) {
+      elems.add(getElementFromItem(item));
     }
     return elems;
   }
@@ -448,8 +453,8 @@ public class TreeTableViewer extends Viewer<TreeContentProvider> implements Chec
   }
 
   private native void init(Tree tree) /*-{
-    tree.@com.extjs.gxt.ui.client.widget.tree.Tree::isViewer = true;
-   }-*/;
+     tree.@com.extjs.gxt.ui.client.widget.tree.Tree::isViewer = true;
+    }-*/;
 
   private void fireCheckStateChanged(ComponentEvent ce) {
     if (checkChangeListener != null) {
@@ -513,7 +518,10 @@ public class TreeTableViewer extends Viewer<TreeContentProvider> implements Chec
     }
     item.setEnabled(false);
 
-    item.getUI().onLoadingChange(true);
+    if (item.getUI() != null) {
+      item.getUI().onLoadingChange(true);
+    }
+    
     getContentProvider().getChildren(getElementFromItem(item),
         new AsyncContentCallback<Object>() {
 
@@ -523,7 +531,9 @@ public class TreeTableViewer extends Viewer<TreeContentProvider> implements Chec
               item.getUI().onLoadingChange(false);
               return;
             }
-            item.getUI().onLoadingChange(false);
+            if (item.getUI() != null) {
+              item.getUI().onLoadingChange(false);
+            }
             item.setEnabled(true);
             children = filterChildren(item, children);
             sortElements(children);
@@ -535,7 +545,7 @@ public class TreeTableViewer extends Viewer<TreeContentProvider> implements Chec
               item.setExpanded(true);
             } else {
               item.setLeaf(true);
-              item.getUI().updateJoint();
+              item.getUI().updateJointStyle();
             }
 
           }
@@ -618,4 +628,8 @@ public class TreeTableViewer extends Viewer<TreeContentProvider> implements Chec
     item.setText(text);
     item.setIconStyle(iconStyle);
   }
+
+  private native void doSelect(TreeSelectionModel sm, Items items) /*-{
+     sm.@com.extjs.gxt.ui.client.widget.tree.TreeSelectionModel::doSelect(Lcom/extjs/gxt/ui/client/widget/Items;)(items);
+   }-*/;
 }

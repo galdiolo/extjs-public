@@ -67,7 +67,7 @@ public class TreeViewerFilterPage extends Container implements EntryPoint {
     super.onRender(parent, pos);
 
     Tree tree = new Tree();
-    tree.itemImageStyle = "icon-music";
+    tree.setItemIconStyle("icon-music");
 
     TreeViewer viewer = new TreeViewer(tree);
     viewer.setContentProvider(new ModelTreeContentProvider());

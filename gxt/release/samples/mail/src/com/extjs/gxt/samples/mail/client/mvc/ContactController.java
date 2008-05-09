@@ -16,11 +16,24 @@ import com.extjs.gxt.ui.client.widget.ContentPanel;
 
 public class ContactController extends Controller {
 
+  protected ContactFolderView folderView;
+
   public ContactController() {
+    registerEventTypes(AppEvents.Init);
     registerEventTypes(AppEvents.NavContacts);
   }
 
+  @Override
+  public void initialize() {
+    super.initialize();
+    folderView = new ContactFolderView(this);
+  }
+
+  @Override
   public void handleEvent(AppEvent event) {
+    if (event.type == AppEvents.Init) {
+      forwardToView(folderView, event);
+    }
     if (event.type == AppEvents.NavContacts) {
       ContentPanel center = (ContentPanel) Registry.get("center");
       center.setHeading("Contacts");

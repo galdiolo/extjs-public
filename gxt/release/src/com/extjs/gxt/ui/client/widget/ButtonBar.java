@@ -8,7 +8,6 @@
 package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.Events;
-import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.core.El;
@@ -71,26 +70,10 @@ import com.google.gwt.user.client.Element;
  * <dd>.my-btn-bar (the button bar itself)</dd>
  * </dl>
  */
-public class ButtonBar extends AbstractContainer {
+public class ButtonBar extends AbstractContainer<Button> {
 
-  /**
-   * The alignment of any buttons added to this panel (defaults to LEFT).
-   * <p>
-   * Valid values are:
-   * <ul>
-   * <li>HorizontalAlignment.LEFT</li>
-   * <li>HorizontalAlignment.CENTER</li>
-   * <li>HorizontalAlignment.RIGHT</li>
-   * </ul>
-   * </p>
-   */
-  public HorizontalAlignment buttonAlign = HorizontalAlignment.LEFT;
-
-  /**
-   * The default button width (defaults to 75).
-   */
-  public int buttonWidth = 75;
-
+  private int buttonWidth = 75;
+  private HorizontalAlignment buttonAlign = HorizontalAlignment.LEFT;
   private Button buttonPressed;
   private HorizontalPanel panel;
   private Listener listener = new Listener<ButtonEvent>() {
@@ -111,10 +94,8 @@ public class ButtonBar extends AbstractContainer {
    */
   public ButtonBar() {
     baseStyle = "x-button-bar";
-    // TODO: fix hack
-    if (!XDOM.isVisibleBox) {
-      setHeight(32);
-    }
+    panel = new HorizontalPanel();
+    panel.setLayoutOnChange(true);
   }
 
   /**
@@ -125,7 +106,7 @@ public class ButtonBar extends AbstractContainer {
    * @param button the button to be added
    */
   public void add(Button button) {
-    insert(button, getButtonCount());
+    insert(button, getItemCount());
   }
 
   /**
@@ -135,7 +116,16 @@ public class ButtonBar extends AbstractContainer {
    * @return the button or <code>null</code>
    */
   public Button getButton(int index) {
-    return (Button) items.get(index);
+    return getItem(index);
+  }
+
+  /**
+   * Returns the bar's horizontal alignment.
+   * 
+   * @return the buttonAlign the alignment
+   */
+  public HorizontalAlignment getButtonAlign() {
+    return buttonAlign;
   }
 
   /**
@@ -145,7 +135,7 @@ public class ButtonBar extends AbstractContainer {
    * @return the button or <code>null</code> if no match
    */
   public Button getButtonById(String buttonId) {
-    int count = getButtonCount();
+    int count = getItemCount();
     for (int i = 0; i < count; i++) {
       Button btn = getButton(i);
       if (btn.getItemId().equals(buttonId)) {
@@ -156,21 +146,19 @@ public class ButtonBar extends AbstractContainer {
   }
 
   /**
-   * Returns the button count.
-   * 
-   * @return the button count
-   */
-  public int getButtonCount() {
-    return items.size();
-  }
-
-  /**
    * Returns the last button that was selected.
    * 
    * @return the last button or <codee>null</code>
    */
   public Button getButtonPressed() {
     return buttonPressed;
+  }
+
+  /**
+   * @return the buttonWidth
+   */
+  public int getButtonWidth() {
+    return buttonWidth;
   }
 
   /**
@@ -186,12 +174,13 @@ public class ButtonBar extends AbstractContainer {
     bbe.button = button;
     bbe.index = index;
     if (fireEvent(Events.BeforeAdd, bbe)) {
-      items.add(index, button);
+      super.insert(button, index);
+      panel.insert(button, index);
       button.addListener(Events.BeforeSelect, listener);
       button.addListener(Events.Select, listener);
-      if (rendered) {
-        renderButton(button, index);
-      }
+      // if (rendered) {
+      // renderButton(button, index);
+      // }
       fireEvent(Events.Add, bbe);
     }
   }
@@ -201,28 +190,42 @@ public class ButtonBar extends AbstractContainer {
    * 
    * @param button the button to be removed
    */
-  public void remove(Button button) {
+  public boolean remove(Button button) {
     ButtonBarEvent be = new ButtonBarEvent(this);
     be.button = button;
 
     if (fireEvent(Events.BeforeRemove, be)) {
       button.removeListener(Events.Select, listener);
       button.removeListener(Events.BeforeSelect, listener);
-      items.remove(button);
-      if (rendered) {
-        panel.remove(button);
-      }
+      panel.remove(button);
       fireEvent(Events.Remove, be);
     }
+    return false;
   }
 
   /**
    * Removes all the buttons.
    */
   public void removeAll() {
-    while (getButtonCount() > 0) {
+    while (getItemCount() > 0) {
       remove(getButton(0));
     }
+  }
+
+  /**
+   * Sets the bar's horizontal alignment.
+   * 
+   * @param buttonAlign the alignment
+   */
+  public void setButtonAlign(HorizontalAlignment buttonAlign) {
+    this.buttonAlign = buttonAlign;
+  }
+
+  /**
+   * @param buttonWidth the buttonWidth to set
+   */
+  public void setButtonWidth(int buttonWidth) {
+    this.buttonWidth = buttonWidth;
   }
 
   protected void onButtonPressed(ButtonEvent be) {
@@ -233,34 +236,37 @@ public class ButtonBar extends AbstractContainer {
     fireEvent(Events.Select, bbe);
   }
 
+  @Override
   protected void onDisable() {
     super.onDisable();
-    for (int i = 0; i < getButtonCount(); i++) {
+    for (int i = 0; i < getItemCount(); i++) {
       getButton(i).disable();
     }
   }
 
+  @Override
   protected void onEnable() {
     super.onEnable();
-    for (int i = 0; i < getButtonCount(); i++) {
+    for (int i = 0; i < getItemCount(); i++) {
       getButton(i).enable();
     }
   }
 
+  @Override
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
     setElement(DOM.createDiv(), target, index);
     setStyleAttribute("overflow", "visible");
-    setStyleName("x-panel-btns-ct");
+    addStyleName("x-panel-btns-ct");
+    el.setHeight(24);
 
-    El wrap = el.insertFirst("<div class='x-panel-btns x-panel-btns-" + buttonAlign
+    El wrap = el.insertFirst("<div class='x-panel-btns x-panel-btns-" + getButtonAlign()
         + "'></div>");
 
-    panel = new HorizontalPanel();
-    panel.horizontalAlign = buttonAlign;
-    panel.verticalAlign = VerticalAlignment.MIDDLE;
+    panel.setHorizontalAlign(getButtonAlign());
+    panel.setVerticalAlign(VerticalAlignment.MIDDLE);
 
-    int count = getButtonCount();
+    int count = getItemCount();
     for (int i = 0; i < count; i++) {
       Button button = getButton(i);
       renderButton(button, i);
@@ -274,7 +280,7 @@ public class ButtonBar extends AbstractContainer {
     data.style = "x-panel-btn-td";
     button.setData(data);
     panel.insert(button, index);
-    button.minWidth = buttonWidth;
+    button.setMinWidth(getButtonWidth());
   }
 
 }

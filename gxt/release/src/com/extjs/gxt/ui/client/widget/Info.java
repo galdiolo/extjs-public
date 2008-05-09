@@ -94,7 +94,7 @@ public class Info extends ContentPanel {
   public Info() {
     baseStyle = "x-info";
     frame = true;
-    shadow = true;
+    setShadow(true);
     setLayoutOnChange(true);
   }
 

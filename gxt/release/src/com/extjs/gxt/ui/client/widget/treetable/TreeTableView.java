@@ -153,7 +153,7 @@ public class TreeTableView {
     boolean isGecko = GXT.isGecko;
     String overflowX = "visible";
 
-    if (treeTable.horizontalScroll) {
+    if (treeTable.getHorizontalScroll()) {
       if (dataEl.getWidth() < (width - adj)) {
         if (isGecko) {
           overflowX = "hidden";

@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
-
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.widget.layout.TableData;
@@ -21,47 +20,11 @@ import com.google.gwt.user.client.Element;
  */
 public class VerticalPanel extends Container {
 
-  /**
-   * The horizontal cell alignment (defaults to LEFT).
-   * <p>
-   * Valid values are:
-   * <ul>
-   * <li>HorizontalAlignment.LEFT</li>
-   * <li>HorizontalAlignment.CENTER</li>
-   * <li>HorizontalAlignment.RIGHT</li>
-   * </ul>
-   * </p>
-   */
-  public HorizontalAlignment horizontalAlign = HorizontalAlignment.LEFT;
-
-  /**
-   * The vertical cell alignment (defaults to TOP).
-   * <p>
-   * Valid values are:
-   * <ul>
-   * <li>VerticalAlignment.TOP</li>
-   * <li>VerticalAlignment.MIDDLE</li>
-   * <li>VertcialAlginment.BOTTOM</li>
-   * </ul>
-   * </p>
-   */
-  public VerticalAlignment verticalAlign = VerticalAlignment.TOP;
-
-  /**
-   * The cell spacing in pixels (defaults to 0).
-   */
-  public int spacing = 0;
-
-  /**
-   * The width of the table (defaults to null).
-   */
-  public String tableWidth;
-
-  /**
-   * The height of the table (defaults to null).
-   */
-  public String tableHeight;
-
+  private String tableWidth;
+  private String tableHeight;
+  private int spacing = 0;
+  private HorizontalAlignment horizontalAlign = HorizontalAlignment.LEFT;
+  private VerticalAlignment verticalAlign = VerticalAlignment.TOP;
   private TableLayout layout;
 
   /**
@@ -69,6 +32,53 @@ public class VerticalPanel extends Container {
    */
   public VerticalPanel() {
     setMonitorResize(false);
+  }
+
+  /**
+   * Returns the horizontal alignment.
+   * 
+   * @return the horizontalAlign
+   */
+  public HorizontalAlignment getHorizontalAlign() {
+    return horizontalAlign;
+  }
+
+  public int getSpacing() {
+    return spacing;
+  }
+
+  /**
+   * Returns the table's height.
+   * 
+   * @return the table height
+   */
+  public String getTableHeight() {
+    return tableHeight;
+  }
+
+  /**
+   * @return the tableWidth
+   */
+  public String getTableWidth() {
+    return tableWidth;
+  }
+
+  /**
+   * Returns the vertical alignment.
+   * 
+   * @return the vertical alignment
+   */
+  public VerticalAlignment getVerticalAlign() {
+    return verticalAlign;
+  }
+  
+  /**
+   * Sets the horizontal cell alignment (defaults to LEFT).
+   * 
+   * @param horizontalAlign the horizontal alignment
+   */
+  public void setHorizontalAlign(HorizontalAlignment horizontalAlign) {
+    this.horizontalAlign = horizontalAlign;
   }
 
   /**
@@ -83,14 +93,39 @@ public class VerticalPanel extends Container {
     }
   }
 
+  /**
+   * Sets the table's height.
+   * 
+   * @param tableHeight the table height
+   */
+  public void setTableHeight(String tableHeight) {
+    this.tableHeight = tableHeight;
+  }
+
+  /**
+   * Sets the width of the internal table.
+   * 
+   * @param tableWidth the table width
+   */
+  public void setTableWidth(String tableWidth) {
+    this.tableWidth = tableWidth;
+  }
+
+  /**
+   * Sets the vertical cell alignment (defaults to TOP).
+   */
+  public void setVerticalAlign(VerticalAlignment verticalAlign) {
+    this.verticalAlign = verticalAlign;
+  }
+
   @Override
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
     setStyleAttribute("overflow", "visible");
     layout = new TableLayout(1);
-    layout.horizontalAlign = horizontalAlign;
-    layout.verticalAlign = verticalAlign;
-    layout.cellSpacing = spacing;
+    layout.horizontalAlign = getHorizontalAlign();
+    layout.verticalAlign = getVerticalAlign();
+    layout.cellSpacing = getSpacing();
     layout.cellPadding = 0;
     layout.width = tableWidth;
     layout.height = tableHeight;

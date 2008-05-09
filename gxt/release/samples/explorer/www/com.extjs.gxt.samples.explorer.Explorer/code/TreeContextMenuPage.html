@@ -42,13 +42,14 @@ body {
 package com.extjs.gxt.samples.explorer.client.pages;
 
 import com.extjs.gxt.samples.resources.client.TestData;
-import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.TreeBuilder;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.TextMenuItem;
+import com.extjs.gxt.ui.client.widget.tree.SingleTreeSelectionModel;
 import com.extjs.gxt.ui.client.widget.tree.Tree;
 import com.extjs.gxt.ui.client.widget.tree.TreeItem;
 import com.google.gwt.core.client.EntryPoint;
@@ -67,8 +68,8 @@ public class TreeContextMenuPage extends Container implements EntryPoint {
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
 
-    final Tree tree = new Tree();
-    tree.itemImageStyle = "icon-music";
+    final Tree<SingleTreeSelectionModel> tree = new Tree();
+    tree.setItemIconStyle("icon-music");
 
     // quick way to build tree from Model instances.
     TreeBuilder.buildTree(tree, TestData.getTreeModel());
@@ -79,9 +80,9 @@ public class TreeContextMenuPage extends Container implements EntryPoint {
     TextMenuItem insert = new TextMenuItem();
     insert.setText("Insert Item");
     insert.setIconStyle("icon-add");
-    insert.addSelectionListener(new SelectionListener() {
-      public void componentSelected(ComponentEvent ce) {
-        TreeItem item = tree.getSelectedItem();
+    insert.addSelectionListener(new SelectionListener<MenuEvent>() {
+      public void componentSelected(MenuEvent ce) {
+        TreeItem item = tree.getSelectionModel().getSelectedItem();
         if (item != null) {
           TreeItem newItem = new TreeItem();
           newItem.setText("Add Child " + count++);
@@ -95,9 +96,9 @@ public class TreeContextMenuPage extends Container implements EntryPoint {
     TextMenuItem remove = new TextMenuItem();
     remove.setText("Remove Selected");
     remove.setIconStyle("icon-delete");
-    remove.addSelectionListener(new SelectionListener() {
-      public void componentSelected(ComponentEvent ce) {
-        TreeItem item = tree.getSelectedItem();
+    remove.addSelectionListener(new SelectionListener<MenuEvent>() {
+      public void componentSelected(MenuEvent ce) {
+        TreeItem item = tree.getSelectionModel().getSelectedItem();
         if (item != null) {
           item.getParentItem().remove(item);
         }

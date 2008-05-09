@@ -39,6 +39,7 @@ import com.google.gwt.user.client.ui.TableListener;
  * Simple date picker.
  * 
  * <dt><b>Events:</b></dt>
+ * 
  * <dd><b>Select</b> : DatePickerEvent(datePicker, date)<br>
  * <div>Fires when a date is selected.</div>
  * <ul>
@@ -130,16 +131,6 @@ public class DatePicker extends BoxComponent {
   public String todayTip;
 
   /**
-   * Minimum allowable date (defaults to null).
-   */
-  public Date minDate;
-
-  /**
-   * Maximum allowable date (defaults to null).
-   */
-  public Date maxDate;
-
-  /**
    * The error text to display if the minDate validation fails (defaults to
    * "This date is before the minimum date").
    */
@@ -168,8 +159,11 @@ public class DatePicker extends BoxComponent {
    * (Control+Up/Down to move years)').
    */
   public String monthYearText;
-
-  public int startDay;
+  
+  private int firstDOW;
+  private Date minDate;
+  private Date maxDate;
+  private int startDay;
   private long today;
   private int mpyear;
   private Grid days, grid;
@@ -184,9 +178,11 @@ public class DatePicker extends BoxComponent {
   private CompositeElement mpMonths, mpYears;
   private El monthPicker;
   private DateTimeConstants constants = (DateTimeConstants) GWT.create(DateTimeConstants.class);
-
   private MyMessages messages = (MyMessages) GWT.create(MyMessages.class);
 
+  /**
+   * Creates a new date picker.
+   */
   public DatePicker() {
     baseStyle = "x-date-picker";
   }
@@ -197,6 +193,33 @@ public class DatePicker extends BoxComponent {
     {
       update(activeDate);
     }
+  }
+
+  /**
+   * Returns the field's maximum allowed date.
+   * 
+   * @return the max date
+   */
+  public Date getMaxDate() {
+    return maxDate;
+  }
+
+  /**
+   * Returns the picker's minimum data.
+   * 
+   * @return the min date
+   */
+  public Date getMinDate() {
+    return minDate;
+  }
+
+  /**
+   * Returns the picker's start day.
+   * 
+   * @return the start day
+   */
+  public int getStartDay() {
+    return startDay;
   }
 
   /**
@@ -216,6 +239,33 @@ public class DatePicker extends BoxComponent {
         onClick(ce);
         return;
     }
+  }
+
+  /**
+   * Sets the picker's maximum allowed date.
+   * 
+   * @param maxDate the max date
+   */
+  public void setMaxDate(Date maxDate) {
+    this.maxDate = maxDate;
+  }
+
+  /**
+   * Sets the picker's minimum allowed date.
+   * 
+   * @param minDate the min date
+   */
+  public void setMinDate(Date minDate) {
+    this.minDate = minDate;
+  }
+
+  /**
+   * Sets the picker's start day
+   * 
+   * @param startDay the start day
+   */
+  public void setStartDay(int startDay) {
+    this.startDay = startDay;
   }
 
   /**
@@ -246,12 +296,14 @@ public class DatePicker extends BoxComponent {
 
   }
 
+  @Override
   protected void doAttachChildren() {
     header.onAttach();
     footer.onAttach();
     WidgetHelper.doAttach(grid);
   }
 
+  @Override
   protected void doDetachChildren() {
     header.onDetach();
     footer.onDetach();
@@ -304,14 +356,22 @@ public class DatePicker extends BoxComponent {
     if (el != null) {
       String dt = el.getElementAttribute("dateValue");
       if (dt != null) {
-        handleDateClick(el.dom, dt);
+        handleDateClick(el, dt);
         return;
       }
     }
   }
 
+  @Override
   protected void onRender(Element target, int index) {
     setElement(DOM.createDiv(), target, index);
+
+    if (minText == null) {
+      minText = GXT.MESSAGES.datePicker_minText();
+    }
+    if (maxText == null) {
+      maxText = GXT.MESSAGES.datePicker_maxText();
+    }
 
     String tt = todayText != null ? todayText : messages.datePicker_todayText();
 
@@ -324,15 +384,16 @@ public class DatePicker extends BoxComponent {
     days.setCellSpacing(0);
     days.setBorderWidth(0);
 
-    String[] dn = constants.shortWeekdays();
+    String[] dn = constants.narrowWeekdays();
+    firstDOW = Integer.parseInt(constants.firstDayOfTheWeek()) - 1;
 
-    days.setHTML(0, 0, "<span>" + dn[0].substring(0, 1) + "</span>");
-    days.setHTML(0, 1, "<span>" + dn[1].substring(0, 1));
-    days.setHTML(0, 2, "<span>" + dn[2].substring(0, 1));
-    days.setHTML(0, 3, "<span>" + dn[3].substring(0, 1));
-    days.setHTML(0, 4, "<span>" + dn[4].substring(0, 1));
-    days.setHTML(0, 5, "<span>" + dn[5].substring(0, 1));
-    days.setHTML(0, 6, "<span>" + dn[6].substring(0, 1));
+    days.setHTML(0, 0, "<span>" + dn[(0 + firstDOW) % 7] + "</span>");
+    days.setHTML(0, 1, "<span>" + dn[(1 + firstDOW) % 7]);
+    days.setHTML(0, 2, "<span>" + dn[(2 + firstDOW) % 7]);
+    days.setHTML(0, 3, "<span>" + dn[(3 + firstDOW) % 7]);
+    days.setHTML(0, 4, "<span>" + dn[(4 + firstDOW) % 7]);
+    days.setHTML(0, 5, "<span>" + dn[(5 + firstDOW) % 7]);
+    days.setHTML(0, 6, "<span>" + dn[(6 + firstDOW) % 7]);
 
     grid = new Grid(6, 7);
     grid.setStyleName("x-date-inner");
@@ -353,8 +414,8 @@ public class DatePicker extends BoxComponent {
     }
 
     footer = new HorizontalPanel();
-    footer.tableWidth = "100%";
-    footer.horizontalAlign = HorizontalAlignment.CENTER;
+    footer.setTableWidth("100%");
+    footer.setHorizontalAlign(HorizontalAlignment.CENTER);
 
     footer.setStyleName("x-date-bottom");
     footer.setWidth(175);
@@ -380,11 +441,12 @@ public class DatePicker extends BoxComponent {
     cells = el.select("table.x-date-inner tbody td");
     textNodes = el.query("table.x-date-inner tbody span");
 
-    activeDate = new DateWrapper();
-    update(new DateWrapper());
+    activeDate = value != null ? value : new DateWrapper();
+    update(activeDate);
 
     el.addEventsSunk(Event.ONCLICK);
     el.makePositionable();
+
   }
 
   private void createMonthPicker() {
@@ -430,9 +492,9 @@ public class DatePicker extends BoxComponent {
 
   }
 
-  private void handleDateClick(Element target, String dt) {
+  private void handleDateClick(El target, String dt) {
     Date d = new Date(Long.valueOf(dt));
-    if (d != null) {
+    if (d != null && !target.getParent().hasStyleName("x-date-disabled")) {
       setValue(d);
     }
   }
@@ -461,12 +523,12 @@ public class DatePicker extends BoxComponent {
       cellEl.addStyleName("x-date-selected");
     }
     if (t < min) {
-//      cellEl.addStyleName("x-date-disabled");
-//      cellEl.setTitle(minText);
+      cellEl.addStyleName("x-date-disabled");
+      cellEl.setTitle(minText);
     }
     if (t > max) {
-//      cellEl.addStyleName("x-date-disabled");
-//      cellEl.setTitle(maxText);
+      cellEl.addStyleName("x-date-disabled");
+      cellEl.setTitle(maxText);
     }
   }
 
@@ -510,7 +572,7 @@ public class DatePicker extends BoxComponent {
       }
       int days = date.getDaysInMonth();
       DateWrapper firstOfMonth = date.getFirstDayOfMonth();
-      int startingPos = firstOfMonth.getDayInWeek() - startDay;
+      int startingPos = firstOfMonth.getDayInWeek() - startDay - firstDOW;
 
       if (startingPos <= startDay) {
         startingPos += 7;
@@ -524,8 +586,8 @@ public class DatePicker extends BoxComponent {
       DateWrapper d = new DateWrapper(pm.getFullYear(), pm.getMonth(), prevStart).clearTime();
       today = new DateWrapper().clearTime().getTime();
       long sel = activeDate.clearTime().getTime();
-      long min = minDate != null ? new DateWrapper(minDate).getTime() : -100000L;
-      long max = maxDate != null ? new DateWrapper(maxDate).getTime() : 10000000L;
+      long min = minDate != null ? new DateWrapper(minDate).getTime() : Long.MIN_VALUE;
+      long max = maxDate != null ? new DateWrapper(maxDate).getTime() : Long.MAX_VALUE;
 
       int i = 0;
       for (; i < startingPos; i++) {
@@ -550,7 +612,7 @@ public class DatePicker extends BoxComponent {
       }
 
       int month = activeDate.getMonth();
-      monthBtn.setText(constants.months()[month] + " " + activeDate.getFullYear());
+      monthBtn.setText(constants.standaloneMonths()[month] + " " + activeDate.getFullYear());
     }
   }
 

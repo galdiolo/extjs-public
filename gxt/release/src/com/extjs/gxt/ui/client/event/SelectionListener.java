@@ -13,13 +13,13 @@ import java.util.EventListener;
  * Interface for components that can be selected. Selection is a GXT event which
  * should not be confused with the browser click event.
  */
-public interface SelectionListener extends EventListener {
+public interface SelectionListener<E extends ComponentEvent> extends EventListener {
 
   /**
    * Fires after a component is selected.
    * 
    * @param ce the component event
    */
-  public void componentSelected(ComponentEvent ce);
+  public void componentSelected(E ce);
 
 }

@@ -10,7 +10,7 @@ package com.extjs.gxt.samples.explorer.client.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.samples.explorer.client.pages.AccordianLayoutPage;
+import com.extjs.gxt.samples.explorer.client.pages.AccordionLayoutPage;
 import com.extjs.gxt.samples.explorer.client.pages.AsyncTreeViewerPage;
 import com.extjs.gxt.samples.explorer.client.pages.BorderLayoutPage;
 import com.extjs.gxt.samples.explorer.client.pages.ButtonPage;
@@ -125,7 +125,7 @@ public class ExplorerModel extends BaseTreeModel {
     add(other);
 
     Category layouts = new Category("Layouts");
-    layouts.addEntry("AccordianLayout", new AccordianLayoutPage());
+    layouts.addEntry("AccordionLayout", new AccordionLayoutPage());
     layouts.addEntry("BorderLayout", new BorderLayoutPage());
     layouts.addEntry("CenterLayout", new CenterLayoutPage());
     layouts.addEntry("RowLayout", new RowLayoutPage());

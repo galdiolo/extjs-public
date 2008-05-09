@@ -162,7 +162,7 @@ public class TableLayout extends Layout {
       td.setElementAttribute("align", data.horizontalAlign.name().toLowerCase());
     }
     if (data.verticalAlign != null) {
-      td.setElementAttribute("verticalAlign", data.verticalAlign.name().toLowerCase());
+      td.setElementAttribute("valign", data.verticalAlign.name().toLowerCase());
     }
     if (data.height != null) {
       td.setElementAttribute("height", data.height);

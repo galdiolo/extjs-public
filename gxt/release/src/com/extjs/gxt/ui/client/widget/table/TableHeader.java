@@ -207,7 +207,7 @@ public class TableHeader extends BoxComponent {
       final CheckMenuItem check = new CheckMenuItem();
       check.setHideOnClick(false);
       check.setText(def.getText());
-      check.checked = !def.isHidden();
+      check.setChecked(!def.isHidden());
       check.addSelectionListener(new SelectionListener() {
 
         public void componentSelected(ComponentEvent ce) {
@@ -289,8 +289,8 @@ public class TableHeader extends BoxComponent {
         if (column.isResizable()) {
           splitBar.setVisible(true);
         }
-        splitBar.minSize = column.getMinWidth();
-        splitBar.maxSize = column.getMaxWidth();
+        splitBar.setMinSize(column.getMinWidth());
+        splitBar.setMaxSize(column.getMaxWidth());
       }
       task.delay(400);
       if (resizeBody) {

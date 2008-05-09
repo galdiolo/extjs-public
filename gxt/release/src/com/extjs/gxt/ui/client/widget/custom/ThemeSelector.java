@@ -7,9 +7,6 @@
  */
 package com.extjs.gxt.ui.client.widget.custom;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.event.FieldEvent;
@@ -17,6 +14,7 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.store.Record;
 import com.extjs.gxt.ui.client.store.Store;
 import com.extjs.gxt.ui.client.util.Theme;
+import com.extjs.gxt.ui.client.util.ThemeManager;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.google.gwt.user.client.Element;
 
@@ -26,29 +24,11 @@ import com.google.gwt.user.client.Element;
  */
 public class ThemeSelector extends ComboBox {
 
-  private List<Theme> themes;
-
   public ThemeSelector() {
     setEditable(false);
-    valueField = "id";
-    displayField = "name";
+    setValueField("id");
+    setDisplayField("name");
     setWidth("100px");
-  }
-
-  /**
-   * Sets the list of themes.
-   * 
-   * @param themes the themes
-   */
-  public void setThemes(List<Theme> themes) {
-    this.themes = themes;
-  }
-
-  protected List<Theme> createThemes() {
-    List<Theme> themes = new ArrayList<Theme>();
-    themes.add(Theme.BLUE);
-    themes.add(Theme.GRAY);
-    return themes;
   }
 
   @Override
@@ -62,12 +42,8 @@ public class ThemeSelector extends ComboBox {
       }
     });
 
-    if (themes == null) {
-      themes = createThemes();
-    }
-
     Store store = new Store();
-    store.add(themes);
+    store.add(ThemeManager.getThemes());
     setStore(store);
 
     super.onRender(parent, index);
@@ -76,7 +52,7 @@ public class ThemeSelector extends ComboBox {
     if (theme == null) {
       setValue(Theme.BLUE);
     }
-    Record r = findRecord(valueField, theme);
+    Record r = findRecord(getValueField(), theme);
     if (r != null) {
       setValue(r);
     }

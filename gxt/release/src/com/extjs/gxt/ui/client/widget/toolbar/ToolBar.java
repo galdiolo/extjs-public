@@ -7,12 +7,12 @@
  */
 package com.extjs.gxt.ui.client.widget.toolbar;
 
-
 import java.util.ArrayList;
 
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.ToolBarEvent;
 import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.AbstractContainer;
@@ -20,6 +20,7 @@ import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.layout.TableData;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Event;
 
 /**
  * A standard tool bar.
@@ -71,20 +72,8 @@ import com.google.gwt.user.client.Element;
  * @see SplitToolItem
  */
 public class ToolBar extends AbstractContainer<ToolItem> {
-  
-  /**
-   * Specifies the cell's horizontal alignment (defaults to LEFT).
-   * <p>
-   * Valid values are:
-   * <ul>
-   * <li>HorizontalAlignment.LEFT</li>
-   * <li>HorizontalAlignment.CENTER</li>
-   * <li>HorizontalAlignment.RIGHT</li>
-   * </ul>
-   * </p>
-   */
-  public HorizontalAlignment buttonAlign = HorizontalAlignment.LEFT;
 
+  private HorizontalAlignment buttonAlign = HorizontalAlignment.LEFT;
   private HorizontalPanel panel;
 
   /**
@@ -93,7 +82,7 @@ public class ToolBar extends AbstractContainer<ToolItem> {
   public ToolBar() {
     baseStyle = "x-toolbar";
   }
-  
+
   /**
    * Adds a item to the tool bar.
    * 
@@ -101,6 +90,15 @@ public class ToolBar extends AbstractContainer<ToolItem> {
    */
   public void add(ToolItem item) {
     insert(item, getItemCount());
+  }
+
+  /**
+   * Returns the button alignment.
+   * 
+   * @return the button alignment
+   */
+  public HorizontalAlignment getButtonAlign() {
+    return buttonAlign;
   }
 
   /**
@@ -115,7 +113,7 @@ public class ToolBar extends AbstractContainer<ToolItem> {
     tbe.index = index;
     if (fireEvent(Events.BeforeAdd, tbe)) {
       item.toolBar = this;
-      items.add(index, item);
+      super.insert(item, index);
       if (rendered) {
         renderItem(item, index);
         if (isAttached()) {
@@ -136,7 +134,7 @@ public class ToolBar extends AbstractContainer<ToolItem> {
     tbe.item = item;
     if (fireEvent(Events.BeforeRemove, tbe)) {
       item.toolBar = null;
-      items.remove(item);
+      super.remove(item);
       if (rendered) {
         panel.remove(item);
       }
@@ -145,27 +143,41 @@ public class ToolBar extends AbstractContainer<ToolItem> {
     }
     return false;
   }
-  
+
   /**
    * Removes all items.
    */
   public void removeAll() {
-    for (ToolItem item : new ArrayList<ToolItem>(items)) {
+    for (ToolItem item : new ArrayList<ToolItem>(getItems())) {
       remove(item);
     }
+  }
+
+  /**
+   * Specifies the cell's horizontal alignment (defaults to LEFT).
+   * 
+   * @param buttonAlign the button alignment
+   */
+  public void setButtonAlign(HorizontalAlignment buttonAlign) {
+    this.buttonAlign = buttonAlign;
+  }
+
+  @Override
+  protected ComponentEvent createComponentEvent(Event event) {
+    return new ToolBarEvent(this);
   }
 
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
     panel = new HorizontalPanel();
     panel.setLayoutOnChange(true);
-    panel.align = buttonAlign;
+    panel.setHorizontalAlign(getButtonAlign());
     panel.setStyleName(baseStyle + " x-small-editor");
     panel.render(target, index);
     setElement(panel.getElement());
     setHeight(25);
     setStyleAttribute("paddingRight", "8px");
-    
+
     renderAll();
   }
 

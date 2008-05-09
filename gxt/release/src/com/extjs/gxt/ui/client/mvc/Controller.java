@@ -34,7 +34,7 @@ public abstract class Controller {
 
   protected Controller parent;
   protected List<Controller> children;
-  
+
   boolean initialized;
   private Set<Integer> supportedEvents;
 
@@ -79,7 +79,7 @@ public abstract class Controller {
         if (!c.initialized) {
           c.initialize();
           c.initialized = true;
-        } 
+        }
         if (c.canHandle(event)) {
           c.handleEvent(event);
         }
@@ -97,7 +97,7 @@ public abstract class Controller {
   /**
    * Called once prior to handleEvent being called.
    */
-  public void initialize() {
+  protected void initialize() {
 
   }
 
@@ -115,7 +115,7 @@ public abstract class Controller {
         supportedEvents.add(type);
       }
     }
-    
+
   }
 
 }

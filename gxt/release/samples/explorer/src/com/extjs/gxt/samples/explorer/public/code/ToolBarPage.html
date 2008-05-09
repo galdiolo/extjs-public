@@ -83,7 +83,7 @@ public class ToolBarPage extends Container implements EntryPoint {
     
     Menu menu = new Menu();
     CheckMenuItem menuItem = new CheckMenuItem("I Like Cats");
-    menuItem.checked = true;
+    menuItem.setChecked(true);
     menu.add(menuItem);
 
     menuItem = new CheckMenuItem("I Like Dogs");
@@ -97,14 +97,14 @@ public class ToolBarPage extends Container implements EntryPoint {
     
     Menu radioMenu = new Menu();
     CheckMenuItem r = new CheckMenuItem("Blue Theme");
-    r.group = "radios";
-    r.checked = true;
+    r.setGroup("radios");
+    r.setChecked(true);
     radioMenu.add(r);
     r = new CheckMenuItem("Gray Theme");
-    r.group = "radios";
+    r.setGroup("radios");
     radioMenu.add(r);
     r = new CheckMenuItem("Slate Theme");
-    r.group = "radios";
+    r.setGroup("radios");
     radioMenu.add(r);
     radios.setSubMenu(radioMenu);
     
@@ -139,8 +139,8 @@ public class ToolBarPage extends Container implements EntryPoint {
     toolBar.add(new AdapterToolItem(new ThemeSelector()));
     
     ContentPanel panel = new ContentPanel();
-    panel.collapsible = true;
-    panel.frame = true;
+    panel.setCollapsible(true);
+    panel.setFrame(true);
     panel.setHeading("ToolBar & Menu Demo");
     panel.setLayout(new FitLayout());
     panel.setSize(450, 300);

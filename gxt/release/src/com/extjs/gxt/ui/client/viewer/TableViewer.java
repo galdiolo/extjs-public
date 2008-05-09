@@ -25,6 +25,7 @@ import com.extjs.gxt.ui.client.data.Loader;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.TableEvent;
 import com.extjs.gxt.ui.client.widget.Component;
+import com.extjs.gxt.ui.client.widget.table.RowSelectionModel;
 import com.extjs.gxt.ui.client.widget.table.Table;
 import com.extjs.gxt.ui.client.widget.table.TableColumn;
 import com.extjs.gxt.ui.client.widget.table.TableItem;
@@ -34,10 +35,10 @@ import com.extjs.gxt.ui.client.widget.table.TableItem;
  * 
  * @see Table
  */
-public class TableViewer<T extends TableItem> extends StructuredViewer {
+public class TableViewer extends StructuredViewer {
 
   private ViewerCell viewerCell = new ViewerCell();
-  private Table table;
+  private Table<RowSelectionModel> table;
   private Loader loader;
   private Listener<LoadEvent> loadListener;
   private CellLabelProvider defaultCellLabelProvider;
@@ -139,9 +140,9 @@ public class TableViewer<T extends TableItem> extends StructuredViewer {
       TableItem item = table.getItem(i);
       Object itemElement = item.getData();
       if (selected.contains(itemElement)) {
-        table.select(i);
+        table.getSelectionModel().select(item);
       } else {
-        table.deselect(i);
+        table.getSelectionModel().deselect(item);
       }
     }
   }
@@ -218,7 +219,7 @@ public class TableViewer<T extends TableItem> extends StructuredViewer {
   @Override
   protected List<Object> getSelectedFromWidget() {
     ArrayList<Object> elems = new ArrayList<Object>();
-    for (TableItem item : table.getSelection()) {
+    for (TableItem item : table.getSelectionModel().getSelectedItems()) {
       elems.add((Object) item.getData());
     }
     return elems;
@@ -259,7 +260,7 @@ public class TableViewer<T extends TableItem> extends StructuredViewer {
       Object element = it.next();
       TableItem item = findItem(element);
       if (item != null) {
-        table.select(item);
+        table.getSelectionModel().select(item);
       }
     }
   }
@@ -281,7 +282,7 @@ public class TableViewer<T extends TableItem> extends StructuredViewer {
     item.setData(element);
     item.setCellToolTips(toolTips);
 
-    table.insert((T) item, index);
+    table.insert(item, index);
     update(element);
   }
 

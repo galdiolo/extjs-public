@@ -8,6 +8,7 @@
 package com.extjs.gxt.ui.client.event;
 
 import com.extjs.gxt.ui.client.Style.SortDir;
+import com.extjs.gxt.ui.client.widget.tree.TreeItem;
 import com.extjs.gxt.ui.client.widget.treetable.TreeTable;
 
 /**
@@ -54,5 +55,11 @@ public class TreeTableEvent extends TreeEvent {
   public TreeTableEvent(TreeTable treeTable) {
     super(treeTable);
     this.treeTable = treeTable;
+  }
+  
+  public TreeTableEvent(TreeTable treeTable, TreeItem item) {
+    super(treeTable);
+    this.treeTable = treeTable;
+    this.item = item;
   }
 }

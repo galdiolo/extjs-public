@@ -17,14 +17,19 @@ import com.extjs.gxt.ui.client.Style.SortDir;
 public interface LoadConfig {
 
   /**
+   * The number of records being requested.
+   */
+  public int getLimit();
+
+  /**
    * The offset for the first record to retrieve.
    */
   public int getOffset();
 
   /**
-   * The number of records being requested.
+   * The requested sort direction.
    */
-  public int getLimit();
+  public SortDir getSortDir();
 
   /**
    * The field to sort by.
@@ -32,8 +37,31 @@ public interface LoadConfig {
   public String getSortField();
 
   /**
-   * The requested sort direction.
+   * Sets the limit.
+   * 
+   * @param limit the limit
    */
-  public SortDir getSortDir();
+  public void setLimit(int limit);
+
+  /**
+   * Sets the offset.
+   * 
+   * @param offset the offset
+   */
+  public void setOffset(int offset);
+
+  /**
+   * Sets the sort dir.
+   * 
+   * @param sortDir the sort dir
+   */
+  public void setSortDir(SortDir sortDir);
+
+  /**
+   * Sets the sort field.
+   * 
+   * @param sortField the sort field
+   */
+  public void setSortField(String sortField);
 
 }

@@ -23,9 +23,13 @@ public class MailController extends Controller {
     registerEventTypes(AppEvents.ViewMailItems);
     registerEventTypes(AppEvents.ViewMailItem);
   }
-  
+
+  @Override
   public void handleEvent(AppEvent event) {
     switch (event.type) {
+      case AppEvents.Init:
+        forwardToView(folderView, event);
+        break;
       case AppEvents.NavMail:
         forwardToView(folderView, event);
         break;
@@ -43,5 +47,5 @@ public class MailController extends Controller {
     listView = new MailListView(this);
     itemView = new MailItemView(this);
   }
-  
+
 }

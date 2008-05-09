@@ -60,7 +60,7 @@ public class ToolTipPage extends Container implements EntryPoint {
     super.onRender(parent, pos);
     
     VerticalPanel vp = new VerticalPanel();
-    vp.spacing = 10;
+    vp.setSpacing(10);
     
     Button btn = new Button("Print");
     btn.setToolTip(new ToolTipConfig("Information", "Prints the current document"));

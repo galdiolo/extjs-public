@@ -31,6 +31,8 @@ public abstract class ViewerFilterField<P, E> extends TriggerField {
   protected List<Viewer> viewers = new ArrayList<Viewer>();
 
   public ViewerFilterField() {
+    setAutoValidate(true);
+    setValidateOnBlur(false);
     triggerStyle = "x-form-clear-trigger";
     filter = new ViewerFilter<P, E>() {
       @Override
@@ -104,11 +106,11 @@ public abstract class ViewerFilterField<P, E> extends TriggerField {
     if (viewer instanceof TreeViewer) {
       Tree tree = ((TreeViewer) viewer).getTree();
       if (!getValue().equals("")) {
-        tree.animate = false;
+        tree.setAnimate(false);
         tree.expandAll();
       } else {
-        tree.animate = animateTree;
         tree.collapseAll();
+        tree.setAnimate(animateTree);
       }
     }
   }

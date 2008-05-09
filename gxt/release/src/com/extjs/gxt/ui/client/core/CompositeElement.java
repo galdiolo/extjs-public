@@ -133,7 +133,7 @@ public class CompositeElement {
    * The list of elements.
    */
   public List<Element> getElements() {
-    return items;
+    return new ArrayList<Element>(items);
   }
 
   /**
@@ -202,7 +202,7 @@ public class CompositeElement {
    * @return the last element
    */
   public Element last() {
-    return item(getCount() - 1);
+    return item(items.size() == 0 ? 0 : getCount() - 1);
   }
 
   /**

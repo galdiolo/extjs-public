@@ -91,7 +91,7 @@ public class Record implements Model, Serializable {
     this.wrappedModel = wrappedModel;
   }
 
-  public void addChangeListener(ChangeListener listener) {
+  public void addChangeListener(ChangeListener... listener) {
     changeEventSupport.addChangeListener(listener);
   }
 
@@ -218,8 +218,12 @@ public class Record implements Model, Serializable {
     return oldValue;
   }
 
-  public void removeChangeListener(ChangeListener listener) {
+  public void removeChangeListener(ChangeListener... listener) {
     changeEventSupport.removeChangeListener(listener);
+  }
+
+  public void removeChangeListeners() {
+    changeEventSupport.removeChangeListeners();
   }
 
   /**
@@ -244,6 +248,10 @@ public class Record implements Model, Serializable {
       modified.put(name, value);
     }
     return oldValue;
+  }
+
+  public void setSilent(boolean silent) {
+    changeEventSupport.setSilent(silent);
   }
 
   protected void clearError() {

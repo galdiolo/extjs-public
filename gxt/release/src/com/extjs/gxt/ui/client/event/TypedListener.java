@@ -65,6 +65,21 @@ public class TypedListener extends BaseTypedListener {
       case Store.Add:
         ((StoreListener) eventListener).add((StoreEvent) be);
         break;
+      case Events.Activate:
+        ((WindowListener) eventListener).windowActivate((WindowEvent) be);
+        break;
+      case Events.Deactivate:
+        ((WindowListener) eventListener).windowDeactivate((WindowEvent) be);
+        break;
+      case Events.Maximize:
+        ((WindowListener) eventListener).windowMaximize((WindowEvent) be);
+        break;
+      case Events.Minimize:
+        ((WindowListener) eventListener).windowMinimize((WindowEvent) be);
+        break;
+      case Events.Restore:
+        ((WindowListener) eventListener).windowRestore((WindowEvent) be);
+        break;
     }
   }
 

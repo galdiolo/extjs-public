@@ -78,8 +78,8 @@ public class CheckBoxGroup extends Field {
 
     for (CheckBox cb : checks) {
       hp.add(cb);
-      if (cb.fieldLabel != null) {
-        Text lbl = new Text(cb.fieldLabel);
+      if (cb.getFieldLabel() != null) {
+        Text lbl = new Text(cb.getFieldLabel());
         lbl.setStyleName("x-form-group-label");
         hp.add(lbl);
       }

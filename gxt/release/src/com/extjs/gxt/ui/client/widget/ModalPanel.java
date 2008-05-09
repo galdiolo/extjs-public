@@ -37,7 +37,7 @@ public class ModalPanel extends BoxComponent {
   public ModalPanel() {
     baseStyle = "x-modal";
     shim = true;
-    shadow = false;
+    setShadow(false);
   }
 
   @Override
@@ -106,8 +106,8 @@ public class ModalPanel extends BoxComponent {
     el.updateZIndex(0);
     component.el.updateZIndex(0);
 
-    eventPreview.ignoreList.removeAll();
-    eventPreview.ignoreList.add(component.getElement());
+    eventPreview.getIgnoreList().removeAll();
+    eventPreview.getIgnoreList().add(component.getElement());
 
     eventPreview.add();
   }

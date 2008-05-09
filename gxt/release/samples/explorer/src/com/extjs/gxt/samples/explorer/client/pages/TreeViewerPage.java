@@ -49,7 +49,7 @@ public class TreeViewerPage extends Container implements EntryPoint {
     final Folder folder = TestData.getTreeModel();
 
     Tree tree = new Tree();
-    tree.itemImageStyle = "icon-music";
+    tree.setItemIconStyle("icon-music");
 
     final TreeViewer viewer = new TreeViewer(tree);
     viewer.setContentProvider(new ModelTreeContentProvider());

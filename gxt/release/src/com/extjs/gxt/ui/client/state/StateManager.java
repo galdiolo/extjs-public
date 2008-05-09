@@ -13,8 +13,8 @@ import java.util.Map;
 /**
  * This is the global state manager. In order for this class to be useful, it
  * must be initialized with a provider when your application initializes. By
- * default, GXT initializes the StateManager with a CookieProvider. The
- * provider can be replaced as needed.
+ * default, GXT initializes the StateManager with a CookieProvider. The provider
+ * can be replaced as needed.
  * 
  * <dl>
  * <dt>Events:</dt>
@@ -41,9 +41,19 @@ public class StateManager {
   public static Object get(String name) {
     return provider.get(name);
   }
-  
+
+  /**
+   * Returns the current value for a key.
+   * 
+   * @param name the key name
+   * @return the value as a map
+   */
   public static Map<String, Object> getMap(String name) {
-    return provider.getMap(name);
+    try {
+      return provider.getMap(name);
+    } catch (Exception e) {
+      return null;
+    }
   }
 
   /**

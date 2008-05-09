@@ -31,11 +31,11 @@ public class DraggablePage extends Container implements EntryPoint {
     super.onRender(parent, pos);
     
     HorizontalPanel vp = new HorizontalPanel();
-    vp.verticalAlign = VerticalAlignment.TOP;
-    vp.spacing = 10;
+    vp.setVerticalAlign(VerticalAlignment.TOP);
+    vp.setSpacing(10);
 
     ContentPanel cp = new ContentPanel();
-    cp.collapsible = true;
+    cp.setCollapsible(true);
     cp.setHeading("Proxy Drag");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     cp.setWidth(200);
@@ -45,8 +45,8 @@ public class DraggablePage extends Container implements EntryPoint {
     vp.add(cp);
 
     cp = new ContentPanel();
-    cp.collapsible = true;
-    cp.bodyStyle = "padding: 4 8px";
+    cp.setCollapsible(true);
+    cp.setBodyStyle("padding: 4 8px");
     cp.setHeading("Direct Drag");
     cp.setIconStyle("icon-text");
     cp.addText("Drags can only be started from the header.");
@@ -58,7 +58,7 @@ public class DraggablePage extends Container implements EntryPoint {
     d.useProxy = false;
 
     cp = new ContentPanel();
-    cp.bodyStyle = "padding: 4 8px";
+    cp.setBodyStyle("padding: 4 8px");
     cp.setHeading("Constrain");
     cp.setIconStyle("icon-text");
     cp.addText("Can only be dragged vertically.");

@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.samples.explorer.client.pages;
 
+import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.Layout;
 import com.extjs.gxt.ui.client.widget.TabItem;
@@ -25,15 +26,18 @@ public class Page extends TabPanel {
     this.content = content;
     this.closable = closeable;
 
-    tabPosition = TabPosition.BOTTOM;
-    border = false;
-    bodyBorder = false;
+    setTabPosition(TabPosition.BOTTOM);
+    setBorderStyle(false);
+    setBodyBorder(false);
 
     TabItem demo = new TabItem();
 
     Layout l = (Layout) content.getData("layout");
     if (l != null) {
       demo.setLayout(l);
+    }
+    if (content.getData("scroll") != null) {
+      demo.setScrollMode(Scroll.AUTO);
     }
     demo.setText("Demo");
     demo.add(content);

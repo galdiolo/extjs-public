@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.widget.tree;
 
+import com.extjs.gxt.ui.client.core.El;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 
@@ -19,12 +20,13 @@ class RootTreeItem extends TreeItem {
   @Override
   protected TreeItemUI getTreeItemUI() {
     ui = new TreeItemUI(this);
-    ui.containerEl = getElement();
+    ui.containerEl = new El(getElement());
     setData("loaded", "true");
-    fly(ui.containerEl).setStyleAttribute("padding", "4px");
+    ui.containerEl.setStyleAttribute("padding", "4px");
     return ui;
   }
 
+  @Override
   protected void onRender(Element target, int index) {
     setElement(DOM.createDiv(), target, index);
     setStyleAttribute("padding", "4 0 0 4px");

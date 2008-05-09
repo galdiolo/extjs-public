@@ -18,7 +18,9 @@ import com.extjs.gxt.ui.client.event.DragListenerAdapter;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.PreviewEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.event.TypedListener;
 import com.extjs.gxt.ui.client.event.WindowEvent;
+import com.extjs.gxt.ui.client.event.WindowListener;
 import com.extjs.gxt.ui.client.fx.Draggable;
 import com.extjs.gxt.ui.client.fx.Resizable;
 import com.extjs.gxt.ui.client.util.BaseEventPreview;
@@ -123,27 +125,18 @@ public class Window extends ContentPanel {
    * window, false to hide the button and disallow closing the window (default
    * to true).
    */
-  public boolean closable = true;
+  private boolean closable = true;
 
   /**
    * True to constrain the window to the viewport, false to allow it to fall
    * outside of the viewport (defaults to true).
    */
-  public boolean constrain = true;
-
-  /**
-   * True to allow the window to be dragged by the header bar, false to disable
-   * dragging (defaults to true). Note that by default the window will be
-   * centered in the viewport, so if dragging is disabled the window may need to
-   * be positioned programmatically after render (e.g.,
-   * myWindow.setPosition(100, 100);).
-   */
-  public boolean draggable = true;
+  private boolean constrain = true;
 
   /**
    * Widget to be given focus when the window is focused (defaults to null).
    */
-  public Widget focusWidget;
+  private Widget focusWidget;
 
   /**
    * True to display the 'maximize' tool button and allow the user to maximize
@@ -153,13 +146,13 @@ public class Window extends ContentPanel {
    * behavior already built-in that will restore the window to its previous
    * size.
    */
-  public boolean maximizable;
+  private boolean maximizable;
 
   /**
    * The minimum height in pixels allowed for this window (defaults to 100).
    * Only applies when resizable = true.
    */
-  public int minHeight = 100;
+  private int minHeight = 100;
 
   /**
    * True to display the 'minimize' tool button and allow the user to minimize
@@ -169,37 +162,37 @@ public class Window extends ContentPanel {
    * minimize event must be handled and a custom minimize behavior implemented
    * for this option to be useful.
    */
-  public boolean minimizable;
+  private boolean minimizable;
 
   /**
    * The minimum width in pixels allowed for this window (defaults to 200). Only
    * applies when resizable = true.
    */
-  public int minWidth = 200;
+  private int minWidth = 200;
 
   /**
    * The width of the window if no width has been specified (defaults to 300).
    */
-  public int initialWidth = 300;
+  private int initialWidth = 300;
 
   /**
    * True to make the window modal and mask everything behind it when displayed,
    * false to display it without restricting access to other UI elements
    * (defaults to false).
    */
-  public boolean modal;
+  private boolean modal;
 
   /**
    * True to blink the window when the user clicks outside of the windows bounds
    * (defaults to false). Only applies window model = true.
    */
-  public boolean blinkModal = false;
+  private boolean blinkModal = false;
 
   /**
    * Allows override of the built-in processing for the escape key. Default
    * action is to close the Window.
    */
-  public boolean onEsc = true;
+  private boolean onEsc = true;
 
   /**
    * True to render the window body with a transparent background so that it
@@ -207,13 +200,13 @@ public class Window extends ContentPanel {
    * color to visually highlight the body element and separate it more
    * distinctly from the surrounding frame (defaults to false).
    */
-  public boolean plain;
+  private boolean plain;
 
   /**
    * True to allow user resizing at each edge and corner of the window, false to
    * disable resizing (defaults to true).
    */
-  public boolean resizable = true;
+  private boolean resizable = true;
 
   private int height = Style.DEFAULT;
   private int width = Style.DEFAULT;
@@ -229,6 +222,7 @@ public class Window extends ContentPanel {
   private ToolButton restoreBtn, closeBtn;
   private Point restorePos;
   private Size restoreSize;
+  private boolean draggable = true;
 
   /**
    * Creates a new window.
@@ -236,8 +230,23 @@ public class Window extends ContentPanel {
   public Window() {
     baseStyle = "x-window";
     frame = true;
-    shadow = true;
+    setShadow(true);
     shim = true;
+    setDraggable(true);
+  }
+
+  /**
+   * Adds a listener to receive window events.
+   * 
+   * @param listener the listener
+   */
+  public void addWindowListener(WindowListener listener) {
+    TypedListener typedListener = new TypedListener(listener);
+    addListener(Events.Activate, typedListener);
+    addListener(Events.Deactivate, typedListener);
+    addListener(Events.Minimize, typedListener);
+    addListener(Events.Maximize, typedListener);
+    addListener(Events.Restore, typedListener);
   }
 
   /**
@@ -247,23 +256,18 @@ public class Window extends ContentPanel {
    * @param pos the position to align to (see {@link El#alignTo} for more
    *            details)
    * @param offsets the offsets
-   * @return this
    */
-  public Window alignTo(Element elem, String pos, int[] offsets) {
+  public void alignTo(Element elem, String pos, int[] offsets) {
     Point p = el.getAlignToXY(elem, pos, offsets);
     setPagePosition(p.x, p.y);
-    return this;
   }
 
   /**
    * Centers the window in the viewport.
-   * 
-   * @return this
    */
-  public Window center() {
+  public void center() {
     Point p = el.getAlignToXY(XDOM.getBody(), "c-c", null);
     setPagePosition(p.x, p.y);
-    return this;
   }
 
   /**
@@ -274,29 +278,74 @@ public class Window extends ContentPanel {
     close(null);
   }
 
-  protected void close(Button buttonPressed) {
-    if (!fireEvent(Events.BeforeClose, new WindowEvent(this, buttonPressed))) {
-      return;
-    }
-    hide(buttonPressed);
-    fireEvent(Events.Close, new WindowEvent(this, buttonPressed));
-    destroy();
-  }
-
   /**
    * Focuses the window. If a focusWidget is set, it will receive focus,
    * otherwise the window itself will receive focus.
    */
   public void focus() {
-    if (focusWidget != null) {
-      if (focusWidget instanceof Component) {
-        ((Component) focusWidget).focus();
+    if (getFocusWidget() != null) {
+      if (getFocusWidget() instanceof Component) {
+        ((Component) getFocusWidget()).focus();
       } else {
-        fly(focusWidget.getElement()).focus();
+        fly(getFocusWidget().getElement()).focus();
       }
     } else {
       super.focus();
     }
+  }
+
+  /**
+   * Returns true if the window is constrained.
+   * 
+   * @return the contstrain state
+   */
+  public boolean getConstrain() {
+    return constrain;
+  }
+
+  /**
+   * Returns the window's draggable instance.
+   * 
+   * @return the draggable instance
+   */
+  public Draggable getDraggable() {
+    return dragger;
+  }
+
+  /**
+   * Returns the focus widget.
+   * 
+   * @return the focus widget
+   */
+  public Widget getFocusWidget() {
+    return focusWidget;
+  }
+
+  /**
+   * Returns the window's initial width.
+   * 
+   * @return the width
+   */
+  public int getInitialWidth() {
+    return initialWidth;
+  }
+
+  /**
+   * Returns the min height.
+   * 
+   * @return the min height
+   */
+  public int getMinHeight() {
+    return minHeight;
+  }
+
+  /**
+   * Returns the min width.
+   * 
+   * @return the min width
+   */
+  public int getMinWidth() {
+    return minWidth;
   }
 
   @Override
@@ -316,10 +365,82 @@ public class Window extends ContentPanel {
     hidden = true;
     layer.hideShadow();
     RootPanel.get().remove(this);
-    if (modal) {
+    if (isModal()) {
       modalPanel.hide();
     }
     fireEvent(Events.Hide, new WindowEvent(this, buttonPressed));
+  }
+
+  /**
+   * Returns true if modal blinking is enabled.
+   * 
+   * @return the blink modal state
+   */
+  public boolean isBlinkModal() {
+    return blinkModal;
+  }
+
+  /**
+   * Returns true if the window is closable.
+   * 
+   * @return the closable state
+   */
+  public boolean isClosable() {
+    return closable;
+  }
+
+  /**
+   * Returns true if window miximizing is enabled.
+   * 
+   * @return the maximizable state
+   */
+  public boolean isMaximizable() {
+    return maximizable;
+  }
+
+  /**
+   * Returns true if window minimizing is enabled.
+   * 
+   * @return the minimizable state
+   */
+  public boolean isMinimizable() {
+    return minimizable;
+  }
+
+  /**
+   * Returns true if modal behavior is enabled.
+   * 
+   * @return the modal state
+   */
+  public boolean isModal() {
+    return modal;
+  }
+
+  /**
+   * Returns true if the window is closed when the esc key is pressed.
+   * 
+   * @return the on esc state
+   */
+  public boolean isOnEsc() {
+    return onEsc;
+  }
+
+  /**
+   * Returns true if the plain style is enabled.
+   * 
+   * @return the plain style state
+   */
+  public boolean isPlain() {
+    return plain;
+  }
+
+  /**
+   * Returns true if window resizing is enabled.
+   * 
+   * @return the resizable state
+   */
+  public boolean isResizable() {
+    return resizable;
   }
 
   /**
@@ -350,6 +471,19 @@ public class Window extends ContentPanel {
    */
   public void minimize() {
     fireEvent(Events.Minimize, new WindowEvent(this));
+  }
+
+  /**
+   * Removes a previously added listener.
+   * 
+   * @param listener the listener to remove
+   */
+  public void removeWindowListener(WindowListener listener) {
+    removeListener(Events.Activate, listener);
+    removeListener(Events.Deactivate, listener);
+    removeListener(Events.Minimize, listener);
+    removeListener(Events.Maximize, listener);
+    removeListener(Events.Restore, listener);
   }
 
   /**
@@ -385,6 +519,146 @@ public class Window extends ContentPanel {
     } else {
       fireEvent(Events.Deactivate, new WindowEvent(this));
     }
+  }
+
+  /**
+   * True to blink the window when the user clicks outside of the windows bounds
+   * (defaults to false). Only applies window model = true.
+   * 
+   * @param blinkModal true to blink
+   */
+  public void setBlinkModal(boolean blinkModal) {
+    this.blinkModal = blinkModal;
+  }
+
+  /**
+   * True to display the 'close' tool button and allow the user to close the
+   * window, false to hide the button and disallow closing the window (default
+   * to true).
+   * 
+   * @param closable true to enable closing
+   */
+  public void setClosable(boolean closable) {
+    this.closable = closable;
+  }
+
+  /**
+   * True to constrain the window to the viewport, false to allow it to fall
+   * outside of the viewport (defaults to true).
+   * 
+   * @param constrain true to constrain, otherwise false
+   */
+  public void setConstrain(boolean constrain) {
+    this.constrain = constrain;
+  }
+
+  /**
+   * Widget to be given focus when the window is focused).
+   * 
+   * @param focusWidget the focu widget
+   */
+  public void setFocusWidget(Widget focusWidget) {
+    this.focusWidget = focusWidget;
+  }
+
+  /**
+   * The width of the window if no width has been specified (defaults to 300).
+   * 
+   * @param initialWidth the initial width
+   */
+  public void setInitialWidth(int initialWidth) {
+    this.initialWidth = initialWidth;
+  }
+
+  /**
+   * True to display the 'maximize' tool button and allow the user to maximize
+   * the window, false to hide the button and disallow maximizing the window
+   * (defaults to false). Note that when a window is maximized, the tool button
+   * will automatically change to a 'restore' button with the appropriate
+   * behavior already built-in that will restore the window to its previous
+   * size.
+   * 
+   * @param maximizable the maximizable state
+   */
+  public void setMaximizable(boolean maximizable) {
+    this.maximizable = maximizable;
+  }
+
+  /**
+   * The minimum height in pixels allowed for this window (defaults to 100).
+   * Only applies when resizable = true.
+   * 
+   * @param minHeight the min height
+   */
+  public void setMinHeight(int minHeight) {
+    this.minHeight = minHeight;
+  }
+
+  /**
+   * True to display the 'minimize' tool button and allow the user to minimize
+   * the window, false to hide the button and disallow minimizing the window
+   * (defaults to false). Note that this button provides no implementation --
+   * the behavior of minimizing a window is implementation-specific, so the
+   * minimize event must be handled and a custom minimize behavior implemented
+   * for this option to be useful.
+   * 
+   * @param minimizable true to enabled minimizing
+   */
+  public void setMinimizable(boolean minimizable) {
+    this.minimizable = minimizable;
+  }
+
+  /**
+   * The minimum width in pixels allowed for this window (defaults to 200). Only
+   * applies when resizable = true.
+   * 
+   * @param minWidth the minimum height
+   */
+  public void setMinWidth(int minWidth) {
+    this.minWidth = minWidth;
+  }
+
+  /**
+   * True to make the window modal and mask everything behind it when displayed,
+   * false to display it without restricting access to other UI elements
+   * (defaults to false).
+   * 
+   * @param modal true for modal
+   */
+  public void setModal(boolean modal) {
+    this.modal = modal;
+  }
+
+  /**
+   * Allows override of the built-in processing for the escape key. Default
+   * action is to close the Window.
+   * 
+   * @param onEsc true to close window on esc key press
+   */
+  public void setOnEsc(boolean onEsc) {
+    this.onEsc = onEsc;
+  }
+
+  /**
+   * True to render the window body with a transparent background so that it
+   * will blend into the framing elements, false to add a lighter background
+   * color to visually highlight the body element and separate it more
+   * distinctly from the surrounding frame (defaults to false).
+   * 
+   * @param plain true to enable the plain style
+   */
+  public void setPlain(boolean plain) {
+    this.plain = plain;
+  }
+
+  /**
+   * True to allow user resizing at each edge and corner of the window, false to
+   * disable resizing (defaults to true).
+   * 
+   * @param resizable true to enabled resizing
+   */
+  public void setResizable(boolean resizable) {
+    this.resizable = resizable;
   }
 
   /**
@@ -440,18 +714,18 @@ public class Window extends ContentPanel {
     el.setVisible(true);
 
     if (maximized) {
-      fitContainer();
+      maximize();
     }
 
     hidden = false;
 
     // no width set
-    if (autoWidth || attachSize.width == Style.DEFAULT) {
-      setWidth(initialWidth);
+    if (isAutoWidth() || attachSize.width == Style.DEFAULT) {
+      setWidth(getInitialWidth());
     }
 
     // workaround for 0 height east, west resizer
-    if (GXT.isIE && resizable) {
+    if (GXT.isIE && isResizable()) {
       el.setHeight(getHeight());
     }
 
@@ -466,31 +740,40 @@ public class Window extends ContentPanel {
 
     toFront();
 
-    if (focusWidget != null) {
-      if (focusWidget instanceof Component) {
-        ((Component) focusWidget).focus();
+    if (getFocusWidget() != null) {
+      if (getFocusWidget() instanceof Component) {
+        ((Component) getFocusWidget()).focus();
       } else {
-        fly(focusWidget.getElement()).focus();
+        fly(getFocusWidget().getElement()).focus();
       }
     }
     fireEvent(Events.Show, new WindowEvent(this));
   }
 
   protected void beforeShow() {
-    if (modal) {
-      modalPanel.blink = blinkModal;
+    if (isModal()) {
+      modalPanel.blink = isBlinkModal();
       modalPanel.show(this);
       el.makePositionable(true);
     }
   }
 
+  protected void close(Button buttonPressed) {
+    if (!fireEvent(Events.BeforeClose, new WindowEvent(this, buttonPressed))) {
+      return;
+    }
+    hide(buttonPressed);
+    fireEvent(Events.Close, new WindowEvent(this, buttonPressed));
+    destroy();
+  }
+
   protected void initTools() {
     super.initTools();
-    if (minimizable) {
+    if (isMinimizable()) {
       minBtn = new ToolButton("x-tool-minimize");
       head.addTool(minBtn);
     }
-    if (maximizable) {
+    if (isMaximizable()) {
       maxBtn = new ToolButton("x-tool-maximize");
       maxBtn.addSelectionListener(new SelectionListener() {
         public void componentSelected(ComponentEvent ce) {
@@ -509,7 +792,7 @@ public class Window extends ContentPanel {
       head.addTool(restoreBtn);
     }
 
-    if (minimizable) {
+    if (isMinimizable()) {
       minBtn = new ToolButton("x-tool-minimize");
       minBtn.addSelectionListener(new SelectionListener() {
         public void componentSelected(ComponentEvent ce) {
@@ -518,7 +801,7 @@ public class Window extends ContentPanel {
       });
     }
 
-    if (closable) {
+    if (isClosable()) {
       closeBtn = new ToolButton("x-tool-close");
       closeBtn.addListener(Events.Select, new Listener<ComponentEvent>() {
         public void handleEvent(ComponentEvent ce) {
@@ -539,11 +822,30 @@ public class Window extends ContentPanel {
 
   protected void onKeyPress(PreviewEvent be) {
     int keyCode = be.getKeyCode();
-    if (onEsc && keyCode == KeyboardListener.KEY_ESCAPE) {
+    if (isOnEsc() && keyCode == KeyboardListener.KEY_ESCAPE) {
       close();
     }
   }
+  
+  /**
+   * True to enable dragging of this Panel (defaults to false).
+   * 
+   * @param draggable the draggable to state
+   */
+  public void setDraggable(boolean draggable) {
+    this.draggable = draggable;
+  }
+  
+  /**
+   * Returns true if the panel is draggable.
+   * 
+   * @return the draggable state
+   */
+  public boolean isDraggable() {
+    return draggable;
+  }
 
+  @Override
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
 
@@ -553,14 +855,14 @@ public class Window extends ContentPanel {
       manager = WindowManager.get();
     }
 
-    if (plain) {
+    if (isPlain()) {
       addStyleName("x-window-plain");
     }
 
     if (resizable) {
       resizer = new Resizable(this);
-      resizer.minWidth = minWidth;
-      resizer.minHeight = minHeight;
+      resizer.minWidth = getMinWidth();
+      resizer.minHeight = getMinHeight();
       resizer.addListener(Events.ResizeStart, new Listener<ComponentEvent>() {
         public void handleEvent(ComponentEvent ce) {
           beforeResize();
@@ -570,7 +872,7 @@ public class Window extends ContentPanel {
 
     if (draggable) {
       dragger = new Draggable(this, head);
-      dragger.constrainClient = constrain;
+      dragger.constrainClient = getConstrain();
       dragger.sizeProxyToSource = false;
       dragger.addDragListener(new DragListenerAdapter() {
         public void dragEnd(DragEvent de) {
@@ -588,22 +890,18 @@ public class Window extends ContentPanel {
       head.setStyleAttribute("cursor", "move");
     }
 
-    if (shadow) {
-      super.shadow = shadow;
-    }
-
     if (modal) {
       modalPanel = new ModalPanel();
-      modalPanel.blink = blinkModal;
+      modalPanel.blink = isBlinkModal();
     }
 
     initEventPreview();
 
     if (width != -1) {
-      setWidth(Math.max(minWidth, width));
+      setWidth(Math.max(getMinWidth(), width));
     }
     if (height != -1) {
-      setHeight(Math.max(minHeight, height));
+      setHeight(Math.max(getMinHeight(), height));
     }
   }
 
@@ -626,12 +924,8 @@ public class Window extends ContentPanel {
   private void endDrag(DragEvent de) {
     unghost(de);
     if (layer != null) {
-      layer.enableShadow(shadow);
+      layer.enableShadow(getShadow());
     }
-  }
-
-  private void fitContainer() {
-
   }
 
   private Layer ghost() {
@@ -649,7 +943,7 @@ public class Window extends ContentPanel {
 
         @Override
         public boolean onPreview(PreviewEvent pe) {
-          if (modal && modalPanel != null && modalPanel.isVisible()) {
+          if (isModal() && modalPanel != null && modalPanel.isVisible()) {
             modalPanel.relayEvent(pe.event);
           }
           return true;

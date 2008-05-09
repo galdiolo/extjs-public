@@ -67,5 +67,10 @@ public class TableEvent extends ComponentEvent {
     super(table);
     this.table = table;
   }
+  
+  public TableEvent(Table table, TableItem item) {
+    super(table);
+    this.item = item;
+  }
 
 }

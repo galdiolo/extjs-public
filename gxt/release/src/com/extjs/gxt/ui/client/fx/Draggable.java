@@ -414,11 +414,13 @@ public class Draggable extends Observable {
         dragWidget.el.setPagePosition(left, top);
       }
 
-      dragEvent.source = this;
-      dragEvent.component = dragWidget;
-      dragEvent.event = event;
-      dragEvent.doit = true;
-      fireEvent(Events.DragMove, dragEvent);
+      if (hasListener) {
+        dragEvent.source = this;
+        dragEvent.component = dragWidget;
+        dragEvent.event = event;
+        dragEvent.doit = true;
+        fireEvent(Events.DragMove, dragEvent);
+      }
 
       if (!dragEvent.doit) {
         cancelDrag();
@@ -450,7 +452,7 @@ public class Draggable extends Observable {
     de.event = event;
     de.x = startBounds.x;
     de.y = startBounds.y;
-    
+
     lastX = startBounds.x;
     lastY = startBounds.y;
     fireEvent(Events.DragStart, de);

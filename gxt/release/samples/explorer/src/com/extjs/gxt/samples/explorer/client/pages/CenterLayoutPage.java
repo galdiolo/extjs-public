@@ -14,12 +14,15 @@ import com.extjs.gxt.ui.client.widget.layout.FillLayout;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 public class CenterLayoutPage extends Container implements EntryPoint {
 
   public void onModuleLoad() {
     RootPanel.get().add(this);
+  }
+  
+  public CenterLayoutPage() {
+    setData("layout", new FillLayout());
   }
 
   @Override
@@ -28,22 +31,14 @@ public class CenterLayoutPage extends Container implements EntryPoint {
     setLayout(new CenterLayout());
 
     ContentPanel panel = new ContentPanel();
-    panel.bodyStyle = "padding: 6px";
-    panel.frame = true;
+    panel.setBodyStyle("padding: 6px");
+    panel.setFrame(true);
     panel.setHeading("CenterLayout");
     panel.addText("I should be centered");
     panel.setWidth(200);
 
     add(panel);
     
-    layout(true);
-
-    Widget p = getParent();
-    if (p instanceof Container) {
-      Container ct = (Container) p;
-      ct.setLayout(new FillLayout());
-      ct.layout(true);
-    }
   }
 
 }

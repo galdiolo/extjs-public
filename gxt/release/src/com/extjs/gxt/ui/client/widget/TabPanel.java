@@ -13,15 +13,12 @@ import java.util.Stack;
 
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Style;
-import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.FxEvent;
 import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.event.TabPanelEvent;
-import com.extjs.gxt.ui.client.event.TypedListener;
 import com.extjs.gxt.ui.client.util.Params;
 import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.viewer.DefaultSelection;
@@ -118,8 +115,7 @@ import com.google.gwt.user.client.Event;
  * 
  * </p>
  */
-public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
-    SelectionProvider {
+public class TabPanel extends AbstractContainer<TabItem> implements SelectionProvider {
 
   /**
    * Tab position enumeration.
@@ -130,9 +126,9 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
 
   private class AccessStack {
 
-    Stack<T> stack = new Stack<T>();
+    Stack<TabItem> stack = new Stack<TabItem>();
 
-    void add(T item) {
+    void add(TabItem item) {
       if (stack.contains(item)) {
         stack.remove(item);
       }
@@ -146,11 +142,11 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
       stack.clear();
     }
 
-    T next() {
+    TabItem next() {
       return stack.size() > 0 ? stack.pop() : null;
     }
 
-    void remove(T item) {
+    void remove(TabItem item) {
       stack.remove(item);
     }
   }
@@ -161,81 +157,23 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
   public static Template itemTemplate;
 
   /**
-   * True to animate tab scrolling so that hidden tabs slide smoothly into view
-   * (defaults to true). Only applies when {@link #enableTabScroll} = true.
-   */
-  public boolean animScroll = false;
-
-  /**
    * True to display an interior border on the body element of the panel, false
    * to hide it (defaults to true).
    */
-  public boolean bodyBorder = true;
+  private boolean bodyBorder = true;
 
-  /**
-   * True to display a border around the tabs (defaults to true).
-   */
-  public boolean border = true;
-
-  /**
-   * True to enable scrolling to tabs that may be invisible due to overflowing
-   * the overall TabPanel width. Only available with tabs on top. (defaults to
-   * false).
-   */
-  public boolean enableTabScroll = false;
-
-  /**
-   * The minimum width in pixels for each tab when {@link #resizeTabs} = true
-   * (defaults to 30).
-   */
-  public int minTabWidth = 30;
-
-  /**
-   * True to automatically resize each tab so that the tabs will completely fill
-   * the tab strip (defaults to false). Setting this to true may cause specific
-   * widths that might be set per tab to be overridden in order to fit them all
-   * into view (although {@link #minTabWidth} will always be honored).
-   */
-  public boolean resizeTabs = false;
-
-  /**
-   * The number of milliseconds that each scroll animation should last (defaults
-   * to 150).
-   */
-  public int scrollDuration = 150;
-
-  /**
-   * The number of pixels to scroll each time a tab scroll button is pressed
-   * (defaults to 100, or if {@link #resizeTabs} = true, the calculated tab
-   * width). Only applies when {@link #enableTabScroll} = true.
-   */
-  public int scrollIncrement = 100;
-
-  /**
-   * The number of pixels of space to calculate into the sizing and scrolling of
-   * tabs (defaults to 2).
-   */
-  public int tabMargin = 2;
-
-  /**
-   * The position where the tab strip should be rendered (defaults to TOP). The
-   * only other supported value is BOTTOM. Note that tab scrolling is only
-   * supported for position TOP.
-   */
-  public TabPosition tabPosition = TabPosition.TOP;
-
-  /**
-   * The initial width in pixels of each new tab (defaults to 120).
-   */
-  public int tabWidth = 120;
-
-  /**
-   * True to have the first item selected when the panel is displayed for the
-   * first time if there is not selection (defaults to true)..
-   */
-  public boolean autoSelect = true;
-
-  private T activeItem;
+  private boolean border = true;
+  private int tabMargin = 2;
+  private int scrollIncrement = 100;
+  private int minTabWidth = 30;
+  private int scrollDuration = 150;
+  private boolean resizeTabs = false;
+  private TabPosition tabPosition = TabPosition.TOP;
+  private int tabWidth = 120;
+  private boolean tabScroll = false;
+  private boolean autoSelect = true;
+  private boolean animScroll = false;
+  private TabItem activeItem;
   private El body, bar, stripWrap, strip;
   private Container<TabItem> container;
   private El edge, scrollLeft, scrollRight;
@@ -252,6 +190,7 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
     attachChildren = false;
     container = new Container<TabItem>();
     container.setLayoutOnChange(true);
+    container.setBorders(false);
   }
 
   /**
@@ -260,18 +199,8 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
    * 
    * @param item the item to be added
    */
-  public void add(T item) {
+  public void add(TabItem item) {
     insert(item, getItemCount());
-  }
-
-  /**
-   * Adds a listener interface to receive selection events.
-   * 
-   * @param listener the listener to add
-   */
-  public void addClickListener(SelectionListener listener) {
-    TypedListener tl = new TypedListener(listener);
-    addListener(Events.Click, tl);
   }
 
   public void addSelectionListener(SelectionChangedListener listener) {
@@ -302,6 +231,60 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
   }
 
   /**
+   * Returns true if scrolling is animated.
+   * 
+   * @return the anim scroll state
+   */
+  public boolean getAnimScroll() {
+    return animScroll;
+  }
+
+  /**
+   * Returns true if the body border is enabled.
+   * 
+   * @return the body border state
+   */
+  public boolean getBodyBorder() {
+    return bodyBorder;
+  }
+
+  /**
+   * Returns true if the border style is enabled.
+   * 
+   * @return the border style
+   */
+  public boolean getBorderStyle() {
+    return border;
+  }
+
+  /**
+   * Returns the minimum tab width.
+   * 
+   * @return the minimum tab width
+   */
+  public int getMinTabWidth() {
+    return minTabWidth;
+  }
+
+  /**
+   * Returns true if tab resizing is enabled.
+   * 
+   * @return the tab resizing state
+   */
+  public boolean getResizeTabs() {
+    return resizeTabs;
+  }
+
+  /**
+   * Returns the scroll duration in millseconds.
+   * 
+   * @return the duration
+   */
+  public int getScrollDuration() {
+    return scrollDuration;
+  }
+
+  /**
    * Returns the current selection tab item.
    * 
    * @return the selected item
@@ -323,13 +306,49 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
   }
 
   /**
+   * Returns the panel's tab margin.
+   * 
+   * @return the margin
+   */
+  public int getTabMargin() {
+    return tabMargin;
+  }
+
+  /**
+   * Returns the tab position.
+   * 
+   * @return the tab position
+   */
+  public TabPosition getTabPosition() {
+    return tabPosition;
+  }
+
+  /**
+   * Returns true if tab scrolling is enabled.
+   * 
+   * @return the tab scroll state
+   */
+  public boolean getTabScroll() {
+    return tabScroll;
+  }
+
+  /**
+   * Returns the default tab width.
+   * 
+   * @return the width
+   */
+  public int getTabWidth() {
+    return tabWidth;
+  }
+
+  /**
    * Inserts a tab item. Fires the <i>BeforeAdd</i> event before inserting,
    * then fires the <i>Add</i> event after the widget has been inserted.
    * 
    * @param item the item to be inserted
    * @param index the insert position
    */
-  public void insert(T item, int index) {
+  public void insert(TabItem item, int index) {
     TabPanelEvent tpe = new TabPanelEvent(this);
     tpe.item = item;
     tpe.index = index;
@@ -348,8 +367,18 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
     }
   }
 
+  /**
+   * Returns true if auto select is enabled.
+   * 
+   * @return the auto select state
+   */
+  public boolean isAutoSelect() {
+    return autoSelect;
+  }
+
   public void onComponentEvent(ComponentEvent ce) {
     super.onComponentEvent(ce);
+    ce.cancelBubble();
     if (ce.type == Event.ONCLICK) {
       El target = ce.getTargetEl();
       if (target.is(".x-tab-scroller-left")) {
@@ -368,28 +397,32 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
    * 
    * @param item the item to be removed
    */
-  public boolean remove(T item) {
+  public boolean remove(TabItem item) {
     TabPanelEvent tpe = new TabPanelEvent(this);
     tpe.item = item;
     if (fireEvent(Events.BeforeRemove, tpe)) {
+      stack.remove(item);
+      container.remove(item);
+      
       super.remove(item);
-      if (rendered) {
 
+      if (rendered) {
         if (item.header.isRendered()) {
           strip.removeChild(item.header.getElement());
-          if (autoDestroy) {
+          if (isAutoDestroy()) {
             item.header.destroy();
           }
         }
-        stack.remove(item);
-        container.remove(item);
+
         if (item == activeItem) {
           activeItem = null;
-          T next = this.stack.next();
+          TabItem next = this.stack.next();
           if (next != null) {
             setSelection(next);
           } else if (getItemCount() > 0) {
             setSelection(getItem(0));
+          } else {
+            layout.setActiveItem(null);
           }
         }
 
@@ -406,18 +439,9 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
   public void removeAll() {
     int size = getItemCount();
     for (int i = 0; i < size; i++) {
-      T item = getItem(0);
+      TabItem item = getItem(0);
       remove(item);
     }
-  }
-
-  /**
-   * Removes a previously added listener.
-   * 
-   * @param listener the listener to be removed
-   */
-  public void removeClickListener(SelectionListener listener) {
-    removeListener(Events.Click, listener);
   }
 
   public void removeSelectionListener(SelectionChangedListener listener) {
@@ -446,10 +470,93 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
     }
   }
 
+  /**
+   * True to animate tab scrolling so that hidden tabs slide smoothly into view
+   * (defaults to true). Only applies when {@link #tabScroll} = true.
+   * 
+   * @param animScroll the anim scroll state
+   */
+  public void setAnimScroll(boolean animScroll) {
+    this.animScroll = animScroll;
+  }
+
+  /**
+   * True to have the first item selected when the panel is displayed for the
+   * first time if there is not selection (defaults to true).
+   * 
+   * @param autoSelect the auto select state
+   */
+  public void setAutoSelect(boolean autoSelect) {
+    this.autoSelect = autoSelect;
+  }
+
+  /**
+   * True to display an interior border on the body element of the panel, false
+   * to hide it (defaults to true, pre-render).
+   * 
+   * @param bodyBorder the body border style
+   */
+  public void setBodyBorder(boolean bodyBorder) {
+    this.bodyBorder = bodyBorder;
+  }
+
+  /**
+   * True to display a border around the tabs (defaults to true).
+   * 
+   * @param border true for borders
+   */
+  public void setBorderStyle(boolean border) {
+    this.border = border;
+  }
+
+  /**
+   * The minimum width in pixels for each tab when {@link #resizeTabs} = true
+   * (defaults to 30).
+   * 
+   * @param minTabWidth the minimum tab width
+   */
+  public void setMinTabWidth(int minTabWidth) {
+    this.minTabWidth = minTabWidth;
+  }
+
+  /**
+   * True to automatically resize each tab so that the tabs will completely fill
+   * the tab strip (defaults to false). Setting this to true may cause specific
+   * widths that might be set per tab to be overridden in order to fit them all
+   * into view (although {@link #minTabWidth} will always be honored).
+   * 
+   * @param resizeTabs true to enable tab resizing
+   */
+  public void setResizeTabs(boolean resizeTabs) {
+    this.resizeTabs = resizeTabs;
+  }
+
+  /**
+   * Sets the number of milliseconds that each scroll animation should last
+   * (defaults to 150).
+   * 
+   * @param scrollDuration the scroll duration
+   */
+  public void setScrollDuration(int scrollDuration) {
+    this.scrollDuration = scrollDuration;
+  }
+
+  /**
+   * Sets the number of pixels to scroll each time a tab scroll button is
+   * pressed (defaults to 100, or if {@link #setResizeTabs(boolean)} = true, the
+   * calculated tab width). Only applies when {@link #setTabScroll(boolean)} =
+   * true.
+   * 
+   * @param scrollIncrement the scroll increment
+   */
+  public void setScrollIncrement(int scrollIncrement) {
+    this.scrollIncrement = scrollIncrement;
+  }
+
   public void setSelection(Selection selection) {
     Object element = selection.getFirstElement();
     if (element != null) {
-      for (T item : items) {
+      for (TabItem item : getItems()) {
         if (element == item.getData() || element.equals(item.getData())) {
           setSelection(item);
           return;
@@ -465,7 +572,7 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
    * 
    * @param item the item to be selected
    */
-  public void setSelection(T item) {
+  public void setSelection(TabItem item) {
     TabPanelEvent tpe = new TabPanelEvent(this);
     tpe.item = item;
     if (item == null || !fireEvent(Events.BeforeSelect, tpe)) {
@@ -487,7 +594,7 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
       container.layout(true);
 
       if (scrolling) {
-        scrollToTab(item, animScroll);
+        scrollToTab(item, getAnimScroll());
       }
       fireEvent(Events.Select, tpe);
       SelectionChangedEvent se = new SelectionChangedEvent(this, getSelection());
@@ -495,30 +602,71 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
     }
   }
 
+  /**
+   * The number of pixels of space to calculate into the sizing and scrolling of
+   * tabs (defaults to 2).
+   * 
+   * @param tabMargin the tab margin
+   */
+  public void setTabMargin(int tabMargin) {
+    this.tabMargin = tabMargin;
+  }
+
+  /**
+   * Sets the position where the tab strip should be rendered (defaults to TOP, pre-render).
+   * The only other supported value is BOTTOM. Note that tab scrolling is only
+   * supported for position TOP.
+   * 
+   * @param tabPosition the tab position
+   */
+  public void setTabPosition(TabPosition tabPosition) {
+    this.tabPosition = tabPosition;
+  }
+
+  /**
+   * True to enable scrolling to tabs that may be invisible due to overflowing
+   * the overall TabPanel width. Only available with tabs on top. (defaults to
+   * false).
+   * 
+   * @param tabScroll true to enable tab scrolling
+   */
+  public void setTabScroll(boolean tabScroll) {
+    this.tabScroll = tabScroll;
+  }
+
+  /**
+   * Sets the initial width in pixels of each new tab (defaults to 120).
+   * 
+   * @param tabWidth
+   */
+  public void setTabWidth(int tabWidth) {
+    this.tabWidth = tabWidth;
+  }
+
   protected void afterRender() {
     super.afterRender();
     if (activeItem != null) {
-      T item = activeItem;
+      TabItem item = activeItem;
       activeItem = null;
       setSelection(item);
-    } else if (activeItem == null && autoSelect && getItemCount() > 0) {
+    } else if (activeItem == null && isAutoSelect() && getItemCount() > 0) {
       setSelection(getItem(0));
     }
-    if (resizeTabs) {
+    if (getResizeTabs()) {
       autoSizeTabs();
     }
   }
 
   protected void doAttachChildren() {
     WidgetHelper.doAttach(container);
-    for (TabItem item : items) {
+    for (TabItem item : getItems()) {
       WidgetHelper.doAttach(item.header);
     }
   }
 
   protected void doDetachChildren() {
     WidgetHelper.doDetach(container);
-    for (TabItem item : items) {
+    for (TabItem item : getItems()) {
       WidgetHelper.doDetach(item.header);
     }
   }
@@ -558,7 +706,7 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
     edge = strip.createChild("<li class=x-tab-edge></li>");
     strip.createChild("<div class=x-clear></div>");
 
-    body.addStyleName("x-tab-panel-body-" + tabPosition);
+    body.addStyleName("x-tab-panel-body-" + getTabPosition());
 
     if (itemTemplate == null) {
       StringBuffer sb = new StringBuffer();
@@ -585,11 +733,12 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
       body.setHeight(height - hh, true);
     }
     if (width != Style.DEFAULT) {
-      bar.setWidth(width, true);
-      body.setWidth(width, true);
+//      bar.setWidth(width, true);
+//      body.setWidth(width, true);
     }
-    int adj = XDOM.isVisibleBox ? 1 : 1;
-    container.setSize(width - adj, height - hh - adj);
+
+    container.setSize(width, height - hh);
+    container.layout();
     delegateUpdates();
   }
 
@@ -599,7 +748,7 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
     }
   }
 
-  void onItemClick(T item, ComponentEvent ce) {
+  void onItemClick(TabItem item, ComponentEvent ce) {
     ce.stopEvent();
     Element target = ce.getTarget();
     if (fly(target).getStyleName().equals("x-tab-strip-close")) {
@@ -617,7 +766,7 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
   void onItemRender(TabItem item, Element target, int pos) {
     item.header.disabledStyle = "x-item-disabled";
 
-    String style = item.closable ? "x-tab-strip-closable " : "";
+    String style = item.isClosable() ? "x-tab-strip-closable " : "";
     if (!item.header.isEnabled()) {
       style += " x-item-disabled";
     }
@@ -628,7 +777,7 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
     p.set("id", item.getId());
     p.set("text", item.getText());
     p.set("style", style);
-    p.set("textStyle", item.textStyle);
+    p.set("textStyle", item.getTextStyle());
     p.set("iconStyle", item.getIconStyle());
     if (item.template == null) {
       item.template = itemTemplate;
@@ -641,14 +790,14 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
   }
 
   private void autoScrollTabs() {
-    int count = items.size();
+    int count = getItemCount();
     int tw = bar.getClientWidth();
 
     int cw = stripWrap.getWidth();
     int pos = getScollPos();
     int l = edge.offsetsTo(stripWrap.dom).x + pos;
 
-    if (!enableTabScroll || count < 1 || cw < 20) {
+    if (!getTabScroll() || count < 1 || cw < 20) {
       return;
     }
 
@@ -686,11 +835,11 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
   }
 
   private void autoSizeTabs() {
-    int count = items.size();
+    int count = getItemCount();
     if (count == 0) return;
     int aw = bar.getClientWidth();
-    int each = (int) Math.max(
-        Math.min(Math.floor((aw - 4) / count) - tabMargin, tabWidth), minTabWidth);
+    int each = (int) Math.max(Math.min(Math.floor((aw - 4) / count) - getTabMargin(),
+        tabWidth), getMinTabWidth());
 
     for (int i = 0; i < count; i++) {
       El el = getItem(i).header.el;
@@ -713,10 +862,10 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
   }
 
   private void delegateUpdates() {
-    if (resizeTabs && rendered) {
+    if (getResizeTabs() && rendered) {
       autoSizeTabs();
     }
-    if (enableTabScroll && rendered) {
+    if (getTabScroll() && rendered) {
       autoScrollTabs();
     }
   }
@@ -755,7 +904,7 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
     int pos = getScollPos();
     int s = Math.max(0, pos - getScrollIncrement());
     if (s != pos) {
-      scrollTo(s, animScroll);
+      scrollTo(s, getAnimScroll());
     }
   }
 
@@ -764,7 +913,7 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
     int pos = getScollPos();
     int s = Math.min(sw, pos + getScrollIncrement());
     if (s != pos) {
-      scrollTo(s, animScroll);
+      scrollTo(s, getAnimScroll());
     }
   }
 
@@ -782,7 +931,7 @@ public class TabPanel<T extends TabItem> extends AbstractContainer<T> implements
 
   private void scrollTo(int pos, boolean animate) {
     if (animate) {
-      stripWrap.scrollTo("left", pos, scrollDuration, new Listener<FxEvent>() {
+      stripWrap.scrollTo("left", pos, getScrollDuration(), new Listener<FxEvent>() {
         public void handleEvent(FxEvent fe) {
           updateScrollButtons();
         }

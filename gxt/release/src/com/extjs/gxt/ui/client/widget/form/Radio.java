@@ -8,6 +8,7 @@
 package com.extjs.gxt.ui.client.widget.form;
 
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.google.gwt.user.client.Element;
 
 /**
  * Single radio field. Same as Checkbox, but provided as a convenience for
@@ -16,31 +17,42 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
  */
 public class Radio extends CheckBox {
 
-  /**
-   * The text that appears beside the checkbox (defaults to null).
-   */
-  public String boxLabel;
-  
   protected RadioGroup group;
 
   /**
-   * If this radio is part of a group, it will return the selected value.
+   * Returns the radios container group.
    * 
-   * @return the value
+   * @return the group
    */
-  public String getGroupValue() {
-    return null;
+  public RadioGroup getGroup() {
+    return group;
+  }
+
+  @Override
+  public void setChecked(boolean checked) {
+    this.checked = checked;
+    if (rendered) {
+      input.setElementAttribute("checked", checked);
+    }
+  }
+
+  @Override
+  public void setValue(Object value) {
+    this.value = value;
   }
 
   @Override
   protected void onClick(ComponentEvent be) {
     if (group != null) {
       group.onRadioClick(this);
-    } else {
-      boolean val = input.getBooleanElementAttribute("checked");
-      if (val != checked) {
-        setValue(String.valueOf(val));
-      }
+    }
+  }
+
+  @Override
+  protected void onRender(Element target, int index) {
+    super.onRender(target, index);
+    if (checked) {
+      setChecked(true);
     }
   }
 

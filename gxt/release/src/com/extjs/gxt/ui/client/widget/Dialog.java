@@ -50,19 +50,6 @@ public class Dialog extends Window {
   public static final String YESNOCANCEL = "yesnocancel";
 
   /**
-   * The buttons to display (defaults to OK).
-   * 
-   * <pre>
-   * Dialog.OK
-   * Dialog.CANCEL
-   * Dialog.OKCANCEL
-   * Dialog.YESNO
-   * Dialog.YESNOCANCEL
-   * </pre>
-   */
-  public String buttons = OK;
-
-  /**
    * The action to take when the close button is clicked. The default action is
    * 'close' which will actually remove the window from the DOM and destroy it.
    * The other valid option is 'hide' which will simply hide the window, keeping
@@ -96,14 +83,28 @@ public class Dialog extends Window {
   public String noText = GXT.MESSAGES.messageBox_no();
 
   /**
-   * Action to run then any  button is selected (defaults to null).  Valid values are null, "close" or "hide"
+   * Action to run then any button is selected (defaults to null). Valid values
+   * are null, "close" or "hide"
    */
   public String buttonPressedAction = null;
 
   protected Button okBtn;
+
   protected Button closeBtn;
   protected Button cancelBtn;
   protected Button noBtn, yesBtn;
+  /**
+   * The buttons to display (defaults to OK).
+   * 
+   * <pre>
+   * Dialog.OK
+   * Dialog.CANCEL
+   * Dialog.OKCANCEL
+   * Dialog.YESNO
+   * Dialog.YESNOCANCEL
+   * </pre>
+   */
+  private String buttons = OK;
 
   private boolean buttonsInitialized;
 
@@ -122,35 +123,59 @@ public class Dialog extends Window {
     return buttonBar.getButtonPressed();
   }
 
+  /**
+   * Returns the button's.
+   * 
+   * @return the buttons the buttons
+   */
+  public String getButtons() {
+    return buttons;
+  }
+
+  /**
+   * Sets the buttons to display (defaults to OK).
+   * 
+   * <pre>
+   * Dialog.OK
+   * Dialog.CANCEL
+   * Dialog.OKCANCEL
+   * Dialog.YESNO
+   * Dialog.YESNOCANCEL
+   * </pre>
+   */
+  public void setButtons(String buttons) {
+    this.buttons = buttons;
+  }
+
   protected void createButtons() {
     if (!buttonsInitialized) {
 
       buttonsInitialized = true;
-      if (buttons.indexOf("ok") != -1) {
+      if (getButtons().indexOf("ok") != -1) {
         okBtn = new Button(okText);
         okBtn.setItemId("ok");
         addButton(okBtn);
       }
 
-      if (buttons.indexOf("yes") != -1) {
+      if (getButtons().indexOf("yes") != -1) {
         yesBtn = new Button(yesText);
         yesBtn.setItemId("yes");
         addButton(yesBtn);
       }
 
-      if (buttons.indexOf("no") != -1) {
+      if (getButtons().indexOf("no") != -1) {
         noBtn = new Button(noText);
         noBtn.setItemId("no");
         addButton(noBtn);
       }
 
-      if (buttons.indexOf("cancel") != -1) {
+      if (getButtons().indexOf("cancel") != -1) {
         cancelBtn = new Button(cancelText);
         cancelBtn.setItemId("cancel");
         addButton(cancelBtn);
       }
 
-      if (buttons.indexOf("close") != -1) {
+      if (getButtons().indexOf("close") != -1) {
         closeBtn = new Button(closeText);
         closeBtn.setItemId("close");
         addButton(closeBtn);
@@ -177,14 +202,13 @@ public class Dialog extends Window {
     }
     if ("close".equalsIgnoreCase(buttonPressedAction)) {
       close(button);
-    }
-    else if ("hide".equalsIgnoreCase(buttonPressedAction)) {
+    } else if ("hide".equalsIgnoreCase(buttonPressedAction)) {
       hide(button);
     }
   }
 
   protected void onRender(Element parent, int pos) {
-    buttonBar.buttonAlign = buttonAlign;
+    buttonBar.setButtonAlign(getButtonAlign());
 
     buttonBar.addListener(Events.Select, new Listener<ButtonBarEvent>() {
       public void handleEvent(ButtonBarEvent bbe) {

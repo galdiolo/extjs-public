@@ -37,8 +37,8 @@ public class MailItemView extends View {
     south.setLayout(new FitLayout());
 
     panel = new ContentPanel();
-    panel.border = false;
-    panel.header = false;
+    panel.setBorders(false);
+    panel.setHeaderVisible(false);
     panel.setScrollMode(Scroll.AUTO);
 
     header = new Html();

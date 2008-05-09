@@ -8,6 +8,7 @@
 package com.extjs.gxt.ui.client.data;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -73,19 +74,23 @@ public class BaseModel extends BaseModelData implements Model, Serializable {
    * 
    * @param listener the listener to be added
    */
-  public void addChangeListener(ChangeListener listener) {
+  public void addChangeListener(ChangeListener... listener) {
     changeEventSupport.addChangeListener(listener);
+  }
+
+  /**
+   * Adds the listeners to receive change events.
+   * 
+   * @param listeners the listeners to add
+   */
+  public void addChangeListener(List<ChangeListener> listeners) {
+    for (ChangeListener listener : listeners) {
+      changeEventSupport.addChangeListener(listener);
+    }
   }
 
   public void notify(ChangeEvent evt) {
     changeEventSupport.notify(evt);
-  }
-
-  @Override
-  public Object set(String name, Object value) {
-    Object oldValue = super.set(name, value);
-    notifyPropertyChanged(name, value, oldValue);
-    return oldValue;
   }
 
   @Override
@@ -103,8 +108,23 @@ public class BaseModel extends BaseModelData implements Model, Serializable {
    * 
    * @param listener the listener to be removed
    */
-  public void removeChangeListener(ChangeListener listener) {
+  public void removeChangeListener(ChangeListener... listener) {
     changeEventSupport.removeChangeListener(listener);
+  }
+
+  public void removeChangeListeners() {
+    changeEventSupport.removeChangeListeners();
+  }
+  
+  @Override
+  public Object set(String name, Object value) {
+    Object oldValue = super.set(name, value);
+    notifyPropertyChanged(name, value, oldValue);
+    return oldValue;
+  }
+
+  public void setSilent(boolean silent) {
+    changeEventSupport.setSilent(silent);
   }
 
   protected void fireEvent(int type) {

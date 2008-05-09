@@ -24,7 +24,7 @@ public class Header extends Component {
   /**
    * Style name added to the header's text element (defaults to null).
    */
-  public String textStyle;
+  private String textStyle;
 
   private IconButton iconBtn;
   private El textEl;
@@ -60,6 +60,15 @@ public class Header extends Component {
   }
 
   /**
+   * Returns the item's text style.
+   * 
+   * @return the textStyle the text style
+   */
+  public String getTextStyle() {
+    return textStyle;
+  }
+
+  /**
    * Returns the tool at the given index.
    * 
    * @param index the index
@@ -87,7 +96,7 @@ public class Header extends Component {
   public void insertTool(Component tool, int index) {
     tools.add(index, tool);
     if (rendered) {
-      widgetPanel.insert((Widget)tool, index);
+      widgetPanel.insert((Widget) tool, index);
     }
   }
 
@@ -130,6 +139,15 @@ public class Header extends Component {
     }
   }
 
+  /**
+   * Sets the style name added to the header's text element.
+   * 
+   * @param textStyle the text style
+   */
+  public void setTextStyle(String textStyle) {
+    this.textStyle = textStyle;
+  }
+
   protected void doAttachChildren() {
     WidgetHelper.doAttach(widgetPanel);
   }
@@ -166,7 +184,7 @@ public class Header extends Component {
 
     textEl = new El(DOM.createSpan());
     el.appendChild(textEl.dom);
-    textEl.setStyleName(textStyle);
+    textEl.setStyleName(getTextStyle());
 
     if (text != null) {
       setText(text);

@@ -55,6 +55,7 @@ public class TableViewerFilterPage extends Container implements EntryPoint {
     FlowLayout layout = new FlowLayout();
     layout.margin = 10;
     setLayout(layout);
+    setMonitorResize(false);
 
     final DateTimeFormat dateFormat = DateTimeFormat.getFormat("MM/d/y");
     final NumberFormat currency = NumberFormat.getCurrencyFormat();
@@ -85,7 +86,6 @@ public class TableViewerFilterPage extends Container implements EntryPoint {
     TableColumnModel cm = new TableColumnModel(columns);
 
     final Table table = new Table(cm);
-    table.horizontalScroll = true;
 
     TableViewer viewer = new TableViewer(table);
     viewer.preventRender = true;
@@ -148,10 +148,10 @@ public class TableViewerFilterPage extends Container implements EntryPoint {
     viewer.setInput(stocks);
 
     ContentPanel panel = new ContentPanel();
-    panel.collapsible = true;
-    panel.frame = true;
-    panel.animCollapse = false;
-    panel.buttonAlign = HorizontalAlignment.CENTER;
+    panel.setCollapsible(true);
+    panel.setFrame(true);
+    panel.setAnimCollapse(false);
+    panel.setButtonAlign(HorizontalAlignment.CENTER);
     panel.setIconStyle("icon-table");
     panel.setHeading("Filter TableViewer Demo");
     panel.setLayout(new FitLayout());

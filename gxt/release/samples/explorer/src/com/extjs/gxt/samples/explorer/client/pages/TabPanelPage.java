@@ -27,7 +27,6 @@ import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 public class TabPanelPage extends Container implements EntryPoint {
 
@@ -37,12 +36,16 @@ public class TabPanelPage extends Container implements EntryPoint {
 
   int count = 1;
 
+  public TabPanelPage() {
+    setData("layout", new FitLayout());
+  }
+
   @Override
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
 
     final TabPanel tabFolder = new TabPanel();
-    tabFolder.enableTabScroll = true;
+    tabFolder.setTabScroll(true);
     tabFolder.addListener(Events.SelectionChange, new Listener<TabPanelEvent>() {
       public void handleEvent(TabPanelEvent tpe) {
         TabItem item = tpe.item;
@@ -58,7 +61,7 @@ public class TabPanelPage extends Container implements EntryPoint {
     tabFolder.setSelection(item);
 
     item = new TabItem();
-    item.closable = true;
+    item.setClosable(true);
     item.setText("Close");
     item.setIconStyle("icon-tabs");
     item.addListener(Events.Close, new Listener<ComponentEvent>() {
@@ -72,7 +75,7 @@ public class TabPanelPage extends Container implements EntryPoint {
     tabFolder.add(item);
 
     item = new TabItem();
-    item.closable = true;
+    item.setClosable(true);
     item.setText("Tab 3");
     item.setIconStyle("icon-tabs");
     item.addListener(Events.Close, new Listener<ComponentEvent>() {
@@ -89,7 +92,7 @@ public class TabPanelPage extends Container implements EntryPoint {
 
       public void componentSelected(ComponentEvent ce) {
         TabItem item = new TabItem();
-        item.closable = true;
+        item.setClosable(true);
         item.setText("New Item " + count++);
         tabFolder.add(item);
       }
@@ -103,14 +106,7 @@ public class TabPanelPage extends Container implements EntryPoint {
     tabFolder.setData(new RowData(RowData.FILL_BOTH));
     add(tabFolder);
     add(buttonBar);
-    
-    
-    Widget p = getParent();
-    if (p instanceof Container) {
-      Container ct = (Container) p;
-      ct.setLayout(new FitLayout());
-      ct.layout(true);
-    }
+
   }
 
 }

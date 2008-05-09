@@ -35,4 +35,10 @@ public class DataListEvent extends ComponentEvent {
     this.dataList = list;
   }
 
+  public DataListEvent(DataList list, DataListItem item) {
+    super(list);
+    this.dataList = list;
+    this.item = item;
+  }
+
 }

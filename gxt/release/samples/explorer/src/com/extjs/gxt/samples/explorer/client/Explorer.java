@@ -12,9 +12,11 @@ import com.extjs.gxt.samples.explorer.client.model.ExplorerModel;
 import com.extjs.gxt.samples.explorer.client.mvc.AppController;
 import com.extjs.gxt.samples.explorer.client.mvc.ContentController;
 import com.extjs.gxt.samples.explorer.client.mvc.NavigationController;
+import com.extjs.gxt.themes.client.Slate;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.mvc.AppEvent;
 import com.extjs.gxt.ui.client.mvc.Dispatcher;
+import com.extjs.gxt.ui.client.util.ThemeManager;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
@@ -32,6 +34,8 @@ public class Explorer implements EntryPoint {
   }
 
   public void onModuleLoad() {
+    ThemeManager.register(Slate.SLATE);
+    
     ExplorerServiceAsync service = (ExplorerServiceAsync) GWT.create(ExplorerService.class);
     ServiceDefTarget endpoint = (ServiceDefTarget) service;
     String moduleRelativeURL = GWT.getModuleBaseURL() + "service";

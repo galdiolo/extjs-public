@@ -15,23 +15,59 @@ import com.google.gwt.user.client.Element;
 /**
  * A panel for displaying form wigets.
  */
-public class FormPanel<T extends Field> extends GenericContentPanel<T> {
+public class FormPanel extends GenericContentPanel<Field> {
 
   /**
-   * The label width in pixels (defaults to 75).
+   * Label alignment enumeration.
    */
-  public int labelWidth = 75;
+  public enum LabelAlign {
+    LEFT, TOP, RIGHT;
+  }
+
+  private LabelAlign labelAlign = LabelAlign.LEFT;
+  private int labelWidth = 75;
+  private int fieldWidth = 210;
+  private int padding = 10;
+
+  public FormPanel() {
+
+  }
 
   /**
-   * The default field width (defaults to 210).
+   * Returns the field width.
+   * 
+   * @return the field width
    */
-  public int fieldWidth = 210;
+  public int getFieldWidth() {
+    return fieldWidth;
+  }
 
   /**
-   * Valid values are "left," "top" and "right" (defaults to "left"). This
-   * property cascades to child containers if not set.
+   * Returns the label alignment.
+   * 
+   * @return the label alignment
    */
-  public String labelAlign = "left";
+  public LabelAlign getLabelAlign() {
+    return labelAlign;
+  }
+
+  /**
+   * Returns the default width.
+   * 
+   * @return the label width
+   */
+  public int getLabelWidth() {
+    return labelWidth;
+  }
+
+  /**
+   * Returns the panel's padding.
+   * 
+   * @return the padding
+   */
+  public int getPadding() {
+    return padding;
+  }
 
   /**
    * Returns the form's valid state by querying all child fields.
@@ -39,7 +75,7 @@ public class FormPanel<T extends Field> extends GenericContentPanel<T> {
    * @return true if value
    */
   public boolean isValid() {
-    for (Component c : items) {
+    for (Component c : getItems()) {
       Field f = (Field) c;
       if (!f.isValid()) {
         return false;
@@ -48,14 +84,54 @@ public class FormPanel<T extends Field> extends GenericContentPanel<T> {
     return true;
   }
 
+  /**
+   * Sets the default field width (defaults to 210).
+   * 
+   * @param fieldWidth the field width
+   */
+  public void setFieldWidth(int fieldWidth) {
+    this.fieldWidth = fieldWidth;
+  }
+
+  /**
+   * Sets the label alignment.
+   * 
+   * @param align the alignment
+   */
+  public void setLabelAlign(LabelAlign align) {
+    this.labelAlign = align;
+  }
+
+  /**
+   * Sets the default label width.
+   * 
+   * @param labelWidth the label width
+   */
+  public void setLabelWidth(int labelWidth) {
+    this.labelWidth = labelWidth;
+  }
+
+  /**
+   * Sets the padding to be applied to the forms children (defaults to
+   * 20,pre-render).
+   * 
+   * @param padding the padding
+   */
+  public void setPadding(int padding) {
+    this.padding = padding;
+  }
+
   @Override
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
+    body.setStyleAttribute("padding", padding);
+
     FormLayout layout = new FormLayout();
-    layout.defaultWidth = fieldWidth;
-    layout.labelWidth = labelWidth;
+    layout.defaultWidth = getFieldWidth();
+    layout.labelWidth = getLabelWidth();
     setLayout(layout);
     layout();
+
   }
 
 }

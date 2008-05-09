@@ -262,8 +262,8 @@ public class Layer extends El {
     if (isVisible() && (shadow != null || shim != null)) {
       int w = getWidth();
       int h = getHeight();
-      int l = getLeft(true);
-      int t = getTop(true);
+      int l = getLeft();
+      int t = getTop();
       if (shadow != null && !shadowDisabled) {
         if (show && !shadow.isVisible()) {
           shadow.show(dom);

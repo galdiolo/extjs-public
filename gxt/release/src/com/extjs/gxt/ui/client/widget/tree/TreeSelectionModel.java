@@ -11,177 +11,56 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.Events;
-import com.extjs.gxt.ui.client.GXT;
-import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.TreeEvent;
-import com.extjs.gxt.ui.client.util.Observable;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.ui.KeyboardListener;
+import com.extjs.gxt.ui.client.util.KeyNav;
+import com.extjs.gxt.ui.client.widget.Items;
+import com.extjs.gxt.ui.client.widget.selection.SelectionModel;
 
 /**
- * A single-select tree selection model.
- * 
- * <dl>
- * <dt><b>Events:</b></dt>
- * 
- * <dd><b>SelectionChange</b> : TreeEvent(tree)<br>
- * <div>Fires after the selection has changed.</div>
- * <ul>
- * <li>tree : this</li>
- * </ul>
- * </dd>
- * </dl>
- * 
- * @see MultiSelectionModel
+ * Abstract base class for Tree selection models.
  */
-public class TreeSelectionModel extends Observable {
+public abstract class TreeSelectionModel implements SelectionModel<Tree>,
+    Listener<TreeEvent> {
 
   protected Tree tree;
-  protected TreeItem selItem;
-  protected TreeItem lastSelItem;
-  protected Listener treeListener;
+  protected KeyNav<TreeEvent> keyNav;
+  protected TreeItem lastSelected;
 
-  public TreeSelectionModel() {
-    treeListener = new Listener<TreeEvent>() {
-      public void handleEvent(TreeEvent te) {
-        int type = te.type;
-        TreeItem item = te.item;
-        switch (type) {
-          case Events.MouseDown:
-            if (!te.isRightClick()) {
-              onItemClick(item, te);
-            }
-            break;
-          case Events.KeyDown:
-            onKeyDown(te);
-            break;
-        }
-        te.cancelBubble();
-      }
-    };
-  }
-
-  /**
-   * Deselect a item.
-   * 
-   * @param item the item to be deselected
-   */
-  public void deselect(TreeItem item) {
-    if (selItem == item) {
-      deselectAll();
+  public void bind(Tree tree) {
+    if (keyNav == null) {
+      createKeyNav(tree);
     }
-  }
-
-  /**
-   * Deselects all selections.
-   */
-  public void deselectAll() {
-    if (selItem != null) {
-      selItem.getUI().onSelectedChange(false);
-      selItem = null;
-      TreeEvent te = new TreeEvent(tree);
-      fireEvent(Events.SelectionChange, te);
-      tree.fireEvent(Events.SelectionChange, te);
+    if (this.tree != null) {
+      this.tree.removeListener(Events.OnClick, this);
+      this.tree.removeListener(Events.Remove, this);
+      keyNav.bind(null);
     }
-  }
-
-  /**
-   * Returns the selected item.
-   * 
-   * @return the selected item or <code>null</code> if no selection
-   */
-  public TreeItem getSelected() {
-    return selItem;
-  }
-
-  /**
-   * Returns a array of selected items.
-   * 
-   * @return the selected items
-   */
-  public List<TreeItem> getSelection() {
-    List<TreeItem> list = new ArrayList<TreeItem>();
-    if (selItem != null) {
-      list.add(selItem);
-    }
-    return list;
-  }
-
-  /**
-   * Returns the model's tree.
-   * 
-   * @return the tree
-   */
-  public Tree getTree() {
-    return tree;
-  }
-
-  /**
-   * Binds the model to the specified tree.
-   * 
-   * @param tree the tree
-   */
-  public void init(Tree tree) {
     this.tree = tree;
-    tree.addListener(Events.MouseDown, treeListener);
-    tree.addListener(Events.KeyDown, treeListener);
+    if (tree != null) {
+      tree.addListener(Events.OnClick, this);
+      tree.addListener(Events.Remove, this);
+      keyNav.bind(tree);
+    }
   }
 
-  /**
-   * Returns <code>true</code> if the item is selected.
-   * 
-   * @param item the item
-   * @return the selected state
-   */
-  public boolean isSelected(TreeItem item) {
-    return selItem == item;
+  public abstract List<TreeItem> doGetSelectedItems();
+
+  public void handleEvent(TreeEvent e) {
+    switch (e.type) {
+      case Events.OnClick:
+        onClick(e);
+        break;
+      case Events.Remove:
+        onRemove(e.item);
+        break;
+    }
   }
 
-  /**
-   * Selects a item.
-   * 
-   * @param item the item to be selected
-   */
-  public void select(final TreeItem item) {
-    if (isSelected(item)) {
-      return;
-    }
-    if (!tree.isRendered()) {
-      tree.addListener(Events.Render, new Listener<ComponentEvent>() {
-        public void handleEvent(ComponentEvent ce) {
-          removeListener(Events.Render, this);
-          select(item);
-        }
-      });
-      return;
-    }
-    TreeItem last = selItem != null ? selItem : lastSelItem;
-    if (last != null) {
-      last.getUI().onSelectedChange(false);
-    }
-    selItem = item;
-    lastSelItem = item;
+  public abstract void refresh();
 
-    if (!selItem.isRendered()) {
-      ensureExpanded(selItem);
-    }
-
-    selItem.getUI().onSelectedChange(true);
-    TreeEvent te = new TreeEvent(tree);
-    te.item = selItem;
-    fireEvent(Events.SelectionChange, te);
-    tree.fireEvent(Events.SelectionChange, te);
-
-    if (GXT.isSafari) {
-      DeferredCommand.addCommand(new Command() {
-        public void execute() {
-          tree.focus();
-        }
-      });
-    }
-
+  public void select(TreeItem item) {
+    doSelect(new Items(item));
   }
 
   /**
@@ -189,23 +68,9 @@ public class TreeSelectionModel extends Observable {
    * the nodes.
    */
   public void selectNext() {
-    TreeItem sel = selItem != null ? selItem : lastSelItem;
-    if (sel == null) {
-      return;
-    }
-    if (sel.firstChild() != null && sel.isExpanded()) {
-      select(sel.firstChild());
-    } else if (sel.nextSibling() != null) {
-      select(sel.nextSibling());
-    } else if (sel.getParentItem() != null) {
-      TreeItem p = sel.getParentItem();
-      while (p != null) {
-        if (p.nextSibling() != null) {
-          select(p.nextSibling());
-          return;
-        }
-        p = p.getParentItem();
-      }
+    TreeItem next = next();
+    if (next != null) {
+      doSelect(new Items(next));
     }
   }
 
@@ -214,86 +79,151 @@ public class TreeSelectionModel extends Observable {
    * the nodes.
    */
   public void selectPrevious() {
-    TreeItem sel = selItem != null ? selItem : lastSelItem;
-    if (sel == null) {
-      return;
+    TreeItem previous = previous();
+    if (previous != null) {
+      doSelect(new Items(previous));
     }
-    TreeItem prev = sel.previousSibling();
-    if (prev != null) {
-      if (!prev.isExpanded() || prev.getItemCount() < 1) {
-        select(prev);
-      } else {
-        TreeItem lastChild = prev.lastChild();
-        while (lastChild != null && lastChild.getItemCount() > 0) {
-          lastChild = lastChild.lastChild();
-        }
-        select(lastChild);
+  }
+
+  protected void createKeyNav(Tree tree) {
+    keyNav = new KeyNav<TreeEvent>() {
+
+      @Override
+      public void onDown(TreeEvent ce) {
+        onKeyDown(ce);
       }
-    } else if (sel.getParentItem() != null && !sel.getParentItem().isRoot()) {
-      select(sel.getParentItem());
-    }
-  }
 
-  protected void onItemClick(TreeItem item, ComponentEvent ce) {
-    if (!ce.within(item.getUI().getJointEl()) && !ce.within(item.getUI().getCheckEl())) {
-      if (isSelected(item) && ce.isControlKey()) {
-        deselect(item);
-      } else {
-        select(item);
+      @Override
+      public void onLeft(TreeEvent ce) {
+        onKeyLeft(ce);
       }
-    }
+
+      @Override
+      public void onRight(TreeEvent ce) {
+        onKeyRight(ce);
+      }
+
+      @Override
+      public void onUp(TreeEvent ce) {
+        onKeyUp(ce);
+      }
+
+    };
   }
 
-  protected void onKeyDown(ComponentEvent ce) {
-    TreeItem sel = selItem != null ? selItem : lastSelItem;
-    if (sel == null) {
-      return;
-    }
-    int key = ce.getKeyCode();
-    switch (key) {
-      case KeyboardListener.KEY_DOWN:
-        ce.stopEvent();
-        selectNext();
-        break;
-      case KeyboardListener.KEY_UP:
-        ce.stopEvent();
-        selectPrevious();
-        break;
-      case KeyboardListener.KEY_LEFT:
-        ce.preventDefault();
-        if (!sel.isLeaf() && sel.isExpanded()) {
-          sel.setExpanded(false);
-        } else if (sel.getParentItem() != null && !sel.getParentItem().isRoot()) {
-          select(sel.getParentItem());
-        }
-        break;
-      case KeyboardListener.KEY_RIGHT:
-        ce.preventDefault();
-        if (!sel.isLeaf()) {
-          if (!sel.isExpanded()) {
-            sel.setExpanded(true);
-            return;
-          }
-        }
-        selectNext();
-        break;
-    }
+  protected abstract void doDeselect(Items<TreeItem> items, boolean supressEvent);
+
+  protected void doSelect(Items items) {
+    doSelect(items, false, false);
   }
 
-  private void ensureExpanded(TreeItem item) {
+  protected abstract void doSelect(Items<TreeItem> items, boolean keepExisting,
+      boolean supressEvent);
+
+  protected void ensureExpanded(TreeItem item) {
     List<TreeItem> stack = new ArrayList<TreeItem>();
     item = item.getParentItem();
     while (item != null) {
-      stack.add(item);
-      if (item.isRendered()) {
-        break;
-      } item = item.getParentItem();
+      if (!item.isRoot()) {
+        stack.add(item);
+      }
+      item = item.getParentItem();
     }
-    
+
     for (int i = stack.size() - 1; i >= 0; i--) {
       TreeItem ti = stack.get(i);
       ti.setExpanded(true);
     }
+  }
+
+  protected TreeItem next() {
+    TreeItem sel = lastSelected;
+    if (sel == null) {
+      return null;
+    }
+    if (sel.firstChild() != null && sel.isExpanded()) {
+      return sel.firstChild();
+    } else if (sel.nextSibling() != null) {
+      return sel.nextSibling();
+    } else if (sel.getParentItem() != null) {
+      TreeItem p = sel.getParentItem();
+      while (p != null) {
+        if (p.nextSibling() != null) {
+          return p.nextSibling();
+        }
+        p = p.getParentItem();
+      }
+    }
+    return null;
+  }
+
+  protected void onClick(TreeEvent e) {
+
+  }
+
+  protected void onKeyDown(TreeEvent e) {
+    selectNext();
+  }
+
+  protected void onKeyLeft(TreeEvent e) {
+    e.preventDefault();
+    if (lastSelected == null) return;
+    if (!lastSelected.isLeaf() && lastSelected.isExpanded()) {
+      lastSelected.setExpanded(false);
+    } else if (lastSelected.getParentItem() != null
+        && !lastSelected.getParentItem().isRoot()) {
+      doSelect(new Items(lastSelected.getParentItem()));
+    }
+  }
+
+  protected void onKeyRight(TreeEvent e) {
+    e.preventDefault();
+    if (lastSelected == null) return;
+    if (!lastSelected.isLeaf()) {
+      if (!lastSelected.isExpanded()) {
+        lastSelected.setExpanded(true);
+        return;
+      }
+    }
+    selectNext();
+  }
+
+  protected void onKeyUp(TreeEvent e) {
+    selectPrevious();
+  }
+
+  protected void onRemove(TreeItem item) {
+
+  }
+
+  protected void onSelectChange(TreeItem item, boolean select) {
+    if (select) {
+      ensureExpanded(item);
+    }
+    item.getUI().onSelectedChange(select);
+  }
+
+  protected TreeItem previous() {
+    TreeItem sel = lastSelected;
+    if (sel == null) {
+      return null;
+    }
+    TreeItem prev = sel.previousSibling();
+    if (prev != null) {
+      if (!prev.isExpanded() || prev.getItemCount() < 1) {
+        return prev;
+      } else {
+        TreeItem lastChild = prev.lastChild();
+        while (lastChild != null && lastChild.getItemCount() > 0
+            && lastChild.isExpanded()) {
+          lastChild = lastChild.lastChild();
+        }
+        return lastChild;
+      }
+    } else if (sel.getParentItem() != null && !sel.getParentItem().isRoot()) {
+      return sel.getParentItem();
+    }
+    return null;
   }
 
 }

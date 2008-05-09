@@ -7,10 +7,42 @@
  */
 package com.extjs.gxt.ui.client;
 
+import com.google.gwt.user.client.Event;
+
 /**
  * Defines the GXT event types.
  */
 public class Events {
+  
+  /**
+   * DOM ONCLICK event type.
+   */
+  public static final int OnClick = Event.ONCLICK;
+  
+  /**
+   * DOM ONDBLCLICK event type.
+   */
+  public static final int OnDoubleClick = Event.ONDBLCLICK;
+  
+  /**
+   * DOM ONMOUSEDOWN event type.
+   */
+  public static final int OnMouseDown = Event.ONMOUSEDOWN;
+  
+  /**
+   * DOM ONMOUSEUP event type.
+   */
+  public static final int OnMouseUp = Event.ONMOUSEUP;
+  
+  /**
+   * DOM ONMOUSEOVER event type.
+   */
+  public static final int OnMouseOver = Event.ONMOUSEOVER;
+  
+  /**
+   * DOM ONMOUSEOUT event type.
+   */
+  public static final int OnMouseOut = Event.ONMOUSEOUT;
 
   /**
    * Activate event type (value is 10).
@@ -143,11 +175,6 @@ public class Events {
   public static final int Clear = 182;
 
   /**
-   * Click event type (value is 190).
-   */
-  public static final int Click = 190;
-
-  /**
    * Close event type (value is 200).
    */
   public static final int Close = 200;
@@ -253,19 +280,9 @@ public class Events {
   public static final int Invalid = 400;
 
   /**
-   * KeyDown event type (value is 410).
-   */
-  public static final int KeyDown = 410;
-
-  /**
    * KeyPress event type (value is 420).
    */
   public static final int KeyPress = 420;
-
-  /**
-   * KeyUp event type (value is 430).
-   */
-  public static final int KeyUp = 430;
 
   /**
    * Minimize event type (value is 440).

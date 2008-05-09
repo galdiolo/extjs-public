@@ -68,7 +68,7 @@ public class AsyncTreeViewerPage extends Container implements EntryPoint {
     Folder folder = TestData.getTreeModel();
 
     Tree tree = new Tree();
-    tree.itemImageStyle = "icon-music";
+    tree.setItemIconStyle("icon-music");
 
     TreeViewer viewer = new TreeViewer(tree);
     viewer.setContentProvider(cp);

@@ -51,7 +51,7 @@ import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.ToolButton;
 import com.extjs.gxt.ui.client.widget.Window;
-import com.extjs.gxt.ui.client.widget.layout.AccordianLayout;
+import com.extjs.gxt.ui.client.widget.layout.AccordionLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.TextToolItem;
@@ -79,8 +79,8 @@ public class WindowPage extends Container implements EntryPoint {
     simple.setScrollMode(Scroll.AUTO);
 
     final Window complex = new Window();
-    complex.maximizable = true;
-    complex.setHeading("Accordian Window");
+    complex.setMaximizable(true);
+    complex.setHeading("Accordion Window");
     complex.setWidth(200);
     complex.setHeight(350);
     
@@ -100,8 +100,8 @@ public class WindowPage extends Container implements EntryPoint {
     item.setIconStyle("icon-user-delete");
     toolBar.add(item);
     
-    complex.setIconStyle("icon-accordian");
-    complex.setLayout(new AccordianLayout());
+    complex.setIconStyle("icon-accordion");
+    complex.setLayout(new AccordionLayout());
 
     ContentPanel cp = new ContentPanel();
     cp.setHeading("Online Users");

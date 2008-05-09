@@ -27,7 +27,7 @@ public class Template {
   }
 
   private JavaScriptObject t;
-
+  
   /**
    * Creates a new template with the given html.
    * 
@@ -90,7 +90,6 @@ public class Template {
   public Element append(Element el, Params values) {
     return appendInternal(t, el, values.getValues());
   }
-
 
   /**
    * Applies the supplied values to the template and appends the new node(s) to
@@ -199,5 +198,13 @@ public class Template {
   private native static JavaScriptObject create(String html) /*-{
      return new $wnd.Ext.Template(html);
    }-*/;
+
+  public String getHtml() {
+    return getHtml(t);
+  }
+  
+  private native static String getHtml(JavaScriptObject t) /*-{
+    return t.html;
+  }-*/;
 
 }

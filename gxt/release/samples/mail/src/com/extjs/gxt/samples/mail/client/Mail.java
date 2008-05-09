@@ -15,7 +15,6 @@ import com.extjs.gxt.samples.mail.client.mvc.TaskController;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.mvc.Dispatcher;
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.Window;
 
 public class Mail implements EntryPoint {
 
@@ -23,8 +22,6 @@ public class Mail implements EntryPoint {
   private Dispatcher dispatcher;
 
   public void onModuleLoad() {
-    Window.alert("This demo is not currently functional");
-    
     model = new MailModel();
     Registry.register("model", model);
 

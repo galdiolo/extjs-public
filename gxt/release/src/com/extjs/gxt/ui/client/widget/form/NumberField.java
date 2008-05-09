@@ -171,9 +171,9 @@ public class NumberField extends TextField {
     } catch (Exception e) {
       String error = "";
       if (nanText == null) {
-        nanText = GXT.MESSAGES.numberField_nanText(v);
+        error = GXT.MESSAGES.numberField_nanText(v);
       } else {
-        nanText = Format.substitute(nanText, v);
+        error = Format.substitute(nanText, v);
       }
       markInvalid(error);
       return false;

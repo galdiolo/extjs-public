@@ -148,7 +148,7 @@ public class TimeField extends ComboBox {
     store.add(times);
 
     setStore(store);
-    displayField = "text";
+    setDisplayField("text");
     super.initList();
   }
 

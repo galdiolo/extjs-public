@@ -26,43 +26,43 @@ import com.google.gwt.user.client.Timer;
 public class ToolTip extends Tip {
 
   /**
-   * True to automatically hide the tooltip after the mouse exits the target
-   * element or after the {@link #dismissDelay} has expired if set (defaults to
-   * true). If {@link #closable} = true a close tool button will be rendered into
-   * the tooltip header.
-   */
-  public boolean autoHide = true;
-
-  /**
    * Delay in milliseconds before the tooltip displays after the mouse enters
    * the target element (defaults to 500).
    */
-  public int showDelay = 500;
+  private int showDelay = 500;
+
+  /**
+   * An XY offset from the mouse position where the tooltip should be shown
+   * (defaults to [10,10]).
+   */
+  private int[] mouseOffset = new int[] {10, 10};
+
+  /**
+   * True to have the tooltip follow the mouse as it moves over the target
+   * element (defaults to false).
+   */
+  private boolean trackMouse;
+
+  /**
+   * True to automatically hide the tooltip after the mouse exits the target
+   * element or after the {@link #dismissDelay} has expired if set (defaults to
+   * true). If {@link #closable} = true a close tool button will be rendered
+   * into the tooltip header.
+   */
+  private boolean autoHide = true;
 
   /**
    * Delay in milliseconds after the mouse exits the target element but before
    * the tooltip actually hides (defaults to 200). Set to 0 for the tooltip to
    * hide immediately.
    */
-  public int hideDelay = 200;
+  private int hideDelay = 200;
 
   /**
    * Delay in milliseconds before the tooltip automatically hides (defaults to
    * 5000). To disable automatic hiding, set dismissDelay = 0.
    */
-  public int dismissDelay = 5000;
-
-  /**
-   * An XY offset from the mouse position where the tooltip should be shown
-   * (defaults to [10,10]).
-   */
-  public int[] mouseOffset = new int[] {10, 10};
-
-  /**
-   * True to have the tooltip follow the mouse as it moves over the target
-   * element (defaults to false).
-   */
-  public boolean trackMouse;
+  private int dismissDelay = 5000;
 
   private Date lastActive;
   private Timer dismissTimer;
@@ -90,11 +90,71 @@ public class ToolTip extends Tip {
     this.config = config;
     initTarget(target);
   }
-  
+
+  /**
+   * Returns the dismiss delay.
+   * 
+   * @return the dismiss delay
+   */
+  public int getDismissDelay() {
+    return dismissDelay;
+  }
+
+  /**
+   * Returns the hide delay.
+   * 
+   * @return the hide delay
+   */
+  public int getHideDelay() {
+    return hideDelay;
+  }
+
   public void hide() {
     clearTimer("dismiss");
     lastActive = new Date();
     super.hide();
+  }
+
+  /**
+   * Returns true if auto hide is enabled.
+   * 
+   * @return the auto hide state
+   */
+  public boolean isAutoHide() {
+    return autoHide;
+  }
+
+  /**
+   * True to automatically hide the tooltip after the mouse exits the target
+   * element or after the {@link #dismissDelay} has expired if set (defaults to
+   * true). If {@link #closable} = true a close tool button will be rendered
+   * into the tooltip header.
+   * 
+   * @param autoHide the auto hide state
+   */
+  public void setAutoHide(boolean autoHide) {
+    this.autoHide = autoHide;
+  }
+
+  /**
+   * Delay in milliseconds before the tooltip automatically hides (defaults to
+   * 5000). To disable automatic hiding, set dismissDelay = 0.
+   * 
+   * @param dismissDelay the dismiss delay in milliseconds
+   */
+  public void setDismissDelay(int dismissDelay) {
+    this.dismissDelay = dismissDelay;
+  }
+
+  /**
+   * Delay in milliseconds after the mouse exits the target element but before
+   * the tooltip actually hides (defaults to 200). Set to 0 for the tooltip to
+   * hide immediately.
+   * 
+   * @param hideDelay the hide delay
+   */
+  public void setHideDelay(int hideDelay) {
+    this.hideDelay = hideDelay;
   }
 
   public void show() {
@@ -106,16 +166,16 @@ public class ToolTip extends Tip {
     lastActive = new Date();
     clearTimers();
     super.showAt(x, y);
-    if (dismissDelay != -1 && autoHide) {
+    if (getDismissDelay() != -1 && isAutoHide()) {
       dismissTimer = new Timer() {
         public void run() {
           hide();
         }
       };
-      dismissTimer.schedule(dismissDelay);
+      dismissTimer.schedule(getDismissDelay());
     }
   }
-  
+
   /**
    * Updates the tool tip with the given config.
    * 
@@ -131,9 +191,9 @@ public class ToolTip extends Tip {
   }
 
   protected void updateContent() {
-    getHeader().setText(config.title == null ? "" : config.title);
-    if (config.text != null) {
-      fly(getElement("body")).update(config.text);
+    getHeader().setText(config.getTitle() == null ? "" : config.getTitle());
+    if (config.getText() != null) {
+      fly(getElement("body")).update(config.getText());
     }
   }
 
@@ -169,7 +229,7 @@ public class ToolTip extends Tip {
           hide();
         }
       };
-      hideTimer.schedule(hideDelay);
+      hideTimer.schedule(getHideDelay());
     }
   }
 
@@ -183,17 +243,17 @@ public class ToolTip extends Tip {
             show();
           }
         };
-        showTimer.schedule(showDelay);
+        showTimer.schedule(getShowDelay());
       }
 
-    } else if (!hidden && !autoHide) {
+    } else if (!hidden && !isAutoHide()) {
       show();
     }
   }
 
   private Point getTargetXY() {
-    int x = targetXY.x + mouseOffset[0];
-    int y = targetXY.y + mouseOffset[1];
+    int x = targetXY.x + getMouseOffset()[0];
+    int y = targetXY.y + getMouseOffset()[1];
     return new Point(x, y);
   }
 
@@ -230,7 +290,7 @@ public class ToolTip extends Tip {
 
   private void onMouseMove(ComponentEvent ce) {
     targetXY = ce.getXY();
-    if (!hidden && trackMouse) {
+    if (!hidden && isTrackMouse()) {
       setPagePosition(getTargetXY());
     }
   }
@@ -240,7 +300,7 @@ public class ToolTip extends Tip {
       return;
     }
     clearTimer("show");
-    if (autoHide) {
+    if (isAutoHide()) {
       delayHide();
     }
   }
@@ -252,6 +312,63 @@ public class ToolTip extends Tip {
     clearTimer("hide");
     targetXY = ce.getXY();
     delayShow();
+  }
+
+  /**
+   * True to have the tooltip follow the mouse as it moves over the target
+   * element (defaults to false).
+   * 
+   * @param trackMouse the track mouse state
+   */
+  public void setTrackMouse(boolean trackMouse) {
+    this.trackMouse = trackMouse;
+  }
+
+  /**
+   * Returns true if mouse tracking is enabled.
+   * 
+   * @return the track mouse state
+   */
+  public boolean isTrackMouse() {
+    return trackMouse;
+  }
+
+  /**
+   * Delay in milliseconds before the tooltip displays after the mouse enters
+   * the target element (defaults to 500).
+   * 
+   * @param showDelay the show delay in milliseconds
+   */
+  public void setShowDelay(int showDelay) {
+    this.showDelay = showDelay;
+  }
+
+  /**
+   * Returns the show delay.
+   * 
+   * @return the show delay
+   */
+  public int getShowDelay() {
+    return showDelay;
+  }
+
+  /**
+   * An XY offset from the mouse position where the tooltip should be shown
+   * (defaults to [10,10]).
+   * 
+   * @param mouseOffset the mouse offsets
+   */
+  public void setMouseOffset(int[] mouseOffset) {
+    this.mouseOffset = mouseOffset;
+  }
+
+  /**
+   * Returns the mouse offsets.
+   * 
+   * @return the mouse offsets
+   */
+  public int[] getMouseOffset() {
+    return mouseOffset;
   }
 
 }

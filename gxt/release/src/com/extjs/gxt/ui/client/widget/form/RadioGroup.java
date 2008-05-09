@@ -25,9 +25,8 @@ public class RadioGroup extends Field {
   private String name;
   private List<Radio> radios;
   private HorizontalPanel hp;
-  
   private static int autoId = 0;
-  
+
   /**
    * Creates a new radio group.
    */
@@ -35,7 +34,6 @@ public class RadioGroup extends Field {
     this.name = "gxt.RadioGroup." + (autoId++);
     initComponent();
   }
-
 
   /**
    * Creates a new radio group.
@@ -97,7 +95,28 @@ public class RadioGroup extends Field {
 
   protected void onRadioClick(Radio radio) {
     for (Radio r : radios) {
-      r.setChecked(r == radio);
+      if (r == radio) {
+        r.setChecked(true);
+      } else {
+        r.setChecked(false);
+      }
+    }
+  }
+
+  @Override
+  public Object getValue() {
+    for (Radio r : radios) {
+      if (r.isChecked()) {
+        return r.getValue();
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public void setValue(Object value) {
+    for (Radio r : radios) {
+      r.setChecked(value.equals(r.getValue()));
     }
   }
 
@@ -108,10 +127,10 @@ public class RadioGroup extends Field {
 
     for (Radio r : radios) {
       r.group = this;
-      r.name = name;
+      r.setName(name);
       hp.add(r);
-      if (r.fieldLabel != null) {
-        Text lbl = new Text(r.fieldLabel);
+      if (r.getFieldLabel() != null) {
+        Text lbl = new Text(r.getFieldLabel());
         lbl.setStyleName("x-form-group-label");
         hp.add(lbl);
       }

@@ -1,13 +1,10 @@
 Add the following entry to you projects module xml file.
 
-<inherits name='com.extjs.gxt.GXT'/>
+<inherits name='com.extjs.gxt.ui.GXT'/>
 
-Add the following stylesheets to your host page.
+Add the following stylesheet to your host page.
 
 <link rel="stylesheet" type="text/css" href="css/ext-all.css" />
-<link rel="stylesheet" type="text/css" href="css/gxt-all.css" />
-<link class="gray" rel="stylesheet" type="text/css" href="css/xtheme-gray.css" />
-<link class="gray" rel="stylesheet" type="text/css" href="css/gxt-all-gray.css" />
 
 Eclipse Setup (should be similiar for other development enviornments)
 These instructions assume you have a existing project and launch confifuration.

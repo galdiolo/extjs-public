@@ -1,6 +1,6 @@
 * {
   font-size: 11px;
-  font-family: tahoma, arial, verdana, sans-serif;
+  font-family: arial, helvetica, tahoma, sans-serif;
 }
 
 .ext-ie .x-form-text {  
@@ -125,8 +125,8 @@
   background-image: url(images/icons/fam/connect.gif) !important;
 }
 
-.icon-accordian {
-  background-image: url(images/icons/accordian.gif) !important;
+.icon-accordion {
+  background-image: url(images/icons/accordion.gif) !important;
 }
 
 .user {
@@ -205,16 +205,12 @@
   background: url(images/icons/shell.gif) no-repeat;
 }
 
-.icon-accordian {
-  background: url(images/icons/accordian.gif) no-repeat;
-}
-
 .icon-page {
   background: url(images/icons/document.gif) no-repeat;
 }
 
 .icon-text {
-  background: url(images/icons/text.gif) no-repeat;
+  background-image: url(images/icons/text.gif) !important;
 }
 
 .icon-add-disabled {

@@ -95,15 +95,14 @@ public class NavigationView extends View {
     createListContent();
     createTreeContent();
 
-    westPanel.layout(true);
   }
 
   private TabPanel createTabPanel() {
     tabPanel = new TabPanel();
-    tabPanel.minTabWidth = 70;
-    tabPanel.border = false;
-    tabPanel.bodyBorder = false;
-    tabPanel.tabPosition = TabPosition.BOTTOM;
+    tabPanel.setMinTabWidth(70);
+    tabPanel.setBorderStyle(false);
+    tabPanel.setBodyBorder(false);
+    tabPanel.setTabPosition(TabPosition.BOTTOM);
 
     treeItem = new TabItem();
     treeItem.setText("Tree");
@@ -118,7 +117,7 @@ public class NavigationView extends View {
 
   private void createTreeContent() {
     Tree tree = new Tree();
-    tree.itemImageStyle = "icon-list";
+    tree.setItemIconStyle("icon-list");
     treeViewer = new TreeViewer(tree);
     treeViewer.setLabelProvider(new ModelLabelProvider());
     treeViewer.setContentProvider(new ModelTreeContentProvider());
@@ -128,7 +127,6 @@ public class NavigationView extends View {
 
     filter.bind(treeViewer);
 
-    
     treeItem.setBorders(false);
     treeItem.setScrollMode(Scroll.AUTO);
     treeItem.add(tree);
@@ -141,7 +139,7 @@ public class NavigationView extends View {
     DataList dataList = new DataList();
     dataList.setScrollMode(Scroll.AUTO);
     dataList.setBorders(false);
-    dataList.flat = true;
+    dataList.setFlatStyle(true);
     listViewer = new DataListViewer(dataList);
     listViewer.setSorter(new ViewerSorter<Entry>() {
       @Override

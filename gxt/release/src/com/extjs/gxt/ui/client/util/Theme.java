@@ -7,6 +7,9 @@
  */
 package com.extjs.gxt.ui.client.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.store.Record;
 
@@ -38,13 +41,14 @@ public class Theme extends Record {
   public static Theme GRAY;
 
   static {
-    BLUE = new Theme("blue", GXT.MESSAGES.themeSelector_blueTheme());
-    GRAY = new Theme("gray", GXT.MESSAGES.themeSelector_grayTheme());
+    BLUE = new Theme("blue", GXT.MESSAGES.themeSelector_blueTheme(), "ext-all.css");
+    GRAY = new Theme("gray", GXT.MESSAGES.themeSelector_grayTheme(), "xtheme-gray.css");
   }
 
-  public Theme(String id, String name) {
+  public Theme(String id, String name, String file) {
     set("id", id);
     set("name", name);
+    set("file", file);
   }
 
   public String getId() {
@@ -53,6 +57,17 @@ public class Theme extends Record {
 
   public String getName() {
     return get("name").toString();
+  }
+
+  public String getFile() {
+    return get("file").toString();
+  }
+
+  public Map asMap() {
+    Map map = new HashMap();
+    map.put("id", getId());
+    map.put("file", getFile());
+    return map;
   }
 
 }

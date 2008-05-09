@@ -20,10 +20,11 @@ import com.google.gwt.user.client.Element;
  * <dl>
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>Select</b> : (component, event)<br>
- * <div>Fires after the item is clicked.</div>
+ * <dd><b>Select</b> : ToolBarEvent(toolBar, item, event)<br>
+ * <div>Fires after the item is selected.</div>
  * <ul>
- * <li>component : this</li>
+ * <li>toolBar : the parent tolbar</li>
+ * <li>item : this</li>
  * <li>event : the dom event</li>
  * </ul>
  * </dd>
@@ -147,24 +148,29 @@ public class TextToolItem extends ToolItem {
     button.setText(text);
   }
 
+  @Override
   protected void doAttachChildren() {
     super.doAttachChildren();
     WidgetHelper.doAttach(button);
   }
 
+  @Override
   protected void doDetachChildren() {
     super.doDetachChildren();
     WidgetHelper.doDetach(button);
   }
 
+  @Override
   protected void onDisable() {
     button.disable();
   }
 
+  @Override
   protected void onEnable() {
     button.enable();
   }
 
+  @Override
   protected void onRender(Element target, int index) {
     button.render(target, index);
     setElement(button.getElement());

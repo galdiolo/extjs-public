@@ -182,16 +182,6 @@ public class Container<T extends Component> extends ScrollContainer<T> {
   }
 
   /**
-   * Returns the index of the component.
-   * 
-   * @param component the component
-   * @return the index
-   */
-  public int indexOf(Component component) {
-    return items.indexOf(component);
-  }
-
-  /**
    * Inserts a widget into this Container at a specified index. Fires the
    * <i>BeforeAdd</i> event before inserting, then fires the <i>Add</i> event
    * after the component has been inserted.
@@ -260,15 +250,16 @@ public class Container<T extends Component> extends ScrollContainer<T> {
    */
   public boolean layout(boolean force) {
     if (force) lastSize = null;
-    if (!isRendered()) {
+    if (!rendered) {
       layoutOnAttach = true;
       return false;
     }
     return onLayout();
   }
 
-  public void onAttach() {
-    super.onAttach();
+  @Override
+  protected void afterRender() {
+    super.afterRender();
     if (layoutOnAttach) {
       layoutOnAttach = false;
       layout(true);

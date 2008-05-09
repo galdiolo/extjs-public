@@ -7,18 +7,16 @@
  */
 package com.extjs.gxt.ui.client.widget.table;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.extjs.gxt.ui.client.Events;
-import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.TableEvent;
 import com.extjs.gxt.ui.client.util.DelayedTask;
+import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.AbstractContainer;
@@ -35,8 +33,8 @@ import com.google.gwt.user.client.ui.Widget;
  * <dt><b>Events:</b></dt>
  * 
  * <dd><b>BeforeAdd</b> : TableEvent(table, item)<br>
- * <div>Fires before a item is added or inserted. Listeners can set the <code>doit</code> field to <code>false</code>
- * to cancel the action.</div>
+ * <div>Fires before a item is added or inserted. Listeners can set the
+ * <code>doit</code> field to <code>false</code> to cancel the action.</div>
  * <ul>
  * <li>table : this</li>
  * <li>item : the item being added</li>
@@ -45,8 +43,8 @@ import com.google.gwt.user.client.ui.Widget;
  * </dd>
  * 
  * <dd><b>BeforeRemove</b> : TableEvent(table, item)<br>
- * <div>Fires before a item is removed. Listeners can set the <code>doit</code> field to <code>false</code> to
- * cancel the action.</div>
+ * <div>Fires before a item is removed. Listeners can set the <code>doit</code>
+ * field to <code>false</code> to cancel the action.</div>
  * <ul>
  * <li>table : this</li>
  * <li>item : the item being removed</li>
@@ -78,8 +76,8 @@ import com.google.gwt.user.client.ui.Widget;
  * </dd>
  * 
  * <dd><b>ContextMenu</b> : TableEvent(table)<br>
- * <div>Fires before the tables context menu is shown. Listeners can set the <code>doit</code> field to
- * <code>false</code> to cancel the action.</div>
+ * <div>Fires before the tables context menu is shown. Listeners can set the
+ * <code>doit</code> field to <code>false</code> to cancel the action.</div>
  * <ul>
  * <li>table : this</li>
  * </ul>
@@ -134,8 +132,8 @@ import com.google.gwt.user.client.ui.Widget;
  * </dd>
  * 
  * <dd><b>SortChange</b> : TableEvent(table, index, size)<br>
- * <div>Fires before the table is sorted. Listeners can set the <code>doit</code> field to <code>false</code> to
- * cancel the action.</div>
+ * <div>Fires before the table is sorted. Listeners can set the
+ * <code>doit</code> field to <code>false</code> to cancel the action.</div>
  * <ul>
  * <li>widget : this</li>
  * <li>index : the column index</li>
@@ -144,8 +142,8 @@ import com.google.gwt.user.client.ui.Widget;
  * </dd>
  * 
  * <dd><b>KeyPress</b> : TableEvent(table)<br>
- * <div>Fires before the table is sorted. Listeners can set the <code>doit</code> field to <code>false</code> to
- * cancel the action.</div>
+ * <div>Fires before the table is sorted. Listeners can set the
+ * <code>doit</code> field to <code>false</code> to cancel the action.</div>
  * <ul>
  * <li>table : this</li>
  * </ul>
@@ -154,45 +152,24 @@ import com.google.gwt.user.client.ui.Widget;
  * @see TableColumn
  * @see TableColumnModel
  */
-public class Table extends AbstractContainer<TableItem> implements BaseTable {
-
-  /**
-   * True to display vertical borders on the table data (defaults to false).
-   */
-  public boolean verticalLines;
-
-  /**
-   * Sets the selection mode (defaults to SINGLE).
-   * <p>
-   * Valid values are:
-   * <ul>
-   * <li>SINGLE - single selection</li>
-   * <li>MULTI - multi selection</li>
-   * </ul>
-   * </p>
-   */
-  public SelectionMode selectionMode = SelectionMode.SINGLE;
-
-  /**
-   * True to display a horizonatal scroll bar when needed (defaults to true).
-   */
-  public boolean horizontalScroll = true;
+public class Table<S extends TableSelectionModel> extends AbstractContainer<TableItem>
+    implements BaseTable {
 
   /**
    * True to highlight the current row (defaults to true).
    */
-  public boolean highlight = true;
+  private boolean highlight = true;
 
   /**
    * True to diable the column context menu (defaults to false).
    */
-  public boolean disableColumnContextMenu;
+  public boolean columnContextMenu;
 
   /**
-   * True to bulk render the table when first rendered (defaults to true). When true, widget are not supported in table
-   * cells.
+   * True to bulk render the table when first rendered (defaults to true). When
+   * true, widget are not supported in table cells.
    */
-  public boolean buildRender = true;
+  private boolean bulkRender = true;
 
   /**
    * The table's column model.
@@ -202,13 +179,19 @@ public class Table extends AbstractContainer<TableItem> implements BaseTable {
   /**
    * The selection model.
    */
-  protected RowSelectionModel sm;
+  protected S sm;
 
   /**
    * The table header.
    */
   protected TableHeader header;
 
+  /**
+   * True to display vertical borders on the table data (defaults to false).
+   */
+  private boolean verticalLines;
+
+  private boolean horizontalScroll = true;
   private Map nodes = new HashMap();
   private TableView view;
   private Size lastSize;
@@ -222,12 +205,14 @@ public class Table extends AbstractContainer<TableItem> implements BaseTable {
   });
 
   /**
-   * Creates a new single select table. A column model must be set before the table is rendered.
+   * Creates a new single select table. A column model must be set before the
+   * table is rendered.
    */
   public Table() {
     focusable = true;
     baseStyle = "my-tbl";
     attachChildren = false;
+    setSelectionModel((S) new RowSelectionModel());
   }
 
   /**
@@ -242,28 +227,14 @@ public class Table extends AbstractContainer<TableItem> implements BaseTable {
   }
 
   /**
-   * Adds a item to the table.
+   * Adds a item to the table. Fires the <i>BeforeAdd</i> event before
+   * inserting, then fires the <i>Add</i> event after the widget has been
+   * inserted.
    * 
    * @param item the item to be added
    */
   public void add(TableItem item) {
     insert(item, getItemCount());
-  }
-
-  /**
-   * Deselects the item at the given index.
-   * 
-   * @param index the item to deselect
-   */
-  public void deselect(int index) {
-    getSelectionModel().deselect(index);
-  }
-
-  /**
-   * Deselects all items.
-   */
-  public void deselectAll() {
-    getSelectionModel().deselectAll();
   }
 
   /**
@@ -292,7 +263,7 @@ public class Table extends AbstractContainer<TableItem> implements BaseTable {
    * @return <code>true</code> if enabled, <code>false</code> otherwise.
    */
   public boolean getColumnContextMenu() {
-    return !disableColumnContextMenu;
+    return !columnContextMenu;
   }
 
   /**
@@ -309,7 +280,7 @@ public class Table extends AbstractContainer<TableItem> implements BaseTable {
    * 
    * @return the column model
    */
-  public TableColumnModel getColumnModel() {
+  public TableColumnModel<TableColumn> getColumnModel() {
     return cm;
   }
 
@@ -318,22 +289,12 @@ public class Table extends AbstractContainer<TableItem> implements BaseTable {
   }
 
   /**
-   * Returns the selected item. If the list is multi-select, returns the first selected item.
+   * Returns true if horizontal scrolling is enabled
    * 
-   * @return the item or <code>null</code> if no selections
+   * @return the horizontal scroll state
    */
-  public TableItem getSelectedItem() {
-    return getSelectionModel().getSelection().size() == 0 ? null
-        : (TableItem) sm.getSelection().get(0);
-  }
-
-  /**
-   * Returns an array of <code>TableItems</code> that are currently selected.
-   * 
-   * @return a list of selected items
-   */
-  public List<TableItem> getSelection() {
-    return new ArrayList<TableItem>(getSelectionModel().getSelection());
+  public boolean getHorizontalScroll() {
+    return horizontalScroll;
   }
 
   /**
@@ -341,10 +302,7 @@ public class Table extends AbstractContainer<TableItem> implements BaseTable {
    * 
    * @return the selection model
    */
-  public RowSelectionModel getSelectionModel() {
-    if (sm == null) {
-      initSelectionModel();
-    }
+  public S getSelectionModel() {
     return sm;
   }
 
@@ -361,6 +319,15 @@ public class Table extends AbstractContainer<TableItem> implements BaseTable {
   }
 
   /**
+   * Returns true if vertical lines are enabled.
+   * 
+   * @return the vertical lines state
+   */
+  public boolean getVerticalLines() {
+    return verticalLines;
+  }
+
+  /**
    * Returns the table's view.
    * 
    * @return the view
@@ -373,7 +340,9 @@ public class Table extends AbstractContainer<TableItem> implements BaseTable {
   }
 
   /**
-   * Inserts a item into the table.
+   * Inserts a item into the table. Fires the <i>BeforeAdd</i> event before
+   * inserting, then fires the <i>Add</i> event after the widget has been
+   * inserted.
    * 
    * @param item the item to insert
    * @param index the insert location
@@ -383,30 +352,13 @@ public class Table extends AbstractContainer<TableItem> implements BaseTable {
     te.item = item;
     te.index = index;
     if (fireEvent(Events.BeforeAdd, te)) {
-      items.add(index, item);
+      super.insert(item, index);
       register(item);
       if (rendered) {
         view.renderItem(item, index);
       }
       fireEvent(Events.Add, te);
     }
-  }
-
-  public void onComponentEvent(ComponentEvent ce) {
-    TableItem item = findItem(ce.getTarget());
-    if (item != null) {
-      item.onComponentEvent(ce);
-    }
-    TableEvent te = new TableEvent(this);
-    te.event = ce.event;
-    switch (ce.type) {
-      case Event.ONKEYPRESS:
-        fireEvent(Events.KeyPress, te);
-        break;
-      case Event.ONKEYDOWN:
-        fireEvent(Events.KeyDown, te);
-    }
-
   }
 
   public void onBrowserEvent(Event event) {
@@ -421,6 +373,14 @@ public class Table extends AbstractContainer<TableItem> implements BaseTable {
       lastLeft = left;
       header.el.setLeft(-left);
       scrollTask.delay(400);
+    }
+  }
+
+  public void onComponentEvent(ComponentEvent ce) {
+    super.onComponentEvent(ce);
+    TableItem item = findItem(ce.getTarget());
+    if (item != null) {
+      item.onComponentEvent(ce);
     }
   }
 
@@ -440,8 +400,7 @@ public class Table extends AbstractContainer<TableItem> implements BaseTable {
     TableEvent te = new TableEvent(this);
     te.item = item;
     if (fireEvent(Events.BeforeRemove, te)) {
-      getSelectionModel().remove(item);
-      items.remove(item);
+      super.remove(item);
       unregister(item);
       if (rendered) {
         view.removeItem(item);
@@ -462,31 +421,18 @@ public class Table extends AbstractContainer<TableItem> implements BaseTable {
     }
   }
 
-  /**
-   * Scrolls the item into view.
-   * 
-   * @param item the item
-   */
+  @Override
   public void scrollIntoView(TableItem item) {
     item.el.scrollIntoView(view.getScrollEl().dom, false);
   }
 
   /**
-   * Selects the item at the given index.
+   * Sets whether the table header context menu is displayed (defaults to true).
    * 
-   * @param index the row to select
+   * @param columnContextMenu the column context menu sate
    */
-  public void select(int index) {
-    getSelectionModel().select(index);
-  }
-
-  /**
-   * Selects the the item.
-   * 
-   * @param item the item to be selected
-   */
-  public void select(TableItem item) {
-    select(indexOf(item));
+  public void setColumnContextMenu(boolean columnContextMenu) {
+    this.columnContextMenu = columnContextMenu;
   }
 
   public void setColumnModel(TableColumnModel cm) {
@@ -500,22 +446,31 @@ public class Table extends AbstractContainer<TableItem> implements BaseTable {
   }
 
   /**
+   * True to display a horizonatal scroll bar when needed (defaults to true).
+   * 
+   * @param horizontalScroll the horizontal scroll state
+   */
+  public void setHorizontalScroll(boolean horizontalScroll) {
+    this.horizontalScroll = horizontalScroll;
+  }
+
+  /**
    * Sets the table's selection model.
    * 
    * @param sm the selection model
    */
-  public void setSelectionModel(RowSelectionModel sm) {
-    if (sm != null) {
-      this.sm.unbind(this);
-      this.sm = null;
+  public void setSelectionModel(S sm) {
+    assert sm != null;
+    if (this.sm != null) {
+      this.sm.bind(null);
     }
     this.sm = sm;
-    this.sm.init(this);
+    sm.bind((Table) this);
   }
 
   /**
-   * Sets the table's header. Should only be called when providing a custom table header. Has no effect if called after
-   * the table has been rendered.
+   * Sets the table's header. Should only be called when providing a custom
+   * table header. Has no effect if called after the table has been rendered.
    * 
    * @param header the table header
    */
@@ -526,7 +481,17 @@ public class Table extends AbstractContainer<TableItem> implements BaseTable {
   }
 
   /**
-   * Sets the table's view. Provides a way to provide specialized views. table views.
+   * True to display vertical borders on the table data (defaults to false).
+   * 
+   * @param verticalLines true for vertical lines
+   */
+  public void setVerticalLines(boolean verticalLines) {
+    this.verticalLines = verticalLines;
+  }
+
+  /**
+   * Sets the table's view. Provides a way to provide specialized views. table
+   * views.
    * 
    * @param view the view
    */
@@ -549,12 +514,20 @@ public class Table extends AbstractContainer<TableItem> implements BaseTable {
         getTableHeader().sort(index, sortDir);
         getView().sort(index, sortDir);
       }
+    } else {
+      TableColumn col = getColumn(index);
+      col.sortDir = sortDir;
     }
+  }
+
+  @Override
+  protected ComponentEvent createComponentEvent(Event event) {
+    return new TableEvent(this);
   }
 
   protected void doAttachChildren() {
     WidgetHelper.doAttach(header);
-    if (!buildRender) {
+    if (!getBulkRender()) {
       int count = getItemCount();
       for (int i = 0; i < count; i++) {
         TableItem item = getItem(i);
@@ -573,7 +546,7 @@ public class Table extends AbstractContainer<TableItem> implements BaseTable {
 
   protected void doDetachChildren() {
     WidgetHelper.doDetach(header);
-    if (!buildRender) {
+    if (!getBulkRender()) {
       int count = getItemCount();
       for (int i = 0; i < count; i++) {
         TableItem item = getItem(i);
@@ -603,26 +576,32 @@ public class Table extends AbstractContainer<TableItem> implements BaseTable {
     }
   }
 
-  protected void initSelectionModel() {
-    if (selectionMode == SelectionMode.MULTI) {
-      sm = new RowSelectionModel(SelectionMode.MULTI);
-    } else {
-      sm = new RowSelectionModel(SelectionMode.SINGLE);
-    }
-    sm.init(this);
+  protected void onKeyPress(TableEvent te) {
+    fireEvent(Events.KeyPress, te);
   }
 
   @Override
   protected void onRender(Element target, int index) {
     setElement(DOM.createDiv(), target, index);
 
-    if (sm == null) {
-      initSelectionModel();
-    }
+    new KeyNav(this) {
+
+      @Override
+      public void onKeyPress(ComponentEvent ce) {
+        Table.this.onKeyPress((TableEvent) ce);
+      }
+
+    };
 
     header = getTableHeader();
     header.render(el.dom);
     header.init(this);
+
+    for (TableColumn col : getColumnModel().getColumns()) {
+      if (col.sortDir != SortDir.NONE) {
+        getTableHeader().getColumnUI(col.index).onSortChange(col.sortDir);
+      }
+    }
 
     view = getView();
     view.init(this);
@@ -667,6 +646,43 @@ public class Table extends AbstractContainer<TableItem> implements BaseTable {
 
   private void unregister(TableItem item) {
     nodes.remove(item.getId());
+  }
+
+  /**
+   * True to bulk render the table when first rendered (defaults to true). When
+   * true, widget are not supported in table cells.
+   * 
+   * @param bulkRender true for bulk rendering
+   */
+  public void setBulkRender(boolean bulkRender) {
+    this.bulkRender = bulkRender;
+  }
+
+  /**
+   * Returns true if bulk rendering is enabled.
+   * 
+   * @return the bulk rendering state
+   */
+  public boolean getBulkRender() {
+    return bulkRender;
+  }
+
+  /**
+   * True to highlight the current row (defaults to true).
+   * 
+   * @param highlight the highlight state
+   */
+  public void setHighlight(boolean highlight) {
+    this.highlight = highlight;
+  }
+
+  /**
+   * Returns true if highlights are enabled.
+   * 
+   * @return true if mouse overs are enable
+   */
+  public boolean getHighlight() {
+    return highlight;
   }
 
 }

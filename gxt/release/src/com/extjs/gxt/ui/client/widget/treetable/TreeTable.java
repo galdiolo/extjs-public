@@ -10,7 +10,9 @@ package com.extjs.gxt.ui.client.widget.treetable;
 import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.event.BaseEvent;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.TreeTableEvent;
 import com.extjs.gxt.ui.client.util.DelayedTask;
 import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.util.StyleTemplate;
@@ -19,6 +21,7 @@ import com.extjs.gxt.ui.client.widget.table.BaseTable;
 import com.extjs.gxt.ui.client.widget.table.TableColumn;
 import com.extjs.gxt.ui.client.widget.table.TableColumnModel;
 import com.extjs.gxt.ui.client.widget.table.TableHeader;
+import com.extjs.gxt.ui.client.widget.tree.SingleTreeSelectionModel;
 import com.extjs.gxt.ui.client.widget.tree.Tree;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -32,74 +35,59 @@ import com.google.gwt.user.client.Event;
  * <dl>
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>CellClick</b> : (widget, item, index)<br>
+ * <dd><b>CellClick</b> : TreeTableEvent(treeTable, item, index)<br>
  * <div>Fires after a cell has been clicked.</div>
  * <ul>
- * <li>widget : tree table</li>
+ * <li>treeTable : tree table</li>
  * <li>item : item represented by the cell</li>
  * <li>index : cell column index</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>CellDoubleClick</b> : (widget, item, index)<br>
+ * <dd><b>CellDoubleClick</b> : TreeTableEvent(treeTable, item, index)<br>
  * <div>Fires after a cell has been double clicked.</div>
  * <ul>
- * <li>widget : tree table</li>
+ * <li>treeTable : tree table</li>
  * <li>item : item represented by the cell</li>
  * <li>index : cell column index</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>RowClick</b> : (widget, item, index)<br>
+ * <dd><b>RowClick</b> : TreeTableEvent(treeTable, item, index)<br>
  * <div>Fires after a cell has been clicked.</div>
  * <ul>
- * <li>widget : tree table</li>
+ * <li>treeTable : tree table</li>
  * <li>item : item that represents the row</li>
  * <li>index : cell column index</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>RowDoubleClick</b> : (widget, item, index)<br>
+ * <dd><b>RowDoubleClick</b> : TreeTableEvent(treeTable, item, index)<br>
  * <div>Fires after a cell has been double clicked.</div>
  * <ul>
- * <li>widget : tree table</li>
+ * <li>treeTable : tree table</li>
  * <li>item : item that represents the row</li>
  * <li>index : cell column index</li>
  * </ul>
  * </dd>
- * 
- * <dt><b>CSS:</b></dt>
- * <dd>.my-treetbl (the containing table)</dd>
- * <dd>.my-treetbl-data (the table data)</dd>
- * <dd>.my-treetbl-item (a row in the table)</dd>
- * <dd>.my-treetbl-tree (the tree itself)</dd>
- * <dd>.my-treetbl-item (a node within the tree)</dd>
- * <dd>.my-treetbl-item-text span (the tree item text)</dd>
  * </dl>
  */
-public class TreeTable extends Tree implements BaseTable {
-
-  /**
-   * True for a checkbox tree (defaults to false).
-   */
-  public boolean checkable;
-
-  /**
-   * True to display a horizonatal scroll bar when needed (defaults to true).
-   */
-  public boolean horizontalScroll = true;
+public class TreeTable extends Tree<SingleTreeSelectionModel> implements BaseTable {
 
   /**
    * True to disable the column context menu (defaults to false).
    */
   public boolean disableColumnContextMenu;
 
+  StyleTemplate styleTemplate = null;
+
+  private boolean checkable;
+  private boolean horizontalScroll = true;
   private TreeTableHeader header;
   private TreeTableColumnModel cm;
   private TreeTableView view;
   private int lastLeft;
   private Size lastSize;
-  StyleTemplate styleTemplate = null;
 
   private DelayedTask scrollTask = new DelayedTask(new Listener() {
     public void handleEvent(BaseEvent be) {
@@ -172,6 +160,15 @@ public class TreeTable extends Tree implements BaseTable {
   }
 
   /**
+   * Returns true if horizontal scrolling is enabled
+   * 
+   * @return the horizontal scroll state
+   */
+  public boolean getHorizontalScroll() {
+    return horizontalScroll;
+  }
+
+  /**
    * Returns the tree table's header.
    * 
    * @return the table header
@@ -184,23 +181,12 @@ public class TreeTable extends Tree implements BaseTable {
   }
 
   /**
-   * Returns <code>true</code> if vertical lines are enabled.
+   * Returns true if check boxes are enabled.
    * 
-   * @return the vertical line state
+   * @return the check box state
    */
-  // public boolean getVeritcalLines() {
-  // return verticalLines;
-  // }
-  /**
-   * Returns the tree table's view.
-   * 
-   * @return the view
-   */
-  protected TreeTableView getView() {
-    if (view == null) {
-      view = new TreeTableView();
-    }
-    return view;
+  public boolean isCheckable() {
+    return checkable;
   }
 
   public void onBrowserEvent(Event event) {
@@ -232,6 +218,24 @@ public class TreeTable extends Tree implements BaseTable {
    */
   public void scrollIntoView(TreeTableItem item) {
     item.el.scrollIntoView(view.getScrollElement(), false);
+  }
+
+  /**
+   * Sets whether items shoud have a check box (defaults to false, pre-render).
+   * 
+   * @param checkable true to enable checbox
+   */
+  public void setCheckable(boolean checkable) {
+    this.checkable = checkable;
+  }
+
+  /**
+   * True to display a horizonatal scroll bar when needed (defaults to true).
+   * 
+   * @param horizontalScroll the horizontal scroll state
+   */
+  public void setHorizontalScroll(boolean horizontalScroll) {
+    this.horizontalScroll = horizontalScroll;
   }
 
   /**
@@ -267,6 +271,16 @@ public class TreeTable extends Tree implements BaseTable {
 
   }
 
+  @Override
+  protected ComponentEvent createComponentEvent(Event event) {
+    return new TreeTableEvent(this, findItem(DOM.eventGetTarget(event)));
+  }
+
+  @Override
+  protected void createRootItem() {
+    root = new RootTreeTableItem(this);
+  }
+
   protected void doAttachChildren() {
     WidgetHelper.doAttach(header);
   }
@@ -287,14 +301,30 @@ public class TreeTable extends Tree implements BaseTable {
     }
   }
 
+  /**
+   * Returns <code>true</code> if vertical lines are enabled.
+   * 
+   * @return the vertical line state
+   */
+  // public boolean getVeritcalLines() {
+  // return verticalLines;
+  // }
+  /**
+   * Returns the tree table's view.
+   * 
+   * @return the view
+   */
+  protected TreeTableView getView() {
+    if (view == null) {
+      view = new TreeTableView();
+    }
+    return view;
+  }
   @Override
   protected void onRender(Element target, int index) {
     setElement(DOM.createDiv());
     setStyleName("my-treetbl");
     el.insertInto(target, index);
-
-    initSelectionModel();
-    this.sm.init(this);
 
     DOM.appendChild(getElement(), root.getElement());
     ((RootTreeTableItem) root).renderChildren();
@@ -332,7 +362,6 @@ public class TreeTable extends Tree implements BaseTable {
     sinkEvents(Event.ONCLICK | Event.ONDBLCLICK | Event.MOUSEEVENTS | Event.KEYEVENTS
         | Event.ONSCROLL);
   }
-
   protected void onResize(int width, int height) {
     int h = width;
     int w = height;
@@ -348,11 +377,6 @@ public class TreeTable extends Tree implements BaseTable {
   protected void onShowContextMenu(int x, int y) {
     super.onShowContextMenu(x, y);
     getView().clearHoverStyles();
-  }
-
-  @Override
-  protected void createRootItem() {
-    root = new RootTreeTableItem(this);
   }
 
 }

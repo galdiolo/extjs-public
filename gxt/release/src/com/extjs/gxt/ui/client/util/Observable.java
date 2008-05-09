@@ -21,6 +21,8 @@ import com.extjs.gxt.ui.client.event.Listener;
 public class Observable {
 
   public EventTable eventTable;
+  
+  protected boolean hasListener;
 
   /**
    * Adds a listener bound by the given event type.
@@ -34,6 +36,7 @@ public class Observable {
       eventTable = new EventTable();
     }
     eventTable.hook(eventType, listener);
+    hasListener = true;
   }
 
   /**
@@ -46,12 +49,15 @@ public class Observable {
     if (eventTable != null) {
       eventTable.unhook(eventType, listener);
     }
+    hasListener = eventTable != null && eventTable.size() > 0;
+
   }
   
   public void removeListener(int eventType, EventListener listener) {
     if (eventTable != null) {
       eventTable.unhook(eventType, listener);
     }
+    hasListener = eventTable != null && eventTable.size() > 0;
   }
 
   /**
@@ -61,6 +67,7 @@ public class Observable {
     if (eventTable != null) {
       eventTable.removeAllListeners();
     }
+    hasListener = false;
   }
 
   /**

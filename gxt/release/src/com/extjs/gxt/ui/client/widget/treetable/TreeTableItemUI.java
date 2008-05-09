@@ -7,74 +7,28 @@
  */
 package com.extjs.gxt.ui.client.widget.treetable;
 
-
-import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.BaseEvent;
-import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.TreeEvent;
-import com.extjs.gxt.ui.client.event.TreeTableEvent;
 import com.extjs.gxt.ui.client.util.Markup;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.widget.table.TableColumnModel;
 import com.extjs.gxt.ui.client.widget.tree.TreeItemUI;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Event;
 
 public class TreeTableItemUI extends TreeItemUI {
 
-  protected static Listener<TreeTableEvent> listener = new Listener<TreeTableEvent>() {
-    public void handleEvent(TreeTableEvent te) {
-      TreeTableItem item = (TreeTableItem) te.item;
-      TreeItemUI ui = item.getUI();
-      Element target = te.getTarget();
-      int type = te.type;
-      switch (type) {
-        case Events.MouseOver:
-        case Events.MouseOut:
-          treeTableMouseListener.handleEvent(te);
-          break;
-        case Events.Click:
-        case Events.DoubleClick:
-          te.stopEvent();
-          if (DOM.isOrHasChild(ui.getCheckEl(), target)) {
-            item.setChecked(!item.isChecked());
-          } else {
-            // TODO fix this.. since this is a ALWAYS class cast exception 
-            clickListener.handleEvent((TreeEvent)((Object)te));
-          }
-          break;
-      }
-    }
-
-  };
-
-  protected static Listener<TreeTableEvent> treeTableMouseListener = new Listener<TreeTableEvent>() {
-    public void handleEvent(TreeTableEvent te) {
-      TreeTableItem item = (TreeTableItem)te.item;
-      TreeTableItemUI treeUI = (TreeTableItemUI) item.getUI();
-      Rectangle rect = item.el.firstChild().getBounds();
-      if (rect.contains(te.getClientX(), te.getClientY())) {
-        if (!treeUI.hovering) {
-          treeUI.hovering = true;
-          treeUI.onMouseOver(te);
-        }
-      } else {
-        treeUI.hovering = false;
-        treeUI.onMouseOut(te);
-      }
-
-    }
-  };
-
   boolean hovering;
+
   private Element tableItemEl;
   private Element rowTableEl;
   private Element rowTrEl;
   private Element[] cells;
-
+  
   public TreeTableItemUI(TreeTableItem item) {
     super(item);
     styleTreeOver = "my-treetbl-over";
@@ -82,28 +36,41 @@ public class TreeTableItemUI extends TreeItemUI {
     styleTreeChecked = "my-treetbl-checked";
     styleTreeNotChecked = "my-treetbl-notchecked";
     styleTreeLoading = "my-treetbl-loading";
-    styleTreeSelected = "my-treetbl-sel";
     classTreeOpen = "my-treetbl-open";
     classTreeClose = "my-treetbl-close";
   }
-
-  public Element getContainer() {
-    return containerEl;
-  }
-
-  public Listener getListener() {
-    return listener;
-  }
-
   public TreeTableItem getTreeTableItem() {
     return (TreeTableItem) item;
   }
 
+  @Override
+  public void handleEvent(TreeEvent e) {
+    TreeTableItem item = (TreeTableItem) e.item;
+    TreeTableItemUI ui = (TreeTableItemUI) item.getUI();
+    Element target = e.getTarget();
+    int type = e.type;
+    switch (type) {
+      case Event.ONMOUSEOVER:
+      case Event.ONMOUSEOUT:
+        ui.handleMouseEvent(e);
+        break;
+      case Event.ONCLICK:
+      case Event.ONDBLCLICK:
+        if (DOM.isOrHasChild(checkEl, target)) {
+          e.stopEvent();
+          item.setChecked(!item.isChecked());
+        } else {
+          handleClickEvent(e);
+        }
+        return;
+    }
+  }
+
   public void onMouseOut(BaseEvent be) {
-//    ToolTip tooltip = getTreeTableItem().getCellToolTip();
-//    if (tooltip != null && tooltip.isShowing()) {
-//      tooltip.hide();
-//    }
+    // ToolTip tooltip = getTreeTableItem().getCellToolTip();
+    // if (tooltip != null && tooltip.isShowing()) {
+    // tooltip.hide();
+    // }
     if (!item.isRoot()) {
       El.fly(tableItemEl).removeStyleName("my-treetbl-item-over");
     }
@@ -129,7 +96,7 @@ public class TreeTableItemUI extends TreeItemUI {
     item.setElement(DOM.createDiv());
     item.setStyleName("my-treeitem");
     DOM.insertChild(target, item.getElement(), index);
-    
+
     TableColumnModel cm = getTreeTableItem().getTreeTable().getColumnModel();
 
     DOM.appendChild(item.getParentItem().getContainer(), item.getElement());
@@ -151,7 +118,7 @@ public class TreeTableItemUI extends TreeItemUI {
     textEl = DOM.getNextSibling(iconEl);
     textSpanEl = DOM.getFirstChild(textEl);
     Element tbl = DOM.getFirstChild(item.getElement());
-    containerEl = DOM.getNextSibling(tbl);
+    containerEl = new El(DOM.getNextSibling(tbl));
 
     int numColumns = cm.getColumnCount();
     cells = new Element[numColumns];
@@ -162,24 +129,23 @@ public class TreeTableItemUI extends TreeItemUI {
 
       DOM.setElementProperty(cells[i], "className", "my-treetbl-cell");
       DOM.setElementAttribute(cells[i], "index", String.valueOf(i));
-      
+
       Element overflowDiv = DOM.createDiv();
       DOM.setElementProperty(overflowDiv, "className", "my-treetbl-cell-overflow");
       DOM.appendChild(cells[i], overflowDiv);
       Element textDiv = DOM.createDiv();
-      
+
       String textStyle = "my-treetbl-cell-text";
-      if (((TreeTableItem)item).getCellStyle(i) != null) {
-        textStyle += " " + ((TreeTableItem)item).getCellStyle(i);
+      if (((TreeTableItem) item).getCellStyle(i) != null) {
+        textStyle += " " + ((TreeTableItem) item).getCellStyle(i);
       }
       DOM.setElementProperty(textDiv, "className", textStyle);
       DOM.appendChild(overflowDiv, textDiv);
       updateCellValues(i, cells[i], cm.getColumn(i).getAlignment());
     }
 
-    boolean checkable = getTreeTableItem().getTreeTable().checkable;
+    boolean checkable = getTreeTableItem().getTreeTable().isCheckable();
     El.fly(checkEl).setVisible(checkable);
-
 
     onValuesChanged(getTreeTableItem().getTreeTable(),
         getTreeTableItem().getRenderedValues());
@@ -195,16 +161,16 @@ public class TreeTableItemUI extends TreeItemUI {
     if (!GXT.isIE) {
       DOM.setElementPropertyInt(item.getElement(), "tabIndex", 0);
     }
-    
+
     getTreeTableItem().initCellToolTips();
 
-    updateJoint();
+    updateJointStyle();
     item.disableTextSelection(true);
 
   }
 
   public void setContainer(Element container) {
-    containerEl = container;
+    containerEl = new El(container);
   }
 
   protected Element getTextCellElement(int column) {
@@ -213,6 +179,22 @@ public class TreeTableItemUI extends TreeItemUI {
     } else {
       return El.fly(cells[column]).getSubChild(2);
     }
+  }
+
+  @Override
+  protected void handleMouseEvent(TreeEvent ce) {
+    TreeTableItemUI treeUI = (TreeTableItemUI) item.getUI();
+    Rectangle rect = item.el.firstChild().getBounds();
+    if (rect.contains(ce.getClientX(), ce.getClientY())) {
+      if (!treeUI.hovering) {
+        treeUI.hovering = true;
+        treeUI.onMouseOver(ce);
+      }
+    } else {
+      treeUI.hovering = false;
+      treeUI.onMouseOut(ce);
+    }
+
   }
 
   protected void onValuesChanged(TreeTable table, String[] values) {
@@ -232,9 +214,9 @@ public class TreeTableItemUI extends TreeItemUI {
 
     String widthClassName = ((TreeTableItem) item).treeTable.getId() + "-col-" + col;
 
-    String className = DOM.getElementProperty(cell, "className");
+    String className = cell.getClassName();
     className = (className == null) ? widthClassName : className + " " + widthClassName;
-    DOM.setElementProperty(cell, "className", className);
+    cell.setClassName(className);
 
     className = DOM.getElementProperty(DOM.getFirstChild(cell), "className");
     className = (className == null) ? widthClassName : className + " " + widthClassName;

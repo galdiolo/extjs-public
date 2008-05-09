@@ -15,6 +15,7 @@ import com.google.gwt.user.client.Element;
  */
 public class SeparatorToolItem extends ToolItem {
 
+  @Override
   protected void onRender(Element target, int index) {
     setElement(DOM.createSpan(), target, index);
     setStyleName("ytb-sep");

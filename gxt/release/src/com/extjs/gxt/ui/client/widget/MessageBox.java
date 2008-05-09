@@ -320,7 +320,7 @@ public class MessageBox {
 
           if (prompt && !multiline) {
             textBox = new TextField();
-            dialog.focusWidget = textBox;
+            dialog.setFocusWidget(textBox);
             textBox.render(contentEl.dom, 2);
             textBox.el.setWidth(GXT.isIE ? "100%" : "90%");
             icon = null;
@@ -330,7 +330,7 @@ public class MessageBox {
             textArea = new TextArea();
             textArea.render(contentEl.dom, 2);
             textArea.el.setWidth(GXT.isIE ? "100%" : "90%");
-            dialog.focusWidget = textArea;
+            dialog.setFocusWidget(textArea);
             icon = null;
           }
 
@@ -351,24 +351,24 @@ public class MessageBox {
 
         @Override
         protected void initTools() {
-          closable = false;
+          setClosable(false);
           super.initTools();
         }
 
       };
 
       dialog.setHeading(title);
-      dialog.resizable = false;
-      dialog.constrain = true;
-      dialog.minimizable = false;
-      dialog.maximizable = false;
-      dialog.closable = false;
-      dialog.modal = true;
-      dialog.buttonAlign = HorizontalAlignment.CENTER;
-      dialog.minHeight = 80;
-      dialog.plain = true;
-      dialog.footer = true;
-      dialog.buttons = buttons;
+      dialog.setResizable(false);
+      dialog.setConstrain(true);
+      dialog.setMinimizable(false);
+      dialog.setMaximizable(false);
+      dialog.setClosable(false);
+      dialog.setModal(true);
+      dialog.setButtonAlign(HorizontalAlignment.CENTER);
+      dialog.setMinHeight(80);
+      dialog.setPlain(true);
+      dialog.setFooter(true);
+      dialog.setButtons(buttons);
       dialog.buttonPressedAction = "hide";
       if (callback != null) {
         dialog.addListener(Events.Hide, callback);

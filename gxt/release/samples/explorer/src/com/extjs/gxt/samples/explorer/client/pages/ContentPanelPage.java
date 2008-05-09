@@ -48,10 +48,10 @@ public class ContentPanelPage extends Container implements EntryPoint {
     };
 
     final HorizontalPanel vp = new HorizontalPanel();
-    vp.spacing = 10;
+    vp.setSpacing(10);
 
     ContentPanel cp = new ContentPanel();
-    cp.frame = true;
+    cp.setFrame(true);
     cp.setSize(200, 120);
     cp.setHeading("Framed Panel");
     cp.setLayout(new FitLayout());
@@ -66,7 +66,7 @@ public class ContentPanelPage extends Container implements EntryPoint {
     vp.add(cp);
 
     cp = new ContentPanel();
-    cp.collapsible = true;
+    cp.setCollapsible(true);
     cp.setWidth(200);
     cp.setHeading("Collapsible");
     cp.addText("<div class=text>" + TestData.DUMMY_TEXT_SHORT + "</div>");

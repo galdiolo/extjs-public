@@ -42,6 +42,7 @@ public class CenterLayout extends TableLayout {
   @Override
   protected void renderAll(Container container, El target) {
     Component c = container.getItem(0);
+    c.setStyleAttribute("textAlign", "left");
     if (c != null && !isValidParent(c.getElement(), target.dom)) {
       renderComponent(c, 0, target);
     }

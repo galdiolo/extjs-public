@@ -83,7 +83,7 @@ public class ButtonPage extends Container implements EntryPoint {
     buttonBar.add(disabled);
     
     ToggleButton toggle = new ToggleButton("Toggle");
-    toggle.pressed = true;
+    toggle.toggle(true);
     buttonBar.add(toggle);
 
     setLayout(new FlowLayout(4));

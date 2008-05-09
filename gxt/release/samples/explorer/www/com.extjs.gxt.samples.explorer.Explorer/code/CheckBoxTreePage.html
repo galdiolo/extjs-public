@@ -55,6 +55,7 @@ import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
+import com.extjs.gxt.ui.client.widget.tree.SingleTreeSelectionModel;
 import com.extjs.gxt.ui.client.widget.tree.Tree;
 import com.extjs.gxt.ui.client.widget.tree.TreeItem;
 import com.google.gwt.core.client.EntryPoint;
@@ -73,12 +74,12 @@ public class CheckBoxTreePage extends Container implements EntryPoint {
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
 
-    final Tree tree = new Tree();
-    tree.checkable = true;
-    tree.itemImageStyle = "icon-music";
+    final Tree<SingleTreeSelectionModel> tree = new Tree();
+    tree.setCheckable(true);
+    tree.setItemIconStyle("icon-music");
     tree.addListener(Events.SelectionChange, new Listener<TreeEvent>() {
       public void handleEvent(TreeEvent te) {
-        TreeItem item = te.item;
+        TreeItem item = te.selectedItem;
         Info.display("Selection Changed", "The '{0}' item was selected", item.getText());
       }
     });
@@ -87,9 +88,9 @@ public class CheckBoxTreePage extends Container implements EntryPoint {
     TreeBuilder.buildTree(tree, TestData.getTreeModel());
 
     ButtonBar buttonBar = new ButtonBar();
-    buttonBar.add(new Button("Copy Selected Path", new SelectionListener() {
-      public void componentSelected(ComponentEvent ce) {
-        TreeItem item = tree.getSelectedItem();
+    buttonBar.add(new Button("Copy Selected Path", new SelectionListener<TreeEvent>() {
+      public void componentSelected(TreeEvent ce) {
+        TreeItem item =  ce.selectedItem;
         if (item == null) return;
         path = item.getPath();
         String[] ids = path.split(",");
@@ -121,7 +122,7 @@ public class CheckBoxTreePage extends Container implements EntryPoint {
     }));
 
     VerticalPanel vp = new VerticalPanel();
-    vp.spacing = 10;
+    vp.setSpacing(10);
 
     vp.add(buttonBar);
     vp.add(tree);

@@ -30,7 +30,7 @@ public class ModelTreeContentProvider implements TreeContentProvider {
 
   protected BaseTreeViewer viewer;
 
-  public void getChildren(Object parent, AsyncContentCallback callback) {
+  public void getChildren(final Object parent, final AsyncContentCallback callback) {
     if (!(parent instanceof TreeModel)) throw new RuntimeException("parent isn't a TreeModel");
     callback.setElements(((TreeModel)parent).getChildren());
   }
@@ -69,7 +69,9 @@ public class ModelTreeContentProvider implements TreeContentProvider {
 
   protected ChangeListener changeListener = new ChangeListener() {
     public void modelChanged(ChangeEvent event) {
-      if (!(event.item instanceof TreeModel)) return;
+      if (event.item != null && (!(event.item instanceof TreeModel))) {
+        return;
+      }
   
       int type = event.type;
       switch (type) {
@@ -84,7 +86,7 @@ public class ModelTreeContentProvider implements TreeContentProvider {
           break;
         }
         case ChangeEventSource.Update: {
-          viewer.update((ModelData) event.item);
+          viewer.update((ModelData) event.source);
           break;
         }
   

@@ -70,46 +70,46 @@ import com.google.gwt.user.client.ui.RootPanel;
 public class Popup extends Container implements EventPreview {
 
   /**
+   * The yOffset when constrainViewport == true (defaults to 15).
+   */
+  private int yOffset = 15;
+
+  /**
+   * The xOffset when constrainViewport == true (defaults to 10).
+   */
+  private int xOffset = 10;
+
+  /**
+   * True to enable event preview (defaults to true).
+   */
+  private boolean eventPreview = true;
+
+  /**
    * True to enable animations when showing and hiding (defaults to false).
    */
-  public boolean animate;
+  private boolean animate;
 
   /**
    * True to move focus to the popup when being opened (defaults to true).
    */
-  public boolean autoFocus = true;
+  private boolean autoFocus = true;
 
   /**
    * True to close the popup when the user clicks outside of the menu (default
    * to true).
    */
-  public boolean autoHide = true;
+  private boolean autoHide = true;
 
   /**
    * True to ensure popup is dislayed within the browser's viewport.
    */
-  public boolean constrainViewport = true;
+  private boolean constrainViewport = true;
 
   /**
    * The default {@link El#alignTo} anchor position value for this menu relative
    * to its element of origin (defaults to "tl-bl?").
    */
-  public String defaultAlign = "tl-bl?";
-
-  /**
-   * The yOffset when constrainViewport == true (defaults to 15).
-   */
-  public int yOffset = 15;
-
-  /**
-   * The xOffset when constrainViewport == true (defaults to 10).
-   */
-  public int xOffset = 10;
-
-  /**
-   * True to enable event preview (defaults to true).
-   */
-  public boolean eventPreview = true;
+  private String defaultAlign = "tl-bl?";
 
   private List<Element> ignoreElements;
   private Element alignElem;
@@ -135,6 +135,15 @@ public class Popup extends Container implements EventPreview {
   }
 
   /**
+   * Returns the default alignment.
+   * 
+   * @return the default align
+   */
+  public String getDefaultAlign() {
+    return defaultAlign;
+  }
+
+  /**
    * Any elements added to this list will be ignored when auto close is enabled.
    * 
    * @return the list of ignored elements
@@ -147,16 +156,34 @@ public class Popup extends Container implements EventPreview {
   }
 
   /**
+   * Returns the x offset.
+   * 
+   * @return the offset
+   */
+  public int getXOffset() {
+    return xOffset;
+  }
+
+  /**
+   * Returns the y offsets.
+   * 
+   * @return the offset
+   */
+  public int getYOffset() {
+    return yOffset;
+  }
+
+  /**
    * Hides the popup.
    */
   public void hide() {
     if (!fireEvent(Events.BeforeHide, new ComponentEvent(this))) {
       return;
     }
-    if (eventPreview) {
+    if (isEventPreview()) {
       DOM.removeEventPreview(this);
     }
-    if (animate) {
+    if (isAnimate()) {
       el.fadeOut(new Listener<FxEvent>() {
         public void handleEvent(FxEvent fe) {
           afterHide();
@@ -167,8 +194,109 @@ public class Popup extends Container implements EventPreview {
     }
   }
 
+  /**
+   * Returns true if animations are enabled.
+   * 
+   * @return the animation state
+   */
+  public boolean isAnimate() {
+    return animate;
+  }
+
+  /**
+   * Returns true if auto focus is enabled.
+   * 
+   * @return the auto focus state
+   */
+  public boolean isAutoFocus() {
+    return autoFocus;
+  }
+
+  /**
+   * Returns true if auto hide is enabled.
+   * 
+   * @return the auto hide state
+   */
+  public boolean isAutoHide() {
+    return autoHide;
+  }
+
+  /**
+   * Returns true if contrain to viewport is enabled.
+   * 
+   * @return the constrain viewport state
+   */
+  public boolean isConstrainViewport() {
+    return constrainViewport;
+  }
+
+  /**
+   * Returns true if event preview is enabled.
+   * 
+   * @return the event preview state
+   */
+  public boolean isEventPreview() {
+    return eventPreview;
+  }
+
   public boolean onEventPreview(Event event) {
     return handleEventPreview(new ComponentEvent(this, event));
+  }
+
+  /**
+   * True to enable animations when showing and hiding (defaults to false).
+   * 
+   * @param animate true to enable animations
+   */
+  public void setAnimate(boolean animate) {
+    this.animate = animate;
+  }
+
+  /**
+   * True to move focus to the popup when being opened (defaults to true).
+   * 
+   * @param autoFocus true for auto focus
+   */
+  public void setAutoFocus(boolean autoFocus) {
+    this.autoFocus = autoFocus;
+  }
+
+  /**
+   * True to close the popup when the user clicks outside of the menu (default
+   * to true).
+   * 
+   * @param autoHide true for auto hide
+   */
+  public void setAutoHide(boolean autoHide) {
+    this.autoHide = autoHide;
+  }
+
+  /**
+   * True to ensure popup is dislayed within the browser's viewport.
+   * 
+   * @param constrainViewport true to constrain
+   */
+  public void setConstrainViewport(boolean constrainViewport) {
+    this.constrainViewport = constrainViewport;
+  }
+
+  /**
+   * The default {@link El#alignTo} anchor position value for this menu relative
+   * to its element of origin (defaults to "tl-bl?").
+   * 
+   * @param defaultAlign the default alignment
+   */
+  public void setDefaultAlign(String defaultAlign) {
+    this.defaultAlign = defaultAlign;
+  }
+
+  /**
+   * True to enable event preview (defaults to true).
+   * 
+   * @param eventPreview true to enable event preview
+   */
+  public void setEventPreview(boolean eventPreview) {
+    this.eventPreview = eventPreview;
   }
 
   /**
@@ -182,6 +310,24 @@ public class Popup extends Container implements EventPreview {
   }
 
   /**
+   * Sets the xOffset when constrainViewport == true (defaults to 10).
+   * 
+   * @param xOffset the x offset
+   */
+  public void setXOffset(int xOffset) {
+    this.xOffset = xOffset;
+  }
+
+  /**
+   * Sets the yOffset when constrainViewport == true (defaults to 15).
+   * 
+   * @param yOffset the offset
+   */
+  public void setYOffset(int yOffset) {
+    this.yOffset = yOffset;
+  }
+
+  /**
    * Displays the popup.
    */
   public void show() {
@@ -189,6 +335,21 @@ public class Popup extends Container implements EventPreview {
     Point p = new Point((int) Window.getClientWidth() / 2,
         (int) Window.getClientHeight() / 2);
     showAt(p.x, p.y);
+  }
+
+  /**
+   * Displays the popup aligned to the bottom left of the widget. For exact
+   * control of popup position see {@link #show(Element, String, int[])}.
+   * 
+   * @param widget the widget to use for alignment
+   */
+  public void show(Component widget) {
+    if (!fireEvent(Events.BeforeShow, new ComponentEvent(this))) {
+      return;
+    }
+    setItem(widget);
+    alignElem = widget.getElement();
+    onShowPopup();
   }
 
   /**
@@ -212,7 +373,7 @@ public class Popup extends Container implements EventPreview {
    * @param offsets the offsets
    */
   public void show(Element elem, String pos, int[] offsets) {
-    if (!fireEvent(Events.BeforeShow, new ComponentEvent(this))){
+    if (!fireEvent(Events.BeforeShow, new ComponentEvent(this))) {
       return;
     }
     alignElem = elem;
@@ -235,21 +396,6 @@ public class Popup extends Container implements EventPreview {
     onShowPopup();
   }
 
-  /**
-   * Displays the popup aligned to the bottom left of the widget. For exact
-   * control of popup position see {@link #show(Element, String, int[])}.
-   * 
-   * @param widget the widget to use for alignment
-   */
-  public void show(Component widget) {
-    if (!fireEvent(Events.BeforeShow, new ComponentEvent(this))){
-      return;
-    }
-    setItem(widget);
-    alignElem = widget.getElement();
-    onShowPopup();
-  }
-
   protected void afterHide() {
     RootPanel.get().remove(this);
     hidden = true;
@@ -263,7 +409,7 @@ public class Popup extends Container implements EventPreview {
     if (layer != null) {
       layer.sync(true);
     }
-    if (autoFocus) {
+    if (isAutoFocus()) {
       focus();
     }
     fireEvent(Events.Open, new ComponentEvent(this));
@@ -278,7 +424,7 @@ public class Popup extends Container implements EventPreview {
       case Event.ONDBLCLICK: {
         if (DOM.getCaptureElement() == null) {
           if (!ce.within(getElement())) {
-            if (autoHide && (ce.type == Event.ONCLICK) || ce.isRightClick()) {
+            if (isAutoHide() && (ce.type == Event.ONCLICK) || ce.isRightClick()) {
               if (ignoreElements != null) {
                 for (int i = 0; i < ignoreElements.size(); i++) {
                   Element elem = (Element) ignoreElements.get(i);
@@ -342,7 +488,7 @@ public class Popup extends Container implements EventPreview {
     Point p = null;
 
     if (alignElem != null) {
-      alignPos = alignPos != null ? alignPos : defaultAlign;
+      alignPos = alignPos != null ? alignPos : getDefaultAlign();
       alignOffsets = alignOffsets != null ? alignOffsets : new int[] {0, 2};
       p = el.getAlignToXY(alignElem, alignPos, alignOffsets);
     } else if (alignPoint != null) {
@@ -359,7 +505,7 @@ public class Popup extends Container implements EventPreview {
     el.setStyleAttribute("zIndex", XDOM.getTopZIndex());
     el.makePositionable(true).setVisibility(false);
 
-    if (constrainViewport) {
+    if (isConstrainViewport()) {
       int clientHeight = Window.getClientHeight() + XDOM.getBodyScrollTop();
       int clientWidth = Window.getClientWidth() + XDOM.getBodyScrollLeft();
 
@@ -369,22 +515,22 @@ public class Popup extends Container implements EventPreview {
       int y = r.y;
 
       if (y + r.height > clientHeight) {
-        y = clientHeight - r.height - yOffset;
+        y = clientHeight - r.height - getYOffset();
         el.setTop(y);
       }
       if (x + r.width > clientWidth) {
-        x = clientWidth - r.width - xOffset;
+        x = clientWidth - r.width - getXOffset();
         el.setLeft(x);
       }
     }
 
     el.setVisibility(true);
 
-    if (eventPreview) {
+    if (isEventPreview()) {
       DOM.addEventPreview(this);
     }
 
-    if (animate) {
+    if (isAnimate()) {
       el.fadeIn(new Listener<FxEvent>() {
         public void handleEvent(FxEvent fe) {
           afterShow();

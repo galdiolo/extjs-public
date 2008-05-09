@@ -30,12 +30,13 @@ public class ContentView extends View {
 
   public void initialize() {
     tabPanel = new TabPanel();
-    tabPanel.enableTabScroll = true;
-    tabPanel.animScroll = true;
+    tabPanel.setBorderStyle(false);
+    tabPanel.setBodyBorder(false);
+    tabPanel.setTabScroll(true);
+    tabPanel.setAnimScroll(true);
     SelectionService.get().register(tabPanel);
     ContentPanel center = (ContentPanel) Registry.get("centerPanel");
     center.add(tabPanel);
-    center.layout(true);
   }
 
   public void onShowPage(Entry entry) {
@@ -43,8 +44,9 @@ public class ContentView extends View {
     TabItem item = tabPanel.findItem(page.getId(), false);
     if (item == null) {
       item = new TabItem();
+      item.setLayoutOnChange(true);
       item.setData(entry);
-      item.closable = page.isClosable();
+      item.setClosable(page.isClosable());
       item.setId(page.getId());
       item.setText(entry.getName());
       item.setLayout(new FitLayout());

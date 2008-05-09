@@ -18,7 +18,7 @@ import com.extjs.gxt.ui.client.widget.SplitButton;
  * 
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>ArrowClick</b> : (component, item, event)<br>
+ * <dd><b>ArrowClick</b> : ToolBarEvent(toolBar, item, event)<br>
  * <div>Fires when this button's arrow is clicked.</div>
  * <ul>
  * <li>component : this</li>
@@ -26,7 +26,6 @@ import com.extjs.gxt.ui.client.widget.SplitButton;
  * <li>event : the dom event</li>
  * </ul>
  * </dd>
- * 
  * </dt>
  */
 public class SplitToolItem extends TextToolItem {

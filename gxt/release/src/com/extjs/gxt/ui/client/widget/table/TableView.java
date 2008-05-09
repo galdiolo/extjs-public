@@ -49,7 +49,7 @@ public class TableView<T extends TableItem> {
 
   protected TableColumnModel cm;
   protected El dataEl, scrollEl;
-  protected Table table;
+  protected Table<TableSelectionModel> table;
   protected int scrollBarWidth;
 
   /**
@@ -86,6 +86,7 @@ public class TableView<T extends TableItem> {
       item.addStyleName(selStyle);
     } else {
       item.removeStyleName(selStyle);
+      item.removeStyleName(overStyle);
     }
   }
 
@@ -148,7 +149,9 @@ public class TableView<T extends TableItem> {
   }
 
   public void removeItem(TableItem item) {
-    dataEl.removeChild(item.getElement());
+    if (item.isRendered()) {
+      item.el.removeFromParent();
+    }
   }
 
   public void render() {
@@ -161,7 +164,7 @@ public class TableView<T extends TableItem> {
     dataEl = scrollEl.firstChild();
     DOM.appendChild(table.getElement(), DOM.getFirstChild(div));
 
-    if (table.verticalLines) {
+    if (table.getVerticalLines()) {
       table.addStyleName("my-tbl-vlines");
     }
 
@@ -186,7 +189,7 @@ public class TableView<T extends TableItem> {
     String[] align = new String[cols];
     for (int i = 0; i < columns.length; i++) {
       columns[i] = cm.getColumn(i);
-      widths[i] = cm.getWidthInPixels(i);
+      widths[i] = cm.getWidthInPixels(i) - (table.getVerticalLines() ? 1 : 0);
       columns[i].lastWidth = widths[i];
       HorizontalAlignment ha = columns[i].getAlignment();
       switch (ha) {
@@ -259,6 +262,7 @@ public class TableView<T extends TableItem> {
       TableColumn c = cm.getColumn(i);
       String display = c.isHidden() ? "none" : "static";
       int w = table.getColumnModel().getWidthInPixels(c.index);
+      w -= table.getVerticalLines() ? 1 : 0;
       HorizontalAlignment align = c.getAlignment();
       String salign = "left";
       if (align == HorizontalAlignment.CENTER) {
@@ -297,7 +301,7 @@ public class TableView<T extends TableItem> {
   }
 
   public void renderItems() {
-    if (table.buildRender) {
+    if (table.getBulkRender()) {
       bulkRender();
     } else {
       int count = table.getItemCount();
@@ -346,7 +350,7 @@ public class TableView<T extends TableItem> {
     boolean isGecko = GXT.isGecko;
     String overflowX = "visible";
 
-    if (table.horizontalScroll) {
+    if (table.getHorizontalScroll()) {
       if (dataEl.getWidth() < (width - adj)) {
         if (isGecko) {
           overflowX = "hidden";
@@ -387,14 +391,11 @@ public class TableView<T extends TableItem> {
   public void resizeCells(int columnIndex) {
     TableColumn c = cm.getColumn(columnIndex);
     int w = cm.getWidthInPixels(c.index);
-
+    w -= table.getVerticalLines() ? 1 : 0;
     if (c.lastWidth != 0 && c.lastWidth == w) {
       return;
     }
     c.lastWidth = w;
-    if (table.verticalLines) {
-      --w;
-    }
 
     int rows = table.getItemCount();
     for (int j = 0; j < rows; j++) {
@@ -414,10 +415,10 @@ public class TableView<T extends TableItem> {
   }
 
   public native void showColumn(Element elem, boolean show, int index) /*-{
-      var tbl = elem.firstChild;
-      var cell = tbl.firstChild.firstChild.childNodes[index]
-      cell.style.display = show ? '' : 'none';
-    }-*/;
+    var tbl = elem.firstChild;
+    var cell = tbl.firstChild.firstChild.childNodes[index]
+    cell.style.display = show ? '' : 'none';
+  }-*/;
 
   public void showColumn(int index, boolean show) {
     int count = table.getItemCount();

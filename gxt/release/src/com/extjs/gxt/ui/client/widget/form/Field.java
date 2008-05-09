@@ -76,16 +76,6 @@ import com.google.gwt.user.client.Event;
 public abstract class Field extends BoxComponent {
 
   /**
-   * The field's HTML name attribute (defaults to null).
-   */
-  public String name;
-
-  /**
-   * The label text to display next to this field (defaults to '')
-   */
-  public String fieldLabel = "";
-
-  /**
    * A CSS style specification to apply directly to this field's label (defaults
    * to the container's labelStyle value if set, or ''). For example,
    * <code>labelStyle: 'font-weight:bold;'</code>
@@ -98,13 +88,15 @@ public abstract class Field extends BoxComponent {
    */
   public String invalidText = GXT.MESSAGES.field_invalidText();
 
-  protected boolean autoValidate = true;
+  protected boolean autoValidate;
   protected int validationDelay = 250;
   protected String emptyText;
   protected IconButton errorIcon;
   protected Object value;
   protected String focusStyle = "x-form-focus";
+  private String name;
 
+  private String fieldLabel = "";
   private String fieldStyle = "x-form-field";
   private String invalidStyle = "x-form-invalid";
   private String messageTarget = "side";
@@ -145,6 +137,14 @@ public abstract class Field extends BoxComponent {
     fireEvent(Events.Valid, new FieldEvent(this));
   }
 
+  @Override
+  public void focus() {
+    super.focus();
+    if (rendered) {
+      onFocus(new FieldEvent(this));
+    }
+  }
+
   /**
    * Returns true if the field value is validated on each key press.
    * 
@@ -164,9 +164,18 @@ public abstract class Field extends BoxComponent {
   }
 
   /**
+   * Returns the field's label.
+   * 
+   * @return the label
+   */
+  public String getFieldLabel() {
+    return fieldLabel;
+  }
+
+  /**
    * Returns the field's message target.
    * 
-   * @return
+   * @return the message target
    */
   public String getMessageTarget() {
     return messageTarget;
@@ -313,6 +322,15 @@ public abstract class Field extends BoxComponent {
   }
 
   /**
+   * Sets the field's label.
+   * 
+   * @param fieldLabel the label
+   */
+  public void setFieldLabel(String fieldLabel) {
+    this.fieldLabel = fieldLabel;
+  }
+
+  /**
    * The location where error text should display. Should be one of the
    * following values (defaults to 'side'): <code><pre>
    * Value         Description
@@ -329,6 +347,11 @@ public abstract class Field extends BoxComponent {
     this.messageTarget = messageTarget;
   }
 
+  /**
+   * Sets the field's HTML name attribute.
+   * 
+   * @param name the name
+   */
   public void setName(String name) {
     this.name = name;
   }
@@ -445,6 +468,11 @@ public abstract class Field extends BoxComponent {
   }
 
   @Override
+  protected ComponentEvent createComponentEvent(Event event) {
+    return new FieldEvent(this);
+  }
+
+  @Override
   protected void doDetachChildren() {
     super.doDetachChildren();
     if (errorIcon != null && errorIcon.isAttached()) {
@@ -472,6 +500,14 @@ public abstract class Field extends BoxComponent {
 
   protected El getStyleEl() {
     return el;
+  }
+
+  protected void initValue() {
+    if (value != null) {
+      setValue(value);
+    } else if (getInputEl().getValue().toString().length() > 0) {
+      this.setValue(getInputEl().getValue());
+    }
   }
 
   /**
@@ -524,7 +560,7 @@ public abstract class Field extends BoxComponent {
       getFocusEl().removeStyleName(focusStyle);
     }
     hasFocus = false;
-    if (!autoValidate && validateOnBlur) {
+    if (validateOnBlur) {
       validate();
     }
     fireChangeEvent(focusValue, getValue());
@@ -558,8 +594,8 @@ public abstract class Field extends BoxComponent {
     String type = getInputEl().getElementAttribute("type");
     getInputEl().addStyleName("x-form-" + type);
 
-    if (name != null) {
-      getInputEl().setElementAttribute("name", name);
+    if (getName() != null) {
+      getInputEl().setElementAttribute("name", getName());
     }
 
     if (readOnly) {
@@ -574,9 +610,7 @@ public abstract class Field extends BoxComponent {
 
     getInputEl().addEventsSunk(Event.ONCLICK | Event.KEYEVENTS | Event.FOCUSEVENTS);
 
-    if (value != null) {
-      setValue(value);
-    }
+    initValue();
   }
 
   /**

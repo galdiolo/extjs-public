@@ -27,10 +27,7 @@ import com.google.gwt.user.client.Element;
  */
 public class ToggleButton extends Button {
 
-  /**
-   * True to start pressed.
-   */
-  public boolean pressed;
+  private boolean pressed;
 
   /**
    * Creates a new toggle button.

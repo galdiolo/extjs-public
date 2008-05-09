@@ -87,44 +87,20 @@ public class Button extends Component {
   public static Template buttonTemplate;
 
   /**
-   * False to disable visual cues on mouseover, mouseout and mousedown (defaults
-   * to true).
-   */
-  public boolean handleMouseEvents = true;
-
-  /**
-   * Submit, reset or button (defaults to 'button').
-   */
-  public String type = "button";
-
-  /**
-   * The position to align the menu to (see {@link El#alignTo} for more details,
-   * defaults to 'tl-bl?').
-   */
-  public String menuAlign = "tl-bl?";
-
-  /**
-   * tabIndex Set a DOM tabIndex for this button (defaults to undefined)
-   */
-  public int tabIndex = -1;
-
-  /**
-   * The minimum width for this button (used to give a set of buttons a common
-   * width)
-   */
-  public int minWidth;
-
-  /**
    * The optional button template (defaults to null). If a template is not
    * specified, the {@link #buttonTemplate} will be used.
    */
   protected Template template;
-
   protected String text;
   protected String buttonSelector = "button";
   protected Menu menu;
   protected El buttonEl;
 
+  private int minWidth;
+  private String type = "button";
+  private int tabIndex = -1;
+  private String menuAlign = "tl-bl?";
+  private boolean handleMouseEvents = true;
   private String iconStyle;
 
   /**
@@ -166,6 +142,15 @@ public class Button extends Component {
   }
 
   /**
+   * Retutns true if mouse over effect is disabled.
+   * 
+   * @return the handleMouseEvents the handle mouse event state
+   */
+  public boolean getMouseEvents() {
+    return handleMouseEvents;
+  }
+
+  /**
    * Returns the button's icon style.
    * 
    * @return the icon style
@@ -184,12 +169,35 @@ public class Button extends Component {
   }
 
   /**
+   * Returns the button's menu alignment.
+   * 
+   * @return the menu alignment
+   */
+  public String getMenuAlign() {
+    return menuAlign;
+  }
+
+  /**
+   * @return the minWidth
+   */
+  public int getMinWidth() {
+    return minWidth;
+  }
+
+  /**
    * Returns the button's text.
    * 
    * @return the button text
    */
   public String getText() {
     return text;
+  }
+
+  /**
+   * @return the type
+   */
+  public String getType() {
+    return type;
   }
 
   /**
@@ -215,6 +223,7 @@ public class Button extends Component {
     Element source = ce.component.getElement();
     ce.stopEvent();
     super.onComponentEvent(ce);
+    ButtonEvent be = (ButtonEvent) ce;
     switch (ce.type) {
       case Event.ONMOUSEOVER:
         Element from = DOM.eventGetFromElement(ce.event);
@@ -243,7 +252,7 @@ public class Button extends Component {
         onFocus(ce);
         break;
       case Event.ONBLUR:
-        onBlur(ce);
+        onBlur(be);
     }
   }
 
@@ -256,6 +265,16 @@ public class Button extends Component {
   public Button removeSelectionListener(SelectionListener listener) {
     removeListener(Events.Select, listener);
     return this;
+  }
+
+  /**
+   * False to disable visual cues on mouseover, mouseout and mousedown (defaults
+   * to true).
+   * 
+   * @param handleMouseEvents false to disable mouse over cahnges
+   */
+  public void setMouseEvents(boolean handleMouseEvents) {
+    this.handleMouseEvents = handleMouseEvents;
   }
 
   /**
@@ -278,6 +297,26 @@ public class Button extends Component {
    */
   public void setMenu(Menu menu) {
     this.menu = menu;
+  }
+
+  /**
+   * Sets the position to align the menu to, see {@link El#alignTo} for more
+   * details (defaults to 'tl-bl?', pre-render).
+   * 
+   * @param menuAlign the menu alignment
+   */
+  public void setMenuAlign(String menuAlign) {
+    this.menuAlign = menuAlign;
+  }
+
+  /**
+   * Sets he minimum width for this button (used to give a set of buttons a
+   * common width)
+   * 
+   * @param minWidth the minimum width
+   */
+  public void setMinWidth(int minWidth) {
+    this.minWidth = minWidth;
   }
 
   /**
@@ -306,11 +345,20 @@ public class Button extends Component {
   }
 
   /**
+   * Submit, reset or button (defaults to 'button').
+   * 
+   * @param type the new type
+   */
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  /**
    * Show this button's menu (if it has one).
    */
   public void showMenu() {
     if (menu != null) {
-      menu.show(getElement(), menuAlign);
+      menu.show(getElement(), getMenuAlign());
       ButtonEvent be = new ButtonEvent(this);
       be.menu = menu;
       fireEvent(Events.MenuShow, be);
@@ -354,12 +402,17 @@ public class Button extends Component {
           buttonEl.setWidth(w);
         }
       }
-      if (minWidth != Style.DEFAULT) {
-        if (el.getWidth() < minWidth) {
-          el.setWidth(minWidth);
+      if (getMinWidth() != Style.DEFAULT) {
+        if (el.getWidth() < getMinWidth()) {
+          el.setWidth(getMinWidth());
         }
       }
     }
+  }
+
+  @Override
+  protected ComponentEvent createComponentEvent(Event event) {
+    return new ButtonEvent(this);
   }
 
   @Override
@@ -381,7 +434,7 @@ public class Button extends Component {
     return buttonEl;
   }
 
-  protected void onBlur(ComponentEvent ce) {
+  protected void onBlur(ButtonEvent e) {
     removeStyleName(baseStyle + "-focus");
   }
 
@@ -453,7 +506,7 @@ public class Button extends Component {
   }
 
   protected void onMouseOver(ComponentEvent ce) {
-    if (!disabled && handleMouseEvents) {
+    if (!disabled && getMouseEvents()) {
       addStyleName(baseStyle + "-over");
     }
     fireEvent(Events.MouseOver, ce);
@@ -476,14 +529,14 @@ public class Button extends Component {
       template = buttonTemplate;
     }
 
-    setElement(template.create(text != null ? text : "", type, baseStyle), target, index);
+    setElement(template.create(text != null ? text : "", getType(), baseStyle), target, index);
 
     buttonEl = el.selectNode(buttonSelector);
 
     if (menu != null) {
       this.el.child("tr").addStyleName("x-btn-with-menu");
     }
-    
+
     getFocusEl().addEventsSunk(Event.FOCUSEVENTS);
 
     el.addEventsSunk(Event.ONCLICK | Event.MOUSEEVENTS);

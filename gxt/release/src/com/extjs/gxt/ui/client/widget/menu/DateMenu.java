@@ -29,7 +29,7 @@ public class DateMenu extends Menu {
     picker = item.picker;
     add(item);
     baseStyle = "x-date-menu";
-    autoHeight = true;
+    setAutoHeight(true);
   }
 
   /**
@@ -53,7 +53,7 @@ public class DateMenu extends Menu {
   @Override
   protected void doAttachChildren() {
     super.doAttachChildren();
-    picker.onAttach();
+    WidgetHelper.doAttach(picker);
   }
 
   @Override

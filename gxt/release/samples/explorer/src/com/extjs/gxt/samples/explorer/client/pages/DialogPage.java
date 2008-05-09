@@ -36,13 +36,14 @@ public class DialogPage extends Container implements EntryPoint {
     super.onRender(parent, pos);
     final Dialog simple = new Dialog();
     simple.setHeading("Dialog Test");
-    simple.buttons = Dialog.YESNO;
+    simple.setButtons(Dialog.YESNO);
     simple.addText(TestData.DUMMY_TEXT_SHORT);
     simple.setScrollMode(Scroll.AUTO);
 
     final Dialog complex = new Dialog();
-    complex.border = false;
-    complex.buttons = Dialog.OK;
+    complex.setBorder(false);
+    complex.setBodyBorder(false);
+    complex.setButtons(Dialog.OK);
     complex.setIconStyle("icon-app-side");
     complex.setHeading("BorderLayout Dialog");
     complex.setWidth(400);

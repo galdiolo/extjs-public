@@ -8,17 +8,32 @@
 package com.extjs.gxt.ui.client.mvc;
 
 /**
- * An app event subclass will specialized support history.
+ * An app event subclass for history events.
  */
 public class HistoryEvent extends AppEvent {
 
-  public HistoryEvent(int type, Object data) {
+  /**
+   * Creates a new history event.
+   * 
+   * @param type the event type
+   * @param data the event data
+   * @param token the history token
+   */
+  public HistoryEvent(int type, Object data, String token) {
     super(type, data);
+    this.token = token;
     historyEvent = true;
   }
 
-  public HistoryEvent(int type) {
+  /**
+   * Creates a new history event.
+   * 
+   * @param type the event type
+   * @param token the history token
+   */
+  public HistoryEvent(int type, String token) {
     super(type);
+    this.token = token;
     historyEvent = true;
   }
 

@@ -32,7 +32,7 @@ public class TreePage extends Container implements EntryPoint {
     super.onRender(parent, pos);
 
     final Tree tree = new Tree();
-    tree.itemImageStyle = "icon-music";
+    tree.setItemIconStyle("icon-music");
 
     // quick way to build tree from Model instances.
     TreeBuilder.buildTree(tree, TestData.getTreeModel());
