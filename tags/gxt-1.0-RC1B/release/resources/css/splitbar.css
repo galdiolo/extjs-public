@@ -1,0 +1,72 @@
+.x-splitbar-shim {
+  filter: alpha(opacity =                   1);
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background-color: white;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  user-select: none;
+  -moz-outline: none;
+  -moz-user-focus: normal;
+}
+
+.x-vsplitbar {
+  background: url(../images/default/s.gif);
+  position: absolute;
+  z-index: 999999;
+  cursor: e-resize;
+  cursor: col-resize;
+}
+
+.x-hsplitbar {
+  background: url(../images/default/s.gif);
+  position: absolute;
+  font-size: 1px;
+  line-height: 1px;
+  z-index: 999999;
+  cursor: s-resize;
+  cursor: row-resize;
+}
+
+.x-splitbar-proxy {
+  position: absolute;
+  background-color: #929090;
+  font-size: 1px;
+  line-height: 1px;
+  z-index: 200;
+}
+
+
+
+.my-splitbar-shim {
+  filter: alpha(opacity =     1);
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background-color: white;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  user-select: none;
+  -moz-outline: none;
+  -moz-user-focus: normal;
+}
+
+.my-splitbar-transparent {
+  background: none;
+  font-size: 1px;
+  line-height: 1px;
+  z-index: 2000;
+}
+
+.my-splitbar-proxy {
+  position: absolute;
+  background-color: #929090;
+  font-size: 1px;
+  line-height: 1px;
+  z-index: 200;
+}
