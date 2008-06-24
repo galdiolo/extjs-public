@@ -12,25 +12,25 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Default implementation of of the <code>TreeModel</code> interface.
+ * Default implementation of the <code>TreeModel</code> interface.
  */
-public class BaseTreeModel extends BaseModel implements TreeModel {
+public class BaseTreeModel<T extends TreeModel> extends BaseModel implements TreeModel<T> {
 
   /**
    * The model's parent.
    */
-  protected TreeModel parent;
+  protected T parent;
 
   /**
    * The model's children.
    */
-  protected List<TreeModel> children;
+  protected List<T> children;
 
   /**
    * Creates a new model instance.
    */
   public BaseTreeModel() {
-    children = new ArrayList<TreeModel>();
+    children = new ArrayList<T>();
   }
 
   /**
@@ -40,7 +40,7 @@ public class BaseTreeModel extends BaseModel implements TreeModel {
    */
   public BaseTreeModel(Map<String, Object> properties) {
     super(properties);
-    children = new ArrayList<TreeModel>();
+    children = new ArrayList<T>();
   }
 
   /**
@@ -48,7 +48,7 @@ public class BaseTreeModel extends BaseModel implements TreeModel {
    * 
    * @param parent the parent
    */
-  public BaseTreeModel(TreeModel parent) {
+  public BaseTreeModel(T parent) {
     this();
     parent.add(this);
   }
@@ -58,7 +58,7 @@ public class BaseTreeModel extends BaseModel implements TreeModel {
    * 
    * @param child the child to be added
    */
-  public void add(TreeModel child) {
+  public void add(T child) {
     insert(child, getChildCount());
   }
 
@@ -69,7 +69,7 @@ public class BaseTreeModel extends BaseModel implements TreeModel {
    * @param index the index to be retrieved
    * @return the model at the index
    */
-  public TreeModel getChild(int index) {
+  public T getChild(int index) {
     if ((index < 0) || (index >= children.size())) return null;
     return children.get(index);
   }
@@ -88,8 +88,8 @@ public class BaseTreeModel extends BaseModel implements TreeModel {
    * 
    * @return the children
    */
-  public List<TreeModel> getChildren() {
-    return new ArrayList<TreeModel>(children);
+  public List<T> getChildren() {
+    return children;
   }
 
   /**
@@ -97,8 +97,12 @@ public class BaseTreeModel extends BaseModel implements TreeModel {
    * 
    * @return the parent
    */
-  public TreeModel getParent() {
+  public T getParent() {
     return parent;
+  }
+
+  public int indexOf(T child) {
+    return children.indexOf(child);
   }
 
   /**
@@ -108,7 +112,7 @@ public class BaseTreeModel extends BaseModel implements TreeModel {
    * @param child the child to be inserted
    * @param index the location to insert the child
    */
-  public void insert(TreeModel child, int index) {
+  public void insert(T child, int index) {
     adopt(child);
     children.add(index, child);
     if (index == getChildCount() - 1) {
@@ -119,6 +123,10 @@ public class BaseTreeModel extends BaseModel implements TreeModel {
       evt.index = index;
       notify(evt);
     }
+  }
+
+  public boolean isLeaf() {
+    return children.size() == 0;
   }
 
   @Override
@@ -146,15 +154,12 @@ public class BaseTreeModel extends BaseModel implements TreeModel {
    * 
    * @param child the child to be removed
    */
-  public void remove(TreeModel child) {
+  public void remove(T child) {
     child.setParent(null);
     children.remove(child);
     fireEvent(Remove, child);
   }
 
-  /**
-   * Removes all the model's children.
-   */
   public void removeAll() {
     for (int i = children.size() - 1; i >= 0; i--) {
       remove(getChild(i));
@@ -166,16 +171,16 @@ public class BaseTreeModel extends BaseModel implements TreeModel {
    * 
    * @param children the children to be set
    */
-  public void setChildren(List<TreeModel> children) {
+  public void setChildren(List<T> children) {
     removeAll();
     if (children != null) {
-      for (TreeModel child : children) {
+      for (T child : children) {
         add(child);
       }
     }
   }
 
-  public void setParent(TreeModel parent) {
+  public void setParent(T parent) {
     this.parent = parent;
   }
 

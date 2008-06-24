@@ -11,7 +11,7 @@ import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.util.Size;
-import com.extjs.gxt.ui.client.widget.Container;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -31,9 +31,9 @@ public class XDOM {
   public static boolean isVisibleBox;
 
   static El bodyEl = new El(getBody());
+  
   private static int scrollBarHeight = Style.DEFAULT;
   private static int AUTO_ID = 0;
-
   private static int Z_INDEX = 1000;
 
   static {
@@ -73,6 +73,9 @@ public class XDOM {
     return bodyEl;
   }
   
+  /**
+   * Reloads the page.
+   */
   public native static void reload() /*-{
     $wnd.location.reload();
   }-*/;
@@ -194,8 +197,8 @@ public class XDOM {
       } else if (typeof $doc.documentElement != 'undefined'
                 && typeof $doc.documentElement.clientWidth !=
                 'undefined' && $doc.documentElement.clientWidth != 0) {
-        vw = document.documentElement.clientWidth;
-        vh = $wnd.innerHeight;
+        vw = $doc.documentElement.clientWidth;
+        vh = $doc.documentElement.clientHeight;
       } else {
         vw = $doc.getElementsByTagName('body')[0].clientWidth;
         vh = $doc.getElementsByTagName('body')[0].clientHeight;
@@ -225,9 +228,9 @@ public class XDOM {
   }
 
   private static int getScrollBarWidthInternal() {
-    Container wc = new Container();
+    LayoutContainer wc = new LayoutContainer();
     RootPanel.get().add(wc);
-    wc.el.setVisibility(false);
+    wc.el().setVisibility(false);
     wc.setScrollMode(Scroll.AUTO);
     wc.setSize(300, 300);
 

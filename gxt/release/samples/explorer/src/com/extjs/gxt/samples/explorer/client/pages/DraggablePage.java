@@ -11,7 +11,7 @@ import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.fx.Draggable;
-import com.extjs.gxt.ui.client.widget.Container;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
@@ -20,7 +20,7 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class DraggablePage extends Container implements EntryPoint {
+public class DraggablePage extends LayoutContainer implements EntryPoint {
 
   public void onModuleLoad() {
     RootPanel.get().add(this);
@@ -36,6 +36,7 @@ public class DraggablePage extends Container implements EntryPoint {
 
     ContentPanel cp = new ContentPanel();
     cp.setCollapsible(true);
+    cp.setBodyStyleName("pad-text");
     cp.setHeading("Proxy Drag");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     cp.setWidth(200);
@@ -46,7 +47,7 @@ public class DraggablePage extends Container implements EntryPoint {
 
     cp = new ContentPanel();
     cp.setCollapsible(true);
-    cp.setBodyStyle("padding: 4 8px");
+    cp.setBodyStyle("padding: 4 8px;fontSize: 12px");
     cp.setHeading("Direct Drag");
     cp.setIconStyle("icon-text");
     cp.addText("Drags can only be started from the header.");
@@ -54,11 +55,11 @@ public class DraggablePage extends Container implements EntryPoint {
     vp.add(cp);
 
     d = new Draggable(cp, cp.getHeader());
-    d.container = this;
-    d.useProxy = false;
+    d.setContainer(this);
+    d.setUseProxy(false);
 
     cp = new ContentPanel();
-    cp.setBodyStyle("padding: 4 8px");
+    cp.setBodyStyle("padding: 4 8px;fontSize: 12px");
     cp.setHeading("Constrain");
     cp.setIconStyle("icon-text");
     cp.addText("Can only be dragged vertically.");
@@ -66,17 +67,17 @@ public class DraggablePage extends Container implements EntryPoint {
     vp.add(cp);
 
     d = new Draggable(cp, cp.getHeader());
-    d.container = this;
-    d.constrainHorizontal = true;
+    d.setContainer(this);
+    d.setConstrainHorizontal(true);
 
     add(vp);
     setScrollMode(Scroll.AUTO);
 
     Widget p = getParent();
-    if (p instanceof Container) {
-      Container ct = (Container) p;
+    if (p instanceof LayoutContainer) {
+      LayoutContainer ct = (LayoutContainer) p;
       ct.setLayout(new FitLayout());
-      ct.layout(true);
+      ct.layout();
     }
   }
 

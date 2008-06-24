@@ -14,11 +14,23 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class WidgetHelper {
 
-  public static native void doAttach(Widget widget) /*-{
-      widget.@com.google.gwt.user.client.ui.Widget::onAttach()();
-    }-*/;
+  public static void doAttach(Widget widget) {
+    if (widget != null && !widget.isAttached()) {
+      doAttachNative(widget);
+    }
+  }
+  
+  public static void doDetach(Widget widget) {
+    if (widget != null && widget.isAttached()) {
+      doDetachNative(widget);
+    }
+  }
+  
+  static native void doAttachNative(Widget widget) /*-{
+    widget.@com.google.gwt.user.client.ui.Widget::onAttach()();
+  }-*/;
 
-  public static native void doDetach(Widget widget) /*-{
+  static native void doDetachNative(Widget widget) /*-{
    widget.@com.google.gwt.user.client.ui.Widget::onDetach()();
   }-*/;
 }

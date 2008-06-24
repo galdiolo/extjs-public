@@ -7,10 +7,12 @@
  */
 package com.extjs.gxt.ui.client.widget.form;
 
+import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -21,13 +23,28 @@ import com.google.gwt.user.client.EventListener;
  */
 public class TwinTriggerField extends TriggerField {
 
-  /**
-   * The field's twin trigger style (defaults to null).
-   */
-  public String twinTriggerStyle;
-
   protected Element twinTrigger;
+
+  private String twinTriggerStyle;
   private Element span;
+
+  /**
+   * Returns the twin trigger style.
+   * 
+   * @return the twin trigger style
+   */
+  public String getTwinTriggerStyle() {
+    return twinTriggerStyle;
+  }
+
+  /**
+   * Sets the field's twin trigger style
+   * 
+   * @param twinTriggerStyle the twin trigger style
+   */
+  public void setTwinTriggerStyle(String twinTriggerStyle) {
+    this.twinTriggerStyle = twinTriggerStyle;
+  }
 
   @Override
   protected void doAttachChildren() {
@@ -45,18 +62,18 @@ public class TwinTriggerField extends TriggerField {
   protected void onRender(Element target, int index) {
     input = new El(DOM.createInputText());
     wrap = new El(DOM.createDiv());
-    wrap.setStyleName("x-form-field-wrap");
+    wrap.dom.setClassName("x-form-field-wrap");
 
     trigger = new El(DOM.createImg());
-    trigger.setStyleName("x-form-trigger");
-    DOM.setElementProperty(trigger.dom, "src", GXT.BLANK_IMAGE_URL);
+    trigger.dom.setClassName("x-form-trigger");
+    trigger.dom.setPropertyString("src", GXT.BLANK_IMAGE_URL);
 
     twinTrigger = DOM.createImg();
-    fly(twinTrigger).setStyleName("x-form-trigger " + twinTriggerStyle);
-    DOM.setElementProperty(twinTrigger, "src", GXT.BLANK_IMAGE_URL);
+    twinTrigger.setClassName("x-form-trigger " + twinTriggerStyle);
+    twinTrigger.setPropertyString("src", GXT.BLANK_IMAGE_URL);
 
     span = DOM.createSpan();
-    fly(span).setStyleName("x-form-twin-triggers");
+    span.setClassName("x-form-twin-triggers");
     DOM.appendChild(span, twinTrigger);
     DOM.appendChild(span, trigger.dom);
 
@@ -69,7 +86,7 @@ public class TwinTriggerField extends TriggerField {
 
     triggerListener = new EventListener() {
       public void onBrowserEvent(Event event) {
-        ComponentEvent ce = new ComponentEvent(TwinTriggerField.this);
+        FieldEvent ce = new FieldEvent(TwinTriggerField.this);
         ce.event = event;
         ce.type = DOM.eventGetType(event);
         ce.stopEvent();
@@ -100,7 +117,7 @@ public class TwinTriggerField extends TriggerField {
   }
 
   protected void onTwinTriggerClick(ComponentEvent ce) {
-
+    fireEvent(Events.TwinTriggerClick, ce);
   }
 
   protected void onTwinTriggerEvent(ComponentEvent ce) {

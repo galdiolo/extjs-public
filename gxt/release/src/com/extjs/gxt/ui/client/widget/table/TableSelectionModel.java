@@ -8,21 +8,24 @@
 package com.extjs.gxt.ui.client.widget.table;
 
 import com.extjs.gxt.ui.client.Style.SelectionMode;
-import com.extjs.gxt.ui.client.event.TableEvent;
-import com.extjs.gxt.ui.client.widget.selection.AbstractListSelectionModel;
+import com.extjs.gxt.ui.client.widget.selection.AbstractSelectionModel;
 
 /**
- * Abstract selection model for tables.
+ * Table selection model.
  */
-public abstract class TableSelectionModel extends
-    AbstractListSelectionModel<TableItem, Table, TableEvent> {
+public class TableSelectionModel extends AbstractSelectionModel<Table, TableItem> {
 
   public TableSelectionModel() {
     super();
   }
 
-  public TableSelectionModel(SelectionMode selectionMode) {
-    super(selectionMode);
+  public TableSelectionModel(SelectionMode mode) {
+    super(mode);
+  }
+
+  @Override
+  protected void doSelectChange(TableItem item, boolean select) {
+    container.getView().onSelectItem(item, select);
   }
 
 }

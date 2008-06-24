@@ -13,8 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.extjs.gxt.ui.client.event.MvcEvent;
-import com.extjs.gxt.ui.client.util.Observable;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.HistoryListener;
 
@@ -46,7 +46,7 @@ import com.google.gwt.user.client.HistoryListener;
  * 
  * @see DispatcherListener
  */
-public class Dispatcher extends Observable {
+public class Dispatcher extends BaseObservable {
 
   /**
    * Fires before an event is dispatched (value is 955).
@@ -152,9 +152,8 @@ public class Dispatcher extends Observable {
    * @param listener the listener to add
    */
   public void addDispatcherListener(DispatcherListener listener) {
-    DispatcherTypedListener typedListener = new DispatcherTypedListener(listener);
-    addListener(BeforeDispatch, typedListener);
-    addListener(AfterDispatch, typedListener);
+    addListener(BeforeDispatch, listener);
+    addListener(AfterDispatch, listener);
   }
 
   /**
@@ -221,10 +220,8 @@ public class Dispatcher extends Observable {
    * @param listener the listener to be removed
    */
   public void removeDispatcherListener(DispatcherListener listener) {
-    if (eventTable != null) {
-      eventTable.unhook(BeforeDispatch, listener);
-      eventTable.unhook(AfterDispatch, listener);
-    }
+      removeListener(BeforeDispatch, listener);
+      removeListener(AfterDispatch, listener);
   }
 
   private void dispatch(AppEvent event, boolean createhistory) {

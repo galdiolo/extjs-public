@@ -16,17 +16,49 @@ import com.google.gwt.user.client.ui.Frame;
 
 /**
  * A tab in a <code>TabPanel</code>.
+ * 
+ * <dl>
+ * <dt><b>Events:</b></dt>
+ * 
+ * <dd><b>BeforeClose</b> : TabPanelEvent(tabPanel, item)<br>
+ * <div>Fires before an item is closed by the user clicking the close icon.
+ * Listeners can set the <code>doit</code> field to <code>false</code> to
+ * cancel the action.</div>
+ * <ul>
+ * <li>tabPanel : this</li>
+ * <li>item : the item that was closed.</li>
+ * </ul>
+ * </dd>
+ * 
+ * <dd><b>Close</b> : TabPanelEvent(tabPanel, item)<br>
+ * <div>Fires after an item is closed by the user clicking the close icon.</div>
+ * <ul>
+ * <li>tabPanel : this</li>
+ * <li>item : the item that was closed.</li>
+ * </ul>
+ * </dd>
+ * <dl>
  */
-public class TabItem extends Container {
+public class TabItem extends LayoutContainer {
 
-  class HeaderItem extends Component {
+  public class HeaderItem extends Component {
 
-    public String text, iconStyle;
+    String text, iconStyle;
 
+    /**
+     * Returns the header's icon style
+     * 
+     * @return the icon style
+     */
     public String getIconStyle() {
       return iconStyle;
     }
 
+    /**
+     * Returns the header's text.
+     * 
+     * @return the text
+     */
     public String getText() {
       return text;
     }
@@ -39,14 +71,27 @@ public class TabItem extends Container {
       }
     }
 
+    /**
+     * Sets the header's icon style (pre-render).
+     * 
+     * @param iconStyle the icon style
+     */
     public void setIconStyle(String iconStyle) {
+      if (rendered) {
+        el().selectNode(".x-tab-strip-text").removeStyleName(this.iconStyle).addStyleName(iconStyle);
+      }
       this.iconStyle = iconStyle;
     }
 
+    /**
+     * Sets the header's text.
+     * 
+     * @param text the text
+     */
     public void setText(String text) {
       this.text = text;
       if (rendered) {
-        el.child(".x-tab-strip-text").setInnerHtml(text);
+        el().child(".x-tab-strip-text").dom.setInnerHTML(text);
       }
     }
 
@@ -99,6 +144,27 @@ public class TabItem extends Container {
     tabPanel.remove(this);
   }
 
+  @Override
+  public void disable() {
+    super.disable();
+    header.disable();
+  }
+
+  @Override
+  public void enable() {
+    super.enable();
+    header.enable();
+  }
+
+  /**
+   * Returns the item's header component.
+   * 
+   * @return the header component
+   */
+  public HeaderItem getHeader() {
+    return header;
+  }
+
   /**
    * Returns the item's icon style.
    * 
@@ -124,6 +190,15 @@ public class TabItem extends Container {
    */
   public String getText() {
     return header.getText();
+  }
+
+  /**
+   * Returns the item's text style name.
+   * 
+   * @return the style name
+   */
+  public String getTextStyle() {
+    return textStyle;
   }
 
   /**
@@ -163,6 +238,15 @@ public class TabItem extends Container {
   }
 
   /**
+   * Sets the style name to be applied to the item's text element.
+   * 
+   * @param textStyle the style name
+   */
+  public void setTextStyle(String textStyle) {
+    this.textStyle = textStyle;
+  }
+
+  /**
    * Sets a url for the content area of the item.
    * 
    * @param url the url
@@ -179,25 +263,7 @@ public class TabItem extends Container {
 
   @Override
   public String toString() {
-    return el != null ? el.toString() : super.toString();
-  }
-
-  /**
-   * Sets the style name to be applied to the item's text element.
-   * 
-   * @param textStyle the style name
-   */
-  public void setTextStyle(String textStyle) {
-    this.textStyle = textStyle;
-  }
-
-  /**
-   * Returns the item's text style name.
-   * 
-   * @return the style name
-   */
-  public String getTextStyle() {
-    return textStyle;
+    return el() != null ? el().toString() : super.toString();
   }
 
 }

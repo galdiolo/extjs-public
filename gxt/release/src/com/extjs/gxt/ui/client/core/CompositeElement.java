@@ -256,7 +256,7 @@ public class CompositeElement {
    */
   public void setInnerHtml(String html) {
     for (Element elem : items) {
-      El.fly(elem).setInnerHtml(html);
+      elem.setInnerHTML(html);
     }
   }
   

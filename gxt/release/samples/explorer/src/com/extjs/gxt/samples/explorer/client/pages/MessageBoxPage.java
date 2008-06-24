@@ -10,19 +10,20 @@ package com.extjs.gxt.samples.explorer.client.pages;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.Button;
-import com.extjs.gxt.ui.client.widget.ButtonBar;
-import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Info;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.ProgressBar;
+import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.button.ButtonBar;
+import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.RootPanel;
 
-public class MessageBoxPage extends Container implements EntryPoint {
+public class MessageBoxPage extends LayoutContainer implements EntryPoint {
 
   public void onModuleLoad() {
     RootPanel.get().add(this);
@@ -41,37 +42,39 @@ public class MessageBoxPage extends Container implements EntryPoint {
 
     ButtonBar buttonBar = new ButtonBar();
 
-    buttonBar.add(new Button("Confirm", new SelectionListener() {
+    buttonBar.add(new Button("Confirm", new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         MessageBox.confirm("Confirm", "Are you sure you want to do that?", l);
       }
     }));
 
-    buttonBar.add(new Button("Prompt", new SelectionListener() {
+    buttonBar.add(new Button("Prompt", new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
-        MessageBox.prompt("Name", "Please enter your name:", l);
+        MessageBox box = MessageBox.prompt("Name", "Please enter your name:");
+        box.addCallback(l);
       }
     }));
 
-    buttonBar.add(new Button("Multiline Prompt", new SelectionListener() {
+    buttonBar.add(new Button("Multiline Prompt", new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
-        MessageBox.prompt("Address", "Please enter your address:", true, l);
+        MessageBox box = MessageBox.prompt("Address", "Please enter your address:", true);
+        box.addCallback(l);
       }
     }));
 
-    buttonBar.add(new Button("Yes/No/Cancel", new SelectionListener() {
+    buttonBar.add(new Button("Yes/No/Cancel", new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         MessageBox box = new MessageBox();
-        box.buttons = MessageBox.YESNOCANCEL;
-        box.icon = MessageBox.QUESTION;
-        box.title = "Save Changes?";
-        box.callback = l;
-        box.message = "You are closing a tab that has unsaved changes. Would you like to save your changes?";
+        box.setButtons(MessageBox.YESNOCANCEL);
+        box.setIcon(MessageBox.QUESTION);
+        box.setTitle("Save Changes?");
+        box.addCallback(l);
+        box.setMessage("You are closing a tab that has unsaved changes. Would you like to save your changes?");
         box.show();
       }
     }));
 
-    buttonBar.add(new Button("Progress", new SelectionListener() {
+    buttonBar.add(new Button("Progress", new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         final MessageBox box = MessageBox.progress("Please wait", "Loading items...",
             "Initializing...");
@@ -94,7 +97,7 @@ public class MessageBoxPage extends Container implements EntryPoint {
       }
     }));
 
-    buttonBar.add(new Button("Wait", new SelectionListener() {
+    buttonBar.add(new Button("Wait", new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         final MessageBox box = MessageBox.wait("Progress",
             "Saving your data, please wait...", "Saving...");
@@ -109,12 +112,12 @@ public class MessageBoxPage extends Container implements EntryPoint {
       }
     }));
 
-    buttonBar.add(new Button("Alert", new SelectionListener() {
+    buttonBar.add(new Button("Alert", new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         MessageBox.alert("Alert", "Access Denied", l);
       }
     }));
-
+    setLayout(new FlowLayout(4));
     add(buttonBar);
   }
 

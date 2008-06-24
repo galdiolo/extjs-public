@@ -7,10 +7,12 @@
  */
 package com.extjs.gxt.samples.mail.client.model;
 
+import java.util.ArrayList;
 import java.util.List;
-import com.extjs.gxt.samples.resources.client.TestData;
-import com.extjs.gxt.samples.resources.client.MailItem;
+
 import com.extjs.gxt.samples.resources.client.Folder;
+import com.extjs.gxt.samples.resources.client.MailItem;
+import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.ui.client.data.BaseTreeModel;
 
 public class MailModel extends BaseTreeModel {
@@ -26,14 +28,23 @@ public class MailModel extends BaseTreeModel {
 
     List items = TestData.getMailItems();
     int count = items.size();
+    
+    List<MailItem> inlist = new ArrayList<MailItem>();
+    List<MailItem> sentlist = new ArrayList<MailItem>();
+    
+    
     for (int i = 0; i < count; i++) {
       MailItem item = (MailItem) items.get(i);
       if (i < (count / 2)) {
-        inbox.add(item);
+        inlist.add(item);
       } else {
-        sent.add(item);
+        sentlist.add(item);
       }
     }
+    
+    inbox.set("children", inlist);
+    sent.set("children", sentlist);
+    trash.set("children", new ArrayList());
 
     add(inbox);
     add(sent);

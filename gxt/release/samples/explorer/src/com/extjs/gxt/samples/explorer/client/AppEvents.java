@@ -13,4 +13,6 @@ public class AppEvents {
   
   public static final int ShowPage = 1;
   
+  public static final int HidePage = 2;
+  
 }

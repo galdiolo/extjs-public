@@ -7,13 +7,18 @@
  */
 package com.extjs.gxt.samples.explorer.client.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.extjs.gxt.ui.client.data.BaseTreeModel;
 
-public class Post extends BaseTreeModel {
+public class Post extends BaseTreeModel<Post> implements Serializable {
 
   protected Date dummy;
+  
+  public Post() {
+    
+  }
 
   public String getUsername() {
     return (String) get("username");

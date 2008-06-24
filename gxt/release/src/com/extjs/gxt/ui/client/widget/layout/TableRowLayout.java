@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.ui.client.widget.layout;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
@@ -21,43 +20,57 @@ import com.google.gwt.user.client.Element;
  */
 public class TableRowLayout extends TableLayout {
 
-  public HorizontalAlignment align = HorizontalAlignment.LEFT;
-
   private Element row;
 
+  @Override
   protected Element getNextCell(Component component) {
     TableData data = (TableData) component.getData();
     if (data == null) {
       data = new TableData();
       component.setData(data);
     }
+    
+    if (component.getData("width") != null) {
+      data.setWidth((String)component.getData("width"));
+    }
 
-    Element td = DOM.createTD();
+    El td = new El(DOM.createTD());
 
-    if (horizontalAlign != null) {
-      DOM.setElementProperty(td, "align", horizontalAlign.name());
-    }
-    if (data.padding > 0) {
-      DOM.setIntStyleAttribute(td, "padding", data.padding);
-    }
-    if (data.style != null) {
-      fly(td).setStyleName(data.style);
-    }
     if (data.horizontalAlign != null) {
-      DOM.setElementProperty(td, "align", data.horizontalAlign.name());
+      td.dom.setPropertyString("align", data.horizontalAlign.name());
+    } else if (cellHorizontalAlign != null) {
+      td.dom.setPropertyString("align", cellHorizontalAlign.name());
     }
-    if (data.verticalAlign != null) {
-      DOM.setStyleAttribute(td, "verticalAlign", data.verticalAlign.name());
-    }
-    if (data.height != null) {
-      DOM.setElementProperty(td, "height", data.height);
-    }
-    if (data.width != null) {
-      DOM.setElementProperty(td, "width", data.width);
-    }
-    DOM.appendChild(row, td);
 
-    return td;
+    if (data.verticalAlign != null) {
+      td.dom.setPropertyString("vAlign", data.verticalAlign.name());
+    } else if (cellVerticalAlign != null) {
+      td.dom.setPropertyString("vAlign", cellVerticalAlign.name());
+    }
+
+    if (data.getPadding() > 0) {
+      td.dom.getStyle().setPropertyPx("padding", data.getPadding());
+    } else if (cellPadding > 0) {
+      td.dom.getStyle().setPropertyPx("padding", cellPadding);
+    }
+    
+    if (data.getStyleName() != null) {
+      td.dom.setClassName(data.getStyleName());
+    }
+
+    if (data.getHeight() != null) {
+      td.dom.setPropertyString("height", data.getHeight());
+    }
+    if (data.getWidth() != null) {
+      td.dom.setPropertyString("width", data.getWidth());
+    }
+    
+    if (data.getStyle() != null) {
+      td.applyStyles(data.getStyle());
+    }
+    DOM.appendChild(row, td.dom);
+
+    return td.dom;
   }
 
   @Override
@@ -67,29 +80,29 @@ public class TableRowLayout extends TableLayout {
 
     target.removeChildren();
 
-    table = new El(DOM.createTable());
+    table = DOM.createTable().cast();
+    
+    if (getTableStyle() != null) {
+      fly(table).applyStyles(getTableStyle());
+    }
 
-    if (cellPadding != -1) {
-      table.setElementAttribute("cellPadding", cellPadding);
+    if (getCellPadding() != -1) {
+      table.setCellPadding(getCellPadding());
     }
     if (cellSpacing != -1) {
-      table.setElementAttribute("cellSpacing", cellSpacing);
+      table.setCellSpacing(cellSpacing);
     }
 
-    if (align == HorizontalAlignment.RIGHT) {
-      table.addStyleName("x-float-right");
+    if (getBorder() > 0) {
+      table.setBorder(getBorder());
     }
 
-    if (border > 0) {
-      table.setElementAttribute("border", border);
+    if (getWidth() != null) {
+      table.setWidth(getWidth());
     }
 
-    if (width != null) {
-      table.setWidth(width);
-    }
-
-    if (height != null) {
-      table.setHeight(height);
+    if (getHeight() != null) {
+      table.setPropertyString("height", getHeight());
     }
 
     tbody = DOM.createTBody();
@@ -98,13 +111,13 @@ public class TableRowLayout extends TableLayout {
     row = DOM.createTR();
     DOM.appendChild(tbody, row);
 
-    if (insertSpacer) {
+    if (getInsertSpacer()) {
       Element td = DOM.createTD();
       fly(td).setWidth("100%");
       DOM.appendChild(row, td);
     }
 
-    target.appendChild(table.dom);
+    target.dom.appendChild(table);
     renderAll(container, target);
   }
 
@@ -116,4 +129,5 @@ public class TableRowLayout extends TableLayout {
       DOM.appendChild(getNextCell(c), c.getElement());
     }
   }
+
 }

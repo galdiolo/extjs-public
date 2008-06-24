@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.widget;
 import com.extjs.gxt.ui.client.event.FxEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.PreviewEvent;
+import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.util.BaseEventPreview;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -21,12 +22,7 @@ import com.google.gwt.user.client.ui.RootPanel;
  */
 public class ModalPanel extends BoxComponent {
 
-  /**
-   * True to blink the widget being displayed when the use clicks outside of the
-   * widgets bounds (defaults to false).
-   */
-  public boolean blink;
-
+  private boolean blink;
   private Component component;
   private boolean blinking;
   private BaseEventPreview eventPreview;
@@ -40,45 +36,28 @@ public class ModalPanel extends BoxComponent {
     setShadow(false);
   }
 
-  @Override
-  protected void onRender(Element target, int index) {
-    super.onRender(target, index);
-    setElement(DOM.createDiv());
-    el.insertInto(target, index);
-    el.setSize("100%", "100%");
-
-    eventPreview = new BaseEventPreview() {
-
-      @Override
-      public boolean onPreview(PreviewEvent pe) {
-        return super.onPreview(pe);
-      }
-
-      @Override
-      protected boolean onAutoHide(PreviewEvent pe) {
-        if (blink && !blinking) {
-          blinking = true;
-          component.el.blink(new Listener<FxEvent>() {
-            public void handleEvent(FxEvent fe) {
-              blinking = false;
-            }
-          });
-        }
-        return false;
-      }
-
-    };
+  public BaseEventPreview getEventPreview() {
+    return eventPreview;
   }
 
   /**
    * Hides the panel.
    */
   public void hide() {
-    el.setZIndex(-1);
+    super.onHide();
+    el().setZIndex(-1);
     eventPreview.remove();
-    RootPanel.get().remove(this);
     RootPanel.get().remove(component);
+    RootPanel.get().remove(this);
+  }
 
+  /**
+   * Returns true if blinking is enabled.
+   * 
+   * @return the blink state
+   */
+  public boolean isBlink() {
+    return blink;
   }
 
   /**
@@ -90,8 +69,14 @@ public class ModalPanel extends BoxComponent {
     eventPreview.onEventPreview(event);
   }
 
-  public BaseEventPreview getEventPreview() {
-    return eventPreview;
+  /**
+   * True to blink the widget being displayed when the use clicks outside of the
+   * widgets bounds (defaults to false).
+   * 
+   * @param blink true to blink
+   */
+  public void setBlink(boolean blink) {
+    this.blink = blink;
   }
 
   /**
@@ -102,14 +87,46 @@ public class ModalPanel extends BoxComponent {
     RootPanel.get().add(this);
     RootPanel.get().add(component);
 
-    el.makePositionable(true);
-    el.updateZIndex(0);
-    component.el.updateZIndex(0);
+    el().makePositionable(true);
+    el().updateZIndex(0);
+    component.el().updateZIndex(0);
+    
+    super.show();
 
     eventPreview.getIgnoreList().removeAll();
     eventPreview.getIgnoreList().add(component.getElement());
 
     eventPreview.add();
+  }
+
+  @Override
+  protected void onRender(Element target, int index) {
+    super.onRender(target, index);
+    setElement(DOM.createDiv());
+    el().insertInto(target, index);
+    el().setSize("100%", "100%");
+
+    eventPreview = new BaseEventPreview() {
+
+      @Override
+      public boolean onPreview(PreviewEvent pe) {
+        return super.onPreview(pe);
+      }
+
+      @Override
+      protected boolean onAutoHide(PreviewEvent pe) {
+        if (isBlink() && !blinking) {
+          blinking = true;
+          component.el().blink(new FxConfig(new Listener<FxEvent>() {
+            public void handleEvent(FxEvent fe) {
+              blinking = false;
+            }
+          }));
+        }
+        return false;
+      }
+
+    };
   }
 
 }

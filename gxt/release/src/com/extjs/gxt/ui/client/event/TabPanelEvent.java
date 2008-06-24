@@ -19,31 +19,14 @@ import com.extjs.gxt.ui.client.widget.TabPanel;
  * 
  * @see TabPanel
  */
-public class TabPanelEvent extends ComponentEvent {
+public class TabPanelEvent extends ContainerEvent<TabPanel, TabItem> {
 
-  /**
-   * The event source.
-   */
-  public TabPanel tabPanel;
-
-  /**
-   * The tab item.
-   */
-  public TabItem item;
-
-  /**
-   * The insert index.
-   */
-  public int index;
-
-  /**
-   * Creates a new tab panel event.
-   * 
-   * @param tabPanel the source panel
-   */
-  public TabPanelEvent(TabPanel tabPanel) {
-    super(tabPanel);
-    this.tabPanel = tabPanel;
+  public TabPanelEvent(TabPanel container) {
+    super(container);
+  }
+  
+  public TabPanelEvent(TabPanel container, TabItem item) {
+    super(container, item);
   }
 
 }

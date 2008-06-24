@@ -12,15 +12,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.extjs.gxt.ui.client.event.StateEvent;
-import com.extjs.gxt.ui.client.util.Observable;
 
 /**
  * Abstract base class for state provider implementations. This class provides
  * methods for encoding and decoding objects.
  */
-public abstract class Provider extends Observable {
+public abstract class Provider extends BaseObservable {
 
+  protected StateManager manager;
+  
+  protected void bind(StateManager manager) {
+    this.manager = manager;
+  }
+  
   /**
    * Clears a value.
    * 
@@ -28,7 +34,7 @@ public abstract class Provider extends Observable {
    */
   public void clear(String name) {
     clearKey(name);
-    StateEvent se = new StateEvent();
+    StateEvent se = new StateEvent(manager);
     se.name = name;
     fireEvent(Events.StateChange, se);
   }
@@ -116,7 +122,7 @@ public abstract class Provider extends Observable {
   public void set(String name, Object value) {
     String val = encodeValue(value);
     setValue(name, val);
-    StateEvent re = new StateEvent();
+    StateEvent re = new StateEvent(manager, name, value);
     re.name = name;
     re.value = value;
     fireEvent(Events.StateChange, re);

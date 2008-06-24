@@ -10,7 +10,7 @@ package com.extjs.gxt.ui.client;
 import java.util.Map;
 
 import com.extjs.gxt.ui.client.core.El;
-import com.extjs.gxt.ui.client.fx.FxStyle;
+import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.messages.MyMessages;
 import com.extjs.gxt.ui.client.state.CookieProvider;
 import com.extjs.gxt.ui.client.state.StateManager;
@@ -19,6 +19,7 @@ import com.extjs.gxt.ui.client.util.Theme;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Timer;
 
 /**
  * GXT core utilities and functions.
@@ -29,11 +30,6 @@ public class GXT {
    * GXT messages.
    */
   public static MyMessages MESSAGES = (MyMessages) GWT.create(MyMessages.class);
-
-  /**
-   * The default theme (defaults to Theme.BLUE).
-   */
-  public static Theme defaultTheme = Theme.BLUE;
 
   /**
    * <code>true</code> if the browser is safari.
@@ -95,10 +91,11 @@ public class GXT {
    * URL to a 1x1 transparent gif image used by GXT to create inline icons with
    * CSS background images. Default value is 'images/default/shared/clear.gif';
    */
-  public static String BLANK_IMAGE_URL = GWT.getModuleBaseURL()
-      + "images/default/shared/clear.gif";
+  public static String BLANK_IMAGE_URL = GWT.getModuleBaseURL() + "images/default/shared/clear.gif";
 
   private static boolean initialized;
+  private static Theme defaultTheme;
+  private static boolean forceTheme;
 
   /**
    * Returns the current theme id.
@@ -106,7 +103,7 @@ public class GXT {
    * @return the theme id
    */
   public static String getThemeId() {
-    Map map = StateManager.getMap("theme");
+    Map map = StateManager.get().getMap("theme");
     if (map != null) {
       return map.get("id").toString();
     } else {
@@ -120,8 +117,8 @@ public class GXT {
    * @return the user agent
    */
   public native static String getUserAgent() /*-{
-     return $wnd.navigator.userAgent.toLowerCase();
-   }-*/;
+      return $wnd.navigator.userAgent.toLowerCase();
+    }-*/;
 
   /**
    * Hides the loading panel.
@@ -131,10 +128,14 @@ public class GXT {
   public static void hideLoadingPanel(String id) {
     final Element loading = XDOM.getElementById(id);
     if (loading != null) {
-      FxStyle fx = new FxStyle(loading);
-      fx.duration = 300;
-      fx.hideOnComplete = true;
-      fx.fadeOut();
+      final El l = new El(loading);
+      Timer t = new Timer() {
+        @Override
+        public void run() {
+          l.fadeOut(FxConfig.NONE);
+        }
+      };
+      t.schedule(1000);
     }
   }
 
@@ -146,6 +147,7 @@ public class GXT {
       return;
     }
     initialized = true;
+
     String ua = getUserAgent();
     isSafari = ua.indexOf("webkit") != -1;
     isOpera = ua.indexOf("opera") != -1;
@@ -181,28 +183,37 @@ public class GXT {
     }
 
     CookieProvider provider = new CookieProvider("/", null, null, false);
-    StateManager.setProvider(provider);
+    StateManager.get().setProvider(provider);
 
-    Map theme = StateManager.getMap("theme");
+    Map theme = StateManager.get().getMap("theme");
+    if ((defaultTheme != null && forceTheme) || (theme == null && defaultTheme != null)) {
+      theme = defaultTheme.asMap();
+    }
     if (theme != null) {
       String themeId = theme.get("id").toString();
       String fileName = theme.get("file").toString();
       CSS.addStyleSheet(themeId, "css/" + fileName);
-
       cls += " x-theme-" + themeId;
+      StateManager.get().set("theme", theme);
     }
 
-    El.fly(XDOM.getBody()).setStyleName(cls);
+    XDOM.getBody().setClassName(cls);
 
     initInternal();
   }
 
-  private static native void initInternal() /*-{
-
-     $wnd.Ext = {};
-     
-     @com.extjs.gxt.ui.client.core.Ext::load()();
-   }-*/;
+  /**
+   * Sets the default theme which will be used if the user does not have a theme
+   * selected with the state provider.
+   * 
+   * @param theme the default theme
+   * @param force true to force the theme, ignoring the the theme saved with the
+   *            state manager
+   */
+  public static void setDefaultTheme(Theme theme, boolean force) {
+    defaultTheme = theme;
+    forceTheme = force;
+  }
 
   /**
    * Changes the theme. A theme's stylehseets should be given a class = to the
@@ -213,12 +224,17 @@ public class GXT {
    * @param theme the new theme name.
    */
   public static void switchTheme(Theme theme) {
-    StateManager.set("theme", theme.asMap());
+    StateManager.get().set("theme", theme.asMap());
     XDOM.reload();
   }
 
+  private static native void initInternal() /*-{
+    $wnd.Ext = {};
+    @com.extjs.gxt.ui.client.core.Ext::load()();
+  }-*/;
+
   private static native boolean isSecure() /*-{
-       return $wnd.location.href.toLowerCase().indexOf("https") === 0;
-     }-*/;
+    return $wnd.location.href.toLowerCase().indexOf("https") === 0;
+  }-*/;
 
 }

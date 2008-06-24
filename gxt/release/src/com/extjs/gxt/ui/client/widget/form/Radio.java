@@ -8,12 +8,22 @@
 package com.extjs.gxt.ui.client.widget.form;
 
 import com.extjs.gxt.ui.client.event.ComponentEvent;
-import com.google.gwt.user.client.Element;
 
 /**
  * Single radio field. Same as Checkbox, but provided as a convenience for
  * automatically setting the input type. Radio grouping is handled automatically
  * by the browser if you give each radio in a group the same name.
+ * 
+ * <dl>
+ * <dt>Events:</dt>
+ * 
+ * <dd><b>Change</b> : FieldEvent(field)<br>
+ * <div>Fires when this field receives input focus.</div>
+ * <ul>
+ * <li>field : this</li>
+ * </ul>
+ * </dd>
+ * </dl>
  */
 public class Radio extends CheckBox {
 
@@ -29,30 +39,21 @@ public class Radio extends CheckBox {
   }
 
   @Override
-  public void setChecked(boolean checked) {
-    this.checked = checked;
-    if (rendered) {
-      input.setElementAttribute("checked", checked);
+  public void setValue(Boolean value) {
+    super.setValue(value);
+    if (value && group != null) {
+      group.onRadioSelected(this);
     }
-  }
-
-  @Override
-  public void setValue(Object value) {
-    this.value = value;
   }
 
   @Override
   protected void onClick(ComponentEvent be) {
+    if (readOnly) {
+      be.stopEvent();
+      return;
+    }
     if (group != null) {
       group.onRadioClick(this);
-    }
-  }
-
-  @Override
-  protected void onRender(Element target, int index) {
-    super.onRender(target, index);
-    if (checked) {
-      setChecked(true);
     }
   }
 

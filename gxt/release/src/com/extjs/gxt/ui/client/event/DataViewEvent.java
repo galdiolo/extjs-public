@@ -8,7 +8,7 @@
 package com.extjs.gxt.ui.client.event;
 
 import com.extjs.gxt.ui.client.widget.DataView;
-import com.google.gwt.user.client.Element;
+import com.extjs.gxt.ui.client.widget.DataViewItem;
 
 /**
  * DataView event type.
@@ -19,31 +19,19 @@ import com.google.gwt.user.client.Element;
  * 
  * @see DataView
  */
-public class DataViewEvent extends ComponentEvent {
+public class DataViewEvent extends ContainerEvent<DataView, DataViewItem> {
 
   /**
    * The source data view instance.
    */
   public DataView view;
 
-  /**
-   * The event element.
-   */
-  public Element element;
-
-  /**
-   * The element index.
-   */
-  public int index;
-
-  /**
-   * Creates a new data view event.
-   * 
-   * @param view the source view
-   */
   public DataViewEvent(DataView view) {
     super(view);
-    this.view = view;
+  }
+
+  public DataViewEvent(DataView view, DataViewItem item) {
+    super(view, item);
   }
 
 }

@@ -7,8 +7,6 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
 
 import com.extjs.gxt.ui.client.Events;
@@ -16,16 +14,13 @@ import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.event.FxEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.TabPanelEvent;
+import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.util.Params;
 import com.extjs.gxt.ui.client.util.WidgetHelper;
-import com.extjs.gxt.ui.client.viewer.DefaultSelection;
-import com.extjs.gxt.ui.client.viewer.Selection;
-import com.extjs.gxt.ui.client.viewer.SelectionChangedEvent;
-import com.extjs.gxt.ui.client.viewer.SelectionChangedListener;
-import com.extjs.gxt.ui.client.viewer.SelectionProvider;
 import com.extjs.gxt.ui.client.widget.layout.CardLayout;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -95,8 +90,6 @@ import com.google.gwt.user.client.Event;
  * </dd>
  * </dl>
  * 
- * <p>
- * 
  * <pre><code>
  TabPanel panel = new TabPanel();
  panel.resizeTabs = true;
@@ -115,7 +108,7 @@ import com.google.gwt.user.client.Event;
  * 
  * </p>
  */
-public class TabPanel extends AbstractContainer<TabItem> implements SelectionProvider {
+public class TabPanel extends Container<TabItem> {
 
   /**
    * Tab position enumeration.
@@ -156,12 +149,7 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
    */
   public static Template itemTemplate;
 
-  /**
-   * True to display an interior border on the body element of the panel, false
-   * to hide it (defaults to true).
-   */
   private boolean bodyBorder = true;
-
   private boolean border = true;
   private int tabMargin = 2;
   private int scrollIncrement = 100;
@@ -175,22 +163,20 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
   private boolean animScroll = false;
   private TabItem activeItem;
   private El body, bar, stripWrap, strip;
-  private Container<TabItem> container;
   private El edge, scrollLeft, scrollRight;
-  private CardLayout layout;
+  private CardLayout cardLayout;
   private boolean scrolling;
   private AccessStack stack;
-  private List<SelectionChangedListener> selectionListeners;
+  private boolean plain;
 
   /**
    * Creates a new tab panel.
    */
   public TabPanel() {
     baseStyle = "x-tab-panel";
-    attachChildren = false;
-    container = new Container<TabItem>();
-    container.setLayoutOnChange(true);
-    container.setBorders(false);
+    cardLayout = new CardLayout();
+    setLayout(cardLayout);
+    enableLayout = true;
   }
 
   /**
@@ -199,17 +185,8 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
    * 
    * @param item the item to be added
    */
-  public void add(TabItem item) {
-    insert(item, getItemCount());
-  }
-
-  public void addSelectionListener(SelectionChangedListener listener) {
-    if (selectionListeners == null) {
-      selectionListeners = new ArrayList<SelectionChangedListener>();
-    }
-    if (!selectionListeners.contains(listener)) {
-      selectionListeners.add(listener);
-    }
+  public boolean add(TabItem item) {
+    return super.add(item);
   }
 
   /**
@@ -223,7 +200,8 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
     int count = getItemCount();
     for (int i = 0; i < count; i++) {
       TabItem item = getItem(i);
-      if (item.getId().equals(id) || (checkText && item.getText().equals(id))) {
+      if (item.getItemId().equals(id) || item.getId().equals(id)
+          || (checkText && item.getText().equals(id))) {
         return item;
       }
     }
@@ -294,18 +272,6 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
   }
 
   /**
-   * Returns the current selection.
-   * 
-   * @return the selection.
-   */
-  public Selection getSelection() {
-    if (activeItem == null) {
-      return DefaultSelection.emptySelection();
-    }
-    return new DefaultSelection(activeItem.getData());
-  }
-
-  /**
    * Returns the panel's tab margin.
    * 
    * @return the margin
@@ -342,20 +308,18 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
   }
 
   /**
-   * Inserts a tab item. Fires the <i>BeforeAdd</i> event before inserting,
-   * then fires the <i>Add</i> event after the widget has been inserted.
+   * Adds a tab item. Fires the <i>BeforeAdd</i> event before inserting, then
+   * fires the <i>Add</i> event after the widget has been inserted.
    * 
    * @param item the item to be inserted
    * @param index the insert position
    */
-  public void insert(TabItem item, int index) {
-    TabPanelEvent tpe = new TabPanelEvent(this);
-    tpe.item = item;
-    tpe.index = index;
-    if (fireEvent(Events.BeforeAdd, tpe)) {
+  @Override
+  public boolean insert(TabItem item, int index) {
+    boolean added = super.insert(item, index);
+    if (added) {
       item.tabPanel = this;
-      super.insert(item, index);
-      container.insert(item, index);
+      item.setAutoHeight(isAutoHeight());
       if (rendered) {
         renderItem(item, index);
         if (isAttached()) {
@@ -363,8 +327,8 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
         }
         delegateUpdates();
       }
-      fireEvent(Events.Add, tpe);
     }
+    return added;
   }
 
   /**
@@ -374,6 +338,15 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
    */
   public boolean isAutoSelect() {
     return autoSelect;
+  }
+
+  /**
+   * Returns true if the tab strip will be rendered without a background.
+   * 
+   * @return the plain state
+   */
+  public boolean isPlain() {
+    return plain;
   }
 
   public void onComponentEvent(ComponentEvent ce) {
@@ -398,22 +371,19 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
    * @param item the item to be removed
    */
   public boolean remove(TabItem item) {
-    TabPanelEvent tpe = new TabPanelEvent(this);
-    tpe.item = item;
-    if (fireEvent(Events.BeforeRemove, tpe)) {
-      stack.remove(item);
-      container.remove(item);
-      
-      super.remove(item);
-
+    boolean removed = super.remove(item);
+    if (removed) {
+      if (stack != null) {
+        stack.remove(item);
+      }
       if (rendered) {
         if (item.header.isRendered()) {
-          strip.removeChild(item.header.getElement());
-          if (isAutoDestroy()) {
-            item.header.destroy();
+          item.header.removeStyleName("x-tab-strip-active");
+          strip.dom.removeChild(item.header.getElement());
+          if (item.header.isAttached()) {
+            WidgetHelper.doDetach(item.header);
           }
         }
-
         if (item == activeItem) {
           activeItem = null;
           TabItem next = this.stack.next();
@@ -422,32 +392,22 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
           } else if (getItemCount() > 0) {
             setSelection(getItem(0));
           } else {
-            layout.setActiveItem(null);
+            getLayout().activeItem = null;
           }
         }
-
       }
-      fireEvent(Events.Remove, tpe);
-      return true;
     }
-    return false;
+
+    return removed;
   }
 
-  /**
-   * Removes all items.
-   */
-  public void removeAll() {
-    int size = getItemCount();
-    for (int i = 0; i < size; i++) {
-      TabItem item = getItem(0);
-      remove(item);
+  @Override
+  public boolean removeAll() {
+    int count = getItemCount();
+    for (int i = 0; i < count; i++) {
+      remove(getItem(0));
     }
-  }
-
-  public void removeSelectionListener(SelectionChangedListener listener) {
-    if (selectionListeners != null) {
-      selectionListeners.remove(listener);
-    }
+    return getItemCount() == 0;
   }
 
   /**
@@ -460,7 +420,7 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
     if (item == null) return;
     int pos = getScollPos();
     int area = getScrollArea();
-    El itemEl = item.header.el;
+    El itemEl = item.header.el();
     int left = itemEl.getOffsetsTo(stripWrap.dom).x + pos;
     int right = left + itemEl.getWidth();
     if (left < pos) {
@@ -478,6 +438,14 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
    */
   public void setAnimScroll(boolean animScroll) {
     this.animScroll = animScroll;
+  }
+
+  @Override
+  public void setAutoHeight(boolean autoHeight) {
+    super.setAutoHeight(autoHeight);
+    for (TabItem item : getItems()) {
+      item.setAutoHeight(autoHeight);
+    }
   }
 
   /**
@@ -520,6 +488,17 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
   }
 
   /**
+   * True to render the tab strip without a background container image (defaults
+   * to false, pre-render).
+   * 
+   * @param plain
+   */
+  public void setPlain(boolean plain) {
+    assertPreRender();
+    this.plain = plain;
+  }
+
+  /**
    * True to automatically resize each tab so that the tabs will completely fill
    * the tab strip (defaults to false). Setting this to true may cause specific
    * widths that might be set per tab to be overridden in order to fit them all
@@ -553,18 +532,6 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
     this.scrollIncrement = scrollIncrement;
   }
 
-  public void setSelection(Selection selection) {
-    Object element = selection.getFirstElement();
-    if (element != null) {
-      for (TabItem item : getItems()) {
-        if (element == item.getData() || element.equals(item.getData())) {
-          setSelection(item);
-          return;
-        }
-      }
-    }
-  }
-
   /**
    * Sets the selected tab item. Fires the <i>BeforeSelect</i> event before
    * selecting, then fires the <i>Select</i> event after the widget has been
@@ -573,8 +540,7 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
    * @param item the item to be selected
    */
   public void setSelection(TabItem item) {
-    TabPanelEvent tpe = new TabPanelEvent(this);
-    tpe.item = item;
+    TabPanelEvent tpe = new TabPanelEvent(this, item);
     if (item == null || !fireEvent(Events.BeforeSelect, tpe)) {
       return;
     }
@@ -583,6 +549,7 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
       activeItem = item;
       return;
     }
+
     if (activeItem != item) {
       if (activeItem != null) {
         activeItem.header.removeStyleName("x-tab-strip-active");
@@ -590,15 +557,14 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
       item.header.addStyleName("x-tab-strip-active");
       activeItem = item;
       stack.add(activeItem);
-      layout.setActiveItem(item);
-      container.layout(true);
+      cardLayout.setActiveItem(item);
+
+      item.layout();
 
       if (scrolling) {
         scrollToTab(item, getAnimScroll());
       }
       fireEvent(Events.Select, tpe);
-      SelectionChangedEvent se = new SelectionChangedEvent(this, getSelection());
-      fireSelectionChanged(se);
     }
   }
 
@@ -613,9 +579,9 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
   }
 
   /**
-   * Sets the position where the tab strip should be rendered (defaults to TOP, pre-render).
-   * The only other supported value is BOTTOM. Note that tab scrolling is only
-   * supported for position TOP.
+   * Sets the position where the tab strip should be rendered (defaults to TOP,
+   * pre-render). The only other supported value is BOTTOM. Note that tab
+   * scrolling is only supported for position TOP.
    * 
    * @param tabPosition the tab position
    */
@@ -643,8 +609,40 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
     this.tabWidth = tabWidth;
   }
 
-  protected void afterRender() {
-    super.afterRender();
+  @Override
+  protected ComponentEvent createComponentEvent(Event event) {
+    return new TabPanelEvent(this);
+  }
+
+  @Override
+  protected ContainerEvent createContainerEvent(TabItem item) {
+    return new TabPanelEvent(this, item);
+  }
+
+  @Override
+  protected void doAttachChildren() {
+    super.doAttachChildren();
+    for (TabItem item : getItems()) {
+      WidgetHelper.doAttach(item.header);
+    }
+  }
+
+  @Override
+  protected void doDetachChildren() {
+    super.doDetachChildren();
+    for (TabItem item : getItems()) {
+      WidgetHelper.doDetach(item.header);
+    }
+  }
+
+  @Override
+  protected El getLayoutTarget() {
+    return body;
+  }
+
+  @Override
+  protected void onAttach() {
+    super.onAttach();
     if (activeItem != null) {
       TabItem item = activeItem;
       activeItem = null;
@@ -652,35 +650,22 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
     } else if (activeItem == null && isAutoSelect() && getItemCount() > 0) {
       setSelection(getItem(0));
     }
-    if (getResizeTabs()) {
+    if (resizeTabs) {
       autoSizeTabs();
     }
   }
 
-  protected void doAttachChildren() {
-    WidgetHelper.doAttach(container);
-    for (TabItem item : getItems()) {
-      WidgetHelper.doAttach(item.header);
-    }
-  }
-
-  protected void doDetachChildren() {
-    WidgetHelper.doDetach(container);
-    for (TabItem item : getItems()) {
-      WidgetHelper.doDetach(item.header);
-    }
-  }
-
+  @Override
   protected void onRender(Element target, int index) {
     setElement(DOM.createDiv(), target, index);
     stack = new AccessStack();
 
     if (tabPosition == TabPosition.TOP) {
-      bar = el.createChild("<div class='x-tab-panel-header'></div>");
-      body = el.createChild("<div class='x-tab-panel-body x-tab-panel-body-top'></div");
+      bar = el().createChild("<div class='x-tab-panel-header'></div>");
+      body = el().createChild("<div class='x-tab-panel-body x-tab-panel-body-top'></div");
     } else {
-      body = el.createChild("<div class='x-tab-panel-body x-tab-panel-body-bottom'></div");
-      bar = el.createChild("<div class='x-tab-panel-footer'></div>");
+      body = el().createChild("<div class='x-tab-panel-body x-tab-panel-body-bottom'></div");
+      bar = el().createChild("<div class='x-tab-panel-footer'></div>");
     }
 
     if (!bodyBorder) {
@@ -706,7 +691,12 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
     edge = strip.createChild("<li class=x-tab-edge></li>");
     strip.createChild("<div class=x-clear></div>");
 
-    body.addStyleName("x-tab-panel-body-" + getTabPosition());
+    body.addStyleName("x-tab-panel-body-" + tabPosition);
+
+    if (plain) {
+      String p = tabPosition == TabPosition.BOTTOM ? "bottom" : "header";
+      bar.addStyleName("x-tab-panel-" + p + "-plain");
+    }
 
     if (itemTemplate == null) {
       StringBuffer sb = new StringBuffer();
@@ -717,28 +707,27 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
       itemTemplate = new Template(sb.toString());
       itemTemplate.compile();
     }
-    layout = new CardLayout();
-    container.setLayout(layout);
 
     renderAll();
-    container.render(body.dom);
 
-    el.addEventsSunk(Event.ONCLICK | Event.MOUSEEVENTS);
+    el().addEventsSunk(Event.ONCLICK | Event.MOUSEEVENTS);
+
   }
 
+  @Override
   protected void onResize(int width, int height) {
     int hh = getFrameHeight();
-    width -= el.getFrameWidth("lr");
+    width -= el().getFrameWidth("lr");
     if (height != Style.DEFAULT) {
       body.setHeight(height - hh, true);
+    } else {
+      body.setHeight("auto");
     }
     if (width != Style.DEFAULT) {
-//      bar.setWidth(width, true);
-//      body.setWidth(width, true);
+      bar.setWidth(width, true);
+      body.setWidth(width, true);
     }
 
-    container.setSize(width, height - hh);
-    container.layout();
     delegateUpdates();
   }
 
@@ -752,7 +741,10 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
     ce.stopEvent();
     Element target = ce.getTarget();
     if (fly(target).getStyleName().equals("x-tab-strip-close")) {
-      remove(item);
+      TabPanelEvent e = new TabPanelEvent(this, item);
+      if (item.fireEvent(Events.BeforeClose, e) && remove(item)) {
+        item.fireEvent(Events.Close, new TabPanelEvent(this, item));
+      }
       return;
     } else if (item != activeItem) {
       setSelection(item);
@@ -760,7 +752,7 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
   }
 
   void onItemOver(TabItem item, boolean over) {
-    item.header.el.setStyleName("x-tab-strip-over", over);
+    item.header.el().setStyleName("x-tab-strip-over", over);
   }
 
   void onItemRender(TabItem item, Element target, int pos) {
@@ -783,8 +775,7 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
       item.template = itemTemplate;
     }
     item.header.setElement(item.template.create(p));
-
-    item.header.el.addEventsSunk(Event.ONCLICK);
+    item.header.el().addEventsSunk(Event.ONCLICK | Event.MOUSEEVENTS);
 
     DOM.insertChild(target, item.header.getElement(), pos);
   }
@@ -838,11 +829,11 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
     int count = getItemCount();
     if (count == 0) return;
     int aw = bar.getClientWidth();
-    int each = (int) Math.max(Math.min(Math.floor((aw - 4) / count) - getTabMargin(),
-        tabWidth), getMinTabWidth());
+    int each = (int) Math.max(Math.min(Math.floor((aw - 4) / count) - getTabMargin(), tabWidth),
+        getMinTabWidth());
 
     for (int i = 0; i < count; i++) {
-      El el = getItem(i).header.el;
+      El el = getItem(i).header.el();
       Element inner = el.childNode(1).firstChild().firstChild().dom;
       int tw = el.getWidth();
       int iw = fly(inner).getWidth();
@@ -862,24 +853,16 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
   }
 
   private void delegateUpdates() {
-    if (getResizeTabs() && rendered) {
+    if (resizeTabs && rendered) {
       autoSizeTabs();
     }
-    if (getTabScroll() && rendered) {
+    if (tabScroll && rendered) {
       autoScrollTabs();
     }
   }
 
-  private void fireSelectionChanged(SelectionChangedEvent se) {
-    if (selectionListeners != null) {
-      for (SelectionChangedListener listener : selectionListeners) {
-        listener.selectionChanged(se);
-      }
-    }
-  }
-
   private int getFrameHeight() {
-    int h = el.getFrameWidth("tb");
+    int h = el().getFrameWidth("tb");
     h += bar.getHeight();
     return h;
   }
@@ -926,16 +909,20 @@ public class TabPanel extends AbstractContainer<TabItem> implements SelectionPro
   }
 
   private void renderItem(TabItem item, int index) {
-    item.header.render(strip.dom, index);
+    if (item.header.isRendered()) {
+      strip.insertChild(item.header.getElement(), index);
+    } else {
+      item.header.render(strip.dom, index);
+    }
   }
 
   private void scrollTo(int pos, boolean animate) {
     if (animate) {
-      stripWrap.scrollTo("left", pos, getScrollDuration(), new Listener<FxEvent>() {
+      stripWrap.scrollTo("left", pos, new FxConfig(new Listener<FxEvent>() {
         public void handleEvent(FxEvent fe) {
           updateScrollButtons();
         }
-      });
+      }));
     } else {
       stripWrap.scrollTo("left", pos);
       updateScrollButtons();

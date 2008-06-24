@@ -7,9 +7,9 @@
  */
 package com.extjs.gxt.ui.client.core;
 
-
 import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.data.ModelStringProvider;
 import com.extjs.gxt.ui.client.js.JsUtil;
 import com.extjs.gxt.ui.client.util.Params;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -27,7 +27,26 @@ public class Template {
   }
 
   private JavaScriptObject t;
-  
+  private ModelStringProvider stringProvider;
+
+  /**
+   * Returns the template's string provider.
+   * 
+   * @return the string provider
+   */
+  public ModelStringProvider getStringProvider() {
+    return stringProvider;
+  }
+
+  /**
+   * Sets the string provider for the template.
+   * 
+   * @param stringProvider the string provider
+   */
+  public void setStringProvider(ModelStringProvider stringProvider) {
+    this.stringProvider = stringProvider;
+  }
+
   /**
    * Creates a new template with the given html.
    * 
@@ -118,8 +137,8 @@ public class Template {
    * overhead.
    */
   public native void compile() /*-{
-     var t = this.@com.extjs.gxt.ui.client.core.Template::t;
-     t.compile();
+   var t = this.@com.extjs.gxt.ui.client.core.Template::t;
+   t.compile();
    }-*/;
 
   /**
@@ -177,34 +196,34 @@ public class Template {
    * @param compile <code>true<code> to compile
    */
   public native void set(String html, boolean compile) /*-{
-    var t = this.@com.extjs.gxt.ui.client.core.Template::t;
-    t.set(html, compile);
-  }-*/;
+   var t = this.@com.extjs.gxt.ui.client.core.Template::t;
+   t.set(html, compile);
+   }-*/;
 
-  private native static Element insertInternal(String method, JavaScriptObject t,
-     Element el, JavaScriptObject values) /*-{
-       return t[name](el, values);
-     }-*/;
+  private native static Element insertInternal(String method, JavaScriptObject t, Element el,
+      JavaScriptObject values) /*-{
+   return t[name](el, values);
+   }-*/;
 
   private native static String applyInternal(JavaScriptObject t, JavaScriptObject values) /*-{
-     return t.applyTemplate(values);
+   return t.applyTemplate(values);
    }-*/;
 
   private native static Element appendInternal(JavaScriptObject t, Element el,
       JavaScriptObject values) /*-{
-    return t.append(el, values);
-  }-*/;
+   return t.append(el, values);
+   }-*/;
 
   private native static JavaScriptObject create(String html) /*-{
-     return new $wnd.Ext.Template(html);
+   return new $wnd.Ext.Template(html);
    }-*/;
 
   public String getHtml() {
     return getHtml(t);
   }
-  
+
   private native static String getHtml(JavaScriptObject t) /*-{
-    return t.html;
-  }-*/;
+   return t.html;
+   }-*/;
 
 }

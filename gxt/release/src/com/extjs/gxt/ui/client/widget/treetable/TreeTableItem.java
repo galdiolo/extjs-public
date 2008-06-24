@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.ui.client.widget.treetable;
 
-
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -150,13 +149,12 @@ import com.google.gwt.user.client.Element;
 public class TreeTableItem extends TreeItem {
 
   protected TreeTable treeTable;
-
-  String[] toolTips;
-  ToolTip cellToolTip;
-  boolean hasWidgets;
-  String[] cellStyles;
-  boolean cellsRendered;
-  private Object[] values;
+  protected String[] cellStyles;
+  protected boolean cellsRendered;
+  protected Object[] values;
+  protected String[] toolTips;
+  protected ToolTip cellToolTip;
+  protected boolean hasWidgets;
 
   /**
    * Creates a new tree table item.
@@ -217,12 +215,12 @@ public class TreeTableItem extends TreeItem {
 
   public void onComponentEvent(ComponentEvent ce) {
     if (ui != null) {
-      getUI().handleEvent((TreeTableEvent)ce);
+      getUI().handleEvent((TreeTableEvent) ce);
     }
 
-//    if (cellToolTip != null) {
-//      cellToolTip.handleEvent(be);
-//    }
+    // if (cellToolTip != null) {
+    // cellToolTip.handleEvent(be);
+    // }
 
     switch (ce.type) {
       case Events.OnClick:
@@ -322,7 +320,7 @@ public class TreeTableItem extends TreeItem {
   protected String[] getRenderedValues() {
     String[] svalues = new String[values.length];
     for (int i = 0; i < values.length; i++) {
-      svalues[i] = treeTable.getRenderedValue(i, values[i]);
+      svalues[i] = treeTable.getRenderedValue(this, i, values[i]);
     }
     return svalues;
   }
@@ -335,7 +333,7 @@ public class TreeTableItem extends TreeItem {
   protected TreeItemUI getTreeItemUI() {
     return new TreeTableItemUI(this);
   }
-  
+
   protected void onRender(Element target, int index) {
     ui = getTreeItemUI();
     ui.render(target, index);
@@ -347,10 +345,10 @@ public class TreeTableItem extends TreeItem {
   }
 
   protected void initCellToolTips() {
-//    if (cellToolTip == null && isRendered()) {
-//      cellToolTip = new ToolTip(this);
-//      cellToolTip.setTrackMouse(true);
-//    }
+    // if (cellToolTip == null && isRendered()) {
+    // cellToolTip = new ToolTip(this);
+    // cellToolTip.setTrackMouse(true);
+    // }
   }
 
   public void setElement(Element elem) {
@@ -369,14 +367,15 @@ public class TreeTableItem extends TreeItem {
       return;
     }
 
-//    if (cellToolTip != null) {
-//      if (toolTips != null && toolTips[index] != null && toolTips[index].length() > 0) {
-//        cellToolTip.setText(null, toolTips[index]);
-//        cellToolTip.setVisible(true);
-//      } else {
-//        cellToolTip.setVisible(false);
-//      }
-//    }
+    // if (cellToolTip != null) {
+    // if (toolTips != null && toolTips[index] != null &&
+    // toolTips[index].length() > 0) {
+    // cellToolTip.setText(null, toolTips[index]);
+    // cellToolTip.setVisible(true);
+    // } else {
+    // cellToolTip.setVisible(false);
+    // }
+    // }
   }
 
   protected void onClick(ComponentEvent ce) {

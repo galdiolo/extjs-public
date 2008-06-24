@@ -15,9 +15,6 @@
 		letter-spacing:-1px;
 		margin:7px 0pt;
       }
-      li a {
-      
-      }
       li {
         margin-bottom: 0.5em;
       }
@@ -32,9 +29,222 @@
   <body>
     <h1>Ext GWT Library Release Notes</h1>
     <ul>
-      <li><a href="#Release_Notes_Current">Release 1.0 Beta 2</a></li>
+      <li><a href="#Release_Notes_Current">Release 1.0 Current</a></li>
+      <li><a href="#Release_Notes_1.0-rc1">Release 1.0 RC1</a></li>
+      <li><a href="#Release_Notes_1.0-beta5">Release 1.0 Beta 5</a></li>
+      <li><a href="#Release_Notes_1.0-beta4">Release 1.0 Beta 4</a></li>
+      <li><a href="#Release_Notes_1.0-beta3">Release 1.0 Beta 3</a></li>
+      <li><a href="#Release_Notes_1.0-beta2">Release 1.0 Beta 2</a></li>
     </ul>
-    <h2><a name="Release_Notes_Current">Release Notes 1.0 Beta 2</a></h2>
+    <h2><a name="Release_Notes_RC1">Release Notes 1.0 Current</a></h2>
+    <h3>General Changes &amp; Enhancements</h3>
+    <ul>
+    	<li>Added TriggerClick event to TriggerField</li>
+    	<li>CheckBox Change event fires on click, from on blur</li>
+    </ul>
+    
+    <h3>Bug Fixes</h3>
+    <ul>
+    	<li>Sort not applied when inserting into ListStore with a sorter</li>
+    	<li>Table binder not sorting containers items when sorting</li>
+    	<li>DatePicker not selecting values</li>
+    	<li>AbstractSelectionModel bug when selecting pre-render</li>
+    </ul>
+    
+    <h2><a name="Release_Notes_RC1">Release Notes 1.0 RC1</a></h2>
+
+    <h3>General Changes &amp; Enhancements</h3>
+    <ul>
+    	<li>BeforeClose event added to TabItem</li>
+    	<li>Added AdapterField</li>
+    	<li>New classes: LayoutData, FillData, FlowData</li>
+    	<li>North and South region in BorderLayout can be floated</li>
+    	<li>Added sort method to DataList</li>
+    </ul>
+    
+    <h3>API Changes</h3>
+    <ul>
+    	<li>StateManager changed to singleton</li>
+    	<li>Registry get changed to use generics</li>
+    	<li>Popup getIgnoreList returns a CompositeElement, was a List</li>
+    	<li>SelectionChange event now always includes the selected items in the new selection field in ContainerEvent</li>
+    	<li>Added setReadOnly method to FormPanel</li>
+    	<li>Removed initialWidth and initialHeight from TextArea</li>
+    </ul>
+    
+ 	<h3>Bug Fixes</h3>
+    <ul>
+    	<li>FormLayout was overriding field width when specified</li>
+    	<li>Table not rendering properly when first loaded by binder (no scroll bars)</li>
+    	<li>Text align not working in table columns</li>
+    	<li>Table vertical lines not working</li>
+    	<li>Header text does not display when collapsing north or south region in BorderLayout</li>
+    	<li>RowLayout not monitoring resize</li>
+    	<li>Menu not hiding MenuItems properly. Menu width not adjusting to changes to Menu</li>
+    	<li>LayoutContainer setting layout data after inserting component</li>
+    	<li>Missing Slate styles for DataList</li>
+    	<li>getNestedValue in BaseModelData error</li>
+    	<li>DataView not fire DataViewEvent event type</li>
+    	<li>setText and setIconStyle not working after render for DataListItem</li>
+    	<li>Rendering a ContentPanel collapsed results in the panel first being expanded</li>
+    	<li>TreeBinder onAdd null pointer for RootTreeItem</li>
+    	<li>NumberPropertyEditor not handling all number types</li>
+    	<li>Restore size in Window broken</li>
+    	<li>DateField and ComboBox allow dropdown and menu to show when read-only</li>
+    	<li>FormPanel getFields class cast exception</li>
+    </ul>
+    
+    <h2><a name="Release_Notes_1.0-beta5">Release Notes 1.0 Beta 5</a></h2>
+    
+    <h3>General Changes &amp; Enhancements</h3>
+    <ul>
+    	<li>Generic support added to TreeModel and BaseTreeModel</li>
+    	<li>Added auto height support to TabPanel. New TabPanel "plain" style. TabItems can be disabled.</li>
+    	<li>Auto height support added to Table. No vertical scroll bar when not needed.</li>
+    </ul>
+    <h3>API Changes</h3>
+    <ul>
+    	<li>TreeBinder.removeAll removed. Use Store API</li>
+    	<li>KeyNav cancelBubble default changed from true to false</li>
+    	<li>TwinTriggerField twinTriggerStyle field changed to getters / setters</li>
+    	<li>AppEvent(int type, String token) constructor removed as ambiguous with AppEvent(int type, Data data)</li>
+    	<li>getProperties() added to ModelData</li>
+    	<li>public fields encapsulated in Draggable</li>
+    	<li>SelectionModel refactoring</li>
+    	<li>CellRenderer render method changed to "public String render(T item, String property, Object value);"</li>
+    	<li>RowLayout and FillLayout changes, see javadocs for updated</li>
+    	<li>MessageBox public fields encapsulated. Removed callback param from prompt, use addCallback</li>
+    	<li>Moved PagingToolBar messages into inner class</li>
+    	<li>New addChildren param added to 4 add and 4 insert methods in TreeStore</li>
+    	<li>Spacing config removed from FlowLayout, apply margins to components instead</li>
+    	<li>SelectionListener and SelectionChangedListener changed to abstract classes. You must pass a type when creating new instances. "new SelectionListener&lt;ComponentEvent&gt;"</li>
+    </ul>
+    
+ 	<h3>Bug Fixes</h3>
+    <ul>
+    	<li>Null pointer in Tree.removeAll</li>
+    	<li>ContextMenu broken with Firefox / Mac</li>
+    	<li>Null pointer when remove field from FormPanel before it is rendered</li>
+    	<li>Table columns not clipping content when resizing</li>
+    	<li>Select on focus not working on ComboBox</li>
+    	<li>Tab index not working on checks and radios</li>
+    	<li>TreeTableBinder update and findItem broken</li>
+    	<li>Table setColumnContextMenu not working</li>
+    	<li>Add secure URL to shim in Layer</li>
+    	<li>Field labelStyle not working</li>
+    	<li>Collapse panel not showing heading for NORTH and SOUTH</li>
+    	<li>ContentPanel / AccordionLayout hide collapse tool not working</li>
+    	<li>StatusBar clear() not clearing content.</li>
+    	<li>RowLayout bug when having 1+ child components</li>
+    	<li>LabelField shows the the label separator</li>
+    	<li>NumberField default minValue was not negative</li>
+    	<li>Field onKeyDown not being called</li>
+    	<li>Modal panel not showing after closing and opening a window</li>
+    </ul>
+
+    <h2><a name="Release_Notes_1.0-beta4">Release Notes 1.0 Beta 4</a></h2>
+
+    <h3>General Changes &amp; Enhancements</h3>
+    <ul>
+		<li>GXT code compiled against GWT RC1</li>
+    	<li>Sorting support added to TreeStore, see javadocs for more information</li>
+    	<li>New ColumnLayout</li>
+    	<li>New CheckProvider, CheckChangedListener, CheckChangedEvent</li>
+    	<li>DataListBinder and TreeBinder now implement CheckProvider</li>
+    	<li>New CardPanel</li>
+    	<li>New TableListener and TableListenerAdapter</li>
+    	<li>ComboBox is a SelectionProvider</li>
+    </ul>
+    <h3>API Changes</h3>
+    <ul>
+    	<li>Layout layout() method changed from public to protected</li>
+    	<li>TextToolItem and ToogleToolItem now fire ToolBarEvents, rather than ButtonEvent</li>
+    	<li>getLimit() added to PagingLoader interface</li>
+    	<li>SelectionProvider addSelectionListener and removeSelectionListener renamed to addSelectionChangedListener and removeSelectionChangedListener.</li>
+    	<li>Destroy functionality removed as deemed unneccesary with GWT development</li>
+    	<li>Window close() method removed as destroying components is removed</li>
+    	<li>getSelectedRecord removed from ComboBox as getValue returns the model instance</li>
+    	<li>Validator made generic</li>
+    	<li>Item renamed to MenuItem, MenuItem renamed to Item, TextMenuItem removed (use MenuItem)</li>
+    	<li>Dialog buttonPressedAction removed and replaced with setHideOnButtonClick</li>
+    	<li>removeAll and update made protected in StoreBinder. Calls should be made on Store</li>
+    	<li>Buttons and button bar moved to new button package</li>
+    	<li>HistoryEvent removed</li>
+    	<li>FillLayout and RowLayout changes</li>
+    	<li>Default margins removed from BorderLayoutData. Default is now 0 margins</li>
+    	<li>All typed listeners are now classes, all adapters removed</li>
+    	<li>getPadding / setPadding moved from FormPanel to FormLayout</li>
+    </ul>
+    <h3>Bug Fixes</h3>
+    <ul>
+    	<li>Minimize button not added to Window</li>
+    	<li>Hide / Show Column bugs with Table</li>
+    	<li>ButtonBar alignment and remove bug</li>
+    	<li>TreeStore not working with sorter</li>
+    	<li>onModelChange implemented for TreeStore(Add, Update, Remove) and ListStore(Update)</li>
+    	<li>Class cast exception in TableHeader with TreeTable</li>
+    	<li>BeforeCheckChange and CheckChange bugs with Tree</li>
+    	<li>CheckChange not firing on DataList</li>
+    	<li>Error icon not showing after being displayed</li>
+    	<li>ComboBox not clearing selection when collapsing list</li>
+    	<li>Tab key not handled when list is open in ComboBox without a selection</li>
+    	<li>update in binders was not updating model referece store on child comonent (setData)</li>
+    	<li>BorderLayout setting container's position to absolute, should be relative if not previously marked aboslute</li>
+    	<li>Window opens to previous location and size if hidden to opened</li>
+    	<li>Hide / Show bug in Table / TreeTable in FF</li>
+    	<li>IE bug with ComboBox. Validation applied when trigger was clicked (focus / blur)</li>
+    	<li>Force selection not implemented in ComboBox</li>
+    	<li>Style provider not used in TreeBinder</li>
+    	<li>DataList moveSelectedUp and moveSelectedDown causing items to be removed</li>
+    	<li>Radio duplicating change events</li>
+    </ul>
+    <h2><a name="Release_Notes_1.0-beta3">Release Notes 1.0 Beta 3</a></h2>
+    <h3>General Changes &amp; Enhancements</h3>
+    <ul>
+    	<li>All Eclipse Public License (EPL) based code removed from project, including the Viewer package. All removed functionality is still available with the updated data and store packages.</li>
+    	<li>Observable changed to interface, BaseObservable provides default implementatation. Both classes moved to event package.</li>
+    	<li>Store is abstract with ListStore and TreeStore subclasses.</li>
+    	<li>4-way margins added to layouts.</li>
+    	<li>getHeader() added to TabPanel. ToolTips can now be set and the header can be hidden.</li>
+    	<li>Fx package refactored to use GWT 1.5 Animation class. Effects are now interface driven.</li>
+    	<li>LoadConfig marker interface removed, config can be any type.</li>
+    	<li>Added read-only behavior to RadioGroup / Radio and CheckBoxGroup / CheckBox.</li>
+    	<li>Added MultiField which RadioGroup and CheckBoxGroup now extends. MultiField has Validator support.</li>
+    	<li>Added CloseAction enum to Window, default action is CLOSE. Click close button in window header now uses close action to determine behavior.</li>
+    	<li>Added LabelField which can be used to display static text.</li>
+    	<li>All component messages moved into public inner class with getters / setters.</li>
+    	<li>BaseModelData supports nested properties with get and set.</li>
+    	<li>Form Field API now fully generic.</li>
+    	<li>NumberField allow negative and decimal seperator implemented.</li>
+    	<li>GXT.defaultTheme replaced with GXT.setDefaultTheme(Theme theme, boolean force).</li>
+    </ul>
+    <h3>Bug Fixes</h3>
+    <ul>
+    	<li>Significent changes with containers. AbststractContainer renamed to Container. Container renamed to LayoutContainer.</li>
+    	<li>Added initial width, initial height, and prevent scroll bar options to TextArea</li>
+    	<li>Fixed null pointer in BaseModel constructor using a map</li>
+    	<li>Name not being set in setName after render for Field</li>
+    	<li>Removed clear hover styles in TreeTable, clear hover style on deselect</li>
+    	<li>Fields lables removed when field removed from panel</li>
+    	<li>Error calculating height with NORTH / SOUTH percentage based sizes in BorderLayout</li>
+    	<li>Context menu now positioned absolutely</li>
+    	<li>Menu now adjusts width based on content in FF</li>
+    	<li>item field null in container remove event</li>
+    	<li>LayoutContainer remove parameter changed to widget</li>
+    	<li>Rendered TreeItems can be added to parent TreeItems</li>
+    	<li>Can't change the icon style of tab after being rendered</li>
+    	<li>Form fields not actually disabled when disable is called</li>
+    	<li>disable / enable not working on CheckBoxGroup and RadioGroup</li>
+    	<li>Initial render of error icon in was too far right in ie</li>
+    	<li>MessageBox updateText() was not updated the message</li>
+    	<li>CloseAction now used in close button in window header</li>
+    	<li>ToolTip was not sinking mouse events on target component</li>
+    	<li>cell horizontal / vertical alignment values are ignored</li>
+    	<li>HttpProxy bug when createing url paramters</li>
+    	<li>TreeItem not being added to correct container after parent is rendered</li>
+    	<li>deselectAll bug with TreeSelectionModel</li>
+    </ul>
+    <h2><a name="Release_Notes_1.0-beta2">Release Notes 1.0 Beta 2</a></h2>
     <h3>General Changes</h3>
     <ul>
     	<li><b>Public fields</b> - Public fields have been removed and replaced with getters and setters. This was the <a href="http://extjs.com/forum/showthread.php?t=33443">communities preference</a>.</li>
@@ -69,6 +279,8 @@
 		<li>ComboBox Store cannot be changed</li>
 		<li>TabPanel bug when closing last open tab</li>
 		<li>ComboBox not scrolling into view with key nav</li>
+		<li>MultiTreeSelection throwing null pointer</li>
+		<li>Checkable DataList not working</li>
 	</ul>
   </body>
 </html>

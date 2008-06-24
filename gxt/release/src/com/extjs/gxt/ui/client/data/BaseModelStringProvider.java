@@ -13,12 +13,6 @@ package com.extjs.gxt.ui.client.data;
  */
 public class BaseModelStringProvider implements ModelStringProvider {
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.extjs.gxt.ui.client.data.ModelStringProvider#getStringValue(com.extjs.gxt.ui.client.data.ModelData,
-   *      java.lang.String)
-   */
   public String getStringValue(ModelData model, String property) {
     Object value = model.get(property);
     return value == null ? "" : value.toString();

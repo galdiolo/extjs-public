@@ -85,6 +85,9 @@ public class TreeTableItemUI extends TreeItemUI {
   public void onSelectedChange(boolean selected) {
     if (item.isRendered()) {
       El.fly(tableItemEl).setStyleName("my-treetbl-item-sel", selected);
+      if (!selected) {
+        onMouseOut(null);
+      }
     }
   }
 
@@ -101,7 +104,7 @@ public class TreeTableItemUI extends TreeItemUI {
 
     DOM.appendChild(item.getParentItem().getContainer(), item.getElement());
     DOM.setInnerHTML(item.getElement(), Markup.TREETABLE_ITEM);
-    tableItemEl = item.el.firstChild().dom;
+    tableItemEl = item.el().firstChild().dom;
 
     rowTableEl = DOM.getFirstChild(tableItemEl);
     rowTrEl = El.fly(rowTableEl).getSubChild(2);
@@ -184,7 +187,7 @@ public class TreeTableItemUI extends TreeItemUI {
   @Override
   protected void handleMouseEvent(TreeEvent ce) {
     TreeTableItemUI treeUI = (TreeTableItemUI) item.getUI();
-    Rectangle rect = item.el.firstChild().getBounds();
+    Rectangle rect = item.el().firstChild().getBounds();
     if (rect.contains(ce.getClientX(), ce.getClientY())) {
       if (!treeUI.hovering) {
         treeUI.hovering = true;
@@ -228,7 +231,7 @@ public class TreeTableItemUI extends TreeItemUI {
   protected void updateText(int column, String value) {
     Element textElem = getTextCellElement(column);
     if (textElem != null) {
-      El.fly(textElem).setInnerHtml(value);
+      textElem.setInnerHTML(value);
     }
   }
 }

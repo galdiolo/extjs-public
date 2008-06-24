@@ -68,7 +68,7 @@ public class Shadow extends BoxComponent {
    * Removes the shadow.
    */
   public void remove() {
-    el.removeFromParent();
+    el().removeFromParent();
   }
 
   public void show(Element target) {
@@ -76,8 +76,8 @@ public class Shadow extends BoxComponent {
     if (!rendered) {
       render(XDOM.getBody());
     }
-    el.insertBefore(target);
-    el.setVisible(true);
+    el().insertBefore(target);
+    el().setVisible(true);
     sync(fly(target).getBounds());
   }
   
@@ -87,13 +87,13 @@ public class Shadow extends BoxComponent {
 
   public void sync(int l, int t, int width, int height) {
     if (target == null) return;
-    el.setLeft(l + adjusts.x);
-    el.setTop(t + adjusts.y);
+    el().setLeft(l + adjusts.x);
+    el().setTop(t + adjusts.y);
 
     int sw = width + adjusts.width;
     int sh = height + adjusts.height;
     if (getWidth() != sw || getOffsetHeight() != sh) {
-      el.setSize(sw, sh);
+      el().setSize(sw, sh);
       if (!GXT.isIE) {
         int w = Math.max(0, sw - 12);
         fly(getChild(0, 1)).setWidth(w);
@@ -119,7 +119,7 @@ public class Shadow extends BoxComponent {
       setElement(XDOM.create(Markup.SHADOW));
     }
     
-    el.enableDisplayMode("block");
+    el().enableDisplayMode("block");
     
     DOM.appendChild(parent, getElement());
 

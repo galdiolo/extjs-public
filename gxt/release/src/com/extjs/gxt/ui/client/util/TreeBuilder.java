@@ -43,6 +43,7 @@ public class TreeBuilder {
     for (int i = 0; i < model.getChildCount(); i++) {
       TreeModel m = model.getChild(i);
       TreeItem item = new TreeItem();
+      item.setData(m);
       item.setText(m.toString());
       root.add(item);
       process(item, m);
@@ -54,6 +55,7 @@ public class TreeBuilder {
       TreeModel m = model.getChild(i);
       TreeItem item = new TreeItem();
       item.setText(m.toString());
+      item.setData(m);
       parentItem.add(item);
       process(item, m);
     }

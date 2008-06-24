@@ -7,6 +7,8 @@
  */
 package com.extjs.gxt.ui.client.mvc;
 
+import java.util.HashMap;
+
 import com.extjs.gxt.ui.client.event.BaseEvent;
 
 /**
@@ -15,12 +17,12 @@ import com.extjs.gxt.ui.client.event.BaseEvent;
  * specific type which are used to identify the event. Typically, applications
  * will define all application events in a constants class.
  */
-public class AppEvent extends BaseEvent {
+public class AppEvent<Data> extends BaseEvent {
 
   /**
    * Application specific data such as the model.
    */
-  public Object data;
+  public Data data;
 
   /**
    * The optional history token (defaults to null). If null, a token will be
@@ -29,29 +31,67 @@ public class AppEvent extends BaseEvent {
   public String token;
 
   /**
-   * True to create a history item for this event when passed to through the
+   * True to create a history item for this event when passed through the
    * dispatcher.
    */
   public boolean historyEvent;
-
+  
+  private HashMap dataMap;
+  
   /**
-   * Creates a new event with the given type.
+   * Creates a new app event.
    * 
    * @param type the event type
    */
   public AppEvent(int type) {
     this.type = type;
   }
-
+  
   /**
-   * Creates a new event with the given type and data.
+   * Creates a new app event.
    * 
    * @param type the event type
    * @param data the data
    */
-  public AppEvent(int type, Object data) {
+  public AppEvent(int type, Data data) {
     this.type = type;
     this.data = data;
+  }
+
+  /**
+   * Creates a new app event.
+   * 
+   * @param type the event type
+   * @param data the event data
+   * @param token the history token
+   */
+  public AppEvent(int type, Data data, String token) {
+    this(type, data);
+    this.token = token;
+    historyEvent = true;
+  }
+  
+  /**
+   * Returns the application defined property for the given name, or
+   * <code>null</code> if it has not been set.
+   * 
+   * @param key the name of the property
+   * @return the value or <code>null</code> if it has not been set
+   */
+  public <X> X getData(String key) {
+    if (dataMap == null) return null;
+    return (X) dataMap.get(key);
+  }
+
+  /**
+   * Sets the application defined property with the given name.
+   * 
+   * @param key the name of the property
+   * @param data the new value for the property
+   */
+  public void setData(String key, Object data) {
+    if (dataMap == null) dataMap = new HashMap();
+    dataMap.put(key, data);
   }
 
   public String toString() {

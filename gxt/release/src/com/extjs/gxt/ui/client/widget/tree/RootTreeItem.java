@@ -21,7 +21,7 @@ class RootTreeItem extends TreeItem {
   protected TreeItemUI getTreeItemUI() {
     ui = new TreeItemUI(this);
     ui.containerEl = new El(getElement());
-    setData("loaded", "true");
+    setData("loaded", true);
     ui.containerEl.setStyleAttribute("padding", "4px");
     return ui;
   }

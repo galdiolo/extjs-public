@@ -28,6 +28,10 @@ public class ContactFolderView extends View {
 
   @Override
   protected void initialize() {
+
+  }
+  
+  protected void initUI() {
     contacts = new ContentPanel();
     contacts.setHeading("Contacts");
     contacts.addListener(Events.Expand, new Listener<ComponentEvent>() {
@@ -42,7 +46,11 @@ public class ContactFolderView extends View {
 
   @Override
   protected void handleEvent(AppEvent event) {
-
+    switch (event.type) {
+      case AppEvents.Init:
+        initUI();
+        break;
+    }
   }
 
 }

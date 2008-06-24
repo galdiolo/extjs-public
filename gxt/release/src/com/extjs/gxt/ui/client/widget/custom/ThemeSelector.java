@@ -11,8 +11,7 @@ import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.store.Record;
-import com.extjs.gxt.ui.client.store.Store;
+import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.Theme;
 import com.extjs.gxt.ui.client.util.ThemeManager;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
@@ -22,7 +21,7 @@ import com.google.gwt.user.client.Element;
  * A combo box for selecting the GXT themes. Changing themes will cause the
  * application to be reloaded.
  */
-public class ThemeSelector extends ComboBox {
+public class ThemeSelector extends ComboBox<Theme> {
 
   public ThemeSelector() {
     setEditable(false);
@@ -32,29 +31,31 @@ public class ThemeSelector extends ComboBox {
   }
 
   @Override
-  protected void onRender(Element parent, int index) {
-    addListener(Events.Select, new Listener<FieldEvent>() {
-      public void handleEvent(FieldEvent be) {
-        Theme t = (Theme) getSelectedRecord();
-        if (t != getValue()) {
-          GXT.switchTheme(t);
-        }
-      }
-    });
-
-    Store store = new Store();
+  protected void beforeRender() {
+    super.beforeRender();
+    ListStore store = new ListStore();
     store.add(ThemeManager.getThemes());
     setStore(store);
-
-    super.onRender(parent, index);
 
     String theme = GXT.getThemeId();
     if (theme == null) {
       setValue(Theme.BLUE);
     }
-    Record r = findRecord(getValueField(), theme);
+    Theme r = findModel(getValueField(), theme);
     if (r != null) {
       setValue(r);
     }
+  }
+
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
+    addListener(Events.Change, new Listener<FieldEvent>() {
+      public void handleEvent(FieldEvent be) {
+        Theme t = (Theme)be.value;
+        GXT.switchTheme(t);
+      }
+    });
+
   }
 }

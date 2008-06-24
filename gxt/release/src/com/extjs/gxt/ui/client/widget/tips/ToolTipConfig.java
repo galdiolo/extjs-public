@@ -12,65 +12,15 @@ import com.extjs.gxt.ui.client.util.Params;
 
 public class ToolTipConfig {
 
-  /**
-   * The tool tip text;
-   */
   private String text;
-
-  /**
-   * Delay in milliseconds before the tooltip displays after the mouse enters
-   * the target element (defaults to 500).
-   */
   private int showDelay = 500;
-
-  /**
-   * Delay in milliseconds after the mouse exits the target element but before
-   * the tooltip actually hides (defaults to 200). Set to 0 for the tooltip to
-   * hide immediately.
-   */
   private int hideDelay = 200;
-
-  /**
-   * Delay in milliseconds before the tooltip automatically hides (defaults to
-   * 5000). To disable automatic hiding, set dismissDelay = 0.
-   */
   private int dismissDelay = 5000;
-
-  /**
-   * An XY offset from the mouse position where the tooltip should be shown
-   * (defaults to [15,18]).
-   */
   private int[] mouseOffset = new int[] {15, 18};
-
-  /**
-   * True to have the tooltip follow the mouse as it moves over the target
-   * element (defaults to false).
-   */
   private boolean trackMouse;
-
-  /**
-   * A optional template to be used to render the tool tip. The {@link #params}
-   * will be applied to the template. If specified, {@link #title} and
-   * {@link #text} will be added to the params before being applied to the
-   * template.
-   */
   private Template template;
-
-  /**
-   * The paramters to be used when a custom a {@link #template} is specified.
-   */
   private Params params;
-
-  /**
-   * The optional tool tip title (defaults to null).
-   */
   private String title;
-
-  /**
-   * True to automatically hide the tooltip after the mouse exits the target
-   * element or after the {@link #dismissDelay} has expired if set (defaults to
-   * true).
-   */
   private boolean autoHide = true;
 
   /**

@@ -7,27 +7,36 @@
  */
 package com.extjs.gxt.ui.client.data;
 
-import com.extjs.gxt.ui.client.data.BaseLoadResult.FailedLoadResult;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * <code>DataProxy</code> implementation that retrieves data using GWT RPC.
  */
-public abstract class RpcProxy<C extends LoadConfig, R extends LoadResult> implements DataProxy<C> {
+public abstract class RpcProxy<C, D> implements DataProxy<C, D> {
 
-  public void load(final DataReader reader, final C loadConfig,
-      final DataCallback callback) {
+  public void load(final DataReader<C, D> reader, final C loadConfig,
+      final AsyncCallback<D> callback) {
+    load(loadConfig, new AsyncCallback() {
 
-    AsyncCallback<R> asyncCallback = new AsyncCallback<R>() {
       public void onFailure(Throwable caught) {
-        callback.setResult(new FailedLoadResult(caught));
+        callback.onFailure(caught);
       }
 
-      public void onSuccess(LoadResult result) {
-        callback.setResult(result);
+      public void onSuccess(Object result) {
+        try {
+          D data = null;
+          if (reader != null) {
+            data = reader.read(loadConfig, result);
+          } else {
+            data = (D) result;
+          }
+          callback.onSuccess(data);
+        } catch (Exception e) {
+          callback.onFailure(e);
+        }
       }
-    };
-    load(reader, loadConfig, asyncCallback);
+
+    });
   }
 
   /**
@@ -35,7 +44,6 @@ public abstract class RpcProxy<C extends LoadConfig, R extends LoadResult> imple
    * 
    * @param callback the callback to be used when making the rpc call.
    */
-  protected abstract void load(final DataReader reader, final C loadConfig,
-      AsyncCallback<R> callback);
+  protected abstract void load(C loadConfig, AsyncCallback<D> callback);
 
 }

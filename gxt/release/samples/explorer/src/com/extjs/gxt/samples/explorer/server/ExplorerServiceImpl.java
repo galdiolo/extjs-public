@@ -21,23 +21,24 @@ import org.dom4j.io.SAXReader;
 
 import com.extjs.gxt.samples.explorer.client.ExplorerService;
 import com.extjs.gxt.samples.explorer.client.model.Post;
-import com.extjs.gxt.ui.client.data.BaseLoadConfig;
-import com.extjs.gxt.ui.client.data.BaseLoadResult.ModelCollectionLoadResult;
+import com.extjs.gxt.ui.client.data.BasePagingLoadResult;
+import com.extjs.gxt.ui.client.data.PagingLoadConfig;
+import com.extjs.gxt.ui.client.data.PagingLoadResult;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 public class ExplorerServiceImpl extends RemoteServiceServlet implements ExplorerService {
 
   private List<Post> posts;
 
-  public ModelCollectionLoadResult<Post> getPosts(final BaseLoadConfig config) {
+  public PagingLoadResult<Post> getPosts(final PagingLoadConfig config) {
     if (posts == null) {
       loadPosts();
     }
 
-    if (config.getSortField() != null) {
-      final String sortField = config.getSortField();
+    if (config.getSortInfo().getSortField() != null) {
+      final String sortField = config.getSortInfo().getSortField();
       if (sortField != null) {
-        Collections.sort(posts, config.getSortDir().comparator(new Comparator() {
+        Collections.sort(posts, config.getSortInfo().getSortDir().comparator(new Comparator() {
           public int compare(Object o1, Object o2) {
             Post p1 = (Post) o1;
             Post p2 = (Post) o2;
@@ -65,7 +66,7 @@ public class ExplorerServiceImpl extends RemoteServiceServlet implements Explore
     for (int i = config.getOffset(); i < limit; i++) {
       sublist.add(posts.get(i));
     }
-    return new ModelCollectionLoadResult<Post>(sublist, posts.size());
+    return new BasePagingLoadResult(sublist, config.getOffset(), posts.size());
   }
 
   private String getValue(Element elem, int index) {

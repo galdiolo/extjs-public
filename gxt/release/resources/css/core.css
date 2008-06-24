@@ -1,7 +1,10 @@
 * {
   margin: 0px;
   padding: 0px;
-  font-size: 11px;
+}
+
+.icon-wait {
+  background: url(../images/gxt/icons/wait.gif) no-repeat !important;	
 }
 
 .x-panel-btns-right {
@@ -42,10 +45,6 @@
 
 .x-border {
   border: 1px solid #99BBE8;
-}
-
-.x-panel-noborder .x-border-top {
-  border-top: 1px solid #99BBE8;
 }
 
 .x-layout-popup {
@@ -232,21 +231,9 @@
   margin-right: 4px;
 }
 
-.x-panel-noborder .x-border-bottom-none {
-  border-bottom: none;
-}
-
-.x-panel-noborder .x-border-top {
-  border-top: 1px solid #99BBE8;
-}
-
 .x-layout-popup {
   background-color: #DFE8F6;
   border: 1px solid #7CA4D9;
-}
-
-.x-panel-popup-body {
-  border-top: 1px solid #99BBE8;
 }
 
 .x-layout-collapsed .x-panel-header .x-tool {
@@ -304,32 +291,6 @@
   user-select: none;
   -moz-outline: none;
   -moz-user-focus: normal;
-}
-
-.x-vsplitbar {
-  background: url(../images/default/s.gif);
-  position: absolute;
-  z-index: 999999;
-  cursor: e-resize;
-  cursor: col-resize;
-}
-
-.x-hsplitbar {
-  background: url(../images/default/s.gif);
-  position: absolute;
-  font-size: 1px;
-  line-height: 1px;
-  z-index: 999999;
-  cursor: s-resize;
-  cursor: row-resize;
-}
-
-.x-splitbar-proxy {
-  position: absolute;
-  background-color: #929090;
-  font-size: 1px;
-  line-height: 1px;
-  z-index: 200;
 }
 
 .x-drag-proxy {

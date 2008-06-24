@@ -9,28 +9,29 @@ package com.extjs.gxt.samples.explorer.client.pages;
 
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.Button;
-import com.extjs.gxt.ui.client.widget.ButtonBar;
-import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.Info;
-import com.extjs.gxt.ui.client.widget.SplitButton;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.button.ButtonBar;
+import com.extjs.gxt.ui.client.widget.button.SplitButton;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
-import com.extjs.gxt.ui.client.widget.menu.TextMenuItem;
+import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.RootPanel;
 
-public class SplitButtonPage extends Container implements EntryPoint {
+public class SplitButtonPage extends LayoutContainer implements EntryPoint {
 
   public void onModuleLoad() {
-
+    RootPanel.get().add(this);
   }
 
   @Override
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
 
-    SelectionListener listener = new SelectionListener() {
+    SelectionListener listener = new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         Button btn = (Button) ce.component;
         Info.display("Click Event", "The '{0}' button was clicked.", btn.getText());
@@ -40,8 +41,8 @@ public class SplitButtonPage extends Container implements EntryPoint {
     ButtonBar buttonBar = new ButtonBar();
 
     Menu menu = new Menu();
-    menu.add(new TextMenuItem("Item 1"));
-    menu.add(new TextMenuItem("Item 2"));
+    menu.add(new MenuItem("Item 1"));
+    menu.add(new MenuItem("Item 2"));
 
     SplitButton button = new SplitButton();
     button.setText("Split Button");

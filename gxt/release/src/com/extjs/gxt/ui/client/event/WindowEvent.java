@@ -7,9 +7,9 @@
  */
 package com.extjs.gxt.ui.client.event;
 
-import com.extjs.gxt.ui.client.widget.Button;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Window;
+import com.extjs.gxt.ui.client.widget.button.Button;
 
 /**
  * Window event type.

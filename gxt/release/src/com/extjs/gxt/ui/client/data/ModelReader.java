@@ -7,24 +7,26 @@
  */
 package com.extjs.gxt.ui.client.data;
 
-import java.util.Collection;
-
-import com.extjs.gxt.ui.client.data.BaseLoadResult.FailedLoadResult;
-import com.extjs.gxt.ui.client.data.BaseLoadResult.ModelCollectionLoadResult;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A <code>DataReader</code> implementation for <code>Model</code>
  * instances.
  */
-public class ModelReader implements DataReader {
+public class ModelReader<C> implements DataReader<C, ListLoadResult<ModelData>> {
 
-  public LoadResult read(LoadConfig loadConfig, Object data) {
-    if (data instanceof Model) {
-      return new BaseLoadResult<Model>((Model) data);
-    } else if (data instanceof Collection) {
-      return new ModelCollectionLoadResult<Model>((Collection) data);
+  public ListLoadResult read(C loadConfig, Object data) {
+    if (data instanceof ModelData) {
+      List list = new ArrayList();
+      list.add(data);
+      return new BaseListLoadResult(list);
+    } else if (data instanceof List) {
+      return new BaseListLoadResult((List) data);
+    } else if (data instanceof ListLoadResult) {
+      return (ListLoadResult)data;
     } else {
-      return new FailedLoadResult();
+      throw new RuntimeException("Error converting data");
     }
   }
 

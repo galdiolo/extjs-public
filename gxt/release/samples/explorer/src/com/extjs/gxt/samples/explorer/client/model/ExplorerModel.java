@@ -11,14 +11,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.samples.explorer.client.pages.AccordionLayoutPage;
-import com.extjs.gxt.samples.explorer.client.pages.AsyncTreeViewerPage;
+import com.extjs.gxt.samples.explorer.client.pages.AsyncTreePage;
+import com.extjs.gxt.samples.explorer.client.pages.AutoHeightTabPanelPage;
+import com.extjs.gxt.samples.explorer.client.pages.AutoHeightTablePage;
 import com.extjs.gxt.samples.explorer.client.pages.BorderLayoutPage;
 import com.extjs.gxt.samples.explorer.client.pages.ButtonPage;
 import com.extjs.gxt.samples.explorer.client.pages.CenterLayoutPage;
 import com.extjs.gxt.samples.explorer.client.pages.CheckBoxTreePage;
+import com.extjs.gxt.samples.explorer.client.pages.ColumnFormPanelPage;
 import com.extjs.gxt.samples.explorer.client.pages.ContentPanelPage;
 import com.extjs.gxt.samples.explorer.client.pages.DataListPage;
-import com.extjs.gxt.samples.explorer.client.pages.DataListViewerPage;
+import com.extjs.gxt.samples.explorer.client.pages.DataListStorePage;
 import com.extjs.gxt.samples.explorer.client.pages.DatePickerPage;
 import com.extjs.gxt.samples.explorer.client.pages.DialogPage;
 import com.extjs.gxt.samples.explorer.client.pages.DraggablePage;
@@ -27,24 +30,24 @@ import com.extjs.gxt.samples.explorer.client.pages.FxPage;
 import com.extjs.gxt.samples.explorer.client.pages.MessageBoxPage;
 import com.extjs.gxt.samples.explorer.client.pages.OverviewPage;
 import com.extjs.gxt.samples.explorer.client.pages.Page;
-import com.extjs.gxt.samples.explorer.client.pages.PagingTableViewerPage;
+import com.extjs.gxt.samples.explorer.client.pages.PagingTablePage;
 import com.extjs.gxt.samples.explorer.client.pages.PercentageTablePage;
 import com.extjs.gxt.samples.explorer.client.pages.ResizablePage;
 import com.extjs.gxt.samples.explorer.client.pages.RowLayoutPage;
 import com.extjs.gxt.samples.explorer.client.pages.SplitButtonPage;
+import com.extjs.gxt.samples.explorer.client.pages.TabPanelFormPanelPage;
 import com.extjs.gxt.samples.explorer.client.pages.TabPanelPage;
+import com.extjs.gxt.samples.explorer.client.pages.TableFilterPage;
 import com.extjs.gxt.samples.explorer.client.pages.TablePage;
-import com.extjs.gxt.samples.explorer.client.pages.TableViewerFilterPage;
-import com.extjs.gxt.samples.explorer.client.pages.TableViewerPage;
+import com.extjs.gxt.samples.explorer.client.pages.TableStorePage;
 import com.extjs.gxt.samples.explorer.client.pages.ToolBarPage;
 import com.extjs.gxt.samples.explorer.client.pages.ToolTipPage;
 import com.extjs.gxt.samples.explorer.client.pages.TreeContextMenuPage;
+import com.extjs.gxt.samples.explorer.client.pages.TreeFilterPage;
 import com.extjs.gxt.samples.explorer.client.pages.TreePage;
-import com.extjs.gxt.samples.explorer.client.pages.TreeTableViewerPage;
-import com.extjs.gxt.samples.explorer.client.pages.TreeViewerFilterPage;
-import com.extjs.gxt.samples.explorer.client.pages.TreeViewerPage;
+import com.extjs.gxt.samples.explorer.client.pages.TreeTablePage;
 import com.extjs.gxt.samples.explorer.client.pages.WindowPage;
-import com.extjs.gxt.samples.explorer.client.pages.XmlTableViewerPage;
+import com.extjs.gxt.samples.explorer.client.pages.XmlTablePage;
 import com.extjs.gxt.ui.client.data.BaseTreeModel;
 import com.extjs.gxt.ui.client.data.TreeModel;
 
@@ -55,49 +58,44 @@ public class ExplorerModel extends BaseTreeModel {
   public ExplorerModel() {
     set("overview", new Entry("Overview", new Page(new OverviewPage(), false)));
 
-    Category viewers = new Category("Viewers");
-
-    Category viewTables = new Category("Table Viewers");
-    viewTables.addEntry("TableViewer", new TableViewerPage());
-    viewTables.addEntry("Filter TableViewer", new TableViewerFilterPage());
-    viewTables.addEntry("Paging TableViewer", new PagingTableViewerPage());
-    viewTables.addEntry("XML TableViewer", new XmlTableViewerPage());
-    viewers.add(viewTables);
-
-    Category treeViewer = new Category("Tree Viewers");
-    treeViewer.addEntry("Async TreeViewer", new AsyncTreeViewerPage());
-    treeViewer.addEntry("TreeViewer", new TreeViewerPage());
-    treeViewer.addEntry("Filter TreeViewer", new TreeViewerFilterPage());
-    treeViewer.addEntry("TreeTableViewer", new TreeTableViewerPage());
-    viewers.add(treeViewer);
-
-    viewers.addEntry("DataListViewer", new DataListViewerPage());
-
-    add(viewers);
-
     Category dataWidgets = new Category("Data Widgets");
 
     Category trees = new Category("Trees");
+    trees.addEntry("Async Tree", new AsyncTreePage());
     trees.addEntry("Basic Tree", new TreePage());
     trees.addEntry("Checkbox Tree", new CheckBoxTreePage());
     trees.addEntry("Context Menu Tree", new TreeContextMenuPage());
+    trees.addEntry("Filter Tree", new TreeFilterPage());
+    trees.addEntry("TreeTable", new TreeTablePage());
     dataWidgets.add(trees);
 
     Category tables = new Category("Tables");
     tables.addEntry("Basic Table", new TablePage());
+    tables.addEntry("Store Table", new TableStorePage());
     tables.addEntry("% Columns", new PercentageTablePage());
+    tables.addEntry("Paging Table", new PagingTablePage());
+    tables.addEntry("Filter Table", new TableFilterPage());
+    tables.addEntry("Xml Table", new XmlTablePage());
+    tables.addEntry("Auto Height Table", new AutoHeightTablePage());
     dataWidgets.add(tables);
 
     Category lists = new Category("Lists");
     lists.addEntry("DataList", new DataListPage());
+    lists.addEntry("Store DataList", new DataListStorePage());
     dataWidgets.add(lists);
 
     add(dataWidgets);
-
+    
+    Category forms = new Category("Forms");
+    forms.addEntry("FormPanel", new FormPanelPage());
+    forms.addEntry("Column Form", new ColumnFormPanelPage());
+    forms.addEntry("TabPanel Form", new TabPanelFormPanelPage());
+    add(forms);
+    
     Category panels = new Category("Panels");
     panels.addEntry("ContentPanel", new ContentPanelPage());
-    panels.addEntry("FormPanel", new FormPanelPage());
     panels.addEntry("TabPanel", new TabPanelPage());
+    panels.addEntry("Auto Height TabPanel", new AutoHeightTabPanelPage());
     add(panels);
 
     Category windows = new Category("Windows");
@@ -157,7 +155,7 @@ public class ExplorerModel extends BaseTreeModel {
 
   }
 
-  private void loadEntries(TreeModel model) {
+  private void loadEntries(TreeModel<TreeModel> model) {
     for (TreeModel child : model.getChildren()) {
       if (child instanceof Entry) {
         entries.add((Entry) child);

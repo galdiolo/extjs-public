@@ -8,10 +8,7 @@
 package com.extjs.gxt.ui.client.widget.layout;
 
 import com.extjs.gxt.ui.client.core.El;
-import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.Component;
-import com.extjs.gxt.ui.client.widget.Container;
-import com.extjs.gxt.ui.client.widget.Layout;
 
 /**
  * This layout contains multiple widgets, each fit to the container, where only
@@ -25,7 +22,12 @@ import com.extjs.gxt.ui.client.widget.Layout;
  * be provided by the developer.
  * </p>
  */
-public class CardLayout extends Layout {
+public class CardLayout extends FitLayout {
+
+  public CardLayout() {
+    monitorResize = true;
+    renderHidden = true;
+  }
 
   /**
    * Returns the active component.
@@ -49,34 +51,17 @@ public class CardLayout extends Layout {
       activeItem = component;
       if (activeItem != null) {
         activeItem.setVisible(true);
+        if (container.isRendered()) {
+          layout();
+        }
       }
     }
   }
 
   @Override
-  protected void renderAll(Container container, El target) {
-    if (activeItem != null) {
-      renderComponent(activeItem, 0, target);
-    }
-  }
-
-  @Override
-  protected void onLayout(Container container, El target) {
-    super.onLayout(container, target);
-
-    Size s = target.getStyleSize();
-
-    if (activeItem == null && container.getItemCount() > 0) {
-      setActiveItem(container.getItem(0));
-    }
-
-    int size = container.getItemCount();
-    for (int i = 0; i < size; i++) {
-      Component child = container.getItem(i);
-      child.setVisible(activeItem == child);
-      if (activeItem == child) {
-        setSize(child, s.width, s.height);
-      }
+  protected void renderComponent(Component component, int index, El target) {
+    if (activeItem == component) {
+      super.renderComponent(component, index, target);
     }
   }
 

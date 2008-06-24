@@ -16,23 +16,23 @@ import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.Button;
-import com.extjs.gxt.ui.client.widget.ButtonBar;
-import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.DataList;
 import com.extjs.gxt.ui.client.widget.DataListItem;
+import com.extjs.gxt.ui.client.widget.DataListSelectionModel;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Info;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
+import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
-import com.extjs.gxt.ui.client.widget.menu.TextMenuItem;
+import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.RootPanel;
 
-public class DataListPage extends Container implements EntryPoint {
+public class DataListPage extends LayoutContainer implements EntryPoint {
 
   private int count;
 
@@ -40,9 +40,7 @@ public class DataListPage extends Container implements EntryPoint {
     RootPanel.get().add(this);
   }
 
-  @Override
-  protected void onRender(Element parent, int pos) {
-    super.onRender(parent, pos);
+  public DataListPage() {
     HorizontalPanel hp = new HorizontalPanel();
     hp.setSpacing(8);
 
@@ -56,16 +54,18 @@ public class DataListPage extends Container implements EntryPoint {
 
     final DataList list = new DataList();
     list.setSelectionMode(SelectionMode.MULTI);
+    final DataListSelectionModel sm = list.getSelectionModel();
+    list.setSelectionModel(sm);
     list.setBorders(false);
     list.addListener(Events.SelectionChange, l);
     list.setWidth(190);
 
     Menu contextMenu = new Menu();
 
-    TextMenuItem insert = new TextMenuItem();
+    MenuItem insert = new MenuItem();
     insert.setText("Insert Item");
     insert.setIconStyle("icon-add");
-    insert.addSelectionListener(new SelectionListener() {
+    insert.addSelectionListener(new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         DataListItem item = list.getSelectedItem();
         if (item != null) {
@@ -79,10 +79,10 @@ public class DataListPage extends Container implements EntryPoint {
     });
     contextMenu.add(insert);
 
-    TextMenuItem remove = new TextMenuItem();
+    MenuItem remove = new MenuItem();
     remove.setText("Remove Selected");
     remove.setIconStyle("icon-delete");
-    remove.addSelectionListener(new SelectionListener() {
+    remove.addSelectionListener(new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         for (DataListItem item : list.getSelectedItems()) {
           list.remove(item);
@@ -104,17 +104,16 @@ public class DataListPage extends Container implements EntryPoint {
     }
     hp.add(list);
 
-    
     ContentPanel frame = new ContentPanel();
     frame.setFrame(true);
     frame.setCollapsible(true);
     frame.setAnimCollapse(false);
     frame.setHeading("Framed List");
     frame.setSize(210, 200);
-    
+
     final DataList list2 = new DataList();
     list2.setFlatStyle(true);
-    
+
     list2.addListener(Events.SelectionChange, l);
     stocks = TestData.getStocks();
     for (Stock stock : stocks) {
@@ -125,22 +124,22 @@ public class DataListPage extends Container implements EntryPoint {
 
     frame.setLayout(new FitLayout());
     frame.add(list2);
-    
+
     hp.add(frame);
 
     VerticalPanel vp = new VerticalPanel();
     vp.setSpacing(8);
     ButtonBar buttonBar = new ButtonBar();
-    buttonBar.add(new Button("Select All", new SelectionListener() {
+    buttonBar.add(new Button("Select All", new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
-        list.selectAll();
+        sm.selectAll();
       }
     }));
-    buttonBar.add(new Button("Select Last", new SelectionListener() {
+    buttonBar.add(new Button("Select Last", new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
-        int idx = list2.getItemCount() - 1;
-        list2.select(idx, idx);
-        list2.scrollIntoView(getItem(idx));
+        DataListItem item = list2.getItem(list2.getItemCount() - 1);
+        list2.getSelectionModel().select(item);
+        list2.scrollIntoView(item);
       }
     }));
 

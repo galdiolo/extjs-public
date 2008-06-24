@@ -7,10 +7,12 @@
  */
 package com.extjs.gxt.ui.client.data;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
 /**
  * Defines the interface for objects that can retrieve data.
  */
-public interface DataProxy<C extends LoadConfig> {
+public interface DataProxy<C, D> {
 
   /**
    * Data should be retrived using the specified load config.
@@ -19,6 +21,6 @@ public interface DataProxy<C extends LoadConfig> {
    * @param loadConfig the config
    * @param callback the data callback
    */
-  public void load(DataReader reader, C loadConfig, DataCallback callback);
+  public void load(DataReader<C, D> reader, C loadConfig, AsyncCallback<D> callback);
 
 }

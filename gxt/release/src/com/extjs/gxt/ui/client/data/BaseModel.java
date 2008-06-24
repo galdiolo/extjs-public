@@ -60,13 +60,22 @@ import java.util.Map;
  */
 public class BaseModel extends BaseModelData implements Model, Serializable {
 
-  protected transient ChangeEventSupport changeEventSupport = new ChangeEventSupport();
+  protected transient ChangeEventSupport changeEventSupport;
 
+  /**
+   * Creates a new base model.
+   */
   public BaseModel() {
+    changeEventSupport = new ChangeEventSupport();
   }
 
+  /**
+   * Creates a new base model.
+   * @param properties the initial values
+   */
   public BaseModel(Map<String, Object> properties) {
-    super(properties);
+    this();
+    setProperties(properties);
   }
 
   /**
@@ -94,9 +103,9 @@ public class BaseModel extends BaseModelData implements Model, Serializable {
   }
 
   @Override
-  public Object remove(String name) {
+  public <X> X remove(String name) {
     if (map.containsKey(name)) {
-      Object oldValue = super.remove(name);
+      X oldValue = (X)super.remove(name);
       notifyPropertyChanged(name, null, oldValue);
       return oldValue;
     }
@@ -115,12 +124,12 @@ public class BaseModel extends BaseModelData implements Model, Serializable {
   public void removeChangeListeners() {
     changeEventSupport.removeChangeListeners();
   }
-  
+
   @Override
-  public Object set(String name, Object value) {
+  public <X> X set(String name, X value) {
     Object oldValue = super.set(name, value);
     notifyPropertyChanged(name, value, oldValue);
-    return oldValue;
+    return (X)oldValue;
   }
 
   public void setSilent(boolean silent) {

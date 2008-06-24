@@ -7,296 +7,418 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.ContainerEvent;
-import com.extjs.gxt.ui.client.util.Size;
+import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * A <code>Container</code> that lays out its children using a
- * <code>Layout</code>. Layouts are responsible for connecting the child
- * components to the container. Layouts are very flexible as they can create any
- * internal element structure, inserting its child components at any location.
- * For example, a TableLayout lays out its children using HTML tables.
- * <p>
- * Many layouts support layout data which are configurable objects that provide
- * additional information to the layout. These objects can be passed when adding
- * and inserting child components into the container. Each layout will document
- * if and what layout data it supports.
- * </p>
+ * <p/> Class for any {@link BoxComponent} that can contain other components.
+ * Containers handle the basic behavior of containing components, namely
+ * managing, attaching, and detaching the child widgets.
  * 
- * <dl>
- * <dt><b>Events:</b></dt>
+ * <p/> When children are added to a container they are not physcially added to
+ * the DOM of the container. Subclasses are responsible for connecting the child
+ * components.
  * 
- * <dd><b>BeforeAdd</b> : ContainerEvent(container, item, index)<br>
- * <div>Fires before a item is added or inserted. Listeners can set the
- * <code>doit</code> field to <code>false</code> to cancel the action.</div>
- * <ul>
- * <li>container : this</li>
- * <li>item : the component being added</li>
- * <li>index : the index at which the component will be added</li>
- * </ul>
- * </dd>
+ * <p/> Container does not define a root element. setElement must be called by
+ * any subclass to ensure the container has an element.
  * 
- * <dd><b>BeforeRemove</b> : ContainerEvent(container, item)<br>
- * <div>Fires before a item is removed. Listeners can set the <code>doit</code>
- * field to <code>false</code> to cancel the action.</div>
- * <ul>
- * <li>container : this</li>
- * <li>item : the component being removed</li>
- * </ul>
- * </dd>
- * 
- * <dd><b>Add</b> : ContainerEvent(container, item, index)<br>
- * <div>Fires after a item has been added or inserted.</div>
- * <ul>
- * <li>container : this</li>
- * <li>item : the item that was added</li>
- * <li>index : the index at which the item will be added</li>
- * </ul>
- * </dd>
- * 
- * <dd><b>Remove</b> : ContainerEvent(container, item)<br>
- * <div>Fires after a item has been removed.</div>
- * <ul>
- * <li>container : this</li>
- * <li>item : the item being removed</li>
- * </ul>
- * </dd>
- * 
- * <dd><b>AfterLayout</b> : ContainerEvent(container)<br>
- * <div>Fires when the widgets in this container are arranged by the associated
- * layout.</div>
- * <ul>
- * <li>container : this</li>
- * </ul>
- * </dd>
- * </dl>
- * 
- * @see Layout
+ * @param <T> the child component type
  */
-public class Container<T extends Component> extends ScrollContainer<T> {
-
-  private static FlowLayout defaultLayout = new FlowLayout();
+public abstract class Container<T extends Component> extends BoxComponent {
 
   /**
-   * True to disable the container's layout, stopping it from executing
+   * True to attach the container's children (defaults to true).
+   */
+  protected boolean attachChildren = true;
+
+  /**
+   * False to disable the container's layout, stopping it from executing
    * (defaults to false).
    */
-  public boolean disableLayout = false;
+  protected boolean enableLayout = false;
 
   /**
-   * The size at the last time the layout executed.
+   * True to execute the container's layout when children are inserted and
+   * removed (defaults to false).
    */
-  protected Size lastSize;
+  protected boolean layoutOnChange;
 
   /**
-   * The container's layout.
+   * True to execute the container's layout when the container is resized
+   * (defaults to true).
    */
-  protected Layout layout;
-
-  private boolean monitorResize = true;
-  private boolean layoutOnChange;
-  private boolean layoutOnAttach;
+  protected boolean monitorResize = true;
 
   /**
-   * Adds a widget to this Container. Fires the <i>BeforeAdd</i> event before
-   * adding, then fires the <i>Add</i> event after the component has been
-   * added.
-   * 
-   * @param widget the widget to add. If the widget is not a Component instance
-   *            it will be wrapped in a WidgetComponent
+   * True to monitor window resizing (defaults to false).
    */
-  public void add(Widget widget) {
-    insert(widget, getItemCount());
+  protected boolean monitorWindowResize = false;
+
+  private Layout layout;
+  private List<T> items;
+  private boolean layoutExecuted;
+
+  /**
+   * Creates a new container.
+   */
+  public Container() {
+    items = new ArrayList<T>();
   }
 
   /**
-   * Adds a widget to this Container. Fires the <i>BeforeAdd</i> event before
-   * adding, then fires the <i>Add</i> event after the component has been
-   * added.
+   * Returns the component whose element, or child element, matches the given
+   * element.
    * 
-   * @param widget the widget to add. If the widget is not a Component instance
-   *            it will be wrapped in a WidgetComponent
-   * @param layoutData the layout data
+   * @param elem the element
+   * @return the matching component or <code>null</code> if no match
    */
-  public void add(Widget widget, Object layoutData) {
-    insert(widget, layoutData, getItemCount());
-  }
-
-  /**
-   * Creates a new HTML instance and adds it to the container. Fires the
-   * <i>BeforeAdd</i> event before adding, then fires the <i>Add</i> event
-   * after the component has been added.
-   * 
-   * @param text the html text
-   * @return the new HTML instance
-   */
-  public Html addText(String text) {
-    Html html = new Html(text);
-    add(html);
-    return html;
-  }
-
-  /**
-   * Returns the layout which is associated with the container, or
-   * <code>null</code> if one has not been set.
-   * 
-   * @return the container's layout or <code>null</code>
-   */
-  public Layout getLayout() {
-    return layout;
-  }
-
-  /**
-   * Returns <code>true</code> if the layout will be executed when widgets are
-   * added or removed.
-   * 
-   * @return the layout on change state
-   */
-  public boolean getLayoutOnChange() {
-    return layoutOnChange;
-  }
-
-  /**
-   * Override this method to specify the element to be used by the layout as the
-   * container. Allows the container to be decorated.
-   * 
-   * @return the element to be used as the panel's container
-   */
-  public El getLayoutTarget() {
-    return el;
-  }
-
-  /**
-   * Returns the monitor resize state.
-   * 
-   * @return <code>true</code> if resizing is being monitored
-   */
-  public boolean getMonitorResize() {
-    return monitorResize;
-  }
-
-  /**
-   * Inserts a widget into this Container at a specified index. Fires the
-   * <i>BeforeAdd</i> event before inserting, then fires the <i>Add</i> event
-   * after the component has been inserted.
-   * 
-   * @param widget the widget to insert. If the widget is not a Component
-   *            instance it will be wrapped in a WidgetComponent
-   * @param index the index at which the component will be inserted in
-   */
-  public void insert(Widget widget, int index) {
-    insert(widget, null, index);
-  }
-
-  /**
-   * Inserts a widget into this Container at a specified index. Fires the
-   * <i>BeforeAdd</i> event before inserting, then fires the <i>Add</i> event
-   * after the component has been inserted.
-   * 
-   * @param widget the widget to insert. If the widget is not a Component
-   *            instance it will be wrapped in a WidgetComponent
-   * @param layoutData the component's layout data
-   * @param index the index at which the component will be inserted in
-   */
-  public void insert(Widget widget, Object layoutData, int index) {
-    T c = null;
-    if (widget instanceof Component) {
-      c = (T) widget;
-    } else {
-      c = (T) new WidgetComponent(widget);
-    }
-
-    ContainerEvent ce = new ContainerEvent(this);
-    ce.item = c;
-    ce.index = index;
-    if (fireEvent(Events.BeforeAdd, ce)) {
-      if (layoutData != null) {
-        c.setData(layoutData);
+  public T findItem(Element elem) {
+    for (T c : items) {
+      if (DOM.isOrHasChild(c.getElement(), elem)) {
+        return c;
       }
-      super.insert(c, index);
-      if (rendered) {
-        if (layoutOnChange) {
-          layout(true);
-        }
+    }
+    return null;
+  }
+
+  /**
+   * Returns the item at the given index or null if index out of bounds.
+   * 
+   * @param index the index
+   * @return the item
+   */
+  public T getItem(int index) {
+    return index < items.size() ? items.get(index) : null;
+  }
+
+  /**
+   * Returns the item with the specified item id.
+   * 
+   * @param itemId the item id
+   * @return the button or <code>null</code> if no match
+   */
+  public T getItemByItemId(String itemId) {
+    for (T item : getItems()) {
+      if (item.getItemId().equals(itemId)) {
+        return item;
       }
-      fireEvent(Events.Add, ce);
+    }
+    return null;
+  }
+
+  /**
+   * Returns the number of children.
+   * 
+   * @return the component count
+   */
+  public int getItemCount() {
+    return items.size();
+  }
+
+  /**
+   * Returns the child items.
+   * 
+   * @return the children
+   */
+  public List<T> getItems() {
+    return items;
+  }
+
+  /**
+   * Returns the widget at the given index. If the child is a WidgetComponent,
+   * the wrapped widget is returned.
+   * 
+   * @param index the index
+   * @return the widget
+   */
+  public Widget getWidget(int index) {
+    Component c = getItem(index);
+    if (c != null && c instanceof WidgetComponent) {
+      return ((WidgetComponent) c).getWidget();
+    } else if (c != null) {
+      return c;
+    }
+    return null;
+  }
+
+  /**
+   * Returns the index of the item.
+   * 
+   * @param item the item
+   * @return the index
+   */
+  public int indexOf(T item) {
+    return items.indexOf(item);
+  }
+
+  /**
+   * Returns an iterator over the container's children.
+   * 
+   * @return an iterator
+   */
+  public Iterator iterator() {
+    return items.iterator();
+  }
+
+  /**
+   * Removes all the container's items.
+   * 
+   * @return true if all items where removed
+   */
+  public boolean removeAll() {
+    return removeAll(false);
+  }
+
+  /**
+   * Scrolls the item into view.
+   * 
+   * @param item the item
+   */
+  public void scrollIntoView(T item) {
+    if (rendered) {
+      item.el().scrollIntoView(el().dom, false);
     }
   }
 
   /**
-   * Executes the container's layout. If a layout has not been set a
-   * <code>FlowLayout</code> will be used. If the size of the container has
-   * not changed since the last time layout was called it will not execute. See
-   * {@link #layout(boolean)} to force the layout to execute.
+   * Adds a item to the container. Fires the <i>BeforeAdd</i> event before
+   * inserting, then fires the <i>Add</i> event after the widget has been
+   * inserted.
    * 
-   * @return True if the layout is executed
+   * @param item the item to be added
    */
-  public boolean layout() {
-    return layout(false);
+  protected boolean add(T item) {
+    return insert(item, getItemCount());
   }
 
   /**
-   * Force this container's layout to be recalculated. If a layout has not been
-   * set a <code>FlowLayout</code> will be used.
+   * Sets the child's parent to this container. In order to support lazy
+   * rendering this method uses JSNI to simply set the child parent without
+   * effecting the attached state of the child.
    * 
-   * @param force <code>true</code> to force the layout to execute
-   * @return true if the layout executes
+   * @param child the child widget
    */
-  public boolean layout(boolean force) {
-    if (force) lastSize = null;
-    if (!rendered) {
-      layoutOnAttach = true;
-      return false;
-    }
-    return onLayout();
+  protected void adopt(T child) {
+    setParent(this, child);
+  }
+
+  protected ContainerEvent createContainerEvent(T item) {
+    return new ContainerEvent(this, item);
   }
 
   @Override
-  protected void afterRender() {
-    super.afterRender();
-    if (layoutOnAttach) {
-      layoutOnAttach = false;
-      layout(true);
+  protected void doAttachChildren() {
+    if (attachChildren) {
+      for (T item : items) {
+        if (item.isRendered() && !item.isAttached()) {
+          item.onAttach();
+        }
+      }
     }
   }
 
-  /**
-   * Removes a component from this container. Fires the 'BeforeRemove' event
-   * before removing, then fires the 'Remove' event after the component has been
-   * removed.
-   * 
-   * @param component the component to remove
-   */
-  public boolean remove(T component) {
-    if (fireEvent(Events.BeforeRemove, component)) {
-      boolean result = super.remove(component);
+  @Override
+  protected void doDetachChildren() {
+    if (attachChildren) {
+      for (T item : items) {
+        if (item.isAttached()) {
+          item.onDetach();
+        }
+      }
+    }
+  }
 
-      if (rendered && layoutOnChange) {
-        layout(true);
+  protected boolean doLayout() {
+    if (!enableLayout) return false;
+
+    layoutExecuted = true;
+
+    if (layout == null) {
+      setLayout(new FlowLayout());
+    }
+
+    // execute the layout
+    layout.layout();
+
+    for (Component c : items) {
+      if (c.isRendered() && !c.isAttached()) {
+        WidgetHelper.doAttach(c);
       }
-      if (layout != null && layout.activeItem == component) {
-        layout.activeItem = null;
+      if (c instanceof LayoutContainer) {
+        ((LayoutContainer) c).layout();
+      } else if (c instanceof Container) {
+        Container con = (Container) c;
+        if (con.layout != null) {
+          con.layout();
+        }
+      } else {
+        c.recalculate();
       }
-      fireEvent(Events.Remove, component);
-      return result;
+    }
+
+    ContainerEvent ce = new ContainerEvent(this);
+    fireEvent(Events.AfterLayout, ce);
+    return true;
+  }
+
+  protected Layout getLayout() {
+    return layout;
+  }
+
+  protected El getLayoutTarget() {
+    return el();
+  }
+
+  /**
+   * Addss a item into the container. Fires the <i>BeforeAdd</i> event before
+   * inserting, then fires the <i>Add</i> event after the widget has been
+   * inserted.
+   * 
+   * @param item the item to insert
+   * @param index the insert location
+   */
+  protected boolean insert(T item, int index) {
+    ContainerEvent containerEvent = createContainerEvent(item);
+    containerEvent.index = index;
+    if (fireEvent(Events.BeforeAdd, containerEvent)) {
+      ComponentEvent componentEvent = item.createComponentEvent(null);
+      if (item.fireEvent(Events.BeforeAdopt, componentEvent)) {
+        onInsert(item, index);
+        items.add(index, item);
+        adopt(item);
+        item.fireEvent(Events.Adopt, componentEvent);
+        fireEvent(Events.Add, containerEvent);
+        if (isRendered() && layoutOnChange) {
+          layout();
+        }
+        return true;
+      }
     }
     return false;
   }
 
   /**
-   * Removes all of children from this container.
+   * Returns true if the container's layout is executed when the container is
+   * resized (default to true).
+   * 
+   * @return true to enable resize monitoring
    */
-  public void removeAll() {
+  protected boolean isMonitorResize() {
+    return monitorResize;
+  }
+
+  /**
+   * Returns true if the container's layout is executed when the browser window
+   * is resized (defaults to false).
+   * 
+   * @return true if window resize monitoring is enabled
+   */
+  protected boolean isMonitorWindowResize() {
+    return monitorWindowResize;
+  }
+
+  /**
+   * Executes the container's layout. If a layout has not been set a
+   * <code>FlowLayout</code> will be used.
+   */
+  protected boolean layout() {
+    if (!rendered) {
+      return false;
+    }
+    return doLayout();
+  }
+
+  @Override
+  protected void onAttach() {
+    super.onAttach();
+    if (!layoutExecuted) {
+      layout();
+    }
+  }
+
+  protected void onInsert(T item, int index) {
+
+  }
+
+  protected void onRemove(T item) {
+
+  }
+
+  protected final void orphan(T child) {
+    assert (child.getParent() == this);
+    if (child.isAttached()) {
+      WidgetHelper.doDetach(child);
+      assert !child.isAttached() : "Failure of " + getClass() + " to call super.onDetach()";
+    }
+    setParent(null, child);
+  }
+
+  /**
+   * Removes the item from the container. Fires the <i>BeforeRemove</i> event
+   * before removing, then fires the <i>Remove</i> event after the widget has
+   * been removed.
+   * 
+   * @param item the item to remove
+   * @return <code>true</code> if the item was removed
+   */
+  protected boolean remove(T item) {
+    return remove(item, false);
+  }
+
+  protected boolean remove(T component, boolean force) {
+    ContainerEvent containerEvent = createContainerEvent(component);
+    containerEvent.item = component;
+    if (fireEvent(Events.BeforeRemove, containerEvent) || force) {
+      ComponentEvent componentEvent = component.createComponentEvent(null);
+      if (component.fireEvent(Events.BeforeOrphan, componentEvent) || force) {
+        onRemove(component);
+
+        if (attachChildren) {
+          if (component.getParent() != this) {
+            throw new RuntimeException("component is not a child of this container");
+          }
+          orphan(component);
+        }
+
+        if (rendered) {
+          Element elem = component.getElement();
+          Element parent = DOM.getParent(elem);
+          if (parent != null) {
+            DOM.removeChild(parent, elem);
+          }
+        }
+
+        items.remove(component);
+
+        component.fireEvent(Events.Orphan, componentEvent);
+        fireEvent(Events.Remove, containerEvent);
+
+        if (isRendered() && layoutOnChange) {
+          layout();
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+
+  protected boolean removeAll(boolean force) {
     int count = getItemCount();
     for (int i = 0; i < count; i++) {
-      remove(getItem(0));
+      remove(getItem(0), force);
     }
+    return getItemCount() == 0;
   }
 
   /**
@@ -304,103 +426,50 @@ public class Container<T extends Component> extends ScrollContainer<T> {
    * 
    * @param layout the new layout
    */
-  public void setLayout(Layout layout) {
+  protected void setLayout(Layout layout) {
     this.layout = layout;
     layout.setContainer(this);
   }
 
   /**
-   * Specifies if the container's layout should be called when widgets are added
-   * or removed. Default value is <code>false</code>.
+   * True to execute the container's layout when the container is resized
+   * (defaults to true).
    * 
-   * @param layoutOnChange <code>true</code> to enable
+   * @param monitorResize true to monitor container resizing
    */
-  public void setLayoutOnChange(boolean layoutOnChange) {
-    this.layoutOnChange = layoutOnChange;
-  }
-  
-  /**
-   * Sets the monitor resize state. When <code>true</code> the container's
-   * layout will be executed when the container is resized. Default value is
-   * <code>true</code>.
-   * 
-   * @param monitorResize <code>true</code> to monitor resizing
-   */
-  public void setMonitorResize(boolean monitorResize) {
+  protected void setMonitorResize(boolean monitorResize) {
     this.monitorResize = monitorResize;
   }
 
   /**
-   * Fires an event with the given event type, widget, and item.
+   * True to have the container's layout executed when the browser window is
+   * resized (default to false).
    * 
-   * @param type the event type
-   * @param item the action widget
-   * @return <code>false</code> if any listeners return <code>false</code>
+   * @param monitorWindowResize true to monitor window resizing
    */
-  protected boolean fireEvent(int type, Component item) {
-    ContainerEvent ce = new ContainerEvent(this);
-    ce.item = item;
-    return fireEvent(type, ce);
+  protected void setMonitorWindowResize(boolean monitorWindowResize) {
+    this.monitorWindowResize = monitorWindowResize;
   }
 
   /**
-   * Fires an event with the given event type, widget, item, and index.
+   * Helper Method for the subclasses that wish to support automatic wrapping of
+   * Widget instances in WidgetComponents
    * 
-   * @param eventType the event type
-   * @param item the action widget
-   * @param index the index
-   * @return <code>false</code> if any listeners return <code>false</code>
+   * <p/> If the widget is a component, no wrapping is performed
+   * 
+   * @param widget the widget to be wrapped
+   * @return the new component
    */
-  protected boolean fireEvent(int eventType, Component item, int index) {
-    ContainerEvent ce = new ContainerEvent(this);
-    ce.item = item;
-    ce.index = index;
-    return fireEvent(eventType, ce);
-  }
-
-  protected boolean onLayout() {
-    Size size = getLayoutTarget().getSize();
-    if (lastSize != null) {
-      if (lastSize.equals(size)) {
-        return false;
-      }
-    }
-    lastSize = size;
-
-    if (layout == null) {
-      layout = defaultLayout;
-    }
-
-    // execute the layout
-    layout.layout(this);
-
-    // execution of the layout can result in new component being rendered
-    // need to attach newly rendered children if the the container
-    // is currently attached
-    if (isAttached()) {
-      int count = getItemCount();
-      for (int i = 0; i < count; i++) {
-        Component c = getItem(i);
-        if (c.isRendered() & !c.isAttached()) {
-          c.onAttach();
-        }
-      }
-    }
-    ContainerEvent ce = new ContainerEvent(this);
-    fireEvent(Events.AfterLayout, ce);
-    return true;
-  }
-
-  protected void onRender(Element parent, int index) {
-    super.onRender(parent, index);
-    setElement(DOM.createDiv(), parent, index);
-    setStyleAttribute("overflow", "hidden");
-  }
-
-  protected void onResize(int width, int height) {
-    if (monitorResize && !disableLayout) {
-      layout();
+  protected Component wrapWidget(Widget widget) {
+    if (widget instanceof Component) {
+      return (Component) widget;
+    } else {
+      return new WidgetComponent(widget);
     }
   }
+
+  private native void setParent(Widget parent, Widget child) /*-{
+   child.@com.google.gwt.user.client.ui.Widget::parent = parent;
+   }-*/;
 
 }

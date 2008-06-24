@@ -57,4 +57,18 @@ public class BoxComponentEvent extends ComponentEvent {
     super(component);
     this.boxComponent = component;
   }
+
+  /**
+   * Creates a new event.
+   * 
+   * @param component the box component
+   * @param width the width
+   * @param height the height
+   */
+  public BoxComponentEvent(BoxComponent component, int width, int height) {
+    super(component);
+    this.boxComponent = component;
+    this.width = width;
+    this.height = height;
+  }
 }

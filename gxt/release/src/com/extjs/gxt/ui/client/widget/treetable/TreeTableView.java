@@ -14,7 +14,6 @@ import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.table.TableColumnModel;
 import com.extjs.gxt.ui.client.widget.table.TableItem;
-import com.extjs.gxt.ui.client.widget.tree.TreeItem;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -47,8 +46,8 @@ public class TreeTableView {
   protected String widgetStyle = cellStyle + "-widget";
 
   protected TableColumnModel cm;
-  protected Element scrollElem, treeDiv;
-  protected El dataEl;
+  protected Element treeDiv;
+  protected El scrollEl, dataEl;
   protected TreeTable treeTable;
   protected int scrollBarWidth;
 
@@ -57,12 +56,6 @@ public class TreeTableView {
       for (int i = 0; i < item.cellStyles.length; i++) {
         setCellStyle(item, i, item.cellStyles[i]);
       }
-    }
-  }
-
-  public void clearHoverStyles() {
-    for (TreeItem item : treeTable.getAllItems()) {
-      item.getUI().onMouseOut(null);
     }
   }
 
@@ -82,8 +75,8 @@ public class TreeTableView {
     return index == null ? Style.DEFAULT : Integer.parseInt(index);
   }
 
-  public Element getScrollElement() {
-    return scrollElem;
+  public El getScrollEl() {
+    return scrollEl;
   }
 
   public Element getTextCellElement(TreeTableItem item, int cell) {
@@ -96,7 +89,7 @@ public class TreeTableView {
   }
 
   public void removeItem(TableItem item) {
-    dataEl.removeChild(item.el.dom);
+    dataEl.dom.removeChild(item.el().dom);
   }
 
   public void render() {
@@ -104,8 +97,8 @@ public class TreeTableView {
 
     Element div = DOM.createDiv();
     DOM.setInnerHTML(div, bodyHTML.toString());
-    scrollElem = El.fly(div).getSubChild(2);
-    dataEl = new El(DOM.getFirstChild(scrollElem));
+    scrollEl = new El(El.fly(div).getSubChild(2));
+    dataEl = new El(DOM.getFirstChild(scrollEl.dom));
     treeDiv = dataEl.firstChild().dom;
     DOM.appendChild(treeDiv, treeTable.getRootItem().getElement());
     DOM.appendChild(treeTable.getElement(), DOM.getFirstChild(div));
@@ -116,7 +109,7 @@ public class TreeTableView {
 
     treeTable.disableTextSelection(true);
 
-    DOM.sinkEvents(scrollElem, Event.ONSCROLL);
+    DOM.sinkEvents(scrollEl.dom, Event.ONSCROLL);
   }
 
   public void renderItemValue(TreeTableItem item, int index, Object value) {
@@ -131,8 +124,8 @@ public class TreeTableView {
           WidgetHelper.doAttach(widget);
         }
       } else {
-        String s = treeTable.getRenderedValue(index, value);
-        El.fly(textElem).setInnerHtml(s);
+        String s = treeTable.getRenderedValue(item, index, value);
+        textElem.setInnerHTML(s);
       }
     }
     applyCellStyles(item);
@@ -144,48 +137,34 @@ public class TreeTableView {
     int bodyHeight = treeTable.getOffsetHeight() - headerHeight;
     int bodyWidth = width;
 
-    dataEl.setWidth(cm.getTotalWidth());
-    treeTable.getTableHeader().setWidth(cm.getTotalWidth());
+    if (treeTable.isAutoHeight()) {
+      scrollEl.setHeight("auto");
+      dataEl.setHeight("auto");
+      bodyHeight = dataEl.getHeight();
+      bodyHeight += treeTable.el().getBorderWidth("tb");
+    }
 
-    boolean vscroll = dataEl.getHeight() > bodyHeight;
-    int adj = vscroll ? scrollBarWidth : 0;
+    int columnModelWidth = cm.getTotalWidth();
+    dataEl.setWidth(Math.min(width, columnModelWidth));
+    treeTable.getTableHeader().setWidth(columnModelWidth);
 
-    boolean isGecko = GXT.isGecko;
-    String overflowX = "visible";
+    bodyHeight -= treeTable.el().getBorderWidth("tb");
+    bodyWidth -= treeTable.el().getBorderWidth("lr");
+
+    scrollEl.setStyleAttribute("overflowY", "auto");
 
     if (treeTable.getHorizontalScroll()) {
-      if (dataEl.getWidth() < (width - adj)) {
-        if (isGecko) {
-          overflowX = "hidden";
-        } else {
-          bodyHeight += scrollBarWidth;
-          treeTable.getTableHeader().el.setLeft(0);
-        }
-      }
-    } else {
-      if (isGecko) {
-        overflowX = "hidden";
-      } else {
-        bodyHeight += scrollBarWidth;
+      scrollEl.setStyleAttribute("overflowX", "auto");
+      if (columnModelWidth < width) {
+        scrollEl.setStyleAttribute("overflowX", "hidden");
+        treeTable.getTableHeader().el().setLeft(0);
       }
     }
 
-    if (isGecko) {
-      El.fly(scrollElem).setStyleAttribute("overflowX", overflowX);
+    if (treeTable.isAutoHeight()) {
+      bodyHeight = -1;
     }
-
-    bodyHeight -= treeTable.el.getBorderWidth("tb");
-    bodyWidth -= treeTable.el.getBorderWidth("lr");
-
-    El.fly(scrollElem).setSize(bodyWidth, bodyHeight);
-
-    int w = cm.getTotalWidth();
-
-    if (w < width) {
-      adj = width - w;
-    }
-
-    dataEl.setWidth(cm.getTotalWidth() + adj);
+    scrollEl.setSize(bodyWidth, bodyHeight);
   }
 
   public void resizeCells(int columnIndex) {

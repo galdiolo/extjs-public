@@ -11,12 +11,11 @@ import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.DragEvent;
 import com.extjs.gxt.ui.client.event.DragListener;
 import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.TypedListener;
-import com.extjs.gxt.ui.client.util.Observable;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.google.gwt.user.client.Command;
@@ -76,56 +75,17 @@ import com.google.gwt.user.client.ui.Widget;
  * </dd>
  * </dl>
  */
-public class Draggable extends Observable {
+public class Draggable extends BaseObservable {
 
-  /**
-   * True to use a proxy widget during drag operation (defaults to true).
-   */
-  public boolean useProxy = true;
-
-  /**
-   * The style name used for proxy drags (defaults to 'my-drag-proxy').
-   */
-  public String proxyStyle = "x-drag-proxy";
-
-  /**
-   * True to stop vertical movement (defaults to false).
-   */
-  public boolean constrainVertical;
-
-  /**
-   * True to stop horizontal movement (defaults to false).
-   */
-  public boolean constrainHorizontal;
-
-  /**
-   * True to set constrain movement to the viewport (defaults to true).
-   */
-  public boolean constrainClient = true;
-
-  /**
-   * True to move source widget aftet a proxy drag (defaults to true).
-   */
-  public boolean moveAfterProxyDrag = true;
-
-  /**
-   * If specified, drag will be constrained by the container bounds.
-   */
-  public Component container;
-
-  /**
-   * True to set proxy dimensions the same as the drag widget (defaults to
-   * true).
-   */
-  public boolean sizeProxyToSource = true;
-
-  /**
-   * True if the CSS z-index should be updated on the widget being dragged.
-   * Setting this value to <code>true</code> will ensure that the dragged
-   * element is always displayed over all other widgets (defaults to true).
-   */
-  public boolean updateZIndex = true;
-
+  private boolean updateZIndex = true;
+  private boolean sizeProxyToSource = true;
+  private Component container;
+  private boolean constrainHorizontal;
+  private boolean moveAfterProxyDrag = true;
+  private boolean constrainVertical;
+  private boolean constrainClient = true;
+  private String proxyStyle = "x-drag-proxy";
+  private boolean useProxy = true;
   private Component dragWidget;
   private Component handle;
   private boolean dragging;
@@ -192,11 +152,11 @@ public class Draggable extends Observable {
       handle.addListener(Events.Render, new Listener<ComponentEvent>() {
         public void handleEvent(ComponentEvent be) {
           handle.removeListener(Events.Render, this);
-          handle.el.addEventsSunk(Event.ONMOUSEDOWN);
+          handle.el().addEventsSunk(Event.ONMOUSEDOWN);
         }
       });
     } else {
-      handle.el.addEventsSunk(Event.ONMOUSEDOWN);
+      handle.el().addEventsSunk(Event.ONMOUSEDOWN);
     }
   }
 
@@ -206,11 +166,38 @@ public class Draggable extends Observable {
    * @param listener the drag listener to be added
    */
   public void addDragListener(DragListener listener) {
-    TypedListener l = new TypedListener(listener);
-    addListener(Events.DragStart, l);
-    addListener(Events.DragMove, l);
-    addListener(Events.DragCancel, l);
-    addListener(Events.DragEnd, l);
+    addListener(Events.DragStart, listener);
+    addListener(Events.DragMove, listener);
+    addListener(Events.DragCancel, listener);
+    addListener(Events.DragEnd, listener);
+  }
+
+  public void cancelDrag() {
+    if (dragging) {
+      DOM.removeEventPreview(preview);
+      dragging = false;
+      if (isUseProxy()) {
+        proxyEl.disableTextSelection(false);
+        Element body = XDOM.getBody();
+        DOM.removeChild(body, proxyEl.dom);
+        proxyEl = null;
+      }
+      if (!isUseProxy()) {
+        dragWidget.el().setPagePosition(startBounds.x, startBounds.y);
+      }
+
+      fireEvent(Events.DragCancel);
+      afterDrag();
+    }
+  }
+
+  /**
+   * Returns the drag container.
+   * 
+   * @return the drag container
+   */
+  public Component getContainer() {
+    return container;
   }
 
   /**
@@ -232,6 +219,42 @@ public class Draggable extends Observable {
   }
 
   /**
+   * Returns the proxy style.
+   * 
+   * @return the proxy style
+   */
+  public String getProxyStyle() {
+    return proxyStyle;
+  }
+
+  /**
+   * Returns true if drag is constrained to the viewport.
+   * 
+   * @return the contstrain client state
+   */
+  public boolean isConstrainClient() {
+    return constrainClient;
+  }
+
+  /**
+   * Returns true if horizontal movement is contstrained.
+   * 
+   * @return the horizontal constrain state
+   */
+  public boolean isConstrainHorizontal() {
+    return constrainHorizontal;
+  }
+
+  /**
+   * Returns true if vertical movement is constrained.
+   * 
+   * @return true if vertical movement constrainer
+   */
+  public boolean isConstrainVertical() {
+    return constrainVertical;
+  }
+
+  /**
    * Returns <code>true</code> if a drag is in progress.
    * 
    * @return the drag state
@@ -241,16 +264,89 @@ public class Draggable extends Observable {
   }
 
   /**
+   * Returns true if the drag widget is moved after a proxy drag.
+   * 
+   * @return the move after proxy state
+   */
+  public boolean isMoveAfterProxyDrag() {
+    return moveAfterProxyDrag;
+  }
+
+  /**
+   * Returns true if the proxy element is sized to match the drag widget.
+   * 
+   * @return the size proxy to source state
+   */
+  public boolean isSizeProxyToSource() {
+    return sizeProxyToSource;
+  }
+
+  /**
+   * Returns true if the z-index is updated after a drag.
+   * 
+   * @return the update z-index state
+   */
+  public boolean isUpdateZIndex() {
+    return updateZIndex;
+  }
+
+  /**
+   * Returns true if proxy element is enabled.
+   * 
+   * @return the use proxy state
+   */
+  public boolean isUseProxy() {
+    return useProxy;
+  }
+
+  /**
    * Removes a previously added listener.
    * 
    * @param listener the listener to be removed
    */
   public void removeDragListener(DragListener listener) {
-    if (eventTable == null) return;
-    eventTable.unhook(Events.DragStart, listener);
-    eventTable.unhook(Events.DragMove, listener);
-    eventTable.unhook(Events.DragCancel, listener);
-    eventTable.unhook(Events.DragEnd, listener);
+    if (hasListeners()) {
+      removeListener(Events.DragStart, listener);
+      removeListener(Events.DragMove, listener);
+      removeListener(Events.DragCancel, listener);
+      removeListener(Events.DragEnd, listener);
+    }
+  }
+
+  /**
+   * True to set constrain movement to the viewport (defaults to true).
+   * 
+   * @param constrainClient true to constrian to viewport
+   */
+  public void setConstrainClient(boolean constrainClient) {
+    this.constrainClient = constrainClient;
+  }
+
+  /**
+   * True to stop horizontal movement (defaults to false).
+   * 
+   * @param constrainHorizontal true to stop horizontal movement
+   */
+  public void setConstrainHorizontal(boolean constrainHorizontal) {
+    this.constrainHorizontal = constrainHorizontal;
+  }
+
+  /**
+   * True to stop vertical movement (defaults to false).
+   * 
+   * @param constrainVertical true to stop vertical movement
+   */
+  public void setConstrainVertical(boolean constrainVertical) {
+    this.constrainVertical = constrainVertical;
+  }
+
+  /**
+   * Specifies a container to which the drag widget is constrained.
+   * 
+   * @param container the container
+   */
+  public void setContainer(Component container) {
+    this.container = container;
   }
 
   /**
@@ -261,6 +357,58 @@ public class Draggable extends Observable {
    */
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
+  }
+
+  /**
+   * True to move source widget after a proxy drag (defaults to true).
+   * 
+   * @param moveAfterProxyDrag true to move after a proxy drag
+   */
+  public void setMoveAfterProxyDrag(boolean moveAfterProxyDrag) {
+    this.moveAfterProxyDrag = moveAfterProxyDrag;
+  }
+
+  public void setProxy(Element element) {
+    proxyEl = new El(element);
+  }
+
+  /**
+   * Sets the style name used for proxy drags (defaults to 'my-drag-proxy').
+   * 
+   * @param proxyStyle the proxy style
+   */
+  public void setProxyStyle(String proxyStyle) {
+    this.proxyStyle = proxyStyle;
+  }
+
+  /**
+   * True to set proxy dimensions the same as the drag widget (defaults to
+   * true).
+   * 
+   * @param sizeProxyToSource true to update proxy size
+   */
+  public void setSizeProxyToSource(boolean sizeProxyToSource) {
+    this.sizeProxyToSource = sizeProxyToSource;
+  }
+
+  /**
+   * True if the CSS z-index should be updated on the widget being dragged.
+   * Setting this value to <code>true</code> will ensure that the dragged
+   * element is always displayed over all other widgets (defaults to true).
+   * 
+   * @param updateZIndex true update the z-index
+   */
+  public void setUpdateZIndex(boolean updateZIndex) {
+    this.updateZIndex = updateZIndex;
+  }
+
+  /**
+   * True to use a proxy widget during drag operation (defaults to true).
+   * 
+   * @param useProxy true use a proxy
+   */
+  public void setUseProxy(boolean useProxy) {
+    this.useProxy = useProxy;
   }
 
   /**
@@ -285,8 +433,12 @@ public class Draggable extends Observable {
     xBottom = bottom;
   }
 
-  public void setProxy(Element element) {
-    proxyEl = new El(element);
+  protected El createProxy() {
+    proxyEl = new El(DOM.createDiv());
+    proxyEl.setVisibility(false);
+    proxyEl.dom.setClassName(getProxyStyle());
+    proxyEl.disableTextSelection(true);
+    return proxyEl;
   }
 
   private void afterDrag() {
@@ -296,25 +448,6 @@ public class Draggable extends Observable {
         dragWidget.enableEvents(true);
       }
     });
-  }
-
-  public void cancelDrag() {
-    if (dragging) {
-      DOM.removeEventPreview(preview);
-      dragging = false;
-      if (useProxy) {
-        proxyEl.disableTextSelection(false);
-        Element body = XDOM.getBody();
-        DOM.removeChild(body, proxyEl.dom);
-        proxyEl = null;
-      }
-      if (!useProxy) {
-        dragWidget.el.setPagePosition(startBounds.x, startBounds.y);
-      }
-
-      fireEvent(Events.DragCancel);
-      afterDrag();
-    }
   }
 
   private void onMouseDown(ComponentEvent ce) {
@@ -327,7 +460,10 @@ public class Draggable extends Observable {
       return;
     }
 
-    startBounds = XDOM.getBounds(dragWidget.getElement(), true);
+    startBounds = dragWidget.el().getBounds();
+
+    dragStartX = ce.getClientX();
+    dragStartY = ce.getClientY();
 
     dragWidget.enableEvents(false);
     startDrag(ce.event);
@@ -336,9 +472,6 @@ public class Draggable extends Observable {
 
     clientWidth = Window.getClientWidth() + XDOM.getBodyScrollLeft();
     clientHeight = Window.getClientHeight() + XDOM.getBodyScrollTop();
-
-    dragStartX = ce.getClientX();
-    dragStartY = ce.getClientY();
 
     if (container != null) {
       conX = container.getAbsoluteLeft();
@@ -366,9 +499,15 @@ public class Draggable extends Observable {
       int width = dragWidget.getOffsetWidth();
       int height = dragWidget.getOffsetHeight();
 
+      if (useProxy) {
+        width = proxyEl.getWidth();
+        height = proxyEl.getHeight();
+      }
+
       if (constrainClient) {
         left = Math.max(left, 0);
         top = Math.max(top, 0);
+
         left = Math.min(clientWidth - width, left);
 
         if (Math.min(clientHeight - height, top) > 0) {
@@ -408,13 +547,13 @@ public class Draggable extends Observable {
       lastX = left;
       lastY = top;
 
-      if (useProxy) {
+      if (isUseProxy()) {
         proxyEl.setLeftTop(left, top);
       } else {
-        dragWidget.el.setPagePosition(left, top);
+        dragWidget.el().setPagePosition(left, top);
       }
 
-      if (hasListener) {
+      if (hasListeners()) {
         dragEvent.source = this;
         dragEvent.component = dragWidget;
         dragEvent.event = event;
@@ -429,21 +568,13 @@ public class Draggable extends Observable {
 
   }
 
-  protected El createProxy() {
-    proxyEl = new El(DOM.createDiv());
-    proxyEl.setVisibility(false);
-    proxyEl.setStyleName(proxyStyle);
-    proxyEl.disableTextSelection(true);
-    return proxyEl;
-  }
-
   private void startDrag(Event event) {
     XDOM.getBodyEl().addStyleName("x-unselectable");
 
-    dragWidget.el.makePositionable();
+    dragWidget.el().makePositionable();
 
     if (updateZIndex) {
-      dragWidget.el.updateZIndex(0);
+      dragWidget.el().updateZIndex(0);
     }
 
     DragEvent de = new DragEvent();
@@ -466,10 +597,10 @@ public class Draggable extends Observable {
     if (useProxy) {
       if (proxyEl == null) {
         createProxy();
-
       }
       Element body = XDOM.getBody();
       DOM.appendChild(body, proxyEl.dom);
+      proxyEl.setVisibility(false);
       proxyEl.setStyleAttribute("zIndex", XDOM.getTopZIndex());
       proxyEl.makePositionable(true);
 
@@ -493,10 +624,10 @@ public class Draggable extends Observable {
     if (dragging) {
       DOM.removeEventPreview(preview);
       dragging = false;
-      if (useProxy) {
-        if (moveAfterProxyDrag) {
+      if (isUseProxy()) {
+        if (isMoveAfterProxyDrag()) {
           Rectangle rect = proxyEl.getBounds();
-          dragWidget.el.setPagePosition(rect.x, rect.y);
+          dragWidget.el().setPagePosition(rect.x, rect.y);
         }
         proxyEl.disableTextSelection(false);
         Element body = XDOM.getBody();

@@ -8,25 +8,64 @@
 package com.extjs.gxt.samples.mail.client.mvc;
 
 import com.extjs.gxt.samples.mail.client.AppEvents;
+import com.extjs.gxt.samples.mail.client.MailServiceAsync;
+import com.extjs.gxt.samples.resources.client.Folder;
+import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.mvc.AppEvent;
 import com.extjs.gxt.ui.client.mvc.Controller;
+import com.extjs.gxt.ui.client.mvc.Dispatcher;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class AppController extends Controller {
 
   private AppView appView;
+  private MailServiceAsync service;
 
   public AppController() {
     registerEventTypes(AppEvents.Init);
+    registerEventTypes(AppEvents.Login);
+    registerEventTypes(AppEvents.Error);
   }
 
   public void handleEvent(AppEvent event) {
-    if (event.type == AppEvents.Init) {
-      forwardToView(appView, event);
+    switch (event.type) {
+      case AppEvents.Init:
+        onInit(event);
+        break;
+      case AppEvents.Login:
+        onLogin(event);
+        break;
+      case AppEvents.Error:
+        onError(event);
+        break;
     }
   }
 
   public void initialize() {
     appView = new AppView(this);
+  }
+
+  protected void onError(AppEvent ae) {
+    System.out.println("error");
+  }
+
+  private void onInit(AppEvent event) {
+    forwardToView(appView, event);
+    service = (MailServiceAsync) Registry.get("service");
+    service.getMailFolders("darrell", new AsyncCallback<Folder>() {
+      public void onFailure(Throwable caught) {
+        Dispatcher.forwardEvent(AppEvents.Error, caught);
+      }
+
+      public void onSuccess(Folder result) {
+        Dispatcher.forwardEvent(AppEvents.NavMail, result);
+      }
+    });
+
+  }
+
+  private void onLogin(AppEvent event) {
+    forwardToView(appView, event);
   }
 
 }

@@ -11,7 +11,7 @@ import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.ui.client.fx.Draggable;
 import com.extjs.gxt.ui.client.fx.Resizable;
 import com.extjs.gxt.ui.client.widget.Component;
-import com.extjs.gxt.ui.client.widget.Container;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
@@ -20,7 +20,7 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class ResizablePage extends Container implements EntryPoint {
+public class ResizablePage extends LayoutContainer implements EntryPoint {
 
   public void onModuleLoad() {
     RootPanel.get().add(this);
@@ -38,17 +38,19 @@ public class ResizablePage extends Container implements EntryPoint {
     cp.setSize(200, 125);
 
     Draggable d = new Draggable(cp);
-    d.container = (Component)getParent();
+    if (getParent() instanceof Component) {
+      d.setContainer((Component)getParent());
+    }
     new Resizable(cp);
 
     setLayout(new FlowLayout(10));
     add(cp);
     
     Widget p = getParent();
-    if (p instanceof Container) {
-      Container ct = (Container) p;
+    if (p instanceof LayoutContainer) {
+      LayoutContainer ct = (LayoutContainer) p;
       ct.setLayout(new FitLayout());
-      ct.layout(true);
+      ct.layout();
     }
 
   }

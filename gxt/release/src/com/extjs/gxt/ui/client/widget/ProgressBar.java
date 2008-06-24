@@ -148,7 +148,7 @@ public class ProgressBar extends Component {
     if (text != null) {
       updateText(text);
     }
-    double w = Math.floor(value * el.firstChild().getWidth());
+    double w = Math.floor(value * el().firstChild().getWidth());
     progressBar.setWidth((int) w);
     if (textTopElem != null) {
       textTopElem.removeStyleName("x-hidden").setWidth((int) w);
@@ -178,7 +178,7 @@ public class ProgressBar extends Component {
     Template t = new Template(sb.toString());
     setElement(t.create(new Params("cls", baseStyle)), target, index);
 
-    final El inner = el.firstChild();
+    final El inner = el().firstChild();
     progressBar = inner.firstChild();
     textTopElem = progressBar.firstChild();
     textBackElem = inner.childNode(1);

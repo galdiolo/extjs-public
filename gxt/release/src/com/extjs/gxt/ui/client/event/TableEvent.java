@@ -16,22 +16,7 @@ import com.extjs.gxt.ui.client.widget.table.TableItem;
  * 
  * @see Table
  */
-public class TableEvent extends ComponentEvent {
-
-  /**
-   * The source table.
-   */
-  public Table table;
-
-  /**
-   * The table item.
-   */
-  public TableItem item;
-
-  /**
-   * The index.
-   */
-  public int index;
+public class TableEvent extends ContainerEvent<Table, TableItem> {
 
   /**
    * The width.
@@ -65,12 +50,10 @@ public class TableEvent extends ComponentEvent {
    */
   public TableEvent(Table table) {
     super(table);
-    this.table = table;
   }
   
   public TableEvent(Table table, TableItem item) {
-    super(table);
-    this.item = item;
+    super(table, item);
   }
 
 }

@@ -8,34 +8,22 @@
 package com.extjs.gxt.ui.client.widget.layout;
 
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.Layout;
 
 /**
- * <code>Layout</code> that positions its children using normal HTML layout
- * behavior. The margin and spacing can be specified. The layout method will be
- * called to any child widgets that are containers. Recalculate will be called
- * on any child widgets that are components.
+ * <code>Layout</code> that simply renders each child component into its
+ * container. The size and position of children are not altered by this layout.
+ * 
+ * <p/> Margins can be applied directly to child components to control the
+ * spacing between components.
  */
 public class FlowLayout extends Layout {
 
-  /**
-   * The number of pixels of margin that will be placed along the edges of the
-   * layout (default is 0).
-   */
-  public int margin = 0;
-
-  /**
-   * The number of pixels between the edge of one cell and the edge of its
-   * neighbouring cell (default value is 0).
-   */
-  public int spacing = 0;
-
-  /**
-   * True to remove postioning from the container's children (defaults to true).
-   */
-  public boolean removePositioning = true;
+  private Margins margins = new Margins();
+  private boolean removePositioning = false;
 
   /**
    * Creates a new layout instance.
@@ -50,7 +38,7 @@ public class FlowLayout extends Layout {
    * @param removePostioning true to remove positioning on child components
    */
   public FlowLayout(boolean removePostioning) {
-    this.removePositioning = removePostioning;
+    this.setRemovePositioning(removePostioning);
   }
 
   /**
@@ -59,15 +47,59 @@ public class FlowLayout extends Layout {
    * @param margin the margin
    */
   public FlowLayout(int margin) {
-    this.margin = margin;
+    setMargins(new Margins(margin));
+  }
+
+  /**
+   * Returns the margins of the layout.
+   * 
+   * @return the margins
+   */
+  public Margins getMargins() {
+    return margins;
+  }
+
+  /**
+   * Returns true if positioning is being removed.
+   * 
+   * @return the remove positioning state
+   */
+  public boolean getRemovePositioning() {
+    return removePositioning;
+  }
+
+  /**
+   * Sets the margins using the give margin.
+   * 
+   * @param margin the margin
+   */
+  public void setMargin(int margin) {
+    setMargins(new Margins(margin));
+  }
+
+  /**
+   * Sets the margins of the layout to be applied to the container.
+   * 
+   * @param margins the margins in pixels
+   */
+  public void setMargins(Margins margins) {
+    this.margins = margins;
+  }
+
+  /**
+   * True to remove positioning from the container's children (defaults to
+   * false).
+   * 
+   * @param removePositioning true to remove positioning
+   */
+  public void setRemovePositioning(boolean removePositioning) {
+    this.removePositioning = removePositioning;
   }
 
   @Override
   protected void onLayout(Container container, El target) {
     super.onLayout(container, target);
-    if (margin != 0) {
-      target.setStyleAttribute("margin", margin);
-    }
+    applyMargins(target, margins);
   }
 
   @Override
@@ -76,16 +108,9 @@ public class FlowLayout extends Layout {
     if (removePositioning) {
       c.setStyleAttribute("position", "static");
     }
-
-    if (index != 0 && spacing > 0) {
-      c.el.setStyleAttribute("marginTop", spacing);
-      c.el.setStyleAttribute("marginRight", spacing);
-    }
-
-    if (c instanceof Container) {
-      ((Container) c).layout();
-    } else {
-      c.recalculate();
+    if (c.getData() != null && c.getData() instanceof FlowData) {
+      FlowData data = (FlowData)c.getData();
+      applyMargins(c.el(), data.getMargins());
     }
   }
 

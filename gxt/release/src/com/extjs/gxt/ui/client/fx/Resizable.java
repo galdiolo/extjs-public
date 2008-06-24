@@ -13,10 +13,10 @@ import java.util.List;
 
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.ResizeEvent;
-import com.extjs.gxt.ui.client.util.Observable;
 import com.extjs.gxt.ui.client.util.Point;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.util.WidgetHelper;
@@ -71,7 +71,7 @@ import com.google.gwt.user.client.ui.RootPanel;
  * </dd>
  * </dl>
  */
-public class Resizable extends Observable {
+public class Resizable extends BaseObservable {
 
   protected enum Dir {
     N, NE, E, SE, S, SW, W, NW;

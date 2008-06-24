@@ -22,31 +22,76 @@ import com.google.gwt.i18n.client.DateTimeFormat;
  * Provides a date input field with a {@link DatePicker} dropdown and automatic
  * date validation.
  */
-public class DateField extends TriggerField {
+public class DateField extends TriggerField<Date> {
 
   /**
-   * The default date format which can be overriden for localization support.
+   * DateField error messages.
    */
-  public DateTimeFormat format = DateTimeFormat.getShortDateFormat();
+  public class DateFieldMessages extends TextFieldMessages {
 
-  /**
-   * The error text to display when the date in the cell is before minValue
-   * (defaults to 'The date in this field must be after {@link #setMinValue}').
-   */
-  public String minText = "The date in this field must be equal to or after {0}";
+    private String minText = "The date in this field must be equal to or after {0}";
+    private String maxText = "The date in this field must be equal to or before {0}";
+    private String invalidText;
 
-  /**
-   * The error text to display when the date in the cell is after maxValue
-   * (defaults to 'The date in this field must be before {{@link #setMaxValue}').
-   */
-  public String maxText = "The date in this field must be equal to or before {0}";
+    /**
+     * Returns the invalid text.
+     * 
+     * @return the invalid text
+     */
+    public String getInvalidText() {
+      return invalidText;
+    }
 
-  /**
-   * "The error text to display when the date in the field is invalid " +
-   * "(defaults to '{value} is not a valid date - it must be in the format
-   * {format}')."
-   */
-  public String invalidText;
+    /**
+     * Returns the max error text.
+     * 
+     * @return the error text
+     */
+    public String getMaxText() {
+      return maxText;
+    }
+
+    /**
+     * Returns the min error text.
+     * 
+     * @return the error text
+     */
+    public String getMinText() {
+      return minText;
+    }
+
+    /**
+     * "The error text to display when the date in the field is invalid " +
+     * "(defaults to '{value} is not a valid date - it must be in the format
+     * {format}')."
+     * 
+     * @param invalidText the invalid text
+     */
+    public void setInvalidText(String invalidText) {
+      this.invalidText = invalidText;
+    }
+
+    /**
+     * Sets the error text to display when the date in the cell is after
+     * maxValue (defaults to 'The date in this field must be before {{@link #setMaxValue}').
+     * 
+     * @param maxText the max error text
+     */
+    public void setMaxText(String maxText) {
+      this.maxText = maxText;
+    }
+
+    /**
+     * The error text to display when the date in the cell is before minValue
+     * (defaults to 'The date in this field must be after {@link #setMinValue}').
+     * 
+     * @param minText the min text
+     */
+    public void setMinText(String minText) {
+      this.minText = minText;
+    }
+
+  }
 
   private Date minValue;
   private Date maxValue;
@@ -57,15 +102,9 @@ public class DateField extends TriggerField {
    */
   public DateField() {
     autoValidate = false;
-  }
-
-  /**
-   * Returns the current selected date.
-   * 
-   * @return the date
-   */
-  public Date getDate() {
-    return (Date) getValue();
+    propertyEditor = new DateTimePropertyEditor();
+    messages = new DateFieldMessages();
+    setTriggerStyle("x-form-date-trigger");
   }
 
   /**
@@ -77,6 +116,11 @@ public class DateField extends TriggerField {
     return maxValue;
   }
 
+  @Override
+  public DateFieldMessages getMessages() {
+    return (DateFieldMessages) messages;
+  }
+
   /**
    * Returns the field's min value.
    * 
@@ -86,13 +130,9 @@ public class DateField extends TriggerField {
     return minValue;
   }
 
-  /**
-   * Sets the date.
-   * 
-   * @param date the new date
-   */
-  public void setDate(Date date) {
-    setValue(format.format(date));
+  @Override
+  public DateTimePropertyEditor getPropertyEditor() {
+    return (DateTimePropertyEditor) propertyEditor;
   }
 
   /**
@@ -114,63 +154,15 @@ public class DateField extends TriggerField {
   }
 
   @Override
-  protected void onTriggerClick(ComponentEvent ce) {
-    super.onTriggerClick(ce);
-    if (menu == null) {
-      menu = new DateMenu();
-      menu.addListener(Events.Select, new Listener<ComponentEvent>() {
-        public void handleEvent(ComponentEvent ce) {
-          setDate(menu.getDate());
-        }
-      });
-    }
-    DatePicker picker = menu.getDatePicker();
-    
-    Object v = getValue();
-    Date d = null;
-    if (v instanceof Date) {
-      d = (Date)v;
-    } else {
-      d = new Date();
-    }
-    picker.setValue(d);
-    picker.setMinDate(minValue);
-    picker.setMaxDate(maxValue);
-
-    menu.show(wrap.dom, "tl-bl?");
-  }
-
-  protected Date parseDate(String date) {
-    try {
-      return format.parse(date);
-    } catch (Exception e) {
-
-    }
-    return null;
-  }
-
-  @Override
-  public void setValue(Object value) {
-    Date d = null;
-    if (value instanceof Date) {
-      d = (Date) value;
-    } else if (value instanceof String) {
-      d = parseDate((String) value);
-    }
-    if (d != null) {
-      super.setValue(format.format(d));
-    } else {
-      setValue(value);
-    }
-
+  public void setRawValue(String value) {
+    super.setRawValue(value);
   }
 
   @Override
   protected void onBlur(ComponentEvent ce) {
     String v = getRawValue();
     try {
-      Date d = format.parse(v);
-      setValue(d);
+      setValue(getPropertyEditor().convertStringValue(v));
     } catch (Exception e) {
 
     }
@@ -178,17 +170,35 @@ public class DateField extends TriggerField {
   }
 
   @Override
-  public Object getValue() {
-    if (value != null && value instanceof Date) {
-      return value;
+  protected void onTriggerClick(ComponentEvent ce) {
+    super.onTriggerClick(ce);
+    if (disabled || isReadOnly()) {
+      return;
     }
-
-    try {
-      return format.parse(super.getValue().toString());
-    } catch (Exception e) {
-
+    if (menu == null) {
+      menu = new DateMenu();
+      menu.addListener(Events.Select, new Listener<ComponentEvent>() {
+        public void handleEvent(ComponentEvent ce) {
+          focusValue = getValue();
+          setValue(menu.getDate());
+          fireChangeEvent(focusValue, getValue());
+        }
+      });
     }
-    return "";
+    DatePicker picker = menu.getDatePicker();
+
+    Object v = getValue();
+    Date d = null;
+    if (v instanceof Date) {
+      d = (Date) v;
+    } else {
+      d = new Date();
+    }
+    picker.setValue(d, true);
+    picker.setMinDate(minValue);
+    picker.setMaxDate(maxValue);
+
+    menu.show(wrap.dom, "tl-bl?");
   }
 
   @Override
@@ -200,23 +210,33 @@ public class DateField extends TriggerField {
       // it's valid
       return true;
     }
-    Date date = parseDate(value);
+
+    DateTimeFormat format = getPropertyEditor().getFormat();
+
+    Date date = null;
+
+    try {
+      date = getPropertyEditor().convertStringValue(value);
+    } catch (Exception e) {
+
+    }
+
     if (date == null) {
       String error = null;
-      if (invalidText != null) {
-        error = Format.substitute(invalidText, 0);
+      if (getMessages().getInvalidText() != null) {
+        error = Format.substitute(getMessages().getInvalidText(), 0);
       } else {
-        error = GXT.MESSAGES.dateField_invalidText(value,
-            format.getPattern().toUpperCase());
+        error = GXT.MESSAGES.dateField_invalidText(value, format.getPattern().toUpperCase());
       }
       markInvalid(error);
       return false;
     }
 
     if (minValue != null && date.before(minValue)) {
+
       String error = null;
-      if (minText != null) {
-        error = Format.substitute(minText, format.format(minValue));
+      if (getMessages().getMinText() != null) {
+        error = Format.substitute(getMessages().getMinText(), format.format(minValue));
       } else {
         error = GXT.MESSAGES.dateField_minText(format.format(minValue));
       }
@@ -225,8 +245,8 @@ public class DateField extends TriggerField {
     }
     if (maxValue != null && date.after(maxValue)) {
       String error = null;
-      if (maxText != null) {
-        error = Format.substitute(maxText, format.format(maxValue));
+      if (getMessages().getMaxText() != null) {
+        error = Format.substitute(getMessages().getMaxText(), format.format(maxValue));
       } else {
         error = GXT.MESSAGES.dateField_minText(format.format(maxValue));
       }

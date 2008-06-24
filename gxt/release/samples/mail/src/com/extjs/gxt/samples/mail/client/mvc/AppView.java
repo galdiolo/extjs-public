@@ -8,135 +8,106 @@
 package com.extjs.gxt.samples.mail.client.mvc;
 
 import com.extjs.gxt.samples.mail.client.AppEvents;
+import com.extjs.gxt.samples.mail.client.widget.LoginDialog;
+import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
+import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.WindowEvent;
 import com.extjs.gxt.ui.client.mvc.AppEvent;
 import com.extjs.gxt.ui.client.mvc.Controller;
 import com.extjs.gxt.ui.client.mvc.Dispatcher;
 import com.extjs.gxt.ui.client.mvc.View;
 import com.extjs.gxt.ui.client.util.Margins;
-import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
+import com.extjs.gxt.ui.client.widget.HtmlContainer;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.Viewport;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.RootPanel;
 
 public class AppView extends View {
 
   private Viewport viewport;
   private ContentPanel west;
-  private Container main;
-  private ContentPanel center;
-
+  private LayoutContainer center;
 
   public AppView(Controller controller) {
     super(controller);
   }
 
   protected void initialize() {
+    LoginDialog dialog = new LoginDialog();
+    dialog.setClosable(false);
+    dialog.addListener(Events.Hide, new Listener<WindowEvent>() {
+      public void handleEvent(WindowEvent be) {
+        Dispatcher.forwardEvent(AppEvents.Init);
+      }
+    });
+    dialog.show();
+  }
+
+  private void initUI() {
     viewport = new Viewport();
     viewport.setLayout(new BorderLayout());
 
-    BorderLayoutData westData = new BorderLayoutData(LayoutRegion.WEST, 200, 150, 350);
-    westData.margins = new Margins(5, 0, 5, 5);
+    createNorth();
+    createWest();
+    createCenter();
 
-    west = new ContentPanel();
-    west.setLayoutOnChange(true);
-    west.setHeading("GXT Mail Demo");
-    west.setLayout(new FitLayout());
-    createNavigation();
-
-    viewport.add(west, westData);
-
-    main = new Container();
-    BorderLayout layout = new BorderLayout();
-    main.setLayout(layout);
-
-    center = new ContentPanel();
-    center.setLayout(new FitLayout());
-
-    Container south = new Container();
-    south.setBorders(true);
-    south.setLayout(new FitLayout());
-
-    BorderLayoutData centerData = new BorderLayoutData(LayoutRegion.CENTER);
-    centerData.margins = new Margins(0, 0, 5, 0);
-
-    BorderLayoutData southData = new BorderLayoutData(LayoutRegion.SOUTH, .5f, 100, 1000);
-    southData.split = true;
-    southData.margins = new Margins(0, 0, 0, 0);
-
-    main.add(center, centerData);
-    main.add(south, southData);
-
-    
-    BorderLayoutData mainCenter = new BorderLayoutData(LayoutRegion.CENTER);
-    mainCenter.margins = new Margins(5, 5, 5, 5);
-    
-    viewport.add(main, mainCenter);
-
+    // registry serves as a global context
     Registry.register("viewport", viewport);
     Registry.register("west", west);
     Registry.register("center", center);
-    Registry.register("south", south);
-    
-    
+
     RootPanel.get().add(viewport);
-    DeferredCommand.addCommand(new Command() {
-      public void execute() {
-        viewport.layout();
-        Dispatcher.forwardEvent(AppEvents.NavMail);
-      }
-    });
+  }
+  
+  private void createNorth() {
+    StringBuffer sb = new StringBuffer();
+    sb.append("<div id='demo-header' class='x-small-editor'><div id='demo-theme'></div><div id=demo-title>Ext GWT Mail Demo</div></div>");
 
+    HtmlContainer northPanel = new HtmlContainer(sb.toString());
+    northPanel.setEnableState(false);
 
+    BorderLayoutData data = new BorderLayoutData(LayoutRegion.NORTH, 33);
+    data.setMargins(new Margins());
+    northPanel.setData(data);
+    viewport.add(northPanel, data);
+  }
+
+  private void createWest() {
+    BorderLayoutData data = new BorderLayoutData(LayoutRegion.WEST, 200, 150, 350);
+    data.setMargins(new Margins(5, 0, 5, 5));
+
+    west = new ContentPanel();
+    west.setBodyBorder(false);
+    west.setLayoutOnChange(true);
+    west.setHeading("GXT Mail Demo");
+    west.setLayout(new FitLayout());
+
+    viewport.add(west, data);
+  }
+
+  private void createCenter() {
+    center = new LayoutContainer();
+    center.setLayout(new FitLayout());
+
+    BorderLayoutData data = new BorderLayoutData(LayoutRegion.CENTER);
+    data.setMargins(new Margins(5, 5, 5, 5));
+
+    viewport.add(center, data);
   }
 
   protected void handleEvent(AppEvent event) {
-    // if (event.type == AppEvents.Init) {
-    // ExpandItem item = expandBar.getItem(0);
-    // expandBar.setExpanded(item, true);
-    // }
-  }
+    switch (event.type) {
+      case AppEvents.Init:
+        initUI();
+        break;
 
-  private void createNavigation() {
-    // expandBar = new ExpandBar(Style.SINGLE | Style.HEADER);
-    // expandBar.setBorders(false);
-    // expandBar.setHeaderHeight(28);
-    //
-    // ExpandItem mailItem = new ExpandItem();
-    // mailItem.setText("Mail");
-    // mailItem.addListener(Events.Expand, new Listener() {
-    // public void handleEvent(BaseEvent be) {
-    // Dispatcher.forwardEvent(AppEvents.NavMail);
-    // }
-    // });
-    // expandBar.add(mailItem);
-    //
-    // ExpandItem taskItem = new ExpandItem();
-    // taskItem.setText("Tasks");
-    // taskItem.addListener(Events.Expand, new Listener() {
-    // public void handleEvent(BaseEvent be) {
-    // Dispatcher.forwardEvent(AppEvents.NavTasks);
-    // }
-    // });
-    // expandBar.add(taskItem);
-    //
-    // ExpandItem contactsItem = new ExpandItem();
-    // contactsItem.setText("Contacts");
-    // contactsItem.addListener(Events.Expand, new Listener() {
-    // public void handleEvent(BaseEvent be) {
-    // Dispatcher.forwardEvent(AppEvents.NavContacts);
-    // }
-    // });
-    // expandBar.add(contactsItem);
-    //
-    // Registry.register("mailItem", mailItem);
-
+    }
   }
 
 }

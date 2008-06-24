@@ -13,12 +13,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.event.TreeEvent;
-import com.extjs.gxt.ui.client.widget.AbstractContainer;
-import com.extjs.gxt.ui.client.widget.Items;
+import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
+import com.extjs.gxt.ui.client.widget.selection.Selectable;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -26,6 +28,8 @@ import com.google.gwt.user.client.Event;
 /**
  * A standard hierarchical tree widget. The tree contains a hierarchy of
  * <code>TreeItems</code> that the user can open, close, and select.
+ * 
+ * <p/>The root item cannot be displayed.
  * 
  * <dt><b>Events:</b></dt>
  * 
@@ -82,12 +86,11 @@ import com.google.gwt.user.client.Event;
  * </ul>
  * </dd>
  * 
- * <dd><b>SelectionChange</b> : TreeEvent(tree, selectedItem, selected)<br>
+ * <dd><b>SelectionChange</b> : TreeEvent(tree, selected)<br>
  * <div>Fires after a item has been removed.</div>
  * <ul>
  * <li>tree : this</li>
- * <li>selectedItem : selection single select</li>
- * <li>selected : selection multi select</li>
+ * <li>selected : the selected items</li>
  * </ul>
  * </dd>
  * 
@@ -131,7 +134,7 @@ import com.google.gwt.user.client.Event;
  * <dd>.my-tree-item-text span (the tree item text)</dd>
  * </dl>
  */
-public class Tree<S extends TreeSelectionModel> extends AbstractContainer<TreeItem> {
+public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
 
   /**
    * Check cascade enum.
@@ -148,7 +151,7 @@ public class Tree<S extends TreeSelectionModel> extends AbstractContainer<TreeIt
   }
 
   protected TreeItem root;
-  protected S sm;
+  protected TreeSelectionModel sm;
   protected boolean isViewer;
   private String openNodeIconStyle = "tree-folder-open";
   private String nodeIconStyle = "tree-folder";
@@ -171,21 +174,27 @@ public class Tree<S extends TreeSelectionModel> extends AbstractContainer<TreeIt
     createRootItem();
     root.root = true;
     nodeHash = new HashMap<String, TreeItem>();
-    setSelectionModel((S) new SingleTreeSelectionModel());
+    setSelectionModel(new TreeSelectionModel());
   }
 
   /**
    * Collapses all item's.
    */
   public void collapseAll() {
+    boolean anim = animate;
+    if (anim) animate = false;
     root.setExpanded(false, true);
+    if (anim) animate = true;
   }
 
   /**
    * Expands all item's.
    */
   public void expandAll() {
+    boolean anim = animate;
+    if (anim) animate = false;
     root.setExpanded(true, true);
+    if (anim) animate = true;
   }
 
   /**
@@ -196,6 +205,7 @@ public class Tree<S extends TreeSelectionModel> extends AbstractContainer<TreeIt
    * @return <code>true</code> if all paths expanded
    */
   public boolean expandPath(String path) {
+    if (path == null) return false;
     String[] ids = path.split(",");
     if (ids.length == 0) return false;
     if (ids[0].equals(root.getId())) {
@@ -249,10 +259,7 @@ public class Tree<S extends TreeSelectionModel> extends AbstractContainer<TreeIt
   public List<TreeItem> getAllItems() {
     List<TreeItem> temp = new ArrayList<TreeItem>();
     temp.add(root);
-    Iterator<TreeItem> it = nodeHash.values().iterator();
-    while (it.hasNext()) {
-      temp.add(it.next());
-    }
+    temp.addAll(nodeHash.values());
     return temp;
   }
 
@@ -362,7 +369,7 @@ public class Tree<S extends TreeSelectionModel> extends AbstractContainer<TreeIt
   }
 
   /**
-   * Returns the tree's root item.
+   * Returns the tree's root item. The root item cannot be displayed.
    * 
    * @return the root item
    */
@@ -371,11 +378,33 @@ public class Tree<S extends TreeSelectionModel> extends AbstractContainer<TreeIt
   }
 
   /**
+   * Returns the selected item.
+   * 
+   * @return the item
+   */
+  public TreeItem getSelectedItem() {
+    return (TreeItem) sm.getSelectedItem();
+  }
+
+  /**
+   * Returns the selected items.
+   * 
+   * @return the selected items
+   */
+  public List<TreeItem> getSelectedItems() {
+    return sm.getSelectedItems();
+  }
+
+  public SelectionMode getSelectionMode() {
+    return sm.getSelectionMode();
+  }
+
+  /**
    * Returns the tree's selection model.
    * 
    * @return the selection model
    */
-  public S getSelectionModel() {
+  public TreeSelectionModel getSelectionModel() {
     return sm;
   }
 
@@ -386,6 +415,17 @@ public class Tree<S extends TreeSelectionModel> extends AbstractContainer<TreeIt
     if (te.item != null) {
       te.item.onComponentEvent(te);
     }
+  }
+
+  public void onSelectChange(TreeItem item, boolean select) {
+    item.getUI().onSelectedChange(select);
+  }
+
+  @Override
+  public boolean removeAll() {
+    getRootItem().removeAll();
+    nodeHash.clear();
+    return true;
   }
 
   /**
@@ -484,7 +524,29 @@ public class Tree<S extends TreeSelectionModel> extends AbstractContainer<TreeIt
     this.openNodeIconStyle = openNodeIconStyle;
   }
 
-  public void setSelectionModel(S sm) {
+  public void setSelectedItem(TreeItem item) {
+    sm.select(item);
+  }
+
+  public void setSelectedItems(List<TreeItem> items) {
+    sm.select(items);
+  }
+
+  /**
+   * Sets the table's selection mode.
+   * 
+   * @param mode the selection mode
+   */
+  public void setSelectionMode(SelectionMode mode) {
+    setSelectionModel(new TreeSelectionModel(mode));
+  }
+
+  /**
+   * Sets the tree's selection model.
+   * 
+   * @param sm the tree selection model
+   */
+  public void setSelectionModel(TreeSelectionModel sm) {
     assert sm != null;
     if (this.sm != null) {
       this.sm.bind(null);
@@ -495,9 +557,12 @@ public class Tree<S extends TreeSelectionModel> extends AbstractContainer<TreeIt
 
   @Override
   protected ComponentEvent createComponentEvent(Event event) {
-    TreeEvent te = new TreeEvent(this, findItem(DOM.eventGetTarget(event)));
-    te.event = event;
-    return te;
+    return new TreeEvent(this, event == null ? null : findItem(DOM.eventGetTarget(event)));
+  }
+
+  @Override
+  protected ContainerEvent createContainerEvent(TreeItem item) {
+    return new TreeEvent(this, item);
   }
 
   protected void createRootItem() {
@@ -517,17 +582,7 @@ public class Tree<S extends TreeSelectionModel> extends AbstractContainer<TreeIt
     }
 
     disableTextSelection(true);
-    el.addEventsSunk(Event.ONCLICK | Event.ONDBLCLICK | Event.KEYEVENTS
-        | Event.MOUSEEVENTS);
-  }
-
-  @Override
-  protected void onRightClick(ComponentEvent ce) {
-    TreeItem item = findItem(ce.getTarget());
-    if (item != null) {
-      sm.doSelect(new Items(item));
-    }
-    super.onRightClick(ce);
+    el().addEventsSunk(Event.ONCLICK | Event.ONDBLCLICK | Event.KEYEVENTS | Event.MOUSEEVENTS);
   }
 
   void registerItem(TreeItem item) {

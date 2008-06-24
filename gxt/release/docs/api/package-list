@@ -1,4 +1,5 @@
 com.extjs.gxt.ui.client
+com.extjs.gxt.ui.client.binder
 com.extjs.gxt.ui.client.core
 com.extjs.gxt.ui.client.data
 com.extjs.gxt.ui.client.event
@@ -9,11 +10,10 @@ com.extjs.gxt.ui.client.mvc
 com.extjs.gxt.ui.client.state
 com.extjs.gxt.ui.client.store
 com.extjs.gxt.ui.client.util
-com.extjs.gxt.ui.client.viewer
 com.extjs.gxt.ui.client.widget
+com.extjs.gxt.ui.client.widget.button
 com.extjs.gxt.ui.client.widget.custom
 com.extjs.gxt.ui.client.widget.form
-com.extjs.gxt.ui.client.widget.impl
 com.extjs.gxt.ui.client.widget.layout
 com.extjs.gxt.ui.client.widget.menu
 com.extjs.gxt.ui.client.widget.selection

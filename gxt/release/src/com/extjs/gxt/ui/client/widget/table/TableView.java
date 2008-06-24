@@ -10,12 +10,15 @@ package com.extjs.gxt.ui.client.widget.table;
 import java.util.Collections;
 import java.util.Comparator;
 
+import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.TableEvent;
 import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -25,7 +28,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * This class encapsulates the user interface of a {@link Table}.
  */
-public class TableView<T extends TableItem> {
+public class TableView {
 
   private static String bodyHTML;
 
@@ -49,8 +52,12 @@ public class TableView<T extends TableItem> {
 
   protected TableColumnModel cm;
   protected El dataEl, scrollEl;
-  protected Table<TableSelectionModel> table;
+  protected Table table;
   protected int scrollBarWidth;
+
+  public El getDataEl() {
+    return dataEl;
+  }
 
   /**
    * Sorts the table items based on the current order.
@@ -60,7 +67,7 @@ public class TableView<T extends TableItem> {
     int numRows = table.getItemCount();
     for (int i = 0; i < numRows; i++) {
       TableItem item = table.getItem(i);
-      dataEl.appendChild(item.getElement());
+      dataEl.dom.appendChild(item.getElement());
     }
     table.getSelectionModel().refresh();
   }
@@ -108,11 +115,11 @@ public class TableView<T extends TableItem> {
   }
 
   public int getCellIndex(Element target) {
-    String index = El.fly(target).getElementAttribute("index");
+    String index = target.getAttribute("index");
     if (index == null) {
       target = DOM.getParent(target);
       while (target != null) {
-        index = El.fly(target).getElementAttribute("index");
+        index = target.getAttribute("index");
         if (index == null) {
           target = DOM.getParent(target);
         } else {
@@ -132,12 +139,38 @@ public class TableView<T extends TableItem> {
   }
 
   public native Element getTextCellInternal(Element elem, int column) /*-{
-     return elem.firstChild.firstChild.firstChild.childNodes[column].firstChild.firstChild;
+   return elem.firstChild.firstChild.firstChild.childNodes[column].firstChild.firstChild;
    }-*/;
 
-  public void init(Table table) {
+  public void init(final Table table) {
     this.table = table;
     this.cm = table.getColumnModel();
+
+    Listener l = new Listener<TableEvent>() {
+
+      public void handleEvent(TableEvent be) {
+        switch (be.type) {
+          case Events.HeaderChange: {
+            TableColumn c = cm.getColumn(be.columnIndex);
+            table.getTableHeader().getColumnUI(be.columnIndex).onTextChange(c.getText());
+            break;
+          }
+          case Events.WidthChange:
+            table.getTableHeader().resizeColumn(be.columnIndex, true);
+            break;
+          case Events.HiddenChange: {
+            TableColumn c = cm.getColumn(be.columnIndex);
+            table.getTableHeader().showColumn(be.columnIndex, !c.isHidden());
+            break;
+          }
+        }
+      }
+
+    };
+
+    cm.addListener(Events.HeaderChange, l);
+    cm.addListener(Events.WidthChange, l);
+
   }
 
   public void onHighlightRow(TableItem item, boolean highlight) {
@@ -150,7 +183,7 @@ public class TableView<T extends TableItem> {
 
   public void removeItem(TableItem item) {
     if (item.isRendered()) {
-      item.el.removeFromParent();
+      item.el().removeFromParent();
     }
   }
 
@@ -159,7 +192,7 @@ public class TableView<T extends TableItem> {
 
     Element div = DOM.createDiv();
 
-    El.fly(div).setInnerHtml(bodyHTML.toString());
+    div.setInnerHTML(bodyHTML.toString());
     scrollEl = new El(El.fly(div).getSubChild(2));
     dataEl = scrollEl.firstChild();
     DOM.appendChild(table.getElement(), DOM.getFirstChild(div));
@@ -176,8 +209,7 @@ public class TableView<T extends TableItem> {
 
     table.disableTextSelection(true);
 
-    table.el.addEventsSunk(Event.ONCLICK | Event.ONDBLCLICK | Event.MOUSEEVENTS
-        | Event.KEYEVENTS);
+    table.el().addEventsSunk(Event.ONCLICK | Event.ONDBLCLICK | Event.MOUSEEVENTS | Event.KEYEVENTS);
   }
 
   public void bulkRender() {
@@ -189,7 +221,7 @@ public class TableView<T extends TableItem> {
     String[] align = new String[cols];
     for (int i = 0; i < columns.length; i++) {
       columns[i] = cm.getColumn(i);
-      widths[i] = cm.getWidthInPixels(i) - (table.getVerticalLines() ? 1 : 0);
+      widths[i] = cm.getWidthInPixels(i) - (table.getVerticalLines() && !XDOM.isVisibleBox ? 1 : 0);
       columns[i].lastWidth = widths[i];
       HorizontalAlignment ha = columns[i].getAlignment();
       switch (ha) {
@@ -212,25 +244,28 @@ public class TableView<T extends TableItem> {
       item.init(table);
       markRendered(item);
       Object[] values = item.getValues();
+      Object[] styles = item.getCellStyles();
       Object[] svalues = new Object[cols];
       for (int k = 0; k < cols; k++) {
-        svalues[k] = table.getRenderedValue(k, values[k]);
+        svalues[k] = table.getRenderedValue(item, k, values[k]);
       }
 
       sb.append("<div class=my-tbl-item><table cellpadding=0 cellspacing=0 tabIndex=1><tr>");
       for (int j = 0; j < cols; j++) {
         String display = columns[j].isHidden() ? "none" : "static";
-        sb.append("<td class=" + cellStyle + " style='display: " + display + ";width: "
-            + widths[j] + "px' index=" + j + "><div class=" + cellOverflowStyle
-            + " style='width:" + widths[j] + "'><div class=" + textStyle
-            + " style='text-align:" + align[j] + "'>" + svalues[j] + "</div></div></td>");
+        sb.append("<td class='" + cellStyle + "my-tbl-td-" + j + "' style='display: " + display
+            + ";width: " + widths[j] + "px' index=" + j + "><div class='" + cellOverflowStyle
+            + " my-tbl-td-inner-" + j + "' style='width:" + widths[j]
+            + "'><div class='my-tbl-td-cell-" + j + " " + textStyle
+            + (styles == null ? "" : " " + styles[j]) + "' style='text-align:" + align[j] + "'>"
+            + svalues[j] + "</div></div></td>");
 
       }
       sb.append("</tr></table></div>");
 
     }
 
-    dataEl.setInnerHtml(sb.toString());
+    dataEl.dom.setInnerHTML(sb.toString());
 
     Element[] elems = dataEl.select(".my-tbl-item");
     int ct = table.getItemCount();
@@ -248,12 +283,17 @@ public class TableView<T extends TableItem> {
 
     int cols = cm.getColumnCount();
     Object[] values = item.getValues();
+    Object[] styles = item.getCellStyles();
     Object[] svalues = new Object[cols];
     for (int i = 0; i < cols; i++) {
       if (!item.hasWidgets && values[i] instanceof Widget) {
         item.hasWidgets = true;
+        if (table.bulkRender) {
+          throw new RuntimeException(
+              "Bulk rendering must be disabled when adding widgets to table items");
+        }
       }
-      svalues[i] = table.getRenderedValue(i, values[i]);
+      svalues[i] = table.getRenderedValue(item, i, values[i]);
     }
 
     StringBuffer sb = new StringBuffer();
@@ -262,7 +302,9 @@ public class TableView<T extends TableItem> {
       TableColumn c = cm.getColumn(i);
       String display = c.isHidden() ? "none" : "static";
       int w = table.getColumnModel().getWidthInPixels(c.index);
-      w -= table.getVerticalLines() ? 1 : 0;
+      if (!XDOM.isVisibleBox) {
+        w -= table.getVerticalLines() ? 1 : 0;
+      }
       HorizontalAlignment align = c.getAlignment();
       String salign = "left";
       if (align == HorizontalAlignment.CENTER) {
@@ -272,13 +314,13 @@ public class TableView<T extends TableItem> {
       }
       sb.append("<td class=" + cellStyle + " style='display: " + display + ";width: " + w
           + "px' index=" + i + "><div class=" + cellOverflowStyle + " style='width:" + w
-          + "'><div class=" + textStyle + " style='text-align:" + salign + "'>"
-          + svalues[i] + "</div></div></td>");
+          + "'><div class='" + textStyle + (styles == null ? "" : " " + styles[i])
+          + "' style='text-align:" + salign + "'>" + svalues[i] + "</div></div></td>");
     }
     sb.append("</tr></table>");
 
     item.render(dataEl.dom, index);
-    item.el.setInnerHtml(sb.toString());
+    item.getElement().setInnerHTML(sb.toString());
 
     if (item.hasWidgets) {
       for (int i = 0; i < cols; i++) {
@@ -286,9 +328,9 @@ public class TableView<T extends TableItem> {
           Widget w = (Widget) values[i];
           Element text = getTextCellElement(item, i);
           El textEl = El.fly(text);
-          textEl.setInnerHtml("");
-          textEl.setStyleName(widgetStyle);
-          textEl.appendChild(w.getElement());
+          textEl.dom.setInnerHTML("");
+          textEl.dom.setClassName(widgetStyle);
+          textEl.dom.appendChild(w.getElement());
           if (table.isAttached()) {
             WidgetHelper.doAttach(w);
           }
@@ -328,8 +370,8 @@ public class TableView<T extends TableItem> {
           WidgetHelper.doAttach(widget);
         }
       } else {
-        String s = table.getRenderedValue(index, value);
-        El.fly(textElem).setInnerHtml(s);
+        String s = table.getRenderedValue(item, index, value);
+        textElem.setInnerHTML(s);
       }
     }
     applyCellStyles(item);
@@ -340,58 +382,48 @@ public class TableView<T extends TableItem> {
     int headerHeight = table.getTableHeader().getOffsetHeight();
     int bodyHeight = table.getOffsetHeight() - headerHeight;
     int bodyWidth = width;
+    
+    if (table.isAutoHeight()) {
+      scrollEl.setHeight("auto");
+      dataEl.setHeight("auto");
+      bodyHeight = dataEl.getHeight();
+      bodyHeight += table.el().getBorderWidth("tb");
+    }
 
-    dataEl.setWidth(cm.getTotalWidth());
-    table.getTableHeader().setWidth(cm.getTotalWidth());
+    int columnModelWidth = cm.getTotalWidth();
+    dataEl.setWidth(Math.max(width, columnModelWidth));
+    table.getTableHeader().setWidth(columnModelWidth);
 
-    boolean vscroll = dataEl.getHeight() > bodyHeight;
-    int adj = vscroll ? scrollBarWidth : 0;
+    bodyHeight -= table.el().getBorderWidth("tb");
+    bodyWidth -= table.el().getBorderWidth("lr");
 
-    boolean isGecko = GXT.isGecko;
-    String overflowX = "visible";
+    if (dataEl.getHeight() < bodyHeight) {
+      scrollEl.setStyleAttribute("overflowY", "hidden");
+    } else {
+      scrollEl.setStyleAttribute("overflowY", "auto");
+    }
 
     if (table.getHorizontalScroll()) {
-      if (dataEl.getWidth() < (width - adj)) {
-        if (isGecko) {
-          overflowX = "hidden";
-        } else {
-          bodyHeight += scrollBarWidth;
-          table.getTableHeader().el.setLeft(0);
-        }
-      }
-    } else {
-      if (isGecko) {
-        overflowX = "hidden";
-      } else {
-        bodyHeight += scrollBarWidth;
+      scrollEl.setStyleAttribute("overflowX", "auto");
+      if (columnModelWidth < width) {
+        scrollEl.setStyleAttribute("overflowX", "hidden");
+        table.getTableHeader().el().setLeft(0);
+        scrollEl.setScrollLeft(0);
       }
     }
-    if (dataEl.getHeight() > bodyHeight) {
-      width -= scrollBarWidth;
+
+    if (table.isAutoHeight()) {
+      bodyHeight = -1;
     }
-
-    if (isGecko) {
-      scrollEl.setStyleAttribute("overflowX", overflowX);
-    }
-
-    bodyHeight -= table.el.getBorderWidth("tb");
-    bodyWidth -= table.el.getBorderWidth("lr");
-
     scrollEl.setSize(bodyWidth, bodyHeight);
-
-    int w = cm.getTotalWidth();
-
-    if (w < width) {
-      adj = width - w;
-    }
-
-    dataEl.setWidth(cm.getTotalWidth() + adj);
   }
 
   public void resizeCells(int columnIndex) {
     TableColumn c = cm.getColumn(columnIndex);
     int w = cm.getWidthInPixels(c.index);
-    w -= table.getVerticalLines() ? 1 : 0;
+    if (!XDOM.isVisibleBox) {
+      w -= table.getVerticalLines() ? 1 : 0;
+    }
     if (c.lastWidth != 0 && c.lastWidth == w) {
       return;
     }
@@ -415,10 +447,10 @@ public class TableView<T extends TableItem> {
   }
 
   public native void showColumn(Element elem, boolean show, int index) /*-{
-    var tbl = elem.firstChild;
-    var cell = tbl.firstChild.firstChild.childNodes[index]
-    cell.style.display = show ? '' : 'none';
-  }-*/;
+   var tbl = elem.firstChild;
+   var cell = tbl.firstChild.firstChild.childNodes[index]
+   cell.style.display = show ? '' : 'none';
+   }-*/;
 
   public void showColumn(int index, boolean show) {
     int count = table.getItemCount();
@@ -428,10 +460,10 @@ public class TableView<T extends TableItem> {
   }
 
   public native void sizeCell(Element elem, int index, int width) /*-{
-     var tbl = elem.firstChild;
-     var cell = tbl.firstChild.firstChild.childNodes[index];
-     cell.style.width = width;
-     cell.firstChild.style.width = width;
+   var tbl = elem.firstChild;
+   var cell = tbl.firstChild.firstChild.childNodes[index];
+   cell.style.width = width;
+   cell.firstChild.style.width = width;
    }-*/;
 
   public void sort(int index, SortDir direction) {
@@ -439,7 +471,7 @@ public class TableView<T extends TableItem> {
   }
 
   public static native void markRendered(TableItem item) /*-{
-     item.@com.extjs.gxt.ui.client.widget.Component::rendered = true;
+   item.@com.extjs.gxt.ui.client.widget.Component::rendered = true;
    }-*/;
 
 }

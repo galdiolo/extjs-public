@@ -9,14 +9,32 @@ package com.extjs.gxt.ui.client.widget.layout;
 
 public class ColumnData {
 
+  private double width;
+
+  public ColumnData() {
+
+  }
+
+  public ColumnData(double width) {
+    this.width = width;
+  }
+
   /**
-   * The percentage width of the column (default value is null).
+   * Sets the width of the column.
+   * 
+   * @param width the width, values <= 1 treated a percentages.
    */
-  public String columnWidth;
-  
+  public void setWidth(double width) {
+    this.width = width;
+  }
+
   /**
-   * The pixel width of the column (default value is DEFAULT).
+   * Returns the width.
+   * 
+   * @return the wdith
    */
-  public float width;
-  
+  public double getWidth() {
+    return width;
+  }
+
 }

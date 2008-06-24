@@ -9,7 +9,7 @@ package com.extjs.gxt.samples.explorer.client.model;
 
 import com.extjs.gxt.samples.explorer.client.pages.Page;
 import com.extjs.gxt.ui.client.data.BaseTreeModel;
-import com.extjs.gxt.ui.client.widget.Container;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 
 public class Category extends BaseTreeModel {
 
@@ -28,7 +28,7 @@ public class Category extends BaseTreeModel {
     return getName();
   }
 
-  void addEntry(String title, Container page) {
+  void addEntry(String title, LayoutContainer page) {
     add(new Entry(title, new Page(page)));
   }
 

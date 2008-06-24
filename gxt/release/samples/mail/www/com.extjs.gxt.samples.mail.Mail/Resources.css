@@ -1,11 +1,5 @@
 * {
-  font-size: 11px;
   font-family: arial, helvetica, tahoma, sans-serif;
-}
-
-.ext-ie .x-form-text {  
-  POSITION: relative;
-  TOP: -1px
 }
 
 #demo-header {
@@ -186,7 +180,11 @@
 }
 
 .icon-email-add {
-  background-image: url(images/icons/email-add.png) !important;
+  background: url(images/icons/email-add.png) 2px 50% no-repeat !important;
+}
+
+.icon-email-reply {
+  background: url(images/icons/email_add.png) 2px 50% no-repeat !important;
 }
 
 .icon-date-add {
@@ -209,6 +207,14 @@
   background: url(images/icons/document.gif) no-repeat;
 }
 
+.icon-page-java {
+  background-image: url(images/icons/page_white_cup.png) 0 50% !important;
+}
+    
+.icon-page-html {
+  background-image: url(images/icons/page_white_code.png) !important;
+}
+
 .icon-text {
   background-image: url(images/icons/text.gif) !important;
 }
@@ -218,11 +224,15 @@
 }
 
 .text {
-  line-height: 135%;
+  font-size: 12px;
+}
+
+.pad-text {
+  font-size: 12px;
+  padding: 5px; 
 }
 
 .text,.text p {
-  margin: 4 0px;
 }
 
 .icon-chart {

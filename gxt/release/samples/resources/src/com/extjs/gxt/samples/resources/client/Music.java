@@ -8,8 +8,9 @@
 package com.extjs.gxt.samples.resources.client;
 
 import com.extjs.gxt.ui.client.data.BaseTreeModel;
+import com.extjs.gxt.ui.client.data.TreeModel;
 
-public class Music extends BaseTreeModel {
+public class Music extends BaseTreeModel<TreeModel> {
 
   public Music() {
 

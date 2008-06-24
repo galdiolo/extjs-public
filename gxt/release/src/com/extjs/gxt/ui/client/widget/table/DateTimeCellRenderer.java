@@ -9,6 +9,7 @@ package com.extjs.gxt.ui.client.widget.table;
 
 import java.util.Date;
 
+import com.extjs.gxt.ui.client.widget.Component;
 import com.google.gwt.i18n.client.DateTimeFormat;
 
 /**
@@ -16,7 +17,7 @@ import com.google.gwt.i18n.client.DateTimeFormat;
  * 
  * @see DateTimeFormat
  */
-public class DateTimeCellRenderer implements CellRenderer {
+public class DateTimeCellRenderer<T extends Component> implements CellRenderer<T> {
 
   private DateTimeFormat format;
 
@@ -38,7 +39,7 @@ public class DateTimeCellRenderer implements CellRenderer {
     this.format = format;
   }
 
-  public String render(String property, Object value) {
+  public String render(T item, String property, Object value) {
     if (value == null) {
       return "";
     }

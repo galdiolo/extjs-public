@@ -42,21 +42,21 @@ body {
 package com.extjs.gxt.samples.explorer.client.pages;
 
 import com.extjs.gxt.ui.client.Style.Scroll;
-import com.extjs.gxt.ui.client.widget.Container;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.Layout;
 import com.extjs.gxt.ui.client.widget.TabItem;
 import com.extjs.gxt.ui.client.widget.TabPanel;
 
 public class Page extends TabPanel {
 
-  protected Container content;
+  protected LayoutContainer content;
   private boolean closable = true;
 
-  public Page(Container content) {
+  public Page(LayoutContainer content) {
     this(content, true);
   }
 
-  public Page(Container content, boolean closeable) {
+  public Page(LayoutContainer content, boolean closeable) {
     this.content = content;
     this.closable = closeable;
 

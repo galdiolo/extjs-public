@@ -10,9 +10,13 @@ package com.extjs.gxt.ui.client.widget.table;
 import java.util.Comparator;
 import java.util.HashMap;
 
+import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.SortDir;
+import com.extjs.gxt.ui.client.event.TableEvent;
+import com.extjs.gxt.ui.client.event.TreeTableEvent;
 import com.extjs.gxt.ui.client.util.DefaultComparator;
+import com.extjs.gxt.ui.client.widget.treetable.TreeTable;
 
 /**
  * A column in a <code>Table</code>. Column sizes can be specified as either
@@ -28,9 +32,11 @@ public class TableColumn {
 
   public static final Comparator<Object> DEFAULT_COMPARATOR = new DefaultComparator<Object>();
 
-  SortDir sortDir = SortDir.NONE;
-  int index;
-  int lastWidth;
+  protected SortDir sortDir = SortDir.NONE;
+  protected int index;
+  protected int lastWidth;
+  protected TableColumnModel cm;
+
   private boolean hidden;
   private HorizontalAlignment align = HorizontalAlignment.LEFT;
   private int maxWidth = 500;
@@ -50,7 +56,7 @@ public class TableColumn {
    * 
    * @param id the column id
    * @param width the column width, widths that are 1 or less are treated as
-   *            percentages
+   *          percentages
    */
   public TableColumn(String id, float width) {
     this.id = id;
@@ -274,6 +280,7 @@ public class TableColumn {
    */
   public void setHidden(boolean hidden) {
     this.hidden = hidden;
+    fireColumnModelEvent(Events.HiddenChange);
   }
 
   /**
@@ -322,6 +329,16 @@ public class TableColumn {
   }
 
   /**
+   * Sets the column's text.
+   * 
+   * @param text the text
+   */
+  public void setText(String text) {
+    this.text = text;
+    fireColumnModelEvent(Events.HeaderChange);
+  }
+
+  /**
    * Sets the column's width. Widths that are 1 or less are treated as
    * percentages.
    * 
@@ -329,6 +346,7 @@ public class TableColumn {
    */
   public void setWidth(float width) {
     this.width = width;
+    fireColumnModelEvent(Events.WidthChange);
   }
 
   protected int getIndex() {
@@ -337,5 +355,20 @@ public class TableColumn {
 
   protected void setIndex(int index) {
     this.index = index;
+  }
+
+  private void fireColumnModelEvent(int type) {
+    if (cm != null) {
+      Object obj = cm.getTable();
+      if (obj instanceof Table) {
+        TableEvent e = new TableEvent((Table) obj);
+        e.columnIndex = index;
+        cm.fireEvent(type, e);
+      } else {
+        TreeTableEvent e = new TreeTableEvent((TreeTable) obj);
+        e.columnIndex = index;
+        cm.fireEvent(type, e);
+      }
+    }
   }
 }

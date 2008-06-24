@@ -43,7 +43,7 @@ public class Html extends BoxComponent {
   public void setHtml(String html) {
     this.html = html;
     if (rendered) {
-      el.setInnerHtml(html);
+      getElement().setInnerHTML(html);
     }
   }
 

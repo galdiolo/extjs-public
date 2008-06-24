@@ -9,12 +9,12 @@ package com.extjs.gxt.samples.explorer.client;
 
 
 import com.extjs.gxt.samples.explorer.client.model.Post;
-import com.extjs.gxt.ui.client.data.BaseLoadConfig;
-import com.extjs.gxt.ui.client.data.BaseLoadResult.ModelCollectionLoadResult;
+import com.extjs.gxt.ui.client.data.PagingLoadConfig;
+import com.extjs.gxt.ui.client.data.PagingLoadResult;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface ExplorerServiceAsync {
 
-  public void getPosts(BaseLoadConfig config, AsyncCallback<ModelCollectionLoadResult<Post>> callback);
+  public void getPosts(PagingLoadConfig config, AsyncCallback<PagingLoadResult<Post>> callback);
   
 }

@@ -7,8 +7,6 @@
  */
 package com.extjs.gxt.ui.client.event;
 
-import java.util.List;
-
 import com.extjs.gxt.ui.client.widget.tree.Tree;
 import com.extjs.gxt.ui.client.widget.tree.TreeItem;
 
@@ -21,7 +19,7 @@ import com.extjs.gxt.ui.client.widget.tree.TreeItem;
  * 
  * @see Tree
  */
-public class TreeEvent extends ComponentEvent {
+public class TreeEvent extends ContainerEvent<Tree, TreeItem> {
 
   /**
    * The source tree.
@@ -29,31 +27,28 @@ public class TreeEvent extends ComponentEvent {
   public Tree tree;
 
   /**
-   * The source tree item.
-   */
-  public TreeItem item;
-
-  /**
    * The child item.
    */
   public TreeItem child;
 
   /**
-   * The insert index.
+   * Creates a new tree event.
+   * 
+   * @param tree the source tree
    */
-  public int index;
-  
-  public TreeItem selectedItem;
-  
-  public List<TreeItem> selected;
-
   public TreeEvent(Tree tree) {
     super(tree);
     this.tree = tree;
   }
-  
+
+  /**
+   * Creates a new tree event.
+   * 
+   * @param tree the source tree
+   * @param item the tree item
+   */
   public TreeEvent(Tree tree, TreeItem item) {
-    this(tree);
-    this.item = item;
+    super(tree, item);
+    this.tree = tree;
   }
 }

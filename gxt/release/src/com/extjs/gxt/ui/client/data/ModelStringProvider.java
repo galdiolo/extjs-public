@@ -10,7 +10,7 @@ package com.extjs.gxt.ui.client.data;
 /**
  * Interface for objects that can translate a model's typed values to strings.
  */
-public interface ModelStringProvider {
+public interface ModelStringProvider<M extends ModelData> {
 
   /**
    * Returns the string value for the property.
@@ -19,6 +19,6 @@ public interface ModelStringProvider {
    * @param property the property name
    * @return the string value
    */
-  public String getStringValue(ModelData model, String property);
+  public String getStringValue(M model, String property);
 
 }

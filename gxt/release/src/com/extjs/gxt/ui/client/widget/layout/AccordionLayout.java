@@ -7,14 +7,16 @@
  */
 package com.extjs.gxt.ui.client.widget.layout;
 
-
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 
 /**
  * This is a layout that contains multiple content panels in an expandable
@@ -26,44 +28,15 @@ import com.extjs.gxt.ui.client.widget.ContentPanel;
  */
 public class AccordionLayout extends FitLayout {
 
-  /**
-   * True to swap the position of each panel as it is expanded so that it
-   * becomes the first item in the container, false to keep the panels in the
-   * rendered order. (defaults to false).
-   */
-  public boolean activeOnTop = false;
-
-  /**
-   * True to set each contained item's width to 'auto', false to use the item's
-   * current width (defaults to true).
-   */
-  public boolean autoWidth = true;
-
-  /**
-   * True to adjust the active item's height to fill the available space in the
-   * container, false to use the item's current height (defaults to true).
-   */
-  public boolean fill = true;
-
-  /**
-   * True to hide the contained panels' collapse/expand toggle buttons, false to
-   * display them (defaults to false). When set to true, {@link #titleCollapse}
-   * should be true also.
-   */
-  public boolean hideCollapseTool = false;
-
-  /**
-   * True to allow expand/collapse of each contained panel by clicking anywhere
-   * on the title bar, false to allow expand/collapse only when the toggle tool
-   * button is clicked (defaults to true). When set to false,
-   * {@link #hideCollapseTool} should be false also.
-   */
-  public boolean titleCollapse = true;
+  private boolean titleCollapse = true;
+  private boolean fill = true;
+  private boolean hideCollapseTool = false;
+  private boolean autoWidth = true;
+  private boolean activeOnTop = false;
 
   private Listener listener;
 
   public AccordionLayout() {
-    renderAll = true;
     listener = new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent ce) {
         setActiveItem(ce.component);
@@ -71,6 +44,56 @@ public class AccordionLayout extends FitLayout {
     };
   }
 
+  /**
+   * Returns true if the active item if first.
+   * 
+   * @return the active on top state
+   */
+  public boolean getActiveOnTop() {
+    return activeOnTop;
+  }
+
+  /**
+   * Returns true if auto width is enabled.
+   * 
+   * @return the auto width state
+   */
+  public boolean getAutoWidth() {
+    return autoWidth;
+  }
+
+  /**
+   * Returns true if fill is enabled.
+   * 
+   * @return the fill state
+   */
+  public boolean getFill() {
+    return fill;
+  }
+
+  /**
+   * Returns true if the collapse tool is hidden.
+   * 
+   * @return the hide collapse tool state
+   */
+  public boolean getHideCollapseTool() {
+    return hideCollapseTool;
+  }
+
+  /**
+   * Returns true if title collapse is enabled.
+   * 
+   * @return the title collapse state
+   */
+  public boolean getTitleCollapse() {
+    return titleCollapse;
+  }
+
+  /**
+   * Sets the active item.
+   * 
+   * @param item the active item
+   */
   public void setActiveItem(Component item) {
     if (container == null || !container.isRendered()) {
       activeItem = item;
@@ -81,7 +104,66 @@ public class AccordionLayout extends FitLayout {
     }
     activeItem = item;
     markExpanded((ContentPanel) activeItem);
-    layout(container);
+    layout();
+    DeferredCommand.addCommand(new Command() {
+      public void execute() {
+        layout();
+      }
+    });
+  }
+
+  /**
+   * True to swap the position of each panel as it is expanded so that it
+   * becomes the first item in the container, false to keep the panels in the
+   * rendered order. (defaults to false).
+   * 
+   * @param activeOnTop true to keep the active item on top
+   */
+  public void setActiveOnTop(boolean activeOnTop) {
+    this.activeOnTop = activeOnTop;
+  }
+
+  /**
+   * True to set each contained item's width to 'auto', false to use the item's
+   * current width (defaults to true).
+   * 
+   * @param autoWidth true for auto width
+   */
+  public void setAutoWidth(boolean autoWidth) {
+    this.autoWidth = autoWidth;
+  }
+
+  /**
+   * True to adjust the active item's height to fill the available space in the
+   * container, false to use the item's current height (defaults to true).
+   * 
+   * @param fill true to fill
+   */
+  public void setFill(boolean fill) {
+    this.fill = fill;
+  }
+
+  /**
+   * True to hide the contained panels' collapse/expand toggle buttons, false to
+   * display them (defaults to false). When set to true, {@link #titleCollapse}
+   * should be true also.
+   * 
+   * @param hideCollapseTool true to hide
+   */
+  public void setHideCollapseTool(boolean hideCollapseTool) {
+    this.hideCollapseTool = hideCollapseTool;
+  }
+
+  /**
+   * True to allow expand/collapse of each contained panel by clicking anywhere
+   * on the title bar, false to allow expand/collapse only when the toggle tool
+   * button is clicked (defaults to true). When set to false,
+   * {@link #hideCollapseTool} should be false also.
+   * 
+   * @param titleCollapse true for title collapse
+   */
+  public void setTitleCollapse(boolean titleCollapse) {
+    this.titleCollapse = titleCollapse;
   }
 
   @Override
@@ -95,7 +177,6 @@ public class AccordionLayout extends FitLayout {
     ContentPanel cp = (ContentPanel) component;
     cp.setCollapsible(true);
     cp.setAnimCollapse(false);
-    cp.setBorders(false);
 
     if (autoWidth) {
       cp.setAutoWidth(autoWidth);
@@ -106,7 +187,7 @@ public class AccordionLayout extends FitLayout {
     if (hideCollapseTool) {
       cp.setHideCollapseTool(true);
     }
-    
+
     super.renderComponent(component, index, target);
 
     if (activeItem == null || activeItem == component) {
@@ -115,7 +196,6 @@ public class AccordionLayout extends FitLayout {
       cp.collapse();
     }
 
-    
     El.fly(cp.getElement("header")).addStyleName("x-accordion-hd");
     cp.addListener(Events.BeforeExpand, listener);
     cp.addListener(Events.Collapse, new Listener<ComponentEvent>() {
@@ -126,7 +206,7 @@ public class AccordionLayout extends FitLayout {
   }
 
   @Override
-  protected void setItemSize(Component item, int width, int height) {
+  protected void setItemSize(Component item, Size size) {
     if (fill && item != null) {
       int count = container.getItemCount();
       int hh = 0;
@@ -134,11 +214,11 @@ public class AccordionLayout extends FitLayout {
         ContentPanel cp = (ContentPanel) container.getItem(i);
         if (cp != item) {
           hh += (cp.getOffsetHeight() - El.fly(cp.getElement("bwrap")).getHeight());
-          cp.el.setWidth(width);
+          cp.el().setWidth(size.width);
         }
       }
-      height -= hh;
-      setSize(item, width, height);
+      size.height -= hh;
+      setSize(item, size.width, size.height);
     }
   }
 
@@ -151,7 +231,7 @@ public class AccordionLayout extends FitLayout {
       if (i != (count - 1) && panel.isExpanded()) {
         anyexpanded = true;
       }
-      panel.getHeader().el.setStyleName("x-border-top", isPriorExpanded(i));
+      panel.getHeader().el().setStyleName("x-border-top", isPriorExpanded(i));
       if (i == (count - 1) && (anyexpanded && !panel.isExpanded())) {
         panel.getHeader().addStyleName("x-border-bottom-none");
       }
@@ -167,7 +247,7 @@ public class AccordionLayout extends FitLayout {
   }
 
   private native void markExpanded(ContentPanel panel) /*-{
-     panel.@com.extjs.gxt.ui.client.widget.GenericContentPanel::collapsed = false;
+     panel.@com.extjs.gxt.ui.client.widget.ContentPanel::collapsed = false;
    }-*/;
 
 }

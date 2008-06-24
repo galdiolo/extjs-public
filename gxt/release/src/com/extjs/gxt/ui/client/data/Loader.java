@@ -7,17 +7,47 @@
  */
 package com.extjs.gxt.ui.client.data;
 
-import com.extjs.gxt.ui.client.Style.SortDir;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.viewer.RemoteContentProvider;
+import com.extjs.gxt.ui.client.event.LoadListener;
+import com.extjs.gxt.ui.client.event.Observable;
 
 /**
- * Interface for objects that can retrieve remote data.
+ * Interface for objects that can load remote data.
  * 
- * @see DataLoader
- * @see RemoteContentProvider
+ * <dl>
+ * <dt><b>Events:</b></dt>
+ * 
+ * <dd><b>BeforeLoad</b> : LoadEvent(loader, config)<br>
+ * <div>Fires before a load operation. Listeners can set the <code>doit</code>
+ * field to <code>false</code> to cancel the action.</div>
+ * <ul>
+ * <li>loader : this</li>
+ * <li>config : the load config</li>
+ * </ul>
+ * </dd>
+ * 
+ * <dd><b>Load</b> : LoadEvent(loader, config, result)<br>
+ * <div>Fires after the button is selected.</div>
+ * <ul>
+ * <li>loader : this</li>
+ * <li>config : the load config</li>
+ * <li>result : the load result</li>
+ * </ul>
+ * </dd>
+ * 
+ * <dd><b>LoadException</b> : LoadEvent(loader, config, result)<br>
+ * <div>Fires after the button is selected.</div>
+ * <ul>
+ * <li>loader : this</li>
+ * <li>config : the load config</li>
+ * <li>result : the load result</li>
+ * </ul>
+ * </dd>
+ * </dl>
+ * 
+ * @see ListLoader
+ * @see TreeLoader
  */
-public interface Loader {
+public interface Loader<C> extends Observable {
 
   /**
    * Fires before a request is made for data (value is 300).
@@ -35,91 +65,33 @@ public interface Loader {
   public static final int LoadException = 302;
 
   /**
-   * Returns <code>true</code> if remote sorting is enabled.
+   * Adds a load listener.
    * 
-   * @return the remote sort state
+   * @param listener the listener to add
    */
-  public boolean getRemoteSort();
-
-  /**
-   * Returns the current sort direction.
-   * 
-   * @return the sort direction
-   */
-  public SortDir getSortDir();
-
-  /**
-   * Returns the current sort field.
-   * 
-   * @return the sort field
-   */
-  public String getSortField();
-
-  /**
-   * Returns the offset of the first record.
-   * 
-   * @return the current offset
-   */
-  public int getOffset();
-
-  /**
-   * Returns the current page size;
-   * 
-   * @return the current page size
-   */
-  public int getPageSize();
-
-  /**
-   * Sets the current sort dir.
-   * 
-   * @param dir the sort dir
-   */
-  public void setSortDir(SortDir dir);
-
-  /**
-   * Sets the current sort field.
-   * 
-   * @param field the sort field
-   */
-  public void setSortField(String field);
-
-  /**
-   * Sets the remote sort state.
-   * 
-   * @param remote true for remote sort, false for local sorting
-   */
-  public void setRemoteSort(boolean remote);
-
-  /**
-   * Loads the data using the specified configuation.
-   * 
-   * @param offset the offset of the first record to return
-   * @param pageSize the page size
-   */
-  public void load(int offset, int pageSize);
+  public void addLoadListener(LoadListener listener);
 
   /**
    * 
-   * Loads the data using the current configuration
+   * Loads the data using the current configuration.
    * 
-   * implementors are to determine what the current configuration is
+   * @return true if the load was requested
    */
-  public void load();
+  public boolean load();
 
   /**
-   * Adds a listener bound by the given event type.
+   * Loads the data using the given load configuration.
    * 
-   * @param eventType the eventType
-   * @param listener the listener to be added
+   * @param loadConfig the load config
+   * @return true if the load was requested
    */
-  public void addListener(int eventType, Listener listener);
+  public boolean load(C loadConfig);
 
   /**
-   * Removes a listener.
+   * Removes a load listener.
    * 
-   * @param eventType the event type
-   * @param listener the listener to be removed
+   * @param listener the listener to remove
    */
-  public void removeListener(int eventType, Listener listener);
+  public void removeLoadListener(LoadListener listener);
 
 }

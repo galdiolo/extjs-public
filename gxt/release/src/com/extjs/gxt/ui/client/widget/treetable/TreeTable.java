@@ -11,6 +11,7 @@ import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.TreeTableEvent;
 import com.extjs.gxt.ui.client.util.DelayedTask;
@@ -21,8 +22,8 @@ import com.extjs.gxt.ui.client.widget.table.BaseTable;
 import com.extjs.gxt.ui.client.widget.table.TableColumn;
 import com.extjs.gxt.ui.client.widget.table.TableColumnModel;
 import com.extjs.gxt.ui.client.widget.table.TableHeader;
-import com.extjs.gxt.ui.client.widget.tree.SingleTreeSelectionModel;
 import com.extjs.gxt.ui.client.widget.tree.Tree;
+import com.extjs.gxt.ui.client.widget.tree.TreeItem;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -72,20 +73,16 @@ import com.google.gwt.user.client.Event;
  * </dd>
  * </dl>
  */
-public class TreeTable extends Tree<SingleTreeSelectionModel> implements BaseTable {
+public class TreeTable extends Tree implements BaseTable {
 
-  /**
-   * True to disable the column context menu (defaults to false).
-   */
-  public boolean disableColumnContextMenu;
+  protected StyleTemplate styleTemplate = null;
+  protected TreeTableHeader header;
+  protected TreeTableColumnModel cm;
+  protected TreeTableView view;
 
-  StyleTemplate styleTemplate = null;
-
+  private boolean columnContextMenu;
   private boolean checkable;
   private boolean horizontalScroll = true;
-  private TreeTableHeader header;
-  private TreeTableColumnModel cm;
-  private TreeTableView view;
   private int lastLeft;
   private Size lastSize;
 
@@ -101,6 +98,24 @@ public class TreeTable extends Tree<SingleTreeSelectionModel> implements BaseTab
    */
   public TreeTable() {
 
+  }
+
+  /**
+   * Sets whether the table header context menu is displayed (defaults to true).
+   * 
+   * @param columnContextMenu the column context menu sate
+   */
+  public void setColumnContextMenu(boolean columnContextMenu) {
+    this.columnContextMenu = columnContextMenu;
+  }
+
+  /**
+   * Returns the column context menu enabed state.
+   * 
+   * @return <code>true</code> if enabled, <code>false</code> otherwise.
+   */
+  public boolean getColumnContextMenu() {
+    return !columnContextMenu;
   }
 
   /**
@@ -130,15 +145,6 @@ public class TreeTable extends Tree<SingleTreeSelectionModel> implements BaseTab
    */
   public TableColumn getColumn(String id) {
     return cm.getColumn(id);
-  }
-
-  /**
-   * Returns the column context menu enabed state.
-   * 
-   * @return <code>true</code> if enabled, <code>false</code> otherwise.
-   */
-  public boolean getColumnContextMenu() {
-    return !disableColumnContextMenu;
   }
 
   /**
@@ -194,19 +200,17 @@ public class TreeTable extends Tree<SingleTreeSelectionModel> implements BaseTab
     int type = DOM.eventGetType(event);
 
     if (type == Event.ONSCROLL) {
-      int left = fly(view.getScrollElement()).getScrollLeft();
+      int left = view.getScrollEl().getScrollLeft();
       if (left == lastLeft) {
         return;
       }
       lastLeft = left;
-      header.el.setLeft(-left);
+      header.el().setLeft(-left);
       scrollTask.delay(400);
     }
   }
 
-  /**
-   * Recalculates the ui based on the table's current size.
-   */
+  @Override
   public void recalculate() {
     onResize(getOffsetWidth(), getOffsetHeight());
   }
@@ -217,7 +221,7 @@ public class TreeTable extends Tree<SingleTreeSelectionModel> implements BaseTab
    * @param item the item
    */
   public void scrollIntoView(TreeTableItem item) {
-    item.el.scrollIntoView(view.getScrollElement(), false);
+    item.el().scrollIntoView(view.getScrollEl().dom, false);
   }
 
   /**
@@ -273,7 +277,16 @@ public class TreeTable extends Tree<SingleTreeSelectionModel> implements BaseTab
 
   @Override
   protected ComponentEvent createComponentEvent(Event event) {
-    return new TreeTableEvent(this, findItem(DOM.eventGetTarget(event)));
+    TreeTableEvent e = new TreeTableEvent(this);
+    if (event != null) {
+      e.item = findItem(DOM.eventGetTarget(event));
+    }
+    return e;
+  }
+
+  @Override
+  protected ContainerEvent createContainerEvent(TreeItem item) {
+    return new TreeTableEvent(this, item);
   }
 
   @Override
@@ -289,10 +302,10 @@ public class TreeTable extends Tree<SingleTreeSelectionModel> implements BaseTab
     WidgetHelper.doDetach(header);
   }
 
-  protected String getRenderedValue(int column, Object value) {
+  protected String getRenderedValue(TreeTableItem item, int column, Object value) {
     TreeTableColumn col = (TreeTableColumn) cm.getColumn(column);
     if (col.getRenderer() != null) {
-      return col.getRenderer().render(col.getId(), value);
+      return col.getRenderer().render(item, col.getId(), value);
     } else {
       if (value != null) {
         return value.toString();
@@ -320,11 +333,12 @@ public class TreeTable extends Tree<SingleTreeSelectionModel> implements BaseTab
     }
     return view;
   }
+
   @Override
   protected void onRender(Element target, int index) {
     setElement(DOM.createDiv());
     setStyleName("my-treetbl");
-    el.insertInto(target, index);
+    el().insertInto(target, index);
 
     DOM.appendChild(getElement(), root.getElement());
     ((RootTreeTableItem) root).renderChildren();
@@ -332,10 +346,10 @@ public class TreeTable extends Tree<SingleTreeSelectionModel> implements BaseTab
     cm.setTable(this);
     ((TreeTableItem) root).setValues(new String[getColumnCount()]);
 
-    el.removeChildren();
+    el().removeChildren();
 
     header = (TreeTableHeader) getTableHeader();
-    header.render(el.dom);
+    header.render(el().dom);
     header.init(this);
 
     DOM.appendChild(getElement(), header.getElement());
@@ -362,6 +376,7 @@ public class TreeTable extends Tree<SingleTreeSelectionModel> implements BaseTab
     sinkEvents(Event.ONCLICK | Event.ONDBLCLICK | Event.MOUSEEVENTS | Event.KEYEVENTS
         | Event.ONSCROLL);
   }
+
   protected void onResize(int width, int height) {
     int h = width;
     int w = height;
@@ -372,11 +387,6 @@ public class TreeTable extends Tree<SingleTreeSelectionModel> implements BaseTab
     }
     lastSize = new Size(w, h);
     header.resizeColumns(false, true);
-  }
-
-  protected void onShowContextMenu(int x, int y) {
-    super.onShowContextMenu(x, y);
-    getView().clearHoverStyles();
   }
 
 }

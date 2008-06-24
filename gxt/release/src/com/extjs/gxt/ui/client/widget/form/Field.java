@@ -13,9 +13,12 @@ import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.FieldEvent;
+import com.extjs.gxt.ui.client.event.KeyListener;
+import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
-import com.extjs.gxt.ui.client.widget.IconButton;
+import com.extjs.gxt.ui.client.widget.button.IconButton;
+import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -58,57 +61,95 @@ import com.google.gwt.user.client.Event;
  * </ul>
  * </dd>
  * 
- * <dd><b>Valid</b> : FieldEvent(field, name)<br>
+ * <dd><b>Valid</b> : FieldEvent(field)<br>
  * <div>Fires after the field has been validated with no errors.</div>
  * <ul>
  * <li>field : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>KeyPress</b> : FieldEvent(field, name)<br>
- * <div>Fires after a key is pressed</div>
+ * <dd><b>KeyPress</b> : FieldEvent(field)<br>
+ * <div>Fires after a key is pressed.</div>
  * <ul>
  * <li>field : this</li>
  * </ul>
  * </dd>
+ * 
  * </dl>
+ * 
+ * 
+ * @param <D> the data type of the field
  */
-public abstract class Field extends BoxComponent {
+public abstract class Field<D> extends BoxComponent {
 
   /**
-   * A CSS style specification to apply directly to this field's label (defaults
-   * to the container's labelStyle value if set, or ''). For example,
-   * <code>labelStyle: 'font-weight:bold;'</code>
+   * The field messages.
    */
-  public String labelStyle = "";
+  public class FieldMessages {
 
-  /**
-   * The error text to use when marking a field invalid and no message is
-   * provided (defaults to "The value in this field is invalid").
-   */
-  public String invalidText = GXT.MESSAGES.field_invalidText();
+    private String invalidText = GXT.MESSAGES.field_invalidText();
+
+    /**
+     * Returns the invalid text.
+     * 
+     * @return the text
+     */
+    public String getInvalidText() {
+      return invalidText;
+    }
+
+    /**
+     * Sets the error text to use when marking a field invalid and no message is
+     * provided (defaults to "The value in this field is invalid").
+     * 
+     * @param invalidText the invalid text
+     */
+    public void setInvalidText(String invalidText) {
+      this.invalidText = invalidText;
+    }
+
+  }
 
   protected boolean autoValidate;
   protected int validationDelay = 250;
   protected String emptyText;
   protected IconButton errorIcon;
-  protected Object value;
+  protected D value;
   protected String focusStyle = "x-form-focus";
-  private String name;
+  protected String invalidStyle = "x-form-invalid";
+  protected String fieldStyle = "x-form-field";
+  protected boolean readOnly;
+  protected FieldMessages messages = new FieldMessages();
+  protected PropertyEditor<D> propertyEditor;
+  protected boolean hasFocus;
+  protected Object focusValue;
 
+  private String labelStyle = "";
+  private String name;
   private String fieldLabel = "";
-  private String fieldStyle = "x-form-field";
-  private String invalidStyle = "x-form-invalid";
   private String messageTarget = "side";
   private boolean validateOnBlur = true;
-  private boolean readOnly;
-  private Object focusValue;
-  private Object originalValue;
-  private boolean hasFocus;
-  private int tabIndex = Style.DEFAULT;
+  private D originalValue;
+  private int tabIndex = 0;
+  private String labelSeparator;
 
-  public Field() {
+  /**
+   * Creates a new field.
+   */
+  protected Field() {
     adjustSize = false;
+    propertyEditor = (PropertyEditor<D>) PropertyEditor.DEFAULT;
+  }
+
+  /**
+   * Adds a key listener.
+   * 
+   * @param listener the key listener
+   */
+  public void addKeyListener(KeyListener listener) {
+    addListener(Events.KeyPress, listener);
+    addListener(Events.KeyUp, listener);
+    addListener(Events.KeyDown, listener);
   }
 
   /**
@@ -131,7 +172,7 @@ public abstract class Field extends BoxComponent {
     } else {
       Element elem = DOM.getElementById(messageTarget);
       if (elem != null) {
-        fly(elem).setInnerHtml("");
+        elem.setInnerHTML("");
       }
     }
     fireEvent(Events.Valid, new FieldEvent(this));
@@ -173,6 +214,33 @@ public abstract class Field extends BoxComponent {
   }
 
   /**
+   * Returns the field's label separator.
+   * 
+   * @return the label separator
+   */
+  public String getLabelSeparator() {
+    return labelSeparator;
+  }
+
+  /**
+   * Returns the field's label style.
+   * 
+   * @return the label style
+   */
+  public String getLabelStyle() {
+    return labelStyle;
+  }
+
+  /**
+   * Returns the field's messages.
+   * 
+   * @return the messages
+   */
+  public FieldMessages getMessages() {
+    return messages;
+  }
+
+  /**
    * Returns the field's message target.
    * 
    * @return the message target
@@ -187,7 +255,16 @@ public abstract class Field extends BoxComponent {
    * @return the field name
    */
   public String getName() {
-    return rendered ? getInputEl().getElementAttribute("name") : name;
+    return rendered ? getInputEl().dom.getAttribute("name") : name;
+  }
+
+  /**
+   * Retuns the field's property editor.
+   * 
+   * @return the property editor
+   */
+  public PropertyEditor<D> getPropertyEditor() {
+    return propertyEditor;
   }
 
   /**
@@ -223,31 +300,43 @@ public abstract class Field extends BoxComponent {
   }
 
   /**
-   * Returns the normalized data value (undefined or emptyText will be returned
-   * as ''). To return the raw value see {@link #getRawValue}.
+   * Returns the typed value of the field.
    * 
    * @return the fields value
    */
-  public Object getValue() {
+  public D getValue() {
     if (!rendered) {
       return value;
     }
-    String v = getInputEl().getValue();
+    String v = getRawValue();
     if (emptyText != null && v.equals(emptyText)) {
-      return "";
+      return null;
     }
-    return v;
+    if (v == null || v.equals("")) {
+      return null;
+    }
+    try {
+      return propertyEditor.convertStringValue(v);
+    } catch (Exception e) {
+      return null;
+    }
   }
 
   /**
-   * Returns <code>true</code> if this field has been changed since it was
-   * originally loaded and is not disabled.
+   * Returns <code>true</code> if this field is dirty. A field is dirty, if
+   * the current value is different than it's original value. The original value
+   * is the value of the field when the field is rendered. Disabled and
+   * pre-rendered fields are never dirty.
    * 
    * @return the dirty state
    */
   public boolean isDirty() {
-    if (!isEnabled()) {
+    if (disabled || !rendered) {
       return false;
+    }
+    Object v = getValue();
+    if (v == null) {
+      return originalValue != null;
     }
     return !getValue().equals(originalValue);
   }
@@ -274,7 +363,54 @@ public abstract class Field extends BoxComponent {
     return validateValue(getRawValue());
   }
 
+  /**
+   * Mark this field as invalid.
+   * 
+   * @param msg the validation message
+   */
+  public void markInvalid(String msg) {
+    if (!rendered) {
+      return;
+    }
+    getInputEl().addStyleName(invalidStyle);
+    msg = msg == null ? getMessages().getInvalidText() : msg;
+
+    if (messageTarget.equals("side")) {
+      if (errorIcon == null) {
+        errorIcon = new IconButton("x-form-invalid-icon");
+        Element p = el().getParent().dom;
+        errorIcon.render(p);
+        errorIcon.removeStyleName("x-tool");
+        errorIcon.el().setVisibility(true);
+      }
+      if (!errorIcon.isAttached()) {
+        WidgetHelper.doAttach(errorIcon);
+      }
+
+      errorIcon.el().setVisible(true);
+      alignErrorIcon();
+      alignErrorIcon();// fixes weird initial render with ie
+      errorIcon.setToolTip(msg);
+      errorIcon.getToolTip().addStyleName("x-form-invalid-tip");
+
+    } else if (messageTarget.equals("title")) {
+      setTitle(msg);
+    } else if ("tooltip".equals(messageTarget)) {
+      setToolTip(msg);
+    } else {
+      Element elem = DOM.getElementById(messageTarget);
+      if (elem != null) {
+        elem.setInnerHTML(msg);
+      }
+    }
+
+    FieldEvent fe = new FieldEvent(this);
+    fe.message = msg;
+    fireEvent(Events.Invalid, fe);
+  }
+
   public void onComponentEvent(ComponentEvent ce) {
+    super.onComponentEvent(ce);
     FieldEvent fe = new FieldEvent(this);
     fe.event = ce.event;
     switch (ce.type) {
@@ -284,14 +420,27 @@ public abstract class Field extends BoxComponent {
       case Event.ONBLUR:
         onBlur(ce);
         break;
-      case Event.ONKEYUP:
-        fe.type = Events.KeyPress;
-        onKeyPress(fe);
-        fireEvent(Events.KeyPress, fe);
-        break;
       case Event.ONCLICK:
         onClick(ce);
+        break;
+      case Event.ONKEYUP:
+        onKeyUp(fe);
+        break;
+      case Event.ONKEYDOWN:
+        onKeyDown(fe);
+        break;
     }
+  }
+
+  /**
+   * Removes the key listener.
+   * 
+   * @param listener the key listener
+   */
+  public void removeKeyListener(KeyListener listener) {
+    removeListener(Events.KeyPress, listener);
+    removeListener(Events.KeyUp, listener);
+    removeListener(Events.KeyDown, listener);
   }
 
   /**
@@ -331,6 +480,37 @@ public abstract class Field extends BoxComponent {
   }
 
   /**
+   * The standard separator to display after the text of each form label
+   * (defaults to the value of {@link FormLayout#setLabelSeperator(String)},
+   * which is a colon ':' by default).
+   * 
+   * @param labelSeparator the label separator or "" for none
+   */
+  public void setLabelSeparator(String labelSeparator) {
+    this.labelSeparator = labelSeparator;
+  }
+
+  /**
+   * A CSS style specification to apply directly to this field's label. For
+   * example, <code>labelStyle: 'font-weight:bold;'</code>
+   * 
+   * @param labelStyle the label style
+   */
+  public void setLabelStyle(String labelStyle) {
+    assertPreRender();
+    this.labelStyle = labelStyle;
+  }
+
+  /**
+   * Sets the field's messages.
+   * 
+   * @param messages the messages
+   */
+  public void setMessages(FieldMessages messages) {
+    this.messages = messages;
+  }
+
+  /**
    * The location where error text should display. Should be one of the
    * following values (defaults to 'side'): <code><pre>
    * Value         Description
@@ -354,6 +534,19 @@ public abstract class Field extends BoxComponent {
    */
   public void setName(String name) {
     this.name = name;
+    if (rendered) {
+      getInputEl().dom.setAttribute("name", name);
+    }
+  }
+
+  /**
+   * Sets the field's property editor which is used to translate typed values to
+   * string, and string values back to typed values.
+   * 
+   * @param propertyEditor the property editor
+   */
+  public void setPropertyEditor(PropertyEditor<D> propertyEditor) {
+    this.propertyEditor = propertyEditor;
   }
 
   /**
@@ -375,8 +568,8 @@ public abstract class Field extends BoxComponent {
    */
   public void setReadOnly(boolean readOnly) {
     this.readOnly = readOnly;
-    if (isRendered()) {
-      DOM.setElementProperty(getElement(), "readOnly", "" + readOnly);
+    if (rendered) {
+      getInputEl().dom.setPropertyBoolean("readOnly", readOnly);
     }
   }
 
@@ -388,7 +581,7 @@ public abstract class Field extends BoxComponent {
   public void setTabIndex(int index) {
     this.tabIndex = index;
     if (rendered) {
-      getInputEl().setElementAttribute("tabIndex", index);
+      getInputEl().dom.setPropertyInt("tabIndex", index);
     }
   }
 
@@ -413,17 +606,17 @@ public abstract class Field extends BoxComponent {
   }
 
   /**
-   * Sets a data value into the field and validates it. To set the value
-   * directly without validation see {@link #setRawValue}.
+   * Sets a data value into the field and validates it. If the field is
+   * rendered, To set the value directly without validation see
+   * {@link #setRawValue}.
    * 
    * @param value the value to set
    */
-  public void setValue(Object value) {
-    Object oldValue = getValue();
+  public void setValue(D value) {
     this.value = value;
-    fireChangeEvent(oldValue, value);
     if (rendered) {
-      getInputEl().setValue(value == null ? "" : value.toString());
+      String v = value == null ? "" : propertyEditor.getStringValue(value);
+      setRawValue(v);
       validate();
     }
   }
@@ -464,7 +657,7 @@ public abstract class Field extends BoxComponent {
   }
 
   protected void alignErrorIcon() {
-    errorIcon.el.alignTo(getElement(), "tl-tr", new int[] {2, 1});
+    errorIcon.el().alignTo(getElement(), "tl-tr", new int[] {2, 1});
   }
 
   @Override
@@ -481,7 +674,7 @@ public abstract class Field extends BoxComponent {
   }
 
   protected void fireChangeEvent(Object oldValue, Object value) {
-    if (!value.equals(oldValue)) {
+    if (oldValue != value) {
       FieldEvent e = new FieldEvent(this);
       e.oldValue = oldValue;
       e.value = value;
@@ -495,64 +688,17 @@ public abstract class Field extends BoxComponent {
    * @return the input element
    */
   protected El getInputEl() {
-    return el;
+    return el();
   }
 
   protected El getStyleEl() {
-    return el;
+    return el();
   }
 
   protected void initValue() {
     if (value != null) {
       setValue(value);
-    } else if (getInputEl().getValue().toString().length() > 0) {
-      this.setValue(getInputEl().getValue());
     }
-  }
-
-  /**
-   * Mark this field as invalid.
-   * 
-   * @param msg the validation message
-   */
-  protected void markInvalid(String msg) {
-    if (!rendered) {
-      return;
-    }
-    getInputEl().addStyleName(invalidStyle);
-    msg = msg == null ? invalidText : msg;
-
-    if (messageTarget.equals("side")) {
-      if (errorIcon == null) {
-        errorIcon = new IconButton("x-form-invalid-icon");
-        Element p = el.getParent().dom;
-        errorIcon.render(p);
-        errorIcon.removeStyleName("x-tool");
-        errorIcon.el.setVisibility(true);
-      }
-      errorIcon.setVisible(true);
-      errorIcon.setToolTip(msg);
-      errorIcon.getToolTip().addStyleName("x-form-invalid-tip");
-      alignErrorIcon();
-
-      if (!errorIcon.isAttached()) {
-        WidgetHelper.doAttach(errorIcon);
-      }
-
-    } else if (messageTarget.equals("title")) {
-      setTitle(msg);
-    } else if ("tooltip".equals(messageTarget)) {
-      setToolTip(msg);
-    } else {
-      Element elem = DOM.getElementById(messageTarget);
-      if (elem != null) {
-        fly(elem).setInnerHtml(msg);
-      }
-    }
-
-    FieldEvent fe = new FieldEvent(this);
-    fe.message = msg;
-    fireEvent(Events.Invalid, fe);
   }
 
   protected void onBlur(ComponentEvent be) {
@@ -563,12 +709,27 @@ public abstract class Field extends BoxComponent {
     if (validateOnBlur) {
       validate();
     }
-    fireChangeEvent(focusValue, getValue());
+
+    if ((focusValue == null && getValue() != null) || (focusValue != null && !focusValue.equals(getValue()))) {
+      fireChangeEvent(focusValue, getValue());
+    }
     fireEvent(Events.Blur, new FieldEvent(this));
   }
 
   protected void onClick(ComponentEvent ce) {
 
+  }
+
+  @Override
+  protected void onDisable() {
+    super.onDisable();
+    getInputEl().dom.setPropertyString("disabled", "true");
+  }
+
+  @Override
+  protected void onEnable() {
+    super.onEnable();
+    getInputEl().dom.removeAttribute("disabled");
   }
 
   protected void onFocus(ComponentEvent ce) {
@@ -582,20 +743,29 @@ public abstract class Field extends BoxComponent {
     }
   }
 
-  protected void onKeyPress(FieldEvent fe) {
+  protected void onKeyDown(FieldEvent fe) {
 
   }
 
+  protected void onKeyPress(FieldEvent fe) {
+    fireEvent(Events.KeyPress, new FieldEvent(this, fe.event));
+  }
+
+  protected void onKeyUp(FieldEvent fe) {
+    fireEvent(Events.KeyUp, new FieldEvent(this, fe.event));
+  }
+
+  @Override
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
 
     addStyleName(fieldStyle);
 
-    String type = getInputEl().getElementAttribute("type");
+    String type = getInputEl().dom.getAttribute("type");
     getInputEl().addStyleName("x-form-" + type);
 
     if (getName() != null) {
-      getInputEl().setElementAttribute("name", getName());
+      getInputEl().dom.setPropertyString("name", getName());
     }
 
     if (readOnly) {
@@ -603,12 +773,24 @@ public abstract class Field extends BoxComponent {
     }
 
     if (tabIndex != Style.DEFAULT) {
-      el.setIntElementProperty("tabIndex", tabIndex);
+      getInputEl().setIntElementProperty("tabIndex", tabIndex);
     }
 
-    originalValue = getValue();
+    if (disabled) {
+      onDisable();
+    }
 
-    getInputEl().addEventsSunk(Event.ONCLICK | Event.KEYEVENTS | Event.FOCUSEVENTS);
+    new KeyNav<FieldEvent>(this) {
+      @Override
+      public void onKeyPress(FieldEvent ce) {
+        Field.this.onKeyPress(ce);
+      }
+    };
+
+    originalValue = value;
+
+    getInputEl().addEventsSunk(
+        Event.ONCLICK | Event.MOUSEEVENTS | Event.FOCUSEVENTS | Event.KEYEVENTS);
 
     initValue();
   }
@@ -622,4 +804,5 @@ public abstract class Field extends BoxComponent {
   protected boolean validateValue(String value) {
     return true;
   }
+
 }

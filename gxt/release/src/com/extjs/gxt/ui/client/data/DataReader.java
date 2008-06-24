@@ -8,19 +8,19 @@
 package com.extjs.gxt.ui.client.data;
 
 /**
- * Interface for objects that can read raw data and produce a set of
- * <code>Model</code> objects.
+ * Interface for objects that translate raw data into a given type.
  * 
- * @see Model
+ * @param <C> the config type
+ * @param <D> the data type
  */
-public interface DataReader {
+public interface DataReader<C, D> {
 
   /**
-   * Reads the raw data and creates a set of Model instances.
+   * Reads the raw data and returns the typed data.
    * 
    * @param data the data to read
-   * @return a load result
+   * @return the data
    */
-  public LoadResult read(LoadConfig loadConfig, Object data);
+  public D read(C loadConfig, Object data);
 
 }

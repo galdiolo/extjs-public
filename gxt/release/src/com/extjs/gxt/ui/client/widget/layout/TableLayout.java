@@ -7,13 +7,14 @@
  */
 package com.extjs.gxt.ui.client.widget.layout;
 
-
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.Layout;
+import com.google.gwt.dom.client.TableCellElement;
+import com.google.gwt.dom.client.TableElement;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 
@@ -30,66 +31,22 @@ import com.google.gwt.user.client.Element;
  */
 public class TableLayout extends Layout {
 
-  /**
-   * True to insert a spacer cell into each row with 100% width so that all
-   * other cells are right aligned (defaults to false).
-   */
-  public boolean insertSpacer;
-
-  /**
-   * Specifies the cell's horizontal alignment (defaults to LEFT).
-   * <p>
-   * Valid values are:
-   * <ul>
-   * <li>HorizontalAlignment.LEFT</li>
-   * <li>HorizontalAlignment.CENTER</li>
-   * <li>HorizontalAlignment.RIGHT</li>
-   * </ul>
-   * </p>
-   */
-  public HorizontalAlignment horizontalAlign;
-
-  /**
-   * Specifies the cell's vertical alignment (defaults to TOP).
-   * <p>
-   * Valid values are:
-   * <ul>
-   * <li>VerticalAlignment.TOP</li>
-   * <li>VerticalAlignment.MIDDLE</li>
-   * <li>VertcialAlginment.BOTTOM</li>
-   * </ul>
-   * </p>
-   */
-  public VerticalAlignment verticalAlign = VerticalAlignment.TOP;
-
-  /**
-   * The number of columns (defaults to 1).
-   */
-  public int columns = 1;
-
-  /**
-   * The table's cellpadding property (defaults to -1).
-   */
-  public int cellPadding = -1;
-
-  /**
-   * Sets the table's cellspacing property (defaults to -1).
-   */
-  public int cellSpacing = -1;
-
-  /**
-   * The table's border property (defaults to 0).
-   */
-  public int border = 0;
-
-  public String width;
-
-  public String height;
-
-  protected El table;
+  protected TableElement table;
   protected Element tbody;
+
   protected int currentColumn;
   protected int currentRow;
+  protected HorizontalAlignment cellHorizontalAlign;
+  protected VerticalAlignment cellVerticalAlign;
+
+  int cellPadding = -1;
+  int cellSpacing = -1;
+  String width;
+  String height;
+  private boolean insertSpacer;
+  private int columns = 1;
+  private int border = 0;
+  private String tableStyle;
 
   /**
    * Creates a new table layout.
@@ -104,19 +61,117 @@ public class TableLayout extends Layout {
    * @param columns the number of columns
    */
   public TableLayout(int columns) {
-    this.columns = columns;
+    this.setColumns(columns);
   }
 
   /**
-   * Sets the table's cell padding.
+   * Returns the border width.
+   * 
+   * @return the border width
+   */
+  public int getBorder() {
+    return border;
+  }
+
+  /**
+   * Returns the cell horizontal alignment.
+   * 
+   * @return the cell horizontal alignment
+   */
+  public HorizontalAlignment getCellHorizontalAlign() {
+    return cellHorizontalAlign;
+  }
+
+  /**
+   * Returns the table cell's padding.
+   * 
+   * @return the cell padding
+   */
+  public int getCellPadding() {
+    return cellPadding;
+  }
+
+  /**
+   * Returns the cell's vertical alignment.
+   * 
+   * @return the vertical alignment
+   */
+  public VerticalAlignment getCellVerticalAlign() {
+    return cellVerticalAlign;
+  }
+
+  /**
+   * Returns the number of columns.
+   * 
+   * @return the column count
+   */
+  public int getColumns() {
+    return columns;
+  }
+
+  /**
+   * Returns the table's height.
+   * 
+   * @return the table height
+   */
+  public String getHeight() {
+    return height;
+  }
+
+  /**
+   * Returns true if spacers are being inserted.
+   * 
+   * @return the insert spacer state
+   */
+  public boolean getInsertSpacer() {
+    return insertSpacer;
+  }
+
+  /**
+   * Returns the table style.
+   * 
+   * @return the table style
+   */
+  public String getTableStyle() {
+    return tableStyle;
+  }
+
+  /**
+   * Returns the table's width.
+   * 
+   * @return the table width
+   */
+  public String getWidth() {
+    return width;
+  }
+
+  /**
+   * Sets the table's border property (defaults to 0).
+   * 
+   * @param border the border
+   */
+  public void setBorder(int border) {
+    this.border = border;
+  }
+
+  /**
+   * Sets the cell's horizontal alignment. If specifed, the value will be
+   * applied to all cell's without a horizontal alignment specified.
+   * 
+   * @param cellHorizontalAlign the horizontal alignment
+   */
+  public void setCellHorizontalAlign(HorizontalAlignment cellHorizontalAlign) {
+    this.cellHorizontalAlign = cellHorizontalAlign;
+  }
+
+  /**
+   * Sets the amount that will be applied to each table cell. This method does
+   * not change the table's cellpadding attribute.
    * 
    * @param padding the cell padding
    */
   public void setCellPadding(int padding) {
     this.cellPadding = padding;
-    if (table != null) {
-      table.setIntElementProperty("cellPadding", padding);
-    }
   }
 
   /**
@@ -127,10 +182,67 @@ public class TableLayout extends Layout {
   public void setCellSpacing(int spacing) {
     this.cellSpacing = spacing;
     if (table != null) {
-      table.setIntElementProperty("cellSpacing", spacing);
+      table.setCellSpacing(spacing);
     }
   }
-  
+
+  /**
+   * Sets the cell's vertical alignment. If specifed, the value will be applied
+   * to all cell's without a horizontal alignment specified.
+   * 
+   * @param cellVerticalAlign the vertical alignment
+   */
+  public void setCellVerticalAlign(VerticalAlignment cellVerticalAlign) {
+    this.cellVerticalAlign = cellVerticalAlign;
+  }
+
+  /**
+   * Sets the number of columns (defaults to 1).
+   * 
+   * @param columns the number of columns
+   */
+  public void setColumns(int columns) {
+    this.columns = columns;
+  }
+
+  /**
+   * Sets the table's height.
+   * 
+   * @param height the table height
+   */
+  public void setHeight(String height) {
+    this.height = height;
+  }
+
+  /**
+   * True to insert a spacer cell into each row with 100% width so that all
+   * other cells are right aligned (defaults to false).
+   * 
+   * @param insertSpacer true to add a spacer
+   */
+  public void setInsertSpacer(boolean insertSpacer) {
+    this.insertSpacer = insertSpacer;
+  }
+
+  /**
+   * Custom CSS styles to be applied to the table in the format expected by
+   * {@link El#applyStyles}.
+   * 
+   * @param tableStyle the table style
+   */
+  public void setTableStyle(String tableStyle) {
+    this.tableStyle = tableStyle;
+  }
+
+  /**
+   * Sets the table's width.
+   * 
+   * @param width the table width
+   */
+  public void setWidth(String width) {
+    this.width = width;
+  }
+
   protected Element getNextCell(Component widget) {
     TableData data = (TableData) widget.getData();
     if (data == null) {
@@ -138,40 +250,54 @@ public class TableLayout extends Layout {
       widget.setData(data);
     }
 
-    El td = new El(DOM.createTD());
+    TableCellElement td = DOM.createTD().cast();
     El row;
-    
-    if (currentColumn != 0 && (currentColumn % columns == 0)) {
+
+    if (currentColumn != 0 && (currentColumn % getColumns() == 0)) {
       row = getRow(++currentRow);
-      currentColumn += data.colspan != -1 ? data.colspan : 1;
+      currentColumn += data.getColspan() != -1 ? data.getColspan() : 1;
     } else {
       row = getRow(currentRow);
-      currentColumn += data.colspan != -1 ? data.colspan : 1;
+      currentColumn += data.getColspan() != -1 ? data.getColspan() : 1;
     }
-    if (data.colspan != 1) {
-      td.setIntElementProperty("colSpan", data.colspan);
+    if (data.getColspan() != 1) {
+      td.setColSpan(data.getColspan());
     }
 
-    if (data.padding > 0) {
-      td.setIntElementProperty("padding", data.padding);
+    if (data.getPadding() > 0) {
+      td.getStyle().setPropertyPx("padding", data.getPadding());
+    } else if (cellPadding > 0) {
+      td.getStyle().setPropertyPx("padding", cellPadding);
     }
-    if (data.style != null) {
-      td.addStyleName(data.style);
+
+    if (data.getStyleName() != null) {
+      fly(td).addStyleName(data.getStyleName());
     }
+
     if (data.horizontalAlign != null) {
-      td.setElementAttribute("align", data.horizontalAlign.name().toLowerCase());
+      td.setAlign(data.horizontalAlign.name());
+    } else if (cellHorizontalAlign != null) {
+      td.setAlign(cellHorizontalAlign.name());
     }
+
     if (data.verticalAlign != null) {
-      td.setElementAttribute("valign", data.verticalAlign.name().toLowerCase());
+      td.setVAlign(data.verticalAlign.name());
+    } else if (cellVerticalAlign != null) {
+      td.setVAlign(cellVerticalAlign.name());
     }
-    if (data.height != null) {
-      td.setElementAttribute("height", data.height);
+
+    if (data.getHeight() != null) {
+      td.setPropertyString("height", data.getHeight());
     }
-    if (data.width != null) {
-      td.setElementAttribute("width", data.width);
+    if (data.getWidth() != null) {
+      td.setPropertyString("width", data.getWidth());
     }
-    DOM.appendChild(row.dom, td.dom);
-    return td.dom;
+
+    if (data.getStyle() != null) {
+      fly(td).applyStyles(data.getStyle());
+    }
+    row.dom.appendChild(td);
+    return td.cast();
   }
 
   protected El getRow(int index) {
@@ -194,32 +320,34 @@ public class TableLayout extends Layout {
     currentRow = 0;
 
     target.removeChildren();
-    
-    table = new El(DOM.createTable());
 
-    if (cellPadding != -1) {
-      table.setElementAttribute("cellPadding", cellPadding);
+    table = DOM.createTable().cast();
+
+    if (tableStyle != null) {
+      El.fly((Element) table.cast()).applyStyles(tableStyle);
     }
+
     if (cellSpacing != -1) {
-      table.setElementAttribute("cellSpacing", cellSpacing);
+      table.setCellSpacing(cellSpacing);
     }
 
     if (border > 0) {
-      table.setElementAttribute("border", border);
+      table.setBorder(border);
     }
 
     if (width != null) {
-      table.setElementAttribute("width", width);
+      table.setWidth(width);
     }
 
     if (height != null) {
-      table.setElementAttribute("height", height);
+      table.setPropertyString("height", height);
     }
 
     tbody = DOM.createTBody();
-    
+
     table.appendChild(tbody);
-    target.appendChild(table.dom);
+    target.dom.appendChild(table);
+
     renderAll(container, target);
   }
 
@@ -227,7 +355,7 @@ public class TableLayout extends Layout {
   protected void renderComponent(Component c, int index, El target) {
     Element td = getNextCell(c);
     if (c.isRendered()) {
-      DOM.appendChild(td, c.getElement());
+      td.appendChild(c.getElement());
     } else {
       c.render(td);
     }

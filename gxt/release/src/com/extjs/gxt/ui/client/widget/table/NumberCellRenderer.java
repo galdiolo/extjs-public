@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.widget.table;
 
+import com.extjs.gxt.ui.client.widget.Component;
 import com.google.gwt.i18n.client.NumberFormat;
 
 /**
@@ -14,7 +15,7 @@ import com.google.gwt.i18n.client.NumberFormat;
  * 
  * @see NumberFormat
  */
-public class NumberCellRenderer implements CellRenderer {
+public class NumberCellRenderer<T extends Component> implements CellRenderer<T> {
 
   private NumberFormat format;
 
@@ -36,7 +37,7 @@ public class NumberCellRenderer implements CellRenderer {
     this.format = format;
   }
 
-  public String render(String property, Object value) {
+  public String render(T item, String property, Object value) {
     if (value instanceof Double) {
       return format.format(((Double) value).doubleValue());
     } else if (value instanceof Float) {

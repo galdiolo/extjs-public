@@ -20,25 +20,16 @@ import com.extjs.gxt.ui.client.widget.menu.Menu;
  * 
  * @see DataList
  */
-public class DataListEvent extends ComponentEvent {
-
-  public DataList dataList;
-
-  public DataListItem item;
-
-  public int index;
+public class DataListEvent extends ContainerEvent<DataList, DataListItem> {
 
   public Menu menu;
 
   public DataListEvent(DataList list) {
     super(list);
-    this.dataList = list;
   }
 
   public DataListEvent(DataList list, DataListItem item) {
-    super(list);
-    this.dataList = list;
-    this.item = item;
+    super(list, item);
   }
 
 }

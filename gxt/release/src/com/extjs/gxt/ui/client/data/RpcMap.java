@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.data;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,7 +31,7 @@ import java.util.Set;
  * generated for any type you add to this map
  * 
  * RpcMap ensures that the following types are supported Byte, Short, Integer,
- * Long, Float, Double, Date, Boolean
+ * Long, Float, Double, Date, Boolean, and arrays of these types.  As well as List, Set and Map
  */
 @SuppressWarnings("unused")
 public class RpcMap implements Map<String, Object> {
@@ -44,6 +45,20 @@ public class RpcMap implements Map<String, Object> {
   private Date _date;
   private Boolean _boolean;
 
+  private Byte[] _bytes;
+  private Short[] _shorts;
+  private Integer[] _integers;
+  private Long[] _longs;
+  private Float[] _floats;
+  private Double[] _doubles;
+  private Date[] _dates;
+  private Boolean[] _booleans;
+
+  private List<String> _list;
+  private Set<String> _set;
+  private Map<String, String> _map;
+
+  
   private transient Map<String, Object> map = new HashMap<String, Object>();
 
   public void clear() {

@@ -8,17 +8,15 @@
 package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.Events;
-import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.DragEvent;
-import com.extjs.gxt.ui.client.event.DragListenerAdapter;
+import com.extjs.gxt.ui.client.event.DragListener;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.PreviewEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.event.TypedListener;
 import com.extjs.gxt.ui.client.event.WindowEvent;
 import com.extjs.gxt.ui.client.event.WindowListener;
 import com.extjs.gxt.ui.client.fx.Draggable;
@@ -27,6 +25,8 @@ import com.extjs.gxt.ui.client.util.BaseEventPreview;
 import com.extjs.gxt.ui.client.util.Point;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.util.Size;
+import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.button.ToolButton;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.KeyboardListener;
@@ -84,22 +84,6 @@ import com.google.gwt.user.client.ui.Widget;
  * </ul>
  * </dd>
  * 
- * <dd><b>BeforeClose</b> : WindowEvent(window, buttonClicked)<br>
- * <div>Fires before the window is to be closed.</div>
- * <ul>
- * <li>window : this</li>
- * <li>buttonClicked : the button that triggered the close event</li>
- * </ul>
- * </dd>
- * 
- * <dd><b>Close</b> : WindowEvent(window, buttonClicked)<br>
- * <div>Fires after the window has been closed.</div>
- * <ul>
- * <li>window : this</li>
- * <li>buttonClicked : the button that triggered the close event</li>
- * </ul>
- * </dd>
- * 
  * <dd><b>BeforeHide</b> : WindowEvent(window, buttonClicked)<br>
  * <div>Fires before the window is to be hidden.</div>
  * <ul>
@@ -120,100 +104,24 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class Window extends ContentPanel {
 
-  /**
-   * True to display the 'close' tool button and allow the user to close the
-   * window, false to hide the button and disallow closing the window (default
-   * to true).
-   */
   private boolean closable = true;
-
-  /**
-   * True to constrain the window to the viewport, false to allow it to fall
-   * outside of the viewport (defaults to true).
-   */
   private boolean constrain = true;
-
-  /**
-   * Widget to be given focus when the window is focused (defaults to null).
-   */
   private Widget focusWidget;
-
-  /**
-   * True to display the 'maximize' tool button and allow the user to maximize
-   * the window, false to hide the button and disallow maximizing the window
-   * (defaults to false). Note that when a window is maximized, the tool button
-   * will automatically change to a 'restore' button with the appropriate
-   * behavior already built-in that will restore the window to its previous
-   * size.
-   */
   private boolean maximizable;
-
-  /**
-   * The minimum height in pixels allowed for this window (defaults to 100).
-   * Only applies when resizable = true.
-   */
   private int minHeight = 100;
-
-  /**
-   * True to display the 'minimize' tool button and allow the user to minimize
-   * the window, false to hide the button and disallow minimizing the window
-   * (defaults to false). Note that this button provides no implementation --
-   * the behavior of minimizing a window is implementation-specific, so the
-   * minimize event must be handled and a custom minimize behavior implemented
-   * for this option to be useful.
-   */
   private boolean minimizable;
-
-  /**
-   * The minimum width in pixels allowed for this window (defaults to 200). Only
-   * applies when resizable = true.
-   */
   private int minWidth = 200;
-
-  /**
-   * The width of the window if no width has been specified (defaults to 300).
-   */
   private int initialWidth = 300;
-
-  /**
-   * True to make the window modal and mask everything behind it when displayed,
-   * false to display it without restricting access to other UI elements
-   * (defaults to false).
-   */
   private boolean modal;
-
-  /**
-   * True to blink the window when the user clicks outside of the windows bounds
-   * (defaults to false). Only applies window model = true.
-   */
   private boolean blinkModal = false;
-
-  /**
-   * Allows override of the built-in processing for the escape key. Default
-   * action is to close the Window.
-   */
   private boolean onEsc = true;
-
-  /**
-   * True to render the window body with a transparent background so that it
-   * will blend into the framing elements, false to add a lighter background
-   * color to visually highlight the body element and separate it more
-   * distinctly from the surrounding frame (defaults to false).
-   */
   private boolean plain;
-
-  /**
-   * True to allow user resizing at each edge and corner of the window, false to
-   * disable resizing (defaults to true).
-   */
   private boolean resizable = true;
-
   private int height = Style.DEFAULT;
   private int width = Style.DEFAULT;
   private Draggable dragger;
   private BaseEventPreview eventPreview;
   private Layer ghost;
-  private boolean hidden = true;
   private WindowManager manager;
   private ToolButton maxBtn, minBtn;
   private boolean maximized;
@@ -223,6 +131,7 @@ public class Window extends ContentPanel {
   private Point restorePos;
   private Size restoreSize;
   private boolean draggable = true;
+  private boolean positioned;
 
   /**
    * Creates a new window.
@@ -232,6 +141,7 @@ public class Window extends ContentPanel {
     frame = true;
     setShadow(true);
     shim = true;
+    hidden = true;
     setDraggable(true);
   }
 
@@ -241,12 +151,12 @@ public class Window extends ContentPanel {
    * @param listener the listener
    */
   public void addWindowListener(WindowListener listener) {
-    TypedListener typedListener = new TypedListener(listener);
-    addListener(Events.Activate, typedListener);
-    addListener(Events.Deactivate, typedListener);
-    addListener(Events.Minimize, typedListener);
-    addListener(Events.Maximize, typedListener);
-    addListener(Events.Restore, typedListener);
+    addListener(Events.Activate, listener);
+    addListener(Events.Deactivate, listener);
+    addListener(Events.Minimize, listener);
+    addListener(Events.Maximize, listener);
+    addListener(Events.Restore, listener);
+    addListener(Events.Hide, listener);
   }
 
   /**
@@ -254,11 +164,11 @@ public class Window extends ContentPanel {
    * 
    * @param elem the element to align to.
    * @param pos the position to align to (see {@link El#alignTo} for more
-   *            details)
+   *          details)
    * @param offsets the offsets
    */
   public void alignTo(Element elem, String pos, int[] offsets) {
-    Point p = el.getAlignToXY(elem, pos, offsets);
+    Point p = el().getAlignToXY(elem, pos, offsets);
     setPagePosition(p.x, p.y);
   }
 
@@ -266,16 +176,8 @@ public class Window extends ContentPanel {
    * Centers the window in the viewport.
    */
   public void center() {
-    Point p = el.getAlignToXY(XDOM.getBody(), "c-c", null);
+    Point p = el().getAlignToXY(XDOM.getBody(), "c-c", null);
     setPagePosition(p.x, p.y);
-  }
-
-  /**
-   * Closes the window, removes it from its parent and destroys the window
-   * object.
-   */
-  public void close() {
-    close(null);
   }
 
   /**
@@ -363,9 +265,15 @@ public class Window extends ContentPanel {
       return;
     }
     hidden = true;
-    layer.hideShadow();
+    
+
+    restoreSize = getSize();
+    restorePos = getPosition(true);
+    
+    super.onHide();
+
     RootPanel.get().remove(this);
-    if (isModal()) {
+    if (modal) {
       modalPanel.hide();
     }
     fireEvent(Events.Hide, new WindowEvent(this, buttonPressed));
@@ -387,6 +295,15 @@ public class Window extends ContentPanel {
    */
   public boolean isClosable() {
     return closable;
+  }
+
+  /**
+   * Returns true if the panel is draggable.
+   * 
+   * @return the draggable state
+   */
+  public boolean isDraggable() {
+    return draggable;
   }
 
   /**
@@ -484,6 +401,8 @@ public class Window extends ContentPanel {
     removeListener(Events.Minimize, listener);
     removeListener(Events.Maximize, listener);
     removeListener(Events.Restore, listener);
+    removeListener(Events.Hide, listener);
+    removeListener(Events.Close, listener);
   }
 
   /**
@@ -493,7 +412,7 @@ public class Window extends ContentPanel {
    */
   public void restore() {
     if (maximized) {
-      el.removeStyleName("x-window-maximized");
+      el().removeStyleName("x-window-maximized");
       restoreBtn.setVisible(false);
       maxBtn.setVisible(true);
       setPosition(restorePos.x, restorePos.y);
@@ -550,6 +469,15 @@ public class Window extends ContentPanel {
    */
   public void setConstrain(boolean constrain) {
     this.constrain = constrain;
+  }
+
+  /**
+   * True to enable dragging of this Panel (defaults to false).
+   * 
+   * @param draggable the draggable to state
+   */
+  public void setDraggable(boolean draggable) {
+    this.draggable = draggable;
   }
 
   /**
@@ -666,21 +594,20 @@ public class Window extends ContentPanel {
    * brings it to front if hidden.
    */
   public void show() {
+    if (!fireEvent(Events.BeforeShow, new WindowEvent(this))) {
+      return;
+    }
+
     RootPanel.get().add(this);
-    el.makePositionable(true);
+    el().makePositionable(true);
+    el().setVisible(true);
 
     if (!hidden) {
       toFront();
       return;
     }
 
-    if (!fireEvent(Events.BeforeShow, new WindowEvent(this))) {
-      return;
-    }
-
-    beforeShow();
     afterShow();
-    return;
   }
 
   /**
@@ -707,75 +634,87 @@ public class Window extends ContentPanel {
 
   protected void afterRender() {
     super.afterRender();
-    el.setVisible(false);
+    el().setVisible(false);
+  }
+
+  @Override
+  public void setPagePosition(int x, int y) {
+    super.setPagePosition(x, y);
+    positioned = true;
+  }
+
+  @Override
+  public void setPosition(int left, int top) {
+    super.setPosition(left, top);
+    positioned = true;
   }
 
   protected void afterShow() {
-    el.setVisible(true);
-
+    if (modal) {
+      modalPanel.setBlink(blinkModal);
+      modalPanel.show(this);
+      el().makePositionable(true);
+    }
+    
+    
     if (maximized) {
       maximize();
     }
 
     hidden = false;
 
-    // no width set
-    if (isAutoWidth() || attachSize.width == Style.DEFAULT) {
-      setWidth(getInitialWidth());
+    if (restorePos != null) {
+      if (restorePos != null) {
+        setPosition(restorePos.x, restorePos.y);
+        restorePos = null;
+      }
+      if (restoreSize != null) {
+        setSize(restoreSize.width, restoreSize.height);
+        restoreSize = null;
+      }
+    } else {
+      // no width set
+      if (isAutoWidth() || attachSize.width == Style.DEFAULT) {
+        setWidth(initialWidth);
+      }
+
+      // not positioned, then center
+      if (!positioned) {
+        el().center();
+      }
+
+      layer.sync(true);
+
     }
-
-    // workaround for 0 height east, west resizer
-    if (GXT.isIE && isResizable()) {
-      el.setHeight(getHeight());
-    }
-
-    // not positioned then center
-    int x = el.getLeft(false);
-    int y = el.getLeft(false);
-    if (x < 1 || y < 1) {
-      el.center();
-    }
-
-    layer.sync(true);
-
     toFront();
 
-    if (getFocusWidget() != null) {
-      if (getFocusWidget() instanceof Component) {
-        ((Component) getFocusWidget()).focus();
+    if (focusWidget != null) {
+      if (focusWidget instanceof Component) {
+        ((Component) focusWidget).focus();
       } else {
-        fly(getFocusWidget().getElement()).focus();
+        fly(focusWidget.getElement()).focus();
       }
     }
+
+    layout();
     fireEvent(Events.Show, new WindowEvent(this));
-  }
-
-  protected void beforeShow() {
-    if (isModal()) {
-      modalPanel.blink = isBlinkModal();
-      modalPanel.show(this);
-      el.makePositionable(true);
-    }
-  }
-
-  protected void close(Button buttonPressed) {
-    if (!fireEvent(Events.BeforeClose, new WindowEvent(this, buttonPressed))) {
-      return;
-    }
-    hide(buttonPressed);
-    fireEvent(Events.Close, new WindowEvent(this, buttonPressed));
-    destroy();
   }
 
   protected void initTools() {
     super.initTools();
-    if (isMinimizable()) {
+    if (minimizable) {
       minBtn = new ToolButton("x-tool-minimize");
+      minBtn.addSelectionListener(new SelectionListener<ComponentEvent>() {
+        public void componentSelected(ComponentEvent ce) {
+          minimize();
+        }
+      });
       head.addTool(minBtn);
     }
-    if (isMaximizable()) {
+
+    if (maximizable) {
       maxBtn = new ToolButton("x-tool-maximize");
-      maxBtn.addSelectionListener(new SelectionListener() {
+      maxBtn.addSelectionListener(new SelectionListener<ComponentEvent>() {
         public void componentSelected(ComponentEvent ce) {
           maximize();
         }
@@ -784,7 +723,7 @@ public class Window extends ContentPanel {
 
       restoreBtn = new ToolButton("x-tool-restore");
       restoreBtn.setVisible(false);
-      restoreBtn.addSelectionListener(new SelectionListener() {
+      restoreBtn.addSelectionListener(new SelectionListener<ComponentEvent>() {
         public void componentSelected(ComponentEvent ce) {
           restore();
         }
@@ -792,16 +731,7 @@ public class Window extends ContentPanel {
       head.addTool(restoreBtn);
     }
 
-    if (isMinimizable()) {
-      minBtn = new ToolButton("x-tool-minimize");
-      minBtn.addSelectionListener(new SelectionListener() {
-        public void componentSelected(ComponentEvent ce) {
-          minimize();
-        }
-      });
-    }
-
-    if (isClosable()) {
+    if (closable) {
       closeBtn = new ToolButton("x-tool-close");
       closeBtn.addListener(Events.Select, new Listener<ComponentEvent>() {
         public void handleEvent(ComponentEvent ce) {
@@ -812,44 +742,18 @@ public class Window extends ContentPanel {
     }
   }
 
-  @Override
-  protected void onDestroy() {
-    super.onDestroy();
-    if (layer != null) {
-      layer.destroy();
-    }
-  }
-
   protected void onKeyPress(PreviewEvent be) {
     int keyCode = be.getKeyCode();
-    if (isOnEsc() && keyCode == KeyboardListener.KEY_ESCAPE) {
-      close();
+    if (onEsc && keyCode == KeyboardListener.KEY_ESCAPE) {
+      hide();
     }
-  }
-  
-  /**
-   * True to enable dragging of this Panel (defaults to false).
-   * 
-   * @param draggable the draggable to state
-   */
-  public void setDraggable(boolean draggable) {
-    this.draggable = draggable;
-  }
-  
-  /**
-   * Returns true if the panel is draggable.
-   * 
-   * @return the draggable state
-   */
-  public boolean isDraggable() {
-    return draggable;
   }
 
   @Override
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
 
-    el.makePositionable(true);
+    el().makePositionable(true);
 
     if (manager == null) {
       manager = WindowManager.get();
@@ -872,9 +776,9 @@ public class Window extends ContentPanel {
 
     if (draggable) {
       dragger = new Draggable(this, head);
-      dragger.constrainClient = getConstrain();
-      dragger.sizeProxyToSource = false;
-      dragger.addDragListener(new DragListenerAdapter() {
+      dragger.setConstrainClient(getConstrain());
+      dragger.setSizeProxyToSource(false);
+      dragger.addDragListener(new DragListener() {
         public void dragEnd(DragEvent de) {
           endDrag(de);
         }
@@ -892,7 +796,7 @@ public class Window extends ContentPanel {
 
     if (modal) {
       modalPanel = new ModalPanel();
-      modalPanel.blink = isBlinkModal();
+      modalPanel.setBlink(isBlinkModal());
     }
 
     initEventPreview();
@@ -913,11 +817,11 @@ public class Window extends ContentPanel {
     Element div = DOM.createDiv();
     Layer l = new Layer(div);
 
-    l.setStyleName("x-panel-ghost");
+    l.dom.setClassName("x-panel-ghost");
     if (head != null) {
-      DOM.appendChild(div, el.firstChild().cloneNode(true));
+      DOM.appendChild(div, el().firstChild().cloneNode(true));
     }
-    l.appendChild(DOM.createElement("ul"));
+    l.dom.appendChild(DOM.createElement("ul"));
     return l;
   }
 
@@ -967,14 +871,14 @@ public class Window extends ContentPanel {
     }
     ghost = ghost();
     ghost.setVisible(true);
-    el.setVisible(false);
+    el().setVisible(false);
     Draggable d = de.draggable;
     d.setProxy(ghost.dom);
   }
 
   private void unghost(DragEvent de) {
     ghost.setVisible(false);
-    el.setVisible(true);
+    el().setVisible(true);
     setPagePosition(de.x, de.y);
   }
 }

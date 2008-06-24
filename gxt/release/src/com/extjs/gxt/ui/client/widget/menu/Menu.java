@@ -8,15 +8,15 @@
 package com.extjs.gxt.ui.client.widget.menu;
 
 import com.extjs.gxt.ui.client.Events;
-import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.PreviewEvent;
 import com.extjs.gxt.ui.client.util.BaseEventPreview;
 import com.extjs.gxt.ui.client.util.KeyNav;
-import com.extjs.gxt.ui.client.widget.AbstractContainer;
+import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.Shadow.ShadowPosition;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -98,16 +98,16 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * </dl>
  */
-public class Menu extends AbstractContainer<MenuItem> {
+public class Menu extends Container<Item> {
 
-  KeyNav keyNav;
-  MenuItem parentItem;
-  
+  protected KeyNav keyNav;
+  protected Item parentItem;
+
   private String subMenuAlign = "tl-tr-?";
   private String defaultAlign = "tl-bl?";
   private ShadowPosition shadowPosition = ShadowPosition.SIDES;
   private int minWidth = 120;
-  private MenuItem activeItem;
+  private Item activeItem;
   private Menu parentMenu;
   private boolean showing;
   private String menuList;
@@ -120,8 +120,10 @@ public class Menu extends AbstractContainer<MenuItem> {
    */
   public Menu() {
     baseStyle = "x-menu";
+    shim = true;
     setShadow(true);
     attachChildren = false;
+    setAutoWidth(true);
     eventPreview = new BaseEventPreview() {
       @Override
       protected boolean onAutoHide(PreviewEvent pe) {
@@ -137,8 +139,9 @@ public class Menu extends AbstractContainer<MenuItem> {
    * 
    * @param item the new item
    */
-  public void add(MenuItem item) {
-    insert(item, getItemCount());
+  @Override
+  public boolean add(Item item) {
+    return super.add(item);
   }
 
   /**
@@ -164,7 +167,7 @@ public class Menu extends AbstractContainer<MenuItem> {
    * 
    * @return the parent item
    */
-  public MenuItem getParentItem() {
+  public Item getParentItem() {
     return parentItem;
   }
 
@@ -227,18 +230,16 @@ public class Menu extends AbstractContainer<MenuItem> {
    * @param item the item to insert
    * @param index the insert location
    */
-  public void insert(MenuItem item, int index) {
-    MenuEvent me = new MenuEvent(this);
-    me.item = item;
-    me.index = index;
-    if (fireEvent(Events.BeforeAdd, me)) {
+  @Override
+  public boolean insert(Item item, int index) {
+    boolean added = super.insert(item, index);
+    if (added) {
       item.parentMenu = this;
-      super.insert(item, index);
       if (rendered) {
         renderItem(item, index);
       }
-      fireEvent(Events.Add, me);
     }
+    return added;
   }
 
   @Override
@@ -267,25 +268,9 @@ public class Menu extends AbstractContainer<MenuItem> {
    * 
    * @param item the menu to remove
    */
-  public boolean remove(MenuItem item) {
-    MenuEvent me = new MenuEvent(this);
-    me.item = item;
-    if (fireEvent(Events.BeforeRemove, me)) {
-      super.remove(item);
-      fireEvent(Events.Remove, me);
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * Removes all menu items from this menu.
-   */
-  public void removeAll() {
-    int size = getItemCount();
-    for (int i = 0; i < size; i++) {
-      remove(getItem(0));
-    }
+  @Override
+  public boolean remove(Item item) {
+    return super.remove(item);
   }
 
   /**
@@ -331,18 +316,18 @@ public class Menu extends AbstractContainer<MenuItem> {
    * 
    * @param elem the element to align to
    * @param pos the {@link El#alignTo} anchor position to use in aligning to the
-   *            element (defaults to defaultAlign)
+   *          element (defaults to defaultAlign)
    * @return this;
    */
   public Menu show(Element elem, String pos) {
     MenuEvent me = new MenuEvent(this);
     if (fireEvent(Events.BeforeShow, me)) {
       RootPanel.get().add(this);
+      el().makePositionable(true);
+      el().alignTo(elem, pos, new int[] {0, 0});
       onShow();
-      el.updateZIndex(0);
-      el.makePositionable(true);
-      el.alignTo(elem, pos, new int[] {0, 0});
       eventPreview.add();
+
       showing = true;
       focus();
       fireEvent(Events.Show, me);
@@ -368,6 +353,8 @@ public class Menu extends AbstractContainer<MenuItem> {
         render(XDOM.getBody());
       }
       RootPanel.get().add(this);
+      el().makePositionable(true);
+      el().makePositionable(true);
       onShow();
       setPagePosition(x, y);
       eventPreview.add();
@@ -375,6 +362,13 @@ public class Menu extends AbstractContainer<MenuItem> {
       focus();
       fireEvent(Events.Show, me);
     }
+  }
+
+  @Override
+  protected void onShow() {
+    super.onShow();
+    autoWidth();
+    el().setZIndex(0);
   }
 
   protected void afterRender() {
@@ -385,6 +379,11 @@ public class Menu extends AbstractContainer<MenuItem> {
   @Override
   protected ComponentEvent createComponentEvent(Event event) {
     return new MenuEvent(this);
+  }
+
+  @Override
+  protected ContainerEvent createContainerEvent(Item item) {
+    return new MenuEvent(this, item);
   }
 
   protected void createStyles(String baseStyle) {
@@ -431,8 +430,8 @@ public class Menu extends AbstractContainer<MenuItem> {
     };
 
     ul = DOM.createElement("ul");
-    fly(ul).setStyleName(menuList);
-    el.appendChild(ul);
+    ul.setClassName(menuList);
+    getElement().appendChild(ul);
 
     renderAll();
 
@@ -440,25 +439,25 @@ public class Menu extends AbstractContainer<MenuItem> {
     eventPreview.getIgnoreList().add(getElement());
 
     autoWidth();
-    el.addEventsSunk(Event.ONCLICK | Event.MOUSEEVENTS | Event.KEYEVENTS);
+    el().addEventsSunk(Event.ONCLICK | Event.MOUSEEVENTS | Event.KEYEVENTS);
   }
 
   protected void renderAll() {
     int count = getItemCount();
     for (int i = 0; i < count; i++) {
-      MenuItem item = getItem(i);
+      Item item = getItem(i);
       renderItem(item, i);
     }
   }
 
-  protected void renderItem(MenuItem item, int index) {
+  protected void renderItem(Item item, int index) {
     Element li = DOM.createElement("li");
     fly(ul).insertChild(li, index);
-    fly(li).setStyleName(menuListItem);
+    li.setClassName(menuListItem);
     item.render(li);
   }
 
-  protected void setActiveItem(MenuItem item, boolean autoExpand) {
+  protected void setActiveItem(Item item, boolean autoExpand) {
     if (item != activeItem) {
       if (activeItem != null) {
         activeItem.deactivate();
@@ -470,28 +469,36 @@ public class Menu extends AbstractContainer<MenuItem> {
     }
   }
 
+  @Override
+  protected void onRemove(Item item) {
+    if (item.isRendered()) {
+      Element li = item.getElement().getParentElement().cast();
+      ul.removeChild(li);
+    }
+    super.onRemove(item);
+    autoWidth();
+  }
+
   private void autoWidth() {
     if (rendered) {
-      if (GXT.isIE) {
-        el.setWidth(getMinWidth());
-        getWidth();
-        el.setWidth(fly(ul).getWidth() + el.getFrameWidth("lr"));
-      } else {
-        setWidth(getMinWidth());
-      }
+      setWidth("auto");
+      int w = fly(ul).getWidth();
+      w = Math.max(minWidth, w);
+      w += el().getFrameWidth("lr");
+      el().setWidth(w);
     }
   }
 
   private void onClick(ComponentEvent ce) {
     ce.stopEvent();
-    MenuItem item = findItem(ce.getTarget());
+    Item item = findItem(ce.getTarget());
     if (item != null) {
       item.onClick(ce);
     }
   }
 
   private void onMouseOut(ComponentEvent ce) {
-    MenuItem item = findItem(ce.getTarget());
+    Item item = findItem(ce.getTarget());
     if (item != null) {
       if (item == activeItem && activeItem.shouldDeactivate(ce)) {
         activeItem.deactivate();
@@ -501,7 +508,7 @@ public class Menu extends AbstractContainer<MenuItem> {
   }
 
   private void onMouseOver(ComponentEvent ce) {
-    MenuItem item = findItem(ce.getTarget());
+    Item item = findItem(ce.getTarget());
     if (item != null) {
       if (item.canActivate && item.isEnabled()) {
         setActiveItem(item, true);
@@ -509,9 +516,9 @@ public class Menu extends AbstractContainer<MenuItem> {
     }
   }
 
-  private MenuItem tryActivate(int start, int step) {
+  private Item tryActivate(int start, int step) {
     for (int i = start, len = getItemCount(); i >= 0 && i < len; i += step) {
-      MenuItem item = getItem(i);
+      Item item = getItem(i);
       if (item.isEnabled() && item.canActivate) {
         setActiveItem(item, false);
         return item;

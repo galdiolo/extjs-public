@@ -17,6 +17,7 @@ public class NavigationController extends Controller {
 
   public NavigationController() {
     registerEventTypes(AppEvents.Init);
+    registerEventTypes(AppEvents.HidePage);
   }
 
   public void initialize() {
@@ -26,6 +27,7 @@ public class NavigationController extends Controller {
   public void handleEvent(AppEvent event) {
     switch (event.type) {
       case AppEvents.Init:
+      case AppEvents.HidePage:
         forwardToView(view, event);
         break;
     }

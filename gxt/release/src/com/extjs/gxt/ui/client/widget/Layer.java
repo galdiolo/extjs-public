@@ -9,11 +9,12 @@ package com.extjs.gxt.ui.client.widget;
 
 import java.util.Stack;
 
-import com.extjs.gxt.ui.client.XDOM;
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.Shadow.ShadowPosition;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 
@@ -27,7 +28,8 @@ public class Layer extends El {
 
   private Shadow shadow = new Shadow(ShadowPosition.DROP);
   private El shim;
-  private boolean shadowDisabled = true;
+  private boolean shimEnabled;
+  private boolean shadowEnabled;
 
   /**
    * Creates a new layer instance.
@@ -61,9 +63,15 @@ public class Layer extends El {
    */
   public El createShim() {
     El el = new El(DOM.createIFrame());
-    el.setElementAttribute("frameborder", "no");
-    el.setStyleName("ext-shim");
+    el.dom.setPropertyString("frameborder", "no");
+    el.dom.setPropertyString("frameBorder", "no");
+    el.dom.setClassName("ext-shim");
+    el.setVisibility(true);
+    el.setVisible(false);
     getParent().insertBefore(el.dom, dom);
+    if (GXT.isIE && GXT.isSecure) {
+      el.dom.setPropertyString("src", GXT.SSL_SECURE_URL);
+    }
     return el;
   }
 
@@ -71,8 +79,8 @@ public class Layer extends El {
    * Disables the shadow.
    */
   public void disableShadow() {
+    shadowEnabled = false;
     if (shadow != null) {
-      shadowDisabled = true;
       Shadow.push(shadow);
     }
   }
@@ -83,8 +91,8 @@ public class Layer extends El {
    * @param show true to show
    */
   public void enableShadow(boolean show) {
+    shadowEnabled = show;
     if (shadow != null) {
-      shadowDisabled = !show;
       if (show) {
         sync(true);
       } else {
@@ -99,6 +107,7 @@ public class Layer extends El {
    * Enables the shim.
    */
   public void enableShim() {
+    shimEnabled = true;
     shim = getShim();
   }
 
@@ -118,7 +127,7 @@ public class Layer extends El {
     if (pn.dom != p.dom) {
       pn.insertBefore(shim.dom, dom);
     }
-    shim.setStyleAttribute("zIndex", XDOM.getTopZIndex() - 2);
+    shim.setStyleAttribute("zIndex", Math.max(0, getZIndex() - 1));
     return shim;
   }
 
@@ -242,14 +251,14 @@ public class Layer extends El {
   @Override
   public El setXY(int x, int y) {
     super.setXY(x, y);
-    sync(false);
+    sync(true);
     return this;
   }
 
   @Override
   public El setY(int y) {
     super.setY(y);
-    sync(false);
+    sync(true);
     return this;
   }
 
@@ -259,45 +268,45 @@ public class Layer extends El {
    * @param show true to show
    */
   public void sync(boolean show) {
-    if (isVisible() && (shadow != null || shim != null)) {
+    if (isVisible() && (shadowEnabled || shimEnabled)) {
       int w = getWidth();
       int h = getHeight();
       int l = getLeft();
       int t = getTop();
-      if (shadow != null && !shadowDisabled) {
+
+      if (shadowEnabled) {
         if (show && !shadow.isVisible()) {
           shadow.show(dom);
         } else {
           shadow.sync(l, t, w, h);
         }
-        if (shim != null) {
-          if (show) {
-            shim.setVisible(true);
+      }
+      if (shimEnabled) {
+        if (show) {
+          if (shim == null) {
+            shim = getShim();
           }
+          shim.setVisible(true);
           Rectangle a = shadow.adjusts;
           if (a == null) a = new Rectangle(0, 0, 0, 0);
-          if (a.x < 0 || a.y < 0) return;
 
-          shim.setLeft(Math.min(l, l + a.x));
-          shim.setTop(Math.min(t, t + a.y));
-          shim.setWidth(w + a.width);
-          shim.setHeight(w + a.height);
+          try {
+            shim.setLeft(Math.min(l, l + a.x));
+            shim.setTop(Math.min(t, t + a.y));
+            shim.setWidth(Math.max(1, w + a.width));
+            shim.setHeight(Math.max(1, h + a.height));
+          } catch (Exception e) {
+            GWT.log("shim error", e);
+          }
+        } else {
+          shim.setVisible(false);
         }
-      } else if (shim != null) {
-        if (show) {
-          shim.setVisible(true);
-        }
-        shim.setSize(w, h);
-        shim.setLeftTop(l, t);
       }
     }
   }
-  
+
   public void destroy() {
     hideUnders(true);
-    if (shadow != null) {
-      shadow.destroy();
-    }
   }
 
   private void hideUnders(boolean hide) {

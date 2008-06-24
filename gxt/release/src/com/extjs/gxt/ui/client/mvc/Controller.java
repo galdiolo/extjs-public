@@ -34,8 +34,8 @@ public abstract class Controller {
 
   protected Controller parent;
   protected List<Controller> children;
-
-  boolean initialized;
+  protected boolean initialized;
+  
   private Set<Integer> supportedEvents;
 
   /**
@@ -92,7 +92,7 @@ public abstract class Controller {
    * 
    * @param event the current event
    */
-  public abstract void handleEvent(AppEvent event);
+  public abstract void handleEvent(AppEvent<?> event);
 
   /**
    * Called once prior to handleEvent being called.
@@ -115,7 +115,6 @@ public abstract class Controller {
         supportedEvents.add(type);
       }
     }
-
   }
 
 }

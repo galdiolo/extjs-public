@@ -14,7 +14,7 @@ import com.extjs.gxt.ui.client.widget.layout.TableRowLayout;
 import com.google.gwt.user.client.Element;
 
 /**
- * A {@link Container} that lays out its children in a single row using a
+ * A {@link LayoutContainer} that lays out its children in a single row using a
  * {@link TableRowLayout}. Each child widget can control its cell's properties
  * using an associated {@link TableData} instance.
  * 
@@ -25,7 +25,7 @@ import com.google.gwt.user.client.Element;
  * hp.add(new Label("Aligned Right"), new TableData("right", "middle");
  * </pre></code>
  */
-public class HorizontalPanel extends Container {
+public class HorizontalPanel extends LayoutContainer {
 
   private String tableWidth;
   private String tableHeight;
@@ -123,12 +123,12 @@ public class HorizontalPanel extends Container {
     super.onRender(parent, pos);
     setStyleAttribute("overflow", "visible");
     layout = new TableRowLayout();
-    layout.horizontalAlign = getHorizontalAlign();
-    layout.verticalAlign = getVerticalAlign();
-    layout.cellSpacing = spacing;
-    layout.cellPadding = 0;
-    layout.width = getTableWidth();
-    layout.height = getTableHeight();
+    layout.setCellHorizontalAlign(horizontalAlign);
+    layout.setCellVerticalAlign(verticalAlign);
+    layout.setCellSpacing(spacing);
+    layout.setCellPadding(0);
+    layout.setWidth(tableWidth);
+    layout.setHeight(tableHeight);
     setLayout(layout);
     layout();
   }

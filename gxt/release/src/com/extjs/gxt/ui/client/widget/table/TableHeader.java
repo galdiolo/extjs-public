@@ -21,20 +21,21 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.event.TableEvent;
+import com.extjs.gxt.ui.client.event.TreeTableEvent;
 import com.extjs.gxt.ui.client.util.DelayedTask;
 import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.SplitBar;
 import com.extjs.gxt.ui.client.widget.menu.CheckMenuItem;
+import com.extjs.gxt.ui.client.widget.menu.Item;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
-import com.extjs.gxt.ui.client.widget.menu.TextMenuItem;
+import com.extjs.gxt.ui.client.widget.treetable.TreeTable;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Event;
 
 public class TableHeader extends BoxComponent {
 
@@ -68,6 +69,13 @@ public class TableHeader extends BoxComponent {
     this.table = table;
     this.columnModel = this.table.getColumnModel();
   }
+  
+  public void clearSort() {
+    if (sortColumn != null) {
+      sortColumn.onSortChange(SortDir.NONE);
+      sortColumn = null;
+    }
+  }
 
   public void sort(int index, SortDir dir) {
     TableColumn column = table.getColumn(index);
@@ -77,10 +85,10 @@ public class TableHeader extends BoxComponent {
 
   public void addColumn(TableColumnUI ui) {
     Element td = DOM.createTD();
-    fly(td).setStyleName("my-tbl-col");
+    td.setClassName("my-tbl-col");
 
     ui.render(td);
-    DOM.appendChild(headerRow, td);
+    headerRow.appendChild(td);
     columns.add(ui);
   }
 
@@ -116,17 +124,26 @@ public class TableHeader extends BoxComponent {
   }
 
   public void onColumnClick(TableColumnUI columnUI) {
-    TableEvent ce = new TableEvent((Table) table);
-    ce.columnIndex = columnUI.index;
+    BaseEvent be = null;
 
-    if (!((Component) table).fireEvent(Events.ColumnClick, ce)) {
+    if (table instanceof TreeTable) {
+      TreeTableEvent tte = new TreeTableEvent((TreeTable) table);
+      tte.columnIndex = columnUI.index;
+      be = tte;
+    } else {
+      TableEvent ce = new TableEvent((Table) table);
+      ce.columnIndex = columnUI.index;
+      be = ce;
+    }
+
+    if (!((Component) table).fireEvent(Events.ColumnClick, be)) {
       return;
     }
 
     if (columnUI.column.isSortable()) {
 
       SortDir sortDir = SortDir.toggle(columnUI.column.sortDir);
-      table.sort(ce.columnIndex, sortDir);
+      table.sort(columnUI.index, sortDir);
     }
   }
 
@@ -137,7 +154,7 @@ public class TableHeader extends BoxComponent {
   @Override
   protected void onRender(Element target, int index) {
     setElement(XDOM.create(html), target, index);
-    headerRow = el.selectNode(".my-tbl-header-row").dom;
+    headerRow = el().selectNode(".my-tbl-header-row").dom;
 
     columns = new ArrayList<TableColumnUI>();
     int cols = columnModel.getColumnCount();
@@ -152,16 +169,15 @@ public class TableHeader extends BoxComponent {
     disableContextMenu(true);
   }
 
-  protected void onRightClick(final TableColumn column, Event event) {
-    DOM.eventCancelBubble(event, true);
-    DOM.eventPreventDefault(event);
+  protected void onRightClick(final TableColumn column, ComponentEvent ce) {
+    ce.stopEvent();
 
     if (!table.getColumnContextMenu()) {
       return;
     }
 
-    final int x = DOM.eventGetClientX(event);
-    final int y = DOM.eventGetClientY(event);
+    final int x = ce.getClientX();
+    final int y = ce.getClientY();
     DeferredCommand.addCommand(new Command() {
       public void execute() {
         onShowContextMenu(column).showAt(x, y);
@@ -173,10 +189,10 @@ public class TableHeader extends BoxComponent {
     final Menu menu = new Menu();
 
     if (column.isSortable()) {
-      TextMenuItem item = new TextMenuItem();
+      MenuItem item = new MenuItem();
       item.setText(GXT.MESSAGES.gridView_sortAscText());
       item.setIconStyle("my-icon-asc");
-      item.addSelectionListener(new SelectionListener() {
+      item.addSelectionListener(new SelectionListener<ComponentEvent>() {
         public void componentSelected(ComponentEvent ce) {
           table.sort(column.index, SortDir.ASC);
         }
@@ -184,10 +200,10 @@ public class TableHeader extends BoxComponent {
       });
       menu.add(item);
 
-      item = new TextMenuItem();
+      item = new MenuItem();
       item.setText(GXT.MESSAGES.gridView_sortDescText());
       item.setIconStyle("my-icon-desc");
-      item.addSelectionListener(new SelectionListener() {
+      item.addSelectionListener(new SelectionListener<ComponentEvent>() {
         public void componentSelected(ComponentEvent ce) {
           table.sort(column.index, SortDir.DESC);
         }
@@ -195,7 +211,7 @@ public class TableHeader extends BoxComponent {
       menu.add(item);
     }
 
-    TextMenuItem columns = new TextMenuItem();
+    MenuItem columns = new MenuItem();
     columns.setText(GXT.MESSAGES.gridView_columnsText());
     columns.setIconStyle("icon-columns");
 
@@ -208,7 +224,7 @@ public class TableHeader extends BoxComponent {
       check.setHideOnClick(false);
       check.setText(def.getText());
       check.setChecked(!def.isHidden());
-      check.addSelectionListener(new SelectionListener() {
+      check.addSelectionListener(new SelectionListener<ComponentEvent>() {
 
         public void componentSelected(ComponentEvent ce) {
           def.setHidden(!check.isChecked());
@@ -219,14 +235,14 @@ public class TableHeader extends BoxComponent {
           }
 
           if (columnModel.getVisibleColumnCount() == 1) {
-            for (MenuItem item : columnMenu.getItems()) {
+            for (Item item : columnMenu.getItems()) {
               CheckMenuItem check = (CheckMenuItem) item;
               if (check.isChecked()) {
                 item.disable();
               }
             }
           } else if (columnModel.getVisibleColumnCount() == 2) {
-            for (MenuItem item : columnMenu.getItems()) {
+            for (Item item : columnMenu.getItems()) {
               item.enable();
             }
           }
@@ -236,7 +252,7 @@ public class TableHeader extends BoxComponent {
       columnMenu.add(check);
 
       if (columnModel.getVisibleColumnCount() == 1) {
-        for (MenuItem item : columnMenu.getItems()) {
+        for (Item item : columnMenu.getItems()) {
           CheckMenuItem ci = (CheckMenuItem) item;
           if (ci.isChecked()) {
             ci.disable();
@@ -258,7 +274,7 @@ public class TableHeader extends BoxComponent {
     return Style.DEFAULT;
   }
 
-  protected void onSortChange(TableColumn column, SortDir sortDir) {
+  public void onSortChange(TableColumn column, SortDir sortDir) {
     column.sortDir = sortDir;
     if (sortColumn != null) {
       getColumnUI(sortColumn.index).onSortChange(SortDir.NONE);
@@ -272,6 +288,7 @@ public class TableHeader extends BoxComponent {
     TableColumnUI ui = getColumnUI(index);
     if (column.isHidden()) {
       ui.setVisible(false);
+      showColumn(index, false);
       return;
     } else {
       ui.setVisible(true);
@@ -283,6 +300,9 @@ public class TableHeader extends BoxComponent {
       w -= fly(td).getBorderWidth("lr");
 
       fly(td).setWidth(w);
+      if (td.getChildNodes().getLength() > 1) {
+        fly(td).getChild(1).setWidth(w);
+      }
 
       SplitBar splitBar = ui.splitBar;
       if (splitBar != null) {
@@ -309,8 +329,8 @@ public class TableHeader extends BoxComponent {
   protected void resizeColumns(boolean fireEvent, boolean resizeBody) {
     int tw = Math.max(columnModel.getTotalWidth(), ((Component) table).getOffsetWidth()) + 100;
     setWidth(tw);
-    el.firstChild().setWidth(tw);
-    endColumn.el.setWidth("100%");
+    el().firstChild().setWidth(tw);
+    endColumn.el().setWidth("100%");
 
     int cols = columnModel.getColumnCount();
     for (int i = 0; i < cols; i++) {
@@ -327,10 +347,17 @@ public class TableHeader extends BoxComponent {
 
   protected void showColumn(int index, boolean show) {
     TableColumnUI ui = getColumnUI(index);
-    ui.el.getParent().setVisible(false);
+
+    ui.el().getParent().setStyleAttribute("display", show ? "" : "none");
+    ui.setVisible(show);
     doTableComponentShowColumn(index, show);
+
     updateSplitBars();
     doTableComponentResize();
+
+    if (show) {
+      resizeColumn(index, true);
+    }
   }
 
   protected void updateSplitBars() {

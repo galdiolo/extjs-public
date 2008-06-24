@@ -20,11 +20,13 @@ import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.event.DataListEvent;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.util.Params;
+import com.extjs.gxt.ui.client.widget.button.IconButton;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
-import com.extjs.gxt.ui.client.widget.selection.AbstractListSelectionModel;
+import com.extjs.gxt.ui.client.widget.selection.Selectable;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -32,6 +34,7 @@ import com.google.gwt.user.client.Event;
 /**
  * Displays a list of list items.
  * 
+ * <dl>
  * <dt><b>Events:</b></dt>
  * 
  * <dd><b>BeforeAdd</b> : DateListEvent(dataList, item, index)<br>
@@ -70,11 +73,11 @@ import com.google.gwt.user.client.Event;
  * </ul>
  * </dd>
  * 
- * <dd><b>SelectionChange</b> : DateListEvent(dataList, item)<br>
+ * <dd><b>SelectionChange</b> : DateListEvent(dataList, selected)<br>
  * <div>Fires after the selection changes.</div>
  * <ul>
  * <li>dataList : this</li>
- * <li>item : the item that is selected (single select)</li>
+ * <li>selected : the selected items</li>
  * </ul>
  * </dd>
  * 
@@ -91,7 +94,7 @@ import com.google.gwt.user.client.Event;
  * <div>Fires after an item is selected.</div>
  * <ul>
  * <li>dataList : this</li>
- * <li>item : the item that is selected (single select)</li>
+ * <li>item : the item that was is checked</li>
  * </ul>
  * </dd>
  * 
@@ -101,7 +104,7 @@ import com.google.gwt.user.client.Event;
  * <dd>.my-listitem .my-listitem-text (list item text)</dd>
  * </dl>
  */
-public class DataList extends ScrollContainer<DataListItem> {
+public class DataList extends ScrollContainer<DataListItem> implements Selectable<DataListItem> {
 
   /**
    * The default template for data list items.
@@ -126,11 +129,11 @@ public class DataList extends ScrollContainer<DataListItem> {
    */
   protected int maxDepth = 15;
 
+  String itemStyle;
   private boolean flat;
   private boolean checkable;
   private Template itemTemplate;
   private El inner;
-  private String itemStyle;
   private List<DataListItem> checked;
   private DataListSelectionModel sm;
 
@@ -140,21 +143,23 @@ public class DataList extends ScrollContainer<DataListItem> {
   public DataList() {
     focusable = true;
     baseStyle = "my-list";
+    itemStyle = "my-list-item";
     attachChildren = false;
+    checked = new ArrayList<DataListItem>();
     setScrollMode(Scroll.AUTO);
-    sm = new DataListSelectionModel(this);
+    sm = new DataListSelectionModel(SelectionMode.SINGLE);
     sm.bind(this);
   }
 
   /**
-   * Adds an item to the list. Fires the <i>BeforeAdd</i> event before
-   * inserting, then fires the <i>Add</i> event after the widget has been
-   * inserted.
+   * Creates then adds an item to the list. Fires the <i>BeforeAdd</i> event
+   * before inserting, then fires the <i>Add</i> event after the widget has
+   * been inserted.
    * 
-   * @param item the item to add
+   * @param component the dataListItem to add
    */
-  public void add(DataListItem item) {
-    insert(item, getItemCount());
+  public boolean add(DataListItem component) {
+    return super.add(component);
   }
 
   /**
@@ -163,47 +168,11 @@ public class DataList extends ScrollContainer<DataListItem> {
    * been inserted.
    * 
    * @param text the item's text
-   * @return the newly created item
+   * @return the newly created item, or null if the add was cancelled
    */
   public DataListItem add(String text) {
     DataListItem item = new DataListItem(text);
-    add(item);
-    return item;
-  }
-
-  /**
-   * Deselects the item(s).
-   * 
-   * @param items the item(s)
-   */
-  public void deselect(DataListItem... items) {
-    sm.deselect(items);
-  }
-
-  /**
-   * Deselects the item(s).
-   * 
-   * @param start the start index
-   * @param end the end index
-   */
-  public void deselect(int start, int end) {
-    sm.deselect(start, end);
-  }
-
-  /**
-   * Deselects the item(s).
-   * 
-   * @param items the item(s)
-   */
-  public void deselect(List<DataListItem> items) {
-    sm.deselect(items);
-  }
-
-  /**
-   * Deselects all selections.
-   */
-  public void deselectAll() {
-    sm.deselectAll();
+    return add(item) ? item : null;
   }
 
   /**
@@ -220,32 +189,25 @@ public class DataList extends ScrollContainer<DataListItem> {
     return super.getContextMenu();
   }
 
-  /**
-   * Returns the selected item. If the list is multi-select, returns the first
-   * selected item.
-   * 
-   * @return the item or <code>null</code> if no selections
-   */
   public DataListItem getSelectedItem() {
-    return sm.getSelectedItem();
+    return (DataListItem) sm.getSelectedItem();
   }
 
-  /**
-   * Returns the selected items.
-   * 
-   * @return the selected items
-   */
   public List<DataListItem> getSelectedItems() {
     return sm.getSelectedItems();
   }
 
-  /**
-   * Returns the selection mode.
-   * 
-   * @return the selection mode
-   */
   public SelectionMode getSelectionMode() {
     return sm.getSelectionMode();
+  }
+
+  /**
+   * Returns the list's selection model.
+   * 
+   * @return the selection model
+   */
+  public DataListSelectionModel getSelectionModel() {
+    return sm;
   }
 
   /**
@@ -256,21 +218,19 @@ public class DataList extends ScrollContainer<DataListItem> {
    * @param item the item
    * @param index the insert location
    */
-  public void insert(DataListItem item, int index) {
-    DataListEvent dle = new DataListEvent(this);
-    dle.item = item;
-    dle.index = index;
-    if (fireEvent(Events.BeforeAdd, dle)) {
+  @Override
+  public boolean insert(DataListItem item, int index) {
+    boolean added = super.insert(item, index);
+    if (added) {
       item.list = this;
       if (checkable) {
         // item.markup = Markup.ITEM_CHECK;
       }
-      super.insert(item, index);
       if (rendered) {
         item.render(inner.dom, index);
       }
-      fireEvent(Events.Add, dle);
     }
+    return added;
   }
 
   /**
@@ -292,16 +252,6 @@ public class DataList extends ScrollContainer<DataListItem> {
   }
 
   /**
-   * Returns <code>true</code> if the item is selected.
-   * 
-   * @param item the item
-   * @return the select state
-   */
-  public boolean isSelected(DataListItem item) {
-    return sm.isSelected(item);
-  }
-
-  /**
    * Moves the current selections down one level.
    */
   public void moveSelectedDown() {
@@ -311,21 +261,19 @@ public class DataList extends ScrollContainer<DataListItem> {
     }
 
     Collections.sort(selected, new Comparator<DataListItem>() {
-      public int compare(DataListItem li1, DataListItem li2) {
-        return indexOf(li1) < indexOf(li2) ? 1 : 0;
+      public int compare(DataListItem o1, DataListItem o2) {
+        return indexOf(o1) > indexOf(o2) ? 1 : 0;
       }
     });
 
     for (DataListItem item : selected) {
       int index = indexOf(item);
-      if (index != (getItemCount() - 1)) {
-        remove(item);
-        insert(item, ++index);
+      if (index < getItemCount() - 1) {
+        inner.insertChild(item.getElement(), index + 2);
+        getItems().remove(item);
+        getItems().add(index + 1, item);
       }
     }
-    doSelect(sm, new Items(selected));
-
-    fireEvent(Events.SelectionChange, new DataListEvent(this));
   }
 
   /**
@@ -342,15 +290,15 @@ public class DataList extends ScrollContainer<DataListItem> {
         return indexOf(o1) > indexOf(o2) ? 1 : 0;
       }
     });
+
     for (DataListItem item : selected) {
       int index = indexOf(item);
       if (index > 0) {
-        remove(item);
-        insert(item, --index);
+        inner.insertChild(item.getElement(), index - 1);
+        getItems().remove(item);
+        getItems().add(index - 1, item);
       }
     }
-    doSelect(sm, new Items(selected));
-    fireEvent(Events.SelectionChange, new DataListEvent(this));
   }
 
   public void onComponentEvent(ComponentEvent ce) {
@@ -365,7 +313,18 @@ public class DataList extends ScrollContainer<DataListItem> {
         case Event.ONMOUSEOUT:
           onOverChange(item, false, dle);
           break;
+        case Event.ONCLICK:
+          onClick(item, dle);
       }
+    }
+  }
+
+  public void onSelectChange(DataListItem item, boolean select) {
+    if (select) {
+      item.removeStyleName(itemStyle + "-over");
+      item.addStyleName(itemStyle + "-sel");
+    } else {
+      item.removeStyleName(itemStyle + "-sel");
     }
   }
 
@@ -388,57 +347,12 @@ public class DataList extends ScrollContainer<DataListItem> {
   }
 
   /**
-   * Removes all the items from the list.
-   */
-  public void removeAll() {
-    int count = getItemCount();
-    for (int i = 0; i < count; i++) {
-      remove(getItem(0));
-    }
-  }
-
-  /**
    * Scrolls the item into view.
    * 
    * @param item the item
    */
   public void scrollIntoView(DataListItem item) {
-    item.el.scrollIntoView(inner.dom, false);
-  }
-
-  /**
-   * Selects the item(s).
-   * 
-   * @param items the item(s) to select
-   */
-  public void select(DataListItem... items) {
-    sm.select(items);
-  }
-
-  /**
-   * Selects the item(s).
-   * 
-   * @param start the start index
-   * @param end the end index
-   */
-  public void select(int start, int end) {
-    sm.select(start, end);
-  }
-
-  /**
-   * Selects the item(s).
-   * 
-   * @param items the item(s) to select
-   */
-  public void select(List<DataListItem> items) {
-    sm.select(items);
-  }
-
-  /**
-   * Selects all items.
-   */
-  public void selectAll() {
-    sm.select(0, getItemCount());
+    item.el().scrollIntoView(inner.dom, false);
   }
 
   /**
@@ -457,7 +371,8 @@ public class DataList extends ScrollContainer<DataListItem> {
 
   /**
    * Sets whether the list should use a "flat" style without rounded corners
-   * (defaults to false, pre-render). The flat style supports variable height list items.
+   * (defaults to false, pre-render). The flat style supports variable height
+   * list items.
    * 
    * @param flat the flat state
    */
@@ -466,9 +381,9 @@ public class DataList extends ScrollContainer<DataListItem> {
   }
 
   /**
-   * Sets the optional template to be used by the data list items (pre-render). The custom
-   * template will be rendered with the following parameters: id, style,
-   * iconStyle, text.
+   * Sets the optional template to be used by the data list items (pre-render).
+   * The custom template will be rendered with the following parameters: id,
+   * style, iconStyle, text.
    * 
    * @param itemTemplate the template
    */
@@ -476,19 +391,60 @@ public class DataList extends ScrollContainer<DataListItem> {
     this.itemTemplate = itemTemplate;
   }
 
+  public void setSelectedItem(DataListItem item) {
+    sm.select(item);
+  }
+
+  public void setSelectedItems(List<DataListItem> items) {
+    sm.select(items);
+  }
+
   /**
-   * Sets the list's selection mode (defaults {@link SelectionMode#SINGLE}).
+   * Sets the list's selection mode.
    * 
-   * @param selectionMode the selection mode
+   * @param mode the selection mode
    */
-  public void setSelectionMode(SelectionMode selectionMode) {
-    sm.setSelectionMode(selectionMode);
+  public void setSelectionMode(SelectionMode mode) {
+    setSelectionModel(new DataListSelectionModel(mode));
+  }
+
+  /**
+   * Sets the list's selection model.
+   * 
+   * @param sm the selection model
+   */
+  public void setSelectionModel(DataListSelectionModel sm) {
+    assert sm != null;
+    if (this.sm != null) {
+      this.sm.bind(null);
+    }
+    this.sm = sm;
+    sm.bind(this);
+  }
+
+  /**
+   * Sorts the data list.
+   * 
+   * @param comparator the comparator
+   */
+  public void sort(Comparator<DataListItem> comparator) {
+    List<DataListItem> list = getItems();
+    Collections.sort(list, comparator);
+    int count = getItemCount();
+    for (int i = 0; i < count; i++) {
+      DataListItem item = getItem(i);
+      inner.dom.appendChild(item.getElement());
+    }
   }
 
   @Override
   protected ComponentEvent createComponentEvent(Event event) {
-    Element target = DOM.eventGetTarget(event);
-    return new DataListEvent(this, findItem(target));
+    return new DataListEvent(this, (event == null) ? null : findItem(DOM.eventGetTarget(event)));
+  }
+
+  @Override
+  protected ContainerEvent createContainerEvent(DataListItem item) {
+    return new DataListEvent(this, item);
   }
 
   @Override
@@ -504,12 +460,21 @@ public class DataList extends ScrollContainer<DataListItem> {
   }
 
   protected void onCheckChange(DataListItem item, boolean checked) {
-    String s = checked ? "icon-checked" : "icon-notchecked";
+    String s = checked ? "my-list-checked" : "my-list-notchecked";
     item.checkBtn.changeStyle(s);
     if (checked) {
       this.checked.add(item);
     } else {
       this.checked.remove(item);
+    }
+    fireEvent(Events.CheckChange, new DataListEvent(this, item));
+  }
+
+  protected void onClick(DataListItem item, DataListEvent dle) {
+    dle.stopEvent();
+    El e = item.el().selectNode(".my-list-item-icon");
+    if (dle.within(e.dom)) {
+      item.setChecked(!item.isChecked());
     }
   }
 
@@ -518,19 +483,19 @@ public class DataList extends ScrollContainer<DataListItem> {
   }
 
   protected void onOverChange(DataListItem item, boolean over, DataListEvent e) {
-    item.el.setStyleName(itemStyle + "-over", over);
+    item.el().setStyleName(itemStyle + "-over", over);
   }
 
   @Override
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
     setElement(DOM.createDiv());
-    el.insertInto(target, index);
+    el().insertInto(target, index);
 
     inner = new El(DOM.createDiv());
-    el.appendChild(inner.dom);
+    getElement().appendChild(inner.dom);
 
-    inner.setStyleName(baseStyle + "-inner");
+    inner.dom.setClassName(baseStyle + "-inner");
 
     if (flat) {
       setStyleName(baseStyle + "-flat");
@@ -560,8 +525,7 @@ public class DataList extends ScrollContainer<DataListItem> {
 
     renderAll();
 
-    el.addEventsSunk(Event.ONCLICK | Event.ONDBLCLICK | Event.KEYEVENTS
-        | Event.MOUSEEVENTS);
+    el().addEventsSunk(Event.ONCLICK | Event.ONDBLCLICK | Event.KEYEVENTS | Event.MOUSEEVENTS);
   }
 
   protected void onRenderItem(DataListItem item, Element target, int index) {
@@ -574,14 +538,15 @@ public class DataList extends ScrollContainer<DataListItem> {
     item.setElement(itemTemplate.create(p), target, index);
 
     if (!GXT.isIE) {
-      item.el.setTabIndex(0);
+      item.el().setTabIndex(0);
     }
 
     if (checkable) {
-      item.checkBtn = new IconButton("icon-notchecked");
-      item.checkBtn.setStyleAttribute("marginRight", "4px");
-      Element elem = el.selectNode(".my-listitem-check").dom;
-      DOM.appendChild(elem, item.checkBtn.getElement());
+      item.checkBtn = new IconButton("my-list-notchecked");
+      El e = item.el().selectNode(".my-list-item-icon");
+      e.removeChildren();
+      e.setVisible(true);
+      item.checkBtn.render(e.dom);
 
       if (item.isChecked()) {
         item.setChecked(true);
@@ -591,25 +556,15 @@ public class DataList extends ScrollContainer<DataListItem> {
 
   protected void onResize(int width, int height) {
     if (height != Style.DEFAULT) {
-      height -= el.getBorderWidth("tb");
+      height -= el().getBorderWidth("tb");
       height -= 2;// inner padding
       inner.setHeight(height, true);
     }
     if (width != Style.DEFAULT) {
-      width -= el.getBorderWidth("lr");
+      width -= el().getBorderWidth("lr");
       width -= 2;// inner padding
       inner.setWidth(width, true);
     }
-  }
-
-  @Override
-  protected void onRightClick(ComponentEvent ce) {
-    ce.cancelBubble();
-    DataListItem item = findItem(ce.getTarget());
-    if (item != null) {
-      select(item);
-    }
-    super.onRightClick(ce);
   }
 
   protected void renderAll() {
@@ -620,16 +575,4 @@ public class DataList extends ScrollContainer<DataListItem> {
     }
   }
 
-  void onSelectChange(DataListItem item, boolean select) {
-    if (select) {
-      item.removeStyleName(itemStyle + "-over");
-      item.addStyleName(itemStyle + "-sel");
-    } else {
-      item.removeStyleName(itemStyle + "-sel");
-    }
-  }
-
-  private native void doSelect(AbstractListSelectionModel sm, Items items) /*-{
-     sm.@com.extjs.gxt.ui.client.widget.selection.AbstractListSelectionModel::doSelect(Lcom/extjs/gxt/ui/client/widget/Items;ZZ)(items, false, false);
-   }-*/;
 }

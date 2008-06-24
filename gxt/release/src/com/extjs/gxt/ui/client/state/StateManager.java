@@ -18,10 +18,10 @@ import java.util.Map;
  * 
  * <dl>
  * <dt>Events:</dt>
- * <dd><b>StateChange</b> : (source this, name, value) <br>
+ * <dd><b>StateChange</b> : (manager, name, value) <br>
  * <div>Fires after a state change.</div>
  * <ul>
- * <li>source : the state manager</li>
+ * <li>manager : the state manager</li>
  * <li>name : the key name</li>
  * <li>value : the value or <code>null</code> if cleared</li>
  * </ul>
@@ -30,7 +30,18 @@ import java.util.Map;
  */
 public class StateManager {
 
-  private static Provider provider;
+  private static StateManager instance = new StateManager();
+
+  /**
+   * Returns the singleton instance.
+   * 
+   * @return the state mananger
+   */
+  public static StateManager get() {
+    return instance;
+  }
+
+  private Provider provider;
 
   /**
    * Returns the current value for a key.
@@ -38,7 +49,7 @@ public class StateManager {
    * @param name the key name
    * @return the value
    */
-  public static Object get(String name) {
+  public Object get(String name) {
     return provider.get(name);
   }
 
@@ -48,7 +59,7 @@ public class StateManager {
    * @param name the key name
    * @return the value as a map
    */
-  public static Map<String, Object> getMap(String name) {
+  public Map<String, Object> getMap(String name) {
     try {
       return provider.getMap(name);
     } catch (Exception e) {
@@ -62,7 +73,7 @@ public class StateManager {
    * @param name the key name
    * @return the value
    */
-  public static Date getDate(String name) {
+  public Date getDate(String name) {
     return provider.getDate(name);
   }
 
@@ -72,7 +83,7 @@ public class StateManager {
    * @param name the key name
    * @return the value
    */
-  public static int getInteger(String name) {
+  public int getInteger(String name) {
     return provider.getInteger(name);
   }
 
@@ -81,7 +92,7 @@ public class StateManager {
    * 
    * @return the provider
    */
-  public static Provider getProvider() {
+  public Provider getProvider() {
     return provider;
   }
 
@@ -91,7 +102,7 @@ public class StateManager {
    * @param name the key name
    * @return the value
    */
-  public static String getString(String name) {
+  public String getString(String name) {
     return provider.getString(name);
   }
 
@@ -101,7 +112,7 @@ public class StateManager {
    * @param name the key name
    * @param value the value
    */
-  public static void set(String name, Object value) {
+  public void set(String name, Object value) {
     provider.set(name, value);
   }
 
@@ -110,8 +121,9 @@ public class StateManager {
    * 
    * @param stateProvider the provider
    */
-  public static void setProvider(Provider stateProvider) {
+  public void setProvider(Provider stateProvider) {
     provider = stateProvider;
+    provider.bind(this);
   }
 
 }

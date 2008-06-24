@@ -49,6 +49,13 @@ public class Style {
    */
   public enum SortDir {
 
+    NONE {
+      @Override
+      public Comparator comparator(Comparator c) {
+        return c;
+      }
+    },
+    
     ASC {
       @Override
       public <X> Comparator<X> comparator(final Comparator<X> c) {
@@ -69,14 +76,9 @@ public class Style {
           }
         };
       }
-    },
-
-    NONE {
-      @Override
-      public Comparator comparator(Comparator c) {
-        return c;
-      }
     };
+
+
 
     public static SortDir toggle(SortDir sortDir) {
       return (sortDir == ASC) ? DESC : ASC;
@@ -119,7 +121,7 @@ public class Style {
    * Selection mode enum.
    */
   public enum SelectionMode {
-    SINGLE, MULTI;
+    SINGLE, SIMPLE, MULTI;
   }
 
   /**

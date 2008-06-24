@@ -7,32 +7,21 @@
  */
 package com.extjs.gxt.ui.client.widget.form;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.extjs.gxt.ui.client.event.ComponentEvent;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
-import com.extjs.gxt.ui.client.widget.HorizontalPanel;
-import com.extjs.gxt.ui.client.widget.Text;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Event;
 
 /**
  * A group of Radio's.
  */
-public class RadioGroup extends Field {
+public class RadioGroup extends MultiField<Radio> {
 
-  private String name;
-  private List<Radio> radios;
-  private HorizontalPanel hp;
   private static int autoId = 0;
+  private String groupName;
 
   /**
    * Creates a new radio group.
    */
   public RadioGroup() {
-    this.name = "gxt.RadioGroup." + (autoId++);
-    initComponent();
+    this.groupName = "gxt.RadioGroup." + (autoId++);
   }
 
   /**
@@ -41,72 +30,16 @@ public class RadioGroup extends Field {
    * @param name the group name
    */
   public RadioGroup(String name) {
-    this.name = name;
-    initComponent();
+    this.groupName = name;
   }
 
   /**
-   * Adds a radio to the group.
-   * 
-   * @param radio the radio to add
+   * Returns the value of the selected radio.
    */
-  public void add(Radio radio) {
-    radios.add(radio);
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  /**
-   * Returns the list of radios.
-   * 
-   * @return the list of radios
-   */
-  public List<Radio> getRadios() {
-    return radios;
-  }
-
-  @Override
-  public void onComponentEvent(ComponentEvent ce) {
-
-  }
-
-  @Override
-  public void onBrowserEvent(Event event) {
-
-  }
-
-  @Override
-  protected void doAttachChildren() {
-    WidgetHelper.doAttach(hp);
-  }
-
-  @Override
-  protected void doDetachChildren() {
-    WidgetHelper.doDetach(hp);
-  }
-
-  protected void initComponent() {
-    radios = new ArrayList<Radio>();
-    baseStyle = "x-form-group";
-  }
-
-  protected void onRadioClick(Radio radio) {
-    for (Radio r : radios) {
-      if (r == radio) {
-        r.setChecked(true);
-      } else {
-        r.setChecked(false);
-      }
-    }
-  }
-
   @Override
   public Object getValue() {
-    for (Radio r : radios) {
-      if (r.isChecked()) {
+    for (Radio r : fields) {
+      if (r.getValue()) {
         return r.getValue();
       }
     }
@@ -114,30 +47,47 @@ public class RadioGroup extends Field {
   }
 
   @Override
+  public boolean isValid() {
+    for (Radio radio : fields) {
+      if (!radio.isValid()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
   public void setValue(Object value) {
-    for (Radio r : radios) {
-      r.setChecked(value.equals(r.getValue()));
+    for (Radio r : fields) {
+      r.setValue(value.equals(r.getValue()));
+    }
+  }
+  
+  protected void onRadioSelected(Radio radio) {
+    for (Radio r : fields) {
+      if (r != radio && r.getValue()) {
+        r.setValue(false);
+      }
+    }
+  }
+
+  protected void onRadioClick(Radio radio) {
+    for (Radio r : fields) {
+      if (r == radio) {
+        r.setValue(true);
+      } else if (r.getValue()){
+        r.setValue(false);
+      }
     }
   }
 
   @Override
-  protected void onRender(Element parent, int index) {
-    hp = new HorizontalPanel();
-    hp.setStyleAttribute("paddingTop", "3px");
-
-    for (Radio r : radios) {
+  protected void onRender(Element target, int index) {
+    super.onRender(target, index);
+    for (Radio r : fields) {
       r.group = this;
-      r.setName(name);
-      hp.add(r);
-      if (r.getFieldLabel() != null) {
-        Text lbl = new Text(r.getFieldLabel());
-        lbl.setStyleName("x-form-group-label");
-        hp.add(lbl);
-      }
+      r.setName(groupName);
     }
-
-    hp.render(parent, index);
-    setElement(hp.getElement());
   }
 
 }

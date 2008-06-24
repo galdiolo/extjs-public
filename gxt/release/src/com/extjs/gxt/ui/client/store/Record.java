@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.ui.client.store;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,34 +14,21 @@ import java.util.Map;
 import java.util.Set;
 
 import com.extjs.gxt.ui.client.data.BaseModelData;
-import com.extjs.gxt.ui.client.data.ChangeEvent;
-import com.extjs.gxt.ui.client.data.ChangeEventSupport;
-import com.extjs.gxt.ui.client.data.ChangeListener;
-import com.extjs.gxt.ui.client.data.Model;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.RpcMap;
-import com.extjs.gxt.ui.client.js.JsObject;
-import com.google.gwt.core.client.JavaScriptObject;
 
 /**
- * A object contained in a Store.
+ * Records wrap model instances and provide specialized editing features,
+ * including modification tracking and editing capabilities.
  */
-public class Record implements Model, Serializable {
+public class Record {
 
   /**
-   * Constant for a edit update.
+   * Update enumeration.
    */
-  public static final int EDIT = 0;
-
-  /**
-   * Constant for a reject udpate.
-   */
-  public static final int REJECT = 1;
-
-  /**
-   * Constnt for a commit update.
-   */
-  public static final int COMMIT = 2;
+  public enum RecordUpdate {
+    EDIT, REJECT, COMMIT;
+  }
 
   /**
    * Contains a map of all fields that have been modified and their original
@@ -56,8 +42,7 @@ public class Record implements Model, Serializable {
    */
   protected Set<String> removed;
 
-  protected ModelData wrappedModel;
-  protected transient ChangeEventSupport changeEventSupport = new ChangeEventSupport();
+  protected ModelData model;
 
   private boolean dirty;
   private transient Store store;
@@ -67,7 +52,7 @@ public class Record implements Model, Serializable {
   /**
    * Creates a new record.
    */
-  public Record() {
+  Record() {
     this(new BaseModelData());
   }
 
@@ -86,13 +71,8 @@ public class Record implements Model, Serializable {
    * @param wrappedModel the model
    */
   public Record(ModelData wrappedModel) {
-    if (wrappedModel == null)
-      throw new RuntimeException("Record cannot wrap a null model");
-    this.wrappedModel = wrappedModel;
-  }
-
-  public void addChangeListener(ChangeListener... listener) {
-    changeEventSupport.addChangeListener(listener);
+    if (wrappedModel == null) throw new RuntimeException("Record cannot wrap a null model");
+    this.model = wrappedModel;
   }
 
   /**
@@ -126,7 +106,7 @@ public class Record implements Model, Serializable {
     if (modified != null && modified.containsKey(property)) {
       return modified.get(property);
     }
-    return wrappedModel.get(property);
+    return model.get(property);
   }
 
   /**
@@ -146,32 +126,18 @@ public class Record implements Model, Serializable {
   }
 
   /**
-   * Returns the record's data as an javascript object.
-   * 
-   * @return the javascript object
-   */
-  public JavaScriptObject getJsObject() {
-    JsObject jsObj = new JsObject();
-    for (String key : getPropertyNames()) {
-      Object value = get(key);
-      jsObj.set(key, value);
-    }
-    return jsObj.getJsObject();
-  }
-
-  /**
    * Returns the wrapped model instance.
    * 
    * @return the model
    */
   public ModelData getModel() {
-    return wrappedModel;
+    return model;
   }
 
   public Collection<String> getPropertyNames() {
     Set<String> names = new HashSet<String>();
 
-    for (String name : wrappedModel.getPropertyNames()) {
+    for (String name : model.getPropertyNames()) {
       names.add(name);
     }
 
@@ -195,10 +161,6 @@ public class Record implements Model, Serializable {
     return dirty;
   }
 
-  public void notify(ChangeEvent event) {
-    changeEventSupport.notify(event);
-  }
-
   /**
    * Removes a field.
    * 
@@ -218,14 +180,6 @@ public class Record implements Model, Serializable {
     return oldValue;
   }
 
-  public void removeChangeListener(ChangeListener... listener) {
-    changeEventSupport.removeChangeListener(listener);
-  }
-
-  public void removeChangeListeners() {
-    changeEventSupport.removeChangeListeners();
-  }
-
   /**
    * Set the named field to the specified value.
    * 
@@ -235,7 +189,7 @@ public class Record implements Model, Serializable {
   public Object set(String name, Object value) {
     Object oldValue = get(name);
     if (!editing) {
-      wrappedModel.set(name, value);
+      model.set(name, value);
       if (store != null) {
         store.afterEdit(this);
       }
@@ -248,10 +202,6 @@ public class Record implements Model, Serializable {
       modified.put(name, value);
     }
     return oldValue;
-  }
-
-  public void setSilent(boolean silent) {
-    changeEventSupport.setSilent(silent);
   }
 
   protected void clearError() {
@@ -267,23 +217,22 @@ public class Record implements Model, Serializable {
   }
 
   /**
-   * Usually called by the {@link Store} which owns the Record. Commits all
+   * Usually called by the {@link ListStore} which owns the Record. Commits all
    * changes made to the Record since either creation, or the last commit
    * operation.
    * 
    * @param silent true to skip notification of the owning store of the change
    */
   void commit(boolean silent) {
-    // update wrappedModel with all modifications and removed properties
     if (modified != null) {
       for (String property : modified.keySet()) {
-        wrappedModel.set(property, modified.get(property));
+        model.set(property, modified.get(property));
       }
     }
 
     if (removed != null) {
       for (String property : removed) {
-        wrappedModel.remove(property);
+        model.remove(property);
       }
     }
 
@@ -297,7 +246,7 @@ public class Record implements Model, Serializable {
   }
 
   /**
-   * Usually called by the {@link Store} which owns the Record. Rejects all
+   * Usually called by the {@link ListStore} which owns the Record. Rejects all
    * changes made to the Record since either creation, or the last commit
    * operation. Modified fields are reverted to their original values.
    * 

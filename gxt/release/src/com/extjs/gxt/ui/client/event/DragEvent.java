@@ -9,6 +9,8 @@ package com.extjs.gxt.ui.client.event;
 
 import com.extjs.gxt.ui.client.fx.Draggable;
 import com.extjs.gxt.ui.client.widget.Component;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 
 /**
@@ -56,5 +58,14 @@ public class DragEvent extends BaseEvent {
    * The current y-coordinate value.
    */
   public int y;
+  
+  /**
+   * Returns the event target.
+   * 
+   * @return the target
+   */
+  public Element getTarget() {
+    return DOM.eventGetTarget(event);
+  }
 
 }

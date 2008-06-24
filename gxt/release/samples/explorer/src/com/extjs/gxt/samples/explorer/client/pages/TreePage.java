@@ -7,24 +7,24 @@
  */
 package com.extjs.gxt.samples.explorer.client.pages;
 
-
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.TreeBuilder;
-import com.extjs.gxt.ui.client.widget.Button;
-import com.extjs.gxt.ui.client.widget.ButtonBar;
-import com.extjs.gxt.ui.client.widget.Container;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
+import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.tree.Tree;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.RootPanel;
 
-public class TreePage extends Container implements EntryPoint {
+public class TreePage extends LayoutContainer implements EntryPoint {
 
   public void onModuleLoad() {
-
+    RootPanel.get().add(this);
   }
 
   @Override
@@ -39,12 +39,12 @@ public class TreePage extends Container implements EntryPoint {
 
     ButtonBar buttonBar = new ButtonBar();
 
-    buttonBar.add(new Button("Expand All", new SelectionListener() {
+    buttonBar.add(new Button("Expand All", new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         tree.expandAll();
       }
     }));
-    buttonBar.add(new Button("Collapse All", new SelectionListener() {
+    buttonBar.add(new Button("Collapse All", new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         tree.collapseAll();
       }

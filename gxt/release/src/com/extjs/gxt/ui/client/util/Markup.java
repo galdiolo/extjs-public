@@ -12,19 +12,11 @@ package com.extjs.gxt.ui.client.util;
  */
 public class Markup {
   
-  public static String ITEM;
-  
-  public static String ITEM_CHECK;
-  
-  public static String BUTTON;
-  
   public static String BOTTOM_BOX;
   
   public static String BOX;
   
   public static String BBOX;
-  
-  public static String TREE_ITEM;
   
   public static String SHADOW;
   
@@ -32,40 +24,6 @@ public class Markup {
   
   static {
     StringBuffer sb = new StringBuffer();
-    sb.append("<table class={0} cellpadding=0 cellspacing=0><tbody><tr>");
-    sb.append("<td class={0}-l><div>&nbsp;</div></td>");
-    sb.append("<td class={0}-ml></td>");
-    sb.append("<td class={0}-c><span class={0}-text></span></td>");
-    sb.append("<td class={0}-mr></td>");
-    sb.append("<td class={0}-r><div>&nbsp;</div></td>");
-    sb.append("</tr></tbody></table>");
-    
-    ITEM = sb.toString();
-    
-    sb = new StringBuffer();
-    sb.append("<table class={0} cellpadding=0 cellspacing=0><tbody><tr>");
-    sb.append("<td class={0}-l><div>&nbsp;</div></td>");
-    sb.append("<td class={0}-ml></td>");
-    sb.append("<td class={0}-c><button class={0}-text></button></td>");
-    sb.append("<td class={0}-mr></td>");
-    sb.append("<td class={0}-r><div>&nbsp;</div></td>");
-    sb.append("</tr></tbody></table>");
-    
-    BUTTON = sb.toString();
-    
-    sb = new StringBuffer();
-    sb.append("<table class={0} cellpadding=0 cellspacing=0><tbody><tr>");
-    sb.append("<td class={0}-l><div>&nbsp;</div></td>");
-    sb.append("<td class={0}-check></td>");
-    sb.append("<td class={0}-ml></td>");
-    sb.append("<td class={0}-c><span class={0}-text></span></td>");
-    sb.append("<td class={0}-mr></td>");
-    sb.append("<td class={0}-r><div>&nbsp;</div></td>");
-    sb.append("</tr></tbody></table>");
-    
-    ITEM_CHECK = sb.toString();
-    
-    sb = new StringBuffer();
     sb.append("<div class={0}-tl><div class={0}-tr><div class={0}-tc></div></div></div>");
     sb.append("<div class={0}-ml><div class={0}-mr><div class={0}-mc></div></div></div>");
     sb.append("<div class={0}-bl><div class={0}-br><div class={0}-bc></div></div></div>");
@@ -88,19 +46,6 @@ public class Markup {
     sb.append("</tr></tbody></table>");
     
     BOX = sb.toString();
-    
-    sb = new StringBuffer();
-    sb.append("<table cellpadding=0 cellspacing=0>");
-    sb.append("<tbody><tr><td><div class=my-tree-indent></div></td>");
-    sb.append("<td class=my-tree-joint align=center valign=middle><div>&nbsp;</div></td>");
-    sb.append("<td class=my-tree-left><div></div></td>");
-    sb.append("<td class=my-tree-check><div class=my-tree-notchecked></div></td>");
-    sb.append("<td class=my-tree-icon><div>&nbsp;</div></td>");
-    sb.append("<td class=my-tree-item-text><span>{0}</span></td>");
-    sb.append("<td class=my-tree-right><div></div></td></tr></tbody></table>");
-    sb.append("<div class=my-tree-ct style='display: none'></div>");
-
-    TREE_ITEM = sb.toString();
     
     sb = new StringBuffer();
     sb.append("<div class=x-shadow><div class=xst><div class=xstl></div><div class=xstc></div><div class=xstr></div></div><div class=xsc><div class=xsml></div><div class=xsmc></div><div class=xsmr></div></div><div class=xsb><div class=xsbl></div><div class=xsbc></div><div class=xsbr></div></div></div>");

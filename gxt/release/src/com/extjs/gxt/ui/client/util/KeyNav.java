@@ -10,9 +10,9 @@ package com.extjs.gxt.ui.client.util;
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.event.BaseEvent;
+import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.TypedListener;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.KeyboardListener;
@@ -20,12 +20,13 @@ import com.google.gwt.user.client.ui.KeyboardListener;
 /**
  * Convenient helper class to process a component's key events.
  */
-public class KeyNav<E extends ComponentEvent> extends Observable implements
+public class KeyNav<E extends ComponentEvent> extends BaseObservable implements
     Listener<E> {
 
   private static int keyEvent;
   private Component component;
-  private boolean cancelBubble = true, preventDefault;
+  private boolean cancelBubble = true;
+  private boolean preventDefault = false;
 
   static {
     if (GXT.isIE) {
@@ -56,23 +57,22 @@ public class KeyNav<E extends ComponentEvent> extends Observable implements
   }
 
   public void addKeyNavListener(KeyNavListener listener) {
-    TypedListener tl = new TypedListener(listener);
-    addListener(KeyboardListener.KEY_ALT, tl);
-    addListener(KeyboardListener.KEY_BACKSPACE, tl);
-    addListener(KeyboardListener.KEY_CTRL, tl);
-    addListener(KeyboardListener.KEY_DELETE, tl);
-    addListener(KeyboardListener.KEY_DOWN, tl);
-    addListener(KeyboardListener.KEY_END, tl);
-    addListener(KeyboardListener.KEY_ENTER, tl);
-    addListener(KeyboardListener.KEY_ESCAPE, tl);
-    addListener(KeyboardListener.KEY_HOME, tl);
-    addListener(KeyboardListener.KEY_LEFT, tl);
-    addListener(KeyboardListener.KEY_PAGEDOWN, tl);
-    addListener(KeyboardListener.KEY_PAGEUP, tl);
-    addListener(KeyboardListener.KEY_RIGHT, tl);
-    addListener(KeyboardListener.KEY_SHIFT, tl);
-    addListener(KeyboardListener.KEY_TAB, tl);
-    addListener(KeyboardListener.KEY_UP, tl);
+    addListener(KeyboardListener.KEY_ALT, listener);
+    addListener(KeyboardListener.KEY_BACKSPACE, listener);
+    addListener(KeyboardListener.KEY_CTRL, listener);
+    addListener(KeyboardListener.KEY_DELETE, listener);
+    addListener(KeyboardListener.KEY_DOWN, listener);
+    addListener(KeyboardListener.KEY_END, listener);
+    addListener(KeyboardListener.KEY_ENTER, listener);
+    addListener(KeyboardListener.KEY_ESCAPE, listener);
+    addListener(KeyboardListener.KEY_HOME, listener);
+    addListener(KeyboardListener.KEY_LEFT, listener);
+    addListener(KeyboardListener.KEY_PAGEDOWN, listener);
+    addListener(KeyboardListener.KEY_PAGEUP, listener);
+    addListener(KeyboardListener.KEY_RIGHT, listener);
+    addListener(KeyboardListener.KEY_SHIFT, listener);
+    addListener(KeyboardListener.KEY_TAB, listener);
+    addListener(KeyboardListener.KEY_UP, listener);
   }
 
   /**
@@ -87,12 +87,12 @@ public class KeyNav<E extends ComponentEvent> extends Observable implements
     if (target != null) {
       target.addListener(keyEvent, this);
       if (target.isRendered()) {
-        target.el.addEventsSunk(Event.KEYEVENTS);
+        target.el().addEventsSunk(Event.KEYEVENTS);
       } else {
         target.addListener(Events.Render, new Listener<ComponentEvent>() {
           public void handleEvent(ComponentEvent be) {
             removeListener(Events.Render, this);
-            target.el.addEventsSunk(Event.KEYEVENTS);
+            target.el().addEventsSunk(Event.KEYEVENTS);
           }
         });
       }

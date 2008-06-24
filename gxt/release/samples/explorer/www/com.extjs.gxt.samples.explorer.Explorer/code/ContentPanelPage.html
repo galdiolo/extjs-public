@@ -46,22 +46,25 @@ import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.fx.Draggable;
-import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Info;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.RootPanel;
 
-public class ContentPanelPage extends Container implements EntryPoint {
+public class ContentPanelPage extends LayoutContainer implements EntryPoint {
 
   public void onModuleLoad() {
     RootPanel.get().add(this);
   }
   
   public ContentPanelPage() {
+    // next line is only used to pass layout to containing container
+    // this will have NO effect outside of the explorer demo
     setData("layout", new FitLayout());
   }
 
@@ -86,13 +89,14 @@ public class ContentPanelPage extends Container implements EntryPoint {
 
     ContentPanel cp = new ContentPanel();
     cp.setFrame(true);
-    cp.setSize(200, 120);
+    cp.setWidth(200);
     cp.setHeading("Framed Panel");
-    cp.setLayout(new FitLayout());
+    cp.setLayout(new FlowLayout());
     cp.setIconStyle("icon-list");
 
-    Container c = new Container();
+    LayoutContainer c = new LayoutContainer();
     c.setStyleAttribute("backgroundColor", "white");
+    c.setStyleName("pad-text");
     c.setBorders(true);
     c.addText(TestData.DUMMY_TEXT_SHORT);
     cp.add(c);
@@ -102,15 +106,16 @@ public class ContentPanelPage extends Container implements EntryPoint {
     cp = new ContentPanel();
     cp.setCollapsible(true);
     cp.setWidth(200);
+    cp.setBodyStyleName("pad-text");
     cp.setHeading("Collapsible");
-    cp.addText("<div class=text>" + TestData.DUMMY_TEXT_SHORT + "</div>");
+    cp.addText(TestData.DUMMY_TEXT_SHORT);
     cp.addListener(Events.Expand, listener);
     cp.addListener(Events.Collapse, listener);
     vp.add(cp);
 
     cp = new ContentPanel();
     cp.setWidth(200);
-
+    cp.setBodyStyleName("pad-text");
     cp.getHeader().setStyleAttribute("cursor", "move");
     cp.setHeading("Draggable");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
@@ -118,8 +123,8 @@ public class ContentPanelPage extends Container implements EntryPoint {
     vp.add(cp);
 
     Draggable d = new Draggable(cp);
-    d.useProxy = false;
-    d.container = this;
+    d.setUseProxy(false);
+    d.setContainer(this);
 
     add(vp);
 

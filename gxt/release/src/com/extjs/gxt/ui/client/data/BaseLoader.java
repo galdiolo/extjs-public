@@ -7,210 +7,162 @@
  */
 package com.extjs.gxt.ui.client.data;
 
-import com.extjs.gxt.ui.client.Style.SortDir;
-import com.extjs.gxt.ui.client.util.Observable;
+import com.extjs.gxt.ui.client.event.BaseObservable;
+import com.extjs.gxt.ui.client.event.LoadListener;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
- * Default implementation of the <code>Loader</code> interface.
+ * Abstract base loader implementation.
  * 
- * <dl>
- * <dt><b>Events:</b></dt>
- * 
- * <dd><b>BeforeLoad</b> : LoadEvent(loader, config)<br>
- * <div>Fires before a load operation. Listeners can set the <code>doit</code>
- * field to <code>false</code> to cancel the action.</div>
- * <ul>
- * <li>loader : this</li>
- * <li>config : the load config</li>
- * </ul>
- * </dd>
- * 
- * <dd><b>Load</b> : LoadEvent(loader, config, result)<br>
- * <div>Fires after the button is selected.</div>
- * <ul>
- * <li>loader : this</li>
- * <li>config : the load config</li>
- * <li>result : the load result</li>
- * </ul>
- * </dd>
- * 
- * <dd><b>LoadException</b> : LoadEvent(loader, config, result)<br>
- * <div>Fires after the button is selected.</div>
- * <ul>
- * <li>loader : this</li>
- * <li>config : the load config</li>
- * <li>result : the load result</li>
- * </ul>
- * </dd>
- * </dl>
+ * @param <C> the config type
+ * @param <D> the data type
  */
-public abstract class BaseLoader<C extends BaseLoadConfig> extends Observable implements
-    Loader {
+public class BaseLoader<C, D> extends BaseObservable implements Loader<C> {
+
+  protected DataProxy<C, D> proxy;
+  protected DataReader reader;
+  protected C lastConfig;
+  protected boolean reuseConfig;
 
   /**
-   * True to reuse the initial load config object (defaults to false).
-   */
-  public boolean reuseLoadConfig;
-
-  protected int offset = 0;
-  protected int limit = 50;
-  protected C lastLoadConfig;
-
-  private boolean remoteSort;
-  private String sortField;
-  private SortDir sortDir = SortDir.NONE;
-
-  /*
-   * (non-Javadoc)
+   * Creates a new base loader instance.
    * 
-   * @see com.extjs.gxt.ui.client.data.Loader#getOffset()
+   * @param proxy the data proxy
    */
-  public int getOffset() {
-    return offset;
+  public BaseLoader(DataProxy<C, D> proxy) {
+    this.proxy = proxy;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
+   * Creates a new base loader instance.
    * 
-   * @see com.extjs.gxt.ui.client.data.Loader#getPageSize()
+   * @param reader the reader
    */
-  public int getPageSize() {
-    return limit;
+  public BaseLoader(DataReader reader) {
+    this.reader = reader;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
+   * Creates a new loader with the given proxy and reader.
    * 
-   * @see com.extjs.gxt.ui.client.data.Loader#getRemoteSort()
+   * @param proxy the data proxy
+   * @param reader an optional data reader, if null, null will be passed to
+   *            proxy.load(Reader, Loadconfig, Datacallback)
    */
-  public boolean getRemoteSort() {
-    return remoteSort;
+  public BaseLoader(DataProxy<C, D> proxy, DataReader reader) {
+    this(proxy);
+    this.reader = reader;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.extjs.gxt.ui.client.data.Loader#getSortDir()
-   */
-  public SortDir getSortDir() {
-    return sortDir;
+  public void addLoadListener(LoadListener listener) {
+    LoadTypedListener tl = new LoadTypedListener(listener);
+    addListener(BeforeLoad, tl);
+    addListener(LoadException, tl);
+    addListener(Load, tl);
   }
 
-  /*
-   * (non-Javadoc)
+  /**
+   * Returns true if the load config is being reused.
    * 
-   * @see com.extjs.gxt.ui.client.data.Loader#getSortField()
+   * @return the reuse load config state
    */
-  public String getSortField() {
-    return sortField;
+  public boolean isReuseLoadConfig() {
+    return reuseConfig;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.extjs.gxt.ui.client.data.Loader#load()
-   */
-  public void load() {
-    C config = (reuseLoadConfig && lastLoadConfig != null) ? lastLoadConfig
-        : newLoadConfig();
-    final C loadConfig = prepareLoadConfig(config);
-    LoadEvent evt = new LoadEvent(this, loadConfig, null);
-    if (fireEvent(BeforeLoad, evt)) {
-      loadData(loadConfig, new DataCallback() {
-        public void setResult(LoadResult result) {
-          onLoadResult(loadConfig, result);
-        }
-      });
+  public boolean load() {
+    C config = (reuseConfig && lastConfig != null) ? lastConfig : newLoadConfig();
+    config = prepareLoadConfig(config);
+    return load(config);
+  }
+
+  public boolean load(C loadConfig) {
+    if (fireEvent(BeforeLoad, new LoadEvent(this, loadConfig))) {
+      lastConfig = loadConfig;
+      loadData(loadConfig);
+      return true;
     }
+    return false;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.extjs.gxt.ui.client.data.Loader#load(int, int)
-   */
-  public void load(int offset, int limit) {
-    this.offset = offset;
-    this.limit = limit;
-    load();
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.extjs.gxt.ui.client.data.Loader#setRemoteSort(boolean)
-   */
-  public void setRemoteSort(boolean remoteSort) {
-    this.remoteSort = remoteSort;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.extjs.gxt.ui.client.data.Loader#setSortDir(com.extjs.gxt.ui.client.Style.SortDir)
-   */
-  public void setSortDir(SortDir sortDir) {
-    this.sortDir = sortDir == null ? SortDir.NONE : sortDir;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.extjs.gxt.ui.client.data.Loader#setSortField(java.lang.String)
-   */
-  public void setSortField(String sortField) {
-    this.sortField = sortField;
+  public void removeLoadListener(LoadListener listener) {
+    removeListener(BeforeLoad, listener);
+    removeListener(LoadException, listener);
+    removeListener(Load, listener);
   }
 
   /**
-   * Use the specified LoadConfig for all load calls. The
-   * {@link #reuseLoadConfig} will be set to true.
+   * Sets whether the same load config instance should be used for load
+   * operations.
+   * 
+   * @param reuseLoadConfig true to reuse
    */
-  public void useLoadConfig(C loadConfig) {
-    reuseLoadConfig = true;
-    lastLoadConfig = loadConfig;
-    offset = loadConfig.getOffset();
-    limit = loadConfig.getLimit();
-    sortDir = loadConfig.getSortDir();
-    sortField = loadConfig.getSortField();
+  public void setReuseLoadConfig(boolean reuseLoadConfig) {
+    this.reuseConfig = reuseLoadConfig;
+  }
+
+  protected void loadData(final C config) {
+    AsyncCallback<D> callback = new AsyncCallback<D>() {
+      public void onFailure(Throwable caught) {
+        onLoadFailure(config, caught);
+      }
+
+      public void onSuccess(D result) {
+        onLoadSuccess(config, result);
+      }
+    };
+    if (proxy == null) {
+      loadData(config, callback);
+      return;
+    }
+    proxy.load(reader, config, callback);
   }
 
   /**
-   * Subclasses must implement and return the remote data to the callback, based
-   * on the given load config. The viewer's setInput method will be called,
-   * passing the data being returned from the callback.
+   * Called when a proxy is not being used.
    * 
    * @param config the load config
    * @param callback the callback
    */
-  protected abstract void loadData(C config, DataCallback callback);
+  protected void loadData(final C config, AsyncCallback<D> callback) {
+
+  }
 
   /**
    * Template method to allow custom BaseLoader subclasses to provide their own
    * implementation of LoadConfig
    */
   protected C newLoadConfig() {
-    return (C) new BaseLoadConfig();
-  }
-
-  protected void onLoadResult(C loadConfig, LoadResult loadResult) {
-    LoadEvent evt = new LoadEvent(this, loadConfig, loadResult);
-    if (loadResult.isSuccess()) {
-      fireEvent(Load, evt);
-    } else {
-      fireEvent(LoadException, evt);
-    }
+    return null;
   }
 
   /**
-   * Template method to allow custom BaseLoader subclasses to prepare the load
-   * config prior to loading data
+   * Called when a load operation fails.
+   * 
+   * @param loadConfig the load config
+   * @param t the exception
+   */
+  protected void onLoadFailure(C loadConfig, Throwable t) {
+    LoadEvent evt = new LoadEvent(this, loadConfig, t);
+    fireEvent(LoadException, evt);
+  }
+
+  /**
+   * Called when the remote data has been received.
+   * 
+   * @param loadConfig the load config
+   * @param data datat
+   */
+  protected void onLoadSuccess(C loadConfig, D data) {
+    LoadEvent evt = new LoadEvent(this, loadConfig, data);
+    fireEvent(Load, evt);
+  }
+
+  /**
+   * Template method to allow custom subclasses to prepare the load config prior
+   * to loading data
    */
   protected C prepareLoadConfig(C config) {
-    config.setOffset(offset);
-    config.setLimit(limit);
-    config.setSortField(sortField);
-    config.setSortDir(sortDir);
     return config;
   }
 

@@ -8,15 +8,13 @@
 package com.extjs.gxt.samples.mail.client.mvc;
 
 import com.extjs.gxt.samples.mail.client.AppEvents;
-import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.mvc.AppEvent;
 import com.extjs.gxt.ui.client.mvc.Controller;
-import com.extjs.gxt.ui.client.widget.Container;
-import com.extjs.gxt.ui.client.widget.ContentPanel;
 
 public class ContactController extends Controller {
 
-  protected ContactFolderView folderView;
+  private ContactFolderView folderView;
+  private ContactView contactView;
 
   public ContactController() {
     registerEventTypes(AppEvents.Init);
@@ -27,6 +25,7 @@ public class ContactController extends Controller {
   public void initialize() {
     super.initialize();
     folderView = new ContactFolderView(this);
+    contactView = new ContactView(this);
   }
 
   @Override
@@ -35,12 +34,7 @@ public class ContactController extends Controller {
       forwardToView(folderView, event);
     }
     if (event.type == AppEvents.NavContacts) {
-      ContentPanel center = (ContentPanel) Registry.get("center");
-      center.setHeading("Contacts");
-      center.removeAll();
-
-      Container south = (Container) Registry.get("south");
-      south.removeAll();
+      forwardToView(contactView, event);
     }
   }
 

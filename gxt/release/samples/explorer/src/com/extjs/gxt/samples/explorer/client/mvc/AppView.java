@@ -57,7 +57,7 @@ public class AppView extends View {
     centerPanel.setLayout(new FitLayout());
 
     BorderLayoutData data = new BorderLayoutData(LayoutRegion.CENTER);
-    data.margins = new Margins(5, 5, 5, 0);
+    data.setMargins(new Margins(5, 5, 5, 0));
     centerPanel.setData(data);
     viewport.add(centerPanel);
     Registry.register("centerPanel", centerPanel);
@@ -65,8 +65,8 @@ public class AppView extends View {
 
   private void createWest() {
     BorderLayoutData data = new BorderLayoutData(LayoutRegion.WEST, 220, 150, 320);
-    data.margins = new Margins(5, 5, 5, 5);
-    data.collapsible = true;
+    data.setMargins(new Margins(5, 5, 5, 5));
+    data.setCollapsible(true);
     westPanel = new ContentPanel();
     westPanel.setData(data);
 
@@ -79,14 +79,16 @@ public class AppView extends View {
 
   private void createNorth() {
     StringBuffer sb = new StringBuffer();
-    sb.append("<div id='demo-header' class='x-small-editor'><div id='demo-theme' class='x-form-field-wrap'></div><div id=demo-title>GXT Explorer Demo</div></div>");
+    sb.append("<div id='demo-header' class='x-small-editor'><div id='demo-theme'></div><div id=demo-title>Ext GWT Explorer Demo</div></div>");
 
     northPanel = new HtmlContainer(sb.toString());
+    northPanel.setEnableState(false);
     ThemeSelector selector = new ThemeSelector();
-    northPanel.add(selector, ".x-form-field-wrap");
+    selector.setWidth(125);
+    northPanel.add(selector, "#demo-theme");
 
     BorderLayoutData data = new BorderLayoutData(LayoutRegion.NORTH, 33);
-    data.margins = new Margins();
+    data.setMargins(new Margins());
     northPanel.setData(data);
     viewport.add(northPanel, data);
     Registry.register("northPanel", northPanel);

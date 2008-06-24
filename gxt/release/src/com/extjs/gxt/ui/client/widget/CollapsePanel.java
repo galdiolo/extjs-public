@@ -8,14 +8,14 @@
 package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.Events;
-import com.extjs.gxt.ui.client.GXT;
-import com.extjs.gxt.ui.client.XDOM;
+import com.extjs.gxt.ui.client.Style.LayoutRegion;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.util.WidgetHelper;
+import com.extjs.gxt.ui.client.widget.button.ToolButton;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.FillLayout;
 import com.google.gwt.user.client.Element;
@@ -32,6 +32,9 @@ public class CollapsePanel extends ContentPanel {
   private El headerEl;
   private ContentPanel panel;
   private Popup popup;
+  private String align;
+  private int[] adj;
+  private LayoutRegion region;
 
   /**
    * Creates a new collapse panel.
@@ -42,6 +45,7 @@ public class CollapsePanel extends ContentPanel {
   public CollapsePanel(ContentPanel panel, BorderLayoutData data) {
     this.panel = panel;
     this.parentData = data;
+    this.region = data.getRegion();
     this.collapse();
   }
 
@@ -62,6 +66,14 @@ public class CollapsePanel extends ContentPanel {
         setExpanded(!expanded);
       }
     }
+    switch (ce.type) {
+      case Event.ONMOUSEOVER:
+        addStyleName("x-layout-collapsed-over");
+        break;
+      case Event.ONMOUSEOUT:
+        removeStyleName("x-layout-collapsed-over");
+      break;
+    }
   }
 
   public void setExpanded(boolean expanded) {
@@ -73,28 +85,10 @@ public class CollapsePanel extends ContentPanel {
     }
   }
 
-  protected void adjustPosition(Rectangle box) {
-    // hack adjustments
-    if (XDOM.isVisibleBox) {
-      box.x--;
-    } else if (GXT.isGecko) {
-      box.x -= 2;
-      box.y--;
-    }
-  }
-
   protected void afterHidePanel(ContentPanel panel) {
-    SplitBar bar = (SplitBar) panel.getData("splitBar");
-    if (bar != null) {
-      bar.show();
-    }
   }
 
   protected void afterShowPanel(ContentPanel panel) {
-    SplitBar bar = (SplitBar) panel.getData("splitBar");
-    if (bar != null) {
-      bar.hide();
-    }
   }
 
   @Override
@@ -124,35 +118,62 @@ public class CollapsePanel extends ContentPanel {
       panel.body.removeStyleName("x-panel-popup-body");
       panel.getHeader().show();
       popup.hide();
+      panel.setStyleAttribute("margin", "0px");
       afterHidePanel(panel);
+
+      SplitBar bar = (SplitBar) panel.getData("splitBar");
+      if (bar != null) {
+        bar.enable();
+      }
     }
   }
 
   @Override
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
-    el.removeChildren();
-    headerEl = el.createChild("<div class=x-panel-header></div>");
+    el().removeChildren();
+    String txt = "";
+
+    LayoutRegion r = parentData.getRegion();
+
+    if (r == LayoutRegion.NORTH || r == LayoutRegion.SOUTH) {
+      txt = panel.getHeader().getText();
+    }
+    headerEl = el().createChild(
+        "<div class=x-panel-header><span class=x-pnael-header-text>" + txt + "</span></div>");
 
     String icon = null;
-    switch (parentData.region) {
+    adj = new int[]{0,0};
+    switch (parentData.getRegion()) {
       case WEST:
         icon = "right";
+        align = "tl-tr";
+        adj = new int[]{0, 24};
         break;
       case EAST:
         icon = "left";
+        align = "tr-tl";
+        adj = new int[]{0, 24};
         break;
       case NORTH:
         icon = "down";
+        align = "tl-bl";
         break;
       case SOUTH:
         icon = "up";
+        align = "bl-tl";
         break;
     }
+    
+    if (r == LayoutRegion.NORTH || region == LayoutRegion.SOUTH) {
+      headerEl.setStyleAttribute("background", "none");
+    }
+ 
+    headerEl.setStyleAttribute("cursor", "default");
 
     setStyleName("x-layout-collapsed");
     collapseBtn = new ToolButton("x-tool-" + icon);
-    collapseBtn.render(headerEl.dom);
+    collapseBtn.render(headerEl.dom, 0);
 
     collapseBtn.addListener(Events.Select, new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent ce) {
@@ -163,41 +184,65 @@ public class CollapsePanel extends ContentPanel {
       }
     });
 
-    if (parentData.floatable) {
-      el.addEventsSunk(Event.MOUSEEVENTS | Event.ONCLICK);
-      addStyleOnOver(getElement(), "x-layout-collapsed-over");
+    if (parentData.isFloatable()) {
+      el().addEventsSunk(Event.MOUSEEVENTS | Event.ONCLICK);
     }
-
-    el.setVisibility(true);
+    el().setVisibility(true);
+    
+    sinkEvents(Event.MOUSEEVENTS);
   }
 
   protected void onShowPanel(ContentPanel panel) {
     this.expanded = true;
     Rectangle box = getBounds(false);
-    adjustPosition(box);
 
-    panel.setPosition(0, 0);
+    SplitBar bar = (SplitBar) panel.getData("splitBar");
+    if (bar != null) {
+      bar.disable();
+    }
+
     popup = new Popup() {
       protected boolean onAutoHide(Event event) {
         setExpanded(false);
         return false;
       }
-
     };
+   
     popup.getIgnoreList().add(collapseBtn.getElement());
+    popup.getIgnoreList().add(getElement());
+    popup.getIgnoreList().add(panel.getElement());
     popup.setStyleName("x-layout-popup");
-    popup.setLayout(new FillLayout(4));
+    popup.setLayout(new FillLayout());
     popup.setShadow(true);
-    int hh = fly(el.firstChild().dom).getHeight();
+
+    int hh = fly(el().firstChild().dom).getHeight();
+    
+    panel.el().setLeftTop(0, 0);
+    panel.setStyleAttribute("margin", "4px");
     panel.getHeader().hide();
     panel.body.addStyleName("x-panel-popup-body");
-    popup.add(panel);
-    int w = (int) parentData.size;
-    int h = box.height - hh;
-    popup.setSize(w, h);
-    popup.showAt(box.x + box.width, box.y + hh);
-    layout(true);
 
+    popup.add(panel);
+
+    int w = 0;
+    int h = 0;
+    
+    switch (region) {
+      case WEST:
+      case EAST:
+        w = (int) parentData.getSize();
+        h = box.height - hh;
+        break;
+      case NORTH:
+      case SOUTH:
+        w = box.width;
+        h = (int)parentData.getSize();
+    }
+
+    popup.setSize(w, h);
+    popup.show(getElement(), align, adj);
+    popup.layout();
+    
     afterShowPanel(panel);
   }
 }

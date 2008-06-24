@@ -8,19 +8,24 @@
 package com.extjs.gxt.ui.client.widget.table;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.TableEvent;
+import com.extjs.gxt.ui.client.event.TableListener;
 import com.extjs.gxt.ui.client.util.DelayedTask;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.util.WidgetHelper;
-import com.extjs.gxt.ui.client.widget.AbstractContainer;
+import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
+import com.extjs.gxt.ui.client.widget.selection.Selectable;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -84,7 +89,7 @@ import com.google.gwt.user.client.ui.Widget;
  * </dd>
  * 
  * <dd><b>CellClick</b> : TableEvent(table, rowIndex, cellIndex, event)<br>
- * <div>Fired after a cell is clicked</div>
+ * <div>Fires after a cell is clicked.</div>
  * <ul>
  * <li>table : this</li>
  * <li>rowIndex : row index</li>
@@ -94,7 +99,7 @@ import com.google.gwt.user.client.ui.Widget;
  * </dd>
  * 
  * <dd><b>CellDoubleClick</b> : TableEvent(table, rowIndex, cellIndex, event)<br>
- * <div>Fired after a cell is double clicked</div>
+ * <div>Fires after a cell is double clicked.</div>
  * <ul>
  * <li>table : this</li>
  * <li>rowIndex : row index</li>
@@ -104,15 +109,15 @@ import com.google.gwt.user.client.ui.Widget;
  * </dd>
  * 
  * <dd><b>ColumnClick</b> : TableEvent(table, columnIndex)<br>
- * <div>Fired after a column is clicked</div>
+ * <div>Fires after a column is clicked.</div>
  * <ul>
  * <li>table : this</li>
  * <li>columnIndex : the column index</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>RowClick</b> : TableEvent(table, index cell index, event)<br>
- * <div>Fired after a row is clicked</div>
+ * <dd><b>RowClick</b> : TableEvent(table, rowIndex, cell index, event)<br>
+ * <div>Fires after a row is clicked.</div>
  * <ul>
  * <li>table : this</li>
  * <li>rowIndex : the row index</li>
@@ -122,7 +127,7 @@ import com.google.gwt.user.client.ui.Widget;
  * </dd>
  * 
  * <dd><b>RowDoubleClick</b> : TableEvent(table, rowIndex, cellIndex, event)<br>
- * <div>Fired after a row is double clicked</div>
+ * <div>Fires after a row is double clicked.</div>
  * <ul>
  * <li>table : this</li>
  * <li>rowIndex : the row index</li>
@@ -131,13 +136,21 @@ import com.google.gwt.user.client.ui.Widget;
  * </ul>
  * </dd>
  * 
- * <dd><b>SortChange</b> : TableEvent(table, index, size)<br>
+ * <dd><b>SortChange</b> : TableEvent(table, colIndex, sortDir)<br>
  * <div>Fires before the table is sorted. Listeners can set the
  * <code>doit</code> field to <code>false</code> to cancel the action.</div>
  * <ul>
- * <li>widget : this</li>
- * <li>index : the column index</li>
- * <li>size : the sort direction</li>
+ * <li>table : this</li>
+ * <li>colIndex : the column index</li>
+ * <li>sortDir : the sort direction</li>
+ * </ul>
+ * </dd>
+ * 
+ * <dd><b>SelectionChange</b> : TableEvent(table, selected)<br>
+ * <div>Fires after a item has been removed.</div>
+ * <ul>
+ * <li>table : this</li>
+ * <li>selected : the selected items</li>
  * </ul>
  * </dd>
  * 
@@ -149,27 +162,18 @@ import com.google.gwt.user.client.ui.Widget;
  * </ul>
  * </dd>
  * 
+ * <dt><b>CSS:</b></dt>
+ * <dd>.my-tbl-col-[column id] { each column }</dd>
+ * <dd>.my-tbl-td-[column index] { cell td }</dd>
+ * </dd>
+ * <dd>.my-tbl-td-inner-[column index] { cell inner element }</dd>
+ * <dd>.my-tbl-td-cell-[column index] { cell text element }</dd>
+ * </dl>
+ * 
  * @see TableColumn
  * @see TableColumnModel
  */
-public class Table<S extends TableSelectionModel> extends AbstractContainer<TableItem>
-    implements BaseTable {
-
-  /**
-   * True to highlight the current row (defaults to true).
-   */
-  private boolean highlight = true;
-
-  /**
-   * True to diable the column context menu (defaults to false).
-   */
-  public boolean columnContextMenu;
-
-  /**
-   * True to bulk render the table when first rendered (defaults to true). When
-   * true, widget are not supported in table cells.
-   */
-  private boolean bulkRender = true;
+public class Table extends Container<TableItem> implements BaseTable, Selectable<TableItem> {
 
   /**
    * The table's column model.
@@ -179,28 +183,33 @@ public class Table<S extends TableSelectionModel> extends AbstractContainer<Tabl
   /**
    * The selection model.
    */
-  protected S sm;
+  protected TableSelectionModel sm;
 
   /**
    * The table header.
    */
   protected TableHeader header;
 
-  /**
-   * True to display vertical borders on the table data (defaults to false).
-   */
-  private boolean verticalLines;
+  protected boolean bulkRender = true;
 
+  private boolean highlight = true;
+  private boolean columnContextMenu = true;
+  private boolean verticalLines;
   private boolean horizontalScroll = true;
   private Map nodes = new HashMap();
   private TableView view;
   private Size lastSize;
   private int lastLeft;
-  private boolean ignoreFist = true;
 
   private DelayedTask scrollTask = new DelayedTask(new Listener<ComponentEvent>() {
     public void handleEvent(ComponentEvent ce) {
       header.updateSplitBars();
+    }
+  });
+  
+  private DelayedTask recaluateTask = new DelayedTask(new Listener<ComponentEvent>() {
+    public void handleEvent(ComponentEvent ce) {
+      recalculate();
     }
   });
 
@@ -212,7 +221,7 @@ public class Table<S extends TableSelectionModel> extends AbstractContainer<Tabl
     focusable = true;
     baseStyle = "my-tbl";
     attachChildren = false;
-    setSelectionModel((S) new RowSelectionModel());
+    setSelectionModel(new TableSelectionModel());
   }
 
   /**
@@ -226,15 +235,32 @@ public class Table<S extends TableSelectionModel> extends AbstractContainer<Tabl
     cm.table = this;
   }
 
+  @Override
+  public boolean add(TableItem item) {
+    return super.add(item);
+  }
+
   /**
-   * Adds a item to the table. Fires the <i>BeforeAdd</i> event before
-   * inserting, then fires the <i>Add</i> event after the widget has been
-   * inserted.
+   * Adds a table listener.
    * 
-   * @param item the item to be added
+   * @param listener thet able listener
    */
-  public void add(TableItem item) {
-    insert(item, getItemCount());
+  public void addTableListener(TableListener listener) {
+    addListener(Events.ColumnClick, listener);
+    addListener(Events.SortChange, listener);
+    addListener(Events.CellClick, listener);
+    addListener(Events.CellDoubleClick, listener);
+    addListener(Events.RowClick, listener);
+    addListener(Events.RowDoubleClick, listener);
+  }
+
+  /**
+   * Returns true if bulk rendering is enabled.
+   * 
+   * @return the bulk rendering state
+   */
+  public boolean getBulkRender() {
+    return bulkRender;
   }
 
   /**
@@ -263,7 +289,7 @@ public class Table<S extends TableSelectionModel> extends AbstractContainer<Tabl
    * @return <code>true</code> if enabled, <code>false</code> otherwise.
    */
   public boolean getColumnContextMenu() {
-    return !columnContextMenu;
+    return columnContextMenu;
   }
 
   /**
@@ -280,12 +306,21 @@ public class Table<S extends TableSelectionModel> extends AbstractContainer<Tabl
    * 
    * @return the column model
    */
-  public TableColumnModel<TableColumn> getColumnModel() {
+  public TableColumnModel getColumnModel() {
     return cm;
   }
 
   public Menu getContextMenu() {
     return super.getContextMenu();
+  }
+
+  /**
+   * Returns true if highlights are enabled.
+   * 
+   * @return true if mouse overs are enable
+   */
+  public boolean getHighlight() {
+    return highlight;
   }
 
   /**
@@ -297,12 +332,24 @@ public class Table<S extends TableSelectionModel> extends AbstractContainer<Tabl
     return horizontalScroll;
   }
 
+  public TableItem getSelectedItem() {
+    return (TableItem) sm.getSelectedItem();
+  }
+
+  public List<TableItem> getSelectedItems() {
+    return sm.getSelectedItems();
+  }
+
+  public SelectionMode getSelectionMode() {
+    return sm.getSelectionMode();
+  }
+
   /**
    * Returns the table's selection model.
    * 
    * @return the selection model
    */
-  public S getSelectionModel() {
+  public TableSelectionModel getSelectionModel() {
     return sm;
   }
 
@@ -339,26 +386,19 @@ public class Table<S extends TableSelectionModel> extends AbstractContainer<Tabl
     return view;
   }
 
-  /**
-   * Inserts a item into the table. Fires the <i>BeforeAdd</i> event before
-   * inserting, then fires the <i>Add</i> event after the widget has been
-   * inserted.
-   * 
-   * @param item the item to insert
-   * @param index the insert location
-   */
-  public void insert(TableItem item, int index) {
-    TableEvent te = new TableEvent(this);
-    te.item = item;
-    te.index = index;
-    if (fireEvent(Events.BeforeAdd, te)) {
-      super.insert(item, index);
+  @Override
+  public boolean insert(TableItem item, int index) {
+    boolean added = super.insert(item, index);
+    if (added) {
       register(item);
       if (rendered) {
         view.renderItem(item, index);
       }
-      fireEvent(Events.Add, te);
+      if (rendered) {
+        recaluateTask.delay(100);
+      }
     }
+    return added;
   }
 
   public void onBrowserEvent(Event event) {
@@ -371,7 +411,7 @@ public class Table<S extends TableSelectionModel> extends AbstractContainer<Tabl
         return;
       }
       lastLeft = left;
-      header.el.setLeft(-left);
+      header.el().setLeft(-left);
       scrollTask.delay(400);
     }
   }
@@ -384,46 +424,54 @@ public class Table<S extends TableSelectionModel> extends AbstractContainer<Tabl
     }
   }
 
-  /**
-   * Recalculates the ui based on the table's current size.
-   */
-  public void recalculate() {
-    onResize(getOffsetWidth(), getOffsetHeight());
+  public void onSelectChange(TableItem item, boolean select) {
+    getView().onSelectItem(item, select);
   }
 
-  /**
-   * Removes the item from the table.
-   * 
-   * @param item the item to be removed
-   */
+  @Override
+  public void recalculate() {
+    header.resizeColumns(false, true);
+  }
+
+  @Override
   public boolean remove(TableItem item) {
-    TableEvent te = new TableEvent(this);
-    te.item = item;
-    if (fireEvent(Events.BeforeRemove, te)) {
-      super.remove(item);
+    boolean removed = super.remove(item);
+    if (removed) {
       unregister(item);
       if (rendered) {
         view.removeItem(item);
       }
-      fireEvent(Events.Remove, te);
-      return true;
     }
-    return false;
+    return removed;
   }
 
   /**
-   * Removes all the item's.
+   * Remvoves a table listener.
+   * 
+   * @param listener the table listener
    */
-  public void removeAll() {
-    int count = getItemCount();
-    for (int i = 0; i < count; i++) {
-      remove(getItem(0));
-    }
+  public void removeTableLisetener(TableListener listener) {
+    removeListener(Events.ColumnClick, listener);
+    removeListener(Events.SortChange, listener);
+    removeListener(Events.CellClick, listener);
+    removeListener(Events.CellDoubleClick, listener);
+    removeListener(Events.RowClick, listener);
+    removeListener(Events.RowDoubleClick, listener);
   }
 
   @Override
   public void scrollIntoView(TableItem item) {
-    item.el.scrollIntoView(view.getScrollEl().dom, false);
+    item.el().scrollIntoView(view.getScrollEl().dom, false);
+  }
+
+  /**
+   * True to bulk render the table when first rendered (defaults to true). When
+   * true, widget are not supported in table cells.
+   * 
+   * @param bulkRender true for bulk rendering
+   */
+  public void setBulkRender(boolean bulkRender) {
+    this.bulkRender = bulkRender;
   }
 
   /**
@@ -435,6 +483,11 @@ public class Table<S extends TableSelectionModel> extends AbstractContainer<Tabl
     this.columnContextMenu = columnContextMenu;
   }
 
+  /**
+   * Sets the table's column model.
+   * 
+   * @param cm the column model
+   */
   public void setColumnModel(TableColumnModel cm) {
     this.cm = cm;
     cm.table = this;
@@ -446,6 +499,15 @@ public class Table<S extends TableSelectionModel> extends AbstractContainer<Tabl
   }
 
   /**
+   * True to highlight the current row (defaults to true).
+   * 
+   * @param highlight the highlight state
+   */
+  public void setHighlight(boolean highlight) {
+    this.highlight = highlight;
+  }
+
+  /**
    * True to display a horizonatal scroll bar when needed (defaults to true).
    * 
    * @param horizontalScroll the horizontal scroll state
@@ -454,18 +516,35 @@ public class Table<S extends TableSelectionModel> extends AbstractContainer<Tabl
     this.horizontalScroll = horizontalScroll;
   }
 
+  public void setSelectedItem(TableItem item) {
+    sm.select(item);
+  }
+
+  public void setSelectedItems(List<TableItem> items) {
+    sm.select(items);
+  }
+
+  /**
+   * Sets the table's selection mode.
+   * 
+   * @param mode the selection mode
+   */
+  public void setSelectionMode(SelectionMode mode) {
+    setSelectionModel(new TableSelectionModel(mode));
+  }
+
   /**
    * Sets the table's selection model.
    * 
    * @param sm the selection model
    */
-  public void setSelectionModel(S sm) {
+  public void setSelectionModel(TableSelectionModel sm) {
     assert sm != null;
     if (this.sm != null) {
       this.sm.bind(null);
     }
     this.sm = sm;
-    sm.bind((Table) this);
+    sm.bind(this);
   }
 
   /**
@@ -522,12 +601,17 @@ public class Table<S extends TableSelectionModel> extends AbstractContainer<Tabl
 
   @Override
   protected ComponentEvent createComponentEvent(Event event) {
-    return new TableEvent(this);
+    return new TableEvent(this, (event == null) ? null : findItem(DOM.eventGetTarget(event)));
+  }
+
+  @Override
+  protected ContainerEvent createContainerEvent(TableItem item) {
+    return new TableEvent(this, item);
   }
 
   protected void doAttachChildren() {
-    WidgetHelper.doAttach(header);
-    if (!getBulkRender()) {
+    if (header != null) WidgetHelper.doAttach(header);
+    if (!bulkRender) {
       int count = getItemCount();
       for (int i = 0; i < count; i++) {
         TableItem item = getItem(i);
@@ -545,7 +629,7 @@ public class Table<S extends TableSelectionModel> extends AbstractContainer<Tabl
   }
 
   protected void doDetachChildren() {
-    WidgetHelper.doDetach(header);
+    if (header != null) WidgetHelper.doDetach(header);
     if (!getBulkRender()) {
       int count = getItemCount();
       for (int i = 0; i < count; i++) {
@@ -563,11 +647,11 @@ public class Table<S extends TableSelectionModel> extends AbstractContainer<Tabl
     }
   }
 
-  protected String getRenderedValue(int column, Object value) {
+  protected String getRenderedValue(TableItem item, int column, Object value) {
     TableColumn col = cm.getColumn(column);
     CellRenderer r = col.getRenderer();
     if (r != null) {
-      return r.render(col.getId(), value);
+      return r.render(item, col.getId(), value);
     } else {
       if (value != null) {
         return value.toString();
@@ -594,12 +678,12 @@ public class Table<S extends TableSelectionModel> extends AbstractContainer<Tabl
     };
 
     header = getTableHeader();
-    header.render(el.dom);
+    header.render(el().dom);
     header.init(this);
 
     for (TableColumn col : getColumnModel().getColumns()) {
       if (col.sortDir != SortDir.NONE) {
-        getTableHeader().getColumnUI(col.index).onSortChange(col.sortDir);
+        header.getColumnUI(col.index).onSortChange(col.sortDir);
       }
     }
 
@@ -609,13 +693,13 @@ public class Table<S extends TableSelectionModel> extends AbstractContainer<Tabl
     view.renderItems();
   }
 
+  @Override
+  protected void afterRender() {
+    super.afterRender();
+    header.resizeColumns(false, true);
+  }
+
   protected void onResize(int width, int height) {
-    if (ignoreFist) {
-      ignoreFist = false;
-      header.resizeColumns(false, false);
-      view.resize();
-      return;
-    }
     int h = width;
     int w = height;
     if (lastSize != null) {
@@ -627,14 +711,7 @@ public class Table<S extends TableSelectionModel> extends AbstractContainer<Tabl
     header.resizeColumns(false, true);
   }
 
-  protected void onRightClick(ComponentEvent ce) {
-    TableItem item = findItem(ce.getTarget());
-    if (item != null) {
-      item.onClick(ce);
-    }
-    super.onRightClick(ce);
-  }
-
+  @Override
   protected void onShowContextMenu(int x, int y) {
     super.onShowContextMenu(x, y);
     getView().clearHoverStyles();
@@ -646,43 +723,6 @@ public class Table<S extends TableSelectionModel> extends AbstractContainer<Tabl
 
   private void unregister(TableItem item) {
     nodes.remove(item.getId());
-  }
-
-  /**
-   * True to bulk render the table when first rendered (defaults to true). When
-   * true, widget are not supported in table cells.
-   * 
-   * @param bulkRender true for bulk rendering
-   */
-  public void setBulkRender(boolean bulkRender) {
-    this.bulkRender = bulkRender;
-  }
-
-  /**
-   * Returns true if bulk rendering is enabled.
-   * 
-   * @return the bulk rendering state
-   */
-  public boolean getBulkRender() {
-    return bulkRender;
-  }
-
-  /**
-   * True to highlight the current row (defaults to true).
-   * 
-   * @param highlight the highlight state
-   */
-  public void setHighlight(boolean highlight) {
-    this.highlight = highlight;
-  }
-
-  /**
-   * Returns true if highlights are enabled.
-   * 
-   * @return true if mouse overs are enable
-   */
-  public boolean getHighlight() {
-    return highlight;
   }
 
 }

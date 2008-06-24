@@ -44,18 +44,18 @@ package com.extjs.gxt.samples.explorer.client.pages;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.Button;
-import com.extjs.gxt.ui.client.widget.ButtonBar;
-import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.Info;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.ProgressBar;
+import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.RootPanel;
 
-public class ProgressBarPage extends Container implements EntryPoint {
+public class ProgressBarPage extends LayoutContainer implements EntryPoint {
 
   public void onModuleLoad() {
     RootPanel.get().add(this);
@@ -67,7 +67,7 @@ public class ProgressBarPage extends Container implements EntryPoint {
 
     ButtonBar buttonBar = new ButtonBar();
   
-    buttonBar.add(new Button("Progress", new SelectionListener() {
+    buttonBar.add(new Button("Progress", new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         final MessageBox box = MessageBox.progress("Please wait", "Loading items...",
             "Initializing...");
@@ -90,7 +90,7 @@ public class ProgressBarPage extends Container implements EntryPoint {
       }
     }));
 
-    buttonBar.add(new Button("Wait", new SelectionListener() {
+    buttonBar.add(new Button("Wait", new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         final MessageBox box = MessageBox.wait("Progress",
             "Saving your data, please wait...", "Saving...");

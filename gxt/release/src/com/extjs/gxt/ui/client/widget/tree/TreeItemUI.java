@@ -17,6 +17,7 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.FxEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.TreeEvent;
+import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -76,20 +77,22 @@ public class TreeItemUI {
   }
 
   public void animCollapse() {
-    containerEl.slideOut(Direction.UP, animDuration, new Listener<FxEvent>() {
-      public void handleEvent(FxEvent fe) {
-        afterCollapse();
-      }
-    });
+    containerEl.slideOut(Direction.UP, new FxConfig(animDuration,
+        new Listener<FxEvent>() {
+          public void handleEvent(FxEvent fe) {
+            afterCollapse();
+          }
+        }));
     item.tree.disableEvents(true);
   }
 
   public void animExpand() {
-    containerEl.slideIn(Direction.DOWN, animDuration, new Listener<FxEvent>() {
-      public void handleEvent(FxEvent fe) {
-        afterExpand();
-      }
-    });
+    containerEl.slideIn(Direction.DOWN, new FxConfig(animDuration,
+        new Listener<FxEvent>() {
+          public void handleEvent(FxEvent fe) {
+            afterExpand();
+          }
+        }));
     item.tree.disableEvents(true);
   }
 
@@ -159,13 +162,12 @@ public class TreeItemUI {
         }
         break;
     }
-
   }
 
   public void onCheckChange(boolean checked) {
     String cls = checked ? styleTreeChecked : styleTreeNotChecked;
-    fly(checkDivEl).setStyleName(cls);
-    item.fireEvent(Events.CheckChange, new TreeEvent(item.tree));
+    checkDivEl.setClassName(cls);
+    item.fireEvent(Events.CheckChange, new TreeEvent(item.tree, item));
   }
 
   public void onClick(TreeEvent te) {
@@ -184,7 +186,7 @@ public class TreeItemUI {
   public void onIconStyleChange(String style) {
     if (item.iconStyle != null) {
       fly(iconEl).setStyleAttribute("display", "");
-      fly(iconDivEl).setStyleName(item.iconStyle);
+      fly(iconDivEl).setIconStyle(item.iconStyle);
       return;
     }
     if (!item.leaf) {
@@ -197,10 +199,10 @@ public class TreeItemUI {
         s = item.tree.getNodeIconStyle();
       }
       fly(iconEl).setStyleAttribute("display", "");
-      fly(iconDivEl).setStyleName(s);
+      iconDivEl.setClassName(s);
     } else {
       fly(iconEl).setStyleAttribute("display", "");
-      fly(iconDivEl).setStyleName(item.tree.getItemIconStyle());
+      iconDivEl.setClassName(item.tree.getItemIconStyle());
       return;
     }
 
@@ -233,7 +235,7 @@ public class TreeItemUI {
 
   public void onTextChange(String text) {
     if (!item.root) {
-      fly(textSpanEl).setInnerHtml(text);
+      textSpanEl.setInnerHTML(text);
     }
   }
 
@@ -248,17 +250,21 @@ public class TreeItemUI {
   }
 
   public void removeItem(TreeItem child) {
-    containerEl.removeChild(child.getElement());
+    containerEl.dom.removeChild(child.getElement());
+    if (item.getItemCount() == 0) {
+       item.setExpanded(false);
+    }
   }
 
   public void render(Element target, int index) {
     if (item.root) return;
 
     item.setElement(template.create());
-    item.el.insertInto(target, index);
-    itemEl = item.el.firstChild();
 
-    El el = item.el;
+    item.el().insertInto(target, index);
+    itemEl = item.el().firstChild();
+
+    El el = item.el();
 
     Element td = el.selectNode("td:first-child").dom;
     indentEl = td.getFirstChildElement().cast();
@@ -272,6 +278,7 @@ public class TreeItemUI {
     textSpanEl = textEl.getFirstChildElement().cast();
     Element tbl = el.dom.getFirstChildElement().cast();
     containerEl = new El(DOM.getNextSibling(tbl));
+    containerEl.makePositionable();
 
     fly(checkEl).setVisible(item.tree.getCheckable());
 
@@ -289,7 +296,7 @@ public class TreeItemUI {
     fly(indentEl).setWidth(getIndent());
 
     if (!GXT.isIE) {
-      el.setElementAttribute("tabIndex", 0);
+      el.dom.setPropertyInt("tabIndex", 0);
     }
 
     updateJointStyle();
@@ -300,16 +307,12 @@ public class TreeItemUI {
     if (item.root) {
       return;
     }
-    boolean loaded = item.getData("loaded") != null;
-    boolean viewer = item.tree.isViewer;
-    boolean children = item.getItemCount() != 0;
-    boolean open = (!viewer && children) || (viewer && (children || !loaded));
 
-    if (!item.leaf && open) {
+    if (!item.leaf) {
       String cls = item.isExpanded() ? classTreeOpen : classTreeClose;
-      fly(jointDivEl).setStyleName(cls);
+      jointDivEl.setClassName(cls);
     } else {
-      fly(jointDivEl).setStyleName("none");
+      jointDivEl.setClassName("none");
     }
 
     if (item.tree.getCheckable()) {

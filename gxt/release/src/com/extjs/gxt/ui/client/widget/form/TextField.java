@@ -21,56 +21,119 @@ import com.google.gwt.user.client.ui.impl.TextBoxImpl;
 
 /**
  * Basic text field.
+ *
+ * @param <D> the data type
  */
-public class TextField extends Field {
+public class TextField<D> extends Field<D> {
 
+  /**
+   * TextField Messages.
+   */
+  public class TextFieldMessages extends FieldMessages {
+
+    private String minLengthText;
+    private String maxLengthText;
+    private String blankText = GXT.MESSAGES.textField_blankText();
+    private String regexText = "";
+
+    /**
+     * Returns the blank text.
+     * 
+     * @return the blank text
+     */
+    public String getBlankText() {
+      return blankText;
+    }
+
+    /**
+     * Returns the max length text.
+     * 
+     * @return the max length text
+     */
+    public String getMaxLengthText() {
+      return maxLengthText;
+    }
+
+    /**
+     * Returns the min length text.
+     * 
+     * @return the min length text
+     */
+    public String getMinLengthText() {
+      return minLengthText;
+    }
+
+    /**
+     * Returns the regex text.
+     * 
+     * @return the regex text
+     */
+    public String getRegexText() {
+      return regexText;
+    }
+
+    /**
+     * Sets the error text to display if the allow blank validation fails
+     * (defaults to "This field is required").
+     * 
+     * @param blankText the blank text
+     */
+    public void setBlankText(String blankText) {
+      this.blankText = blankText;
+    }
+
+    /**
+     * Sets the error text to display if the maximum length validation fails
+     * (defaults to "The maximum length for this field is {maxLength}").
+     * 
+     * @param maxLengthText the max length text
+     */
+    public void setMaxLengthText(String maxLengthText) {
+      this.maxLengthText = maxLengthText;
+    }
+
+    /**
+     * Sets the error text to display if the minimum length validation fails
+     * (defaults to "The minimum length for this field is {minLength}").
+     * 
+     * @param minLengthText the min length text
+     */
+    public void setMinLengthText(String minLengthText) {
+      this.minLengthText = minLengthText;
+    }
+
+    /**
+     * The error text to display if {@link #setRegexText} is used and the test
+     * fails during validation.
+     * 
+     * @param regexText the regex text
+     */
+    public void setRegexText(String regexText) {
+      this.regexText = regexText;
+    }
+
+  }
+  
   private static TextBoxImpl impl = (TextBoxImpl) GWT.create(TextBoxImpl.class);
 
-  /**
-   * Error text to display if the minimum length validation fails (defaults to
-   * "The minimum length for this field is {minLength}").
-   */
-  public String minLengthText;
+  
 
-  /**
-   * Error text to display if the maximum length validation fails (defaults to
-   * "The maximum length for this field is {maxLength}").
-   */
-  public String maxLengthText;
-
-  /**
-   * Error text to display if the allow blank validation fails (defaults to
-   * "This field is required").
-   */
-  public String blankText = GXT.MESSAGES.textField_blankText();
-
-  /**
-   * The error text to display if {@link #regex} is used and the test fails
-   * during validation (defaults to "").
-   */
-  public String regexText = "";
-
-  /**
-   * True to disable input keystroke filtering (defaults to false).
-   */
-  public boolean disableKeyFilter;
-
-  /**
-   * True to create the text field as a password input (defaults to false).
-   */
-  public boolean password;
-
+  protected String emptyStyle = "x-form-empty-field";
+  
+  private boolean password;
   private boolean allowBlank = true;
   private String regex;
   private boolean selectOnFocus = false;
   private int minLength = 0;
   private int maxLength = Integer.MAX_VALUE;
-  private String emptyStyle = "x-form-empty-field";
   private Validator validator;
   private DelayedTask validationTask;
 
+  /**
+   * Creates a new text field.
+   */
   public TextField() {
-    adjustSize = false;
+    messages = new TextFieldMessages();
   }
 
   /**
@@ -82,13 +145,9 @@ public class TextField extends Field {
     return allowBlank;
   }
 
-  /**
-   * Returns true if key filtering is disabled.
-   * 
-   * @return the disable key filter state
-   */
-  public boolean getDisableKeyFilter() {
-    return disableKeyFilter;
+  @Override
+  public TextFieldMessages getMessages() {
+    return (TextFieldMessages) messages;
   }
 
   /**
@@ -128,6 +187,15 @@ public class TextField extends Field {
   }
 
   /**
+   * Returns true if the field is a password field.
+   * 
+   * @return that password state
+   */
+  public boolean isPassword() {
+    return password;
+  }
+
+  /**
    * Selects text in the field.
    * 
    * @param start the index where the selection should start.
@@ -148,21 +216,12 @@ public class TextField extends Field {
   }
 
   /**
-   * Sets whether a field is value when its value length = 0.
+   * Sets whether a field is value when its value length = 0 (default to true).
    * 
    * @param allowBlank true to allow blanks, false otherwise
    */
   public void setAllowBlank(boolean allowBlank) {
     this.allowBlank = allowBlank;
-  }
-
-  /**
-   * True to disable input keystroke filtering (defaults to false).
-   * 
-   * @param disableKeyFilter true to disable filtering
-   */
-  public void setDisableKeyFilter(boolean disableKeyFilter) {
-    this.disableKeyFilter = disableKeyFilter;
   }
 
   /**
@@ -182,12 +241,23 @@ public class TextField extends Field {
   public void setMinLength(int minLength) {
     this.minLength = minLength;
   }
-  
+
+  /**
+   * True to create the text field as a password input (defaults to false,
+   * pre-render).
+   * 
+   * @param password the password state
+   */
+  public void setPassword(boolean password) {
+    assertPreRender();
+    this.password = password;
+  }
+
   /**
    * Sets regular expression to be tested against the field value during
    * validation. If available, this regex will be evaluated only after the basic
    * validators all return true. If the test fails, the field will be marked
-   * invalid using {@link #regexText}.
+   * invalid using the regex error message.
    * 
    * @param regex the regex expression
    */
@@ -219,7 +289,7 @@ public class TextField extends Field {
   }
 
   @Override
-  public void setValue(Object value) {
+  public void setValue(D value) {
     if (rendered && emptyText != null && !emptyText.equals("")) {
       removeStyleName(emptyStyle);
     }
@@ -228,7 +298,7 @@ public class TextField extends Field {
   }
 
   protected void applyEmptyText() {
-    if (rendered && emptyText != null && getRawValue().length() < 1) {
+    if (rendered && !password && emptyText != null && getRawValue().length() < 1) {
       setRawValue(emptyText);
       getInputEl().addStyleName(emptyStyle);
     }
@@ -248,7 +318,7 @@ public class TextField extends Field {
       if (emptyText.equals(v)) {
         setRawValue("");
       }
-      removeStyleName(emptyStyle);
+      getInputEl().removeStyleName(emptyStyle);
     }
     if (selectOnFocus) {
       selectAll();
@@ -265,7 +335,7 @@ public class TextField extends Field {
 
   @Override
   protected void onRender(Element target, int index) {
-    if (el == null) {
+    if (el() == null) {
       if (password) {
         setElement(DOM.createInputPassword());
 
@@ -273,7 +343,7 @@ public class TextField extends Field {
         setElement(DOM.createInputText());
       }
 
-      el.insertInto(target, index);
+      el().insertInto(target, index);
     }
 
     super.onRender(target, index);
@@ -299,16 +369,16 @@ public class TextField extends Field {
         clearInvalid();
         return true;
       } else {
-        markInvalid(blankText);
+        markInvalid(getMessages().getBlankText());
         return false;
       }
     }
     if (length < minLength) {
       String error = "";
-      if (maxLengthText == null) {
+      if (getMessages().getMinLengthText() == null) {
         error = GXT.MESSAGES.textField_minLengthText(minLength);
       } else {
-        error = Format.substitute(minLengthText, minLength);
+        error = Format.substitute(getMessages().getMinLengthText(), minLength);
       }
       markInvalid(error);
       return false;
@@ -316,10 +386,10 @@ public class TextField extends Field {
 
     if (length > maxLength) {
       String error = "";
-      if (maxLengthText == null) {
+      if (getMessages().getMaxLengthText() == null) {
         error = GXT.MESSAGES.textField_maxLengthText(maxLength);
       } else {
-        error = Format.substitute(maxLengthText, maxLength);
+        error = Format.substitute(getMessages().getMaxLengthText(), maxLength);
       }
       markInvalid(error);
       return false;
@@ -334,7 +404,7 @@ public class TextField extends Field {
     }
 
     if (regex != null && !value.matches(regex)) {
-      markInvalid(regexText);
+      markInvalid(getMessages().getRegexText());
       return false;
     }
 

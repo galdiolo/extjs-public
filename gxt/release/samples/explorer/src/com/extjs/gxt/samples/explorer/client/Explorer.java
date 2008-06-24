@@ -26,8 +26,7 @@ public class Explorer implements EntryPoint {
 
   private Dispatcher dispatcher;
   private ExplorerModel model;
-  private static Entry activePage;
-  
+
   public Explorer() {
     model = new ExplorerModel();
     Registry.register("model", model);
@@ -35,14 +34,19 @@ public class Explorer implements EntryPoint {
 
   public void onModuleLoad() {
     ThemeManager.register(Slate.SLATE);
-    
+
     ExplorerServiceAsync service = (ExplorerServiceAsync) GWT.create(ExplorerService.class);
     ServiceDefTarget endpoint = (ServiceDefTarget) service;
     String moduleRelativeURL = GWT.getModuleBaseURL() + "service";
     endpoint.setServiceEntryPoint(moduleRelativeURL);
     Registry.register("service", service);
-    
-    
+
+    FileServiceAsync fileservice = (FileServiceAsync) GWT.create(FileService.class);
+    endpoint = (ServiceDefTarget) fileservice;
+    moduleRelativeURL = GWT.getModuleBaseURL() + "fileservice";
+    endpoint.setServiceEntryPoint(moduleRelativeURL);
+    Registry.register("fileservice", fileservice);
+
     dispatcher = Dispatcher.get();
     dispatcher.addController(new AppController());
     dispatcher.addController(new NavigationController());
@@ -52,7 +56,7 @@ public class Explorer implements EntryPoint {
     String hash = Window.Location.getHash();
 
     showPage(model.findEntry("overview"));
-    
+
     if (!"".equals(hash)) {
       hash = hash.substring(1);
       Entry entry = model.findEntry(hash);
@@ -63,11 +67,6 @@ public class Explorer implements EntryPoint {
   }
 
   public static void showPage(Entry entry) {
-    if (activePage == entry) {
-      return;
-    }
-    activePage = entry;
-    
     AppEvent appEvent = new AppEvent(AppEvents.ShowPage, entry);
     appEvent.historyEvent = true;
     appEvent.token = entry.getId();

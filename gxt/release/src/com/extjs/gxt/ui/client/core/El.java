@@ -7,15 +7,15 @@
  */
 package com.extjs.gxt.ui.client.core;
 
-import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.Style.ScrollDir;
-import com.extjs.gxt.ui.client.event.FxEvent;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.fx.FxStyle;
+import com.extjs.gxt.ui.client.fx.BaseEffect;
+import com.extjs.gxt.ui.client.fx.Fx;
+import com.extjs.gxt.ui.client.fx.FxConfig;
+import com.extjs.gxt.ui.client.fx.Move;
 import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.util.Markup;
 import com.extjs.gxt.ui.client.util.Point;
@@ -23,6 +23,7 @@ import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.util.Region;
 import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.util.TextMetrics;
+import com.extjs.gxt.ui.client.util.Util;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
@@ -33,14 +34,13 @@ import com.google.gwt.user.client.Window;
 public class El {
 
   /**
-   * Visibility mode constant - Use display to hide element.
+   * VisMode enumeration. Specifies the the element should hidden using the CSS
+   * display or visibility style.
+   * 
    */
-  public static final int DISPLAY = 0;
-
-  /**
-   * Visibility mode constant - Use visibility to hide element.
-   */
-  public static final int VISIBILITY = 1;
+  public enum VisMode {
+    DISPLAY, VISIBILITY
+  }
 
   /**
    * The globally shared El instance.
@@ -73,44 +73,49 @@ public class El {
     global.dom = element;
     return global;
   }
+  
+  public static El fly(com.google.gwt.dom.client.Element element) {
+    global.dom = (Element)element;
+    return global;
+  }
 
   private static native String addUnitsInternal(String v, String defaultUnit) /*-{
-    if(v === "" || v == "auto"){
-        return v;
-    }
-    if(v === undefined){
-        return '';
-    }
-    if(typeof v == "number" || !/\d+(px|em|%|en|ex|pt|in|cm|mm|pc)$/i.test(v)){
-        return v + (defaultUnit || 'px');
-    }
-    return v;
-  }-*/;
+   if(v === "" || v == "auto"){
+   return v;
+   }
+   if(v === undefined){
+   return '';
+   }
+   if(typeof v == "number" || !/\d+(px|em|%|en|ex|pt|in|cm|mm|pc)$/i.test(v)){
+   return v + (defaultUnit || 'px');
+   }
+   return v;
+   }-*/;
 
   private native static void disableContextMenuInternal(Element elem, boolean disable) /*-{
-     if (disable) {
-       elem.oncontextmenu = function() {  return false};
-     } else {
-       elem.oncontextmenu = null;
-     }
+   if (disable) {
+   elem.oncontextmenu = function() {  return false};
+   } else {
+   elem.oncontextmenu = null;
+   }
    }-*/;
 
   private native static void disableTextSelectInternal(Element e, boolean disable)/*-{
-    if (disable) {
-      e.ondrag = function () { return false; };
-      e.onselectstart = function () { return false; };
-    } else {
-      e.ondrag = null;
-      e.onselectstart = null;
-    }
-  }-*/;
+   if (disable) {
+   e.ondrag = function () { return false; };
+   e.onselectstart = function () { return false; };
+   } else {
+   e.ondrag = null;
+   e.onselectstart = null;
+   }
+   }-*/;
 
   /**
    * The wrapped dom element.
    */
   public Element dom;
-  
-  private int visiblityMode = DISPLAY;
+
+  private VisMode visiblityMode = VisMode.DISPLAY;
   private String originalDisplay = "block";
   private El _mask;
   private El _maskMsg;
@@ -221,7 +226,7 @@ public class El {
    * @return the child element
    */
   public El appendChild(Element child) {
-    DOM.appendChild(dom, child);
+    dom.appendChild(child);
     return new El(child);
   }
 
@@ -240,13 +245,11 @@ public class El {
   /**
    * Blinks the element.
    * 
-   * @param listener the callback listener
+   * @param config the fx config
    * @return this
    */
-  public El blink(Listener<FxEvent> listener) {
-    FxStyle style = new FxStyle(dom);
-    style.addListener(Events.EffectComplete, listener);
-    style.blink();
+  public El blink(FxConfig config) {
+    BaseEffect.blink(this, config, 50);
     return this;
   }
 
@@ -263,13 +266,12 @@ public class El {
    * Wraps the specified element with a special markup/CSS block.
    * 
    * @param style a base CSS class to apply to the containing wrapper element
-   *            (defaults to 'x-box').
+   *          (defaults to 'x-box').
    * @return this
    */
   public El boxWrap(String style) {
     String s = style != null ? style : "x-box";
-    El temp = insertHtml("beforeBegin", Format.substitute(
-        "<div class={0}>" + Markup.BBOX, s)
+    El temp = insertHtml("beforeBegin", Format.substitute("<div class={0}>" + Markup.BBOX, s)
         + "</div>");
     temp.child("." + s + "-mc").appendChild(dom);
     return temp;
@@ -339,16 +341,16 @@ public class El {
    * @return this
    */
   public native El click() /*-{
-     var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-     if (dom.click) {
-       dom.click();
-     }
-     else {
-        var event = $doc.createEvent("MouseEvents");
-        event.initEvent('click', true, true, $wnd, 0, 0, 0, 0, 0, false, false, false, false, 1, dom);
-        dom.dispatchEvent(event);    
-     }
-     return this;
+   var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+   if (dom.click) {
+   dom.click();
+   }
+   else {
+   var event = $doc.createEvent("MouseEvents");
+   event.initEvent('click', true, true, $wnd, 0, 0, 0, 0, 0, false, false, false, false, 1, dom);
+   dom.dispatchEvent(event);    
+   }
+   return this;
    }-*/;
 
   /**
@@ -377,9 +379,9 @@ public class El {
    * @return the new element
    */
   public native Element cloneNode(boolean deep) /*-{
-      var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-      return dom.cloneNode(deep);
-    }-*/;
+   var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+   return dom.cloneNode(deep);
+   }-*/;
 
   /**
    * Creates and adds a child using the HTML fragment.
@@ -397,9 +399,9 @@ public class El {
    * @return this
    */
   public native El disable() /*-{
-     var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-     dom.disabled = true;
-     return this;
+   var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+   dom.disabled = true;
+   return this;
    }-*/;
 
   /**
@@ -449,19 +451,19 @@ public class El {
    * @return this
    */
   public native El enable()/*-{
-    var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-    dom.disabled = false;
-    return this;
-  }-*/;
+   var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+   dom.disabled = false;
+   return this;
+   }-*/;
 
   /**
-   * Convenience method for setVisibilityMode(El.DISPLAY).
+   * Convenience method for setVisibilityMode(VisibilityMode.DISPLAY).
    * 
    * @param display what to set display to when visible
    * @return this
    */
   public El enableDisplayMode(String display) {
-    setVisibilityMode(El.DISPLAY);
+    setVisibilityMode(VisMode.DISPLAY);
     if (display != null) {
       originalDisplay = display;
     }
@@ -471,26 +473,37 @@ public class El {
   /**
    * Fades in the element.
    * 
-   * @param callback the listener called after the effect completes
+   * @param config the fx config
    * @return this
    */
-  public El fadeIn(Listener<FxEvent> callback) {
-    FxStyle fx = new FxStyle(dom);
-    fx.addListener(Events.EffectComplete, callback);
-    fx.fadeIn();
+  public El fadeIn(FxConfig config) {
+    BaseEffect.fadeIn(this, config);
     return this;
   }
 
   /**
    * Fades out the element.
    * 
-   * @param callback the listener called after the effect completes
+   * @param config the fx config
    * @return this
    */
-  public El fadeOut(Listener<FxEvent> callback) {
-    FxStyle fx = new FxStyle(dom);
-    fx.addListener(Events.EffectComplete, callback);
-    fx.fadeOut();
+  public El fadeOut(FxConfig config) {
+    BaseEffect.fadeOut(this, config);
+    return this;
+  }
+
+  /**
+   * Toggles the element visibility using a fade effect.
+   * 
+   * @param config the fx config
+   * @return this
+   */
+  public El fadeToggle(FxConfig config) {
+    if (!isVisible() || !isVisibility()) {
+      BaseEffect.fadeIn(this, config);
+    } else {
+      BaseEffect.fadeOut(this, config);
+    }
     return this;
   }
 
@@ -561,9 +574,9 @@ public class El {
    * element.
    * 
    * @param anchor the specified anchor position (defaults to "c"). See
-   *            {@link #alignTo} for details on supported anchor positions.
+   *          {@link #alignTo} for details on supported anchor positions.
    * @param local <code>true</code> to get the local (element
-   *            top/left-relative) anchor position instead of page coordinates
+   *          top/left-relative) anchor position instead of page coordinates
    * @return the position
    */
   public Point getAnchorXY(String anchor, boolean local) {
@@ -584,8 +597,8 @@ public class El {
    * Returns the width of the border(s) for the specified side(s).
    * 
    * @param sides can be t, l, r, b or any combination of those to add multiple
-   *            values. For example, passing lr would get the border (l)eft
-   *            width + the border (r)ight width.
+   *          values. For example, passing lr would get the border (l)eft width +
+   *          the border (r)ight width.
    * @return the width of the sides passed added together
    */
   public int getBorderWidth(String sides) {
@@ -620,7 +633,7 @@ public class El {
    * Returns the element's bounds in page coordinates.
    * 
    * @param local if true the element's left and top are returned instead of
-   *            page coordinates
+   *          page coordinates
    * @return the element's bounds
    */
   public Rectangle getBounds(boolean local) {
@@ -703,9 +716,9 @@ public class El {
    * @return the attribute value
    */
   public native String getElementAttribute(String attr)/*-{
-    var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-    return dom.getAttribute(attr);
-  }-*/;
+   var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+   return dom.getAttribute(attr);
+   }-*/;
 
   /**
    * Returns the sum width of the padding and borders for the passed "sides".
@@ -851,8 +864,8 @@ public class El {
    * Gets the width of the padding(s) for the specified side(s).
    * 
    * @param sides can be t, l, r, b or any combination of those to add multiple
-   *            values. For example, passing lr would get the border (l)eft
-   *            width + the border (r)ight width.
+   *          values. For example, passing lr would get the border (l)eft width +
+   *          the border (r)ight width.
    * @return the width of the sides passed added together
    */
   public int getPadding(String sides) {
@@ -889,7 +902,7 @@ public class El {
    * width).
    * 
    * @param local <code>true</code> to get the local css position instead of
-   *            page coordinate
+   *          page coordinate
    * @return the right value
    */
   public int getRight(boolean local) {
@@ -948,6 +961,24 @@ public class El {
   }
 
   /**
+   * Returns the style width.
+   * 
+   * @return the style width
+   */
+  public int getStyleHeight() {
+    String h = getStyleAttribute("height");
+    if (h == null || h.equals("")) return 0;
+    if (h.matches("(auto|em|%|en|ex|pt|in|cm|mm|pc)")) {
+      return 0;
+    }
+    h = h.replaceAll("px", "");
+    if (h.length() > 0) {
+      return Integer.parseInt(h);
+    }
+    return 0;
+  }
+
+  /**
    * Returns the element's style name.
    * 
    * @return the style name
@@ -955,7 +986,7 @@ public class El {
   public String getStyleName() {
     return DOM.getElementProperty(dom, "className");
   }
-  
+
   /**
    * Returns the element's size, using style attribute before offsets.
    * 
@@ -963,6 +994,25 @@ public class El {
    */
   public Size getStyleSize() {
     return XElement.fly(dom).getStyleSize();
+  }
+
+  /**
+   * Returns the style width. A value is only returned if the specified style is
+   * in pixels.
+   * 
+   * @return the style width
+   */
+  public int getStyleWidth() {
+    String w = getStyleAttribute("width");
+    if (w == null || w.equals("")) return 0;
+    if (w.matches("(auto|em|%|en|ex|pt|in|cm|mm|pc)")) {
+      return 0;
+    }
+    w = w.replaceAll("px", "");
+    if (w.length() > 0) {
+      return Integer.parseInt(w);
+    }
+    return 0;
   }
 
   /**
@@ -1059,12 +1109,12 @@ public class El {
    * @return the location
    */
   public native Point getXY() /*-{
-    var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-    $wnd.dom = dom;
-    var xy = $wnd._el.fly(dom).getXY();
-    var p = @com.extjs.gxt.ui.client.util.Point::newInstance(II)(xy[0],xy[1]);
-    return p;
-  }-*/;
+   var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+   $wnd.dom = dom;
+   var xy = $wnd._el.fly(dom).getXY();
+   var p = @com.extjs.gxt.ui.client.util.Point::newInstance(II)(xy[0],xy[1]);
+   return p;
+   }-*/;
 
   /**
    * Gets the current Y position of the element based on page coordinates.
@@ -1081,7 +1131,11 @@ public class El {
    * @return the z-index
    */
   public int getZIndex() {
-    return DOM.getIntStyleAttribute(dom, "zIndex");
+    try {
+      return DOM.getIntStyleAttribute(dom, "zIndex");
+    } catch (Exception e) {
+      return 0;
+    }
   }
 
   /**
@@ -1143,14 +1197,13 @@ public class El {
     DOM.insertChild(dom, child, index);
     return this;
   }
-  
+
   public El insertChild(Element[] children, int index) {
     for (int i = children.length - 1; i >= 0; i--) {
       DOM.insertChild(dom, children[i], index);
     }
     return this;
   }
-
 
   /**
    * Inserts an element as the first child.
@@ -1160,6 +1213,13 @@ public class El {
    */
   public El insertFirst(Element element) {
     DOM.insertChild(dom, element, 0);
+    return this;
+  }
+
+  public El insertFirst(Element[] elems) {
+    for (int i = 0; i < elems.length; i++) {
+      DOM.appendChild(dom, elems[i]);
+    }
     return this;
   }
 
@@ -1177,7 +1237,7 @@ public class El {
    * Inserts an html fragment into this element
    * 
    * @param where where to insert the html in relation to el - beforeBegin,
-   *            afterBegin, beforeEnd, afterEnd.
+   *          afterBegin, beforeEnd, afterEnd.
    * @param html the HTML frament
    * @return the inserted node (or nearest related if more than 1 inserted)
    */
@@ -1235,13 +1295,6 @@ public class El {
   public El insertSibling(Element[] elems, String where) {
     for (int i = 0; i < elems.length; i++) {
       insertSibling(elems[i], where);
-    }
-    return this;
-  }
-  
-  public El insertFirst(Element[] elems) {
-    for (int i = 0; i < elems.length; i++) {
-      DOM.appendChild(dom, elems[i]);
     }
     return this;
   }
@@ -1480,44 +1533,44 @@ public class El {
    * @param hscroll <code>false</code> to disable horizontal scrolling.
    */
   public native void scrollIntoView(Element container, boolean hscroll) /*-{
-      var elem = this.@com.extjs.gxt.ui.client.core.El::dom;
-      var c = container || $doc.body;
-      var o = this.@com.extjs.gxt.ui.client.core.El::offsetsTo(Lcom/google/gwt/user/client/Element;)(container);
-      var l = o.@com.extjs.gxt.ui.client.util.Point::x;
-      var t = o.@com.extjs.gxt.ui.client.util.Point::y;
-      l = l + c.scrollLeft;
-      t = t + c.scrollTop;
-      var b = t + elem.offsetHeight;
-      var r = l + elem.offsetWidth;
-      
-      var ch = c.clientHeight;
-      var ct = parseInt(c.scrollTop, 10);
-      var cl = parseInt(c.scrollLeft, 10);
-      var cb = ct + ch;
-      var cr = cl + c.clientWidth;
-      
-      if (t < ct){
-        c.scrollTop = t;
-      }else if(b > cb){
-        c.scrollTop = b-ch;
-      }
-      c.scrollTop = c.scrollTop; 
-      
-      if(hscroll !== false){
-        if(l < cl){
-          c.scrollLeft = l;
-        } else if(r > cr){
-          c.scrollLeft = r-c.clientWidth;
-        }
-        c.scrollLeft = c.scrollLeft;
-      }
-    }-*/;
+   var elem = this.@com.extjs.gxt.ui.client.core.El::dom;
+   var c = container || $doc.body;
+   var o = this.@com.extjs.gxt.ui.client.core.El::offsetsTo(Lcom/google/gwt/user/client/Element;)(container);
+   var l = o.@com.extjs.gxt.ui.client.util.Point::x;
+   var t = o.@com.extjs.gxt.ui.client.util.Point::y;
+   l = l + c.scrollLeft;
+   t = t + c.scrollTop;
+   var b = t + elem.offsetHeight;
+   var r = l + elem.offsetWidth;
+   
+   var ch = c.clientHeight;
+   var ct = parseInt(c.scrollTop, 10);
+   var cl = parseInt(c.scrollLeft, 10);
+   var cb = ct + ch;
+   var cr = cl + c.clientWidth;
+   
+   if (t < ct){
+   c.scrollTop = t;
+   }else if(b > cb){
+   c.scrollTop = b-ch;
+   }
+   c.scrollTop = c.scrollTop; 
+   
+   if(hscroll !== false){
+   if(l < cl){
+   c.scrollLeft = l;
+   } else if(r > cr){
+   c.scrollLeft = r-c.clientWidth;
+   }
+   c.scrollLeft = c.scrollLeft;
+   }
+   }-*/;
 
   /**
    * Scrolls this element the specified scroll point.
    * 
    * @param side either "left" for scrollLeft values or "top" for scrollTop
-   *            values.
+   *          values.
    * @param value the new scroll value
    * @return this
    */
@@ -1535,17 +1588,13 @@ public class El {
    * Scrolls this element the specified scroll point.
    * 
    * @param side side either "left" for scrollLeft values or "top" for scrollTop
-   *            values.
+   *          values.
    * @param value the new scroll value
-   * @param duration the animation duration in milliseconds
-   * @param callback the listener to be called when the effect is complete
+   * @param config the fx config
    * @return this
    */
-  public El scrollTo(String side, int value, int duration, Listener<FxEvent> callback) {
-    FxStyle fx = new FxStyle(dom);
-    fx.duration = duration;
-    fx.addListener(Events.EffectComplete, callback);
-    fx.scroll(ScrollDir.HORIZONTAL, value);
+  public El scrollTo(String side, int value, FxConfig config) {
+    BaseEffect.scroll(this, config, ScrollDir.HORIZONTAL, value);
     return this;
   }
 
@@ -1705,17 +1754,17 @@ public class El {
    * @param focus the new focus state
    */
   public native El setFocus(boolean focus) /*-{
-    var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-    try {
-       if (focus) {
-         dom.focus();
-       } else {
-         dom.blur();
-       }
-     } 
-     catch(err) {
-     }
-     return this;
+   var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+   try {
+   if (focus) {
+   dom.focus();
+   } else {
+   dom.blur();
+   }
+   } 
+   catch(err) {
+   }
+   return this;
    }-*/;
 
   /**
@@ -1756,6 +1805,19 @@ public class El {
   public El setHeight(String height) {
     DOM.setStyleAttribute(dom, "height", addUnits(height));
     return this;
+  }
+
+  /**
+   * Sets the the icon for an element either as a CSS style name or image path.
+   * 
+   * @param style the style are image path
+   */
+  public void setIconStyle(String style) {
+    if (Util.isImagePath(style)) {
+      setStyleAttribute("backgroundImage", "url(" + style + ")");
+    } else {
+      setStyleName(style);
+    }
   }
 
   /**
@@ -1921,20 +1983,7 @@ public class El {
     XElement.fly(dom).setStyleAttribute(attr, value);
     return this;
   }
-  
-  /**
-   * Sets the element's size using style attributes.
-   * 
-   * @param width the width
-   * @param height the height
-   * @return this
-   */
-  public El setStyleSize(int width, int height) {
-    setStyleAttribute("width", width);
-    setStyleAttribute("height", height);
-    return this;
-  }
-  
+
   /**
    * Sets the element's style attribute.
    * 
@@ -1973,7 +2022,20 @@ public class El {
     }
     return this;
   }
-  
+
+  /**
+   * Sets the element's size using style attributes.
+   * 
+   * @param width the width
+   * @param height the height
+   * @return this
+   */
+  public El setStyleSize(int width, int height) {
+    setStyleAttribute("width", width);
+    setStyleAttribute("height", height);
+    return this;
+  }
+
   /**
    * Sets the element's tab index.
    * 
@@ -2035,25 +2097,25 @@ public class El {
    * Sets the element's visibility mode. When setVisible() is called it will use
    * this to determine whether to set the visibility or the display property.
    * 
-   * @param visMode {value #VISIBILITY} or {@value #DISPLAY}
+   * @param visMode {value {link VisMode#VISIBILITY}} or {@link VisMode#DISPLAY}
    * @return this
    */
-  public El setVisibilityMode(int visMode) {
+  public El setVisibilityMode(VisMode visMode) {
     visiblityMode = visMode;
     return this;
   }
 
   /**
-   * Sets the visibility of the element (see details). If the visibilityMode is
-   * set to El.DISPLAY, it will use the display property to hide the element,
-   * otherwise it uses visibility. The default is to hide and show using the
-   * visibility property.
+   * Sets the visibility of the element (see details). If the vis mode is set to
+   * DISPLAY, it will use the display property to hide the element, otherwise it
+   * uses visibility. The default is to hide and show using the DISPLAY
+   * property.
    * 
    * @param visible whether the element is visible
    * @return this
    */
   public El setVisible(boolean visible) {
-    if (visiblityMode == DISPLAY) {
+    if (visiblityMode == VisMode.DISPLAY) {
       setDisplayed(visible);
     } else {
       setVisibility(visible);
@@ -2127,6 +2189,23 @@ public class El {
   }
 
   /**
+   * Sets the elements position in page coordinates.
+   * 
+   * @param x the x coordinate
+   * @param y the y coordinate
+   * @return this
+   */
+  public El setXY(int x, int y, FxConfig config) {
+    if (config == null) {
+      setXY(x, y);
+    } else {
+      Fx fx = new Fx(config);
+      fx.run(new Move(this, x, y));
+    }
+    return this;
+  }
+
+  /**
    * Sets the element's position in page coordinates.
    * 
    * @param p the position
@@ -2145,10 +2224,10 @@ public class El {
    * @return this
    */
   public native El setY(int y) /*-{
-      var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-      $wnd._el.fly(dom).setY(y);
-      return this;
-    }-*/;
+   var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+   $wnd._el.fly(dom).setY(y);
+   return this;
+   }-*/;
 
   /**
    * Sets the element's z-index.
@@ -2165,40 +2244,11 @@ public class El {
    * Slides the element in.
    * 
    * @param direction the direction
+   * @param config the fx config
    * @return this
    */
-  public El slideIn(Direction direction) {
-    FxStyle fx = new FxStyle(this);
-    fx.duration = 300;
-    fx.slideIn(direction);
-    return this;
-  }
-
-  /**
-   * Slides the element in.
-   * 
-   * @param direction the direction
-   * @param duration the slide duration
-   * @param callback the callback function to be called when the effect is
-   *            complete
-   * @return this
-   */
-  public El slideIn(Direction direction, int duration, Listener callback) {
-    FxStyle fx = new FxStyle(dom);
-    fx.slideIn(direction, duration, callback);
-    return this;
-  }
-
-  /**
-   * Slides the element out.
-   * 
-   * @param direction the direction\
-   * @return this
-   */
-  public El slideOut(Direction direction) {
-    FxStyle fx = new FxStyle(this);
-    fx.duration = 300;
-    fx.slideOut(direction);
+  public El slideIn(Direction direction, FxConfig config) {
+    BaseEffect.slideIn(this, config, direction);
     return this;
   }
 
@@ -2206,13 +2256,11 @@ public class El {
    * Slides the element out.
    * 
    * @param direction the direction
-   * @param duration the slide duration
-   * @param callback the callback to be called when the effect completes
+   * @param config the fx config
    * @return this
    */
-  public El slideOut(Direction direction, int duration, Listener callback) {
-    FxStyle fx = new FxStyle(dom);
-    fx.slideOut(direction, duration, callback);
+  public El slideOut(Direction direction, FxConfig config) {
+    BaseEffect.slideOut(this, config, direction);
     return this;
   }
 
@@ -2242,7 +2290,7 @@ public class El {
   public String toString() {
     return getOuterHtml();
   }
-  
+
   /**
    * Return clipping (overflow) to original clipping before clip() was called.
    * 
@@ -2289,7 +2337,7 @@ public class El {
     DOM.removeChild(p, dom);
     DOM.appendChild(p, child);
   }
-  
+
   /**
    * Walks up the dom looking for a parent node that matches the passed simple
    * selector (e.g. div.some-class or span:first-child).

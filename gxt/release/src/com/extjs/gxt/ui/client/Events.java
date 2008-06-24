@@ -13,36 +13,51 @@ import com.google.gwt.user.client.Event;
  * Defines the GXT event types.
  */
 public class Events {
-  
+
   /**
    * DOM ONCLICK event type.
    */
   public static final int OnClick = Event.ONCLICK;
-  
+
   /**
    * DOM ONDBLCLICK event type.
    */
   public static final int OnDoubleClick = Event.ONDBLCLICK;
-  
+
   /**
    * DOM ONMOUSEDOWN event type.
    */
   public static final int OnMouseDown = Event.ONMOUSEDOWN;
-  
+
   /**
    * DOM ONMOUSEUP event type.
    */
   public static final int OnMouseUp = Event.ONMOUSEUP;
-  
+
   /**
    * DOM ONMOUSEOVER event type.
    */
   public static final int OnMouseOver = Event.ONMOUSEOVER;
-  
+
   /**
    * DOM ONMOUSEOUT event type.
    */
   public static final int OnMouseOut = Event.ONMOUSEOUT;
+
+  /**
+   * DOM ONMOUSEMOVE event type.
+   */
+  public static final int OnMouseMove = Event.ONMOUSEMOVE;
+
+  /**
+   * DOM ONKEYDOWN event type.
+   */
+  public static final int OnKeyDown = Event.ONKEYDOWN;
+
+  /**
+   * DOM ONKEYUP event type.
+   */
+  public static final int OnKeyUp = Event.ONKEYUP;
 
   /**
    * Activate event type (value is 10).
@@ -88,11 +103,6 @@ public class Events {
    * BeforeCollapse event type (value is 70).
    */
   public static final int BeforeCollapse = 70;
-
-  /**
-   * BeforeDestroy event type (value is 75).
-   */
-  public static final int BeforeDestroy = 75;
 
   /**
    * BeforeExpand event type (value is 80).
@@ -200,11 +210,6 @@ public class Events {
   public static final int Deactivate = 240;
 
   /**
-   * Destroy event type (value is 250).
-   */
-  public static final int Destroy = 250;
-
-  /**
    * Detach event type (value is 260).
    */
   public static final int Detach = 260;
@@ -213,11 +218,6 @@ public class Events {
    * Disable event type (value is 270).
    */
   public static final int Disable = 270;
-
-  /**
-   * DoubleClick event type (value 280).
-   */
-  public static final int DoubleClick = 280;
 
   /**
    * DragCancel event type (value is 290).
@@ -268,6 +268,16 @@ public class Events {
    * Focus event type (value is 380).
    */
   public static final int Focus = 380;
+  
+  /**
+   * HeaderChange event type (value is 382).
+   */
+  public static final int HeaderChange = 382;
+  
+  /**
+   * HiddenChange event type (value is 384).
+   */
+  public static final int HiddenChange = 384;
 
   /**
    * Hide event type (value is 390).
@@ -283,6 +293,16 @@ public class Events {
    * KeyPress event type (value is 420).
    */
   public static final int KeyPress = 420;
+ 
+  /**
+   * KeyUp event type (value is 425).
+   */
+  public static final int KeyUp = 425;
+  
+  /**
+   * KeyDown event type (value is 430).
+   */
+  public static final int KeyDown = 430;
 
   /**
    * Minimize event type (value is 440).
@@ -303,31 +323,6 @@ public class Events {
    * Minimize event type (value is 470).
    */
   public static final int Minimize = 470;
-
-  /**
-   * MouseDown event type (value is 480).
-   */
-  public static final int MouseDown = 480;
-
-  /**
-   * MouseMove event type (value is 490).
-   */
-  public static final int MouseMove = 490;
-
-  /**
-   * MouseOut event type (value is 500).
-   */
-  public static final int MouseOut = 500;
-
-  /**
-   * MouseOver event type (value is 510).
-   */
-  public static final int MouseOver = 510;
-
-  /**
-   * MouseUp event type (value is 520).
-   */
-  public static final int MouseUp = 520;
 
   /**
    * Resize event type (value is 530).
@@ -423,6 +418,16 @@ public class Events {
    * Toggle event type (value is 690).
    */
   public static final int Toggle = 690;
+  
+  /**
+   * TriggerClick event type (value is 692);
+   */
+  public static final int TriggerClick = 692;
+  
+  /**
+   * TwinTriggerClick event type (value is 694);
+   */
+  public static final int TwinTriggerClick = 694;
 
   /**
    * Change event type (value is 700).
@@ -433,5 +438,30 @@ public class Events {
    * Valid event type (value is 710).
    */
   public static final int Valid = 710;
+  
+  /**
+   * WidthChange event type (value is 712).
+   */
+  public static final int WidthChange = 712;
+
+  /**
+   * BeforeAdopt event type (value is 720).
+   */
+  public static final int BeforeAdopt = 720;
+
+  /**
+   * Adopt event type (value is 730).
+   */
+  public static final int Adopt = 730;
+
+  /**
+   * BeforeOrphan event type (value is 740).
+   */
+  public static final int BeforeOrphan = 740;
+
+  /**
+   * Orphan event type (value is 750).
+   */
+  public static final int Orphan = 750;
 
 }

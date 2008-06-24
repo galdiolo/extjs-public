@@ -7,9 +7,10 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
-import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.data.Loader;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.event.HtmlContainerEvent;
 import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.google.gwt.http.client.Request;
@@ -19,6 +20,7 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.RequestBuilder.Method;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -26,14 +28,14 @@ import com.google.gwt.user.client.ui.Widget;
  * element, an html fragment, or a remote url. When adding children a css
  * selector is used to identify the element the child will be inserted into.
  */
-public class HtmlContainer<T extends Component> extends AbstractContainer<T> {
+public class HtmlContainer extends Container<Component> {
 
   /**
    * The method used when requesting remote content (defaults to
    * RequestBuilder.GET). Only applies when specifying a {@link #setUrl(String)}.
    */
   public Method httpMethod = RequestBuilder.GET;
-  
+
   /**
    * True to defer remote requests until the component is rendered (defauls to
    * false).
@@ -50,12 +52,14 @@ public class HtmlContainer<T extends Component> extends AbstractContainer<T> {
   private String url;
   private RequestBuilder requestBuilder;
   private RequestCallback callback;
+
   /**
    * Creates a new container.
    */
   public HtmlContainer() {
-    attachChildren = false;
+
   }
+
   /**
    * Creates a new container.
    * 
@@ -93,17 +97,12 @@ public class HtmlContainer<T extends Component> extends AbstractContainer<T> {
    * @param selector the css selector used to identify the components parent
    */
   public void add(Widget widget, String selector) {
-    T c = widget instanceof Component ? (T) widget : (T)new WidgetComponent(
-        widget);
-    HtmlContainerEvent hce = new HtmlContainerEvent(this);
-    hce.item = c;
-    if (fireEvent(Events.BeforeAdd, hce)) {
-      super.insert(c, getItemCount());
-      c.setData("selector", selector);
+    Component component = wrapWidget(widget);
+    if (super.add(component)) {
+      component.setData("selector", selector);
       if (rendered) {
-        renderItem(c, selector);
+        renderItem(component, selector);
       }
-      fireEvent(Events.Add, hce);
     }
   }
 
@@ -114,20 +113,6 @@ public class HtmlContainer<T extends Component> extends AbstractContainer<T> {
     return tagName;
   }
 
-  /**
-   * Removes a component from the container.
-   * 
-   * @param component the widget to remove
-   * @return <code>true</code> if the widget was removed
-   */
-  public boolean remove(T component) {
-    if (fireEvent(Events.BeforeRemove, component)) {
-      boolean result = super.remove(component);
-      fireEvent(Events.Remove, component);
-      return result;
-    }
-    return false;
-  }
 
   /**
    * Sets the container's inner html.
@@ -137,8 +122,8 @@ public class HtmlContainer<T extends Component> extends AbstractContainer<T> {
   public void setHtml(String html) {
     this.html = html;
     if (rendered) {
-      el.removeChildren();
-      el.setInnerHtml(html);
+      el().removeChildren();
+      getElement().setInnerHTML(html);
       renderAll();
     }
   }
@@ -201,13 +186,13 @@ public class HtmlContainer<T extends Component> extends AbstractContainer<T> {
   }
 
   protected void renderItem(Component item, String selector) {
-    El elem = el.selectNode(selector);
+    El elem = el().selectNode(selector);
     if (elem != null) {
       elem.removeChildren();
       if (!item.isRendered()) {
         item.render(elem.dom);
       } else {
-        el.appendChild(item.getElement());
+        getElement().appendChild(item.getElement());
       }
       if (isAttached() && !item.isAttached()) {
         WidgetHelper.doAttach(item);
@@ -238,10 +223,13 @@ public class HtmlContainer<T extends Component> extends AbstractContainer<T> {
 
   }
 
-  private boolean fireEvent(int type, Component item) {
-    HtmlContainerEvent ce = new HtmlContainerEvent(this);
-    ce.item = item;
-    return fireEvent(type, ce);
+  @Override
+  protected ComponentEvent createComponentEvent(Event event) {
+    return new HtmlContainerEvent(this);
   }
 
+  @Override
+  protected ContainerEvent createContainerEvent(Component item) {
+    return new HtmlContainerEvent(this, item);
+  }
 }

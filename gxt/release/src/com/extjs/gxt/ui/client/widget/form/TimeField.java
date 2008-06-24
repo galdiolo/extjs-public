@@ -11,8 +11,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.extjs.gxt.ui.client.store.Record;
-import com.extjs.gxt.ui.client.store.Store;
+import com.extjs.gxt.ui.client.data.BaseModelData;
+import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.DateWrapper;
 import com.google.gwt.i18n.client.DateTimeFormat;
 
@@ -52,42 +53,102 @@ import com.google.gwt.i18n.client.DateTimeFormat;
  * </dd>
  * </dl>
  */
-public class TimeField extends ComboBox {
+public class TimeField extends ComboBox<ModelData> {
 
   /**
-   * The error text to display when the date in the cell is before minValue
-   * (defaults to 'The time in this field must be equal to or after {0}').
+   * TimeField error messages.
    */
-  public String minText;
+  public class TimeFieldMessages extends ComboBoxMessages {
+
+    private String minText;
+    private String maxText;
+
+    /**
+     * Returns the max text.
+     * 
+     * @return the max text
+     */
+    public String getMaxText() {
+      return maxText;
+    }
+
+    /**
+     * Returns the min text.
+     * 
+     * @return the min text
+     */
+    public String getMinText() {
+      return minText;
+    }
+
+    /**
+     * Sets the error text to display when the time in the field is invalid
+     * (defaults to '{value} is not a valid time - it must be in the format
+     * {format}').
+     * 
+     * @param invalidText the invalid text
+     */
+    public void setInvalidText(String invalidText) {
+      super.setInvalidText(invalidText);
+    }
+
+    /**
+     * Sets the error text to display when the time is after maxValue (defaults
+     * to 'The time in this field must be equal to or before {0}').
+     * 
+     * @param maxText the max text
+     */
+    public void setMaxText(String maxText) {
+      this.maxText = maxText;
+    }
+
+    /**
+     * Sets the error text to display when the date in the cell is before
+     * minValue (defaults to 'The time in this field must be equal to or after
+     * {0}').
+     * 
+     * @param minText the min text
+     */
+    public void setMinText(String minText) {
+      this.minText = minText;
+    }
+
+  }
 
   /**
-   * The error text to display when the time is after maxValue (defaults to 'The
-   * time in this field must be equal to or before {0}').
+   * The number of minutes between each time value in the list (defaults to 15).
    */
-  public String maxText;
-
-  /**
-   * The error text to display when the time in the field is invalid (defaults
-   * to '{value} is not a valid time - it must be in the format {format}').
-   */
-  public String invalidText;
+  private int increment = 15;
 
   /**
    * The date time format used to format each entry (defaults to
    * {@link DateTimeFormat#getShortDateFormat()}.
    */
-  public DateTimeFormat format = DateTimeFormat.getShortTimeFormat();
-
-  /**
-   * The number of minutes between each time value in the list (defaults to 15).
-   */
-  public int increment = 15;
+  private DateTimeFormat format = DateTimeFormat.getShortTimeFormat();
 
   private Date minValue;
   private Date maxValue;
 
   public TimeField() {
+    setMessages(new TimeFieldMessages());
+  }
 
+  /**
+   * Returns the date time format.
+   * 
+   * @return the date time format
+   */
+  public DateTimeFormat getFormat() {
+    return format;
+  }
+
+  /**
+   * Returns the number of minutes between each time value.
+   * 
+   * @return the increment
+   */
+  public int getIncrement() {
+    return increment;
   }
 
   /**
@@ -99,6 +160,11 @@ public class TimeField extends ComboBox {
     return maxValue;
   }
 
+  @Override
+  public TimeFieldMessages getMessages() {
+    return (TimeFieldMessages) messages;
+  }
+
   /**
    * Returns the fields minimum value.
    * 
@@ -106,6 +172,26 @@ public class TimeField extends ComboBox {
    */
   public Date getMinValue() {
     return minValue;
+  }
+
+  /**
+   * Sets the date time format used to format each entry (defaults to
+   * {@link DateTimeFormat#getShortDateFormat()}.
+   * 
+   * @param format the date time format
+   */
+  public void setFormat(DateTimeFormat format) {
+    this.format = format;
+  }
+
+  /**
+   * Sets the number of minutes between each time value in the list (defaults to
+   * 15).
+   * 
+   * @param increment the increment
+   */
+  public void setIncrement(int increment) {
+    this.increment = increment;
   }
 
   /**
@@ -136,15 +222,15 @@ public class TimeField extends ComboBox {
       max = max.clearTime().addMinutes((24 * 60) - 1);
     }
 
-    List<Record> times = new ArrayList<Record>();
+    List times = new ArrayList();
     while (min.before(max)) {
-      Record r = new Record();
-      r.set("text", format.format(min.asDate()));
+      BaseModelData r = new BaseModelData();
+      r.set("text", getFormat().format(min.asDate()));
       times.add(r);
-      min = min.addMinutes(increment);
+      min = min.addMinutes(getIncrement());
     }
 
-    Store store = new Store();
+    ListStore store = new ListStore();
     store.add(times);
 
     setStore(store);

@@ -9,6 +9,7 @@ package com.extjs.gxt.ui.client.util;
 
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.core.CompositeElement;
+import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.extjs.gxt.ui.client.event.PreviewEvent;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
@@ -46,7 +47,7 @@ import com.google.gwt.user.client.EventPreview;
  * </dd>
  * </dt>
  */
-public class BaseEventPreview extends Observable implements EventPreview {
+public class BaseEventPreview extends BaseObservable implements EventPreview {
 
   private CompositeElement ignoreList = new CompositeElement();
   private boolean autoHide = true;
@@ -83,7 +84,7 @@ public class BaseEventPreview extends Observable implements EventPreview {
     PreviewEvent be = new PreviewEvent(this, event);
     be.type = DOM.eventGetType(event);
     be.event = event;
-    if (isAutoHide() && onAutoHidePreview(be)) {
+    if (autoHide && onAutoHidePreview(be)) {
       remove();
     }
     return onPreview(be);
@@ -161,9 +162,9 @@ public class BaseEventPreview extends Observable implements EventPreview {
       case Event.ONMOUSEUP:
       case Event.ONCLICK:
       case Event.ONDBLCLICK: {
-        boolean autoHide = !getIgnoreList().is(ce.getTarget());
-        if (autoHide && onAutoHide(ce)) {
-          remove();
+        boolean ignore = getIgnoreList().is(ce.getTarget());
+        if (!ignore && onAutoHide(ce)) {
+          return true;
         }
       }
     }

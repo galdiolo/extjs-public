@@ -7,16 +7,27 @@
  */
 package com.extjs.gxt.ui.client.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.js.JsObject;
 import com.extjs.gxt.ui.client.widget.Component;
-
+import com.google.gwt.core.client.JavaScriptObject;
 
 /**
- * Various utility funcitons.
+ * Various utility functions.
  */
 public class Util {
-  
+
+  /**
+   * Constrains the value by a min and max value.
+   * 
+   * @param value the value
+   * @param min the minimum
+   * @param max the maximum
+   * @return the adjusted value
+   */
   public static int constrain(int value, int min, int max) {
     value = Math.max(value, min);
     value = Math.min(value, max);
@@ -39,6 +50,18 @@ public class Util {
   }
 
   /**
+   * Creates a new list and adds the element(s).
+   * 
+   * @param element the item to add to the list
+   * @return the new list
+   */
+  public static List createList(Object... element) {
+    List list = new ArrayList();
+    fill(list, element);
+    return list;
+  }
+
+  /**
    * Populates a list with an array of elements.
    * 
    * @param list the list
@@ -49,15 +72,47 @@ public class Util {
       list.add(elements[i]);
     }
   }
-  
+
+  /**
+   * Returns the model's data as a javascript object.
+   * 
+   * @param model the model
+   * @return the javascript object
+   */
+  public static JavaScriptObject getJsObject(ModelData model) {
+    JsObject jsObj = new JsObject();
+    for (String key : model.getPropertyNames()) {
+      Object value = model.get(key);
+      jsObj.set(key, value);
+    }
+    return jsObj.getJsObject();
+  }
+
+  /**
+   * Returns the index of a object in an array.
+   * 
+   * @param elements the array
+   * @param elem the elemnt
+   * @return the index or -1 if elem not in the array
+   */
   public static int indexOf(Object[] elements, Object elem) {
     for (int i = 0; i < elements.length; i++) {
       if (elements[i] == elem) {
         return i;
       }
     }
-    
+
     return -1;
+  }
+
+  /**
+   * Returns true if the style ends with .jpg, .gif, or .png.
+   * 
+   * @param style the style
+   * @return true for an image path
+   */
+  public static boolean isImagePath(String style) {
+    return style.matches(".*(jpg$|gif$|png$)");
   }
 
   /**

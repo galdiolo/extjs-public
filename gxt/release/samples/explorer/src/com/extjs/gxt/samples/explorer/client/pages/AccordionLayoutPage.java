@@ -11,6 +11,7 @@ import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.layout.AccordionLayout;
+import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.tree.Tree;
 import com.extjs.gxt.ui.client.widget.tree.TreeItem;
 import com.google.gwt.core.client.EntryPoint;
@@ -20,14 +21,16 @@ import com.google.gwt.user.client.ui.RootPanel;
 public class AccordionLayoutPage extends ContentPanel implements EntryPoint {
 
   public AccordionLayoutPage() {
+    // next line is only used to pass layout to containing container
+    // this will have NO effect outside of the explorer demo
+    setData("layout", new FlowLayout(10));
+    
     setHeading("AccordionLayout");
     setBodyBorder(false);
   }
 
-  private TreeItem newItem(String text, String iconStyle) {
-    TreeItem item = new TreeItem(text);
-    item.setIconStyle(iconStyle);
-    return item;
+  public void onModuleLoad() {
+    RootPanel.get().add(this);
   }
 
   @Override
@@ -61,16 +64,19 @@ public class AccordionLayoutPage extends ContentPanel implements EntryPoint {
     cp.add(tree);
 
     cp = new ContentPanel();
+    cp.setBodyStyleName("pad-text");
     cp.setHeading("Settings");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     add(cp);
     
     cp = new ContentPanel();
+    cp.setBodyStyleName("pad-text");
     cp.setHeading("Stuff");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     add(cp);
     
     cp = new ContentPanel();
+    cp.setBodyStyleName("pad-text");
     cp.setHeading("More Stuff");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     add(cp);
@@ -78,8 +84,10 @@ public class AccordionLayoutPage extends ContentPanel implements EntryPoint {
     setSize(200, 325);
   }
 
-  public void onModuleLoad() {
-    RootPanel.get().add(this);
+  private TreeItem newItem(String text, String iconStyle) {
+    TreeItem item = new TreeItem(text);
+    item.setIconStyle(iconStyle);
+    return item;
   }
 
 }

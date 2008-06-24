@@ -7,51 +7,104 @@
  */
 package com.extjs.gxt.ui.client.widget.form;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.util.Format;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.KeyboardListener;
 
 /**
  * Numeric text field that provides automatic keystroke filtering and numeric
  * validation.
  */
-public class NumberField extends TextField {
+public class NumberField extends TextField<Number> {
 
   /**
-   * Character(s) to allow as the decimal separator (defaults to '.').
+   * NumberField messages.
    */
-  public char decimalSeperator = '.';
+  public class NumberFieldMessages extends TextFieldMessages {
+    private String minText;
+    private String maxText;
+    private String nanText;
 
-  /**
-   * The maximum precision to display after the decimal separator (defaults to
-   * 2).
-   */
-  public int decimalPrecision = 2;
+    /**
+     * Returns the max error text.
+     * 
+     * @return the error text
+     */
+    public String getMaxText() {
+      return maxText;
+    }
 
-  /**
-   * Error text to display if the minimum value validation fails (defaults to
-   * "The minimum value for this field is {minValue}").
-   */
-  public String minText;
+    /**
+     * Returns the min error text.
+     * 
+     * @return the min eror text
+     */
+    public String getMinText() {
+      return minText;
+    }
 
-  /**
-   * Error text to display if the maximum value validation fails (defaults to
-   * "The maximum value for this field is {maxValue}").
-   */
-  public String maxText;
+    /**
+     * Returns the not a number error text.
+     * 
+     * @return the not a number error text
+     */
+    public String getNanText() {
+      return nanText;
+    }
 
-  /**
-   * Error text to display if the value is not a valid number. For example, this
-   * can happen if a valid character like '.' or '-' is left in the field with
-   * no number (defaults to "{value} is not a valid number").
-   */
-  public String nanText;
+    /**
+     * Error text to display if the maximum value validation fails (defaults to
+     * "The maximum value for this field is {maxValue}").
+     * 
+     * @param maxText the max error text
+     */
+    public void setMaxText(String maxText) {
+      this.maxText = maxText;
+    }
 
-  private NumberFormat format = NumberFormat.getDecimalFormat();
+    /**
+     * Sets the Error text to display if the minimum value validation fails
+     * (defaults to "The minimum value for this field is {minValue}").
+     * 
+     * @param minText min error text
+     */
+    public void setMinText(String minText) {
+      this.minText = minText;
+    }
+
+    /**
+     * Sets the error text to display if the value is not a valid number. For
+     * example, this can happen if a valid character like '.' or '-' is left in
+     * the field with no number (defaults to "{value} is not a valid number").
+     * 
+     * @param nanText the not a number text
+     */
+    public void setNanText(String nanText) {
+      this.nanText = nanText;
+    }
+  }
+
+  private String baseChars = "0123456789";
+  private String decimalSeparator = ".";
   private boolean allowNegative = true;
   private boolean allowDecimals = true;
-  private double minValue = Double.MIN_VALUE;
+  private List<Character> allowed;
+  private double minValue = Double.NEGATIVE_INFINITY;
   private double maxValue = Double.MAX_VALUE;
+
+  /**
+   * Creates a new number field.
+   */
+  public NumberField() {
+    messages = new NumberFieldMessages();
+    propertyEditor = new NumberPropertyEditor();
+  }
 
   /**
    * Returns true of decimal values are allowed.
@@ -72,12 +125,30 @@ public class NumberField extends TextField {
   }
 
   /**
+   * Returns the base characters.
+   * 
+   * @return the base characters
+   */
+  public String getBaseChars() {
+    return baseChars;
+  }
+
+  /**
+   * Returns the field's decimal seperator.
+   * 
+   * @return the seperator
+   */
+  public String getDecimalSeparator() {
+    return decimalSeparator;
+  }
+
+  /**
    * Returns the field's number format.
    * 
    * @return the number format
    */
   public NumberFormat getFormat() {
-    return format;
+    return getPropertyEditor().getFormat();
   }
 
   /**
@@ -89,6 +160,11 @@ public class NumberField extends TextField {
     return maxValue;
   }
 
+  @Override
+  public NumberFieldMessages getMessages() {
+    return (NumberFieldMessages) messages;
+  }
+
   /**
    * Returns the field's minimum value.
    * 
@@ -96,6 +172,11 @@ public class NumberField extends TextField {
    */
   public double getMinValue() {
     return minValue;
+  }
+
+  @Override
+  public NumberPropertyEditor getPropertyEditor() {
+    return (NumberPropertyEditor) propertyEditor;
   }
 
   /**
@@ -117,12 +198,32 @@ public class NumberField extends TextField {
   }
 
   /**
+   * Sets the base set of characters to evaluate as valid numbers (defaults to
+   * '0123456789').
+   * 
+   * @param baseChars the base character
+   */
+  public void setBaseChars(String baseChars) {
+    assertPreRender();
+    this.baseChars = baseChars;
+  }
+
+  /**
+   * Sets the character(s) to allow as the decimal separator (defaults to '.').
+   * 
+   * @param decimalSeparator
+   */
+  public void setDecimalSeparator(String decimalSeparator) {
+    this.decimalSeparator = decimalSeparator;
+  }
+
+  /**
    * Sets the cell's number formatter.
    * 
    * @param format the format
    */
   public void setFormat(NumberFormat format) {
-    this.format = format;
+    getPropertyEditor().setFormat(format);
   }
 
   /**
@@ -144,13 +245,38 @@ public class NumberField extends TextField {
   }
 
   @Override
-  public void setValue(Object value) {
-    if (value instanceof Double) {
-      super.setValue(format.format(((Double) value)));
-    } else {
-      super.setValue(value);
+  protected void onKeyDown(FieldEvent fe) {
+    super.onKeyDown(fe);
+    char key = (char) fe.getKeyCode();
+    
+    if (fe.getKeyCode() == 190) {
+      key = '.';
     }
-    this.value = value;
+    
+    if (fe.isSpecialKey() || key == KeyboardListener.KEY_BACKSPACE || key == KeyboardListener.KEY_DELETE) {
+      return;
+    }
+
+    if (!allowed.contains(key)) {
+      fe.stopEvent();
+    }
+  }
+
+  @Override
+  protected void onRender(Element target, int index) {
+    super.onRender(target, index);
+    allowed = new ArrayList<Character>();
+    for (int i = 0; i < baseChars.length(); i++) {
+      allowed.add(baseChars.charAt(i));
+    }
+    if (allowNegative) {
+      allowed.add('-');
+    }
+    if (allowDecimals) {
+      for (int i = 0; i < decimalSeparator.length(); i++) {
+        allowed.add(decimalSeparator.charAt(i));
+      }
+    }
   }
 
   @Override
@@ -163,27 +289,27 @@ public class NumberField extends TextField {
       return true;
     }
 
-    String v = value.replace(decimalSeperator, '.');
+    String v = value.replace(decimalSeparator, ".");
 
     Double d = null;
     try {
-      d = Double.parseDouble(v);
+      d = getPropertyEditor().convertStringValue(value);
     } catch (Exception e) {
       String error = "";
-      if (nanText == null) {
+      if (getMessages().getNanText() == null) {
         error = GXT.MESSAGES.numberField_nanText(v);
       } else {
-        error = Format.substitute(nanText, v);
+        error = Format.substitute(getMessages().getNanText(), v);
       }
       markInvalid(error);
       return false;
     }
     if (d < minValue) {
       String error = "";
-      if (minText == null) {
-        error = GXT.MESSAGES.numberField_minText(d);
+      if (getMessages().getMinText() == null) {
+        error = GXT.MESSAGES.numberField_minText(minValue);
       } else {
-        error = Format.substitute(minText, d);
+        error = Format.substitute(getMessages().getMinText(), minValue);
       }
       markInvalid(error);
       return false;
@@ -191,15 +317,14 @@ public class NumberField extends TextField {
 
     if (d > maxValue) {
       String error = "";
-      if (maxText == null) {
-        error = GXT.MESSAGES.numberField_maxText(d);
+      if (getMessages().getMaxText() == null) {
+        error = GXT.MESSAGES.numberField_maxText(maxValue);
       } else {
-        error = Format.substitute(maxText, d);
+        error = Format.substitute(getMessages().getMaxText(), maxValue);
       }
       markInvalid(error);
       return false;
     }
     return true;
   }
-
 }

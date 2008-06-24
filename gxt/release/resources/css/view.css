@@ -24,8 +24,8 @@
 }
 
 .x-view-item-over {
-  background: #DFE8F6 none repeat scroll 0%;
-  border: 1px dotted #A3BAE9 !important;
+  background: #efefef url(../images/default/grid/row-over.gif) repeat-x left top;
+  border: 1px dotted #dddddd !important;
   cursor: pointer;
 }
 

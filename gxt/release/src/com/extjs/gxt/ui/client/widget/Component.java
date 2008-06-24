@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
-import java.util.EventListener;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,12 +15,13 @@ import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.event.BaseEvent;
+import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.TypedListener;
+import com.extjs.gxt.ui.client.event.Observable;
 import com.extjs.gxt.ui.client.event.WidgetListener;
 import com.extjs.gxt.ui.client.state.StateManager;
-import com.extjs.gxt.ui.client.util.Observable;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.tips.ToolTip;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
@@ -30,19 +30,18 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Base class for GXT components. All subclasses of Component can automatically
- * participate in the standard GXT component lifecycle of creation, rendering
- * and destruction. They also have automatic support for basic hide/show and
+ * participate in the standard GXT component lifecycle of creation, attach and
+ * detach. They also have automatic support for basic hide/show and
  * enable/disable behavior. Component allows any subclass to be lazy-rendered
- * into any GXT {@link AbstractContainer}. Components added to a GWT
- * {@link Panel} will be rendered when inserted. All visual widgets that require
- * rendering into a layout should subclass Component (or {@link BoxComponent} if
- * managed box model handling is required).
+ * into any GXT {@link Container}. Components added to a GWT {@link Panel} will
+ * be rendered when inserted. All visual widgets that require rendering into a
+ * layout should subclass Component (or {@link BoxComponent} if managed box
+ * model handling is required).
  * 
  * <p>
  * The following 4 methods inherited from UIObject (setSize, setWidth,
@@ -126,21 +125,6 @@ import com.google.gwt.user.client.ui.Widget;
  * </ul>
  * </dd>
  * 
- * <dd><b>BeforeDestroy</b> : ComponentEvent(component)<br>
- * <div>Fires before the component is destroyed. Listeners can set the
- * <code>doit</code> field to <code>false</code> to cancel the action.</div>
- * <ul>
- * <li>component : this</li>
- * </ul>
- * </dd>
- * 
- * <dd><b>Destroy</b> : ComponentEvent(component)<br>
- * <div>Fires after the component is destroyed.</div>
- * <ul>
- * <li>component : this</li>
- * </ul>
- * </dd>
- * 
  * <dd><b>BrowserEvent</b> : ComponentEvent(component, event)<br>
  * <div>Fires on any browser event the component receives. Listners will be
  * called prior to any event processing and before
@@ -190,16 +174,11 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * </dl>
  */
-public abstract class Component extends Widget {
+public abstract class Component extends Widget implements Observable {
 
   static {
     GXT.init();
   }
-
-  /**
-   * The wrapped el instance.
-   */
-  public El el;
 
   /**
    * The base style is typically set as the component's style when rendered. All
@@ -245,15 +224,17 @@ public abstract class Component extends Widget {
    * The state id (defaults to null).
    */
   protected String stateId;
+
   protected boolean hasListeners;
 
+  private El el;
   private Map<String, Object> state;
   private ToolTipConfig toolTipConfig;
   private Menu contextMenu;
   private String id, itemId, cls, title;
   private Object data;
   private HashMap dataMap;
-  private Observable observable;
+  private BaseObservable observable;
   private String styles = "";
   private ToolTip toolTip;
   private int disableTextSelection = Style.DEFAULT;
@@ -262,15 +243,17 @@ public abstract class Component extends Widget {
   private El focusEl;
   private Map overElements;
   private Element dummy;
-  private boolean destroyed;
   private boolean disableEvents;
   private boolean hasBrowserListener;
+  private boolean enableState = true;
+  private boolean focused;
+  private boolean afterRender;
 
   /**
    * Creates a new component..
    */
   public Component() {
-    observable = new Observable();
+    observable = new BaseObservable();
   }
 
   /**
@@ -322,42 +305,9 @@ public abstract class Component extends Widget {
    * @param listener the listener to be added
    */
   public void addWidgetListener(WidgetListener listener) {
-    TypedListener l = new TypedListener(listener);
-    addListener(Events.Attach, l);
-    addListener(Events.Detach, l);
-    addListener(Events.Resize, l);
-  }
-
-  /**
-   * Destroys this component by purging any event listeners, removing the
-   * component's element from the DOM, removing the component from its parent
-   * (if applicable). Subclasses should override as needed.
-   */
-  public void destroy() {
-    if (fireEvent(Events.BeforeDestroy)) {
-      Widget p = getParent();
-      if (p != null) {
-        if (p instanceof HasWidgets) {
-          ((HasWidgets) p).remove(this);
-        } else if (p instanceof AbstractContainer) {
-          ((AbstractContainer) p).remove(this);
-        }
-      }
-      Element el = DOM.getParent(getElement());
-      if (el != null) {
-        DOM.removeChild(el, getElement());
-      }
-      if (getElement() != null) {
-        clearElemenet();
-      }
-      overElements = null;
-      destroyed = true;
-      disabled = true;
-      onDestroy();
-      fireEvent(Events.Destroy);
-      removeAllListeners();
-      observable = null;
-    }
+    addListener(Events.Attach, listener);
+    addListener(Events.Detach, listener);
+    addListener(Events.Resize, listener);
   }
 
   /**
@@ -393,6 +343,15 @@ public abstract class Component extends Widget {
   }
 
   /**
+   * Returns the component's el instance.
+   * 
+   * @return the el instance
+   */
+  public El el() {
+    return el;
+  }
+
+  /**
    * Enable this component. Fires the <i>Enable</i> event.
    */
   public void enable() {
@@ -419,8 +378,13 @@ public abstract class Component extends Widget {
    * @return <code>false</code> if any listeners return <code>false</code>
    */
   public boolean fireEvent(int type) {
-    ComponentEvent be = new ComponentEvent(this);
+    ComponentEvent be = createComponentEvent(null);
+    be.type = type;
     return fireEvent(type, be);
+  }
+
+  public boolean fireEvent(int eventType, BaseEvent be) {
+    return observable.fireEvent(eventType, be);
   }
 
   /**
@@ -448,6 +412,7 @@ public abstract class Component extends Widget {
    * Try to focus this component. Fires the <i>Focus</i> event.
    */
   public void focus() {
+    this.focused = true;
     if (rendered) {
       getFocusEl().focus();
     }
@@ -487,9 +452,9 @@ public abstract class Component extends Widget {
    * @param key the name of the property
    * @return the value or <code>null</code> if it has not been set
    */
-  public Object getData(String key) {
+  public <X> X getData(String key) {
     if (dataMap == null) return null;
-    return dataMap.get(key);
+    return (X) dataMap.get(key);
   }
 
   @Override
@@ -535,7 +500,7 @@ public abstract class Component extends Widget {
    * @return the state
    */
   public Map<String, Object> getState() {
-    if (state == null) {
+    if (!enableState || state == null) {
       state = new HashMap<String, Object>();
     }
     return state;
@@ -578,15 +543,6 @@ public abstract class Component extends Widget {
   }
 
   /**
-   * Returns <code>true</code> if the component is destroyed.
-   * 
-   * @return the dispose state
-   */
-  public boolean isDestroyed() {
-    return destroyed;
-  }
-
-  /**
    * Returns <code>true</code> if the component is enabled.
    * 
    * @return the enabled state
@@ -621,9 +577,9 @@ public abstract class Component extends Widget {
     if (disabled || disableEvents) {
       return;
     }
-    
+
     int type = DOM.eventGetType(event);
-    
+
     // hack to receive keyboard events in safari
     if (GXT.isSafari && type == Event.ONCLICK && focusable) {
       focus();
@@ -645,7 +601,8 @@ public abstract class Component extends Widget {
       return;
     }
 
-    if (ce.type == Event.ONMOUSEUP && ce.isRightClick()) {
+    int tt = GXT.isSafari ? Event.ONMOUSEDOWN : Event.ONMOUSEUP;
+    if (ce.type == tt && ce.isRightClick()) {
       onRightClick(ce);
     }
 
@@ -674,10 +631,9 @@ public abstract class Component extends Widget {
   }
 
   /**
-   * Notifies the component that it should recalculate its layout based on its
-   * current size if neccessary. Default implementation does nothing. Layouts
-   * will call this method if a child component is not sized directly when the
-   * layout is executed.
+   * Called when the component is in a LayoutContainer and the container's
+   * layout executes. This method will not be called on container
+   * instances.  Default implementation does nothing.
    */
   public void recalculate() {
 
@@ -692,8 +648,8 @@ public abstract class Component extends Widget {
 
   @Override
   public void removeFromParent() {
-    if (getParent() instanceof AbstractContainer) {
-      ((AbstractContainer) getParent()).remove(this);
+    if (getParent() instanceof Container) {
+      ((Container) getParent()).remove(this);
       return;
     }
     super.removeFromParent();
@@ -705,20 +661,9 @@ public abstract class Component extends Widget {
    * @param eventType the event type
    * @param listener the listener to be removed
    */
-  public void removeListener(int eventType, EventListener listener) {
-    observable.removeListener(eventType, listener);
-    hasListeners = observable.eventTable != null && observable.eventTable.size() > 0;
-  }
-
-  /**
-   * Removes a listener.
-   * 
-   * @param eventType the event type
-   * @param listener the listener to be removed
-   */
   public void removeListener(int eventType, Listener listener) {
     observable.removeListener(eventType, listener);
-    hasListeners = observable.eventTable != null && observable.eventTable.size() > 0;
+    hasListeners = observable.hasListeners();
   }
 
   /**
@@ -746,10 +691,11 @@ public abstract class Component extends Widget {
    * @param listener the listener to be removed
    */
   public void removeWidgetListener(WidgetListener listener) {
-    if (observable.eventTable == null) return;
-    observable.eventTable.unhook(Events.Attach, listener);
-    observable.eventTable.unhook(Events.Detach, listener);
-    observable.eventTable.unhook(Events.Resize, listener);
+    if (observable.hasListeners()) {
+      observable.removeListener(Events.Attach, listener);
+      observable.removeListener(Events.Detach, listener);
+      observable.removeListener(Events.Resize, listener);
+    }
   }
 
   /**
@@ -770,16 +716,17 @@ public abstract class Component extends Widget {
    * 
    * @param target the element this component should be rendered into
    * @param index the index within the container <b>before</b> which this
-   *            component will be inserted (defaults to appending to the end of
-   *            the container if value is -1)
+   *          component will be inserted (defaults to appending to the end of
+   *          the container if value is -1)
    */
   public void render(Element target, int index) {
     if (rendered || !fireEvent(Events.BeforeRender)) {
       return;
     }
-    rendered = true;
 
-    initState();
+    beforeRender();
+
+    rendered = true;
 
     createStyles(baseStyle);
 
@@ -789,8 +736,17 @@ public abstract class Component extends Widget {
     onRender(target, index);
 
     if (el == null)
-      throw new RuntimeException(getClass().getName()
-          + " must call setElement in onRender");
+      throw new RuntimeException(getClass().getName() + " must call setElement in onRender");
+
+    if (id == null) {
+      id = el.getId();
+      if (id == null || id.equals("")) {
+        id = XDOM.getUniqueId();
+      }
+    }
+    getElement().setId(id);
+
+    initState();
 
     addStyleName(baseStyle);
 
@@ -802,11 +758,6 @@ public abstract class Component extends Widget {
     if (title != null) {
       setTitle(title);
     }
-
-    if (id == null) {
-      id = XDOM.getUniqueId();
-    }
-    setId(id);
 
     if (styles != null && !styles.equals("")) {
       el.applyStyles(styles);
@@ -825,14 +776,20 @@ public abstract class Component extends Widget {
       disable();
     }
 
+    if (focused) {
+      focus();
+    }
+
     if (borders != Style.DEFAULT) {
       setBorders(borders == 1);
     }
 
     if (focusable && GXT.isSafari) {
       focusEl = new El(createHiddenInput());
-      el.appendChild(focusEl.dom);
+      getElement().appendChild(focusEl.dom);
     }
+
+    afterRender = true;
     afterRender();
 
     fireEvent(Events.Render);
@@ -842,12 +799,12 @@ public abstract class Component extends Widget {
    * Saves the component's current state.
    */
   public void saveState() {
-    if (state != null) {
-      ComponentEvent ce = new ComponentEvent(this);
+    if (enableState && state != null) {
+      ComponentEvent ce = createComponentEvent(null);
       ce.state = state;
       if (fireEvent(Events.BeforeStateSave, ce)) {
         String sid = stateId != null ? stateId : getId();
-        StateManager.set(sid, state);
+        StateManager.get().set(sid, state);
         fireEvent(Events.StateSave, ce);
       }
     }
@@ -903,6 +860,15 @@ public abstract class Component extends Widget {
     } else {
       enable();
     }
+  }
+
+  /**
+   * Sets whether the component's state is enabled (defaults to true).
+   * 
+   * @param enable true to enable
+   */
+  public void setEnableState(boolean enable) {
+    this.enableState = enable;
   }
 
   /**
@@ -1068,7 +1034,7 @@ public abstract class Component extends Widget {
       id = fly(elem).getId();
       if (id == null || id.equals("")) {
         id = XDOM.getUniqueId();
-        fly(elem).setId(id);
+        fly(elem).dom.setId(id);
       }
     }
     overElements.put(id, style);
@@ -1083,8 +1049,20 @@ public abstract class Component extends Widget {
 
   }
 
+  /**
+   * Called before the component has been rendered.
+   * 
+   * <p/> This method can be used to lazily alter this component pre-render
+   */
+  protected void beforeRender() {
+  }
+
   protected void applyState(Map<String, Object> state) {
 
+  }
+
+  protected void assertPreRender() {
+    assert !afterRender : "Method must be called before the component is rendered";
   }
 
   /**
@@ -1133,9 +1111,9 @@ public abstract class Component extends Widget {
 
   protected void initState() {
     String sid = stateId != null ? stateId : getId();
-    state = StateManager.getMap(sid);
+    state = StateManager.get().getMap(sid);
     if (state != null) {
-      ComponentEvent ce = new ComponentEvent(this);
+      ComponentEvent ce = createComponentEvent(null);
       ce.state = state;
       if (fireEvent(Events.BeforeStateRestore, ce)) {
         applyState(state);
@@ -1163,9 +1141,6 @@ public abstract class Component extends Widget {
     super.onAttach();
   }
 
-  protected void onDestroy() {
-  }
-
   protected void onDetach() {
     super.onDetach();
     if (disableTextSelection > 0) {
@@ -1190,7 +1165,7 @@ public abstract class Component extends Widget {
   }
 
   protected void onHideContextMenu() {
-    disabled = false;
+    disableEvents = false;
   }
 
   protected void onLoad() {
@@ -1214,11 +1189,13 @@ public abstract class Component extends Widget {
       ce.stopEvent();
       final int x = ce.getClientX();
       final int y = ce.getClientY();
-      DeferredCommand.addCommand(new Command() {
-        public void execute() {
-          onShowContextMenu(x, y);
-        }
-      });
+      if (fireEvent(Events.ContextMenu, ce)) {
+        DeferredCommand.addCommand(new Command() {
+          public void execute() {
+            onShowContextMenu(x, y);
+          }
+        });
+      }
     }
   }
 
@@ -1227,16 +1204,14 @@ public abstract class Component extends Widget {
   }
 
   protected void onShowContextMenu(int x, int y) {
-    if (fireEvent(Events.ContextMenu)) {
-      contextMenu.addListener(Events.Hide, new Listener<ComponentEvent>() {
-        public void handleEvent(ComponentEvent ce) {
-          contextMenu.removeListener(Events.Hide, this);
-          onHideContextMenu();
-        }
-      });
-      contextMenu.showAt(x + 5, y + 5);
-      disabled = true;
-    }
+    contextMenu.addListener(Events.Hide, new Listener<ComponentEvent>() {
+      public void handleEvent(ComponentEvent ce) {
+        contextMenu.removeListener(Events.Hide, this);
+        onHideContextMenu();
+      }
+    });
+    contextMenu.showAt(x + 5, y + 5);
+    disableEvents = true;
   }
 
   protected void removeStyleOnOver(Element elem) {
@@ -1258,25 +1233,28 @@ public abstract class Component extends Widget {
     }
   }
 
+  protected void setEl(El el) {
+    this.el = el;
+  }
+
   protected void setElement(Element elem, Element parent, int index) {
     setElement(elem);
     DOM.insertChild(parent, elem, index);
   }
 
-  private native void clearElemenet() /*-{
-      this.@com.google.gwt.user.client.ui.UIObject::element = null;
-    }-*/;
+  protected void setFiresEvents(boolean firesEvents) {
+    observable.setFiresEvents(firesEvents);
+  }
 
   private native Element createHiddenInput() /*-{
-      var input = $doc.createElement('input');
-      input.type = 'text';
-      input.style.opacity = 0;
-      input.style.zIndex = -1;
-      input.style.height = '1px';
-      input.style.width = '1px';
-      input.style.overflow = 'hidden';
-      input.style.position = 'absolute';
-      return input;
-    }-*/;
-
+   var input = $doc.createElement('input');
+   input.type = 'text';
+   input.style.opacity = 0;
+   input.style.zIndex = -1;
+   input.style.height = '1px';
+   input.style.width = '1px';
+   input.style.overflow = 'hidden';
+   input.style.position = 'absolute';
+   return input;
+   }-*/;
 }

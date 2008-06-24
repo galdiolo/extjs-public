@@ -7,12 +7,12 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
-
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.WindowEvent;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.google.gwt.user.client.Element;
@@ -29,29 +29,36 @@ import com.google.gwt.user.client.Element;
 public class MessageBox {
 
   /**
+   * MessageBox type enumeration.
+   */
+  public enum MessageBoxType {
+    ALERT, CONFIRM, PROMPT, MULTIPROMPT, PROGRESSS, WAIT
+  }
+
+  /**
    * Button constant that displays a single OK button.
    */
-  public static final String OK = "ok";
+  public static final String OK = Dialog.OK;
 
   /**
    * Button constant that displays a single CANCEL button.
    */
-  public static final String CANCEL = "cancel";
+  public static final String CANCEL = Dialog.CANCEL;
 
   /**
    * Button constant that displays a OK and CANCEL button.
    */
-  public static final String OKCANCEL = "okcancel";
+  public static final String OKCANCEL = Dialog.OKCANCEL;
 
   /**
    * Button constant that displays a YES and NO button.
    */
-  public static final String YESNO = "yesno";
+  public static final String YESNO = Dialog.YESNO;
 
   /**
    * Button constant that displays a YES, NO, and CANCEL button.
    */
-  public static final String YESNOCANCEL = "yesnocancel";
+  public static final String YESNOCANCEL = Dialog.YESNOCANCEL;
 
   /**
    * The CSS style name that provides the INFO icon image.
@@ -82,14 +89,88 @@ public class MessageBox {
    * @param callback listener to be called when the box is closed
    * @return the new message box instance
    */
-  public static MessageBox alert(String title, String msg, Listener callback) {
+  public static MessageBox alert(String title, String msg, Listener<WindowEvent> callback) {
     MessageBox box = new MessageBox();
-    box.modal = false;
-    box.title = title;
-    box.message = msg;
+    box.setModal(false);
+    box.setTitle(title);
+    box.setMessage(msg);
     box.callback = callback;
-    box.buttons = OK;
+    box.setButtons(OK);
     box.icon = WARNING;
+    box.show();
+    return box;
+  }
+
+  /**
+   * Displays a confirmation message box with Yes and No buttons (comparable to
+   * JavaScript's confirm).
+   * 
+   * @param title the title bar text
+   * @param msg the message box body text
+   * @param callback the listener invoked after the message box is closed
+   * @return the new message box instance
+   */
+  public static MessageBox confirm(String title, String msg, Listener<WindowEvent> callback) {
+    MessageBox box = new MessageBox();
+    box.setTitle(title);
+    box.setMessage(msg);
+    box.callback = callback;
+    box.icon = QUESTION;
+    box.setButtons(YESNO);
+    box.show();
+    return box;
+  }
+
+  /**
+   * Displays a message box with a progress bar. This message box has no buttons
+   * and is not closeable by the user. You are responsible for updating the
+   * progress bar as needed via {@link MessageBox#updateProgress}
+   * 
+   * @param title the title bar text
+   * @param msg the message box body text
+   * @param progressText the text to display inside the progress bar
+   * @return the new message box
+   */
+  public static MessageBox progress(String title, String msg, String progressText) {
+    MessageBox box = new MessageBox();
+    box.setTitle(title);
+    box.setMessage(msg);
+    box.setType(MessageBoxType.PROGRESSS);
+    box.setProgressText(progressText);
+    box.setButtons("");
+    box.setClosable(false);
+    box.show();
+    return box;
+  }
+
+  /**
+   * Displays a message box with OK and Cancel buttons prompting the user to
+   * enter some text (comparable to JavaScript's prompt).
+   * 
+   * @param title the title bar text
+   * @param msg the message box body text
+   * @return the new message box
+   */
+  public static MessageBox prompt(String title, String msg) {
+    return prompt(title, msg, false);
+  }
+
+  /**
+   * Displays a message box with OK and Cancel buttons prompting the user to
+   * enter some text (comparable to JavaScript's prompt).
+   * 
+   * @param title the title bar text
+   * @param msg the message box body text
+   * @param multiline true for a multi-line text aread
+   * @return the new message box
+   */
+  public static MessageBox prompt(String title, String msg, boolean multiline) {
+    MessageBox box = new MessageBox();
+    box.setTitle(title);
+    box.setMessage(msg);
+    box.setType(MessageBoxType.PROMPT);
+    box.setButtons(Dialog.OKCANCEL);
+    box.setType(multiline ? MessageBoxType.MULTIPROMPT : MessageBoxType.PROMPT);
     box.show();
     return box;
   }
@@ -107,192 +188,73 @@ public class MessageBox {
    */
   public static MessageBox wait(String title, String msg, String progressText) {
     MessageBox box = new MessageBox();
-    box.title = title;
-    box.message = msg;
-    box.wait = true;
-    box.progressText = progressText;
-    box.buttons = "";
-    box.closable = false;
+    box.setTitle(title);
+    box.setMessage(msg);
+    box.setType(MessageBoxType.WAIT);
+    box.setProgressText(progressText);
+    box.setButtons("");
+    box.setClosable(false);
     box.show();
     return box;
   }
 
-  /**
-   * Displays a confirmation message box with Yes and No buttons (comparable to
-   * JavaScript's confirm).
-   * 
-   * @param title the title bar text
-   * @param msg the message box body text
-   * @param callback the listener invoked after the message box is closed
-   * @return the new message box instance
-   */
-  public static MessageBox confirm(String title, String msg, Listener callback) {
-    MessageBox box = new MessageBox();
-    box.title = title;
-    box.message = msg;
-    box.callback = callback;
-    box.icon = QUESTION;
-    box.buttons = YESNO;
-    box.show();
-    return box;
-  }
 
-  /**
-   * Displays a message box with a progress bar. This message box has no buttons
-   * and is not closeable by the user. You are responsible for updating the
-   * progress bar as needed via {@link MessageBox#updateProgress}
-   * 
-   * @param title the title bar text
-   * @param msg the message box body text
-   * @param progressText the text to display inside the progress bar
-   * @return the new message box
-   */
-  public static MessageBox progress(String title, String msg, String progressText) {
-    MessageBox box = new MessageBox();
-    box.title = title;
-    box.message = msg;
-    box.progress = true;
-    box.progressText = progressText;
-    box.buttons = "";
-    box.closable = false;
-    box.show();
-    return box;
-  }
-
-  /**
-   * Displays a message box with OK and Cancel buttons prompting the user to
-   * enter some text (comparable to JavaScript's prompt).
-   * 
-   * @param title the title bar text
-   * @param msg the message box body text
-   * @param callback the listener invoked after the message box is closed
-   * @return the new message box
-   */
-  public static MessageBox prompt(String title, String msg, Listener callback) {
-    return prompt(title, msg, false, callback);
-  }
-
-  public static MessageBox prompt(String title, String msg, boolean multiline,
-      Listener callback) {
-    MessageBox box = new MessageBox();
-    box.title = title;
-    box.message = msg;
-    box.prompt = true;
-    box.multiline = multiline;
-    box.callback = callback;
-    box.show();
-    return box;
-  }
-
-  /**
-   * The default height in pixels of the message box's multiline textarea if
-   * displayed (defaults to 75).
-   */
-  public int defaultTextHeight = 75;
-
-  /**
-   * The maximum width in pixels of the message box (defaults to 600).
-   */
-  public int maxWidth = 600;
-
-  /**
-   * The minimum width in pixels of the message box (defaults to 100).
-   */
-  public int minWidth = 100;
-
-  /**
-   * False to allow user interaction with the page while the message box is
-   * displayed (defaults to true).
-   */
-  public boolean modal = true;
-
-  /**
-   * True to display a progress bar (defaults to false).
-   */
-  public boolean progress = false;
-
-  /**
-   * The text to display inside the progress bar if progress = true (defaults to
-   * "").
-   */
-  public String progressText = "";
-
-  /**
-   * The minimum width in pixels of the message box if it is a progress-style
-   * dialog. This is useful for setting a different minimum width than text-only
-   * dialogs may need (defaults to 250).
-   */
-  public int minProgressWidth = 250;
-
-  /**
-   * False to hide the top-right close button (defaults to true). Note that
-   * progress and wait dialogs will ignore this property and always hide the
-   * close button as they can only be closed programmatically.
-   */
-  public boolean closable = true;
-
-  /**
-   * True to display a progress bar (defaults to false).
-   */
-  public boolean wait;
-
-  /**
-   * True to prompt the user to enter single-line text (defaults to false).
-   */
-  public boolean prompt = false;
-
-  /**
-   * True to prompt the user to enter multi-line text (defaults to false).
-   */
-  public boolean multiline = false;
-
-  /**
-   * The buttons to display (defaults to OK).
-   * 
-   * <pre>
-   * MessageBox.OK
-   * MessageBox.CANCEL
-   * MessageBox.OKCANCEL
-   * MessageBox.YESNO
-   * MessageBox.YESNOCANCEL
-   * </pre>
-   */
-  public String buttons = OK;
-
-  /**
-   * The title text.
-   */
-  public String title;
-
-  /**
-   * A string that will replace the existing message box body text (defaults to
-   * the XHTML-compliant non-breaking space character '&#160;').
-   */
-  public String message = "&#160;";
-  /**
-   * A CSS class that provides a background image to be used as an icon for the
-   * dialog (e.g., MessageBox.WARNING or 'custom-class', defaults to "").
-   * 
-   * <pre>
-   * MessageBox.INFO
-   * MessageBox.WARNING
-   * MessageBox.QUESTION
-   * MessageBox.ERROR
-   * </pre>
-   */
-  public String icon = "";
-
-  /**
-   * Listener to be called when the message box is closed.
-   */
-  public Listener callback;
-
+  private Listener<WindowEvent> callback;
+  private String icon = "";
+  private MessageBoxType type;
+  private int defaultTextHeight = 75;
+  private int maxWidth = 600;
+  private int minWidth = 100;
+  private boolean modal = true;
+  private String progressText = "";
+  private int minProgressWidth = 250;
+  private String message = "&#160;";
+  private boolean closable = true;
+  private String title;
+  private String buttons = OK;
   private Dialog dialog;
   private Element iconEl;
   private Element msgEl;
   private ProgressBar progressBar;
   private TextField textBox;
   private TextArea textArea;
+  
+  /**
+   * Adds a listener that will be called when the message box is closed.
+   * 
+   * @param listener the callback listener
+   */
+  public void addCallback(Listener listener) {
+    dialog.addListener(Events.Hide, listener);
+  }
+
+  /**
+   * Convernience method to add a listener to the underlying dialog instance.
+   * 
+   * @param event the event type
+   * @param listener the listener
+   */
+  public void addListener(int event, Listener listener) {
+    dialog.addListener(event, listener);
+  }
+
+  /**
+   * Returns the buttons.
+   * 
+   * @return the buttons
+   */
+  public String getButtons() {
+    return buttons;
+  }
+
+  /**
+   * Returns the default text height.
+   * 
+   * @return the height
+   */
+  public int getDefaultTextHeight() {
+    return defaultTextHeight;
+  }
 
   /**
    * Returns the underlying window.
@@ -311,37 +273,37 @@ public class MessageBox {
           El body = new El(dialog.getElement("body"));
 
           String html = "<div class='ext-mb-icon x-hidden'></div><div class=ext-mb-content><span class=ext-mb-text></span><br /></div>";
-          body.setInnerHtml(html);
+          body.dom.setInnerHTML(html);
 
           iconEl = body.firstChild().dom;
-          El contentEl = body.childNode(1);
-          El msgEl = contentEl.firstChild();
-          msgEl.update(message);
+          Element contentEl = body.dom.getChildNodes().getItem(1).cast();
+          msgEl = contentEl.getFirstChild().cast();
+          msgEl.setInnerHTML(message);
 
-          if (prompt && !multiline) {
+          if (type == MessageBoxType.PROMPT) {
             textBox = new TextField();
             dialog.setFocusWidget(textBox);
-            textBox.render(contentEl.dom, 2);
-            textBox.el.setWidth(GXT.isIE ? "100%" : "90%");
+            textBox.render(contentEl, 2);
+            textBox.el().setWidth(GXT.isIE ? "100%" : "90%");
             icon = null;
           }
 
-          if (multiline) {
+          if (type == MessageBoxType.MULTIPROMPT) {
             textArea = new TextArea();
-            textArea.render(contentEl.dom, 2);
-            textArea.el.setWidth(GXT.isIE ? "100%" : "90%");
+            textArea.render(contentEl, 2);
+            textArea.el().setWidth(GXT.isIE ? "100%" : "90%");
             dialog.setFocusWidget(textArea);
             icon = null;
           }
 
-          if (progress || wait) {
+          if (type == MessageBoxType.PROGRESSS || type == MessageBoxType.WAIT) {
             progressBar = new ProgressBar();
             progressBar.render(body.dom);
-            if (wait) {
+            if (type == MessageBoxType.WAIT) {
               progressBar.auto();
             }
-            if (progressText != null) {
-              progressBar.updateText(progressText);
+            if (getProgressText() != null) {
+              progressBar.updateText(getProgressText());
             }
             icon = null;
           }
@@ -357,7 +319,7 @@ public class MessageBox {
 
       };
 
-      dialog.setHeading(title);
+      dialog.setHeading(getTitle());
       dialog.setResizable(false);
       dialog.setConstrain(true);
       dialog.setMinimizable(false);
@@ -368,13 +330,56 @@ public class MessageBox {
       dialog.setMinHeight(80);
       dialog.setPlain(true);
       dialog.setFooter(true);
-      dialog.setButtons(buttons);
-      dialog.buttonPressedAction = "hide";
+      dialog.setButtons(getButtons());
+      dialog.setHideOnButtonClick(true);
       if (callback != null) {
         dialog.addListener(Events.Hide, callback);
       }
+      if (getButtons() != null) {
+        if (getButtons().contains(Dialog.YES)) {
+          dialog.setFocusWidget(dialog.getButtonBar().getButtonById(Dialog.YES));
+        } else if (getButtons().contains(Dialog.OK)) {
+          dialog.setFocusWidget(dialog.getButtonBar().getButtonById(Dialog.OK));
+        }
+      }
     }
     return dialog;
+  }
+
+  /**
+   * Returns the max width.
+   * 
+   * @return the max width
+   */
+  public int getMaxWidth() {
+    return maxWidth;
+  }
+
+  /**
+   * Returns the message.
+   * 
+   * @return the message
+   */
+  public String getMessage() {
+    return message;
+  }
+
+  /**
+   * Returns the min progress width.
+   * 
+   * @return the width
+   */
+  public int getMinProgressWidth() {
+    return minProgressWidth;
+  }
+
+  /**
+   * Returns the min width.
+   * 
+   * @return the min width
+   */
+  public int getMinWidth() {
+    return minWidth;
   }
 
   /**
@@ -387,12 +392,39 @@ public class MessageBox {
   }
 
   /**
+   * Returns the progress text.
+   * 
+   * @return the progress text
+   */
+  public String getProgressText() {
+    return progressText;
+  }
+
+  /**
    * Returns the box's text box.
    * 
    * @return the text box
    */
   public TextField getTextBox() {
     return textBox;
+  }
+
+  /**
+   * Returns the title text.
+   * 
+   * @return the title text
+   */
+  public String getTitle() {
+    return title;
+  }
+
+  /**
+   * Returns the message box type.
+   * 
+   * @return the type
+   */
+  public MessageBoxType getType() {
+    return type;
   }
 
   /**
@@ -405,12 +437,60 @@ public class MessageBox {
   }
 
   /**
+   * Returns true if the hide button is displayed.
+   * 
+   * @return the closable state
+   */
+  public boolean isClosable() {
+    return closable;
+  }
+
+  /**
+   * Returns true if modal is enabled.
+   * 
+   * @return the modal state
+   */
+  public boolean isModal() {
+    return modal;
+  }
+
+  /**
    * Returns true if the message box is currently displayed.
    * 
    * @return the visible state
    */
   public boolean isVisible() {
     return dialog != null && dialog.isVisible();
+  }
+
+  /**
+   * The buttons to display (defaults to OK, pre-render).
+   * 
+   * @param buttons the buttons
+   */
+  public void setButtons(String buttons) {
+    this.buttons = buttons;
+  }
+
+  /**
+   * False to hide the top-right close button (defaults to true, pre-render).
+   * Note that progress and wait dialogs will ignore this property and always
+   * hide the close button as they can only be closed programmatically.
+   * 
+   * @param closable false to hide the top-right close button
+   */
+  public void setClosable(boolean closable) {
+    this.closable = closable;
+  }
+
+  /**
+   * The default height in pixels of the message box's multiline textarea if
+   * displayed (defaults to 75, pre-render).
+   * 
+   * @param defaultTextHeight the default text height
+   */
+  public void setDefaultTextHeight(int defaultTextHeight) {
+    this.defaultTextHeight = defaultTextHeight;
   }
 
   /**
@@ -438,6 +518,85 @@ public class MessageBox {
       el.replaceStyleName(this.icon, "x-hidden");
       icon = "";
     }
+  }
+
+  /**
+   * The maximum width in pixels of the message box (defaults to 600,
+   * pre-render).
+   * 
+   * @param maxWidth the max width
+   */
+  public void setMaxWidth(int maxWidth) {
+    this.maxWidth = maxWidth;
+  }
+
+  /**
+   * A string that will replace the existing message box body text (defaults to
+   * the XHTML-compliant non-breaking space character '&#160;').
+   * 
+   * @param message the message
+   */
+  public void setMessage(String message) {
+    this.message = message;
+  }
+
+  /**
+   * The minimum width in pixels of the message box if it is a progress-style
+   * dialog. This is useful for setting a different minimum width than text-only
+   * dialogs may need (defaults to 250).
+   * 
+   * @param minProgressWidth the min progress width
+   */
+  public void setMinProgressWidth(int minProgressWidth) {
+    this.minProgressWidth = minProgressWidth;
+  }
+
+  /**
+   * The minimum width in pixels of the message box (defaults to 100,
+   * pre-render).
+   * 
+   * @param minWidth the min width
+   */
+  public void setMinWidth(int minWidth) {
+    this.minWidth = minWidth;
+  }
+
+  /**
+   * False to allow user interaction with the page while the message box is
+   * displayed (defaults to true, pre-render).
+   * 
+   * @param modal true for modal
+   */
+  public void setModal(boolean modal) {
+    this.modal = modal;
+  }
+
+  /**
+   * The text to display inside the progress bar if progress = true (defaults to
+   * "", pre-render).
+   * 
+   * @param progressText the progress text
+   */
+  public void setProgressText(String progressText) {
+    this.progressText = progressText;
+  }
+
+  /**
+   * Sets the title text (pre-render).
+   * 
+   * @param title the title text
+   */
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  /**
+   * Sets the message box type (pre-render).
+   * 
+   * @param type the type
+   */
+  public void setType(MessageBoxType type) {
+    this.type = type;
   }
 
   /**
@@ -470,7 +629,7 @@ public class MessageBox {
    * @return this
    */
   public MessageBox updateText(String text) {
-    El.fly(msgEl).update(text != null ? text : "&#160;");
+    msgEl.setInnerHTML(text != null ? text : "&#160;");
     return this;
   }
 

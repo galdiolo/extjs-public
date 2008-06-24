@@ -76,9 +76,9 @@ public class TextMetrics {
    * @return the size
    */
   public Size getSize(String text) {
-    el.setInnerHtml(text);
+    el.dom.setInnerHTML(text);
     Size size = el.getSize();
-    el.setInnerHtml("");
+    el.dom.setInnerHTML("");
     return size;
   }
 

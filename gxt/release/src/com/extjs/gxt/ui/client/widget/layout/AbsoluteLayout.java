@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.ui.client.widget.layout;
 
-
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.widget.Container;
 
@@ -20,7 +19,7 @@ import com.extjs.gxt.ui.client.widget.Container;
 public class AbsoluteLayout extends AnchorLayout {
 
   public AbsoluteLayout() {
-    extraStyle = "x-abs-layout-item";
+    setExtraStyle("x-abs-layout-item");
   }
 
   @Override
@@ -28,5 +27,5 @@ public class AbsoluteLayout extends AnchorLayout {
     super.onLayout(container, target);
     target.makePositionable();
   }
-  
+
 }

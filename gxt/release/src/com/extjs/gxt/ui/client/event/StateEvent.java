@@ -16,8 +16,41 @@ import com.extjs.gxt.ui.client.state.StateManager;
  */
 public class StateEvent extends BaseEvent {
 
+  /**
+   * The state provider.
+   */
+  public StateManager manager;
+
+  /**
+   * The property value.
+   */
   public Object value;
 
+  /**
+   * The property name.
+   */
   public String name;
+
+  /**
+   * Creates a new state event.
+   * 
+   * @param manager the source manager
+   */
+  public StateEvent(StateManager manager) {
+    this.manager = manager;
+  }
+
+  /**
+   * Creates a new state event.
+   * 
+   * @param manager the source manager
+   * @param name the property name
+   * @param value the property value
+   */
+  public StateEvent(StateManager manager, String name, Object value) {
+    this.manager = manager;
+    this.name = name;
+    this.value = value;
+  }
 
 }

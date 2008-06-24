@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.data.Model;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.TreeEvent;
 import com.extjs.gxt.ui.client.widget.Component;
@@ -138,7 +139,44 @@ public class TreeItem extends Component {
    * @param item the item to be added
    */
   public void add(TreeItem item) {
-    insert(item, getItemCount());
+    add(item, getItemCount());
+  }
+
+  /**
+   * Inserts a child item at the specified position.
+   * 
+   * @param item the item to be added
+   * @param index index at which the specified element is to be inserted
+   */
+  public void add(TreeItem item, int index) {
+    TreeEvent te = new TreeEvent(tree);
+    te.item = this;
+    te.child = item;
+    te.index = index;
+    if (fireEvent(Events.BeforeAdd, te)) {
+      item.parentItem = this;
+      item.setTree(tree);
+
+      tree.registerItem(item);
+      children.add(index, item);
+      leaf = false;
+
+      if (childrenRendered) {
+        Element target = root ? getContainer() : ui.containerEl.dom;
+        if (item.isRendered()) {
+          fly(target).insertChild(item.getElement(), index);
+        } else {
+          item.render(target, index);
+        }
+      }
+
+      if (rendered && !root) {
+        ui.updateJointStyle();
+        ui.onIconStyleChange(getIconStyle());
+      }
+      fireEvent(Events.Add, te);
+    }
+
   }
 
   /**
@@ -285,39 +323,6 @@ public class TreeItem extends Component {
   }
 
   /**
-   * Inserts a child item at the specified position.
-   * 
-   * @param item the item to be added
-   * @param index index at which the specified element is to be inserted
-   */
-  public void insert(TreeItem item, int index) {
-    TreeEvent te = new TreeEvent(tree);
-    te.item = this;
-    te.child = item;
-    te.index = index;
-    if (fireEvent(Events.BeforeAdd, te)) {
-      item.parentItem = this;
-      item.setTree(tree);
-
-      tree.registerItem(item);
-      children.add(index, item);
-      leaf = false;
-
-      if (childrenRendered) {
-        Element target = root ? getContainer() : parentItem.getContainer();
-        item.render(target, index);
-      }
-
-      if (rendered && !root) {
-        ui.updateJointStyle();
-        ui.onIconStyleChange(getIconStyle());
-      }
-      fireEvent(Events.Add, te);
-    }
-
-  }
-
-  /**
    * Returns <code>true</code> if the item is checked.
    * 
    * @return the checked state
@@ -381,7 +386,11 @@ public class TreeItem extends Component {
       item.tree = null;
       item.parentItem = null;
       if (rendered && item.rendered) {
-        ui.removeItem(item);
+        if (root) {
+          item.el().removeFromParent();
+        } else {
+          ui.removeItem(item);
+        }
       }
       fireEvent(Events.Remove, te);
     }
@@ -406,35 +415,38 @@ public class TreeItem extends Component {
   public void setChecked(boolean checked) {
     this.checked = checked;
     if (rendered) {
-      ui.onCheckChange(checked);
-      if (checked) {
-        switch (tree.getCheckStyle()) {
-          case PARENTS:
-            TreeItem p = getParentItem();
-            while (p != null && !p.root) {
-              p.setChecked(true);
-              p = p.getParentItem();
-            }
-            break;
-          case CHILDREN:
-            for (int i = 0; i < getItemCount(); i++) {
-              getItem(i).setChecked(true);
-            }
-            break;
-        }
+      if (fireEvent(Events.BeforeCheckChange, new TreeEvent(tree, this))) {
+        ui.onCheckChange(checked);
+        if (checked) {
+          switch (tree.getCheckStyle()) {
+            case PARENTS:
+              TreeItem p = getParentItem();
+              while (p != null && !p.root) {
+                p.setChecked(true);
+                p = p.getParentItem();
+              }
+              break;
+            case CHILDREN:
+              for (int i = 0; i < getItemCount(); i++) {
+                getItem(i).setChecked(true);
+              }
+              break;
+          }
 
-      } else {
-        switch (tree.getCheckStyle()) {
-          case PARENTS:
-            clearCheckChildren(this);
-            break;
-          case CHILDREN:
-            for (int i = 0; i < getItemCount(); i++) {
-              getItem(i).setChecked(false);
-            }
-            break;
+        } else {
+          switch (tree.getCheckStyle()) {
+            case PARENTS:
+              clearCheckChildren(this);
+              break;
+            case CHILDREN:
+              for (int i = 0; i < getItemCount(); i++) {
+                getItem(i).setChecked(false);
+              }
+              break;
+          }
         }
       }
+      
     }
   }
 
@@ -543,6 +555,7 @@ public class TreeItem extends Component {
 
   /**
    * Sets the item's text style.
+   * 
    * @param style the text style
    */
   public void setTextStyle(String style) {
@@ -560,7 +573,7 @@ public class TreeItem extends Component {
   }
 
   public String toString() {
-    return "tree: " + text != null ? text : "" + " " + el;
+    return "tree: " + (text != null ? text  : "" + " ") + el();
   }
 
   protected boolean fireEvent(int type, TreeEvent te) {
@@ -594,6 +607,10 @@ public class TreeItem extends Component {
       getItem(i).render(getContainer(), i);
     }
     childrenRendered = true;
+  }
+
+  protected void renderItem(Model model) {
+
   }
 
   protected void setChildrenRendered(boolean rendered) {

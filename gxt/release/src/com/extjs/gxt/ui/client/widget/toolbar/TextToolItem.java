@@ -7,11 +7,15 @@
  */
 package com.extjs.gxt.ui.client.widget.toolbar;
 
+import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.event.ToolBarEvent;
 import com.extjs.gxt.ui.client.util.WidgetHelper;
-import com.extjs.gxt.ui.client.widget.Button;
+import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
+import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.google.gwt.user.client.Element;
 
 /**
@@ -66,18 +70,13 @@ public class TextToolItem extends ToolItem {
     setIconStyle(iconStyle);
   }
 
-  @Override
-  public void addListener(int eventType, Listener listener) {
-    button.addListener(eventType, listener);
-  }
-
   /**
    * Adds a selection listener.
    * 
    * @param listener the selection listener
    */
   public void addSelectionListener(SelectionListener listener) {
-    button.addSelectionListener(listener);
+    addListener(Events.Select, listener);
   }
 
   /**
@@ -107,18 +106,13 @@ public class TextToolItem extends ToolItem {
     return toolBar;
   }
 
-  @Override
-  public void removeListener(int eventType, Listener listener) {
-    button.removeListener(eventType, listener);
-  }
-
   /**
    * Removes a selection listener.
    * 
    * @param listener the listener to be removed
    */
   public void removeSelectionListener(SelectionListener listener) {
-    button.removeSelectionListener(listener);
+    removeListener(Events.Select, listener);
   }
 
   /**
@@ -149,6 +143,16 @@ public class TextToolItem extends ToolItem {
   }
 
   @Override
+  public void setToolTip(String text) {
+    button.setToolTip(text);
+  }
+
+  @Override
+  public void setToolTip(ToolTipConfig config) {
+    button.setToolTip(config);
+  }
+
+  @Override
   protected void doAttachChildren() {
     super.doAttachChildren();
     WidgetHelper.doAttach(button);
@@ -158,6 +162,12 @@ public class TextToolItem extends ToolItem {
   protected void doDetachChildren() {
     super.doDetachChildren();
     WidgetHelper.doDetach(button);
+  }
+
+  protected void onButtonSelect(ButtonEvent be) {
+    ToolBarEvent evt = new ToolBarEvent(toolBar, this);
+    evt.event = be.event;
+    fireEvent(Events.Select, evt);
   }
 
   @Override
@@ -173,6 +183,11 @@ public class TextToolItem extends ToolItem {
   @Override
   protected void onRender(Element target, int index) {
     button.render(target, index);
+    button.addListener(Events.Select, new Listener<ButtonEvent>() {
+      public void handleEvent(ButtonEvent be) {
+        onButtonSelect(be);
+      }
+    });
     setElement(button.getElement());
   }
 

@@ -1,19 +1,14 @@
-/*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *     Ext GWT - derived implementation
- *******************************************************************************/
+/*
+ * Ext GWT - Ext for GWT
+ * Copyright(c) 2007, 2008, Ext JS, LLC.
+ * licensing@extjs.com
+ * 
+ * http://extjs.com/license
+ */
 package com.extjs.gxt.ui.client.util;
 
 /**
- * Instances of this class represent rectangular areas in an (x, y) coordinate
- * system.
+ * Represents an area in a coordinate system.
  * 
  * @see Point
  */
@@ -30,12 +25,12 @@ public class Rectangle {
   public int y;
 
   /**
-   * The width of the rectangle
+   * The width of the rectangle.
    */
   public int width;
 
   /**
-   * The height of the rectangle
+   * The height of the rectangle.
    */
   public int height;
 
@@ -66,8 +61,7 @@ public class Rectangle {
    * 
    * @param x the x coordinate value
    * @param y the y coordinate value
-   * @return <code>true</code> if the rectangle contains the point and
-   *         <code>false</code> otherwise
+   * @return true if xy is contained within the rectangle
    */
   public boolean contains(int x, int y) {
     return (x >= this.x) && (y >= this.y) && ((x - this.x) < width)
@@ -75,22 +69,13 @@ public class Rectangle {
   }
 
   /**
-   * Returns true if the point is within the rectangle's region.
+   * Returns true if the point is within the rectangle.
    * 
-   * @param p the test point
-   * @return <code>true</code> if the rectangle contains the point and
-   *         <code>false</code> otherwise
+   * @param p the point
+   * @return true if the point is contained within the rectangle
    */
   public boolean contains(Point p) {
     return contains(p.x, p.y);
-  }
-
-  public boolean equals(Object object) {
-    if (object == this) return true;
-    if (!(object instanceof Rectangle)) return false;
-    Rectangle r = (Rectangle) object;
-    return (r.x == this.x) && (r.y == this.y) && (r.width == this.width)
-        && (r.height == this.height);
   }
 
   public String toString() {

@@ -22,33 +22,26 @@ import com.extjs.gxt.ui.client.widget.Layout;
  */
 public class FitLayout extends Layout {
 
-  /**
-   * True to render all children (defaults to false).
-   */
-  protected boolean renderAll;
+  public FitLayout() {
+    monitorResize = true;
+  }
 
   @Override
   protected void onLayout(Container container, El target) {
-    Size s = target.getStyleSize();
-    Component a = activeItem != null ? activeItem : container.getItem(0);
-    if (a == null) return;
-
-    if (renderAll) {
-      super.onLayout(container, target);
-      setItemSize(a, s.width, s.height);
-    } else {
-      setItemSize(a, s.width, s.height);
-      if (!a.isRendered()) {
-        renderComponent(a, 0, target);
-      } else {
-        target.insertChild(a.getElement(), 0);
-      }
+    if (container.getItemCount() == 0) {
+      return;
     }
+    super.onLayout(container, target);
+    Component a = activeItem != null ? activeItem : container.getItem(0);
+    setItemSize(a, target.getStyleSize());
   }
 
-  protected void setItemSize(Component item, int width, int height) {
-    item.setStyleAttribute("position", "static");
-    setSize(item, width, height);
+  protected void setItemSize(Component item, Size size) {
+    if (item != null && item.isRendered() && size.height > 10) {
+      size.width -= item.el().getMargins("lr");
+      size.height -= item.el().getMargins("tb");
+      setSize(item, size.width, size.height);
+    } 
   }
 
 }

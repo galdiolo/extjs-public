@@ -7,12 +7,11 @@
  */
 package com.extjs.gxt.ui.client.widget.layout;
 
-
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.util.Size;
-import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
+import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Layout;
 
 /**
@@ -28,7 +27,7 @@ import com.extjs.gxt.ui.client.widget.Layout;
  * </p>
  * <p>
  * The items added to an AnchorLayout can also supply an anchoring-specific
- * layout property (see {@link AnchorData#anchorSpec}) which is a string
+ * layout property (see {@link AnchorData#setAnchorSpec(String)}) which is a string
  * containing two values: the horizontal anchor value and the vertical anchor
  * value (for example, '100% 50%'). This value is what tells the layout how the
  * item should be anchored to the container. The following types of anchor
@@ -48,10 +47,6 @@ import com.extjs.gxt.ui.client.widget.Layout;
  * container minus 50 pixels and the complete height minus 100 pixels. If only
  * one anchor value is supplied it is assumed to be the right offset value and
  * the bottom offset will default to 0.</li>
- * <li><b>Sides</b>:<br>
- * Valid values are 'right' (or 'r') and 'bottom' (or 'b'). Either the container
- * must have a fixed size or an anchorSize config value defined at render time
- * in order for these to have any effect.</li>
  * </ul>
  * <p>
  * Anchor values can also be mixed as needed. For example, '-50 75%' would
@@ -61,17 +56,13 @@ import com.extjs.gxt.ui.client.widget.Layout;
  */
 public class AnchorLayout extends Layout {
 
-  /**
-   * If specified, the layout will use the size as a virtual container.
-   */
-  public Size anchorSize;
+  private Size anchorSize;
 
   @Override
   protected void onLayout(Container container, El target) {
     super.onLayout(container, target);
 
-    El ct = container.getLayoutTarget();
-    Rectangle rect = ct.getBounds(true);
+    Rectangle rect = target.getBounds(true);
 
     int w = rect.width, h = rect.height;
 
@@ -94,13 +85,24 @@ public class AnchorLayout extends Layout {
       Component comp = container.getItem(i);
       AnchorData data = (AnchorData) comp.getData();
 
+      if (data == null && comp.getData("anchorSpec") != null) {
+        data = new AnchorData();
+        data.setAnchorSpec((String) comp.getData("anchorSpec"));
+      }
+
       if (data != null) {
-        String anchor = data.anchorSpec;
+        String anchor = data.getAnchorSpec();
         if (anchor != null) {
           String[] vs = anchor.split(" ");
           int cw = parseAnchor(vs[0], w, aw, aw);
-          int ch = parseAnchor(vs[1], h, ah, ah);
-
+          int ch = -1;
+          if (vs.length > 1) {
+            ch = parseAnchor(vs[1], h, ah, ah);
+          }
+          
+          cw -= comp.el().getMargins("lr");
+          ch -= comp.el().getMargins("tb");
+          
           setSize(comp, cw, ch);
         }
       }
@@ -113,7 +115,7 @@ public class AnchorLayout extends Layout {
         int diff = cstart = start;
         return v - diff;
       } else if (a.indexOf("%") != -1) {
-        double ratio = Float.parseFloat(a.replace('%', ' ')) * .01;
+        double ratio = Float.parseFloat(a.replaceAll("%", "")) * .01;
         return (int) Math.floor(v * ratio);
       } else {
         try {
@@ -128,11 +130,29 @@ public class AnchorLayout extends Layout {
   }
 
   private native boolean standard(String a) /*-{
-     if(/^(r|right|b|bottom)$/i.test(a)){ 
-       return true;
-     } else {
-       return false;
-     }
-   }-*/;
+    if(/^(r|right|b|bottom)$/i.test(a)){ 
+      return true;
+    } else {
+      return false;
+    }
+  }-*/;
+
+  /**
+   * Sets a virtual container for the layout to use.
+   * 
+   * @param anchorSize the anchor size
+   */
+  public void setAnchorSize(Size anchorSize) {
+    this.anchorSize = anchorSize;
+  }
+
+  /**
+   * Returns the anchor size.
+   * 
+   * @return the anchor size
+   */
+  public Size getAnchorSize() {
+    return anchorSize;
+  }
 
 }

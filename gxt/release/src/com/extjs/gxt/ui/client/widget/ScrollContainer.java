@@ -7,14 +7,11 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
-
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.Style.Scroll;
-import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.ScrollListener;
-import com.extjs.gxt.ui.client.event.TypedListener;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -32,7 +29,7 @@ import com.google.gwt.user.client.ui.Widget;
  * </dd>
  * </dl>
  */
-public class ScrollContainer<T extends Component> extends AbstractContainer<T> {
+public class ScrollContainer<T extends Component> extends Container<T> {
 
   private Scroll scrollMode = Scroll.NONE;
   private int scrollLeft = Style.DEFAULT;
@@ -44,7 +41,7 @@ public class ScrollContainer<T extends Component> extends AbstractContainer<T> {
    * @param listener the listener to be added
    */
   public void addScrollListener(ScrollListener listener) {
-    addListener(Events.Scroll, new TypedListener(listener));
+    addListener(Events.Scroll, listener);
   }
 
   /**
@@ -53,7 +50,7 @@ public class ScrollContainer<T extends Component> extends AbstractContainer<T> {
    * @return the horizontal scroll position
    */
   public int getHScrollPosition() {
-    return rendered ? el.getScrollLeft() : 0;
+    return rendered ? el().getScrollLeft() : 0;
   }
 
   /**
@@ -119,7 +116,7 @@ public class ScrollContainer<T extends Component> extends AbstractContainer<T> {
   public void setScrollMode(Scroll scroll) {
     this.scrollMode = scroll;
     if (rendered) {
-      getLayoutTarget().setStyleAttribute("overflow", scrollMode.value());
+      getLayoutTarget().setStyleAttribute("overflow", scrollMode.value().toLowerCase());
     }
   }
 
@@ -147,10 +144,6 @@ public class ScrollContainer<T extends Component> extends AbstractContainer<T> {
     }
     getLayoutTarget().addEventsSunk(Event.ONSCROLL);
     super.afterRender();
-  }
-
-  protected El getLayoutTarget() {
-    return el;
   }
 
 }

@@ -15,20 +15,18 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 
 public class DomEvent extends BaseEvent {
-  
+
   /**
    * The dom event.
    */
   public Event event;
-  
 
-  private Element target;
   private El el;
-  
+
   protected DomEvent() {
-    
+
   }
-  
+
   /**
    * Creates a new base event.
    * 
@@ -36,10 +34,7 @@ public class DomEvent extends BaseEvent {
    */
   public DomEvent(Event event) {
     this.event = event;
-    type = DOM.eventGetType(event);
-    target = DOM.eventGetTarget(event);
   }
-  
 
   /**
    * Cancels bubbling for the given event. This will stop the event from being
@@ -81,7 +76,7 @@ public class DomEvent extends BaseEvent {
    * @return the event type
    */
   public int getEventType() {
-    return DOM.eventGetType(event);
+    return event == null ? -1 : DOM.eventGetType(event);
   }
 
   /**
@@ -90,7 +85,7 @@ public class DomEvent extends BaseEvent {
    * @return the key code
    */
   public int getKeyCode() {
-    return DOM.eventGetKeyCode(event);
+    return event == null ? -1 : DOM.eventGetKeyCode(event);
   }
 
   /**
@@ -99,10 +94,7 @@ public class DomEvent extends BaseEvent {
    * @return the target element or <code>null</code> if no dom event
    */
   public Element getTarget() {
-    if (target == null && event != null) {
-      target = DOM.eventGetTarget(event);
-    }
-    return target;
+    return event == null ? null : DOM.eventGetTarget(event);
   }
 
   /**
@@ -151,8 +143,8 @@ public class DomEvent extends BaseEvent {
    */
   public boolean hasModifier() {
     if (event != null) {
-      if (DOM.eventGetAltKey(event) || DOM.eventGetCtrlKey(event)
-          || DOM.eventGetShiftKey(event) || DOM.eventGetMetaKey(event)) {
+      if (DOM.eventGetAltKey(event) || DOM.eventGetCtrlKey(event) || DOM.eventGetShiftKey(event)
+          || DOM.eventGetMetaKey(event)) {
         return true;
       }
     }
@@ -174,8 +166,7 @@ public class DomEvent extends BaseEvent {
    * @return the control key state
    */
   public boolean isControlKey() {
-    return event == null ? false
-        : (DOM.eventGetCtrlKey(event) || DOM.eventGetMetaKey(event));
+    return event == null ? false : (DOM.eventGetCtrlKey(event) || DOM.eventGetMetaKey(event));
   }
 
   /**
@@ -203,10 +194,24 @@ public class DomEvent extends BaseEvent {
   }
 
   /**
+   * Returns true if the key is a "special" key.
+   * 
+   * @return the special state
+   */
+  public boolean isSpecialKey() {
+    int k = getKeyCode();
+    return k == 17 || k == 9 || k == 13 || k == 40 || k == 27 || (k == 16) || (k == 17)
+        || (k >= 18 && k <= 20) || (k >= 33 && k <= 35) || (k >= 36 && k <= 39)
+        || (k >= 44 && k <= 45);
+  }
+
+  /**
    * Prevents the browser from taking its default action for the given event.
    */
   public void preventDefault() {
-    DOM.eventPreventDefault(event);
+    if (event != null) {
+      DOM.eventPreventDefault(event);
+    }
   }
 
   /**

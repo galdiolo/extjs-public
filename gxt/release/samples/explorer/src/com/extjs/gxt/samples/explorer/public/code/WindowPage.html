@@ -45,12 +45,12 @@ import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.Button;
-import com.extjs.gxt.ui.client.widget.ButtonBar;
-import com.extjs.gxt.ui.client.widget.Container;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
-import com.extjs.gxt.ui.client.widget.ToolButton;
 import com.extjs.gxt.ui.client.widget.Window;
+import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.button.ButtonBar;
+import com.extjs.gxt.ui.client.widget.button.ToolButton;
 import com.extjs.gxt.ui.client.widget.layout.AccordionLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
@@ -62,7 +62,7 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.RootPanel;
 
-public class WindowPage extends Container implements EntryPoint {
+public class WindowPage extends LayoutContainer implements EntryPoint {
 
   public void onModuleLoad() {
     RootPanel.get().add(this);
@@ -75,6 +75,7 @@ public class WindowPage extends Container implements EntryPoint {
     final Window simple = new Window();
     simple.setHeading("Simple Window");
     simple.setWidth(250);
+    simple.setBodyStyleName("pad-text");
     simple.addText(TestData.DUMMY_TEXT_SHORT);
     simple.setScrollMode(Scroll.AUTO);
 
@@ -131,28 +132,33 @@ public class WindowPage extends Container implements EntryPoint {
 
     cp = new ContentPanel();
     cp.setHeading("Settings");
+    cp.setBodyStyleName("pad-text");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     complex.add(cp);
 
     cp = new ContentPanel();
     cp.setHeading("Stuff");
+    cp.setBodyStyleName("pad-text");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     complex.add(cp);
 
     cp = new ContentPanel();
     cp.setHeading("More Stuff");
+    cp.setBodyStyleName("pad-text");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     complex.add(cp);
+    
+    complex.layout();
 
     ButtonBar buttons = new ButtonBar();
 
-    buttons.add(new Button("Simple", new SelectionListener() {
+    buttons.add(new Button("Simple", new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         simple.show();
       }
     }));
 
-    buttons.add(new Button("Complex", new SelectionListener() {
+    buttons.add(new Button("Complex", new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         complex.show();
       }
@@ -160,7 +166,7 @@ public class WindowPage extends Container implements EntryPoint {
 
     add(buttons);
     setLayout(new FlowLayout(4));
-    layout(true);
+    layout();
   }
 
   private TreeItem newItem(String text, String iconStyle) {

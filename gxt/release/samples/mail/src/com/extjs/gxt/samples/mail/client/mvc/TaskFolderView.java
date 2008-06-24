@@ -27,7 +27,20 @@ public class TaskFolderView extends View {
   }
 
   @Override
+  protected void handleEvent(AppEvent event) {
+    switch (event.type) {
+      case AppEvents.Init:
+        initUI();
+        break;
+    }
+  }
+  
+  @Override
   protected void initialize() {
+
+  }
+
+  protected void initUI() {
     tasks = new ContentPanel();
     tasks.setHeading("Tasks");
     tasks.addListener(Events.Expand, new Listener<ComponentEvent>() {
@@ -38,10 +51,5 @@ public class TaskFolderView extends View {
 
     ContentPanel west = (ContentPanel) Registry.get("west");
     west.add(tasks);
-  }
-
-  @Override
-  protected void handleEvent(AppEvent event) {
-
   }
 }

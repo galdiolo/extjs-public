@@ -7,10 +7,7 @@ http://extjs.com/license
 
 Open Source License
 ------------------------------------------------------------------------------------------
-Ext GWT is licensed under the terms of the Open Source GPL 3.0 license. You may wish to use
-our open source license if you:
- * Want to use Ext in an open source project that is compatible with the GPL
- * Plan to use Ext in a personal, educational or non-profit manner
+Ext is licensed under the terms of the Open Source GPL 3.0 license. 
 
 http://www.gnu.org/licenses/gpl.html
 
@@ -23,75 +20,11 @@ a commercial license. Please visit http://extjs.com/license for more details.
 
 OEM / Reseller License
 ------------------------------------------------------------------------------------------
-If you plan to distribute Ext in a product that will be packaged or sold as a software 
-development library, toolkit or plug-in-based framework ("LIBRARY"), we require that you 
-work with us to establish a specific license that is appropriate. Use of the open source 
-license in a LIBRARY is not permitted without explicit permission from Ext JS, LLC.
-
 For more details, please visit: http://extjs.com/license.
-
-Third Party Content
-GXT includes items that have been sourced from third parties
-as set out below.
-
-Your use of the GWT-Derived Work is subject to the terms and
-conditions of the Apache License v. 2.0. A copy of the license
-is contained in the file license/apache-2.0.html and is also available at
-http://www.apache.org/licenses/LICENSE-2.0.
-
-SWT
-The following classes in the GXT JAR are based on SWT code
-developed by the Eclipse Foundation and shall be defined as the
-"SWT-Derived Work":
-
-com.extjs.gxt.client.Style
-com.extjs.gxt.client.event.TypedListener
-com.extjs.gxt.client.util.EventTable
-com.extjs.gxt.client.util.Rectangle
-com.extjs.gxt.client.widget.layout.FillLayout
-com.extjs.gxt.client.widget.layout.RowLayout
-com.extjs.gxt.client.widget.layout.RowData
-
-Your use of the SWT-Derived Work is subject to the terms and
-conditions of the Eclipse Public License v1.0. A copy of the license
-is contained in the file license/epl-v10.html and is also available at
-http://www.eclipse.org/legal/epl-v10.html.
-
-JFace 3.2
-The following classes in the GXT JAR are based on JFace code
-developed by the Eclipse Foundation and shall be defined as the
-"JFace-Derived Work":
-
-com.extjs.gxt.client.viewer.*
-
-The binary and source code for the JFace-Derived Work is located in
-the gxt.jar.
-
-Your use of the JFace-Derived Work is subject to the terms and
-conditions of the Eclipse Public License v1.0. A copy of the license
-is contained in the file license/epl-v10.html and is also available at
-http://www.eclipse.org/legal/epl-v10.html.
-
-
-MooTools
-The following classes in the GXT JAR are based on MooTools code
-developed by Valerio Proietti and shall be defined as the
-"MooTools-Derived Work":
-
-com.extjs.gxt.client.fx.*
-
-The binary and source code for the MooTools-Derived Work is located in
-the gxt.jar.
-
-Your use of the MooTools-Derived Work is subject to the terms and
-conditions of the MIT License. A copy of the license
-is contained in the file license/mit-license.txt and is also available at
-http://www.opensource.org/licenses/mit-license.php.
 
 --
 
 This library is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
-    
+General Public License for more details.

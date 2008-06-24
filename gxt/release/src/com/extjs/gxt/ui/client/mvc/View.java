@@ -13,7 +13,7 @@ package com.extjs.gxt.ui.client.mvc;
 public abstract class View {
 
   protected Controller controller;
-  boolean initialized;
+  protected boolean initialized;
 
   /**
    * Creates a new view instance.
@@ -62,7 +62,7 @@ public abstract class View {
    * 
    * @param event the event to be processed
    */
-  protected abstract void handleEvent(AppEvent event);
+  protected abstract void handleEvent(AppEvent<?> event);
 
   /**
    * Called once prior to handleEvent being called. Widgets should be

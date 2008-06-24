@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.ui.client.widget.table;
 
-
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -41,7 +40,7 @@ public class TableItem extends Component {
   public TableItem(Object[] values) {
     this.values = values;
   }
-  
+
   /**
    * Returns the item's cell tooltip.
    * 
@@ -83,7 +82,7 @@ public class TableItem extends Component {
     // Pass along the event to the related cell tooltip if it exists
     // so that we don't consume the event before the tooltip processes it
     if (cellToolTip != null) {
-//      cellToolTip.handleEvent(be);
+      // cellToolTip.handleEvent(be);
     }
     switch (ce.type) {
       case Event.ONDBLCLICK:
@@ -113,6 +112,10 @@ public class TableItem extends Component {
     if (isRendered()) {
       table.getView().setCellStyle(this, index, style);
     }
+  }
+
+  public String[] getCellStyles() {
+    return cellStyles;
   }
 
   /**
@@ -161,7 +164,8 @@ public class TableItem extends Component {
   }
 
   /**
-   * Sets a widget as a cell value.
+   * Sets a widget as a cell value. When using widgets in cells, bulk rendering
+   * must be disabled.
    * 
    * @param index the column index
    * @param widget the widget
@@ -176,10 +180,10 @@ public class TableItem extends Component {
   }
 
   protected void initCellToolTips() {
-//    if (cellToolTip == null && isRendered()) {
-//      cellToolTip = new ToolTip(this);
-//      cellToolTip.setTrackMouse(true);
-//    }
+    if (cellToolTip == null && isRendered()) {
+      cellToolTip = new ToolTip(this);
+      cellToolTip.setTrackMouse(true);
+    }
   }
 
   protected void onCellMouseOver(ComponentEvent ce) {
@@ -190,14 +194,14 @@ public class TableItem extends Component {
       return;
     }
 
-//    if (cellToolTip != null) {
-//      if (toolTips != null && toolTips[index] != null && toolTips[index].length() > 0) {
-//        cellToolTip.setText(null, toolTips[index]);
-//        cellToolTip.setVisible(true);
-//      } else {
-//        cellToolTip.setVisible(false);
-//      }
-//    }
+    if (cellToolTip != null) {
+      if (toolTips != null && toolTips[index] != null && toolTips[index].length() > 0) {
+//         cellToolTip.setText(null, toolTips[index]);
+        // cellToolTip.setVisible(true);
+        // } else {
+        // cellToolTip.setVisible(false);
+      }
+    }
   }
 
   protected void onClick(ComponentEvent ce) {
@@ -246,7 +250,7 @@ public class TableItem extends Component {
   @Override
   protected void onRender(Element target, int index) {
     setElement(DOM.createDiv());
-    el.insertInto(target, index);
+    el().insertInto(target, index);
   }
 
   protected void onSelectChange(boolean select) {

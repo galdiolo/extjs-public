@@ -10,7 +10,7 @@ package com.extjs.gxt.ui.client.widget.toolbar;
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.widget.SplitButton;
+import com.extjs.gxt.ui.client.widget.button.SplitButton;
 
 
 /**

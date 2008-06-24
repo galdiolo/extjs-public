@@ -7,22 +7,55 @@
  */
 package com.extjs.gxt.ui.client.widget.layout;
 
+import com.extjs.gxt.ui.client.util.Margins;
+
 /**
  * Layout data for <code>AnchorLayout</code>.
  */
-public class AnchorData {
+public class AnchorData extends LayoutData {
+
+  private String anchorSpec;
+
+  public AnchorData() {
+
+  }
 
   /**
-   * Specifies the anchor data.
+   * Creates a new anchor data.
+   * 
+   * @param anchorSpec the anchor spec
    */
-  public String anchorSpec;
-  
-  public AnchorData() {
-    
-  }
-  
   public AnchorData(String anchorSpec) {
+    this.setAnchorSpec(anchorSpec);
+  }
+
+  /**
+   * Creates a new anchor data.
+   * 
+   * @param anchorSpec the anchor spec
+   * @param margins the margins
+   */
+  public AnchorData(String anchorSpec, Margins margins) {
+    super(margins);
     this.anchorSpec = anchorSpec;
   }
-  
+
+  /**
+   * Sets the anchor spec.
+   * 
+   * @param anchorSpec the anchor spec
+   */
+  public void setAnchorSpec(String anchorSpec) {
+    this.anchorSpec = anchorSpec;
+  }
+
+  /**
+   * Returns the anchor spec.
+   * 
+   * @return the anchor spec
+   */
+  public String getAnchorSpec() {
+    return anchorSpec;
+  }
+
 }

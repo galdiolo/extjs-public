@@ -14,17 +14,16 @@ import com.extjs.gxt.samples.resources.client.Stock;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.SelectionMode;
-import com.extjs.gxt.ui.client.widget.Button;
-import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.Viewport;
+import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FillLayout;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.table.CellRenderer;
 import com.extjs.gxt.ui.client.widget.table.DateTimeCellRenderer;
 import com.extjs.gxt.ui.client.widget.table.NumberCellRenderer;
-import com.extjs.gxt.ui.client.widget.table.RowSelectionModel;
 import com.extjs.gxt.ui.client.widget.table.Table;
 import com.extjs.gxt.ui.client.widget.table.TableColumn;
 import com.extjs.gxt.ui.client.widget.table.TableColumnModel;
@@ -35,23 +34,24 @@ import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.RootPanel;
 
-public class TablePage extends Container implements EntryPoint {
+public class TablePage extends LayoutContainer implements EntryPoint {
 
   public void onModuleLoad() {
+    setStyleAttribute("margin", "8px");
+    
     Viewport v = new Viewport();
-    v.setLayout(new FillLayout(8));
+    v.setLayout(new FillLayout());
     v.add(this);
-    v.layout();
+    RootPanel.get().add(v);
   }
   
   @Override
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
     
-    FlowLayout layout = new FlowLayout();
-    layout.margin = 10;
-    setLayout(layout);
+    setLayout(new FlowLayout(10));
     
     final NumberFormat currency = NumberFormat.getCurrencyFormat();
     final NumberFormat number = NumberFormat.getFormat("0.00");
@@ -74,8 +74,8 @@ public class TablePage extends Container implements EntryPoint {
 
     col = new TableColumn("Change", 75);
     col.setAlignment(HorizontalAlignment.RIGHT);
-    col.setRenderer(new CellRenderer() {
-      public String render(String property, Object value) {
+    col.setRenderer(new CellRenderer<TableItem>() {
+      public String render(TableItem item, String property, Object value) {
         double val = (Double) value;
         String style = val < 0 ? "red" : "green";
         return "<span style='color:" + style + "'>" + number.format(val) + "</span>";
@@ -91,7 +91,7 @@ public class TablePage extends Container implements EntryPoint {
     TableColumnModel cm = new TableColumnModel(columns);
 
     Table tbl = new Table(cm);
-    tbl.setSelectionModel(new RowSelectionModel(SelectionMode.MULTI));
+    tbl.setSelectionMode(SelectionMode.MULTI);
     tbl.setHorizontalScroll(true);
 
     List<Stock> stocks = TestData.getStocks();

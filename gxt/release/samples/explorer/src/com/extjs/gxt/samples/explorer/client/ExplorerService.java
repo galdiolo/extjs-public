@@ -9,12 +9,12 @@ package com.extjs.gxt.samples.explorer.client;
 
 
 import com.extjs.gxt.samples.explorer.client.model.Post;
-import com.extjs.gxt.ui.client.data.BaseLoadConfig;
-import com.extjs.gxt.ui.client.data.BaseLoadResult.ModelCollectionLoadResult;
+import com.extjs.gxt.ui.client.data.PagingLoadConfig;
+import com.extjs.gxt.ui.client.data.PagingLoadResult;
 import com.google.gwt.user.client.rpc.RemoteService;
 
 public interface ExplorerService extends RemoteService {
 
-  public ModelCollectionLoadResult<Post> getPosts(BaseLoadConfig config);
+  public PagingLoadResult<Post> getPosts(PagingLoadConfig config);
   
 }

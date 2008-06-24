@@ -54,9 +54,9 @@ public class FramePanel extends Component {
   protected void onRender(Element target, int index) {
     setElement(DOM.createIFrame(), target, index);
     if (GXT.isIE && GXT.isSecure) {
-      el.setElementAttribute("src", GXT.SSL_SECURE_URL);
+      getElement().setPropertyString("src", GXT.SSL_SECURE_URL);
     }
-    el.insertInto(target, index);
+    el().insertInto(target, index);
   }
 
   /**

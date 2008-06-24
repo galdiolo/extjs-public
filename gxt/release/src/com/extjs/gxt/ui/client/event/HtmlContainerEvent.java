@@ -20,22 +20,7 @@ import com.google.gwt.http.client.Response;
  * 
  * @see HtmlContainer
  */
-public class HtmlContainerEvent extends ComponentEvent {
-
-  /**
-   * The source container.
-   */
-  public HtmlContainer container;
-
-  /**
-   * The child item.
-   */
-  public Component item;
-
-  /**
-   * The insert index.
-   */
-  public int index;
+public class HtmlContainerEvent extends ContainerEvent<HtmlContainer, Component> {
 
   /**
    * The exception for remote requests.
@@ -59,7 +44,10 @@ public class HtmlContainerEvent extends ComponentEvent {
    */
   public HtmlContainerEvent(HtmlContainer container) {
     super(container);
-    this.container = container;
+  }
+
+  public HtmlContainerEvent(HtmlContainer container, Component component) {
+    super(container, component);
   }
 
 }

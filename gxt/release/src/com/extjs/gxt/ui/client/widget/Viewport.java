@@ -11,36 +11,36 @@ import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.DelayedTask;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.WindowResizeListener;
 
 /**
- * <p/>A WidgetContainer that fills the viewport and monitors window resizing.
+ * A LayoutContainer that fills the viewport and monitors window resizing.
  * Viewports are best used for applications that will fill the browser without
  * window scrolling. Children of the viewport can allow scrolling.
  * 
- * <p/>The viewport is not added to the root panel automatically. Is is not
+ * <p/> The viewport is not added to the root panel automatically. Is is not
  * neccesary to call {@link #layout()} after adding the viewport to the
  * RootPanel. Layout will be called in a deferred command after being added to
  * the root panel.
  */
-public class Viewport extends Container {
+public class Viewport extends LayoutContainer {
 
   private String loadingPanelId = "loading";
-  private boolean initialized;
-  private boolean layoutOnAttach = true;
-  private int delay = 400;
+  private int delay = 100;
   private boolean enableScroll = false;
-  
+
   private DelayedTask task = new DelayedTask(new Listener<ComponentEvent>() {
     public void handleEvent(ComponentEvent ce) {
-      setBounds(0, 0, Window.getClientWidth(), Window.getClientHeight());
+      el().setBounds(0, 0, Window.getClientWidth(), Window.getClientHeight());
+      layout();
     }
   });
   
+  public Viewport() {
+    baseStyle = "x-viewport";
+  }
 
   /**
    * Returns the window resize delay.
@@ -71,19 +71,13 @@ public class Viewport extends Container {
 
   public void onAttach() {
     super.onAttach();
-    GXT.hideLoadingPanel(getLoadingPanelId());
-    if (layoutOnAttach) {
-      DeferredCommand.addCommand(new Command() {
-        public void execute() {
-          layout();
-        }
-      });
-    }
+    task.delay(delay);
+    GXT.hideLoadingPanel(loadingPanelId);
   }
 
   /**
    * Sets delay in milliseconds used to buffer window resizing (defaults to
-   * 400).
+   * 100).
    * 
    * @param delay the delay
    */
@@ -110,19 +104,10 @@ public class Viewport extends Container {
     this.loadingPanelId = loadingPanelId;
   }
 
-  protected boolean onLayout() {
-    if (!initialized) {
-      initialized = true;
-      el.setLeftTop(0, 0);
-      el.setSize(Window.getClientWidth(), Window.getClientHeight());
-    }
-    lastSize = null;
-    return super.onLayout();
-  }
-
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
-    el.makePositionable();
+    el().setLeftTop(0, 0);
+
     Window.enableScrolling(enableScroll);
 
     Window.addWindowResizeListener(new WindowResizeListener() {

@@ -9,7 +9,6 @@ package com.extjs.gxt.ui.client.widget.tips;
 
 import java.util.Date;
 
-import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.Point;
@@ -25,45 +24,12 @@ import com.google.gwt.user.client.Timer;
  */
 public class ToolTip extends Tip {
 
-  /**
-   * Delay in milliseconds before the tooltip displays after the mouse enters
-   * the target element (defaults to 500).
-   */
   private int showDelay = 500;
-
-  /**
-   * An XY offset from the mouse position where the tooltip should be shown
-   * (defaults to [10,10]).
-   */
   private int[] mouseOffset = new int[] {10, 10};
-
-  /**
-   * True to have the tooltip follow the mouse as it moves over the target
-   * element (defaults to false).
-   */
   private boolean trackMouse;
-
-  /**
-   * True to automatically hide the tooltip after the mouse exits the target
-   * element or after the {@link #dismissDelay} has expired if set (defaults to
-   * true). If {@link #closable} = true a close tool button will be rendered
-   * into the tooltip header.
-   */
   private boolean autoHide = true;
-
-  /**
-   * Delay in milliseconds after the mouse exits the target element but before
-   * the tooltip actually hides (defaults to 200). Set to 0 for the tooltip to
-   * hide immediately.
-   */
   private int hideDelay = 200;
-
-  /**
-   * Delay in milliseconds before the tooltip automatically hides (defaults to
-   * 5000). To disable automatic hiding, set dismissDelay = 0.
-   */
   private int dismissDelay = 5000;
-
   private Date lastActive;
   private Timer dismissTimer;
   private Timer showTimer;
@@ -81,6 +47,16 @@ public class ToolTip extends Tip {
   }
 
   /**
+   * Creates a new tool tip.
+   * 
+   * @param target the target widget
+   */
+  public ToolTip(Component target) {
+    this();
+    initTarget(target);
+  }
+
+  /**
    * Creates a new tool tip for the given target.
    * 
    * @param target the target widget
@@ -88,6 +64,7 @@ public class ToolTip extends Tip {
   public ToolTip(Component target, ToolTipConfig config) {
     this();
     this.config = config;
+    this.trackMouse = config.isTrackMouse();
     initTarget(target);
   }
 
@@ -276,7 +253,7 @@ public class ToolTip extends Tip {
               onTargetOut(ce);
             }
             break;
-          case Events.MouseMove:
+          case Event.ONMOUSEMOVE:
             onMouseMove(ce);
             break;
         }
@@ -286,11 +263,12 @@ public class ToolTip extends Tip {
     target.addListener(Event.ONMOUSEOVER, l);
     target.addListener(Event.ONMOUSEOUT, l);
     target.addListener(Event.ONMOUSEMOVE, l);
+    target.el().addEventsSunk(Event.MOUSEEVENTS);
   }
 
   private void onMouseMove(ComponentEvent ce) {
     targetXY = ce.getXY();
-    if (!hidden && isTrackMouse()) {
+    if (!hidden && trackMouse) {
       setPagePosition(getTargetXY());
     }
   }

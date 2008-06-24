@@ -14,12 +14,39 @@ import com.google.gwt.user.client.Element;
  * Multiline text field. Can be used as a direct replacement for traditional
  * textarea fields.
  */
-public class TextArea extends TextField {
+public class TextArea extends TextField<String> {
+
+  private boolean preventScrollbars = false;
+
+  /**
+   * Returns true if scroll bars are disabled.
+   * 
+   * @return the scroll bar state
+   */
+  public boolean isPreventScrollbars() {
+    return preventScrollbars;
+  }
+
+  /**
+   * True to prevent scrollbars from appearing regardless of how much text is in
+   * the field (equivalent to setting overflow: hidden, defaults to false,
+   * pre-render).
+   * 
+   * @param preventScrollbars true to disable scroll bars
+   */
+  public void setPreventScrollbars(boolean preventScrollbars) {
+    this.preventScrollbars = preventScrollbars;
+  }
 
   @Override
   protected void onRender(Element target, int index) {
     setElement(DOM.createTextArea(), target, index);
-    setSize(100, 60);
+    el().setSize(100, 60);
+    getElement().setPropertyString("autocomplete", "off");
+
+    if (preventScrollbars) {
+      el().setStyleAttribute("overflow", "hidden");
+    }
     super.onRender(target, index);
   }
 

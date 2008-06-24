@@ -13,9 +13,9 @@ import com.extjs.gxt.ui.client.event.BaseEvent;
  * Instances of this class are sent as a result of load operations.
  * 
  * @param <C> the load config type
- * @param <R> the load result type
+ * @param <D> the result data type
  */
-public class LoadEvent<C extends LoadConfig, R extends LoadResult> extends BaseEvent {
+public class LoadEvent<C, D> extends BaseEvent {
 
   /**
    * The loader that triggered this event.
@@ -30,12 +30,54 @@ public class LoadEvent<C extends LoadConfig, R extends LoadResult> extends BaseE
   /**
    * The LoadResult object.
    */
-  public R result;
+  public D data;
 
-  public LoadEvent(Loader loader, C config, R result) {
+  public Throwable exception;
+
+  /**
+   * Creates a new load event.
+   * 
+   * @param loader the data loader
+   */
+  public LoadEvent(Loader loader) {
+    this.loader = loader;
+  }
+
+  /**
+   * Creates a new load event.
+   * 
+   * @param loader the data loader
+   * @param config the config object
+   */
+  public LoadEvent(Loader loader, C config) {
     this.loader = loader;
     this.config = config;
-    this.result = result;
+  }
+
+  /**
+   * Creates a new load event.
+   * 
+   * @param loader the data loader
+   * @param config the config object
+   * @param data the data
+   */
+  public LoadEvent(Loader loader, C config, D data) {
+    this.loader = loader;
+    this.config = config;
+    this.data = data;
+  }
+
+  /**
+   * Creates a new load event.
+   * 
+   * @param loader the data loader
+   * @param config the config object
+   * @param t the exception
+   */
+  public LoadEvent(Loader loader, C config, Throwable t) {
+    this.loader = loader;
+    this.config = config;
+    this.exception = t;
   }
 
 }

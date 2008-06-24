@@ -8,7 +8,7 @@
 package com.extjs.gxt.ui.client.event;
 
 import com.extjs.gxt.ui.client.widget.menu.Menu;
-import com.extjs.gxt.ui.client.widget.menu.MenuItem;
+import com.extjs.gxt.ui.client.widget.menu.Item;
 
 /**
  * Menu event type.
@@ -19,26 +19,15 @@ import com.extjs.gxt.ui.client.widget.menu.MenuItem;
  * 
  * @see Menu
  */
-public class MenuEvent extends ComponentEvent {
-
-  /**
-   * The source menu.
-   */
-  public Menu menu;
-
-  /**
-   * The menu item.
-   */
-  public MenuItem item;
-
-  /**
-   * The insert index.
-   */
-  public int index;
+public class MenuEvent extends ContainerEvent<Menu, Item> {
 
   public MenuEvent(Menu menu) {
     super(menu);
-    this.menu = menu;
   }
+
+  public MenuEvent(Menu container, Item component) {
+    super(container, component);
+  }
+  
 
 }

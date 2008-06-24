@@ -7,10 +7,12 @@
  */
 package com.extjs.gxt.ui.client.widget.form;
 
+import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -19,18 +21,25 @@ import com.google.gwt.user.client.EventListener;
 /**
  * Provides a convenient wrapper for TextFields that adds a clickable trigger
  * button (looks like a combobox by default).
+ * 
+ * <dt><b>Events:</b></dt>
+ * 
+ * <dd><b>TriggerClick</b> : FieldEvent(field, event)<br>
+ * <div>Fires after the trigger is clicked.</div>
+ * <ul>
+ * <li>field : this</li>
+ * <li>event : event</li>
+ * </ul>
+ * </dd>
  */
-public class TriggerField extends TextField {
-
-  /**
-   * The trigger style name (defaults to null).
-   */
-  public String triggerStyle;
+public class TriggerField<Data> extends TextField<Data> {
 
   protected El wrap;
   protected El trigger;
   protected El input;
   protected EventListener triggerListener;
+  
+  private String triggerStyle;
 
   @Override
   public Element getElement() {
@@ -41,9 +50,27 @@ public class TriggerField extends TextField {
     }
   }
 
+  /**
+   * Returns the trigger style.
+   * 
+   * @return the trigger style
+   */
+  public String getTriggerStyle() {
+    return triggerStyle;
+  }
+
+  /**
+   * Sets the trigger style name.
+   * 
+   * @param triggerStyle
+   */
+  public void setTriggerStyle(String triggerStyle) {
+    this.triggerStyle = triggerStyle;
+  }
+
   @Override
   protected void alignErrorIcon() {
-    errorIcon.el.alignTo(wrap.dom, "tl-tr", new int[] {2, 1});
+    errorIcon.el().alignTo(wrap.dom, "tl-tr", new int[] {1, 1});
   }
 
   @Override
@@ -99,27 +126,28 @@ public class TriggerField extends TextField {
 
   @Override
   protected void onRender(Element target, int index) {
-    if (el != null) {
+    if (el() != null) {
       super.onRender(target, index);
       return;
     }
     input = new El(DOM.createInputText());
     wrap = new El(DOM.createDiv());
-    wrap.setStyleName("x-form-field-wrap");
+    wrap.dom.setClassName("x-form-field-wrap");
+    
+    input.addStyleName(fieldStyle);
 
     trigger = new El(DOM.createImg());
-    trigger.setStyleName("x-form-trigger " + triggerStyle);
-    trigger.setElementAttribute("src", GXT.BLANK_IMAGE_URL);
-    wrap.appendChild(input.dom);
-    wrap.appendChild(trigger.dom);
+    trigger.dom.setClassName("x-form-trigger " + triggerStyle);
+    trigger.dom.setPropertyString("src", GXT.BLANK_IMAGE_URL);
+    wrap.dom.appendChild(input.dom);
+    wrap.dom.appendChild(trigger.dom);
     setElement(wrap.dom, target, index);
 
     super.onRender(target, index);
 
-    final TriggerField ffield = this;
     triggerListener = new EventListener() {
       public void onBrowserEvent(Event event) {
-        ComponentEvent ce = new ComponentEvent(ffield);
+        FieldEvent ce = new FieldEvent(TriggerField.this);
         ce.event = event;
         ce.type = DOM.eventGetType(event);
         ce.stopEvent();
@@ -139,7 +167,7 @@ public class TriggerField extends TextField {
   }
 
   protected void onTriggerClick(ComponentEvent ce) {
-
+    fireEvent(Events.TriggerClick, ce);
   }
 
   protected void onTriggerEvent(ComponentEvent ce) {

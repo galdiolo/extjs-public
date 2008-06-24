@@ -7,30 +7,38 @@
  */
 package com.extjs.gxt.samples.mail.client;
 
-import com.extjs.gxt.samples.mail.client.model.MailModel;
 import com.extjs.gxt.samples.mail.client.mvc.AppController;
 import com.extjs.gxt.samples.mail.client.mvc.ContactController;
 import com.extjs.gxt.samples.mail.client.mvc.MailController;
 import com.extjs.gxt.samples.mail.client.mvc.TaskController;
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.mvc.Dispatcher;
+import com.extjs.gxt.ui.client.util.Theme;
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 public class Mail implements EntryPoint {
 
-  private MailModel model;
-  private Dispatcher dispatcher;
-
   public void onModuleLoad() {
-    model = new MailModel();
-    Registry.register("model", model);
-
-    dispatcher = Dispatcher.get();
+    GXT.setDefaultTheme(Theme.GRAY, true);
+    GXT.hideLoadingPanel("loading");
+    
+    MailServiceAsync service = (MailServiceAsync) GWT.create(MailService.class);
+    ServiceDefTarget endpoint = (ServiceDefTarget) service;
+    String moduleRelativeURL = GWT.getModuleBaseURL() + "service";
+    endpoint.setServiceEntryPoint(moduleRelativeURL);
+    Registry.register("service", service);
+    
+    Dispatcher dispatcher = Dispatcher.get();
     dispatcher.addController(new AppController());
     dispatcher.addController(new MailController());
     dispatcher.addController(new TaskController());
     dispatcher.addController(new ContactController());
-    dispatcher.dispatch(AppEvents.Init);
+    
+    dispatcher.dispatch(AppEvents.Login); 
+    
   }
 
 }

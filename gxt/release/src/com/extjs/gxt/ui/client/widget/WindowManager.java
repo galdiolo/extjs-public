@@ -142,7 +142,7 @@ public class WindowManager {
       Collections.sort(accessList, comparator);
       for (int i = 0; i < accessList.size(); i++) {
         Window w = (Window) accessList.get(i);
-        w.el.setStyleAttribute("zIndex", zseed + (i * 10));
+        w.el().setStyleAttribute("zIndex", zseed + (i * 10));
       }
     }
   }

@@ -7,163 +7,144 @@
  */
 package com.extjs.gxt.ui.client.widget.menu;
 
-import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
-import com.extjs.gxt.ui.client.util.Format;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Element;
+import com.extjs.gxt.ui.client.event.MenuEvent;
+import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.widget.Component;
 
 /**
- * A base class for all menu items that require menu-related functionality (like
- * sub-menus) and are not static display items. Item extends the base
- * functionality of {@link MenuItem} by adding menu-specific activation and
- * click handling.
+ * The base class for all items that render into menus. BaseItem provides
+ * default rendering, activated state management.
  */
-public class Item extends MenuItem {
-
-  protected Menu subMenu;
-  protected String itemStyle = "x-menu-item";
-  protected String iconStyle;
-  protected String text;
+public abstract class Item extends Component {
 
   /**
-   * Creates a new item.
+   * True if this item can be visually activated (defaults to false).
    */
-  public Item() {
-    canActivate = true;
-  }
+  protected boolean canActivate;
 
   /**
-   * Creates a new item with the given text.
+   * True to hide the containing menu after this item is clicked (defaults to
+   * true).
+   */
+  protected boolean hideOnClick = true;
+
+  /**
+   * The item's containing menu.
+   */
+  protected Menu parentMenu;
+
+  /**
+   * The CSS class to use when the item becomes activated (defaults to
+   * "x-menu-item-active").
+   */
+  private String activeStyle = "x-menu-item-active";
+
+  /**
+   * Adds a selection listener.
    * 
-   * @param text the item's text
+   * @param listener the listener to add
    */
-  public Item(String text) {
-    this.text = text;
+  public void addSelectionListener(SelectionListener listener) {
+    addListener(Events.Select, listener);
   }
 
   /**
-   * Expands the item's sub menu.
-   */
-  public void expandMenu() {
-    if (isEnabled() && subMenu != null) {
-      subMenu.show(el.dom, "tl-tr?");
-    }
-  }
-
-  /**
-   * Returns the item's icon style.
+   * Returns the active style.
    * 
-   * @return the icon style
+   * @return the style
    */
-  public String getIconStyle() {
-    return iconStyle;
+  public String getActiveStyle() {
+    return activeStyle;
   }
 
   /**
-   * Returns the item's sub menu.
+   * Returns the hide on click state.
    * 
-   * @return the sub menu
+   * @return the hide on click state
    */
-  public Menu getSubMenu() {
-    return subMenu;
+  public boolean getHideOnClick() {
+    return hideOnClick;
   }
 
   /**
-   * Returns the item's text.
+   * Returns the item's containing menu.
    * 
-   * @return the text
+   * @return the menu
    */
-  public String getText() {
-    return text;
+  public Menu getParentMenu() {
+    return parentMenu;
   }
 
   /**
-   * Sets the item's icon style.
+   * Removes a previously added listener.
    * 
-   * @param iconStyle the icon style
+   * @param listener the listener to be removed
    */
-  public void setIconStyle(String iconStyle) {
-    String oldStyle = this.iconStyle;
-    this.iconStyle = iconStyle;
-    if (rendered) {
-      el.child("img.x-menu-item-icon").replaceStyleName(oldStyle, iconStyle);
-    }
+  public void removeSelectionListener(SelectionListener listener) {
+    removeListener(Events.Select, listener);
   }
 
   /**
-   * Sets the item's sub menu.
+   * The CSS class to use when the item becomes activated (defaults to
+   * "x-menu-item-active").
    * 
-   * @param menu the sub menu
+   * @param activeStyle the active style
    */
-  public void setSubMenu(Menu menu) {
-    this.subMenu = menu;
-    menu.parentItem = this;
+  public void setActiveStyle(String activeStyle) {
+    this.activeStyle = activeStyle;
   }
 
   /**
-   * Sets the item's text.
+   * True to hide the containing menu after this item is clicked (defaults to
+   * true).
    * 
-   * @param text the text
+   * @param hideOnClick true to hide, otherwise false
    */
-  public void setText(String text) {
-    this.text = text;
-    if (rendered) {
-      String img = "<img src='{0}' class='x-menu-item-icon {2}' />{1}";
-      String[] vals = new String[3];
-      vals[0] = GXT.BLANK_IMAGE_URL;
-      vals[1] = text;
-      vals[2] = iconStyle;
-      img = Format.substitute(img, (Object[]) vals);
-      el.setInnerHtml(img);
-    }
+  public void setHideOnClick(boolean hideOnClick) {
+    this.hideOnClick = hideOnClick;
   }
 
-  @Override
   protected void activate(boolean autoExpand) {
-    super.activate(autoExpand);
-    if (autoExpand && subMenu != null) {
-      expandMenu();
+    if (disabled) {
+      return;
     }
+    El li = el().getParent();
+    li.addStyleName(activeStyle);
+    MenuEvent me = new MenuEvent(parentMenu);
+    me.item = this;
+    fireEvent(Events.Activate, me);
   }
 
-  @Override
-  protected void afterRender() {
-    super.afterRender();
-    if (text != null) {
-      setText(text);
-    }
-  }
-
-  @Override
   protected void deactivate() {
-    super.deactivate();
-    if (subMenu != null && subMenu.isVisible()) {
-      subMenu.hide();
+    El li = el().getParent();
+    li.removeStyleName(activeStyle);
+    MenuEvent me = new MenuEvent(parentMenu);
+    me.item = this;
+    fireEvent(Events.Deactivate, me);
+  }
+
+  protected void expandMenu(boolean autoActivate) {
+
+  }
+
+  protected void handleClick(ComponentEvent be) {
+    if (hideOnClick) {
+      parentMenu.hide(true);
     }
   }
 
-  @Override
-  protected void onRender(Element target, int index) {
-    super.onRender(target, index);
-    setElement(DOM.createAnchor(), target, index);
-
-    el.setElementAttribute("href", "#");
-    String s = itemStyle + (subMenu != null ? " x-menu-item-arrow" : "");
-    setStyleName(s);
-
-    String img = "<img src='{0}' class='x-menu-item-icon {1}' />{2}";
-    img = Format.substitute(img, GXT.BLANK_IMAGE_URL, iconStyle, text);
-    el.update(img);
+  protected void onClick(ComponentEvent be) {
+    MenuEvent me = new MenuEvent(parentMenu);
+    me.item = this;
+    if (!disabled && fireEvent(Events.Select, me)) {
+      handleClick(be);
+    }
   }
 
-  @Override
   protected boolean shouldDeactivate(ComponentEvent ce) {
-    if (super.shouldDeactivate(ce)) {
-      if (subMenu != null && subMenu.isVisible()) {
-        return !subMenu.el.getBounds().contains(ce.getXY());
-      }
-    }
     return true;
   }
 

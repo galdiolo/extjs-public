@@ -11,6 +11,8 @@ import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.event.ButtonBarEvent;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.google.gwt.user.client.Element;
 
 /**
@@ -45,17 +47,19 @@ public class Dialog extends Window {
   public static final String YESNO = "yesno";
 
   /**
+   * Button constant for the itemId of a NO button.
+   */
+  public static final String NO = "no";
+
+  /**
+   * Button constant for the itemId of a YES button.
+   */
+  public static final String YES = "yes";
+
+  /**
    * Button constant that displays a YES, NO, and CANCEL button.
    */
   public static final String YESNOCANCEL = "yesnocancel";
-
-  /**
-   * The action to take when the close button is clicked. The default action is
-   * 'close' which will actually remove the window from the DOM and destroy it.
-   * The other valid option is 'hide' which will simply hide the window, keeping
-   * the window available to be redisplayed via the {@link #show} method.
-   */
-  public String closeAction = "close";
 
   /**
    * The OK button text (defaults to 'OK');
@@ -82,30 +86,13 @@ public class Dialog extends Window {
    */
   public String noText = GXT.MESSAGES.messageBox_no();
 
-  /**
-   * Action to run then any button is selected (defaults to null). Valid values
-   * are null, "close" or "hide"
-   */
-  public String buttonPressedAction = null;
-
   protected Button okBtn;
-
   protected Button closeBtn;
   protected Button cancelBtn;
   protected Button noBtn, yesBtn;
-  /**
-   * The buttons to display (defaults to OK).
-   * 
-   * <pre>
-   * Dialog.OK
-   * Dialog.CANCEL
-   * Dialog.OKCANCEL
-   * Dialog.YESNO
-   * Dialog.YESNOCANCEL
-   * </pre>
-   */
-  private String buttons = OK;
 
+  private boolean hideOnButtonClick = false;
+  private String buttons = OK;
   private boolean buttonsInitialized;
 
   @Override
@@ -133,6 +120,15 @@ public class Dialog extends Window {
   }
 
   /**
+   * Returns true if the dialog will be hidden on any button click.
+   * 
+   * @return the hide on button click state
+   */
+  public boolean isHideOnButtonClick() {
+    return hideOnButtonClick;
+  }
+
+  /**
    * Sets the buttons to display (defaults to OK).
    * 
    * <pre>
@@ -147,31 +143,40 @@ public class Dialog extends Window {
     this.buttons = buttons;
   }
 
+  /**
+   * True to hide the dialog on any button click.
+   * 
+   * @param hideOnButtonClick true to hide
+   */
+  public void setHideOnButtonClick(boolean hideOnButtonClick) {
+    this.hideOnButtonClick = hideOnButtonClick;
+  }
+
   protected void createButtons() {
     if (!buttonsInitialized) {
 
       buttonsInitialized = true;
-      if (getButtons().indexOf("ok") != -1) {
+      if (getButtons().indexOf(OK) != -1) {
         okBtn = new Button(okText);
-        okBtn.setItemId("ok");
+        okBtn.setItemId(OK);
         addButton(okBtn);
       }
 
-      if (getButtons().indexOf("yes") != -1) {
+      if (getButtons().indexOf(YES) != -1) {
         yesBtn = new Button(yesText);
-        yesBtn.setItemId("yes");
+        yesBtn.setItemId(YES);
         addButton(yesBtn);
       }
 
-      if (getButtons().indexOf("no") != -1) {
+      if (getButtons().indexOf(NO) != -1) {
         noBtn = new Button(noText);
-        noBtn.setItemId("no");
+        noBtn.setItemId(NO);
         addButton(noBtn);
       }
 
-      if (getButtons().indexOf("cancel") != -1) {
+      if (getButtons().indexOf(CANCEL) != -1) {
         cancelBtn = new Button(cancelText);
-        cancelBtn.setItemId("cancel");
+        cancelBtn.setItemId(CANCEL);
         addButton(cancelBtn);
       }
 
@@ -192,17 +197,9 @@ public class Dialog extends Window {
    */
   protected void onButtonPressed(Button button) {
     if (button == closeBtn) {
-      if ("close".equalsIgnoreCase(closeAction)) {
-        close(button);
-        return;
-      } else if ("hide".equalsIgnoreCase(closeAction)) {
-        hide(button);
-        return;
-      }
+      hide(button);
     }
-    if ("close".equalsIgnoreCase(buttonPressedAction)) {
-      close(button);
-    } else if ("hide".equalsIgnoreCase(buttonPressedAction)) {
+    if (isHideOnButtonClick()) {
       hide(button);
     }
   }
@@ -212,7 +209,7 @@ public class Dialog extends Window {
 
     buttonBar.addListener(Events.Select, new Listener<ButtonBarEvent>() {
       public void handleEvent(ButtonBarEvent bbe) {
-        onButtonPressed(bbe.button);
+        onButtonPressed(bbe.item);
       }
     });
 

@@ -7,14 +7,25 @@
  */
 package com.extjs.gxt.ui.client.mvc;
 
-import java.util.EventListener;
-
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MvcEvent;
 
 /**
- * Event interface for dispatcher events.
+ * Event listener for dispatcher events.
  */
-public interface DispatcherListener extends EventListener {
+public class DispatcherListener implements Listener<MvcEvent> {
+
+  public void handleEvent(MvcEvent me) {
+    switch (me.type) {
+      case Dispatcher.BeforeDispatch:
+        beforeDispatch(me);
+        break;
+      case Dispatcher.AfterDispatch:
+        afterDispatch(me);
+        break;
+    }
+
+  }
 
   /**
    * Fires before an event is dispatched. Listeners can set the
@@ -22,13 +33,17 @@ public interface DispatcherListener extends EventListener {
    * 
    * @param mvce the app event to be dispatched
    */
-  public void beforeDispatch(MvcEvent mvce);
+  public void beforeDispatch(MvcEvent mvce) {
+
+  }
 
   /**
    * Fires after an event has been dispatched.
    * 
    * @param mvce the event that was dispatched
    */
-  public void afterDispatch(MvcEvent mvce);
+  public void afterDispatch(MvcEvent mvce) {
+
+  }
 
 }

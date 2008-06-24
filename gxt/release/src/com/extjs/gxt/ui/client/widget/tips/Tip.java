@@ -13,8 +13,8 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Point;
 import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
-import com.extjs.gxt.ui.client.widget.ToolButton;
 import com.extjs.gxt.ui.client.widget.Shadow.ShadowPosition;
+import com.extjs.gxt.ui.client.widget.button.ToolButton;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.RootPanel;
 
@@ -127,21 +127,21 @@ public class Tip extends ContentPanel {
    */
   public void showAt(int x, int y) {
     RootPanel.get().add(this);
-    el.makePositionable(true);
+    el().makePositionable(true);
     updateContent();
-    el.setVisibility(true);
-    el.setVisible(true);
+    el().setVisibility(true);
+    el().setVisible(true);
     if (attachSize.width == Style.DEFAULT) {
       Element body = getElement("body");
       int bw = fly(body).getTextWidth() + 10;
       if (title != null) {
-        bw = Math.max(bw, head.el.child("span").getTextWidth());
+        bw = Math.max(bw, head.el().child("span").getTextWidth());
       }
-      bw += getFrameWidth() + (isClosable() ? 20 : 0) + fly(body).getPadding("lr");
-      setWidth(Util.constrain(bw, getMinWidth(), getMaxWidth()));
+      bw += getFrameWidth() + (closable ? 20 : 0) + fly(body).getPadding("lr") - 7;//why?
+      setWidth(Util.constrain(bw, minWidth, maxWidth));
     }
     Point p = new Point(x, y);
-    p = el.adjustForConstraints(p);
+    p = el().adjustForConstraints(p);
     setPagePosition(p.x, p.y);
   }
 
@@ -158,7 +158,7 @@ public class Tip extends ContentPanel {
   protected void onRender(Element parent, int pos) {
     if (isClosable()) {
       setHeaderVisible(true);
-      head.addTool(new ToolButton("x-tool-close", new SelectionListener() {
+      head.addTool(new ToolButton("x-tool-close", new SelectionListener<ComponentEvent>() {
         public void componentSelected(ComponentEvent ce) {
           hide();
         }

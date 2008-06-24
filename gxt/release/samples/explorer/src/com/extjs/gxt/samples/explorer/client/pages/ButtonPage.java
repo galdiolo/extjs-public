@@ -10,27 +10,23 @@ package com.extjs.gxt.samples.explorer.client.pages;
 
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.Button;
-import com.extjs.gxt.ui.client.widget.ButtonBar;
-import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.Info;
-import com.extjs.gxt.ui.client.widget.ToggleButton;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.button.ButtonBar;
+import com.extjs.gxt.ui.client.widget.button.ToggleButton;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.RootPanel;
 
-public class ButtonPage extends Container implements EntryPoint {
+public class ButtonPage extends LayoutContainer implements EntryPoint {
 
   public void onModuleLoad() {
     RootPanel.get().add(this);
   }
-
-  @Override
-  protected void onRender(Element parent, int pos) {
-    super.onRender(parent, pos);
-    
-    SelectionListener listener = new SelectionListener() {
+  
+  public ButtonPage() {
+    SelectionListener listener = new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         Button btn = (Button) ce.component;
         Info.display("Click Event", "The '{0}' button was clicked.", btn.getText());
@@ -54,7 +50,7 @@ public class ButtonPage extends Container implements EntryPoint {
 
     setLayout(new FlowLayout(4));
     add(buttonBar);
-    layout(true);
   }
+
 
 }

@@ -1,3 +1,10 @@
+/*
+ * Ext GWT - Ext for GWT
+ * Copyright(c) 2007, 2008, Ext JS, LLC.
+ * licensing@extjs.com
+ * 
+ * http://extjs.com/license
+ */
 package com.extjs.gxt.samples.explorer.client.pages;
 
 import com.extjs.gxt.samples.explorer.client.Explorer;
@@ -6,20 +13,22 @@ import com.extjs.gxt.samples.explorer.client.model.ExplorerModel;
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.Style.Scroll;
+import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.DataViewEvent;
 import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.store.Record;
-import com.extjs.gxt.ui.client.store.Store;
-import com.extjs.gxt.ui.client.widget.Container;
+import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.DataView;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.Element;
 
-public class OverviewPage extends Container {
+public class OverviewPage extends LayoutContainer {
 
   private DataView dataView;
 
   public OverviewPage() {
+    // next line is only used to pass layout to containing container
+    // this will have NO effect outside of the explorer demo
     setData("layout", new FitLayout());
   }
 
@@ -30,7 +39,7 @@ public class OverviewPage extends Container {
     setScrollMode(Scroll.AUTO);
 
     ExplorerModel model = (ExplorerModel) Registry.get("model");
-    Store store = new Store();
+    ListStore store = new ListStore();
     store.add(model.getEntries());
 
     StringBuffer sb = new StringBuffer();
@@ -48,13 +57,12 @@ public class OverviewPage extends Container {
     dataView.setTemplate(sb.toString());
     dataView.addListener(Events.SelectionChange, new Listener<DataViewEvent>() {
       public void handleEvent(DataViewEvent be) {
-        Record record = (Record) dataView.getSelection().get(0);
-        Entry entry = (Entry) record.getModel();
+        ModelData record = (ModelData) dataView.getSelectedItem().getData();
+        Entry entry = (Entry) record;
         Explorer.showPage(entry);
       }
     });
 
     add(dataView);
-
   }
 }

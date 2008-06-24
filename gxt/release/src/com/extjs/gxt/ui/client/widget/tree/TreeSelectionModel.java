@@ -10,57 +10,49 @@ package com.extjs.gxt.ui.client.widget.tree;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.ui.client.Events;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.TreeEvent;
-import com.extjs.gxt.ui.client.util.KeyNav;
+import com.extjs.gxt.ui.client.Style.SelectionMode;
+import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.widget.Items;
-import com.extjs.gxt.ui.client.widget.selection.SelectionModel;
+import com.extjs.gxt.ui.client.widget.selection.AbstractSelectionModel;
 
 /**
- * Abstract base class for Tree selection models.
+ * Tree single-select selection model.
  */
-public abstract class TreeSelectionModel implements SelectionModel<Tree>,
-    Listener<TreeEvent> {
+public class TreeSelectionModel extends AbstractSelectionModel<Tree, TreeItem> {
 
-  protected Tree tree;
-  protected KeyNav<TreeEvent> keyNav;
-  protected TreeItem lastSelected;
-
-  public void bind(Tree tree) {
-    if (keyNav == null) {
-      createKeyNav(tree);
-    }
-    if (this.tree != null) {
-      this.tree.removeListener(Events.OnClick, this);
-      this.tree.removeListener(Events.Remove, this);
-      keyNav.bind(null);
-    }
-    this.tree = tree;
-    if (tree != null) {
-      tree.addListener(Events.OnClick, this);
-      tree.addListener(Events.Remove, this);
-      keyNav.bind(tree);
-    }
+  public TreeSelectionModel() {
+    super();
   }
 
-  public abstract List<TreeItem> doGetSelectedItems();
-
-  public void handleEvent(TreeEvent e) {
-    switch (e.type) {
-      case Events.OnClick:
-        onClick(e);
-        break;
-      case Events.Remove:
-        onRemove(e.item);
-        break;
+  public TreeSelectionModel(SelectionMode mode) {
+    super(mode);
+  }
+  
+  @Override
+  protected void onClick(ContainerEvent ce) {
+    TreeItem item = (TreeItem)ce.item;
+    if (item != null) {
+      if (!ce.within(item.getUI().getJointEl()) && !ce.within(item.getUI().getCheckEl())) {
+        if (isSelected(item) && ce.isControlKey()) {
+          deselect(item);
+        } else {
+          doSelect(new Items(item), ce.isControlKey(), false);
+        }
+      }
     }
   }
-
-  public abstract void refresh();
-
-  public void select(TreeItem item) {
-    doSelect(new Items(item));
+  
+  @Override
+  protected void doMultiSelect(TreeItem item, ContainerEvent ce) {
+    if (ce.isShiftKey() && selectedItem != null) {
+      // not implemented
+    } else {
+      if (ce.isControlKey() && isSelected(item)) {
+        deselect(item);
+      } else {
+        doSelect(new Items(item), ce.isControlKey(), false);
+      }
+    }
   }
 
   /**
@@ -70,7 +62,7 @@ public abstract class TreeSelectionModel implements SelectionModel<Tree>,
   public void selectNext() {
     TreeItem next = next();
     if (next != null) {
-      doSelect(new Items(next));
+      doSelect(new Items(next), false, false);
     }
   }
 
@@ -81,44 +73,9 @@ public abstract class TreeSelectionModel implements SelectionModel<Tree>,
   public void selectPrevious() {
     TreeItem previous = previous();
     if (previous != null) {
-      doSelect(new Items(previous));
+      doSelect(new Items(previous), false, false);
     }
   }
-
-  protected void createKeyNav(Tree tree) {
-    keyNav = new KeyNav<TreeEvent>() {
-
-      @Override
-      public void onDown(TreeEvent ce) {
-        onKeyDown(ce);
-      }
-
-      @Override
-      public void onLeft(TreeEvent ce) {
-        onKeyLeft(ce);
-      }
-
-      @Override
-      public void onRight(TreeEvent ce) {
-        onKeyRight(ce);
-      }
-
-      @Override
-      public void onUp(TreeEvent ce) {
-        onKeyUp(ce);
-      }
-
-    };
-  }
-
-  protected abstract void doDeselect(Items<TreeItem> items, boolean supressEvent);
-
-  protected void doSelect(Items items) {
-    doSelect(items, false, false);
-  }
-
-  protected abstract void doSelect(Items<TreeItem> items, boolean keepExisting,
-      boolean supressEvent);
 
   protected void ensureExpanded(TreeItem item) {
     List<TreeItem> stack = new ArrayList<TreeItem>();
@@ -136,8 +93,9 @@ public abstract class TreeSelectionModel implements SelectionModel<Tree>,
     }
   }
 
+  @Override
   protected TreeItem next() {
-    TreeItem sel = lastSelected;
+    TreeItem sel = selectedItem;
     if (sel == null) {
       return null;
     }
@@ -157,54 +115,55 @@ public abstract class TreeSelectionModel implements SelectionModel<Tree>,
     return null;
   }
 
-  protected void onClick(TreeEvent e) {
-
+  @Override
+  protected void onKeyDown(ContainerEvent ce) {
+    super.onKeyDown(ce);
   }
 
-  protected void onKeyDown(TreeEvent e) {
-    selectNext();
-  }
-
-  protected void onKeyLeft(TreeEvent e) {
-    e.preventDefault();
-    if (lastSelected == null) return;
-    if (!lastSelected.isLeaf() && lastSelected.isExpanded()) {
-      lastSelected.setExpanded(false);
-    } else if (lastSelected.getParentItem() != null
-        && !lastSelected.getParentItem().isRoot()) {
-      doSelect(new Items(lastSelected.getParentItem()));
+  @Override
+  protected void onKeyLeft(ContainerEvent ce) {
+    ce.preventDefault();
+    if (selectedItem == null) return;
+    if (!selectedItem.isLeaf() && selectedItem.isExpanded()) {
+      selectedItem.setExpanded(false);
+    } else if (selectedItem.getParentItem() != null && !selectedItem.getParentItem().isRoot()) {
+      doSelect(new Items(selectedItem.getParentItem()), false, false);
     }
   }
 
-  protected void onKeyRight(TreeEvent e) {
-    e.preventDefault();
-    if (lastSelected == null) return;
-    if (!lastSelected.isLeaf()) {
-      if (!lastSelected.isExpanded()) {
-        lastSelected.setExpanded(true);
+  @Override
+  protected void onKeyRight(ContainerEvent ce) {
+    ce.preventDefault();
+    if (selectedItem == null) return;
+    if (!selectedItem.isLeaf()) {
+      if (!selectedItem.isExpanded()) {
+        selectedItem.setExpanded(true);
         return;
       }
     }
     selectNext();
   }
 
-  protected void onKeyUp(TreeEvent e) {
-    selectPrevious();
+  @Override
+  protected void onKeyUp(ContainerEvent ce) {
+    super.onKeyUp(ce);
   }
 
-  protected void onRemove(TreeItem item) {
-
-  }
-
+  @Override
   protected void onSelectChange(TreeItem item, boolean select) {
+    if (!container.isRendered()) {
+      hookPreRender(item, select);
+      return;
+    }
     if (select) {
       ensureExpanded(item);
     }
     item.getUI().onSelectedChange(select);
   }
 
+  @Override
   protected TreeItem previous() {
-    TreeItem sel = lastSelected;
+    TreeItem sel = selectedItem;
     if (sel == null) {
       return null;
     }
@@ -214,8 +173,7 @@ public abstract class TreeSelectionModel implements SelectionModel<Tree>,
         return prev;
       } else {
         TreeItem lastChild = prev.lastChild();
-        while (lastChild != null && lastChild.getItemCount() > 0
-            && lastChild.isExpanded()) {
+        while (lastChild != null && lastChild.getItemCount() > 0 && lastChild.isExpanded()) {
           lastChild = lastChild.lastChild();
         }
         return lastChild;

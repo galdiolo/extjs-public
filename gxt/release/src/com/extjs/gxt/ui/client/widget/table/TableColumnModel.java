@@ -13,8 +13,8 @@ import java.util.List;
 
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.XDOM;
+import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.extjs.gxt.ui.client.event.TableEvent;
-import com.extjs.gxt.ui.client.util.Observable;
 import com.extjs.gxt.ui.client.widget.Component;
 
 /**
@@ -31,27 +31,46 @@ import com.extjs.gxt.ui.client.widget.Component;
  * <li>width : the new column width</li>
  * </ul>
  * </dd>
+ * 
+ * <dd><b>HeaderChange</b> : TableEvent(table, columnIndex)<br>
+ * <div>Fires when the text of a header changes.</div>
+ * <ul>
+ * <li>table : table</li>
+ * <li>columnIndex : columnIndex</li>
+ * </ul>
+ * </dd>
+ * 
+ * <dd><b>WidthChange</b> : TableEvent(table, columnIndex)<br>
+ * <div>Fires when the width of a column changes.</div>
+ * <ul>
+ * <li>table : table</li>
+ * <li>columnIndex : columnIndex</li>
+ * </ul>
+ * </dd>
+ * 
+ * </dl>
  */
-public class TableColumnModel<T extends TableColumn> extends Observable {
+public class TableColumnModel extends BaseObservable {
 
-  Component table;
-  List<T> columns;
+  protected Component table;
+  protected List<? extends TableColumn> columns;
 
   /**
    * Constructs a new instance.
    */
-  public TableColumnModel(List<T> columns) {
+  public TableColumnModel(List<? extends TableColumn> columns) {
     assert columns != null;
     this.columns = columns;
     for (int i = 0; i < columns.size(); i++) {
       columns.get(i).index = i;
+      columns.get(i).cm = this;
     }
   }
 
   /**
    * Constructs a new instance.
    */
-  public TableColumnModel(T... columns) {
+  public TableColumnModel(TableColumn... columns) {
     this(columns == null ? null : Arrays.asList(columns));
   }
 
@@ -97,8 +116,8 @@ public class TableColumnModel<T extends TableColumn> extends Observable {
    * 
    * @return the columns
    */
-  public List<T> getColumns() {
-    return new ArrayList<T>(columns);
+  public List<TableColumn> getColumns() {
+    return new ArrayList<TableColumn>(columns);
   }
 
   public Component getTable() {

@@ -790,9 +790,20 @@ class Ext {
            setOpacity : function(opacity){
                   var s = this.dom.style;
                   if(Ext.isIE){
-                      s.zoom = 1;
-                      s.filter = (s.filter || '').replace(/alpha\([^\)]*\)/gi,"") +
-                                 (opacity == 1 ? "" : " alpha(opacity=" + opacity * 100 + ")");
+
+    var elem = this.dom;
+    if ( typeof elem.style.filter == 'string' ) { // in case not appended
+       elem.style.filter = 'alpha(opacity=' + opacity * 100 + ')';
+
+       if (!elem.currentStyle || !elem.currentStyle.hasLayout) {
+         elem.style.zoom = 1; // when no layout or cant tell
+       }
+   }
+
+
+
+
+
                   }else{
                       s.opacity = opacity;
                   }

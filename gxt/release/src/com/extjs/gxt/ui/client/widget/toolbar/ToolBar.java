@@ -7,18 +7,16 @@
  */
 package com.extjs.gxt.ui.client.widget.toolbar;
 
-import java.util.ArrayList;
-
-import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.event.ToolBarEvent;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
-import com.extjs.gxt.ui.client.widget.AbstractContainer;
-import com.extjs.gxt.ui.client.widget.Component;
-import com.extjs.gxt.ui.client.widget.HorizontalPanel;
+import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.layout.TableData;
+import com.extjs.gxt.ui.client.widget.layout.TableRowLayout;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 
@@ -71,16 +69,17 @@ import com.google.gwt.user.client.Event;
  * @see ToggleToolItem
  * @see SplitToolItem
  */
-public class ToolBar extends AbstractContainer<ToolItem> {
+public class ToolBar extends Container<ToolItem> {
 
   private HorizontalAlignment buttonAlign = HorizontalAlignment.LEFT;
-  private HorizontalPanel panel;
 
   /**
    * Creates a new tool bar.
    */
   public ToolBar() {
     baseStyle = "x-toolbar";
+    layoutOnChange = true;
+    enableLayout = true;
   }
 
   /**
@@ -88,8 +87,9 @@ public class ToolBar extends AbstractContainer<ToolItem> {
    * 
    * @param item the item to add
    */
-  public void add(ToolItem item) {
-    insert(item, getItemCount());
+  @Override
+  public boolean add(ToolItem item) {
+    return super.add(item);
   }
 
   /**
@@ -107,21 +107,17 @@ public class ToolBar extends AbstractContainer<ToolItem> {
    * @param item the item to add
    * @param index the insert location
    */
-  public void insert(ToolItem item, int index) {
-    ToolBarEvent tbe = new ToolBarEvent(this);
-    tbe.item = item;
-    tbe.index = index;
-    if (fireEvent(Events.BeforeAdd, tbe)) {
-      item.toolBar = this;
-      super.insert(item, index);
-      if (rendered) {
-        renderItem(item, index);
-        if (isAttached()) {
-          WidgetHelper.doAttach(item);
-        }
+  public boolean insert(ToolItem item, int index) {
+    boolean added = super.insert(item, index);
+    if (added) {
+      TableData data = new TableData();
+      data.setVerticalAlign(VerticalAlignment.MIDDLE);
+      item.setData(data);
+      if (item instanceof FillToolItem) {
+        data.setWidth("100%");
       }
-      fireEvent(Events.Add, tbe);
     }
+    return added;
   }
 
   /**
@@ -130,27 +126,7 @@ public class ToolBar extends AbstractContainer<ToolItem> {
    * @param item the item to be removed
    */
   public boolean remove(ToolItem item) {
-    ToolBarEvent tbe = new ToolBarEvent(this);
-    tbe.item = item;
-    if (fireEvent(Events.BeforeRemove, tbe)) {
-      item.toolBar = null;
-      super.remove(item);
-      if (rendered) {
-        panel.remove(item);
-      }
-      fireEvent(Events.Remove, tbe);
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * Removes all items.
-   */
-  public void removeAll() {
-    for (ToolItem item : new ArrayList<ToolItem>(getItems())) {
-      remove(item);
-    }
+    return super.remove(item);
   }
 
   /**
@@ -167,36 +143,24 @@ public class ToolBar extends AbstractContainer<ToolItem> {
     return new ToolBarEvent(this);
   }
 
+  @Override
+  protected ContainerEvent createContainerEvent(ToolItem item) {
+    return new ToolBarEvent(this, item);
+  }
+
   protected void onRender(Element target, int index) {
-    super.onRender(target, index);
-    panel = new HorizontalPanel();
-    panel.setLayoutOnChange(true);
-    panel.setHorizontalAlign(getButtonAlign());
-    panel.setStyleName(baseStyle + " x-small-editor");
-    panel.render(target, index);
-    setElement(panel.getElement());
-    setHeight(25);
+    setElement(DOM.createDiv(), target, index);
+
+    addStyleName(baseStyle + " x-small-editor");
     setStyleAttribute("paddingRight", "8px");
+    
+    int h = XDOM.isVisibleBox ? 28 : 23;
+    el().setHeight(h);
 
-    renderAll();
-  }
+    TableRowLayout layout = new TableRowLayout();
+    setLayout(layout);
+    layout();
 
-  private void renderAll() {
-    int count = getItemCount();
-    for (int i = 0; i < count; i++) {
-      Component item = getItem(i);
-      renderItem(item, i);
-    }
-  }
-
-  private void renderItem(Component item, int index) {
-    TableData data = new TableData();
-    data.verticalAlign = VerticalAlignment.MIDDLE;
-    item.setData(data);
-    if (item instanceof FillToolItem) {
-      data.width = "100%";
-    }
-    panel.insert(item, index);
   }
 
 }

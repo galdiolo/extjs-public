@@ -8,8 +8,9 @@
 package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.event.TypedListener;
+import com.extjs.gxt.ui.client.widget.button.IconButton;
 import com.google.gwt.user.client.Element;
 
 /**
@@ -47,8 +48,7 @@ public class DataListItem extends Component {
    * @param listener the listener
    */
   public void addSelectionListener(SelectionListener listener) {
-    TypedListener tl = new TypedListener(listener);
-    addListener(Events.Select, tl);
+    addListener(Events.Select, listener);
   }
 
   /**
@@ -105,6 +105,10 @@ public class DataListItem extends Component {
    * @param iconStyle the icon style
    */
   public void setIconStyle(String iconStyle) {
+    if (rendered) {
+      El elem = el().selectNode("." + "x-icon-btn");
+      elem.replaceStyleName(this.iconStyle, iconStyle);
+    }
     this.iconStyle = iconStyle;
   }
 
@@ -115,6 +119,10 @@ public class DataListItem extends Component {
    */
   public void setText(String text) {
     this.text = text;
+    if (rendered) {
+      El elem = el().selectNode("." + list.itemStyle + "-text");
+      elem.dom.setInnerHTML(text);
+    }
   }
 
   /**

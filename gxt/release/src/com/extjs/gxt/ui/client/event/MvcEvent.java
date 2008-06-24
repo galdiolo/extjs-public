@@ -19,12 +19,27 @@ import com.extjs.gxt.ui.client.mvc.Dispatcher;
  */
 public class MvcEvent extends BaseEvent {
 
+  /**
+   * The dispatcher.
+   */
   public Dispatcher dispatcher;
 
+  /**
+   * The app event.
+   */
   public AppEvent appEvent;
 
+  /**
+   * The name.
+   */
   public String name;
 
+  /**
+   * Creates a new mvc event.
+   * 
+   * @param d the dispatcher
+   * @param ae the app event
+   */
   public MvcEvent(Dispatcher d, AppEvent ae) {
     this.dispatcher = d;
     this.appEvent = ae;

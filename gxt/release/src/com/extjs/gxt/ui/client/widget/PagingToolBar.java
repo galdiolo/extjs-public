@@ -8,10 +8,13 @@
 package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.GXT;
-import com.extjs.gxt.ui.client.data.DataLoader;
+import com.extjs.gxt.ui.client.XDOM;
+import com.extjs.gxt.ui.client.data.ListLoader;
 import com.extjs.gxt.ui.client.data.LoadEvent;
-import com.extjs.gxt.ui.client.data.LoadResult;
 import com.extjs.gxt.ui.client.data.Loader;
+import com.extjs.gxt.ui.client.data.PagingLoadConfig;
+import com.extjs.gxt.ui.client.data.PagingLoadResult;
+import com.extjs.gxt.ui.client.data.PagingLoader;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
@@ -34,63 +37,202 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * A specialized toolbar that is bound to a {@link DataLoader} and provides
+ * A specialized toolbar that is bound to a {@link ListLoader} and provides
  * automatic paging controls.
  */
 public class PagingToolBar extends Component implements Listener {
 
-  /**
-   * The paging status message to display (defaults to "Displaying {0} - {1} of
-   * {2}"). Note that this string is formatted using the braced numbers 0-2 as
-   * tokens that are replaced by the values for start, end and total
-   * respectively. These tokens should be preserved when overriding this string
-   * if showing those values is desired.
-   */
-  public String displayMsg;
+  public class PagingToolBarMessages {
+    private String afterPageText;
+    private String beforePageText;
+    private String displayMsg;
+    private String emptyMsg;
+    private String firstText;
+    private String lastText;
+    private String nextText;
+    private String prevText;
+    private String refreshText;
 
-  /**
-   * Customizable piece of the default paging text (defaults to "Page").
-   */
-  public String beforePageText;
+    public String getAfterPageText() {
+      return afterPageText;
+    }
 
-  /**
-   * Customizable piece of the default paging text (defaults to "of {0}").
-   */
-  public String afterPageText;
+    public String getBeforePageText() {
+      return beforePageText;
+    }
 
-  /**
-   * Customizable piece of the default paging text (defaults to "First Page").
-   */
-  public String firstText;
+    public String getDisplayMsg() {
+      return displayMsg;
+    }
 
-  /**
-   * Customizable piece of the default paging text (defaults to "Previous
-   * Page").
-   */
-  public String prevText;
+    public String getEmptyMsg() {
+      return emptyMsg;
+    }
 
-  /**
-   * Customizable piece of the default paging text (defaults to "Next Page").
-   */
-  public String nextText;
+    public String getFirstText() {
+      return firstText;
+    }
 
-  /**
-   * Customizable piece of the default paging text (defaults to "Last Page").
-   */
-  public String lastText;
+    public String getLastText() {
+      return lastText;
+    }
 
-  /**
-   * Customizable piece of the default paging text (defaults to "Refresh").
-   */
-  public String refreshText;
+    public String getNextText() {
+      return nextText;
+    }
 
-  /**
-   * The message to display when no records are found (defaults to "No data to
-   * display").
-   */
-  public String emptyMsg;
+    public String getPrevText() {
+      return prevText;
+    }
 
-  protected Loader loader;
+    public String getRefreshText() {
+      return refreshText;
+    }
+
+    /**
+     * Customizable piece of the default paging text (defaults to "of {0}").
+     * 
+     * @param afterPageText the after page text
+     */
+    public void setAfterPageText(String afterPageText) {
+      this.afterPageText = afterPageText;
+    }
+
+    /**
+     * Customizable piece of the default paging text (defaults to "Page").
+     * 
+     * @param beforePageText the before page text
+     */
+    public void setBeforePageText(String beforePageText) {
+      this.beforePageText = beforePageText;
+    }
+
+    /**
+     * The paging status message to display (defaults to "Displaying {0} - {1}
+     * of {2}"). Note that this string is formatted using the braced numbers 0-2
+     * as tokens that are replaced by the values for start, end and total
+     * respectively. These tokens should be preserved when overriding this
+     * string if showing those values is desired.
+     * 
+     * @param displayMsg the display message
+     */
+    public void setDisplayMsg(String displayMsg) {
+      this.displayMsg = displayMsg;
+    }
+
+    /**
+     * The message to display when no records are found (defaults to "No data to
+     * display").
+     * 
+     * @param emptyMsg
+     */
+    public void setEmptyMsg(String emptyMsg) {
+      this.emptyMsg = emptyMsg;
+    }
+
+    /**
+     * Customizable piece of the default paging text (defaults to "First Page").
+     * 
+     * @param firstText the first text
+     */
+    public void setFirstText(String firstText) {
+      this.firstText = firstText;
+    }
+
+    /**
+     * Customizable piece of the default paging text (defaults to "Last Page").
+     * 
+     * @param lastText the last text
+     */
+    public void setLastText(String lastText) {
+      this.lastText = lastText;
+    }
+
+    /**
+     * Customizable piece of the default paging text (defaults to "Next Page").
+     * 
+     * @param nextText the next text
+     */
+    public void setNextText(String nextText) {
+      this.nextText = nextText;
+    }
+
+    /**
+     * Customizable piece of the default paging text (defaults to "Previous
+     * Page").
+     * 
+     * @param prevText the prev text
+     */
+    public void setPrevText(String prevText) {
+      this.prevText = prevText;
+    }
+
+    /**
+     * Customizable piece of the default paging text (defaults to "Refresh").
+     * 
+     * @param refreshText the refresh text
+     */
+    public void setRefreshText(String refreshText) {
+      this.refreshText = refreshText;
+    }
+
+  }
+
+  //
+  // /**
+  // * The paging status message to display (defaults to "Displaying {0} - {1}
+  // of
+  // * {2}"). Note that this string is formatted using the braced numbers 0-2 as
+  // * tokens that are replaced by the values for start, end and total
+  // * respectively. These tokens should be preserved when overriding this
+  // string
+  // * if showing those values is desired.
+  // */
+  // public String displayMsg;
+  //
+  // /**
+  // * Customizable piece of the default paging text (defaults to "Page").
+  // */
+  // public String beforePageText;
+  //
+  // /**
+  // * Customizable piece of the default paging text (defaults to "of {0}").
+  // */
+  // public String afterPageText;
+  //
+  // /**
+  // * Customizable piece of the default paging text (defaults to "First Page").
+  // */
+  // public String firstText;
+  //
+  // /**
+  // * Customizable piece of the default paging text (defaults to "Previous
+  // * Page").
+  // */
+  // public String prevText;
+  //
+  // /**
+  // * Customizable piece of the default paging text (defaults to "Next Page").
+  // */
+  // public String nextText;
+  //
+  // /**
+  // * Customizable piece of the default paging text (defaults to "Last Page").
+  // */
+  // public String lastText;
+  //
+  // /**
+  // * Customizable piece of the default paging text (defaults to "Refresh").
+  // */
+  // public String refreshText;
+  //
+  // /**
+  // * The message to display when no records are found (defaults to "No data to
+  // * display").
+  // */
+  // public String emptyMsg;
+
+  protected PagingLoader loader;
   protected int start, pageSize, totalLength;
   protected int activePage = -1, pages;
   protected ToolBar toolBar;
@@ -98,6 +240,7 @@ public class PagingToolBar extends Component implements Listener {
   protected Label afterText;
   protected Label displayText;
   protected TextBox pageText;
+  protected PagingToolBarMessages msgs;
 
   /**
    * Creates a new paging tool bar with the given page size.
@@ -106,6 +249,7 @@ public class PagingToolBar extends Component implements Listener {
    */
   public PagingToolBar(final int pageSize) {
     this.pageSize = pageSize;
+    msgs = new PagingToolBarMessages();
   }
 
   /**
@@ -113,7 +257,7 @@ public class PagingToolBar extends Component implements Listener {
    * 
    * @param loader the loader
    */
-  public void bind(Loader loader) {
+  public void bind(PagingLoader loader) {
     if (this.loader != null) {
       this.loader.removeListener(Loader.BeforeLoad, this);
       this.loader.removeListener(Loader.Load, this);
@@ -144,6 +288,15 @@ public class PagingToolBar extends Component implements Listener {
   }
 
   /**
+   * Returns the tool bar's messages.
+   * 
+   * @return the messages
+   */
+  public PagingToolBarMessages getMessages() {
+    return msgs;
+  }
+
+  /**
    * Returns the current page size.
    * 
    * @return the page size
@@ -163,14 +316,14 @@ public class PagingToolBar extends Component implements Listener {
 
   public void handleEvent(BaseEvent be) {
     switch (be.type) {
-      case DataLoader.BeforeLoad:
+      case Loader.BeforeLoad:
         disable();
         break;
-      case DataLoader.Load:
+      case Loader.Load:
         onLoad((LoadEvent) be);
         enable();
         break;
-      case DataLoader.LoadException:
+      case Loader.LoadException:
         enable();
         break;
     }
@@ -207,7 +360,7 @@ public class PagingToolBar extends Component implements Listener {
   }
 
   /**
-   * Sets the active page.
+   * Sets the active page (1 to page count inclusive).
    * 
    * @param page the page
    */
@@ -221,6 +374,15 @@ public class PagingToolBar extends Component implements Listener {
     } else {
       pageText.setText(String.valueOf((int) activePage));
     }
+  }
+
+  /**
+   * Sets the tool bar's messages.
+   * 
+   * @param messages the messages
+   */
+  public void setMessages(PagingToolBarMessages messages) {
+    msgs = messages;
   }
 
   /**
@@ -242,8 +404,8 @@ public class PagingToolBar extends Component implements Listener {
     WidgetHelper.doDetach(toolBar);
   }
 
-  protected void onLoad(LoadEvent event) {
-    LoadResult result = event.result;
+  protected void onLoad(LoadEvent<PagingLoadConfig, PagingLoadResult> event) {
+    PagingLoadResult result = event.data;
     start = event.config.getOffset();
     totalLength = result.getTotalLength();
     activePage = (int) Math.ceil((double) (start + pageSize) / pageSize);
@@ -251,8 +413,8 @@ public class PagingToolBar extends Component implements Listener {
     pages = totalLength < pageSize ? 1 : (int) Math.ceil((double) totalLength / pageSize);
 
     String after = null, display = null;
-    if (afterPageText != null) {
-      after = Format.substitute(afterPageText, "" + pages);
+    if (msgs.getAfterPageText() != null) {
+      after = Format.substitute(msgs.getAfterPageText(), "" + pages);
     } else {
       after = GXT.MESSAGES.pagingToolBar_afterPageText((int) pages);
     }
@@ -266,15 +428,14 @@ public class PagingToolBar extends Component implements Listener {
 
     if (display != null) {
       String[] params = new String[] {"" + (start + 1), "" + temp, "" + totalLength};
-      display = Format.substitute(afterPageText, (Object[]) params);
+      display = Format.substitute(msgs.getAfterPageText(), (Object[]) params);
     } else {
-      display = GXT.MESSAGES.pagingToolBar_displayMsg(start + 1, (int) temp,
-          (int) totalLength);
+      display = GXT.MESSAGES.pagingToolBar_displayMsg(start + 1, (int) temp, (int) totalLength);
     }
 
     String msg = display;
     if (totalLength == 0) {
-      msg = emptyMsg;
+      msg = msgs.getEmptyMsg();
     }
     displayText.setText(msg);
   }
@@ -293,22 +454,23 @@ public class PagingToolBar extends Component implements Listener {
   protected void onRender(Element target, int index) {
     MyMessages msg = GXT.MESSAGES;
 
-    refreshText = refreshText == null ? msg.pagingToolBar_refreshText() : refreshText;
-    nextText = nextText == null ? msg.pagingToolBar_nextText() : nextText;
-    prevText = prevText == null ? msg.pagingToolBar_prevText() : prevText;
-    firstText = firstText == null ? msg.pagingToolBar_firstText() : firstText;
-    lastText = lastText == null ? msg.pagingToolBar_lastText() : lastText;
-    beforePageText = beforePageText == null ? msg.pagingToolBar_beforePageText()
-        : beforePageText;
-    emptyMsg = emptyMsg == null ? msg.pagingToolBar_emptyMsg() : emptyMsg;
+    msgs.setRefreshText(msgs.getRefreshText() == null ? msg.pagingToolBar_refreshText()
+        : msgs.getRefreshText());
+    msgs.setNextText(msgs.getNextText() == null ? msg.pagingToolBar_nextText() : msgs.getNextText());
+    msgs.setPrevText(msgs.getPrevText() == null ? msg.pagingToolBar_prevText() : msgs.getPrevText());
+    msgs.setFirstText(msgs.getFirstText() == null ? msg.pagingToolBar_firstText()
+        : msgs.getFirstText());
+    msgs.setLastText(msgs.getLastText() == null ? msg.pagingToolBar_lastText() : msgs.getLastText());
+    msgs.setBeforePageText(msgs.getBeforePageText() == null ? msg.pagingToolBar_beforePageText()
+        : msgs.getBeforePageText());
+    msgs.setEmptyMsg(msgs.getEmptyMsg() == null ? msg.pagingToolBar_emptyMsg() : msgs.getEmptyMsg());
 
     toolBar = new ToolBar();
-    toolBar.setHeight(26);
 
     first = new TextToolItem();
     first.setIconStyle("x-tbar-page-first");
-    first.setToolTip(firstText);
-    first.addSelectionListener(new SelectionListener() {
+    first.setToolTip(msgs.getFirstText());
+    first.addSelectionListener(new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         first();
       }
@@ -316,8 +478,8 @@ public class PagingToolBar extends Component implements Listener {
 
     prev = new TextToolItem();
     prev.setIconStyle("x-tbar-page-prev");
-    prev.setToolTip(prevText);
-    prev.addSelectionListener(new SelectionListener() {
+    prev.setToolTip(msgs.getPrevText());
+    prev.addSelectionListener(new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         previous();
       }
@@ -325,8 +487,8 @@ public class PagingToolBar extends Component implements Listener {
 
     next = new TextToolItem();
     next.setIconStyle("x-tbar-page-next");
-    next.setToolTip(nextText);
-    next.addSelectionListener(new SelectionListener() {
+    next.setToolTip(msgs.getNextText());
+    next.addSelectionListener(new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         next();
       }
@@ -334,8 +496,8 @@ public class PagingToolBar extends Component implements Listener {
 
     last = new TextToolItem();
     last.setIconStyle("x-tbar-page-last");
-    last.setToolTip(lastText);
-    last.addSelectionListener(new SelectionListener() {
+    last.setToolTip(msgs.getLastText());
+    last.addSelectionListener(new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         last();
       }
@@ -343,14 +505,14 @@ public class PagingToolBar extends Component implements Listener {
 
     refresh = new TextToolItem();
     refresh.setIconStyle("x-tbar-loading");
-    refresh.setToolTip(refreshText);
-    refresh.addSelectionListener(new SelectionListener() {
+    refresh.setToolTip(msgs.getRefreshText());
+    refresh.addSelectionListener(new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         refresh();
       }
     });
 
-    Label beforePage = new Label(beforePageText);
+    Label beforePage = new Label(msgs.getBeforePageText());
     beforePage.setStyleName("my-paging-text");
     afterText = new Label();
     afterText.setStyleName("my-paging-text");
@@ -391,6 +553,9 @@ public class PagingToolBar extends Component implements Listener {
 
     toolBar.render(target, index);
     setElement(toolBar.getElement());
+
+    int h = XDOM.isVisibleBox ? 27 : 23;
+    el().setHeight(h);
   }
 
 }

@@ -8,21 +8,21 @@
 package com.extjs.gxt.samples.explorer.client.pages;
 
 import com.extjs.gxt.samples.resources.client.TestData;
+import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.TreeBuilder;
-import com.extjs.gxt.ui.client.widget.Container;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
-import com.extjs.gxt.ui.client.widget.menu.TextMenuItem;
-import com.extjs.gxt.ui.client.widget.tree.SingleTreeSelectionModel;
+import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.tree.Tree;
 import com.extjs.gxt.ui.client.widget.tree.TreeItem;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.RootPanel;
 
-public class TreeContextMenuPage extends Container implements EntryPoint {
+public class TreeContextMenuPage extends LayoutContainer implements EntryPoint {
 
   public void onModuleLoad() {
     RootPanel.get().add(this);
@@ -34,7 +34,8 @@ public class TreeContextMenuPage extends Container implements EntryPoint {
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
 
-    final Tree<SingleTreeSelectionModel> tree = new Tree();
+    final Tree tree = new Tree();
+    tree.setSelectionMode(SelectionMode.MULTI);
     tree.setItemIconStyle("icon-music");
 
     // quick way to build tree from Model instances.
@@ -43,12 +44,12 @@ public class TreeContextMenuPage extends Container implements EntryPoint {
     Menu contextMenu = new Menu();
     contextMenu.setWidth(130);
 
-    TextMenuItem insert = new TextMenuItem();
+    MenuItem insert = new MenuItem();
     insert.setText("Insert Item");
     insert.setIconStyle("icon-add");
     insert.addSelectionListener(new SelectionListener<MenuEvent>() {
       public void componentSelected(MenuEvent ce) {
-        TreeItem item = tree.getSelectionModel().getSelectedItem();
+        TreeItem item = (TreeItem)tree.getSelectionModel().getSelectedItem();
         if (item != null) {
           TreeItem newItem = new TreeItem();
           newItem.setText("Add Child " + count++);
@@ -59,12 +60,12 @@ public class TreeContextMenuPage extends Container implements EntryPoint {
     });
     contextMenu.add(insert);
 
-    TextMenuItem remove = new TextMenuItem();
+    MenuItem remove = new MenuItem();
     remove.setText("Remove Selected");
     remove.setIconStyle("icon-delete");
     remove.addSelectionListener(new SelectionListener<MenuEvent>() {
       public void componentSelected(MenuEvent ce) {
-        TreeItem item = tree.getSelectionModel().getSelectedItem();
+        TreeItem item = (TreeItem)tree.getSelectionModel().getSelectedItem();
         if (item != null) {
           item.getParentItem().remove(item);
         }

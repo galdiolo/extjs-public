@@ -7,41 +7,77 @@
  */
 package com.extjs.gxt.ui.client.util;
 
-import java.util.EventListener;
-
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.Listener;
+import com.google.gwt.user.client.ui.KeyboardListener;
 
 /**
- * Interface for key navs.
+ * Listener for key navs.
  * 
  * @see KeyNav
  */
-public interface KeyNavListener extends EventListener {
+public class KeyNavListener implements Listener<ComponentEvent> {
 
-  public void onDelete(ComponentEvent ce);
+  public void handleEvent(ComponentEvent ce) {
+    switch (ce.type) {
+      case KeyboardListener.KEY_DELETE:
+        
+        break;
+      
+      
+    }
+  }
 
-  public void onDown(ComponentEvent ce);
+  public void onDelete(ComponentEvent ce) {
+    
+  }
 
-  public void onEnd(ComponentEvent ce);
+  public void onDown(ComponentEvent ce) {
+    
+  }
 
-  public void onEnter(ComponentEvent ce);
+  public void onEnd(ComponentEvent ce) {
+    
+  }
 
-  public void onEscape(ComponentEvent ce);
+  public void onEnter(ComponentEvent ce) {
+    
+  }
 
-  public void onHome(ComponentEvent ce);
+  public void onEscape(ComponentEvent ce) {
+    
+  }
 
-  public void onKeyPress(ComponentEvent ce);
+  public void onHome(ComponentEvent ce) {
+    
+  }
 
-  public void onLeft(ComponentEvent ce);
+  public void onKeyPress(ComponentEvent ce) {
+    
+  }
 
-  public void onRight(ComponentEvent ce);
+  public void onLeft(ComponentEvent ce) {
+    
+  }
 
-  public void onUp(ComponentEvent ce);
+  public void onRight(ComponentEvent ce) {
+    
+  }
 
-  public void onPageDown(ComponentEvent ce);
+  public void onUp(ComponentEvent ce) {
+    
+  }
 
-  public void onPageUp(ComponentEvent ce);
+  public void onPageDown(ComponentEvent ce) {
+    
+  }
 
-  public void onTab(ComponentEvent ce);
+  public void onPageUp(ComponentEvent ce) {
+    
+  }
+
+  public void onTab(ComponentEvent ce) {
+    
+  }
 
 }

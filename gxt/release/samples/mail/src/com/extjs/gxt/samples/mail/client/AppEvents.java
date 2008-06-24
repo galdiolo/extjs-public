@@ -11,6 +11,10 @@ public class AppEvents {
 
   public static final int Init = 0;
   
+  public static final int Login = 2;
+  
+  public static final int Error = 5;
+  
   public static final int NavMail = 10;
 
   public static final int NavTasks = 20;

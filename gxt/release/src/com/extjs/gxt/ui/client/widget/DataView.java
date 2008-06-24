@@ -7,21 +7,20 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.ui.client.Events;
-import com.extjs.gxt.ui.client.core.CompositeElement;
-import com.extjs.gxt.ui.client.core.CompositeFunction;
-import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.XDOM;
+import com.extjs.gxt.ui.client.Style.SelectionMode;
+import com.extjs.gxt.ui.client.binder.DataViewBinder;
 import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.event.DataViewEvent;
-import com.extjs.gxt.ui.client.store.Record;
-import com.extjs.gxt.ui.client.store.Store;
-import com.extjs.gxt.ui.client.store.StoreEvent;
-import com.extjs.gxt.ui.client.store.StoreListener;
-import com.extjs.gxt.ui.client.store.StoreListenerAdapter;
+import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.util.Params;
+import com.extjs.gxt.ui.client.widget.menu.Menu;
+import com.extjs.gxt.ui.client.widget.selection.AbstractSelectionModel;
+import com.extjs.gxt.ui.client.widget.selection.Selectable;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -30,167 +29,107 @@ import com.google.gwt.user.client.Event;
  * A mechanism for displaying data using custom layout templates. DataView uses
  * an {@link Template} as its internal templating mechanism.
  * <p>
- * The view also provides built-in behavior for many common events that can
- * occur for its contained items including <i>Click</i>, <i>DoubleClick</i>,
- * <i>MouseOver</i>, <i>MouseOut</i>, etc. as well as a built-in selection
- * model. <b>In order to use these features, an {@link #itemSelector} config
- * must be provided for the DataView to determine what nodes it will be working
- * with.</b>
+ * A {@link #itemSelector} MUST be provided for the DataView to determine what
+ * nodes it will be working with.
  * </p>
  * 
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>BeforeSelect</b> : DataViewEvent(view, index, element, event)<br>
- * <div>Fires before a click is processed. Listeners can set the
+ * <dd><b>BeforeAdd</b> : DataViewEvent(view, item, index)<br>
+ * <div>Fires before an item is added or inserted. Listeners can set the
  * <code>doit</code> field to <code>false</code> to cancel the action.</div>
  * <ul>
  * <li>view : this</li>
- * <li>index : the index of the target node</li>
- * <li>element : the target node</li>
- * <li>event : the dom event</li>
+ * <li>item : the item being added</li>
+ * <li>index : the index at which the item will be added</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Select</b> : DataViewEvent(view, index, element, event)<br>
- * <div>Fires when a template node is selected.</div>
+ * <dd><b>BeforeRemove</b> : DataViewEvent(view, item)<br>
+ * <div>Fires before an item is removed. Listeners can set the <code>doit</code>
+ * field to <code>false</code> to cancel the action.</div>
  * <ul>
  * <li>view : this</li>
- * <li>index : the index of the target node</li>
- * <li>element : the target node</li>
- * <li>event : the dom event</li>
+ * <li>item : the item being removed</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Click</b> : DataViewEvent(view, event)<br>
- * <div>Fires when a template node is clicked.</div>
+ * <dd><b>Add</b> : DataViewEvent(view, item, index)<br>
+ * <div>Fires after an item has been added or inserted.</div>
  * <ul>
  * <li>view : this</li>
- * <li>event : the dom event</li>
+ * <li>item : the item that was added</li>
+ * <li>index : the index at which the item will be added</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>ContainerClick</b> : DataViewEvent(view, event)<br>
- * <div>Fires when a click occurs and it is not on a template node.</div>
+ * <dd><b>Remove</b> : DataViewEvent(view, item)<br>
+ * <div>Fires after an item has been removed.</div>
  * <ul>
  * <li>view : this</li>
- * <li>event : the dom event</li>
+ * <li>item : the item that was removed</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>DoubleClick</b> : DataViewEvent(view, index, element, event)<br>
- * <div>Fires when a template node is double clicked.</div>
+ * <dd><b>SelectionChange</b> : DataViewEvent(view, selected)<br>
+ * <div>Fires after the selection changes.</div>
  * <ul>
  * <li>view : this</li>
- * <li>index : the index of the target node</li>
- * <li>element : the target nodet</li>
- * <li>event : the dom event</li>
+ * <li>selected : the selected items</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>ContextMenu</b> : DataViewEvent(view, index, element, event)<br>
- * <div>Fires when a template node is right clicked.</div>
- * <ul>
- * <li>view : this</li>
- * <li>index : the index of the target node</li>
- * <li>element : the target node</li>
- * <li>event : the dom event</li>
- * </ul>
- * </dd>
- * 
- * <dd><b>BeforeSelect</b> : DataViewEvent(view, elements)<br>
- * <div>Fires before a selection is made. Listeners can set the
+ * <dd><b>ContextMenu</b> : DataViewEvent(view)<br>
+ * <div>Fires before the view's context menu is shown. Listeners can set the
  * <code>doit</code> field to <code>false</code> to cancel the action.</div>
  * <ul>
  * <li>view : this</li>
- * <li>elements : the selected nodes</li>
- * </ul>
- * </dd>
- * 
- * <dd><b>SelectChange</b> : DataViewEvent(view)<br>
- * <div>Fires when the selected nodes change.</div>
- * <ul>
- * <li>view : this</li>
+ * <li>menu : menu</li>
  * </ul>
  * </dd>
  * 
  * </dt>
  */
-public class DataView extends BoxComponent {
+public class DataView extends Container<DataViewItem> implements Selectable<DataViewItem> {
 
   /**
-   * Identifies an node in the view either by the model object, DOM element, or
-   * index.
+   * Data view selection model.
    */
-  public static class NodeInfo {
+  public class DataViewSelectionModel extends AbstractSelectionModel<DataView, DataViewItem> {
 
-    public Element elem;
-    public int index;
-    public Record record;
-
-    public NodeInfo(Element elem) {
-      this.elem = elem;
+    public DataViewSelectionModel() {
+      super();
     }
 
-    public NodeInfo(int index) {
-      this.index = index;
+    public DataViewSelectionModel(SelectionMode mode) {
+      super(mode);
     }
 
-    public NodeInfo(Record record) {
-      this.record = record;
-    }
-  }
-
-  public enum ViewSelectionMode {
-    SINGLE, MULTI, SIMPLE;
   }
 
   /**
-   * The default HTML frament to be used if no template is specified.
+   * The view's selection model.
    */
-  public String defaultTemplate = "<div class=x-view-item>{text}</div>";
+  protected DataViewSelectionModel sm;
 
-  /**
-   * The style to be applied to each selected item (defaults to
-   * 'x-view-item-sel').
-   */
-  private String selectStyle = "x-view-item-sel";
-
-  /**
-   * Sets the container style name (defaults to 'x-view').
-   */
-  private String containerStyle = "x-view";
-
-  /**
-   * The style name to apply on mouse over (defaults to 'x-view-item-over').
-   */
-  private String overStyle = "x-view-item-over";
-
-  /**
-   * This is a required setting. A simple CSS selector (e.g. div.some-class or
-   * span:first-child) that will be used to determine what nodes this DataView
-   * will be working with (defaults to 'x-view-item').
-   */
   private String itemSelector = ".x-view-item";
-
-  private ViewSelectionMode selectionMode = ViewSelectionMode.SINGLE;
-  private boolean selectOnHover;
-  private int last = -1;
-  private CompositeElement all, selected;
-  private boolean singleSelect, multiSelect, simpleSelect;
-  private Store store;
+  private String selectStyle = "x-view-item-sel";
+  private String overStyle = "x-view-item-over";
   private Template template;
-  private boolean initial;
-  private StoreListener storeListener;
+  private String defaultTemplate = "<div class=x-view-item>{text}</div>";
+  private DataViewBinder binder;
+  private boolean selectOnHover;
 
   /**
-   * Creates a new template list.
+   * Creates a new data view.
    */
   public DataView() {
-    initComponent();
+    baseStyle = "x-view";
+    setSelectionMode(SelectionMode.SINGLE);
   }
 
   /**
-   * Creates a new template list.
+   * Creates a new data view with the given template.
    * 
    * @param template the template
    */
@@ -199,78 +138,33 @@ public class DataView extends BoxComponent {
     this.template = template;
   }
 
-  /**
-   * Deselects a node.
-   * 
-   * @param index the index of the node to deselect
-   */
-  public void deselect(int index) {
-    deselect(new NodeInfo(index));
+  @Override
+  public boolean add(DataViewItem component) {
+    return super.add(component);
   }
 
   /**
-   * Deselects a node.
+   * Returns the view's binder. Only applies when set
+   * {@link #setStore(ListStore)} is used.
    * 
-   * @param node the node to deselect
+   * @return the binder
    */
-  public void deselect(NodeInfo node) {
-    if (isSelected(node)) {
-      selected.remove(getNode(node));
-    }
+  public DataViewBinder getBinder() {
+    return binder;
+  }
+
+  @Override
+  public Menu getContextMenu() {
+    return super.getContextMenu();
   }
 
   /**
-   * Deselects all nodes.
-   */
-  public void deselectAll() {
-    if (multiSelect || singleSelect) {
-      selected.each(new CompositeFunction() {
-        public void doFunction(Element elem, CompositeElement ce, int index) {
-          fly(elem).removeStyleName(getSelectStyle());
-        }
-      });
-      selected.removeAll();
-      last = -1;
-      DataViewEvent dve = new DataViewEvent(this);
-      fireEvent(Events.SelectionChange, dve);
-    }
-  }
-
-  /**
-   * Returns the container style name.
+   * Returns the default template.
    * 
-   * @return the style name
+   * @return the default template
    */
-  public String getContainerStyle() {
-    return containerStyle;
-  }
-
-  /**
-   * Returns the element at the given index.
-   * 
-   * @param index the index
-   * @return the element
-   */
-  public Element getElement(int index) {
-    return all.getElement(index);
-  }
-
-  /**
-   * Returns all of the child elements.
-   * 
-   * @return the elements
-   */
-  public List<Element> getElements() {
-    return all.getElements();
-  }
-
-  /**
-   * Returns the number of records in the view.
-   * 
-   * @return the count
-   */
-  public int getItemCount() {
-    return store.getCount();
+  public String getDefaultTemplate() {
+    return defaultTemplate;
   }
 
   /**
@@ -291,49 +185,30 @@ public class DataView extends BoxComponent {
     return overStyle;
   }
 
-  /**
-   * Returns the first selected index.
-   * 
-   * @return the selected index
-   */
-  public int getSelectedIndex() {
-    if (selected.getCount() > 0) {
-      return indexOf(selected.getElement(0));
-    }
-    return -1;
+  public DataViewItem getSelectedItem() {
+    return (DataViewItem) sm.getSelectedItem();
+  }
+
+  public List<DataViewItem> getSelectedItems() {
+    return sm.getSelectedItems();
   }
 
   /**
-   * Returns the selected indexes.
+   * Returns the view's selection mode.
    * 
-   * @return the selected indexes
+   * @return the selection mode.
    */
-  public int[] getSelectedIndexes() {
-    int[] indexes = new int[selected.getCount()];
-    for (int i = 0; i < indexes.length; i++) {
-      indexes[i] = indexOf(selected.getElement(i));
-    }
-    return indexes;
-  }
-
-  public List<Record> getSelection() {
-    final List<Record> list = new ArrayList<Record>();
-    selected.each(new CompositeFunction() {
-      public void doFunction(Element elem, CompositeElement ce, int index) {
-        int idx = indexOf(elem);
-        list.add(store.getAt(idx));
-      }
-    });
-    return list;
+  public SelectionMode getSelectionMode() {
+    return sm.getSelectionMode();
   }
 
   /**
-   * Returns the selection mode
+   * Returns the view's selection model.
    * 
-   * @return the selection mode
+   * @return the selection model
    */
-  public ViewSelectionMode getSelectionMode() {
-    return selectionMode;
+  public DataViewSelectionModel getSelectionModel() {
+    return sm;
   }
 
   /**
@@ -355,7 +230,7 @@ public class DataView extends BoxComponent {
   }
 
   /**
-   * Returns the list's template.
+   * Returns the view's template.
    * 
    * @return the template
    */
@@ -363,136 +238,52 @@ public class DataView extends BoxComponent {
     return template;
   }
 
-  /**
-   * Reuturns the index of the element.
-   * 
-   * @param element the element
-   * @return the index
-   */
-  public int indexOf(Element element) {
-    return all.indexOf(element);
-  }
-
-  /**
-   * Returns the index of the node
-   * 
-   * @param node the node
-   * @return the index
-   */
-  public int indexOf(NodeInfo node) {
-    Element elem = getNode(node);
-    return indexOf(elem);
-  }
-
-  /**
-   * Returns true if the node is selected.
-   * 
-   * @param node the node
-   * @return the select state
-   */
-  public boolean isSelected(NodeInfo node) {
-    return selected.contains(getNode(node));
+  @Override
+  public boolean insert(DataViewItem item, int index) {
+    boolean added = super.insert(item, index);
+    if (added) {
+      if (rendered) {
+        renderItem(item, index);
+      }
+    }
+    return added;
   }
 
   public void onComponentEvent(ComponentEvent ce) {
-    super.onComponentEvent(ce);
-    switch (ce.type) {
-      case Event.ONMOUSEOVER:
-        onMouseOver(ce);
-        break;
-      case Event.ONMOUSEOUT:
-        onMouseOut(ce);
-        break;
-      case Event.ONCLICK:
-        onClick(ce);
-        fireEvent(Events.Select, ce);
-        break;
-    }
-  }
-
-  /**
-   * Refreshes the view by reloading the data from the store and re-rendering
-   * the template.
-   */
-  public void refresh() {
-    deselectAll(false);
-    el.setInnerHtml("");
-    if (all != null) {
-      all.removeAll();
-    }
-    renderAll();
-  }
-
-  /**
-   * Refreshes an individual node's data from the store.
-   * 
-   * @param index the items data index in the store
-   */
-  public void refreshNode(int index) {
-    onUpdate(store.getAt(index), index);
-  }
-
-  /**
-   * Selected a node.
-   * 
-   * @param index the index of the node to select
-   */
-  public void select(int index) {
-    select(new NodeInfo(index));
-  }
-
-  /**
-         * Selects a node.
-         * 
-         * @param node the node to select
-         */
-  public void select(NodeInfo node) {
-    select(node, false);
-  }
-
-  /**
-                 * Selects a node.
-                 * 
-                 * @param node the node to select
-                 * @param keepExisting true to keep existing selections
-                 */
-  public void select(NodeInfo node, boolean keepExisting) {
-    Element elem = getNode(node);
-    if (!keepExisting) {
-      deselectAll(true);
-    }
-    if (elem != null && !isSelected(node)) {
-      DataViewEvent dve = new DataViewEvent(this);
-      if (fireEvent(Events.BeforeSelect, dve)) {
-        fly(elem).removeStyleName(getOverStyle());
-        fly(elem).addStyleName(getSelectStyle());
-        selected.add(elem);
-        last = indexOf(elem);
-        fireEvent(Events.SelectionChange, dve);
+    DataViewItem item = findItem(ce.getTarget());
+    if (item != null) {
+      switch (ce.type) {
+        case Event.ONMOUSEOVER:
+          onMouseOver(item);
+          break;
+        case Event.ONMOUSEOUT:
+          onMouseOut(item);
+          break;
       }
     }
   }
 
-  /**
-   * Selects a range of nodes.
-   * 
-   * @param start the index of the first node in the range
-   * @param end the index of the last node in the range
-   * @param keepSelected true to retain existing selections
-   */
-  public void selectRange(int start, int end, boolean keepSelected) {
-    if (!keepSelected) {
-      deselectAll(true);
-    }
+  public void onSelectChange(DataViewItem item, boolean select) {
+    item.el().setStyleName(selectStyle, select);
+  }
+
+  @Override
+  public boolean remove(DataViewItem component) {
+    return super.remove(component);
+  }
+
+  @Override
+  public void setContextMenu(Menu menu) {
+    super.setContextMenu(menu);
   }
 
   /**
-   * Sets the container style name (defaults to 'x-view').
+   * Sets the default template.
    * 
-   * @param containerStyle the container style name
+   * @param defaultTemplate the default template
    */
-  public void setContainerStyle(String containerStyle) {
-    this.containerStyle = containerStyle;
+  public void setDefaultTemplate(String defaultTemplate) {
+    this.defaultTemplate = defaultTemplate;
   }
 
   /**
@@ -507,7 +298,7 @@ public class DataView extends BoxComponent {
   }
 
   /**
-   * Sets the style name to apply on mouse over (defaults to
+   * Sets the style name to be applied on mouse over (defaults to
    * 'x-view-item-over').
    * 
    * @param overStyle the over style
@@ -516,23 +307,21 @@ public class DataView extends BoxComponent {
     this.overStyle = overStyle;
   }
 
+  public void setSelectedItem(DataViewItem item) {
+    sm.select(item);
+  }
+
+  public void setSelectedItems(List<DataViewItem> items) {
+    sm.select(items);
+  }
+
   /**
-   * Sets the selection mode (defaults to SINGLE).
-   * <p>
-   * Valid values are:
-   * <ul>
-   * <li>SINGLE - single selection</li>
-   * <li>MULTI - multi selection</li>
-   * <li>SIMPLE - multiselection by clicking on multiple items without
-   * requiring the user to hold Shift or Ctrl, false to force the user to hold
-   * Ctrl or Shift to select more than on item</li>
-   * </ul>
-   * </p>
+   * Sets the list's selection mode.
    * 
-   * @param selectionMode the selection mode
+   * @param mode the selection mode
    */
-  public void setSelectionMode(ViewSelectionMode selectionMode) {
-    this.selectionMode = selectionMode;
+  public void setSelectionMode(SelectionMode mode) {
+    setSelectionModel(new DataViewSelectionModel(mode));
   }
 
   /**
@@ -555,199 +344,70 @@ public class DataView extends BoxComponent {
   }
 
   /**
-                               * Changes the data store bound to this view and
-                               * refreshes it.
-                               * 
-                               * @param store the store to bind this view
-                               */
-  public void setStore(Store store) {
-    if (!initial && this.store != null) {
-      this.store.removeStoreListener(storeListener);
-    }
-    if (store != null) {
-      store.addStoreListener(storeListener);
-    }
-    this.store = store;
-    if (store != null && isRendered()) {
-      refresh();
-    }
+   * Convenience method that create a new {@link DataViewBinder} using the given
+   * store.
+   * 
+   * @param store the store
+   */
+  public void setStore(ListStore store) {
+    binder = new DataViewBinder(this, store);
+    binder.init();
   }
 
   /**
-                           * Sets the view's template.
-                           * 
-                           * @param html the HTML fragment
-                           */
+   * Sets the view's template.
+   * 
+   * @param html the HTML fragment
+   */
   public void setTemplate(String html) {
     setTemplate(new Template(html));
   }
 
   /**
-                   * Sets the view's template.
-                   * 
-                   * @param template the template
-                   */
+   * Sets the view's template.
+   * 
+   * @param template the template
+   */
   public void setTemplate(Template template) {
     this.template = template;
   }
 
+  protected String bulkRenderItem(DataViewItem item) {
+    return template.applyTemplate(new Params(item.getValues()));
+  }
+
   @Override
   protected ComponentEvent createComponentEvent(Event event) {
-    return new DataViewEvent(this);
+    return new DataViewEvent(this, (event == null) ? null : findItem(DOM.eventGetTarget(event)));
   }
 
-  protected void doMultiSelect(Element elem, int index, ComponentEvent ce) {
-    NodeInfo info = new NodeInfo(elem);
-    if (ce.isShiftKey() && last != -1) {
-      int l = last;
-      selectRange(last, index, ce.isControlKey());
-      last = l;
-    } else {
-      if ((ce.isControlKey() || simpleSelect) && isSelected(info)) {
-        deselect(info);
+  @Override
+  protected ContainerEvent createContainerEvent(DataViewItem item) {
+    return new DataViewEvent(this, item);
+  }
+
+  protected void onMouseOut(DataViewItem item) {
+    item.el().removeStyleName(overStyle);
+  }
+
+  protected void onMouseOver(DataViewItem item) {
+    if (el() != null) {
+      if (selectOnHover) {
+        setSelectedItem(item);
       } else {
-        select(new NodeInfo(index),
-            (ce.isControlKey() || ce.isShiftKey() || simpleSelect));
+        item.el().addStyleName(overStyle);
       }
     }
-  }
-
-  protected void doSingleSelect(Element elem, int index, ComponentEvent be) {
-    NodeInfo info = new NodeInfo(index);
-    if (be.isControlKey() && isSelected(info)) {
-      deselect(info);
-    } else {
-      select(info);
-    }
-  }
-
-  protected void fireEvent(int type, Object item, Element elem, int index, Event event) {
-    DataViewEvent dve = new DataViewEvent(this);
-    dve.element = elem;
-    dve.index = index;
-    dve.event = event;
-    fireEvent(type, dve);
-  }
-
-  protected void initComponent() {
-    storeListener = new StoreListenerAdapter() {
-      public void add(StoreEvent se) {
-        onAdd(se.records, se.index);
-      }
-
-      public void beforeLoad(StoreEvent se) {
-        onBeforeLoad(se);
-      }
-
-      public void clear(StoreEvent se) {
-        refresh();
-      }
-
-      public void dataChanged(StoreEvent se) {
-        refresh();
-      }
-
-      public void remove(StoreEvent se) {
-        onRemove(se.record, se.index);
-      }
-
-      public void update(StoreEvent se) {
-        onUpdate(se.record, se.index);
-      }
-
-    };
-  }
-
-  protected void onAdd(List<Record> records, int index) {
-    Element[] nodes = bufferRender(records);
-    el.insertChild(nodes, index);
-    all.insert(nodes, index);
-  }
-
-  protected void onBeforeLoad(StoreEvent se) {
-
-  }
-
-  protected void onClick(ComponentEvent be) {
-    El el = be.getTarget(getItemSelector(), 10);
-    if (el != null) {
-      onItemClick(el.dom, indexOf(el.dom), be);
-    }
-  }
-
-  protected void onDoubleClick(ComponentEvent ce) {
-    El el = ce.getTarget(getItemSelector(), 10);
-    if (el != null) {
-      int index = indexOf(el.dom);
-      Record record = store.getAt(index);
-      fireEvent(Events.DoubleClick, record, el.dom, index, ce.event);
-    }
-  }
-
-  protected void onItemClick(Element elem, int index, ComponentEvent ce) {
-    if (getSelectionMode() == ViewSelectionMode.MULTI) {
-      doMultiSelect(elem, index, ce);
-    } else if (getSelectionMode() == ViewSelectionMode.SINGLE) {
-      doSingleSelect(elem, index, ce);
-    }
-  }
-
-  protected void onMouseOut(ComponentEvent ce) {
-    El el = ce.getTarget(getItemSelector(), 10);
-    if (el != null) {
-      el.removeStyleName(getOverStyle());
-    }
-  }
-
-  protected void onMouseOver(ComponentEvent ce) {
-    El el = ce.getTarget(getItemSelector(), 10);
-    if (el != null) {
-      if (getSelectOnOver()) {
-        select(new NodeInfo(el.dom));
-      } else {
-        el.addStyleName(getOverStyle());
-      }
-
-    }
-  }
-
-  protected void onRemove(Record record, int index) {
-    deselect(index);
-    if (all != null) {
-      all.remove(index);
-    }
+   
   }
 
   protected void onRender(Element target, int index) {
-    super.onRender(target, index);
     setElement(DOM.createDiv(), target, index);
-    setStyleName(getContainerStyle());
-    el.setStyleAttribute("overflow", "auto");
+    setStyleAttribute("overflow", "auto");
 
-    singleSelect = getSelectionMode() == ViewSelectionMode.SINGLE;
-    multiSelect = getSelectionMode() == ViewSelectionMode.MULTI;
-    simpleSelect = getSelectionMode() == ViewSelectionMode.SIMPLE;
+    renderAll();
 
-    selected = new CompositeElement();
-
-    if (store != null) {
-      renderAll();
-    }
-
-    sinkEvents(Event.ONCLICK | Event.ONDBLCLICK | Event.MOUSEEVENTS);
-  }
-
-  protected void onUpdate(Record record, int index) {
-    boolean sel = isSelected(new NodeInfo(index));
-    Element original = all.getElement(index);
-    List<Record> records = new ArrayList<Record>();
-    records.add(record);
-    Element node = bufferRender(records)[0];
-    all.replaceElement(original, node);
-    if (sel) {
-      selected.replaceElement(original, node);
-      fly(all.getElement(index)).addStyleName(getSelectStyle());
-    }
+    el().addEventsSunk(Event.ONCLICK | Event.ONDBLCLICK | Event.MOUSEEVENTS | Event.KEYEVENTS);
   }
 
   protected void renderAll() {
@@ -756,56 +416,33 @@ public class DataView extends BoxComponent {
     }
 
     StringBuffer sb = new StringBuffer();
-    int size = store.getCount();
-    for (int i = 0; i < size; i++) {
-      Record item = store.getAt(i);
-      sb.append(renderItem(item));
+    for (DataViewItem item : getItems()) {
+      sb.append(bulkRenderItem(item));
     }
-    el.setInnerHtml(sb.toString());
+    getElement().setInnerHTML(sb.toString());
 
-    all = new CompositeElement(el.select(getItemSelector()));
-  }
+    Element[] elems = el().select(itemSelector);
 
-  protected String renderItem(Record record) {
-    return template.applyTemplate(record.getJsObject());
-  }
-
-  private Element[] bufferRender(List<Record> records) {
-    StringBuffer sb = new StringBuffer();
-    for (Record r : records) {
-      sb.append(template.applyTemplate(r.getJsObject()));
-    }
-    Element div = DOM.createDiv();
-    fly(div).setInnerHtml(sb.toString());
-
-    return fly(div).select(getItemSelector());
-  }
-
-  private void deselectAll(boolean suppresEvent) {
-    if (multiSelect || singleSelect) {
-      selected.each(new CompositeFunction() {
-        public void doFunction(Element elem, CompositeElement ce, int index) {
-          ce.remove(elem);
-          fly(elem).removeStyleName(getSelectStyle());
-        }
-      });
-      last = -1;
-      if (!suppresEvent) {
-        DataViewEvent dve = new DataViewEvent(this);
-        fireEvent(Events.SelectionChange, dve);
-      }
+    for (int i = 0; i < elems.length; i++) {
+      DataViewItem item = getItem(i);
+      item.setElement(elems[i]);
+      item.rendered = true;
     }
   }
+  
+  protected void renderItem(DataViewItem item, int index) {
+    item.setElement(XDOM.create(template.applyTemplate(new Params(item.getValues()))));
+    item.rendered = true;
+    el().insertChild(item.getElement(), index);
+  }
 
-  private Element getNode(NodeInfo node) {
-    if (node.elem != null) {
-      return node.elem;
-    } else if (node.index != -1) {
-      return (Element) all.getElement(node.index);
-    } else if (node.record != null) {
-      return (Element) all.getElement(store.indexOf(node.record));
+  protected void setSelectionModel(DataViewSelectionModel sm) {
+    assert sm != null;
+    if (this.sm != null) {
+      this.sm.bind(null);
     }
-    return null;
+    this.sm = sm;
+    sm.bind(this);
   }
 
 }

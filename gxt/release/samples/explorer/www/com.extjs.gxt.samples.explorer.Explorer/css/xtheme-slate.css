@@ -679,3 +679,54 @@ td.x-date-mp-sel a{
 .x-item-disabled * {
 	color:#333 !important;
 }
+
+.x-date-right-icon {
+  background-image: url(../images/slate/shared/right-btn.gif);
+  margin-right: 2px;
+  text-decoration: none !important;
+}
+
+.x-date-left-icon {
+  background-image: url(../images/slate/shared/left-btn.gif);
+  margin-right: 2px;
+  text-decoration: none !important;
+}
+
+.my-list-item-over .my-list-item-l {
+  background: url(../images/gxt/shared/select-19-bg-gray.gif) no-repeat left -57px;
+}
+
+.my-list-item-over .my-list-item-icon,.my-list-item-over .my-list-item-check,.my-list-item-over .my-list-item-c
+  {
+  background: url(../images/gxt/shared/select-19-bg-gray.gif) repeat-x left -95px;
+}
+
+.my-list-item-over .my-list-item-r {
+  background: url(../images/gxt/shared/select-19-bg-gray.gif) no-repeat right -76px;
+}
+
+.my-list-item-sel .my-list-item-l {
+  background: url(../images/gxt/shared/select-19-bg-gray.gif) no-repeat left 0px;
+}
+
+.my-list-item-sel .my-list-item-icon,.my-list-item-sel .my-list-item-check,.my-list-item-sel .my-list-item-c
+  {
+  background: url(../images/gxt/shared/select-19-bg-gray.gif) left -38px;
+}
+
+.my-list-item-sel .my-list-item-r {
+  background: url(../images/gxt/shared/select-19-bg-gray.gif) no-repeat right -19px;
+}
+
+.my-list-flat .my-list-item-sel {
+  background-color: #DDE4F0;
+  border: 1px dotted #9EB8ED;
+}
+
+.x-border {
+  border: 1px solid #ABB7BD;
+}
+
+.my-list {
+  border: 1px solid #ABB7BD;
+}

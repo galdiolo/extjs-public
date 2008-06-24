@@ -28,11 +28,6 @@ public class TreeTableEvent extends TreeEvent {
   public TreeTable treeTable;
 
   /**
-   * The index.
-   */
-  public int index;
-
-  /**
    * The column index.
    */
   public int columnIndex;
@@ -56,10 +51,10 @@ public class TreeTableEvent extends TreeEvent {
     super(treeTable);
     this.treeTable = treeTable;
   }
-  
+
   public TreeTableEvent(TreeTable treeTable, TreeItem item) {
     super(treeTable);
     this.treeTable = treeTable;
-    this.item = item;
+    if (item != null) this.item = item;
   }
 }

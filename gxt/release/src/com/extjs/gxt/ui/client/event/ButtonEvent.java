@@ -7,7 +7,7 @@
  */
 package com.extjs.gxt.ui.client.event;
 
-import com.extjs.gxt.ui.client.widget.Button;
+import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 
 /**

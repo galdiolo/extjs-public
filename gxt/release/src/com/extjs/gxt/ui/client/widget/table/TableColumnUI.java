@@ -8,7 +8,6 @@
 package com.extjs.gxt.ui.client.widget.table;
 
 import com.extjs.gxt.ui.client.Events;
-import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
@@ -31,7 +30,7 @@ public class TableColumnUI extends BoxComponent {
 
   static {
     StringBuffer sb = new StringBuffer();
-    sb.append("<div class=my-tbl-col-overflow style='align: {0}'>");
+    sb.append("<div class=my-tbl-col-overflow style='text-align: {0}'>");
     sb.append("<div class=my-tbl-col-text>{1}</div>");
     sb.append("</div>");
     html = sb.toString();
@@ -76,17 +75,17 @@ public class TableColumnUI extends BoxComponent {
     return align;
   }
 
+  @Override
+  protected void onRightClick(ComponentEvent ce) {
+    super.onRightClick(ce);
+    header.onRightClick(column, ce);
+  }
+
   public void onBrowserEvent(Event event) {
     if (!header.isEnabled()) {
       return;
     }
     super.onBrowserEvent(event);
-    if (DOM.eventGetType(event) == Event.ONMOUSEUP) {
-      if (DOM.eventGetButton(event) == Event.BUTTON_RIGHT
-          || (GXT.isMac && DOM.eventGetCtrlKey(event))) {
-        header.onRightClick(column, event);
-      }
-    }
   }
 
   public void onColumnResize(SplitBarEvent sbe) {
@@ -149,8 +148,8 @@ public class TableColumnUI extends BoxComponent {
   }
 
   public void onTextChange(String text) {
-    El textEl = el.selectNode(".my-tbl-col-text");
-    textEl.setInnerHtml(text);
+    El textEl = el().selectNode(".my-tbl-col-text");
+    textEl.dom.setInnerHTML(text);
   }
 
   @Override
@@ -163,8 +162,14 @@ public class TableColumnUI extends BoxComponent {
     }
     String s = Format.substitute(html, (Object[]) params);
     setElement(XDOM.create(s), target, index);
+
+    if (column != null) {
+      addStyleName("my-tbl-col-" + column.getId());
+    }
+    
+
     // TODO: remove hardcoded height
-    el.setHeight(24);
+    el().setHeight(24);
 
     if (!end && column.isResizable()) {
       splitBar = header.createSplitBar(LayoutRegion.EAST, this);

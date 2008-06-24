@@ -7,14 +7,11 @@
  */
 package com.extjs.gxt.ui.client.event;
 
+import com.extjs.gxt.ui.client.fx.Effect;
 import com.extjs.gxt.ui.client.fx.Fx;
 
 /**
  * Fx event type.
- * 
- * <p/>Note: For a given event, only the fields which are appropriate will be
- * filled in. The appropriate fields for each event are documented by the event
- * source.
  * 
  * @see Fx
  */
@@ -24,8 +21,13 @@ public class FxEvent extends BaseEvent {
    * The source fx.
    */
   public Fx fx;
+  
+  /**
+   * The current effect.
+   */
+  public Effect effect;
 
-  public FxEvent(Fx fx) {
+  public FxEvent(Fx fx, Effect effect) {
     this.fx = fx;
   }
 

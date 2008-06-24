@@ -7,22 +7,21 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.XDOM;
+import com.extjs.gxt.ui.client.core.CompositeElement;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.FxEvent;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.PreviewEvent;
+import com.extjs.gxt.ui.client.fx.FxConfig;
+import com.extjs.gxt.ui.client.util.BaseEventPreview;
 import com.extjs.gxt.ui.client.util.Point;
 import com.extjs.gxt.ui.client.util.Rectangle;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.EventPreview;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -67,62 +66,40 @@ import com.google.gwt.user.client.ui.RootPanel;
  * <dd>.x-popup (the popup itself)</dd>
  * </dl>
  */
-public class Popup extends Container implements EventPreview {
+public class Popup extends LayoutContainer {
 
-  /**
-   * The yOffset when constrainViewport == true (defaults to 15).
-   */
   private int yOffset = 15;
-
-  /**
-   * The xOffset when constrainViewport == true (defaults to 10).
-   */
   private int xOffset = 10;
-
-  /**
-   * True to enable event preview (defaults to true).
-   */
   private boolean eventPreview = true;
-
-  /**
-   * True to enable animations when showing and hiding (defaults to false).
-   */
   private boolean animate;
-
-  /**
-   * True to move focus to the popup when being opened (defaults to true).
-   */
   private boolean autoFocus = true;
-
-  /**
-   * True to close the popup when the user clicks outside of the menu (default
-   * to true).
-   */
   private boolean autoHide = true;
-
-  /**
-   * True to ensure popup is dislayed within the browser's viewport.
-   */
   private boolean constrainViewport = true;
-
-  /**
-   * The default {@link El#alignTo} anchor position value for this menu relative
-   * to its element of origin (defaults to "tl-bl?").
-   */
   private String defaultAlign = "tl-bl?";
 
-  private List<Element> ignoreElements;
   private Element alignElem;
   private String alignPos;
   private int[] alignOffsets;
   private Point alignPoint;
+  private BaseEventPreview preview = new BaseEventPreview() {
+    @Override
+    protected boolean onAutoHide(PreviewEvent ce) {
+      if (ce.getTarget() == XDOM.getBody()) {
+        return false;
+      }
+      Popup.this.onAutoHide(ce.event);
+      return true;
+    }
+  
+  };
 
   /**
    * Creates a new popup panel.
    */
   public Popup() {
-    baseStyle = "x-podpup";
+    baseStyle = "x-popup";
     shim = true;
+    enableLayout = true;
   }
 
   /**
@@ -130,7 +107,7 @@ public class Popup extends Container implements EventPreview {
    */
   public void center() {
     if (rendered) {
-      el.center();
+      el().center();
     }
   }
 
@@ -148,11 +125,8 @@ public class Popup extends Container implements EventPreview {
    * 
    * @return the list of ignored elements
    */
-  public List getIgnoreList() {
-    if (ignoreElements == null) {
-      ignoreElements = new ArrayList<Element>();
-    }
-    return ignoreElements;
+  public CompositeElement getIgnoreList() {
+    return preview.getIgnoreList();
   }
 
   /**
@@ -180,15 +154,15 @@ public class Popup extends Container implements EventPreview {
     if (!fireEvent(Events.BeforeHide, new ComponentEvent(this))) {
       return;
     }
-    if (isEventPreview()) {
-      DOM.removeEventPreview(this);
+    if (eventPreview) {
+      preview.remove();
     }
     if (isAnimate()) {
-      el.fadeOut(new Listener<FxEvent>() {
+      el().fadeOut(new FxConfig(new Listener<FxEvent>() {
         public void handleEvent(FxEvent fe) {
           afterHide();
         }
-      });
+      }));
     } else {
       afterHide();
     }
@@ -237,10 +211,6 @@ public class Popup extends Container implements EventPreview {
    */
   public boolean isEventPreview() {
     return eventPreview;
-  }
-
-  public boolean onEventPreview(Event event) {
-    return handleEventPreview(new ComponentEvent(this, event));
   }
 
   /**
@@ -402,6 +372,7 @@ public class Popup extends Container implements EventPreview {
     if (layer != null) {
       layer.hideShadow();
     }
+    el().setVisible(false);
     fireEvent(Events.Hide, new ComponentEvent(this));
   }
 
@@ -413,41 +384,6 @@ public class Popup extends Container implements EventPreview {
       focus();
     }
     fireEvent(Events.Open, new ComponentEvent(this));
-  }
-
-  protected boolean handleEventPreview(ComponentEvent ce) {
-    switch (ce.type) {
-      case Event.ONMOUSEDOWN:
-      case Event.ONMOUSEUP:
-      case Event.ONMOUSEMOVE:
-      case Event.ONCLICK:
-      case Event.ONDBLCLICK: {
-        if (DOM.getCaptureElement() == null) {
-          if (!ce.within(getElement())) {
-            if (isAutoHide() && (ce.type == Event.ONCLICK) || ce.isRightClick()) {
-              if (ignoreElements != null) {
-                for (int i = 0; i < ignoreElements.size(); i++) {
-                  Element elem = (Element) ignoreElements.get(i);
-                  if (DOM.isOrHasChild(elem, ce.getTarget())) {
-                    return true;
-                  }
-                }
-              }
-              if (onAutoHide(ce.event)) {
-                hide();
-                return true;
-              }
-            }
-            return false;
-          }
-        }
-        break;
-      }
-      case Event.ONKEYUP:
-        handleKeyUp(ce);
-        break;
-    }
-    return true;
   }
 
   protected void handleKeyUp(ComponentEvent ce) {
@@ -477,65 +413,64 @@ public class Popup extends Container implements EventPreview {
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
     setStyleAttribute("zIndex", "100");
-    el.makePositionable(true);
+    el().makePositionable(true);
   }
 
   protected Popup onShowPopup() {
     RootPanel.get().add(this);
 
     hidden = false;
-
     Point p = null;
-
+ 
     if (alignElem != null) {
       alignPos = alignPos != null ? alignPos : getDefaultAlign();
       alignOffsets = alignOffsets != null ? alignOffsets : new int[] {0, 2};
-      p = el.getAlignToXY(alignElem, alignPos, alignOffsets);
+      p = el().getAlignToXY(alignElem, alignPos, alignOffsets);
     } else if (alignPoint != null) {
       p = alignPoint;
     }
 
-    el.setLeftTop(p.x, p.y);
+    el().setLeftTop(p.x, p.y);
 
     alignElem = null;
     alignPos = null;
     alignOffsets = null;
     alignPoint = null;
 
-    el.setStyleAttribute("zIndex", XDOM.getTopZIndex());
-    el.makePositionable(true).setVisibility(false);
+    el().setStyleAttribute("zIndex", XDOM.getTopZIndex());
+    el().makePositionable(true).setVisibility(false);
 
-    if (isConstrainViewport()) {
+    if (constrainViewport) {
       int clientHeight = Window.getClientHeight() + XDOM.getBodyScrollTop();
       int clientWidth = Window.getClientWidth() + XDOM.getBodyScrollLeft();
 
-      Rectangle r = el.getBounds();
+      Rectangle r = el().getBounds();
 
       int x = r.x;
       int y = r.y;
 
       if (y + r.height > clientHeight) {
         y = clientHeight - r.height - getYOffset();
-        el.setTop(y);
+        el().setTop(y);
       }
       if (x + r.width > clientWidth) {
         x = clientWidth - r.width - getXOffset();
-        el.setLeft(x);
+        el().setLeft(x);
       }
     }
 
-    el.setVisibility(true);
+    el().setVisibility(true);
 
-    if (isEventPreview()) {
-      DOM.addEventPreview(this);
+    if (eventPreview) {
+      preview.add();
     }
 
-    if (isAnimate()) {
-      el.fadeIn(new Listener<FxEvent>() {
+    if (animate) {
+      el().fadeIn(new FxConfig(new Listener<FxEvent>() {
         public void handleEvent(FxEvent fe) {
           afterShow();
         }
-      });
+      }));
     } else {
       afterShow();
     }

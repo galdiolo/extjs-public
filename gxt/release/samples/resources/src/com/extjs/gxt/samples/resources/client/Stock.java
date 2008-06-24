@@ -18,10 +18,11 @@ public class Stock extends BaseModel {
 
   public Stock(String name, String symbol, double open, double last) {
     set("name", name);
-    set("symbox", symbol);
-    set("open", new Double(open));
-    set("last", new Double(last));
+    set("symbol", symbol);
+    set("open", open);
+    set("last", last);
     set("date", new Date());
+    set("change", last - open);
   }
 
   public Date getLastTrans() {
@@ -33,7 +34,7 @@ public class Stock extends BaseModel {
   }
 
   public String getSymbol() {
-    return (String) get("symbox");
+    return (String) get("symbol");
   }
 
   public double getOpen() {

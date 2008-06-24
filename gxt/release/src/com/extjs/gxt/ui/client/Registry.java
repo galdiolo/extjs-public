@@ -10,13 +10,13 @@ package com.extjs.gxt.ui.client;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.extjs.gxt.ui.client.util.Observable;
+import com.extjs.gxt.ui.client.event.BaseObservable;
 
 
 /**
  * A local storage of objects stored by id.
  */
-public class Registry extends Observable {
+public class Registry extends BaseObservable {
 
   protected static Map<String, Object> map = new HashMap<String, Object>();
 
@@ -26,8 +26,8 @@ public class Registry extends Observable {
    * @param id the identifier
    * @return the object or <code>null</code> if no match
    */
-  public static Object get(String id) {
-    return map.get(id);
+  public static <X> X get(String id) {
+    return (X)map.get(id);
   }
 
   /**

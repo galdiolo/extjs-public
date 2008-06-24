@@ -7,8 +7,8 @@
  */
 package com.extjs.gxt.ui.client.event;
 
-import com.extjs.gxt.ui.client.widget.Button;
-import com.extjs.gxt.ui.client.widget.ButtonBar;
+import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 
 /**
  * ButtonBar event type.
@@ -19,31 +19,15 @@ import com.extjs.gxt.ui.client.widget.ButtonBar;
  * 
  * @see ButtonBar
  */
-public class ButtonBarEvent extends ComponentEvent {
-
-  /**
-   * The button bar.
-   */
-  public ButtonBar buttonBar;
-
-  /**
-   * The button.
-   */
-  public Button button;
-
-  /**
-   * The insert index.
-   */
-  public int index;
+public class ButtonBarEvent extends ContainerEvent<ButtonBar, Button> {
 
   /**
    * Creates a new event.
    * 
    * @param buttonBar the source button bar
    */
-  public ButtonBarEvent(ButtonBar buttonBar) {
-    super(buttonBar);
-    this.buttonBar = buttonBar;
+  public ButtonBarEvent(ButtonBar buttonBar, Button item) {
+    super(buttonBar, item);
   }
 
 }

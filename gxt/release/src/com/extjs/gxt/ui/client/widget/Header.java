@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.util.WidgetHelper;
+import com.extjs.gxt.ui.client.widget.button.IconButton;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
@@ -21,11 +22,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class Header extends Component {
 
-  /**
-   * Style name added to the header's text element (defaults to null).
-   */
   private String textStyle;
-
   private IconButton iconBtn;
   private El textEl;
   private List<Component> tools = new ArrayList<Component>();
@@ -121,7 +118,7 @@ public class Header extends Component {
     this.iconStyle = iconStyle;
     if (rendered) {
       textEl.addStyleName("x-panel-icon");
-      iconBtn.el.setLeft(1);
+      iconBtn.el().setLeft(1);
       iconBtn.setVisible(true);
       iconBtn.changeStyle(iconStyle);
     }
@@ -135,7 +132,7 @@ public class Header extends Component {
   public void setText(String text) {
     this.text = text;
     if (rendered) {
-      textEl.setInnerHtml(text);
+      textEl.dom.setInnerHTML(text);
     }
   }
 
@@ -146,28 +143,34 @@ public class Header extends Component {
    */
   public void setTextStyle(String textStyle) {
     this.textStyle = textStyle;
+    if (rendered) {
+      textEl.dom.setClassName(textStyle);
+    }
   }
 
+  @Override
   protected void doAttachChildren() {
     WidgetHelper.doAttach(widgetPanel);
   }
 
+  @Override
   protected void doDetachChildren() {
     WidgetHelper.doDetach(widgetPanel);
   }
 
+  @Override
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
     setElement(DOM.createDiv(), target, index);
     addStyleName("x-small-editor");
-    el.makePositionable();
+    el().makePositionable();
 
     iconBtn = new IconButton();
     iconBtn.setVisible(false);
     iconBtn.setStyleAttribute("position", "absolute");
     iconBtn.setStyleAttribute("marginLeft", "0px");
     iconBtn.setWidth(20);
-    iconBtn.render(el.dom);
+    iconBtn.render(el().dom);
 
     widgetPanel = new HorizontalPanel();
     widgetPanel.setStyleName("x-panel-toolbar");
@@ -183,8 +186,11 @@ public class Header extends Component {
     widgetPanel.render(getElement());
 
     textEl = new El(DOM.createSpan());
-    el.appendChild(textEl.dom);
-    textEl.setStyleName(getTextStyle());
+    getElement().appendChild(textEl.dom);
+    
+    if (textStyle != null) {
+      setTextStyle(textStyle);
+    }
 
     if (text != null) {
       setText(text);

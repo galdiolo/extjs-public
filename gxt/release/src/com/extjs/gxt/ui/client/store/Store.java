@@ -8,66 +8,44 @@
 package com.extjs.gxt.ui.client.store;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import com.extjs.gxt.ui.client.Style.SortDir;
-import com.extjs.gxt.ui.client.data.BaseLoadConfig;
-import com.extjs.gxt.ui.client.data.DataCallback;
-import com.extjs.gxt.ui.client.data.DataProxy;
-import com.extjs.gxt.ui.client.data.DataReader;
-import com.extjs.gxt.ui.client.data.LoadConfig;
-import com.extjs.gxt.ui.client.data.LoadEvent;
-import com.extjs.gxt.ui.client.data.LoadResult;
-import com.extjs.gxt.ui.client.data.Loader;
+import com.extjs.gxt.ui.client.data.ChangeEvent;
+import com.extjs.gxt.ui.client.data.ChangeEventSource;
+import com.extjs.gxt.ui.client.data.ChangeListener;
+import com.extjs.gxt.ui.client.data.DefaultModelComparer;
+import com.extjs.gxt.ui.client.data.ModelComparer;
 import com.extjs.gxt.ui.client.data.ModelData;
-import com.extjs.gxt.ui.client.event.TypedListener;
-import com.extjs.gxt.ui.client.util.Observable;
+import com.extjs.gxt.ui.client.data.SortInfo;
+import com.extjs.gxt.ui.client.event.BaseObservable;
+import com.extjs.gxt.ui.client.store.Record.RecordUpdate;
 import com.extjs.gxt.ui.client.widget.DataView;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
 
 /**
- * The Store class encapsulates a client side cache of {@link Record Record}
- * objects which provide input data for Components such as the {@link ComboBox}
- * and {@link DataView DataView}
+ * The store class encapsulates a client side cache of {@link ModelData} objects
+ * which provide input data for components such as the {@link ComboBox} and
+ * {@link DataView DataView}.
  * 
- * </p>
- * This class is not fully implemented. Please review the source code.
- * 
+ * <dl>
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>DataChange</b> : StoreEvent(store)<br>
- * <div>Fires when the data cache has changed, and a widget which is using this
- * Store as a Record cache should refresh its view.</div>
+ * <dd><b>Filter</b> : StoreEvent(store)<br>
+ * <div>Fires when filters are applied and removed from the store.</div>
  * <ul>
  * <li>store : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Add</b> : StoreEvent(store, records, index)<br>
- * <div>Fires when Records have been added to the Store.</div>
+ * <dd><b>Update</b> : StoreEvent(store, model, record)<br>
+ * <div>Fires when a model has been updated via its record.</div>
  * <ul>
  * <li>store : this</li>
- * <li>records : the added records</li>
- * <li>index : the index at which the record(s) were added</li>
- * </ul>
- * </dd>
- * 
- * <dd><b>Remove</b> : StoreEvent(store, record)<br>
- * <div>Fires when a Record has been removed from the Store.</div>
- * <ul>
- * <li>store : this</li>
- * <li>record : the record that was removed</li>
- * <li>index : the index at which the record was removed</li>
- * </ul>
- * </dd>
- * 
- * <dd><b>Update</b> : StoreEvent(store, record)<br>
- * <div>Fires when a Record has been updated.</div>
- * <ul>
- * <li>store : this</li>
+ * <li>model : the model that was updated</li>
  * <li>record : the record that was updated</li>
- * <li>operation : the update operation being performed. Value may be one of:
- * EDIT, REJECT, COMMIT.</li>
+ * <li>operation : the update operation being performed.</li>
  * </ul>
  * </dd>
  * 
@@ -78,119 +56,66 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
  * </ul>
  * </dd>
  * 
- * <dd><b>BeforeLoad</b> : StoreEvent(store, options)<br>
- * <div>Fires before a request is made for a new data object.</div>
- * <ul>
- * <li>store : this</li>
- * <li>option : the loading options that were specified (see {@link #load} for
- * details)</li>
- * </ul>
- * </dd>
+ * </dl>
  * 
- * <dd><b>Load</b> : StoreEvent(store, records, options)<br>
- * <div>Fires after a new set of Records has been loaded.</div>
- * <ul>
- * <li>store : this</li>
- * <li>records : the records that were loaded</li>
- * <li>options : the loading options that were specified (see {@link #load} for
- * details)</li>
- * </ul>
- * </dd>
- * 
- * <dd><b>LoadException</b> : StoreEvent(store)<br>
- * <div>Fires after a new set of Records has been loaded.</div>
- * <ul>
- * <li>store : this</li>
- * </ul>
- * </dd>
- * </dt>
+ * @param <M> the model data type
  */
-public class Store<C extends LoadConfig> extends Observable implements Loader {
+public abstract class Store<M extends ModelData> extends BaseObservable {
 
   /**
-   * DataChange event type.
+   * BeforeDataChanged event type (value is 1100).
    */
-  public static final int DataChanged = 1100;
+  public static final int BeforeDataChanged = 1100;
 
   /**
-   * Add event type.
+   * DataChanged event type (value is 1102).
+   */
+  public static final int DataChanged = 1102;
+
+  /**
+   * Filter event type (value is 1105).
+   */
+  public static final int Filter = 1105;
+
+  /**
+   * Filter event type (value is 1107).
+   */
+  public static final int Sort = 1107;
+
+  /**
+   * Add event type (value is 1110).
    */
   public static final int Add = 1110;
 
   /**
-   * Remove event type.
+   * Remove event type (value is 1120).
    */
   public static final int Remove = 1120;
 
   /**
-   * Update event type.
+   * Update event type (value is 1130).
    */
   public static final int Update = 1130;
 
   /**
-   * Clear event type.
+   * Clear event type (value is 1140).
    */
   public static final int Clear = 1140;
 
-  /**
-   * Convenient method that unwraps the wrapped Model from each Record
-   * 
-   * Useful in conjunction with {@link #getRecords()} and
-   * {@link #getModifiedRecords()}
-   * 
-   */
-  public static List<? extends ModelData> unwrap(List<Record> records) {
-    List<ModelData> models = new ArrayList<ModelData>();
-    for (Record record : records) {
-      models.add(record.getModel());
-    }
-    return models;
-  }
+  protected List<M> all = new ArrayList<M>();
+  protected Map<M, Record> recordMap = new HashMap<M, Record>();
+  protected List<M> filtered;
+  protected List<Record> modified = new ArrayList<Record>();
+  protected SortInfo sortInfo = new SortInfo();
+  protected StoreSorter storeSorter;
+  protected String filterProperty;
 
-  protected DataProxy<C> dataProxy;
-  protected DataReader reader;
-  protected int offset = 0;
-  protected int limit = 50;
-  C lastLoadConfig;
-
-  private boolean reuseLoadConfig = false;
-  private boolean remoteSort;
-  private SortInfo sortInfo;
-  private int totalCount;
-  private List<Record> items = new ArrayList<Record>();
-  private List<Record> modified = new ArrayList<Record>();
+  private List<M> snapshot;
   private List<StoreFilter> filters;
-
-  /**
-   * Creates a new store.
-   */
-  public Store() {
-
-  }
-
-  public Store(DataProxy<C> dataProxy, DataReader reader) {
-    this.dataProxy = dataProxy;
-    this.reader = reader;
-  }
-
-  /**
-   * Adds a the items to the store and fires the <i>Add</i> event.
-   * 
-   * @param items the items to add
-   * @return the Record that represents wach item in Items.
-   */
-  public List<Record> add(List<? extends ModelData> items) {
-    return insert(items, getCount());
-  }
-
-  /**
-   * Adds the item to the store and fires the <i>Add</i> event.
-   * 
-   * @param item the item to add
-   */
-  public Record add(ModelData item) {
-    return insert(item, getCount());
-  }
+  protected boolean filtersEnabled;
+  private ModelComparer<M> comparer = DefaultModelComparer.DFFAULT;
+  private ChangeListener changeListener;
+  private boolean monitorChanges;
 
   /**
    * Adds a filter to the store.
@@ -210,31 +135,60 @@ public class Store<C extends LoadConfig> extends Observable implements Loader {
    * @param listener the listener to add
    */
   public void addStoreListener(StoreListener listener) {
-    TypedListener tl = new TypedListener(listener);
-    addListener(Store.BeforeLoad, tl);
-    addListener(Store.DataChanged, tl);
-    addListener(Store.Add, tl);
-    addListener(Store.Remove, tl);
-    addListener(Store.Update, tl);
-    addListener(Store.Clear, tl);
+    StoreTypedListener tl = new StoreTypedListener(listener);
+    addListener(Filter, tl);
+    addListener(Sort, tl);
+    addListener(BeforeDataChanged, tl);
+    addListener(DataChanged, tl);
+    addListener(Add, tl);
+    addListener(Remove, tl);
+    addListener(Update, tl);
+    addListener(Clear, tl);
   }
 
   /**
-   * Revert to a view of this store with no filtering applied.
+   * Applies the current filters to the store.
    * 
-   * @param supressEvent if true the filter is cleared silently without
-   *            notifying listeners
+   * @param property the optional active property
    */
-  public void clearFilters(boolean supressEvent) {
-    if (isFiltered()) {
+  public void applyFilters(String property) {
+    if (filters != null && filters.size() == 0) {
+      return;
+    }
+    if (!filtersEnabled) {
+      snapshot = all;
+    }
+    filtersEnabled = true;
+    filtered = new ArrayList<M>();
+    for (M items : snapshot) {
+      if (!isFiltered(items, property)) {
+        filtered.add(items);
+      }
+    }
+    all = filtered;
+    
+    fireEvent(Filter, createStoreEvent());
 
+    if (storeSorter != null) {
+      applySort(false);
     }
   }
 
   /**
-   * Commit all Records with outstanding changes. To handle updates for changes,
+   * Revert to a view of this store with no filtering applied.
+   */
+  public void clearFilters() {
+    if (isFiltered()) {
+      filtersEnabled = false;
+      all = snapshot;
+      fireEvent(Filter, createStoreEvent());
+    }
+  }
+
+  /**
+   * Commit all items with outstanding changes. To handle updates for changes,
    * subscribe to the Store's <i>Update</i> event, and perform updating when
-   * the operation parameter is {@link Record#COMMIT}.
+   * the operation parameter is {@link RecordUpdate#COMMIT}.
    */
   public void commitChanges() {
     for (Record r : modified) {
@@ -244,27 +198,66 @@ public class Store<C extends LoadConfig> extends Observable implements Loader {
   }
 
   /**
-   * Get the Record at the specified index.
+   * Returns true if the item is in this store.
    * 
-   * @param index the index of the record to find
-   * @return the record at the passed index
+   * @param item the item
+   * @return true if container
    */
-  public Record getAt(int index) {
-    return items.get(index);
+  public boolean contains(ModelData item) {
+    return all.contains(item);
   }
 
   /**
-   * Gets the number of cached records.
-   * <p>
-   * If using paging, this may not be the total size of the dataset. If the data
-   * object used by the Reader contains the dataset size, then the
-   * {@link #getTotalCount} function returns the dataset size.
-   * </p>
+   * Filters the store using the given property.
    * 
-   * @return the number of Records in the Store's cache.
+   * @param property the property to filter by
    */
-  public int getCount() {
-    return items.size();
+  public void filter(String property) {
+    filterProperty = property;
+    applyFilters(property);
+  }
+
+  /**
+   * Returns the matching model in the cache using the model comparer to test
+   * for equality.
+   * 
+   * @param model the model
+   * @return the matching model or null if no match
+   */
+  public M findModel(M model) {
+    for (M m : all) {
+      if (comparer.equals(m, model)) {
+        return m;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Returns the store's filters.
+   * 
+   * @return the filters
+   */
+  public List<StoreFilter> getFilters() {
+    return filters;
+  }
+
+  /**
+   * Returns the comparer used to comapare model instances.
+   * 
+   * @return the comparer
+   */
+  public ModelComparer<M> getModelComparer() {
+    return comparer;
+  }
+
+  /**
+   * Returns the store's models.
+   * 
+   * @return the items
+   */
+  public List<M> getModels() {
+    return new ArrayList<M>(all);
   }
 
   /**
@@ -277,132 +270,30 @@ public class Store<C extends LoadConfig> extends Observable implements Loader {
     return new ArrayList<Record>(modified);
   }
 
-  public int getPageSize() {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
   /**
-   * Returns a range of Records between specified indices.
-   * 
-   * @param start the starting index
-   * @param end the ending index
-   * @return the list of records
-   */
-  public List<Record> getRange(int start, int end) {
-    return items.subList(start, end);
-  }
-
-  public List<Record> getRecords() {
-    return new ArrayList<Record>(items);
-  }
-
-  public boolean getRemoteSort() {
-    return remoteSort;
-  }
-
-  public SortDir getSortDir() {
-    return sortInfo.sortDir;
-  }
-
-  public String getSortField() {
-    return sortInfo.sortField;
-  }
-
-  /**
-   * Returns the current sort state of this Store.
-   * 
-   * @return the sort state
-   */
-  public SortInfo getSortState() {
-    return sortInfo;
-  }
-
-  public int getOffset() {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  /**
-   * Gets the total number of records in the dataset as returned by the server.
-   * <p>
-   * If using paging, for this to be accurate, the data object used by the
-   * Reader must contain the dataset size. For remote data sources, this is
-   * provided by a query on the server.
-   * </p>
-   * 
-   * @return the number of records as passed from the server
-   */
-  public int getTotalCount() {
-    return totalCount;
-  }
-
-  /**
-   * returns the index of the item in this store.
+   * Returns the record instance for the item. Records are created on-demand and
+   * are cleared after a stores modifications are accepted or rejected.
    * 
    * @param item the item
-   * @return the index
+   * @return the record for the item
    */
-  public int indexOf(ModelData item) {
-    if (item instanceof Record) {
-      return items.indexOf(item);
-    } else {
-      int i = 0;
-      for (Record record : items) {
-        if (record.getModel().equals(item)) {
-          return i;
-        }
-        i++;
-      }
+  public Record getRecord(M item) {
+    Record record = recordMap.get(item);
+    if (record == null) {
+      record = new Record(item);
+      record.join(this);
+      recordMap.put(item, record);
     }
-    return -1;
+    return record;
   }
 
   /**
-   * Inserts the model to the Store at the given index and fires the <i>Add</i>
-   * event.
-   * <p>
-   * The input can contain anything that extends ModelStorage.
-   * </p>
-   * <p>
-   * If the input element is not a Record, it will be wrapped in a Record.
-   * </p>
+   * Returns the store sorter.
    * 
-   * @param records the records to insert
-   * @param index the insert location
+   * @return the store storter
    */
-  @SuppressWarnings("unchecked")
-  public List<Record> insert(List<? extends ModelData> records, int index) {
-    List<Record> list = new ArrayList<Record>();
-    for (ModelData m : records) {
-      Record r = m instanceof Record ? (Record) m : new Record(m);
-      r.join(this);
-      list.add(r);
-    }
-    items.addAll(index, list);
-    for (Record r : list) {
-      r.join(this);
-    }
-    fireStoreEvent(Store.Add, list, null, index);
-    return list;
-  }
-
-  /**
-   * Inserts the model to the Store at the given index and fires the <i>Add</i>
-   * event.
-   * 
-   * <p>
-   * If the model is not a Record it will be wapped in a record
-   * </p>
-   * 
-   * @param model the record to insert
-   * @param index the insert location
-   */
-  public Record insert(ModelData model, int index) {
-    ArrayList<ModelData> list = new ArrayList<ModelData>();
-    list.add(model);
-    List<Record> inserted = insert(list, index);
-    return inserted.get(0);
+  public StoreSorter getStoreSorter() {
+    return storeSorter;
   }
 
   /**
@@ -411,232 +302,198 @@ public class Store<C extends LoadConfig> extends Observable implements Loader {
    * @return true if the store is filtered
    */
   public boolean isFiltered() {
-    return filters != null && filters.size() > 0;
-  }
-
-  public void load() {
-    C config = (isReuseLoadConfig() && lastLoadConfig != null) ? lastLoadConfig
-        : newLoadConfig();
-    final C loadConfig = prepareLoadConfig(config);
-    LoadEvent evt = new LoadEvent(this, loadConfig, null);
-    if (fireEvent(BeforeLoad, evt)) {
-      loadData(loadConfig, new DataCallback() {
-        public void setResult(LoadResult result) {
-          onLoadResult(loadConfig, result);
-        }
-      });
-    }
-  }
-
-  public void load(int offset, int limit) {
-    this.offset = offset;
-    this.limit = limit;
-    load();
+    return filtersEnabled;
   }
 
   /**
-   * Loads the Record cache.
+   * Returns true if the store is monitoring changes.
    * 
-   * @param options options for the load call
-   * @return whether the load fired (if <i>BeforeLoad</i> failed).
+   * @return the montitro changes state
    */
-  public boolean load(LoadConfig options) {
-    if (options == null) {
-      options = new BaseLoadConfig();
-    }
-    if (fireEvent(BeforeLoad)) {
-      storeOptions(options);
-      if (sortInfo != null && remoteSort) {
-
-      }
-      return true;
-
-    } else {
-      return false;
-    }
+  public boolean isMonitorChanges() {
+    return monitorChanges;
   }
 
   /**
    * Cancel outstanding changes on all changed records.
    */
   public void rejectChanges() {
-
-  }
-
-  /**
-   * Reloads the Record cache from the configured Proxy using the configured
-   * Reader and the options from the last load operation performed.
-   */
-  public void reload() {
-    load(lastLoadConfig);
-  }
-
-  /**
-   * Remove a Model (or a Record) from the Store and fires the <i>Remove</i>
-   * event.
-   * 
-   * @param model the model to remove
-   */
-  public void remove(ModelData model) {
-    int index = indexOf(model);
-    if (index > -1) {
-      Record record = items.remove(index);
-      fireStoreEvent(Store.Remove, null, record, index);
+    for (Record r : modified) {
+      r.reject(false);
     }
+    modified.clear();
   }
 
   /**
-   * Remove all Records from the Store and fires the <i>Clear</i> event.
+   * Remove all items from the store and fires the <i>Clear</i> event.
    */
   public void removeAll() {
-    items.clear();
-    fireEvent(Store.Clear);
+    all.clear();
+    fireEvent(Clear, createStoreEvent());
   }
 
+  /**
+   * Removes a previously added filter.
+   * 
+   * @param filter the filter to remove
+   */
   public void removeFilter(StoreFilter filter) {
     if (filters != null) {
       filters.remove(filter);
     }
   }
 
+  /**
+   * Removes a store listener.
+   * 
+   * @param listener the store listener to remove
+   */
   public void removeStoreListener(StoreListener listener) {
-    removeListener(Store.BeforeLoad, listener);
-    removeListener(Store.DataChanged, listener);
-    removeListener(Store.Add, listener);
-    removeListener(Store.Remove, listener);
-    removeListener(Store.Update, listener);
-    removeListener(Store.Clear, listener);
+    removeListener(Sort, listener);
+    removeListener(Filter, listener);
+    removeListener(BeforeDataChanged, listener);
+    removeListener(DataChanged, listener);
+    removeListener(Add, listener);
+    removeListener(Remove, listener);
+    removeListener(Update, listener);
+    removeListener(Clear, listener);
   }
 
   /**
-   * Sets the default sort column and order to be used by the next load
-   * operation.
+   * Sets the comparer to be used when comparing model instances.
    * 
-   * @param field the name of the field to sort by
-   * @param dir the sort order, ASC or DESC
+   * @param comparer the comparer
    */
-  public void setDefaultSort(String field, SortDir dir) {
-    sortInfo = new SortInfo(field, dir);
-  }
-
-  public void setRemoteSort(boolean remoteSort) {
-
-  }
-
-  public void setSortDir(SortDir dir) {
-    sortInfo.sortDir = dir;
-  }
-
-  public void setSortField(String field) {
-
+  public void setModelComparer(ModelComparer<M> comparer) {
+    this.comparer = comparer;
   }
 
   /**
-   * Sort the Records.
-   * <p>
-   * If remote sorting is used, the sort is performed on the server, and the
-   * cache is reloaded. If local sorting is used, the cache is sorted
-   * internally.
-   * </p>
+   * Sets whether the store should listen to change events on its children
+   * (default to false).
    * 
-   * @param fieldName
-   * @param dir
+   * @param monitorChanges true to monitor changes
    */
-  public void sort(String fieldName, int dir) {
+  public void setMonitorChanges(boolean monitorChanges) {
+    if (changeListener == null) {
+      changeListener = new ChangeListener() {
 
+        public void modelChanged(ChangeEvent event) {
+          onModelChange(event);
+        }
+
+      };
+    }
+    this.monitorChanges = monitorChanges;
   }
 
   /**
-   * Sums the value of <i>property</i> for each record between start and end
-   * and returns the result.
+   * Sets the store's sorter.
    * 
-   * @param property
-   * @param start
-   * @param end
-   * @return the total
+   * @param storeSorter the sorter
    */
-  public float sum(String property, int start, int end) {
-    return 0f;
+  public void setStoreSorter(StoreSorter storeSorter) {
+    this.storeSorter = storeSorter;
+  }
+
+  /**
+   * Notifies the store that the model has been updated and fires the <i>Update</i>
+   * event.
+   * 
+   * @param model the updated model
+   */
+  public void update(M model) {
+    M m = findModel(model);
+    if (m != null) {
+      if (m != model) {
+        swapModelInstance(m, model);
+      }
+      StoreEvent<M> evt = createStoreEvent();
+      evt.model = model;
+      fireEvent(Update, evt);
+    }
   }
 
   protected void afterCommit(Record record) {
     modified.remove(record);
-    fireStoreEvent(Store.Update, Record.COMMIT, record, indexOf(record));
+    fireStoreEvent(Update, RecordUpdate.COMMIT, record);
   }
 
   protected void afterEdit(Record record) {
     if (!modified.contains(record)) {
       modified.add(record);
     }
-    fireStoreEvent(Store.Update, Record.EDIT, record, indexOf(record));
+    fireStoreEvent(Update, RecordUpdate.EDIT, record);
   }
 
   protected void afterReject(Record record) {
     modified.remove(record);
-    fireStoreEvent(Store.Update, Record.REJECT, record, indexOf(record));
+    fireStoreEvent(Update, RecordUpdate.REJECT, record);
   }
 
-  protected void loadData(C config, DataCallback callback) {
+  protected void applySort(boolean supressEvent) {
 
   }
 
-  /**
-   * template method to allow custom BaseLoader subclasses to provide their own
-   * implementation of LoadConfig
-   */
-  protected C newLoadConfig() {
-    return (C) new BaseLoadConfig();
+  protected StoreEvent createStoreEvent() {
+    return new StoreEvent(this);
   }
 
-  protected void onLoadResult(C loadConfig, LoadResult loadResult) {
-    LoadEvent evt = new LoadEvent(this, loadConfig, loadResult);
-    if (loadResult.isSuccess()) {
-      fireEvent(Load, evt);
-    } else {
-      fireEvent(LoadException, evt);
+  protected void fireStoreEvent(int type, RecordUpdate operation, Record record) {
+    StoreEvent evt = createStoreEvent();
+    evt.operation = operation;
+    evt.record = record;
+    fireEvent(type, evt);
+  }
+
+  protected boolean isFiltered(ModelData record, String property) {
+    if (filters != null) {
+      for (StoreFilter filter : filters) {
+        boolean result = filter.select(this, record, record, property);
+        if (!result) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  protected void onModelChange(ChangeEvent ce) {
+    if (ce.type == ChangeEventSource.Update) {
+      update((M) ce.source);
     }
   }
 
   /**
-   * template method to allow custom BaseLoader subclasses to prepare the load
-   * config prior to loading data
+   * Subclasses must register any model instance being inserted into the store.
+   * 
+   * @param model the model
    */
-  protected C prepareLoadConfig(C config) {
-    config.setOffset(offset);
-    config.setLimit(limit);
-    // config.setSortField(sortField);
-    // config.setSortDir(sortDir);
-    return config;
+  protected void registerModel(M model) {
+    if (monitorChanges && model instanceof ChangeEventSource) {
+      ((ChangeEventSource) model).addChangeListener(changeListener);
+    }
   }
 
-  private void fireStoreEvent(int type, int operation, Record record, int index) {
-    StoreEvent se = new StoreEvent();
-    se.store = this;
-    se.operation = operation;
-    se.record = record;
-    se.index = index;
-    fireEvent(type, se);
+  /**
+   * Subclasses must unregister any model instance being removed from the store.
+   * 
+   * @param model the model
+   */
+  protected void unregisterModel(M model) {
+    if (monitorChanges && model instanceof ChangeEventSource) {
+      ((ChangeEventSource) model).removeChangeListener(changeListener);
+    }
   }
 
-  private void fireStoreEvent(int type, List<Record> records, Record record, int index) {
-    StoreEvent se = new StoreEvent();
-    se.store = this;
-    se.records = records;
-    se.record = record;
-    se.index = index;
-    fireEvent(type, se);
-  }
-
-  private void storeOptions(LoadConfig options) {
-
-  }
-
-  public void setReuseLoadConfig(boolean reuseLoadConfig) {
-    this.reuseLoadConfig = reuseLoadConfig;
-  }
-
-  public boolean isReuseLoadConfig() {
-    return reuseLoadConfig;
+  protected void swapModelInstance(M oldModel, M newModel) {
+    int index = all.indexOf(oldModel);
+    if (index != -1) {
+      all.remove(oldModel);
+      all.add(index, newModel);
+      unregisterModel(oldModel);
+      registerModel(newModel);
+    }
   }
 
 }

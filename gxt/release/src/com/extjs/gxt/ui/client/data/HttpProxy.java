@@ -7,54 +7,72 @@
  */
 package com.extjs.gxt.ui.client.data;
 
-import com.extjs.gxt.ui.client.data.BaseLoadResult.FailedLoadResult;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
- * A concrete <code>DataProxy</code> that retrieves data using
+ * A concrete <code>DataProxy</code> that retrieves data using a
  * <code>RequestBulder</code> instances.
  * 
  * @see RequestBuilder
  */
-public class HttpProxy<C extends LoadConfig> implements DataProxy<C> {
+public class HttpProxy<C, D> implements DataProxy<C, D> {
 
-  private RequestBuilder builder;
+  protected RequestBuilder builder;
 
+  /**
+   * Creates a new HttpProxy.
+   * 
+   * @param builder the request builder
+   */
   public HttpProxy(RequestBuilder builder) {
     this.builder = builder;
   }
 
-  public void load(final DataReader reader, final C loadConfig,
-      final DataCallback callback) {
+  public void load(final DataReader<C, D> reader, final C loadConfig,
+      final AsyncCallback<D> callback) {
     try {
       builder.sendRequest(generateUrl(loadConfig), new RequestCallback() {
         public void onError(Request request, Throwable exception) {
-          callback.setResult(new FailedLoadResult(exception));
+          callback.onFailure(exception);
         }
 
         public void onResponseReceived(Request request, Response response) {
           String text = response.getText();
-          LoadResult result = reader.read(loadConfig, text);
-          // TODO implement this
-          // result.setCursor(config.getStart());
-          callback.setResult(result);
+          try {
+            D data = null;
+            if (reader != null) {
+              data = reader.read(loadConfig, text);
+            } else {
+              data = (D) text;
+            }
+            callback.onSuccess(data);
+          } catch (Exception e) {
+            callback.onFailure(e);
+          }
         }
-
       });
     } catch (Exception e) {
-      callback.setResult(new FailedLoadResult(e));
+      callback.onFailure(e);
     }
   }
 
-  protected String generateUrl(LoadConfig loadConfig) {
+  protected String generateUrl(C loadConfig) {
     StringBuffer sb = new StringBuffer();
-    sb.append("start=" + loadConfig.getOffset());
-    sb.append("&limit=" + loadConfig.getLimit());
-    sb.append("&sortField=" + loadConfig.getSortField());
-    sb.append("&sortDir=" + loadConfig.getSortDir());
+    if (loadConfig instanceof ListLoadConfig) {
+      ListLoadConfig cfg = (ListLoadConfig) loadConfig;
+      sb.append("&sortField=" + cfg.getSortInfo().getSortField());
+      sb.append("&sortDir=" + cfg.getSortInfo().getSortDir());
+    }
+    if (loadConfig instanceof PagingLoadConfig) {
+      PagingLoadConfig cfg = (PagingLoadConfig) loadConfig;
+      sb.append("&start=" + cfg.getOffset());
+      sb.append("&limit=" + cfg.getLimit());
+    }
+
     return sb.toString();
   }
 }

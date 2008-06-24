@@ -15,7 +15,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * Allows any widget to be placed in a menu.
  */
-public class AdapterMenuItem extends MenuItem {
+public class AdapterMenuItem extends Item {
 
   /**
    * The wrapped widget.

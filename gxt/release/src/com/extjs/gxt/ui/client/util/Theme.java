@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.extjs.gxt.ui.client.GXT;
-import com.extjs.gxt.ui.client.store.Record;
+import com.extjs.gxt.ui.client.data.BaseModelData;
 
 /**
  * A UI theme. Themes are identified by there an id. The CSS stylesheet(s)
@@ -28,7 +28,7 @@ import com.extjs.gxt.ui.client.store.Record;
  * @see Theme#GRAY
  * 
  */
-public class Theme extends Record {
+public class Theme extends BaseModelData {
 
   /**
    * Default GXT blue theme.
@@ -44,6 +44,10 @@ public class Theme extends Record {
     BLUE = new Theme("blue", GXT.MESSAGES.themeSelector_blueTheme(), "ext-all.css");
     GRAY = new Theme("gray", GXT.MESSAGES.themeSelector_grayTheme(), "xtheme-gray.css");
   }
+  
+  protected Theme() {
+    
+  }
 
   public Theme(String id, String name, String file) {
     set("id", id);
@@ -52,15 +56,15 @@ public class Theme extends Record {
   }
 
   public String getId() {
-    return get("id").toString();
+    return this.<String>get("id");
   }
 
   public String getName() {
-    return get("name").toString();
+    return this.<String>get("name");
   }
 
   public String getFile() {
-    return get("file").toString();
+    return this.<String>get("file");
   }
 
   public Map asMap() {

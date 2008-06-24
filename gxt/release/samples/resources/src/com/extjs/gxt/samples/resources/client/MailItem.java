@@ -7,9 +7,9 @@
  */
 package com.extjs.gxt.samples.resources.client;
 
-import com.extjs.gxt.ui.client.data.BaseTreeModel;
+import com.extjs.gxt.ui.client.data.BaseModel;
 
-public class MailItem extends BaseTreeModel {
+public class MailItem extends BaseModel {
 
   public MailItem() {
 

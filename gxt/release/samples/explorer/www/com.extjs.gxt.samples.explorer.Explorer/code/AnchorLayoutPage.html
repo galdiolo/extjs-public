@@ -41,16 +41,18 @@ body {
  */
 package com.extjs.gxt.samples.explorer.client.pages;
 
-import com.extjs.gxt.ui.client.widget.Container;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.layout.AnchorData;
 import com.extjs.gxt.ui.client.widget.layout.AnchorLayout;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.Element;
 
-public class AnchorLayoutPage extends Container {
+public class AnchorLayoutPage extends LayoutContainer {
 
   public AnchorLayoutPage() {
+    // next line is only used to pass layout to containing container
+    // this will have NO effect outside of the explorer demo
     setData("layout", new FitLayout());
   }
 

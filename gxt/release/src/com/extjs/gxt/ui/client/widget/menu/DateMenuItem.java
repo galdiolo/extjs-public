@@ -16,7 +16,7 @@ import com.google.gwt.user.client.Element;
 /**
  * A MenuItem that displays a DatePicker.
  */
-public class DateMenuItem extends MenuItem {
+public class DateMenuItem extends Item {
 
   protected DatePicker picker;
 

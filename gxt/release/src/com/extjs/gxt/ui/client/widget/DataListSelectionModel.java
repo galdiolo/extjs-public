@@ -7,26 +7,16 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
-import com.extjs.gxt.ui.client.event.DataListEvent;
-import com.extjs.gxt.ui.client.widget.selection.AbstractListSelectionModel;
+import com.extjs.gxt.ui.client.Style.SelectionMode;
+import com.extjs.gxt.ui.client.widget.selection.AbstractSelectionModel;
 
-public class DataListSelectionModel extends
-    AbstractListSelectionModel<DataListItem, DataList, DataListEvent> {
+/**
+ * Single-select selection model for DataList.
+ */
+public class DataListSelectionModel extends AbstractSelectionModel<DataList, DataListItem> {
 
-  protected DataList dataList;
-
-  public DataListSelectionModel(DataList dataList) {
-    this.dataList = dataList;
-  }
-
-  @Override
-  protected DataListEvent createEvent(DataList list, DataListItem item) {
-    return new DataListEvent(list, item);
-  }
-
-  @Override
-  public void onSelectChange(DataListItem item, boolean select) {
-    dataList.onSelectChange(item, select);
+  public DataListSelectionModel(SelectionMode mode) {
+    super(mode);
   }
 
 }

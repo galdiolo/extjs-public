@@ -9,7 +9,7 @@ package com.extjs.gxt.samples.explorer.client.pages;
 
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
 import com.extjs.gxt.ui.client.util.Margins;
-import com.extjs.gxt.ui.client.widget.Container;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Viewport;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
@@ -17,16 +17,20 @@ import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.RootPanel;
 
-public class BorderLayoutPage extends Container implements EntryPoint {
+public class BorderLayoutPage extends LayoutContainer implements EntryPoint {
 
   public void onModuleLoad() {
     Viewport v = new Viewport();
+    v.setLayout(new FitLayout());
     v.add(this);
-    v.layout(true);
+    RootPanel.get().add(v);
   }
   
   public BorderLayoutPage() {
+    // next line is only used to pass layout to containing container
+    // this will have NO effect outside of the explorer demo
     setData("layout", new FitLayout());
   }
 
@@ -42,26 +46,30 @@ public class BorderLayoutPage extends Container implements EntryPoint {
     ContentPanel south = new ContentPanel();
     
     BorderLayoutData northData = new BorderLayoutData(LayoutRegion.NORTH, 100);
-    northData.split = true;
-    northData.margins = new Margins(5, 5, 0, 5);
+    northData.setCollapsible(true);
+    northData.setFloatable(true);
+    northData.setSplit(true);
+    northData.setMargins(new Margins(5, 5, 0, 5));
     
     BorderLayoutData westData = new BorderLayoutData(LayoutRegion.WEST, 200);
-    westData.split = true;
-    westData.collapsible = true;
-    westData.margins = new Margins(5, 5, 5, 5);
+    westData.setSplit(true);
+    westData.setCollapsible(true);
+    westData.setMargins(new Margins(5));
     
     BorderLayoutData centerData = new BorderLayoutData(LayoutRegion.CENTER);
-    centerData.margins = new Margins(5, 0, 5, 0);
+    centerData.setMargins(new Margins(5, 0, 5, 0));
     
     
     BorderLayoutData eastData = new BorderLayoutData(LayoutRegion.EAST, 200);
-    eastData.split = true;
-    eastData.collapsible = true;
-    eastData.margins = new Margins(5, 5, 5, 5);
+    eastData.setSplit(true);
+    eastData.setCollapsible(true);
+    eastData.setMargins(new Margins(5));
     
     BorderLayoutData southData = new BorderLayoutData(LayoutRegion.SOUTH, 100);
-    southData.split = true;
-    southData.margins = new Margins(0, 5, 5, 5);
+    southData.setSplit(true);
+    southData.setCollapsible(true);
+    southData.setFloatable(true);
+    southData.setMargins(new Margins(0, 5, 5, 5));
     
     add(north, northData);
     add(west, westData);

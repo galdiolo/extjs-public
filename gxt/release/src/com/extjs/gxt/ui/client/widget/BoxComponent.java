@@ -11,9 +11,11 @@ import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.BoxComponentEvent;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.util.Point;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.util.Size;
+import com.google.gwt.user.client.Event;
 
 /**
  * Base class for any visual {@link Component} that uses a box container.
@@ -63,6 +65,7 @@ public class BoxComponent extends Component {
   protected Layer layer;
 
   protected Size attachSize = new Size(-1, -1);
+  protected Size lastSize;
 
   private boolean shadow = false;
   private boolean deferHeight;
@@ -78,11 +81,11 @@ public class BoxComponent extends Component {
    * The component must be attached to return page coordinates.
    * 
    * @param local if true the element's left and top are returned instead of
-   *            page coordinates
+   *          page coordinates
    * @return the component's bounds
    */
   public Rectangle getBounds(boolean local) {
-    return el.getBounds(local);
+    return el().getBounds(local);
   }
 
   /**
@@ -91,7 +94,7 @@ public class BoxComponent extends Component {
    * @return the height
    */
   public int getHeight() {
-    return el.getHeight();
+    return el().getHeight();
   }
 
   /**
@@ -101,7 +104,7 @@ public class BoxComponent extends Component {
    * @return the height
    */
   public int getHeight(boolean content) {
-    return el.getHeight(content);
+    return el().getHeight(content);
   }
 
   /**
@@ -109,14 +112,14 @@ public class BoxComponent extends Component {
    * return page coordinates.
    * 
    * @param local true to return the element's left and top rather than page
-   *            coordinates
+   *          coordinates
    * @return the position
    */
   public Point getPosition(boolean local) {
     if (local) {
-      return new Point(el.getLeft(true), el.getTop(true));
+      return new Point(el().getLeft(true), el().getTop(true));
     }
-    return el.getXY();
+    return el().getXY();
   }
 
   /**
@@ -134,7 +137,7 @@ public class BoxComponent extends Component {
    * @return the size
    */
   public Size getSize() {
-    return el.getSize();
+    return el().getSize();
   }
 
   /**
@@ -153,7 +156,7 @@ public class BoxComponent extends Component {
    * @return the width
    */
   public int getWidth(boolean content) {
-    return el.getWidth(content);
+    return el().getWidth(content);
   }
 
   /**
@@ -179,9 +182,13 @@ public class BoxComponent extends Component {
     return deferHeight;
   }
 
-  @Override
-  public void recalculate() {
-    onResize(getOffsetWidth(), getOffsetHeight());
+  /**
+   * Returns true if shimming is enabled.
+   * 
+   * @return the shim state
+   */
+  public boolean isShim() {
+    return shim;
   }
 
   /**
@@ -274,7 +281,7 @@ public class BoxComponent extends Component {
     if (!boxReady) {
       return;
     }
-    el.setXY(pageX, pageY);
+    el().setXY(pageX, pageY);
     onPosition(pageX, pageY);
     if (hasListeners) {
       BoxComponentEvent ce = new BoxComponentEvent(this);
@@ -354,6 +361,16 @@ public class BoxComponent extends Component {
   }
 
   /**
+   * True to enable a shim which uses a transparent iframe to stop content from
+   * bleeding through.
+   * 
+   * @param shim true to enable a shim
+   */
+  public void setShim(boolean shim) {
+    this.shim = shim;
+  }
+
+  /**
    * Sets the width and height of the component. This method fires the <i>Resize</i>
    * event.
    * 
@@ -362,11 +379,9 @@ public class BoxComponent extends Component {
    */
   public void setSize(int width, int height) {
     if (width != Style.DEFAULT) {
-      setAutoWidth(false);
       attachSize.width = width;
     }
     if (height != Style.DEFAULT) {
-      setAutoHeight(false);
       attachSize.height = height;
     }
 
@@ -374,15 +389,17 @@ public class BoxComponent extends Component {
       return;
     }
 
-    if (isAutoWidth()) {
+    if (autoWidth) {
+      width = -1;
       setStyleAttribute("width", "auto");
     } else if (attachSize.width != Style.DEFAULT) {
-      el.setWidth(attachSize.width, adjustSize);
+      el().setWidth(attachSize.width, adjustSize);
     }
-    if (isAutoHeight()) {
+    if (autoHeight) {
+      height = -1;
       setStyleAttribute("height", "auto");
     } else if (attachSize.height != Style.DEFAULT) {
-      el.setHeight(attachSize.height, adjustSize);
+      el().setHeight(attachSize.height, adjustSize);
     }
 
     onResize(width, height);
@@ -410,24 +427,24 @@ public class BoxComponent extends Component {
       return;
     }
 
-    if (isAutoWidth()) {
-      el.setWidth("auto");
+    if (autoWidth) {
+      el().setWidth("auto");
     } else if (!width.equals(Style.UNDEFINED)) {
-      el.setWidth(width);
+      el().setWidth(width);
     }
-    if (isAutoHeight()) {
-      el.setHeight("auto");
+    if (autoHeight) {
+      el().setHeight("auto");
     } else if (!height.equals(Style.UNDEFINED)) {
-      el.setHeight(height);
+      el().setHeight(height);
     }
 
-    onResize(getOffsetWidth(), getOffsetHeight());
-    
+    int w = autoWidth ? -1 : getOffsetWidth();
+    int h = autoHeight ? -1 : getOffsetHeight();
+
+    onResize(w, h);
+
     if (hasListeners) {
-      BoxComponentEvent be = new BoxComponentEvent(this);
-      be.width = getOffsetWidth();
-      be.height = getOffsetHeight();
-      fireEvent(Events.Resize, be);
+      fireEvent(Events.Resize, new BoxComponentEvent(this, w, h));
     }
   }
 
@@ -459,7 +476,7 @@ public class BoxComponent extends Component {
       layer = new Layer(getElement());
       layer.enableShadow(getShadow());
       layer.enableShim();
-      el = layer;
+      setEl(layer);
     }
 
     if (attachSize.width != -1 || attachSize.height != -1) {
@@ -483,6 +500,13 @@ public class BoxComponent extends Component {
 
   }
 
+  @Override
+  protected ComponentEvent createComponentEvent(Event event) {
+    BoxComponentEvent e = new BoxComponentEvent(this);
+    e.event = event;
+    return e;
+  }
+
   /**
    * Returns the element to be used when positioning the component. Subclasses
    * may override as needed. Default method returns the component's root
@@ -491,7 +515,7 @@ public class BoxComponent extends Component {
    * @return the position element
    */
   protected El getPositionEl() {
-    return el;
+    return el();
   }
 
   /**
@@ -501,7 +525,7 @@ public class BoxComponent extends Component {
    * @return the resize element
    */
   protected El getResizeEl() {
-    return el;
+    return el();
   }
 
   /**

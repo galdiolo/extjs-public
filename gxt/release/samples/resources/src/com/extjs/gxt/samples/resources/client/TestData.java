@@ -12,9 +12,9 @@ import java.util.List;
 
 public class TestData {
 
-  public static String DUMMY_TEXT_SHORT = "<div style='padding:4 8px'>Lorem Ipsum is simply dummy text of the "
+  public static String DUMMY_TEXT_SHORT = "Lorem Ipsum is simply dummy text of the "
       + "printing and typesetting industry. Lorem Ipsum has been the industry's standard "
-      + "dummy text ever since the 1500s.</div>";
+      + "dummy text ever since the 1500s.";
 
   public static String DUMMY_TEXT_LONG = "<div class=text style='padding:2 8px'><p>Lorem ipsum dolor sit amet, consectetuer "
       + "adipiscing elit. Suspendisse velit metus, ultricies nec, aliquam quis, porttitor "

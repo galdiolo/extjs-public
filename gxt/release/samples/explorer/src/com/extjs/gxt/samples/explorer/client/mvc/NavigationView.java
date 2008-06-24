@@ -7,36 +7,42 @@
  */
 package com.extjs.gxt.samples.explorer.client.mvc;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+import com.extjs.gxt.samples.explorer.client.AppEvents;
 import com.extjs.gxt.samples.explorer.client.Explorer;
 import com.extjs.gxt.samples.explorer.client.model.Entry;
 import com.extjs.gxt.samples.explorer.client.model.ExplorerModel;
 import com.extjs.gxt.samples.resources.client.Folder;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.Style.Scroll;
-import com.extjs.gxt.ui.client.data.BaseTreeModel;
-import com.extjs.gxt.ui.client.data.Model;
+import com.extjs.gxt.ui.client.binder.DataListBinder;
+import com.extjs.gxt.ui.client.binder.TreeBinder;
+import com.extjs.gxt.ui.client.data.BaseTreeLoader;
 import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.data.TreeLoader;
+import com.extjs.gxt.ui.client.data.TreeModel;
+import com.extjs.gxt.ui.client.data.TreeModelReader;
+import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
+import com.extjs.gxt.ui.client.event.SelectionChangedListener;
+import com.extjs.gxt.ui.client.event.SelectionService;
+import com.extjs.gxt.ui.client.event.SourceSelectionChangedListener;
 import com.extjs.gxt.ui.client.mvc.AppEvent;
 import com.extjs.gxt.ui.client.mvc.Controller;
 import com.extjs.gxt.ui.client.mvc.View;
-import com.extjs.gxt.ui.client.viewer.DataListViewer;
-import com.extjs.gxt.ui.client.viewer.ModelContentProvider;
-import com.extjs.gxt.ui.client.viewer.ModelLabelProvider;
-import com.extjs.gxt.ui.client.viewer.ModelTreeContentProvider;
-import com.extjs.gxt.ui.client.viewer.SelectionChangedEvent;
-import com.extjs.gxt.ui.client.viewer.SelectionChangedListener;
-import com.extjs.gxt.ui.client.viewer.SelectionService;
-import com.extjs.gxt.ui.client.viewer.SourceSelectionChangedListener;
-import com.extjs.gxt.ui.client.viewer.TreeViewer;
-import com.extjs.gxt.ui.client.viewer.Viewer;
-import com.extjs.gxt.ui.client.viewer.ViewerFilterField;
-import com.extjs.gxt.ui.client.viewer.ViewerSorter;
+import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.store.Store;
+import com.extjs.gxt.ui.client.store.StoreSorter;
+import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.DataList;
-import com.extjs.gxt.ui.client.widget.IconButton;
+import com.extjs.gxt.ui.client.widget.StoreFilterField;
 import com.extjs.gxt.ui.client.widget.TabItem;
 import com.extjs.gxt.ui.client.widget.TabPanel;
 import com.extjs.gxt.ui.client.widget.TabPanel.TabPosition;
+import com.extjs.gxt.ui.client.widget.button.IconButton;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.AdapterToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
@@ -49,9 +55,10 @@ public class NavigationView extends View {
   private ToolBar toolBar;
   private TabPanel tabPanel;
   private TabItem listItem, treeItem;
-  private TreeViewer treeViewer;
-  private DataListViewer listViewer;
-  private ViewerFilterField filter;
+  private TreeBinder binder;
+  private DataList dataList;
+  private TreeStore treeStore;
+  private StoreFilterField filter;
 
   public NavigationView(Controller controller) {
     super(controller);
@@ -59,26 +66,35 @@ public class NavigationView extends View {
 
   protected void initialize() {
     model = (ExplorerModel) Registry.get("model");
-    SelectionService.get().addListener(new SelectionChangedListener() {
+    SelectionService.get().addListener(new SelectionChangedListener<ModelData>() {
       public void selectionChanged(SelectionChangedEvent event) {
-        BaseTreeModel m = (BaseTreeModel) event.getSelection().getFirstElement();
-        if (m instanceof Entry) {
-          Explorer.showPage((Entry) m);
+        List<TreeModel> sel = event.getSelection();
+        if (sel.size() > 0) {
+          TreeModel m = (TreeModel) event.getSelection().get(0);
+          if (m != null && m instanceof Entry) {
+            Explorer.showPage((Entry) m);
+          }
         }
       }
     });
 
-    filter = new ViewerFilterField<Model, Model>() {
-      protected boolean doSelect(Model parent, Model element, String filter) {
-        if (element instanceof Folder) {
+    filter = new StoreFilterField<ModelData>() {
+
+      @Override
+      protected boolean doSelect(Store store, ModelData parent, ModelData child, String property,
+          String filter) {
+        if (child instanceof Folder) {
           return false;
         }
-        String name = element.get("name").toString().toLowerCase();
+        String name = child.get("name");
+        name = name.toLowerCase();
         if (name.indexOf(filter.toLowerCase()) != -1) {
           return true;
         }
         return false;
+
       }
+
     };
 
     westPanel = (ContentPanel) Registry.get("westPanel");
@@ -86,7 +102,7 @@ public class NavigationView extends View {
     westPanel.setLayout(new FitLayout());
     westPanel.add(createTabPanel());
 
-    toolBar = (ToolBar)westPanel.getTopComponent();
+    toolBar = (ToolBar) westPanel.getTopComponent();
     IconButton filterBtn = new IconButton("icon-filter");
     filterBtn.setWidth(20);
     toolBar.add(new AdapterToolItem(filterBtn));
@@ -94,7 +110,6 @@ public class NavigationView extends View {
 
     createListContent();
     createTreeContent();
-
   }
 
   private TabPanel createTabPanel() {
@@ -111,21 +126,26 @@ public class NavigationView extends View {
     listItem = new TabItem();
     listItem.setText("List");
     tabPanel.add(listItem);
-    
+
     return tabPanel;
   }
 
   private void createTreeContent() {
     Tree tree = new Tree();
     tree.setItemIconStyle("icon-list");
-    treeViewer = new TreeViewer(tree);
-    treeViewer.setLabelProvider(new ModelLabelProvider());
-    treeViewer.setContentProvider(new ModelTreeContentProvider());
-    treeViewer.setInput(model, true);
-    SelectionService.get().addListener(new SourceSelectionChangedListener(treeViewer));
-    SelectionService.get().register(treeViewer);
 
-    filter.bind(treeViewer);
+    TreeLoader loader = new BaseTreeLoader(new TreeModelReader());
+    treeStore = new TreeStore<ModelData>(loader);
+
+    binder = new TreeBinder(tree, treeStore);
+    binder.setAutoLoad(true);
+    binder.setDisplayProperty("name");
+
+    SelectionService.get().addListener(new SourceSelectionChangedListener(binder));
+    SelectionService.get().register(binder);
+
+    filter.bind(treeStore);
+    loader.load(model);
 
     treeItem.setBorders(false);
     treeItem.setScrollMode(Scroll.AUTO);
@@ -136,41 +156,42 @@ public class NavigationView extends View {
     listItem.setLayout(new FitLayout());
     listItem.setBorders(false);
 
-    DataList dataList = new DataList();
+    dataList = new DataList();
     dataList.setScrollMode(Scroll.AUTO);
     dataList.setBorders(false);
     dataList.setFlatStyle(true);
-    listViewer = new DataListViewer(dataList);
-    listViewer.setSorter(new ViewerSorter<Entry>() {
-      @Override
-      public int compare(Viewer viewer, Entry e1, Entry e2) {
+
+    ListStore<Entry> store = new ListStore<Entry>();
+    store.setStoreSorter(new StoreSorter(new Comparator<Entry>() {
+
+      public int compare(Entry e1, Entry e2) {
         return e1.getName().compareTo(e2.getName());
       }
 
-    });
-    listViewer.setLabelProvider(new ModelLabelProvider() {
-      @Override
-      public String getText(ModelData element) {
-        Entry entry = (Entry) element;
-        return entry.getName();
-      }
+    }));
+    store.add(model.getEntries());
 
-      @Override
-      public String getIconStyle(ModelData element) {
-        return "icon-list";
+    DataListBinder binder = new DataListBinder(dataList, store);
+    binder.setDisplayProperty("name");
+    binder.addSelectionChangedListener(new SelectionChangedListener<Entry>() {
+      public void selectionChanged(SelectionChangedEvent<Entry> se) {
+        Entry e = se.getSelection().get(0);
+        if (e != null && e instanceof Entry) {
+          Explorer.showPage(e);
+        }
       }
-
     });
-    listViewer.setContentProvider(new ModelContentProvider());
-    listViewer.setInput(model.getEntries());
-    SelectionService.get().addListener(new SourceSelectionChangedListener(listViewer));
-    SelectionService.get().register(listViewer);
-    filter.bind(listViewer);
+    binder.init();
+    filter.bind(store);
     listItem.add(dataList);
   }
 
   protected void handleEvent(AppEvent event) {
-
+    switch (event.type) {
+      case AppEvents.HidePage:
+        binder.setSelection(new ArrayList());
+        break;
+    }
   }
 
 }

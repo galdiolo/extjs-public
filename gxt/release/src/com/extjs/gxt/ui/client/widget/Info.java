@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 import com.extjs.gxt.ui.client.XDOM;
-import com.extjs.gxt.ui.client.event.FxEvent;
-import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.util.Params;
 import com.extjs.gxt.ui.client.util.Point;
@@ -37,17 +35,17 @@ public class Info extends ContentPanel {
   public static void display(InfoConfig config) {
     pop().show(config);
   }
-  
+
   /**
-   * Displays a message with the given text. All {0},{1}... values in text will be
-   * replaced with values.
+   * Displays a message with the given text. All {0},{1}... values in text will
+   * be replaced with values.
    * 
    * @param title the message title
    * @param text the message
    * @param values the values to be substituted
    */
   public static void display(String title, String text, String... values) {
-    display(new InfoConfig(title, text, new Params((Object[])values)));
+    display(new InfoConfig(title, text, new Params((Object[]) values)));
   }
 
   /**
@@ -84,7 +82,7 @@ public class Info extends ContentPanel {
   private static void push(Info info) {
     infoStack.push(info);
   }
-  
+
   private InfoConfig config;
   private int level;
 
@@ -114,19 +112,16 @@ public class Info extends ContentPanel {
   }
 
   private void afterHide() {
-    slots.set(level, null);
+    layer.hideShadow();
     RootPanel.get().remove(this);
+    slots.set(level, null);
     push(this);
   }
 
   private void afterShow() {
     Timer t = new Timer() {
       public void run() {
-        el.fadeOut(new Listener<FxEvent>() {
-          public void handleEvent(FxEvent ce) {
-            afterHide();
-          }
-        });
+        afterHide();
       }
     };
     t.schedule(config.display);
@@ -134,24 +129,19 @@ public class Info extends ContentPanel {
 
   private void onShowInfo() {
     RootPanel.get().add(this);
-    el.makePositionable(true);
+    el().makePositionable(true);
 
     setTitle();
     setText();
 
     level = firstAvail();
     slots.add(level, this);
-    
+
     Point p = position();
-    el.setLeftTop(p.x, p.y);
+    el().setLeftTop(p.x, p.y);
     setSize(config.width, config.height);
 
-    el.setVisibility(false);
-    el.fadeIn(new Listener<FxEvent>() {
-      public void handleEvent(FxEvent fe) {
-        afterShow();
-      }
-    });
+    afterShow();
   }
 
   private Point position() {
@@ -160,7 +150,7 @@ public class Info extends ContentPanel {
     int top = s.height - config.height - 10 - (level * (config.height + 10));
     return new Point(left, top);
   }
-  
+
   private void setText() {
     if (config.text != null) {
       if (config.params != null) {

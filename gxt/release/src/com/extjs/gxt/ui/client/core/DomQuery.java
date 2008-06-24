@@ -8,6 +8,8 @@
 package com.extjs.gxt.ui.client.core;
 
 
+import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.js.JsUtil;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.Element;
@@ -95,6 +97,9 @@ import com.google.gwt.user.client.Element;
  */
 public class DomQuery {
 
+  static {
+    GXT.init();
+  }
   /**
    * Filters an array of elements to only include matches of a simple selector
    * (e.g. div.some-class or span:first-child).
@@ -155,6 +160,28 @@ public class DomQuery {
   public static Element selectNode(String selector) {
     return select(selector)[0];
   }
+  
+  /**
+   * Selects the value of a node,
+   * 
+   * @param selector the selector/xpath query
+   * @param root the start of the query
+   * @return the value
+   */
+  public static native String selectValue(String selector, Element root) /*-{
+    return $wnd.Ext.DomQuery.selectValue(selector, root);
+  }-*/;
+  
+  /**
+   * Selects the value of a node,
+   * 
+   * @param selector the selector/xpath query
+   * @param root the start of the query
+   * @return the value
+   */
+  public static native String selectValue(String selector, JavaScriptObject root) /*-{
+    return $wnd.Ext.DomQuery.selectValue(selector, root);
+  }-*/;
 
   /**
    * Selects a single element using the given root node.
@@ -164,6 +191,11 @@ public class DomQuery {
    * @return the matching element
    */
   public static Element selectNode(String selector, Element root) {
+    // temporary hack unti ext dom query is fixed for id
+    String[] tokens = selector.split(" ");
+    if (tokens.length == 1 && tokens[0].startsWith("#")) {
+      return XDOM.getElementById(tokens[0].substring(1));
+    }
     return select(selector, root)[0];
   }
 

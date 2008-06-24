@@ -25,14 +25,15 @@ public class DataField {
 
   /**
    * An optional field used when the property name of the model is different
-   * than the property name of the raw data.
+   * than the property name of the raw data. The values is treated as a CSS
+   * selector.
    */
   public String map;
 
   /**
    * The data type of the field.
    */
-  public String type;
+  public Class type;
 
   /**
    * Format is used when converting raw data to object instances.

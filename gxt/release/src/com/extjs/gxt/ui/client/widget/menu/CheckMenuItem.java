@@ -37,7 +37,7 @@ import com.google.gwt.user.client.Element;
  * </dd>
  * </dt>
  */
-public class CheckMenuItem extends Item {
+public class CheckMenuItem extends MenuItem {
 
   private String groupStyle = "x-menu-group-item";
   private boolean checked;
@@ -112,8 +112,8 @@ public class CheckMenuItem extends Item {
     MenuEvent me = new MenuEvent(parentMenu);
     me.item = this;
     if (fireEvent(Events.BeforeCheckChange, me)) {
-      if (el.getParent() != null) {
-        el.getParent().setStyleName("x-menu-item-checked", state);
+      if (el().getParent() != null) {
+        el().getParent().setStyleName("x-menu-item-checked", state);
       }
       checked = state;
       if (!supressEvent) {
@@ -155,7 +155,7 @@ public class CheckMenuItem extends Item {
 
   protected void onRadioClick(ComponentEvent ce) {
     if (parentMenu != null) {
-      for (MenuItem item : parentMenu.getItems()) {
+      for (Item item : parentMenu.getItems()) {
         if (item instanceof CheckMenuItem) {
           CheckMenuItem check = (CheckMenuItem) item;
           if (check != this && check.isChecked()) {
@@ -170,7 +170,7 @@ public class CheckMenuItem extends Item {
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
     if (getGroup() != null) {
-      el.addStyleName(getGroupStyle());
+      el().addStyleName(getGroupStyle());
     }
     if (checked) {
       setChecked(true, true);

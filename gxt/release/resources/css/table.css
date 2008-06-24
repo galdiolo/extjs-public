@@ -15,7 +15,7 @@
 }
 
 .ext-ie .my-tbl-col-overflow {
-  width: 100%;
+
 }
 
 .my-tbl-col-text {
@@ -88,12 +88,16 @@
 .my-tbl-item table {
   -moz-outline: none;
   -moz-user-focus: normal;
+  table-layout: fixed;
 }
 
 .my-tbl-data .my-tbl-item-cell {
-  height: 20px;
   -moz-outline: none;
   -moz-user-focus: normal;
+}
+
+.my-tbl-vlines .my-tbl-data .my-tbl-item-cell-overflow {
+	border-right: 1px solid #EDEDED;
 }
 
 .my-tbl-data .my-tbl-item-cell-overflow {

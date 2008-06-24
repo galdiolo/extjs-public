@@ -7,8 +7,7 @@
  */
 package com.extjs.gxt.ui.client.event;
 
-import java.util.EventListener;
-
+import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.widget.ScrollContainer;
 
 /**
@@ -16,13 +15,21 @@ import com.extjs.gxt.ui.client.widget.ScrollContainer;
  * 
  * @see ScrollContainer
  */
-public interface ScrollListener extends EventListener {
+public class ScrollListener implements Listener<ComponentEvent> {
+
+  public void handleEvent(ComponentEvent ce) {
+    if (ce.type == Events.Scroll) {
+      widgetScrolled(ce);
+    }
+  }
 
   /**
    * Fires when a component is scrolled.
    * 
    * @param ce the component event
    */
-  public void widgetScrolled(ComponentEvent ce);
+  public void widgetScrolled(ComponentEvent ce) {
+    
+  }
 
 }

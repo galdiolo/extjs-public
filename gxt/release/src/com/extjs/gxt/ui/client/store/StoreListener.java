@@ -7,61 +7,69 @@
  */
 package com.extjs.gxt.ui.client.store;
 
-import java.util.EventListener;
+import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.event.Listener;
 
 /**
- * Store event interface.
+ * Store event listener.
  */
-public interface StoreListener extends EventListener {
+public class StoreListener<M extends ModelData> implements Listener<StoreEvent<M>> {
+
+  public void handleEvent(StoreEvent<M> se) {
+    switch (se.type) {
+      case Store.Add:
+        storeAdd(se);
+        break;
+      case Store.Clear:
+        storeClear(se);
+        break;
+      case Store.BeforeDataChanged:
+        storeBeforeDataChanged(se);
+        break;
+      case Store.DataChanged:
+        storeDataChanged(se);
+        break;
+      case Store.Filter:
+        storeFilter(se);
+        break;
+      case Store.Remove:
+        storeRemove(se);
+        break;
+      case Store.Sort:
+        storeSort(se);
+        break;
+      case Store.Update:
+        storeUpdate(se);
+        break;
+    }
+  }
 
   /**
-   * Fires when Records have been added to the Store.
+   * Fires when records have been added to the store.
    * 
    * @param se the store event
    */
-  public void add(StoreEvent se);
+  public void storeAdd(StoreEvent<M> se) {
 
-  /**
-   * Fires when a Record has been removed from the Store.
-   * 
-   * @param se the store event
-   */
-  public void remove(StoreEvent se);
-
-  /**
-   * Fires when a Record has been updated.
-   * 
-   * @param se the store event
-   */
-  public void update(StoreEvent se);
+  }
 
   /**
    * Fires when the data cache has been cleared.
    * 
    * @param se the store event
    */
-  public void clear(StoreEvent se);
+  public void storeClear(StoreEvent<M> se) {
+
+  }
 
   /**
-   * Fires after a new set of Records has been loaded.
+   * Fires before the data cache has changed.
    * 
    * @param se the store event
    */
-  public void load(StoreEvent se);
+  public void storeBeforeDataChanged(StoreEvent<M> se) {
 
-  /**
-   * Fires after a new set of Records has been loaded.
-   * 
-   * @param se the store event
-   */
-  public void loadException(StoreEvent se);
-
-  /**
-   * Fires before a request is made for a new data object.
-   * 
-   * @param se the store event
-   */
-  public void beforeLoad(StoreEvent se);
+  }
 
   /**
    * Fires when the data cache has changed, and a widget which is using this
@@ -69,6 +77,45 @@ public interface StoreListener extends EventListener {
    * 
    * @param se the store event
    */
-  public void dataChanged(StoreEvent se);
+  public void storeDataChanged(StoreEvent<M> se) {
+
+  }
+
+  /**
+   * Fires after filters have been applied or removed. See
+   * {@link ListStore#isFiltered()} to determine if filters are applied.
+   * 
+   * @param se the store event
+   */
+  public void storeFilter(StoreEvent<M> se) {
+
+  }
+
+  /**
+   * Fires when a tecord has been removed from the store.
+   * 
+   * @param se the store event
+   */
+  public void storeRemove(StoreEvent<M> se) {
+
+  }
+
+  /**
+   * Fires after the store has been sorted.
+   * 
+   * @param se the store event
+   */
+  public void storeSort(StoreEvent<M> se) {
+
+  }
+
+  /**
+   * Fires when a tecord has been updated.
+   * 
+   * @param se the store event
+   */
+  public void storeUpdate(StoreEvent<M> se) {
+
+  }
 
 }

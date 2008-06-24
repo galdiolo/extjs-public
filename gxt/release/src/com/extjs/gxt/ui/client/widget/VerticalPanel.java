@@ -14,11 +14,11 @@ import com.extjs.gxt.ui.client.widget.layout.TableLayout;
 import com.google.gwt.user.client.Element;
 
 /**
- * A {@link Container} that lays out its children in a single column using a
+ * A {@link LayoutContainer} that lays out its children in a single column using a
  * {@link TableLayout}. Each child widget can control its cell's properties
  * using an associated {@link TableData} instance.
  */
-public class VerticalPanel extends Container {
+public class VerticalPanel extends LayoutContainer {
 
   private String tableWidth;
   private String tableHeight;
@@ -123,12 +123,12 @@ public class VerticalPanel extends Container {
     super.onRender(parent, pos);
     setStyleAttribute("overflow", "visible");
     layout = new TableLayout(1);
-    layout.horizontalAlign = getHorizontalAlign();
-    layout.verticalAlign = getVerticalAlign();
-    layout.cellSpacing = getSpacing();
-    layout.cellPadding = 0;
-    layout.width = tableWidth;
-    layout.height = tableHeight;
+    layout.setCellHorizontalAlign(horizontalAlign);
+    layout.setCellVerticalAlign(verticalAlign);
+    layout.setCellSpacing(spacing);
+    layout.setCellPadding(0);
+    layout.setWidth(tableWidth);
+    layout.setHeight(tableHeight);
     setLayout(layout);
     layout();
   }

@@ -10,7 +10,7 @@ package com.extjs.gxt.ui.client.widget.form;
 /**
  * Interface for validating a field's value.
  */
-public interface Validator {
+public interface Validator<Data, F extends Field<Data>> {
 
   /**
    * Validates the fields value.
@@ -20,6 +20,6 @@ public interface Validator {
    * @return <code>null</code> if validation passes, otherwise the error
    *         message
    */
-  public String validate(Field field, String value);
+  public String validate(F field, String value);
 
 }
