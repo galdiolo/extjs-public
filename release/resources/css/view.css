@@ -1,0 +1,36 @@
+.x-view {
+  -moz-outline: none;
+  -moz-user-focus: normal;
+  padding: 1px;
+  background-color: white;
+  cursor: default;
+  border: 1px solid #98C0F4;
+  overflow: hidden;
+}
+
+.x-view-item {
+  border: 1px solid #FFFFFF;
+  font-family: tahoma, arial, helvetica, sans-serif;
+  font-size: 12px;
+  font-size-adjust: none;
+  font-stretch: normal;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  line-height: normal;
+  overflow: hidden;
+  padding: 2px;
+  white-space: nowrap;
+}
+
+.x-view-item-over {
+  background: #efefef url(../images/default/grid/row-over.gif) repeat-x left top;
+  border: 1px dotted #dddddd !important;
+  cursor: pointer;
+}
+
+.x-view-item-sel {
+  background: #DFE8F6 none repeat scroll 0%;
+  border: 1px dotted #A3BAE9 !important;
+  cursor: pointer;
+}
