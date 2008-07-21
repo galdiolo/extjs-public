@@ -19,7 +19,9 @@ import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.button.IconButton;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 
@@ -477,6 +479,15 @@ public abstract class Field<D> extends BoxComponent {
    */
   public void setFieldLabel(String fieldLabel) {
     this.fieldLabel = fieldLabel;
+    if (rendered) {
+      El elem = el().findParent(".x-form-item", 5);
+      if (elem != null ) {
+        elem = elem.firstChild();
+        if (elem != null) {
+          elem.setInnerHtml(fieldLabel + labelSeparator);
+        }
+      }
+    }
   }
 
   /**
@@ -657,7 +668,11 @@ public abstract class Field<D> extends BoxComponent {
   }
 
   protected void alignErrorIcon() {
-    errorIcon.el().alignTo(getElement(), "tl-tr", new int[] {2, 1});
+    DeferredCommand.addCommand(new Command() {
+      public void execute() {
+        errorIcon.el().alignTo(getElement(), "tl-tr", new int[] {2, 1});
+      }
+    });
   }
 
   @Override
@@ -669,6 +684,7 @@ public abstract class Field<D> extends BoxComponent {
   protected void doDetachChildren() {
     super.doDetachChildren();
     if (errorIcon != null && errorIcon.isAttached()) {
+      errorIcon.setVisible(false);
       WidgetHelper.doDetach(errorIcon);
     }
   }

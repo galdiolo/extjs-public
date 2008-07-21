@@ -82,6 +82,7 @@ import com.extjs.gxt.ui.client.util.Util;
  * <li>store : this</li>
  * <li>parent : the parent</li>
  * <li>child : the removed child</li>
+ * <li>children : all the children of the removed item</li>
  * </ul>
  * </dd>
  * 
@@ -194,6 +195,20 @@ public class TreeStore<M extends ModelData> extends Store<M> {
   }
 
   /**
+   * Returns the root level child.
+   * 
+   * @param index the index
+   * @return the child
+   */
+  public M getChild(int index) {
+    TreeModel child = rootWrapper.getChild(index);
+    if (child != null) {
+      return unwrap(child);
+    }
+    return null;
+  }
+
+  /**
    * Returns the child at the given index.
    * 
    * @param parent the parent model
@@ -202,6 +217,7 @@ public class TreeStore<M extends ModelData> extends Store<M> {
    */
   public M getChild(M parent, int index) {
     TreeModel p = findWrapper(parent);
+
     if (p != null) {
       TreeModel child = p.getChild(index);
       if (child != null) {
@@ -209,6 +225,15 @@ public class TreeStore<M extends ModelData> extends Store<M> {
       }
     }
     return null;
+  }
+
+  /**
+   * Returns the root level child count.
+   * 
+   * @return the child count
+   */
+  public int getChildCount() {
+    return rootWrapper.getChildCount();
   }
 
   /**
@@ -445,7 +470,7 @@ public class TreeStore<M extends ModelData> extends Store<M> {
       TreeModel wrapper = findWrapper((M) le.parent);
       if (wrapper != null) {
         if (wrapper.getChildren().size() > 0) {
-          removeAll((M)le.parent);
+          removeAll((M) le.parent);
         }
         List<TreeModel> insert = new ArrayList<TreeModel>();
         List<M> list = (List<M>) le.data;
@@ -462,7 +487,7 @@ public class TreeStore<M extends ModelData> extends Store<M> {
   }
 
   protected void onLoadException(LoadEvent le) {
-
+    throw new RuntimeException(le.exception);
   }
 
   @Override
@@ -556,12 +581,28 @@ public class TreeStore<M extends ModelData> extends Store<M> {
       }
     }
   }
+  
+  private void findChildren(M parent, List<M> children) {
+    for (M child : getChildren(parent)) {
+      children.add(child);
+      findChildren(child, children);
+    }
+  }
 
   private void remove(TreeModel parent, TreeModel child, boolean supressEvent) {
     int index = parent.getChildren().indexOf(child);
     if (index != -1) {
       parent.remove(child);
       M model = unwrap(child);
+      List<M> children = new ArrayList<M>();
+      findChildren(model, children);
+
+      for (M c : children) {
+        all.remove(c);
+        modelMap.remove(c);
+        unregisterModel(c);
+        wrapperMap.remove(findWrapper(c));
+      }
       all.remove(model);
       wrapperMap.remove(child);
       modelMap.remove(model);
@@ -570,11 +611,11 @@ public class TreeStore<M extends ModelData> extends Store<M> {
         TreeStoreEvent evt = new TreeStoreEvent(this);
         evt.parent = unwrap(parent);
         evt.child = model;
+        evt.children = children;
         evt.index = index;
         fireEvent(Remove, evt);
       }
     }
-
   }
 
   private void removeAll(boolean supressEvent) {

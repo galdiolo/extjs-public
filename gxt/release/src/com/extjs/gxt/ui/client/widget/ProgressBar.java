@@ -151,7 +151,7 @@ public class ProgressBar extends Component {
     double w = Math.floor(value * el().firstChild().getWidth());
     progressBar.setWidth((int) w);
     if (textTopElem != null) {
-      textTopElem.removeStyleName("x-hidden").setWidth((int) w);
+      textTopElem.removeStyleName("x-hidden").setWidth((int) w, true);
     }
     fireEvent(Events.Update, new ComponentEvent(this));
     return this;

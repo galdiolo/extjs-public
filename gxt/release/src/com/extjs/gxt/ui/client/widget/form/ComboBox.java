@@ -193,7 +193,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     list.el().setVisibility(false);
     list.el().updateZIndex(0);
     list.show();
-    restrictHeight();
+    restrict();
     list.el().setVisibility(true);
 
     eventPreview.add();
@@ -773,24 +773,25 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     }
   }
 
-  private void restrictHeight() {
+  private void restrict() {
     int w = Math.max(getWidth(), minListWidth);
     list.setWidth(w);
 
     int fw = list.el().getFrameWidth("tb");
     int h = view.el().getHeight() + fw;
     h = Math.min(h, maxHeight - fw);
+    list.setHeight(h);
     list.el().makePositionable(true);
-    list.el().alignTo(wrap.dom, listAlign, new int[] {0, -2});
+    list.el().alignTo(getElement(), listAlign, new int[] {0, -1});
 
     int y = list.el().getY();
     int b = y + h;
-    int vh = XDOM.getViewportSize().height;
+    int vh = XDOM.getViewportSize().height + XDOM.getBodyScrollTop();
     if (b > vh) {
       y = y - (b - vh) - 5;
       list.el().setTop(y);
     }
-    list.setHeight(h);
+    
   }
 
   private void selectNext() {

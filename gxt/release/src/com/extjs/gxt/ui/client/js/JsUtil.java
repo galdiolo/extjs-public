@@ -12,6 +12,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.util.Params;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.Element;
 
@@ -101,7 +103,13 @@ public class JsUtil {
     Iterator<String> keys = params.keySet().iterator();
     while (keys.hasNext()) {
       String k = keys.next();
-      obj.set(k, params.get(k));
+      Object v = params.get(k);
+      if (v instanceof Params) {
+        v = ((Params)v).getValues();
+      } else if (v instanceof ModelData) {
+        v = new Params(((ModelData)v).getProperties()).getValues();
+      }
+      obj.set(k, v);
     }
     return obj.getJsObject();
   }

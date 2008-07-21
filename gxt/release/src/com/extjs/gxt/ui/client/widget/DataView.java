@@ -260,6 +260,7 @@ public class DataView extends Container<DataViewItem> implements Selectable<Data
           onMouseOut(item);
           break;
       }
+      item.onComponentEvent(ce);
     }
   }
 
@@ -426,13 +427,11 @@ public class DataView extends Container<DataViewItem> implements Selectable<Data
     for (int i = 0; i < elems.length; i++) {
       DataViewItem item = getItem(i);
       item.setElement(elems[i]);
-      item.rendered = true;
     }
   }
   
   protected void renderItem(DataViewItem item, int index) {
     item.setElement(XDOM.create(template.applyTemplate(new Params(item.getValues()))));
-    item.rendered = true;
     el().insertChild(item.getElement(), index);
   }
 

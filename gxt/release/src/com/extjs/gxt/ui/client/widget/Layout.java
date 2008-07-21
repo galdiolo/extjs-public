@@ -16,7 +16,9 @@ import com.extjs.gxt.ui.client.event.LayoutEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.DelayedTask;
 import com.extjs.gxt.ui.client.util.Margins;
+import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.layout.LayoutData;
+import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
@@ -41,10 +43,8 @@ public abstract class Layout extends BaseObservable {
   private int resizeDelay = 100;
 
   private Listener resizeListener = new Listener<ComponentEvent>() {
-    public void handleEvent(ComponentEvent be) {
-      if (container.isMonitorResize()) {
-        layout();
-      }
+    public void handleEvent(ComponentEvent ce) {
+      onResize(ce);
     }
   };
 
@@ -186,9 +186,9 @@ public abstract class Layout extends BaseObservable {
     if (renderHidden && component != activeItem) {
       component.setVisible(false);
     }
-    Object data = component.getData();
-    if (data != null && data instanceof LayoutData) {
-      LayoutData ld = (LayoutData)data;
+    LayoutData data = component.getLayoutData();
+    if (data != null && data instanceof MarginData) {
+      MarginData ld = (MarginData)data;
       applyMargins(component.el(), ld.getMargins());
     }
   }
@@ -211,6 +211,14 @@ public abstract class Layout extends BaseObservable {
   
   protected void layoutContainer() {
     container.layout();
+  }
+  
+  protected void setLayoutData(Component c, LayoutData data) {
+    WidgetHelper.setLayoutData(c, data);
+  }
+  
+  protected LayoutData getLayoutData(Component c) {
+    return WidgetHelper.getLayoutData(c);
   }
   
   protected void applyPadding(El target, Margins margins) {

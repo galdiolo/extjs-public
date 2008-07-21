@@ -37,6 +37,7 @@ public abstract class StoreFilterField<M extends ModelData> extends TriggerField
     setAutoValidate(true);
     setValidateOnBlur(false);
     setTriggerStyle("x-form-clear-trigger");
+    setWidth(150);
     filter = new StoreFilter<M>() {
       public boolean select(Store store, M parent, M model, String property) {
         String v = getRawValue();

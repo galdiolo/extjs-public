@@ -108,8 +108,8 @@ public class FlowLayout extends Layout {
     if (removePositioning) {
       c.setStyleAttribute("position", "static");
     }
-    if (c.getData() != null && c.getData() instanceof FlowData) {
-      FlowData data = (FlowData)c.getData();
+    if (getLayoutData(c) != null && getLayoutData(c) instanceof FlowData) {
+      FlowData data = (FlowData)getLayoutData(c);
       applyMargins(c.el(), data.getMargins());
     }
   }

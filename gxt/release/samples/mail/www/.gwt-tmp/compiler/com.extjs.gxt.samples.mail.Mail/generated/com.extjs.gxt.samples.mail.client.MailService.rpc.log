@@ -1,4 +1,4 @@
-Reachable types computed on: Fri Jun 20 01:11:06 EDT 2008
+Reachable types computed on: Wed Jul 16 23:23:43 EDT 2008
 com.extjs.gxt.samples.mail.client.model.MailModel
    Serialization status
       Not serializable
@@ -95,6 +95,15 @@ com.google.gwt.i18n.client.impl.ConstantMap.OrderedConstantSet<java.lang.String>
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       Started from 'com.extjs.gxt.samples.resources.client.Folder'
 
+com.google.gwt.i18n.client.impl.ConstantMap.OrderedConstantSet<T>
+   Serialization status
+      Not serializable
+   Path
+      'com.google.gwt.i18n.client.impl.ConstantMap.OrderedConstantSet<T>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
+      'java.util.List<java.lang.String>' is reachable from field '_list' of type 'com.extjs.gxt.ui.client.data.RpcMap'
+      'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
+      Started from 'com.extjs.gxt.samples.resources.client.Folder'
+
 com.google.gwt.i18n.client.impl.ConstantMap.OrderedConstantSet<java.util.Map.Entry<java.lang.String, java.lang.String>>
    Serialization status
       Not serializable
@@ -102,15 +111,6 @@ com.google.gwt.i18n.client.impl.ConstantMap.OrderedConstantSet<java.util.Map.Ent
       'com.google.gwt.i18n.client.impl.ConstantMap.OrderedConstantSet<java.util.Map.Entry<java.lang.String, java.lang.String>>' is reachable from field 'entries' of type 'com.google.gwt.i18n.client.impl.ConstantMap'
       'com.google.gwt.i18n.client.impl.ConstantMap' is reachable as a subtype of type 'interface java.util.Map<java.lang.String, java.lang.String>'
       'java.util.Map<java.lang.String, java.lang.String>' is reachable from field '_map' of type 'com.extjs.gxt.ui.client.data.RpcMap'
-      'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
-      Started from 'com.extjs.gxt.samples.resources.client.Folder'
-
-com.google.gwt.i18n.client.impl.ConstantMap.OrderedConstantSet<T>
-   Serialization status
-      Not serializable
-   Path
-      'com.google.gwt.i18n.client.impl.ConstantMap.OrderedConstantSet<T>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
-      'java.util.List<java.lang.String>' is reachable from field '_list' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       Started from 'com.extjs.gxt.samples.resources.client.Folder'
 
@@ -418,7 +418,7 @@ java.util.AbstractList<E>
    Serialization status
       Not serializable
    Path
-      'java.util.AbstractList<E>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
+      'java.util.Vector<E>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
       'java.util.List<java.lang.String>' is reachable from field '_list' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       Started from 'com.extjs.gxt.samples.resources.client.Folder'
@@ -427,7 +427,7 @@ java.util.AbstractList<E>
    Serialization status
       Not serializable
    Path
-      'java.util.Vector<E>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
+      'java.util.AbstractList<E>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
       'java.util.List<java.lang.String>' is reachable from field '_list' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       Started from 'com.extjs.gxt.samples.resources.client.Folder'
@@ -466,7 +466,7 @@ java.util.AbstractSequentialList<E>
    Serialization status
       Not serializable
    Path
-      'java.util.AbstractSequentialList<E>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
+      'java.util.LinkedList<E>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
       'java.util.List<java.lang.String>' is reachable from field '_list' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       Started from 'com.extjs.gxt.samples.resources.client.Folder'
@@ -475,7 +475,7 @@ java.util.AbstractSequentialList<E>
    Serialization status
       Not serializable
    Path
-      'java.util.LinkedList<E>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
+      'java.util.AbstractSequentialList<E>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
       'java.util.List<java.lang.String>' is reachable from field '_list' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       Started from 'com.extjs.gxt.samples.resources.client.Folder'
@@ -484,7 +484,7 @@ java.util.AbstractSet<E>
    Serialization status
       Not serializable
    Path
-      'java.util.AbstractSet<E>' is reachable as a subtype of type 'interface java.util.Set<java.lang.String>'
+      'java.util.HashSet<E>' is reachable as a subtype of type 'interface java.util.Set<java.lang.String>'
       'java.util.Set<java.lang.String>' is reachable from field '_set' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       Started from 'com.extjs.gxt.samples.resources.client.Folder'
@@ -493,7 +493,7 @@ java.util.AbstractSet<E>
    Serialization status
       Not serializable
    Path
-      'java.util.HashSet<E>' is reachable as a subtype of type 'interface java.util.Set<java.lang.String>'
+      'java.util.AbstractSet<E>' is reachable as a subtype of type 'interface java.util.Set<java.lang.String>'
       'java.util.Set<java.lang.String>' is reachable from field '_set' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       Started from 'com.extjs.gxt.samples.resources.client.Folder'

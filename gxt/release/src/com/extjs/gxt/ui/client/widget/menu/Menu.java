@@ -114,6 +114,7 @@ public class Menu extends Container<Item> {
   private String menuListItem;
   private Element ul;
   private BaseEventPreview eventPreview;
+  private boolean constrainViewport = true;
 
   /**
    * Creates a new menu.
@@ -242,6 +243,15 @@ public class Menu extends Container<Item> {
     return added;
   }
 
+  /**
+   * Returns true if constrain to viewport is enabled.
+   * 
+   * @return the contstrain to viewport state
+   */
+  public boolean isConstrainViewport() {
+    return constrainViewport;
+  }
+
   @Override
   public boolean isVisible() {
     return showing;
@@ -271,6 +281,16 @@ public class Menu extends Container<Item> {
   @Override
   public boolean remove(Item item) {
     return super.remove(item);
+  }
+
+  /**
+   * Sets whether the menu should be constrained to the viewport when shown.
+   * Only applies when using {@link #showAt(int, int)}.
+   * 
+   * @param constrainViewport true to contrain
+   */
+  public void setConstrainViewport(boolean constrainViewport) {
+    this.constrainViewport = constrainViewport;
   }
 
   /**
@@ -317,27 +337,30 @@ public class Menu extends Container<Item> {
    * @param elem the element to align to
    * @param pos the {@link El#alignTo} anchor position to use in aligning to the
    *          element (defaults to defaultAlign)
-   * @return this;
    */
-  public Menu show(Element elem, String pos) {
+  public void show(Element elem, String pos) {
     MenuEvent me = new MenuEvent(this);
     if (fireEvent(Events.BeforeShow, me)) {
       RootPanel.get().add(this);
-      el().makePositionable(true);
-      el().alignTo(elem, pos, new int[] {0, 0});
-      onShow();
-      eventPreview.add();
-
       showing = true;
+      el().makePositionable(true);
+      
+      onShow();
+      el().alignTo(elem, pos, new int[] {0, 0});
+     
+      eventPreview.add();
       focus();
       fireEvent(Events.Show, me);
-
     }
-    return this;
   }
 
-  public Menu show(Widget widget) {
-    return show(widget.getElement(), getDefaultAlign());
+  /**
+   * Displays this menu relative to the widget using the default alignment.
+   * 
+   * @param widget the align widget
+   */
+  public void show(Widget widget) {
+    show(widget.getElement(), defaultAlign);
   }
 
   /**
@@ -354,26 +377,29 @@ public class Menu extends Container<Item> {
       }
       RootPanel.get().add(this);
       el().makePositionable(true);
-      el().makePositionable(true);
+      
       onShow();
       setPagePosition(x, y);
+
+      if (constrainViewport) {
+        int ch = XDOM.getViewportSize().height;
+        int cw = XDOM.getViewportSize().width;
+        int bottom = el().getBottom(false);
+        int right = el().getRight(false);
+        if (bottom > ch) {
+          y -= (bottom - ch) - 3;
+        }
+        if (right > cw) {
+          x -= (right - cw) - 3;
+        }
+        setPagePosition(x, y);
+      }
+
       eventPreview.add();
       showing = true;
       focus();
       fireEvent(Events.Show, me);
     }
-  }
-
-  @Override
-  protected void onShow() {
-    super.onShow();
-    autoWidth();
-    el().setZIndex(0);
-  }
-
-  protected void afterRender() {
-    super.afterRender();
-    autoWidth();
   }
 
   @Override
@@ -389,6 +415,22 @@ public class Menu extends Container<Item> {
   protected void createStyles(String baseStyle) {
     menuList = baseStyle + "-list";
     menuListItem = baseStyle + "-list-item";
+  }
+
+  @Override
+  protected void onInsert(Item item, int index) {
+    super.onInsert(item, index);
+    autoWidth();
+  }
+
+  @Override
+  protected void onRemove(Item item) {
+    if (item.isRendered()) {
+      Element li = item.getElement().getParentElement().cast();
+      ul.removeChild(li);
+    }
+    super.onRemove(item);
+    autoWidth();
   }
 
   protected void onRender(Element target, int index) {
@@ -442,6 +484,13 @@ public class Menu extends Container<Item> {
     el().addEventsSunk(Event.ONCLICK | Event.MOUSEEVENTS | Event.KEYEVENTS);
   }
 
+  @Override
+  protected void onShow() {
+    super.onShow();
+    el().updateZIndex(0);
+    autoWidth();
+  }
+
   protected void renderAll() {
     int count = getItemCount();
     for (int i = 0; i < count; i++) {
@@ -467,16 +516,6 @@ public class Menu extends Container<Item> {
     } else if (autoExpand) {
       item.expandMenu(autoExpand);
     }
-  }
-
-  @Override
-  protected void onRemove(Item item) {
-    if (item.isRendered()) {
-      Element li = item.getElement().getParentElement().cast();
-      ul.removeChild(li);
-    }
-    super.onRemove(item);
-    autoWidth();
   }
 
   private void autoWidth() {

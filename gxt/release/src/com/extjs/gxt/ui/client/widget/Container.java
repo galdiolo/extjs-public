@@ -252,7 +252,7 @@ public abstract class Container<T extends Component> extends BoxComponent {
     layout.layout();
 
     for (Component c : items) {
-      if (c.isRendered() && !c.isAttached()) {
+      if (attachChildren && c.isRendered() && !c.isAttached()) {
         WidgetHelper.doAttach(c);
       }
       if (c instanceof LayoutContainer) {

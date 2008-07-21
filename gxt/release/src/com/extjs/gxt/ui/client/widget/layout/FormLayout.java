@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.widget.layout;
 import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.Template;
+import com.extjs.gxt.ui.client.util.Params;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.form.Field;
@@ -59,7 +60,7 @@ public class FormLayout extends AnchorLayout {
   public boolean getHideLabels() {
     return hideLabels;
   }
-  
+
   /**
    * Returns the label alignment.
    * 
@@ -192,7 +193,6 @@ public class FormLayout extends AnchorLayout {
   @Override
   protected void onLayout(Container container, El target) {
     super.onLayout(container, target);
-
     if (padding > 0) {
       target.setStyleAttribute("padding", padding);
     }
@@ -202,13 +202,13 @@ public class FormLayout extends AnchorLayout {
   protected void renderComponent(Component component, int index, El target) {
     if (component instanceof Field) {
       Field f = (Field) component;
-      
+
       renderField((Field) component, index, target);
-      FormData formData = (FormData) f.getData();
+      FormData formData = (FormData) getLayoutData(f);
       if (formData == null) {
         formData = f.getData("formData");
       }
-      
+
       f.setWidth(defaultWidth);
       if (formData != null) {
         if (formData.getWidth() > 0) {
@@ -224,12 +224,22 @@ public class FormLayout extends AnchorLayout {
   private void renderField(Field field, int index, El target) {
     if (field != null && !field.isRendered()) {
       String ls = field.getLabelSeparator() != null ? field.getLabelSeparator() : labelSeperator;
-      fieldTemplate.append(target.dom, field.getId(), field.getFieldLabel(), labelStyle,
-          elementStyle, ls, hideLabels ? "x-hide-label" : "", "x-form-clear-left", field.getLabelStyle());
+      field.setLabelSeparator(ls);
+
+      Params p = new Params();
+      p.add(field.getId());
+      p.add(field.getFieldLabel());
+      p.add(labelStyle);
+      p.add(elementStyle);
+      p.add(ls);
+      p.add(hideLabels ? "x-hide-label" : "");
+      p.add("x-form-clear-left");
+      p.add(field.getLabelStyle());
+
+      fieldTemplate.append(target.dom, p);
 
       Element parent = XDOM.getElementById("x-form-el-" + field.getId());
       field.render(parent);
-
     } else {
       super.renderComponent(field, index, target);
     }

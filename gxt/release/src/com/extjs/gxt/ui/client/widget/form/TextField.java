@@ -21,7 +21,7 @@ import com.google.gwt.user.client.ui.impl.TextBoxImpl;
 
 /**
  * Basic text field.
- *
+ * 
  * @param <D> the data type
  */
 public class TextField<D> extends Field<D> {
@@ -113,13 +113,11 @@ public class TextField<D> extends Field<D> {
     }
 
   }
-  
+
   private static TextBoxImpl impl = (TextBoxImpl) GWT.create(TextBoxImpl.class);
 
-  
-
   protected String emptyStyle = "x-form-empty-field";
-  
+
   private boolean password;
   private boolean allowBlank = true;
   private String regex;
@@ -145,6 +143,15 @@ public class TextField<D> extends Field<D> {
     return allowBlank;
   }
 
+  /**
+   * Returns the cursor position.
+   * 
+   * @return the cursor position
+   */
+  public int getCursorPos() {
+    return impl.getCursorPos(getInputEl().dom);
+  }
+  
   @Override
   public TextFieldMessages getMessages() {
     return (TextFieldMessages) messages;
@@ -166,6 +173,25 @@ public class TextField<D> extends Field<D> {
    */
   public String getRegex() {
     return regex;
+  }
+
+  /**
+   * Returns the selected text.
+   * 
+   * @return the selected text
+   */
+  public String getSelectedText() {
+    int start = getCursorPos(), length = getSelectionLength();
+    return getRawValue().substring(start, start + length);
+  }
+
+  /**
+   * Returns the length of the current selection.
+   * 
+   * @return the selection length
+   */
+  public int getSelectionLength() {
+    return impl.getSelectionLength(getInputEl().dom);
   }
 
   /**
@@ -225,6 +251,15 @@ public class TextField<D> extends Field<D> {
   }
 
   /**
+   * Sets the cursor position.
+   * 
+   * @param pos the position
+   */
+  public void setCursorPos(int pos) {
+    setSelectionRange(pos, 0);
+  }
+  
+  /**
    * Sets the maximum input field length.
    * 
    * @param maxLength the max length
@@ -264,7 +299,17 @@ public class TextField<D> extends Field<D> {
   public void setRegex(String regex) {
     this.regex = regex;
   }
-
+  
+  /**
+   * Selects the range.
+   * 
+   * @param pos the position
+   * @param length the range length
+   */
+  public void setSelectionRange(int pos, int length) {
+    impl.setSelectionRange(getInputEl().dom, pos, length);
+  }
+  
   /**
    * True to automatically select any existing field text when the field
    * receives input focus (defaults to false).

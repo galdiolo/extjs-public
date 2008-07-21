@@ -12,7 +12,7 @@ import com.extjs.gxt.ui.client.util.Margins;
 /**
  * Layout data for <code>AnchorLayout</code>.
  */
-public class AnchorData extends LayoutData {
+public class AnchorData extends MarginData {
 
   private String anchorSpec;
 

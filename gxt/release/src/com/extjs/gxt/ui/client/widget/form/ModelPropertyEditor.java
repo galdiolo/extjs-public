@@ -44,7 +44,11 @@ public abstract class ModelPropertyEditor<Data extends ModelData> implements Pro
   }
 
   public String getStringValue(Data value) {
-    return value.get(displayProperty);
+    Object obj = value.get(displayProperty);
+    if (obj != null) {
+      return obj.toString();
+    }
+    return null;
   }
 
   /**

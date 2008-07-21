@@ -123,16 +123,18 @@ public class TableHeader extends BoxComponent {
     this.columnModel = this.table.getColumnModel();
   }
 
-  public void onColumnClick(TableColumnUI columnUI) {
+  public void onColumnClick(TableColumnUI columnUI, ComponentEvent e) {
     BaseEvent be = null;
 
     if (table instanceof TreeTable) {
       TreeTableEvent tte = new TreeTableEvent((TreeTable) table);
       tte.columnIndex = columnUI.index;
+      tte.event = e.event;
       be = tte;
     } else {
       TableEvent ce = new TableEvent((Table) table);
       ce.columnIndex = columnUI.index;
+      ce.event = e.event;
       be = ce;
     }
 
@@ -263,6 +265,13 @@ public class TableHeader extends BoxComponent {
 
     columns.setSubMenu(columnMenu);
     menu.add(columns);
+    
+    if (table instanceof Table) {
+      TableEvent e = new TableEvent((Table)table);
+      e.columnIndex = column.getIndex();
+      e.menu = menu;
+      ((Table)table).fireEvent(Events.HeaderContextMenu, e);
+    }
 
     return menu;
   }

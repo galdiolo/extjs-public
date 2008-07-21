@@ -8,6 +8,7 @@
 package com.extjs.gxt.ui.client.event;
 
 import com.extjs.gxt.ui.client.Style.SortDir;
+import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.table.Table;
 import com.extjs.gxt.ui.client.widget.table.TableItem;
 
@@ -42,6 +43,11 @@ public class TableEvent extends ContainerEvent<Table, TableItem> {
    * The sort direction.
    */
   public SortDir sortDir = SortDir.NONE;
+  
+  /**
+   * The context menu.
+   */
+  public Menu menu;
 
   /**
    * Creates a new table event.

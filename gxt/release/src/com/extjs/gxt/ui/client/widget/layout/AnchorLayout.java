@@ -83,7 +83,7 @@ public class AnchorLayout extends Layout {
     int len = container.getItemCount();
     for (int i = 0; i < len; i++) {
       Component comp = container.getItem(i);
-      AnchorData data = (AnchorData) comp.getData();
+      AnchorData data = (AnchorData) getLayoutData(comp);
 
       if (data == null && comp.getData("anchorSpec") != null) {
         data = new AnchorData();

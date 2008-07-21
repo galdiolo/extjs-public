@@ -166,7 +166,7 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
       }
     }
     all = filtered;
-    
+
     fireEvent(Filter, createStoreEvent());
 
     if (storeSorter != null) {
@@ -328,7 +328,12 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
    * Remove all items from the store and fires the <i>Clear</i> event.
    */
   public void removeAll() {
+    for (M m : all) {
+      unregisterModel(m);
+    }
     all.clear();
+    modified.clear();
+    recordMap.clear();
     fireEvent(Clear, createStoreEvent());
   }
 
@@ -370,7 +375,9 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
 
   /**
    * Sets whether the store should listen to change events on its children
-   * (default to false).
+   * (defaults to false). This method should be called prior to any models being
+   * added to the store when monitoring changes. Only model instances which
+   * implement {@link ChangeEventSource} may be monitored.
    * 
    * @param monitorChanges true to monitor changes
    */
@@ -443,6 +450,7 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
     StoreEvent evt = createStoreEvent();
     evt.operation = operation;
     evt.record = record;
+    evt.model = record.getModel();
     fireEvent(type, evt);
   }
 
@@ -483,6 +491,9 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
   protected void unregisterModel(M model) {
     if (monitorChanges && model instanceof ChangeEventSource) {
       ((ChangeEventSource) model).removeChangeListener(changeListener);
+    }
+    if (recordMap.containsKey(model)) {
+      recordMap.remove(model);
     }
   }
 

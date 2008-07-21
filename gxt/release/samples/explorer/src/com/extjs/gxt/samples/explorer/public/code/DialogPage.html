@@ -97,15 +97,13 @@ public class DialogPage extends LayoutContainer implements EntryPoint {
     data.setSplit(true);
     data.setCollapsible(true);
     data.setFloatable(true);
-    panel.setData(data);
-    complex.add(panel);
+    complex.add(panel, data);
 
     // center
     panel = new ContentPanel();
     panel.setHeading("West");
     data = new BorderLayoutData(LayoutRegion.CENTER);
-    panel.setData(data);
-    complex.add(panel);
+    complex.add(panel, data);
 
     ButtonBar buttons = new ButtonBar();
 

@@ -7,68 +7,9 @@
  */
 package com.extjs.gxt.ui.client.widget.layout;
 
-import com.extjs.gxt.ui.client.util.Margins;
-
 /**
- * Base layout data with margin support.
+ * Abstract base class for all layout data.
  */
-public class LayoutData {
-  
-  private Margins margins;
-  
-  /**
-   * Creates a new layout data.
-   */
-  public LayoutData() {
-    
-  }
+public abstract class LayoutData {
 
-  /**
-   * Creates a new layout data.
-   * 
-   * @param margin the margin
-   */
-  public LayoutData(int margin) {
-    this.margins = new Margins(margin);
-  }
-
-
-  /**
-   * Creates a new layout data.
-   * 
-   * @param top the top margin
-   * @param right the right margin
-   * @param bottom the bottom margin
-   * @param left the left margin
-   */
-  public LayoutData(int top, int right, int bottom, int left) {
-    this.margins = new Margins(top, right, bottom, left);
-  }
-
-  /**
-   * Creates a new layout data.
-   * 
-   * @param margins the margins
-   */
-  public LayoutData(Margins margins) {
-    this.margins = margins;
-  }
-
-  /**
-   * Returns the data's margins.
-   * 
-   * @return the margins
-   */
-  public Margins getMargins() {
-    return margins;
-  }
-
-  /**
-   * Sets the data's margins.
-   * 
-   * @param margins the margins
-   */
-  public void setMargins(Margins margins) {
-    this.margins = margins;
-  }
 }

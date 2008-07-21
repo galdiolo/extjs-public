@@ -378,44 +378,46 @@ public class TableView {
   }
 
   public void resize() {
-    int width = table.getOffsetWidth();
-    int headerHeight = table.getTableHeader().getOffsetHeight();
-    int bodyHeight = table.getOffsetHeight() - headerHeight;
-    int bodyWidth = width;
-    
-    if (table.isAutoHeight()) {
-      scrollEl.setHeight("auto");
-      dataEl.setHeight("auto");
-      bodyHeight = dataEl.getHeight();
-      bodyHeight += table.el().getBorderWidth("tb");
-    }
+    if (table != null && table.isRendered()) {
+      int width = table.getOffsetWidth();
+      int headerHeight = table.getTableHeader().getOffsetHeight();
+      int bodyHeight = table.getOffsetHeight() - headerHeight;
+      int bodyWidth = width;
 
-    int columnModelWidth = cm.getTotalWidth();
-    dataEl.setWidth(Math.max(width, columnModelWidth));
-    table.getTableHeader().setWidth(columnModelWidth);
-
-    bodyHeight -= table.el().getBorderWidth("tb");
-    bodyWidth -= table.el().getBorderWidth("lr");
-
-    if (dataEl.getHeight() < bodyHeight) {
-      scrollEl.setStyleAttribute("overflowY", "hidden");
-    } else {
-      scrollEl.setStyleAttribute("overflowY", "auto");
-    }
-
-    if (table.getHorizontalScroll()) {
-      scrollEl.setStyleAttribute("overflowX", "auto");
-      if (columnModelWidth < width) {
-        scrollEl.setStyleAttribute("overflowX", "hidden");
-        table.getTableHeader().el().setLeft(0);
-        scrollEl.setScrollLeft(0);
+      if (table.isAutoHeight()) {
+        scrollEl.setHeight("auto");
+        dataEl.setHeight("auto");
+        bodyHeight = dataEl.getHeight();
+        bodyHeight += table.el().getBorderWidth("tb");
       }
-    }
 
-    if (table.isAutoHeight()) {
-      bodyHeight = -1;
+      int columnModelWidth = cm.getTotalWidth();
+      dataEl.setWidth(Math.max(width, columnModelWidth));
+      table.getTableHeader().setWidth(columnModelWidth);
+
+      bodyHeight -= table.el().getBorderWidth("tb");
+      bodyWidth -= table.el().getBorderWidth("lr");
+
+      if (dataEl.getHeight() < bodyHeight) {
+        scrollEl.setStyleAttribute("overflowY", "hidden");
+      } else {
+        scrollEl.setStyleAttribute("overflowY", "auto");
+      }
+
+      if (table.getHorizontalScroll()) {
+        scrollEl.setStyleAttribute("overflowX", "auto");
+        if (columnModelWidth < width) {
+          scrollEl.setStyleAttribute("overflowX", "hidden");
+          table.getTableHeader().el().setLeft(0);
+          scrollEl.setScrollLeft(0);
+        }
+      }
+
+      if (table.isAutoHeight()) {
+        bodyHeight = -1;
+      }
+      scrollEl.setSize(bodyWidth, bodyHeight);
     }
-    scrollEl.setSize(bodyWidth, bodyHeight);
   }
 
   public void resizeCells(int columnIndex) {

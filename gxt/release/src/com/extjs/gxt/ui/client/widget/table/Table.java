@@ -162,6 +162,15 @@ import com.google.gwt.user.client.ui.Widget;
  * </ul>
  * </dd>
  * 
+ * <dd><b>HeaderContextMenu</b> : TableEvent(table, colIndex, menu)<br>
+ * <div>Fires right before the header's context menu is displayed.</div>
+ * <ul>
+ * <li>table : this</li>
+ * <li>colIndex : the column index</li>
+ * <li>menu : the context menu</li>
+ * </ul>
+ * </dd>
+ * 
  * <dt><b>CSS:</b></dt>
  * <dd>.my-tbl-col-[column id] { each column }</dd>
  * <dd>.my-tbl-td-[column index] { cell td }</dd>
@@ -430,7 +439,9 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
 
   @Override
   public void recalculate() {
-    header.resizeColumns(false, true);
+    if (rendered) {
+      header.resizeColumns(false, true);
+    }
   }
 
   @Override
@@ -694,8 +705,8 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
   }
 
   @Override
-  protected void afterRender() {
-    super.afterRender();
+  protected void onAttach() {
+    super.onAttach();
     header.resizeColumns(false, true);
   }
 

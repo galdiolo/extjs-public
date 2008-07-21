@@ -9,6 +9,7 @@ package com.extjs.gxt.ui.client.widget.menu;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Format;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -16,8 +17,8 @@ import com.google.gwt.user.client.Element;
 /**
  * A base class for all menu items that require menu-related functionality (like
  * sub-menus) and are not static display items. Item extends the base
- * functionality of {@link Item} by adding menu-specific activation and
- * click handling.
+ * functionality of {@link Item} by adding menu-specific activation and click
+ * handling.
  */
 public class MenuItem extends Item {
 
@@ -41,6 +42,40 @@ public class MenuItem extends Item {
   public MenuItem(String text) {
     this();
     this.text = text;
+  }
+
+  /**
+   * Creates a new item.
+   * 
+   * @param text the item text
+   * @param listener the selection listenor
+   */
+  public MenuItem(String text, SelectionListener listener) {
+    this(text);
+    addSelectionListener(listener);
+  }
+
+  /**
+   * Creates a new item.
+   * 
+   * @param text the item's text
+   * @param iconStyle the item's icon style
+   */
+  public MenuItem(String text, String iconStyle) {
+    this(text);
+    setIconStyle(iconStyle);
+  }
+
+  /**
+   * Creates a new item.
+   * 
+   * @param text the item's text
+   * @param iconStyle the item's icon style
+   * @param listener the selection listener
+   */
+  public MenuItem(String text, String iconStyle, SelectionListener listener) {
+    this(text, iconStyle);
+    addSelectionListener(listener);
   }
 
   /**

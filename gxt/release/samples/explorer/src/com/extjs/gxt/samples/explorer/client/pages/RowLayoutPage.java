@@ -56,13 +56,9 @@ public class RowLayoutPage extends LayoutContainer implements EntryPoint {
     label3.addStyleName("text");
     label3.setBorders(true);
 
-    label1.setData(new RowData(1, -1));
-    label2.setData(new RowData(1, 1));
-    label3.setData(new RowData(1, -1));
-    
-    add(label1);
-    add(label2);
-    add(label3);
+    add(label1, new RowData(1, -1));
+    add(label2, new RowData(1, 1));
+    add(label3, new RowData(1, -1));
 
     setBorders(true);
 

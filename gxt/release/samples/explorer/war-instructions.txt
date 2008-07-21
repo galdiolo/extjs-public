@@ -1,0 +1,1 @@
+The war does not include the gwt-user.jar and gwt-servlet.jar.

@@ -27,10 +27,12 @@ import com.extjs.gxt.ui.client.util.Margins;
  * 
  * @see RowLayout
  */
-public class RowData extends LayoutData {
+public class RowData extends MarginData {
 
   private double width = Style.DEFAULT;
   private double height = Style.DEFAULT;
+  int calcHeight;
+  int calcWidth;
 
   /**
    * Creates a new row data.

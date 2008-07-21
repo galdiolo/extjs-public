@@ -53,18 +53,38 @@ public class PagingToolBar extends Component implements Listener {
     private String prevText;
     private String refreshText;
 
+    /**
+     * Returns the after page text.
+     * 
+     * @return the after page text
+     */
     public String getAfterPageText() {
       return afterPageText;
     }
 
+    /**
+     * Returns the before page text.
+     * 
+     * @return the before page text
+     */
     public String getBeforePageText() {
       return beforePageText;
     }
 
+    /**
+     * Returns the display message.
+     * 
+     * @return the display message.
+     */
     public String getDisplayMsg() {
       return displayMsg;
     }
 
+    /**
+     * Returns the empty message.
+     * 
+     * @return the empty message
+     */
     public String getEmptyMsg() {
       return emptyMsg;
     }
@@ -73,18 +93,38 @@ public class PagingToolBar extends Component implements Listener {
       return firstText;
     }
 
+    /**
+     * Returns the last text.
+     * 
+     * @return the last text
+     */
     public String getLastText() {
       return lastText;
     }
 
+    /**
+     * Returns the next text.
+     * 
+     * @return the next ext
+     */
     public String getNextText() {
       return nextText;
     }
 
+    /**
+     * Returns the previous text.
+     * 
+     * @return the previous text
+     */
     public String getPrevText() {
       return prevText;
     }
 
+    /**
+     * Returns the refresh text.
+     * 
+     * @return the refresh text
+     */
     public String getRefreshText() {
       return refreshText;
     }
@@ -124,7 +164,7 @@ public class PagingToolBar extends Component implements Listener {
      * The message to display when no records are found (defaults to "No data to
      * display").
      * 
-     * @param emptyMsg
+     * @param emptyMsg the empty message
      */
     public void setEmptyMsg(String emptyMsg) {
       this.emptyMsg = emptyMsg;
@@ -178,60 +218,6 @@ public class PagingToolBar extends Component implements Listener {
 
   }
 
-  //
-  // /**
-  // * The paging status message to display (defaults to "Displaying {0} - {1}
-  // of
-  // * {2}"). Note that this string is formatted using the braced numbers 0-2 as
-  // * tokens that are replaced by the values for start, end and total
-  // * respectively. These tokens should be preserved when overriding this
-  // string
-  // * if showing those values is desired.
-  // */
-  // public String displayMsg;
-  //
-  // /**
-  // * Customizable piece of the default paging text (defaults to "Page").
-  // */
-  // public String beforePageText;
-  //
-  // /**
-  // * Customizable piece of the default paging text (defaults to "of {0}").
-  // */
-  // public String afterPageText;
-  //
-  // /**
-  // * Customizable piece of the default paging text (defaults to "First Page").
-  // */
-  // public String firstText;
-  //
-  // /**
-  // * Customizable piece of the default paging text (defaults to "Previous
-  // * Page").
-  // */
-  // public String prevText;
-  //
-  // /**
-  // * Customizable piece of the default paging text (defaults to "Next Page").
-  // */
-  // public String nextText;
-  //
-  // /**
-  // * Customizable piece of the default paging text (defaults to "Last Page").
-  // */
-  // public String lastText;
-  //
-  // /**
-  // * Customizable piece of the default paging text (defaults to "Refresh").
-  // */
-  // public String refreshText;
-  //
-  // /**
-  // * The message to display when no records are found (defaults to "No data to
-  // * display").
-  // */
-  // public String emptyMsg;
-
   protected PagingLoader loader;
   protected int start, pageSize, totalLength;
   protected int activePage = -1, pages;
@@ -268,6 +254,17 @@ public class PagingToolBar extends Component implements Listener {
       loader.addListener(Loader.BeforeLoad, this);
       loader.addListener(Loader.Load, this);
       loader.addListener(Loader.LoadException, this);
+    }
+  }
+
+  /**
+   * Clears the current toolbar text.
+   */
+  public void clear() {
+    if (rendered) {
+      pageText.setText("");
+      afterText.setText("");
+      displayText.setText("");
     }
   }
 
@@ -328,7 +325,8 @@ public class PagingToolBar extends Component implements Listener {
         break;
     }
   }
-
+  
+  
   /**
    * Moves to the last page.
    */
@@ -406,7 +404,7 @@ public class PagingToolBar extends Component implements Listener {
 
   protected void onLoad(LoadEvent<PagingLoadConfig, PagingLoadResult> event) {
     PagingLoadResult result = event.data;
-    start = event.config.getOffset();
+    start = event.data.getOffset();
     totalLength = result.getTotalLength();
     activePage = (int) Math.ceil((double) (start + pageSize) / pageSize);
     pageText.setText(String.valueOf((int) activePage));
@@ -426,9 +424,9 @@ public class PagingToolBar extends Component implements Listener {
     last.setEnabled(activePage != pages);
     int temp = activePage == pages ? totalLength : start + pageSize;
 
-    if (display != null) {
+    if (msgs.getDisplayMsg() != null) {
       String[] params = new String[] {"" + (start + 1), "" + temp, "" + totalLength};
-      display = Format.substitute(msgs.getAfterPageText(), (Object[]) params);
+      display = Format.substitute(msgs.getDisplayMsg(), (Object[]) params);
     } else {
       display = GXT.MESSAGES.pagingToolBar_displayMsg(start + 1, (int) temp, (int) totalLength);
     }
@@ -554,8 +552,9 @@ public class PagingToolBar extends Component implements Listener {
     toolBar.render(target, index);
     setElement(toolBar.getElement());
 
-    int h = XDOM.isVisibleBox ? 27 : 23;
-    el().setHeight(h);
+    if (XDOM.isVisibleBox) {
+      toolBar.setHeight(25);
+    }
   }
 
 }

@@ -67,9 +67,6 @@ public class ToolBarPage extends LayoutContainer implements EntryPoint {
     r = new CheckMenuItem("Gray Theme");
     r.setGroup("radios");
     radioMenu.add(r);
-    r = new CheckMenuItem("Slate Theme");
-    r.setGroup("radios");
-    radioMenu.add(r);
     radios.setSubMenu(radioMenu);
     
     MenuItem date = new MenuItem("Choose a Date");

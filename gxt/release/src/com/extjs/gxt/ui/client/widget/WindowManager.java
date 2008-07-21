@@ -17,7 +17,6 @@ import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 
-
 /**
  * An object that represents a group of {@link Window} instances and provides
  * z-order management and window activation behavior.
@@ -25,7 +24,6 @@ import com.extjs.gxt.ui.client.event.Listener;
 public class WindowManager {
 
   private static WindowManager instance;
-  private int zseed = 9000;
 
   /**
    * Returns the singleton instance.
@@ -48,8 +46,8 @@ public class WindowManager {
     accessList = new Stack<Window>();
     comparator = new Comparator<Window>() {
       public int compare(Window w1, Window w2) {
-        Long d1 = (Long) w1.getData("date");
-        Long d2 = (Long) w2.getData("date");
+        Long d1 = (Long) w1.getData("_gxtdate");
+        Long d2 = (Long) w2.getData("_gxtdate");
         return d1 == null || d1 < d2 ? -1 : 1;
       }
     };
@@ -60,27 +58,20 @@ public class WindowManager {
     };
   }
 
-  void register(Window window) {
-    list.add(window);
-    accessList.push(window);
-    window.addListener(Events.Hide, listener);
-  }
-
-  void unregister(Window window) {
-    list.remove(window);
-    window.removeListener(Events.Hide, listener);
-    accessList.remove(window);
-  }
-
   /**
-   * Hides all windows in the group.
+   * Brings the specified window to the front of any other active windows.
+   * 
+   * @param window the window return True if the dialog was brought to the
+   *          front, else false if it was already in front
    */
-  public void hideAll() {
-    int count = list.size();
-    for (int i = 0; i < count; i++) {
-      Window w = (Window) list.get(i);
-      w.hide();
+  public boolean bringToFront(Window window) {
+    if (window != front) {
+      window.setData("_gxtdate", System.currentTimeMillis());
+      orderWindows(false);
+      return true;
     }
+
+    return false;
   }
 
   /**
@@ -101,19 +92,23 @@ public class WindowManager {
   }
 
   /**
-   * Brings the specified window to the front of any other active windows.
+   * Gets the currently-active window in the group.
    * 
-   * @param window the window return True if the dialog was brought to the
-   *            front, else false if it was already in front
+   * @return the active window
    */
-  public boolean bringToFront(Window window) {
-    if (window != front) {
-      window.setData("date", System.currentTimeMillis());
-      orderWindows();
-      return true;
-    }
+  public Window getActive() {
+    return front;
+  }
 
-    return false;
+  /**
+   * Hides all windows in the group.
+   */
+  public void hideAll() {
+    int count = list.size();
+    for (int i = 0; i < count; i++) {
+      Window w = (Window) list.get(i);
+      w.hide();
+    }
   }
 
   /**
@@ -123,26 +118,49 @@ public class WindowManager {
    * @return the window
    */
   public Window sendToBack(Window window) {
-    window.setData("date", System.currentTimeMillis());
-    orderWindows();
+    window.setData("_gxtdate", System.currentTimeMillis());
+    orderWindows(true);
     return window;
   }
 
   /**
-   * Gets the currently-active window in the group.
+   * Unregisters the window.
    * 
-   * @return the active window
+   * @param window the window to unregister
    */
-  public Window getActive() {
-    return front;
+  public void unregister(Window window) {
+    list.remove(window);
+    window.removeListener(Events.Hide, listener);
+    accessList.remove(window);
   }
 
-  private void orderWindows() {
+  protected void register(Window window) {
+    list.add(window);
+    accessList.push(window);
+    window.setData("_gxtdate", System.currentTimeMillis());
+    window.addListener(Events.Hide, listener);
+  }
+
+  private void activateLast() {
+    for (int i = accessList.size() - 1; i >= 0; --i) {
+      Window w = (Window) accessList.get(i);
+      if (w.isVisible()) {
+        setActiveWin(w);
+        return;
+      }
+    }
+    setActiveWin(null);
+  }
+
+  private void orderWindows(boolean reverse) {
     if (accessList.size() > 0) {
       Collections.sort(accessList, comparator);
+      if (reverse) {
+        Collections.reverse(accessList);
+      }
       for (int i = 0; i < accessList.size(); i++) {
         Window w = (Window) accessList.get(i);
-        w.el().setStyleAttribute("zIndex", zseed + (i * 10));
+        w.el().updateZIndex(0);
       }
     }
   }
@@ -157,16 +175,5 @@ public class WindowManager {
         window.setActive(true);
       }
     }
-  }
-
-  private void activateLast() {
-    for (int i = accessList.size() - 1; i >= 0; --i) {
-      Window w = (Window) accessList.get(i);
-      if (w.isVisible()) {
-        setActiveWin(w);
-        return;
-      }
-    }
-    setActiveWin(null);
   }
 }

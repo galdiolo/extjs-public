@@ -36,10 +36,6 @@ public abstract class Item extends Component {
    */
   protected Menu parentMenu;
 
-  /**
-   * The CSS class to use when the item becomes activated (defaults to
-   * "x-menu-item-active").
-   */
   private String activeStyle = "x-menu-item-active";
 
   /**

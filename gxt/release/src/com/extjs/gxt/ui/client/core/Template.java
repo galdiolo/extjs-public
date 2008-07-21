@@ -215,7 +215,7 @@ public class Template {
    }-*/;
 
   private native static JavaScriptObject create(String html) /*-{
-   return new $wnd.Ext.Template(html);
+   return new $wnd.GXT.Ext.Template(html);
    }-*/;
 
   public String getHtml() {

@@ -14,7 +14,7 @@ import com.google.gwt.user.client.Element;
  * and Template objects available. Only the parts of the library being used are
  * loaded and were manually moved into the class. No event, listener, or animation code is
  * used. Provides low level dom related functions. A reference to the Ext
- * instance is set $wnd.Ext.
+ * instance is set $wnd.GXT.Ext.
  */
 class Ext {
 
@@ -33,31 +33,31 @@ class Ext {
   }
   
   native static void call(Element dom, String method, String value) /*-{
-    $wnd._el.fly(dom)[method](value);
+    $wnd.GXT._el.fly(dom)[method](value);
   }-*/;
   
   native static Element callElement(Element dom, String method, String value) /*-{
-    return $wnd._el.fly(dom)[method](value);
+    return $wnd.GXT._el.fly(dom)[method](value);
   }-*/;
   
   native static Element findParent(Element dom, String selector, int maxDepth) /*-{
-    return $wnd._el.fly(dom).findParent(selector, maxDepth);
+    return $wnd.GXT._el.fly(dom).findParent(selector, maxDepth);
   }-*/;
   
   native static int callInt(Element dom, String method, String value) /*-{
-    return $wnd._el.fly(dom)[method](value);
+    return $wnd.GXT._el.fly(dom)[method](value);
   }-*/;
   
   native static String callString(Element dom, String method, String value) /*-{
-    return $wnd._el.fly(dom)[method](value);
+    return $wnd.GXT._el.fly(dom)[method](value);
   }-*/;
 
   private native static void loadExt() /*-{
     var document = $doc;
     var window = $wnd;
     var navigator = window.navigator;
-    var Ext = $wnd.Ext;
-    var D = $wnd.Ext.lib.Dom;
+    var Ext = $wnd.GXT.Ext;
+    var D = $wnd.GXT.Ext.lib.Dom;
     window["undefined"] = window["undefined"];
     Ext.apply = function(o, c, defaults){
          if(defaults){
@@ -191,14 +191,14 @@ class Ext {
        });
      };
      initload();
-     $wnd.Ext = Ext;
+     $wnd.GXT.Ext = Ext;
   }-*/;
 
   private native static void loadElement() /*-{
     var document = $doc;
     var window = $wnd;
-    var Ext = $wnd.Ext;
-    var D = $wnd.Ext.lib.Dom;
+    var Ext = $wnd.GXT.Ext;
+    var D = $wnd.GXT.Ext.lib.Dom;
     var propCache = {};
     var camelRe = /(-[a-z])/gi;
     var camelFn = function(m, a){ return a.charAt(1).toUpperCase(); };
@@ -375,12 +375,9 @@ class Ext {
                 throw "Element.alignToXY with an element that doesn't exist";
             }
             
-            
-            
             var d = this.dom;
             var c = false; //constrain to viewport
             var p1 = "", p2 = "";
-
     
             if(!p){
                 p = "tl-bl";
@@ -414,29 +411,32 @@ class Ext {
                 //If we are at a viewport boundary and the aligned el is anchored on a target border that is
                 //perpendicular to the vp border, allow the aligned el to slide on that border,
                 //otherwise swap the aligned el to the opposite border of the target.
-                var p1y = p1.charAt(0), p1x = p1.charAt(p1.length-1);
+               var p1y = p1.charAt(0), p1x = p1.charAt(p1.length-1);
                var p2y = p2.charAt(0), p2x = p2.charAt(p2.length-1);
+               
                var swapY = ((p1y=="t" && p2y=="b") || (p1y=="b" && p2y=="t"));
                var swapX = ((p1x=="r" && p2x=="l") || (p1x=="l" && p2x=="r"));
-    
+               
                var doc = $doc;
-               var scrollX = (doc.documentElement.scrollLeft || doc.body.scrollLeft || 0)+5;
-               var scrollY = (doc.documentElement.scrollTop || doc.body.scrollTop || 0)+5;
+               var scrollX = (doc.documentElement.scrollLeft || doc.body.scrollLeft || 0);
+               var scrollY = (doc.documentElement.scrollTop || doc.body.scrollTop || 0);
                
               
                if((x+w) > dw + scrollX){
-                    x = swapX ? r.left-w : dw+scrollX-w;
+                   x = swapX ? r.left-w : dw+scrollX-w;
                 }
                if(x < scrollX){
                    x = swapX ? r.right : scrollX;
                }
-               if((y+h) > dh + scrollY){
-                    y = swapY ? r.top-h : dh+scrollY-h;
+
+               if((y+h) > (dh + scrollY)){
+                   y = swapY ? r.top-h : dh+scrollY-h;
                 }
                if (y < scrollY){
                    y = swapY ? r.bottom : scrollY;
                }
             }
+            
             return [x,y];
         },
         
@@ -648,13 +648,13 @@ class Ext {
               var w, h, d = this.dom, s = d.style;
               if(s.width && s.width != 'auto'){
                   w = parseInt(s.width, 10);
-                  if($wnd.Ext.isBorderBox){
+                  if($wnd.GXT.Ext.isBorderBox){
                      w -= this.getFrameWidth('lr');
                   }
               }
               if(s.height && s.height != 'auto'){
                   h = parseInt(s.height, 10);
-                  if($wnd.Ext.isBorderBox){
+                  if($wnd.GXT.Ext.isBorderBox){
                      h -= this.getFrameWidth('tb');
                   }
               }
@@ -904,11 +904,11 @@ class Ext {
      El.borders = {l: "border-left-width", r: "border-right-width", t: "border-top-width", b: "border-bottom-width"};
      El.paddings = {l: "padding-left", r: "padding-right", t: "padding-top", b: "padding-bottom"};
      El.margins = {l: "margin-left", r: "margin-right", t: "margin-top", b: "margin-bottom"};
-     $wnd._el = El;
+     $wnd.GXT._el = El;
    }-*/;
 
   private native static void loadFormat() /*-{
-     var Ext = $wnd.Ext;
+     var Ext = $wnd.GXT.Ext;
      Ext.util = {};
      Ext.util.Format = function(){
       var trimRe = /^\s+|\s+$/g;
@@ -1031,7 +1031,7 @@ class Ext {
    }-*/;
 
   private native static void loadDomQuery() /*-{
-    var Ext = $wnd.Ext;
+    var Ext = $wnd.GXT.Ext;
     Ext.DomQuery = function() {
       var cache      = {
       }, simpleCache = {
@@ -1082,7 +1082,7 @@ class Ext {
         return this;
       }
       ;
-      $wnd.__byClassName = function(c, a, v) {
+      $wnd.GXT.__byClassName = function(c, a, v) {
         if (! v) {
           return c;
         }
@@ -1110,7 +1110,7 @@ class Ext {
         return n.getAttribute(attr) || n[attr];
       }
       ;
-      $wnd.__getNodes = function(ns, mode, tagName) {
+      $wnd.GXT.__getNodes = function(ns, mode, tagName) {
         var result = [], ri = - 1, cs;
         if (! ns) {
           return result;
@@ -1164,7 +1164,7 @@ class Ext {
         }
         return a;
       }
-      $wnd.__byTag = function(cs, tagName) {
+      $wnd.GXT.__byTag = function(cs, tagName) {
         if (cs.tagName || cs == document) {
           cs = [cs];
         }
@@ -1180,7 +1180,7 @@ class Ext {
         }
         return r;
       };
-      $wnd.__byId = function(cs, attr, id) {
+      $wnd.GXT.__byId = function(cs, attr, id) {
         if (cs.tagName || cs == document) {
           cs = [cs];
         }
@@ -1196,7 +1196,7 @@ class Ext {
         }
         return r;
       };
-      $wnd.__byAttribute = function(cs, attr, value, op, custom) {
+      $wnd.GXT.__byAttribute = function(cs, attr, value, op, custom) {
         var r = [], ri = - 1, st = custom == "{";
         var f = Ext.DomQuery.operators[op];
         for (var i = 0, ci; ci = cs[i]; i++) {
@@ -1218,7 +1218,7 @@ class Ext {
         }
         return r;
       };
-      $wnd.__byPseudo = function(cs, name, value) {
+      $wnd.GXT.__byPseudo = function(cs, name, value) {
         return Ext.DomQuery.pseudos[name](cs, value);
       } ;
       // This is for IE MSXML which does not support expandos.
@@ -1245,7 +1245,7 @@ class Ext {
         }
         return r;
       }
-      $wnd.GXTnodup = function(cs) {
+      $wnd.GXT.___nodup = function(cs) {
         if (! cs) {
           return [];
         }
@@ -1318,8 +1318,8 @@ class Ext {
           var d = root.ownerDocument || root;
           return d.getElementById(id);
         }
-        ns = $wnd.__getNodes(ns, mode, "*");
-        return $wnd.__byId(ns, null, id);
+        ns = $wnd.GXT.__getNodes(ns, mode, "*");
+        return $wnd.GXT.__byId(ns, null, id);
       }
       return {
         getStyle: function(el, name) {
@@ -1350,18 +1350,18 @@ class Ext {
                 if (tm[1] == "#") {
                   fn[fn.length] = 'n = quickId(n, mode, root, "' + tm[2] + '");';
                 } else {
-                  fn[fn.length] = 'n = $wnd.__getNodes(n, mode, "' + tm[2] + '");';
+                  fn[fn.length] = 'n = $wnd.GXT.__getNodes(n, mode, "' + tm[2] + '");';
                 }
                 q = q.replace(tm[0], "");
               } else if (q.substr(0, 1) != '@') {
-                fn[fn.length] = 'n = $wnd.__getNodes(n, mode, "*");';
+                fn[fn.length] = 'n = $wnd.GXT.__getNodes(n, mode, "*");';
               }
             } else {
               if (tm) {
                 if (tm[1] == "#") {
-                  fn[fn.length] = 'n = $wnd.__byId(n, null, "' + tm[2] + '");';
+                  fn[fn.length] = 'n = $wnd.GXT.__byId(n, null, "' + tm[2] + '");';
                 } else {
-                  fn[fn.length] = 'n = $wnd.__byTag(n, "' + tm[2] + '");';
+                  fn[fn.length] = 'n = $wnd.GXT.__byTag(n, "' + tm[2] + '");';
                 }
                 q = q.replace(tm[0], "");
               }
@@ -1390,7 +1390,7 @@ class Ext {
               q = q.replace(mm[1], "");
             }
           }
-          fn[fn.length] = "return $wnd.GXTnodup(n);\n}";
+          fn[fn.length] = "return $wnd.GXT.___nodup(n);\n}";
           eval(fn.join(""));
           return f;
         },
@@ -1417,7 +1417,7 @@ class Ext {
             }
           }
           if (paths.length > 1) {
-            return $wnd.GXTnodup(results);
+            return $wnd.GXT.___nodup(results);
           }
           return results;
         },
@@ -1457,15 +1457,15 @@ class Ext {
         matchers: [
           {
             re: /^\.([\w-]+)/,
-            select: 'n = $wnd.__byClassName(n, null, " {1} ");'
+            select: 'n = $wnd.GXT.__byClassName(n, null, " {1} ");'
           },
           {
             re: /^\:([\w-]+)(?:\(((?:[^\s>\/]*|.*?))\))?/,
-            select: 'n = $wnd.__byPseudo(n, "{1}", "{2}");'
+            select: 'n = $wnd.GXT.__byPseudo(n, "{1}", "{2}");'
           },
           {
             re: /^(?:([\[\{])(?:@)?([\w-]+)\s?(?:(=|.=)\s?['"]?(.*?)["']?)?[\]\}])/,
-            select: 'n = $wnd.__byAttribute(n, "{2}", "{4}", "{3}", "{1}");'
+            select: 'n = $wnd.GXT.__byAttribute(n, "{2}", "{4}", "{3}", "{1}");'
           },
           {
             re: /^#([\w-]+)/,
@@ -1671,7 +1671,7 @@ class Ext {
    }-*/;
 
   private native static void loadDomHelper() /*-{
-       var Ext = $wnd.Ext;
+       var Ext = $wnd.GXT.Ext;
        Ext.DomHelper = function(){
           var tempTableEl = null;
           var emptyTags = /^(?:br|frame|hr|img|input|link|meta|range|spacer|wbr|area|param|col)$/i;
@@ -1997,7 +1997,7 @@ class Ext {
    }-*/;
 
   private native static void loadTemplate() /*-{
-       var Ext = $wnd.Ext;
+       var Ext = $wnd.GXT.Ext;
       Ext.Template = function(html){
         var a = arguments;
         if(html instanceof Array){
@@ -2174,8 +2174,8 @@ class Ext {
            var r = {};
            r.left = this.getX(el);
            r.top = this.getY(el);
-           r.right = r.left + $wnd._el.fly(el).getWidth();
-           r.bottom = r.top + $wnd._el.fly(el).getHeight(); 
+           r.right = r.left + $wnd.GXT._el.fly(el).getWidth();
+           r.bottom = r.top + $wnd.GXT._el.fly(el).getHeight(); 
           return r;
       },
 
@@ -2189,7 +2189,7 @@ class Ext {
           return Math.max(scrollWidth, this.getViewportWidth());
       },
       getViewportHeight: function(){
-          if($wnd.Ext.isIE){
+          if($wnd.GXT.Ext.isIE){
               return Ext.isStrict ? document.documentElement.clientHeight :
                        document.body.clientHeight;
           }else{
@@ -2215,7 +2215,7 @@ class Ext {
       },
       setXY : function(el, xy) {
           var dom = el;
-          el = new $wnd.Ext.Element(el);
+          el = new $wnd.GXT.Ext.Element(el);
           
           el.position();
           var pts = el.translatePoints(el, xy);
@@ -2234,7 +2234,7 @@ class Ext {
           return this.getXY(el)[1];
       },
       getXY : function(el) {
-            var fly = $wnd.Ext.fly;
+            var fly = $wnd.GXT.Ext.fly;
             var p, pe, b, scroll, bd = ($doc.body || $doc.documentElement);
             if(el == bd){
                 return [0, 0];
@@ -2301,12 +2301,12 @@ class Ext {
             return [x, y];
       }
     };
-    $wnd.Ext = Ext;
+    $wnd.GXT.Ext = Ext;
   }-*/;
 
   private static native void loadDate() /*-{
   
-var Ext = $wnd.Ext;  
+var Ext = $wnd.GXT.Ext;  
   
 Date.prototype.getFirstDateOfMonth = function() {
     return new Date(this.getFullYear(), this.getMonth(), 1);

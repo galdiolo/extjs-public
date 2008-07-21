@@ -868,8 +868,12 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
   padding: 0px;
 }
 
+.ext-el-mask {
+  z-index: 100;
+}
+
 .icon-wait {
-  background: url(../images/gxt/icons/wait.gif) no-repeat !important;	
+  background: url(../images/gxt/icons/wait.gif) no-repeat !important;
 }
 
 .x-panel-btns-right {
@@ -890,7 +894,7 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
   position: absolute;
   z-index: 10;
   background-color: black;
-  filter: alpha(opacity =           10);
+  filter: alpha(opacity =               10);
   opacity: .1;
   left: 0px;
   top: 0px;
@@ -971,11 +975,10 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
   cursor: row-resize;
 }
 
-
 .x-drag-proxy {
   border: 1px dashed #3b5a82;
   background-color: #EDEDED;
-  filter: alpha(opacity =               50);
+  filter: alpha(opacity =                   50);
   opacity: .5;
   background-color: #c3daf9;
   z-index: 20000;
@@ -1078,7 +1081,7 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
   position: absolute;
   z-index: 10;
   background-color: black;
-  filter: alpha(opacity =           10);
+  filter: alpha(opacity =               10);
   opacity: .1;
   left: 0px;
   top: 0px;
@@ -1144,7 +1147,7 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
 }
 
 .x-splitbar-shim {
-  filter: alpha(opacity =                   1);
+  filter: alpha(opacity =                       1);
   opacity: 0;
   position: absolute;
   width: 100%;
@@ -1161,7 +1164,7 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
 .x-drag-proxy {
   border: 1px dashed #3b5a82;
   background-color: #EDEDED;
-  filter: alpha(opacity =               50);
+  filter: alpha(opacity =                   50);
   opacity: .5;
   background-color: #c3daf9;
   z-index: 20000;
@@ -1169,6 +1172,10 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
   position: absolute;
   left: 0;;
   top: 0;
+}
+
+.ext-ie .x-toolbar {
+  padding-bottom: 0px;
 }.x-date-picker, .x-date-picker a {
   font-size: 11px; 
 }
@@ -1534,7 +1541,6 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
   font-size: 11px;
   padding-top: 3px;
   padding-left: 2px;
-  color: black;
   white-space: nowrap;
   overflow: hidden;
   line-height: 19px;
@@ -1708,7 +1714,7 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
 }
 
 .ext-ie .my-tbl-col-overflow {
-
+  
 }
 
 .my-tbl-col-text {
@@ -1790,7 +1796,7 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
 }
 
 .my-tbl-vlines .my-tbl-data .my-tbl-item-cell-overflow {
-	border-right: 1px solid #EDEDED;
+  border-right: 1px solid #EDEDED;
 }
 
 .my-tbl-data .my-tbl-item-cell-overflow {
@@ -1823,6 +1829,11 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
   background-color: #D9E1ED;
   border-top: 1px dotted #9EB8ED;
   border-bottom: 1px dotted #9EB8ED;
+}
+
+.ext-ie .my-tbl TD .x-form-text {
+  POSITION: static;
+  TOP: 0px;
 }.tree-folder {
   background: url(../images/gxt/icons/folder-closed.gif) no-repeat -1px -1px;
 }
@@ -1956,11 +1967,11 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
 .my-tree-loading .my-tree-item-text span {
   font-style: italic;
 }.tree-folder {
-  background: url(../images/gxt/icons/folder-closed.png) no-repeat -1px -1px;
+  background: url(../images/gxt/icons/folder-closed.gif) no-repeat -1px -1px;
 }
 
 .tree-folder-open {
-  background: url(../images/gxt/icons/folder.png) no-repeat -1px -1px;
+  background: url(../images/gxt/icons/folder.gif) no-repeat -1px -1px;
 }
 
 .my-treetbl-tree {

@@ -25,3 +25,5 @@ These instructions assume you have a existing project and launch confifuration.
 	b. Select your appropriate launch configuration under 'Java Application'.
 	c. Select the 'Classpath' tab.
 	d. Add the gxt.jar to the classpath.
+	
+For more information, visit the Ext GWT Help Center at http://extjs.com/helpcenter.

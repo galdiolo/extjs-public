@@ -22,10 +22,24 @@ public class CheckBoxGroup extends MultiField<CheckBox> {
   }
 
   /**
-   * Returns a list of all checked check boxes.
+   * Returns the first checked check box.
    */
   @Override
-  public Object getValue() {
+  public CheckBox getValue() {
+    for (CheckBox check : fields) {
+      if (check.getValue()) {
+        return check;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Returns a list of all selected check boxes.
+   * 
+   * @return the list
+   */
+  public List<CheckBox> getValues() {
     List<CheckBox> values = new ArrayList<CheckBox>();
     for (CheckBox check : fields) {
       if (check.getValue()) {

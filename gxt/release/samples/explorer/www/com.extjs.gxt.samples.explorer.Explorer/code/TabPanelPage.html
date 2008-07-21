@@ -137,8 +137,7 @@ public class TabPanelPage extends LayoutContainer implements EntryPoint {
     RowLayout layout = new RowLayout(Orientation.VERTICAL);
     setLayout(layout);
     tabFolder.setStyleAttribute("margin", "15px");
-    tabFolder.setData(new RowData(1, 1));
-    add(tabFolder);
+    add(tabFolder, new RowData(1, 1));
     add(buttonBar);
 
   }

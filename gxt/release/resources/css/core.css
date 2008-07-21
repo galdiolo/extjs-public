@@ -3,8 +3,12 @@
   padding: 0px;
 }
 
+.ext-el-mask {
+  z-index: 100;
+}
+
 .icon-wait {
-  background: url(../images/gxt/icons/wait.gif) no-repeat !important;	
+  background: url(../images/gxt/icons/wait.gif) no-repeat !important;
 }
 
 .x-panel-btns-right {
@@ -25,7 +29,7 @@
   position: absolute;
   z-index: 10;
   background-color: black;
-  filter: alpha(opacity =           10);
+  filter: alpha(opacity =               10);
   opacity: .1;
   left: 0px;
   top: 0px;
@@ -106,11 +110,10 @@
   cursor: row-resize;
 }
 
-
 .x-drag-proxy {
   border: 1px dashed #3b5a82;
   background-color: #EDEDED;
-  filter: alpha(opacity =               50);
+  filter: alpha(opacity =                   50);
   opacity: .5;
   background-color: #c3daf9;
   z-index: 20000;
@@ -213,7 +216,7 @@
   position: absolute;
   z-index: 10;
   background-color: black;
-  filter: alpha(opacity =           10);
+  filter: alpha(opacity =               10);
   opacity: .1;
   left: 0px;
   top: 0px;
@@ -279,7 +282,7 @@
 }
 
 .x-splitbar-shim {
-  filter: alpha(opacity =                   1);
+  filter: alpha(opacity =                       1);
   opacity: 0;
   position: absolute;
   width: 100%;
@@ -296,7 +299,7 @@
 .x-drag-proxy {
   border: 1px dashed #3b5a82;
   background-color: #EDEDED;
-  filter: alpha(opacity =               50);
+  filter: alpha(opacity =                   50);
   opacity: .5;
   background-color: #c3daf9;
   z-index: 20000;
@@ -304,4 +307,8 @@
   position: absolute;
   left: 0;;
   top: 0;
+}
+
+.ext-ie .x-toolbar {
+  padding-bottom: 0px;
 }

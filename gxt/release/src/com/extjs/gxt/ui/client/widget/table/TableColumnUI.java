@@ -112,7 +112,7 @@ public class TableColumnUI extends BoxComponent {
         onMouseOut(ce);
         break;
       case Event.ONCLICK:
-        header.onColumnClick(this);
+        header.onColumnClick(this, ce);
         break;
     }
   }

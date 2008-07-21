@@ -143,12 +143,19 @@ public class ListStore<M extends ModelData> extends Store<M> {
 
   protected void onLoad(LoadEvent le) {
     Object data = le.data;
+    
+    removeAll();
+    
     if (data instanceof List) {
       List<M> list = (List) le.data;
       all = list;
 
     } else if (data instanceof ListLoadResult) {
       all = ((ListLoadResult) data).getData();
+    }
+    
+    for (M m : all) {
+      registerModel(m);
     }
 
     if (le.config instanceof ListLoadConfig) {
@@ -171,7 +178,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
   }
 
   protected void onLoadException(LoadEvent le) {
-
+    throw new RuntimeException(le.exception);
   }
 
   /**
@@ -294,7 +301,6 @@ public class ListStore<M extends ModelData> extends Store<M> {
     List<M> temp = new ArrayList<M>();
     temp.add(model);
     insert(temp, index);
-
   }
 
   /**

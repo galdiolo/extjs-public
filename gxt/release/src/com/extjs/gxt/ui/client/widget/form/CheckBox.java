@@ -54,7 +54,7 @@ public class CheckBox extends Field<Boolean> {
   @Override
   public String getRawValue() {
     String propName = isAttached() ? "checked" : "defaultChecked";
-    return String.valueOf(DOM.getElementPropertyBoolean(input.dom, propName));
+    return input.dom.getPropertyString(propName);
   }
 
   @Override
@@ -74,8 +74,8 @@ public class CheckBox extends Field<Boolean> {
   @Override
   public void setRawValue(String value) {
     boolean b = Boolean.valueOf(value).booleanValue();
-    DOM.setElementPropertyBoolean(getInputEl().dom, "checked", b);
-    DOM.setElementPropertyBoolean(getInputEl().dom, "defaultChecked", b);
+    getInputEl().dom.setPropertyBoolean("checked", b);
+    getInputEl().dom.setPropertyBoolean("defaultChecked", b);
   }
 
   @Override
@@ -104,7 +104,7 @@ public class CheckBox extends Field<Boolean> {
       ce.stopEvent();
       return;
     }
-    boolean v = getInputEl().getBooleanElementAttribute("checked");
+    boolean v = getInputEl().dom.getPropertyBoolean("checked");
     setValue(v);
     focusValue = v;
     fireChangeEvent(!v, v);

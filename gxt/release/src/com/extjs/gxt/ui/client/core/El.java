@@ -293,22 +293,20 @@ public class El {
    * @return this
    */
   public El center(Element container) {
-    int width, height;
-    if (container != null) {
-      width = fly(container).getWidth();
-      height = fly(container).getHeight();
-    } else {
-      width = Window.getClientWidth();
-      height = Window.getClientHeight();
+    int width = container == null ? Window.getClientWidth() : container.getOffsetWidth();
+    int height = container == null ? Window.getClientHeight() : container.getOffsetHeight();
+
+    if (container == null) {
+      container = XDOM.getBody();
     }
 
     int w = getWidth();
     int h = getHeight();
 
-    int left = (width / 2) - (w / 2);
-    int top = (height / 2) - (h / 2);
-    setLeft(left);
-    setTop(top);
+    int left = (width / 2) - (w / 2) + container.getScrollTop();
+    int top = (height / 2) - (h / 2) + container.getScrollLeft();
+
+    setLeftTop(left, top);
     sync(true);
     return this;
   }
@@ -323,6 +321,17 @@ public class El {
   public El child(String selector) {
     Element child = DomQuery.selectNode(selector, dom);
     return child == null ? null : new El(child);
+  }
+  
+  /**
+   * Selects a single child at any depth below this element based on the passed
+   * CSS selector.
+   * 
+   * @param selector the css selector
+   * @return the child element
+   */
+  public Element childElement(String selector) {
+    return DomQuery.selectNode(selector, dom);
   }
 
   /**
@@ -428,7 +437,9 @@ public class El {
    * @return this
    */
   public El disableTextSelection(boolean disable) {
-    setStyleName("x-unselectable", disable);
+    if (GXT.isGecko) {
+      setStyleName("x-unselectable", disable);
+    }
     disableTextSelectInternal(dom, disable);
     return this;
   }
@@ -519,7 +530,19 @@ public class El {
     if (elem == null) {
       return null;
     }
-    return fly(elem);
+    return new El(elem);
+  }
+  
+  /**   
+   * Looks at this node and then at parent nodes for a match of the passed
+   * simple selector (e.g. div.some-class or span:first-child).
+   * 
+   * @param selector the simple selector to test
+   * @param maxDepth the max depth
+   * @return the matching element
+   */
+  public Element findParentElement(String selector, int maxDepth) {
+    return Ext.findParent(dom, selector, maxDepth);
   }
 
   /**
@@ -581,16 +604,6 @@ public class El {
    */
   public Point getAnchorXY(String anchor, boolean local) {
     return XElement.fly(dom).getAnchorXY(anchor, local);
-  }
-
-  /**
-   * Returns the element's attribute value.
-   * 
-   * @param attr the attribute name
-   * @return the attribute value
-   */
-  public boolean getBooleanElementAttribute(String attr) {
-    return DOM.getElementPropertyBoolean(dom, attr);
   }
 
   /**
@@ -710,17 +723,6 @@ public class El {
   }
 
   /**
-   * Returns the element's attribute value.
-   * 
-   * @param attr the attribute name
-   * @return the attribute value
-   */
-  public native String getElementAttribute(String attr)/*-{
-   var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-   return dom.getAttribute(attr);
-   }-*/;
-
-  /**
    * Returns the sum width of the padding and borders for the passed "sides".
    * See #getBorderWidth() for more information about the sides.
    * 
@@ -770,16 +772,6 @@ public class El {
    */
   public String getInnerHtml() {
     return DOM.getInnerHTML(dom);
-  }
-
-  /**
-   * Returns the element's attribute value.
-   * 
-   * @param attr the attribute name
-   * @return the attribute value
-   */
-  public int getIntElementAttribute(String attr) {
-    return Integer.parseInt(getElementAttribute(attr));
   }
 
   /**
@@ -836,6 +828,9 @@ public class El {
    * @return the margins
    */
   public int getMargins(String sides) {
+    if (getStyleAttribute("margin").equals("")) {
+      return 0;
+    }
     return Ext.callInt(dom, "getMargins", sides);
   }
 
@@ -857,7 +852,7 @@ public class El {
    * @return the inner html
    */
   public String getOuterHtml() {
-    return getElementAttribute("outerHTML");
+    return dom.getAttribute("outerHTML");
   }
 
   /**
@@ -984,7 +979,7 @@ public class El {
    * @return the style name
    */
   public String getStyleName() {
-    return DOM.getElementProperty(dom, "className");
+    return dom.getClassName();
   }
 
   /**
@@ -1111,7 +1106,7 @@ public class El {
   public native Point getXY() /*-{
    var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
    $wnd.dom = dom;
-   var xy = $wnd._el.fly(dom).getXY();
+   var xy = $wnd.GXT._el.fly(dom).getXY();
    var p = @com.extjs.gxt.ui.client.util.Point::newInstance(II)(xy[0],xy[1]);
    return p;
    }-*/;
@@ -1353,9 +1348,11 @@ public class El {
    *         <code>false</code>
    */
   public boolean isVisible() {
-    if (getStyleAttribute("visibility").equals("hidden")) {
+    String v = getStyleAttribute("visibility");
+    String d = getStyleAttribute("display");
+    if (v != null && v.equals("hidden")) {
       return false;
-    } else if (getStyleAttribute("display").equals("none")) {
+    } else if (d != null && d.equals("none")) {
       return false;
     } else {
       return true;
@@ -1417,7 +1414,7 @@ public class El {
 
     appendChild(_mask.dom);
 
-    _maskMsg = new El("<div class='ext-el-mask-msg'><div></div></div>");
+    _maskMsg = new El("<div class='ext-el-mask-msg' style='z-index: 100'><div style='background-color: white'></div></div>");
     _maskMsg.firstChild().setInnerHtml(message);
     _maskMsg.setDisplayed(true);
 
@@ -2225,7 +2222,7 @@ public class El {
    */
   public native El setY(int y) /*-{
    var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-   $wnd._el.fly(dom).setY(y);
+   $wnd.GXT._el.fly(dom).setY(y);
    return this;
    }-*/;
 

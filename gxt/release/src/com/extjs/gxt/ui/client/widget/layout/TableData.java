@@ -14,7 +14,7 @@ import com.extjs.gxt.ui.client.core.El;
 /**
  * Layout data for <code>TableLayout</code>.
  */
-public class TableData {
+public class TableData extends LayoutData {
 
   HorizontalAlignment horizontalAlign;
   VerticalAlignment verticalAlign;

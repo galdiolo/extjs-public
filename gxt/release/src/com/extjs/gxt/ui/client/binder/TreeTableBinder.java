@@ -39,7 +39,7 @@ public class TreeTableBinder<M extends ModelData> extends TreeBinder<M> {
   @Override
   public Component findItem(M model) {
     for (TreeItem item : treeTable.getAllItems()) {
-      if (store.getModelComparer().equals((M) item.getData(), model)) {
+      if (store.getModelComparer().equals((M) item.getModel(), model)) {
         return item;
       }
     }
@@ -74,7 +74,7 @@ public class TreeTableBinder<M extends ModelData> extends TreeBinder<M> {
   protected TreeItem createItem(M model) {
     int cols = treeTable.getColumnCount();
     TreeTableItem item = new TreeTableItem(new Object[cols]);
-    item.setData(model);
+    setModel(item, model);
     updateItemValues(item);
     updateItemStyles(item);
 
@@ -112,7 +112,7 @@ public class TreeTableBinder<M extends ModelData> extends TreeBinder<M> {
   }
 
   private void filterItems(TreeItem item) {
-    if (item.isRoot() || isOrDecendantSelected(null, (M) item.getData())) {
+    if (item.isRoot() || isOrDecendantSelected(null, (M) item.getModel())) {
       item.setVisible(true);
       int count = item.getItemCount();
       for (int i = 0; i < count; i++) {
@@ -130,7 +130,7 @@ public class TreeTableBinder<M extends ModelData> extends TreeBinder<M> {
     TreeItem item = (TreeItem) findItem(model);
     if (item != null) {
       for (TreeItem child : item.getItems()) {
-        boolean result = isOrDecendantSelected(model, (M) child.getData());
+        boolean result = isOrDecendantSelected(model, (M) child.getModel());
         if (result) {
           return true;
         }
@@ -140,7 +140,7 @@ public class TreeTableBinder<M extends ModelData> extends TreeBinder<M> {
   }
 
   private void updateItemStyles(TreeTableItem item) {
-    M model = (M) item.getData();
+    M model = (M) item.getModel();
     int cols = treeTable.getColumnCount();
     for (int i = 0; i < cols; i++) {
       String id = getColumnId(i);
@@ -150,7 +150,7 @@ public class TreeTableBinder<M extends ModelData> extends TreeBinder<M> {
   }
 
   private void updateItemValues(TreeTableItem item) {
-    M model = (M) item.getData();
+    M model = (M) item.getModel();
     int cols = treeTable.getColumnCount();
     for (int j = 0; j < cols; j++) {
       String id = getColumnId(j);

@@ -64,7 +64,6 @@ public class AnchorLayoutPage extends LayoutContainer {
     ContentPanel panel1 = new ContentPanel();
     panel1.setHeading("Panel 1");
     panel1.addText("Width = 50% of the container");
-    panel1.setData(new AnchorData("50%"));
 
     ContentPanel panel2 = new ContentPanel();
     panel2.setHeading("Panel 2");
@@ -74,7 +73,7 @@ public class AnchorLayoutPage extends LayoutContainer {
     panel3.setHeading("Panel 3");
     panel3.addText("Width = container width - 10 pixels<br>Height = container height - 262 pixels");
 
-    add(panel1);
+    add(panel1, new AnchorData("50%"));
     add(panel2);
     add(panel3);
   }

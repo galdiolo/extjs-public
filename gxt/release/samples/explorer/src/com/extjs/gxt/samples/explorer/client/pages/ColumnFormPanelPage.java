@@ -42,7 +42,6 @@ public class ColumnFormPanelPage extends LayoutContainer {
     main.setLayout(new ColumnLayout());
 
     LayoutContainer left = new LayoutContainer();
-    left.setData(new ColumnData(.5));
 
     FormLayout layout = new FormLayout();
     layout.setLabelAlign(LabelAlign.TOP);
@@ -64,7 +63,6 @@ public class ColumnFormPanelPage extends LayoutContainer {
     left.add(birthday);
 
     LayoutContainer right = new LayoutContainer();
-    right.setData(new ColumnData(.5));
 
     layout = new FormLayout();
     layout.setLabelAlign(LabelAlign.TOP);
@@ -92,8 +90,8 @@ public class ColumnFormPanelPage extends LayoutContainer {
     group.add(radio2);
     right.add(group);
 
-    main.add(left);
-    main.add(right);
+    main.add(left, new ColumnData(.5));
+    main.add(right, new ColumnData(.5));
 
     panel.add(main);
 

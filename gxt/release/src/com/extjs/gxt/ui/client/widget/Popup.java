@@ -87,7 +87,9 @@ public class Popup extends LayoutContainer {
       if (ce.getTarget() == XDOM.getBody()) {
         return false;
       }
-      Popup.this.onAutoHide(ce.event);
+      if (Popup.this.onAutoHide(ce.event)) {
+        hide();
+      }
       return true;
     }
   
@@ -377,6 +379,8 @@ public class Popup extends LayoutContainer {
   }
 
   protected void afterShow() {
+    el().setVisible(true);
+    
     if (layer != null) {
       layer.sync(true);
     }

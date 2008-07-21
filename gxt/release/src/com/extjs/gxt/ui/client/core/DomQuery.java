@@ -125,7 +125,7 @@ public class DomQuery {
    * @return true if matches
    */
   public static native boolean is(Element elem, String selector) /*-{
-     return $wnd.Ext.DomQuery.is(elem, selector);
+     return $wnd.GXT.Ext.DomQuery.is(elem, selector);
    }-*/;
 
   /**
@@ -169,7 +169,7 @@ public class DomQuery {
    * @return the value
    */
   public static native String selectValue(String selector, Element root) /*-{
-    return $wnd.Ext.DomQuery.selectValue(selector, root);
+    return $wnd.GXT.Ext.DomQuery.selectValue(selector, root);
   }-*/;
   
   /**
@@ -180,7 +180,7 @@ public class DomQuery {
    * @return the value
    */
   public static native String selectValue(String selector, JavaScriptObject root) /*-{
-    return $wnd.Ext.DomQuery.selectValue(selector, root);
+    return $wnd.GXT.Ext.DomQuery.selectValue(selector, root);
   }-*/;
 
   /**
@@ -191,27 +191,31 @@ public class DomQuery {
    * @return the matching element
    */
   public static Element selectNode(String selector, Element root) {
-    // temporary hack unti ext dom query is fixed for id
+    // temporary hack until ext dom query is fixed for id
     String[] tokens = selector.split(" ");
     if (tokens.length == 1 && tokens[0].startsWith("#")) {
       return XDOM.getElementById(tokens[0].substring(1));
     }
-    return select(selector, root)[0];
+    Element[] m = select(selector, root);
+    if (m.length > 0) {
+      return m[0];
+    }
+    return null;
   }
 
   private static native JavaScriptObject internalFilter(Element[] elems, String selector,
       boolean nonMatches) /*-{
-     var result = $wnd.Ext.DomQuery.filter(elems, selector, root, nonMatches);
+     var result = $wnd.GXT.Ext.DomQuery.filter(elems, selector, root, nonMatches);
      return result;
    }-*/;
 
   private static native JavaScriptObject internalSelect(String selector) /*-{
-    var result = $wnd.Ext.DomQuery.select(selector);
+    var result = $wnd.GXT.Ext.DomQuery.select(selector);
     return result;
   }-*/;
 
   private static native JavaScriptObject internalSelect(String selector, Element root) /*-{
-    var result = $wnd.Ext.DomQuery.select(selector, root);
+    var result = $wnd.GXT.Ext.DomQuery.select(selector, root);
     return result;
   }-*/;
 

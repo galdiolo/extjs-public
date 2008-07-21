@@ -23,6 +23,14 @@ import com.google.gwt.xml.client.XMLParser;
  * <code>ModelData</code> instances. Subclass may override
  * {@link #newModelInstance()} to return any model data subclass.
  * 
+ * <code><pre>
+ *  // defines the xml structure
+ *  ModelType type = new ModelType();
+ *  type.recordName = "record"; // The repeated element which contains row information
+ *  type.root = "records"; // the root element that contains the total attribute (optional)
+ *  type.totalName = "total"; // The element which contains the total dataset size (optional)
+ * </pre></code>
+ * 
  * @param <C> the load config type
  */
 public class XmlReader<C> implements DataReader<C, ListLoadResult<ModelData>> {
@@ -40,13 +48,13 @@ public class XmlReader<C> implements DataReader<C, ListLoadResult<ModelData>> {
 
   public ListLoadResult read(C loadConfig, Object data) {
     Document doc = XMLParser.parse((String) data);
-    Node root = doc.getFirstChild();
+    
     NodeList list = doc.getElementsByTagName(modelType.recordName);
-    ArrayList<BaseModel> records = new ArrayList<BaseModel>();
+    ArrayList<ModelData> records = new ArrayList<ModelData>();
     for (int i = 0; i < list.getLength(); i++) {
       Node node = list.item(i);
       Element elem = (Element) node;
-      BaseModel model = new BaseModel();
+      ModelData model = newModelInstance();
       for (int j = 0; j < modelType.getFieldCount(); j++) {
         DataField field = modelType.getField(j);
         String map = field.map != null ? field.map : field.name;
@@ -58,7 +66,8 @@ public class XmlReader<C> implements DataReader<C, ListLoadResult<ModelData>> {
 
     int totalCount = records.size();
 
-    if (modelType.totalName != null) {
+    Node root = doc.getElementsByTagName(modelType.root).item(0);
+    if (root != null && modelType.totalName != null) {
       Node totalNode = root.getAttributes().getNamedItem(modelType.totalName);
       if (totalNode != null) {
         String sTot = totalNode.getNodeValue();
@@ -66,11 +75,12 @@ public class XmlReader<C> implements DataReader<C, ListLoadResult<ModelData>> {
       }
     }
 
-    return new BasePagingLoadResult(records, 0, totalCount);
+    return new BasePagingLoadResult(records, ((PagingLoadConfig) loadConfig).getOffset(),
+        totalCount);
   }
 
   protected native JavaScriptObject getJsObject(Element elem) /*-{
-     return elem.@com.google.gwt.xml.client.impl.DOMItem::getJsObject()();
+   return elem.@com.google.gwt.xml.client.impl.DOMItem::getJsObject()();
    }-*/;
 
   protected String getValue(Element elem, String name) {
@@ -78,8 +88,8 @@ public class XmlReader<C> implements DataReader<C, ListLoadResult<ModelData>> {
   }
 
   /**
-   * Returns the new model instances. Subclasses may override to provide a
-   * model data subclass.
+   * Returns the new model instances. Subclasses may override to provide a model
+   * data subclass.
    * 
    * @return the new model data instance
    */

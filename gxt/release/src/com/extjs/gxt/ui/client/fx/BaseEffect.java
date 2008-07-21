@@ -37,6 +37,7 @@ public class BaseEffect implements Effect {
     }
 
     public void onStart() {
+      el.setStyleAttribute("opacity", 0);
       el.setVisible(true);
     }
 
@@ -123,7 +124,8 @@ public class BaseEffect implements Effect {
 
     public void onComplete() {
       el.setVisible(false);
-      el.setStyleAttribute("opacity", "");
+      el.dom.getStyle().setProperty("opacity", "");
+      el.dom.getStyle().setProperty("filter", "");
     }
 
   }

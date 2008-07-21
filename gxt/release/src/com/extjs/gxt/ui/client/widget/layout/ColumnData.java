@@ -7,7 +7,7 @@
  */
 package com.extjs.gxt.ui.client.widget.layout;
 
-public class ColumnData {
+public class ColumnData extends LayoutData {
 
   private double width;
 

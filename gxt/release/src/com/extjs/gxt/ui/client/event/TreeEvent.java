@@ -27,9 +27,9 @@ public class TreeEvent extends ContainerEvent<Tree, TreeItem> {
   public Tree tree;
 
   /**
-   * The child item.
+   * The parent item.
    */
-  public TreeItem child;
+  public TreeItem parent;
 
   /**
    * Creates a new tree event.

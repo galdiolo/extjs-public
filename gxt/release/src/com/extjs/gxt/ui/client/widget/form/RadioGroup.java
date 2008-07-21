@@ -34,13 +34,13 @@ public class RadioGroup extends MultiField<Radio> {
   }
 
   /**
-   * Returns the value of the selected radio.
+   * Returns the selected radio.
    */
   @Override
-  public Object getValue() {
+  public Radio getValue() {
     for (Radio r : fields) {
       if (r.getValue()) {
-        return r.getValue();
+        return r;
       }
     }
     return null;
@@ -57,9 +57,11 @@ public class RadioGroup extends MultiField<Radio> {
   }
 
   @Override
-  public void setValue(Object value) {
+  public void setValue(Radio value) {
     for (Radio r : fields) {
-      r.setValue(value.equals(r.getValue()));
+      if (r.equals(value)) {
+        r.setValue(true);
+      }
     }
   }
   

@@ -9,6 +9,8 @@ package com.extjs.gxt.ui.client.widget;
 
 import java.util.Map;
 
+import com.extjs.gxt.ui.client.event.ComponentEvent;
+
 /**
  * A item in a <code>DataView</code>.
  */
@@ -22,6 +24,14 @@ public class DataViewItem extends Component {
   
   public Map<String, Object> getValues() {
     return properties;
+  }
+
+  @Override
+  public void onComponentEvent(ComponentEvent ce) {
+    super.onComponentEvent(ce);
+    if (toolTip != null) {
+      toolTip.handleEvent(ce);
+    }
   }
   
 }

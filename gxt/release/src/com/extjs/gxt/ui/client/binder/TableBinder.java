@@ -58,7 +58,7 @@ public class TableBinder<M extends ModelData> extends StoreBinder<ListStore<M>, 
   @Override
   public Component findItem(M model) {
     for (TableItem item : table.getItems()) {
-      if (store.getModelComparer().equals((M) item.getData(), model)) {
+      if (store.getModelComparer().equals((M) item.getModel(), model)) {
         return item;
       }
     }
@@ -92,7 +92,7 @@ public class TableBinder<M extends ModelData> extends StoreBinder<ListStore<M>, 
   protected void update(M model) {
     TableItem item = (TableItem) findItem(model);
     if (item != null) {
-      item.setData(model);
+      setModel(item, model);
       updateItemStyles(item);
       updateItemValues(item);
     }
@@ -112,7 +112,7 @@ public class TableBinder<M extends ModelData> extends StoreBinder<ListStore<M>, 
 
   protected TableItem createItem(M model) {
     TableItem item = new TableItem(new Object[table.getColumnCount()]);
-    item.setData(model);
+    setModel(item, model);
     updateItemValues(item);
     updateItemStyles(item);
     return item;
@@ -127,7 +127,7 @@ public class TableBinder<M extends ModelData> extends StoreBinder<ListStore<M>, 
     List<M> selection = new ArrayList<M>();
     List<TableItem> sel = table.getSelectedItems();
     for (TableItem item : sel) {
-      selection.add((M) item.getData());
+      selection.add((M) item.getModel());
     }
     return selection;
   }
@@ -165,14 +165,16 @@ public class TableBinder<M extends ModelData> extends StoreBinder<ListStore<M>, 
       table.getTableHeader().clearSort();
     }
 
-    table.getView().resize();
+    if (table != null && table.isRendered()) {
+      table.getView().resize();
+    }
   }
 
   @Override
   protected void onFilter(StoreEvent se) {
     if (store.isFiltered()) {
       for (TableItem item : table.getItems()) {
-        M model = (M) item.getData();
+        M model = (M) item.getModel();
         item.setVisible(store.contains(model));
       }
     } else {
@@ -197,8 +199,8 @@ public class TableBinder<M extends ModelData> extends StoreBinder<ListStore<M>, 
     
     Collections.sort(table.getItems(), new Comparator<TableItem>() {
       public int compare(TableItem o1, TableItem o2) {
-        int idx1 = store.indexOf((M)o1.getData());
-        int idx2 = store.indexOf((M)o2.getData());
+        int idx1 = store.indexOf((M)o1.getModel());
+        int idx2 = store.indexOf((M)o2.getModel());
         return idx1 < idx2 ? -1 : 1;
       }
     });
@@ -229,7 +231,7 @@ public class TableBinder<M extends ModelData> extends StoreBinder<ListStore<M>, 
   }
 
   private void updateItemStyles(TableItem item) {
-    M model = (M) item.getData();
+    M model = (M) item.getModel();
     int cols = table.getColumnCount();
     for (int i = 0; i < cols; i++) {
       String id = getColumnId(i);
@@ -239,7 +241,7 @@ public class TableBinder<M extends ModelData> extends StoreBinder<ListStore<M>, 
   }
 
   private void updateItemValues(TableItem item) {
-    M model = (M) item.getData();
+    M model = (M) item.getModel();
     int cols = table.getColumnCount();
     for (int j = 0; j < cols; j++) {
       String id = getColumnId(j);

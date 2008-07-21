@@ -12,7 +12,7 @@ import com.extjs.gxt.ui.client.util.Margins;
 /**
  * Layout data for <code>FillLayout</code>.
  */
-public class FillData extends LayoutData {
+public class FillData extends MarginData {
 
   public FillData() {
     super();

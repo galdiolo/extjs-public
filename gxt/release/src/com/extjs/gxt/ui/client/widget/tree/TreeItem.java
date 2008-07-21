@@ -24,75 +24,84 @@ import com.google.gwt.user.client.Element;
  * <dl>
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>BeforeAdd</b> : TreeEvent(item, child, index)<br>
+ * <dd><b>BeforeAdd</b> : TreeEvent(tree, parent, item, index)<br>
  * <div>Fires before a item is added or inserted. Listeners can set the
  * <code>doit</code> field to <code>false</code> to cancel the action.</div>
  * <ul>
- * <li>item : this</li>
- * <li>child : the item being added</li>
+ * <li>tree : the source tree</li>
+ * <li>parent : this</li>
+ * <li>item : the item being added</li>
  * <li>index : the index at which the item will be added</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>BeforeRemove</b> : TreeEvent(item, child)<br>
+ * <dd><b>BeforeRemove</b> : TreeEvent(tree, parent, item)<br>
  * <div>Fires before a item is removed. Listeners can set the <code>doit</code>
  * field to <code>false</code> to cancel the action.</div>
  * <ul>
- * <li>item : this</li>
- * <li>child : the item being removed</li>
+ * <li>tree : the source tree</li>
+ * <li>parent : this</li>
+ * <li>item : the item being removed</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>BeforeExpand</b> : TreeEvent(item)<br>
+ * <dd><b>BeforeExpand</b> : TreeEvent(tree, item)<br>
  * <div>Fires before a item is expanded. Listeners can set the <code>doit</code>
  * field to <code>false</code> to cancel the expand.</div>
  * <ul>
+ * <li>tree : the source tree</li>
  * <li>item : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>BeforeCollapse</b> : TreeEvent(item)<br>
+ * <dd><b>BeforeCollapse</b> : TreeEvent(tree, item)<br>
  * <div>Fires before a item is collapsed. Listeners can set the
  * <code>doit</code> field to <code>false</code> to cancel the collapse.</div>
  * <ul>
+ * <li>tree : the source tree</li>
  * <li>item : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Add</b> : TreeEvent(item, child, index)<br>
+ * <dd><b>Add</b> : TreeEvent(tree, parent, item, index)<br>
  * <div>Fires after a item has been added or inserted.</div>
  * <ul>
- * <li>item : this</li>
- * <li>child : the item that was added</li>
+ * <li>tree : the source tree</li>
+ * <li>parent : this</li>
+ * <li>item : the item that was added</li>
  * <li>index : the index at which the item will be added</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Remove</b> : TreeEvent(item, child)<br>
+ * <dd><b>Remove</b> : TreeEvent(tree, parent, item)<br>
  * <div>Fires after a item has been removed.</div>
  * <ul>
- * <li>item : this</li>
- * <li>child : the item being removed</li>
+ * <li>tree : the source tree</li>
+ * <li>parent : this</li>
+ * <li>item : the item being removed</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Expand</b> : TreeEvent(item)<br>
+ * <dd><b>Expand</b> : TreeEvent(tree, item)<br>
  * <div>Fires after a item has been expanded.</div>
  * <ul>
+ * <li>tree : the source tree</li>
  * <li>item : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Collapse</b> : TreeEvent(item)<br>
+ * <dd><b>Collapse</b> : TreeEvent(tree, item)<br>
  * <div>Fires ater a item is collapsed.</div>
  * <ul>
+ * <li>tree : the source tree</li>
  * <li>item : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>CheckChange</b> : TreeEvent(item)<br>
+ * <dd><b>CheckChange</b> : TreeEvent(tree, item)<br>
  * <div>Fires after a check state change.</div>
  * <ul>
+ * <li>tree : the source tree</li>
  * <li>item : this</li>
  * </ul>
  * </dd>
@@ -110,8 +119,9 @@ public class TreeItem extends Component {
   protected boolean childrenRendered;
 
   TreeItem parentItem;
-  boolean leaf = true;
+  
   String text, iconStyle;
+  private boolean leaf = true;
   private List<TreeItem> children;
   private String textStyle;
   private boolean expandOnRender;
@@ -150,8 +160,8 @@ public class TreeItem extends Component {
    */
   public void add(TreeItem item, int index) {
     TreeEvent te = new TreeEvent(tree);
-    te.item = this;
-    te.child = item;
+    te.parent = this;
+    te.item = item;
     te.index = index;
     if (fireEvent(Events.BeforeAdd, te)) {
       item.parentItem = this;
@@ -378,8 +388,8 @@ public class TreeItem extends Component {
       return;
     }
     TreeEvent te = new TreeEvent(tree);
-    te.item = this;
-    te.child = item;
+    te.parent = this;
+    te.item = item;
     if (fireEvent(Events.BeforeRemove, te)) {
       children.remove(item);
       tree.unregisterItem(item);
@@ -596,8 +606,16 @@ public class TreeItem extends Component {
   protected void onRender(Element target, int index) {
     ui = getTreeItemUI();
     ui.render(target, index);
+    
+    if (textStyle != null) {
+      ui.onTextStyleChange(textStyle);
+    }
+    
     if (expandOnRender) {
+      boolean anim = tree.getAnimate();
+      tree.setAnimate(false);
       setExpanded(true);
+      tree.setAnimate(anim);
     }
   }
 

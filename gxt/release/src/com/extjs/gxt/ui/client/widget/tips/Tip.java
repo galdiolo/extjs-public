@@ -133,11 +133,11 @@ public class Tip extends ContentPanel {
     el().setVisible(true);
     if (attachSize.width == Style.DEFAULT) {
       Element body = getElement("body");
-      int bw = fly(body).getTextWidth() + 10;
+      int bw = fly(body).getTextWidth() + 1;
       if (title != null) {
         bw = Math.max(bw, head.el().child("span").getTextWidth());
       }
-      bw += getFrameWidth() + (closable ? 20 : 0) + fly(body).getPadding("lr") - 7;//why?
+      bw += getFrameWidth() + (closable ? 20 : 0) + fly(body).getPadding("lr");
       setWidth(Util.constrain(bw, minWidth, maxWidth));
     }
     Point p = new Point(x, y);

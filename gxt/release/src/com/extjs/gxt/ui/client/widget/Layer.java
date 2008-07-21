@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.widget;
 import java.util.Stack;
 
 import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.util.Size;
@@ -68,10 +69,10 @@ public class Layer extends El {
     el.dom.setClassName("ext-shim");
     el.setVisibility(true);
     el.setVisible(false);
-    getParent().insertBefore(el.dom, dom);
     if (GXT.isIE && GXT.isSecure) {
       el.dom.setPropertyString("src", GXT.SSL_SECURE_URL);
     }
+    getParent().insertBefore(el.dom, dom);
     return el;
   }
 
@@ -131,6 +132,15 @@ public class Layer extends El {
     return shim;
   }
 
+  @Override
+  public El updateZIndex(int adj) {
+    super.updateZIndex(adj);
+    if (shim != null) {
+      shim.setZIndex(Math.max(0, XDOM.getTopZIndex() - 2));
+    }
+    return this;
+  }
+
   /**
    * Hides the layer's shadow.
    */
@@ -146,6 +156,7 @@ public class Layer extends El {
   public void hideShim() {
     if (shim != null) {
       shim.setVisible(false);
+      shim.removeFromParent();
       shims.push(shim);
       shim = null;
     }

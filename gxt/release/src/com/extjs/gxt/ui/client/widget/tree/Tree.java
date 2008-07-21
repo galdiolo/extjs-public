@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.extjs.gxt.ui.client.Style.SelectionMode;
-import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.event.TreeEvent;
@@ -186,7 +185,7 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
     root.setExpanded(false, true);
     if (anim) animate = true;
   }
-
+  
   /**
    * Expands all item's.
    */
@@ -240,7 +239,7 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
    * @return the matching tree item or <code>null</code> if no match
    */
   public TreeItem findItem(Element element) {
-    El elem = fly(element).findParent("." + itemStyle, 15);
+    Element elem = fly(element).findParentElement("." + itemStyle, 15);
     if (elem != null) {
       String id = elem.getId();
       if (id != null && !id.equals("")) {
@@ -329,6 +328,11 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
    */
   public int getIndentWidth() {
     return indentWidth;
+  }
+
+  @Override
+  public TreeItem getItem(int index) {
+    return getRootItem().getItem(index);
   }
 
   /**

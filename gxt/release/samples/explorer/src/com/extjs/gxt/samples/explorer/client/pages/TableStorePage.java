@@ -33,7 +33,6 @@ import com.extjs.gxt.ui.client.widget.toolbar.TextToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.i18n.client.NumberFormat;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.RootPanel;
 
 public class TableStorePage extends LayoutContainer implements EntryPoint {
@@ -44,11 +43,6 @@ public class TableStorePage extends LayoutContainer implements EntryPoint {
 
   public TableStorePage() {
     setMonitorResize(false);
-  }
-
-  @Override
-  protected void onRender(Element parent, int pos) {
-    super.onRender(parent, pos);
 
     setLayout(new FlowLayout(10));
     setMonitorResize(false);
@@ -123,8 +117,8 @@ public class TableStorePage extends LayoutContainer implements EntryPoint {
     // add buttons
     panel.addButton(new Button("Save"));
     panel.addButton(new Button("Cancel"));
-    
-    add(panel);
 
+    add(panel);
   }
+
 }

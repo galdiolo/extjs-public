@@ -44,8 +44,6 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
   private List<CheckChangedListener> checkListeners;
   private boolean silent;
   private boolean caching = true;
-  private TreeItem activeItem;
-  private boolean activeExpand;
   private boolean expandOnFilter = true;
 
   /**
@@ -74,7 +72,7 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
   public Component findItem(M model) {
     ModelComparer<M> comparer = store.getModelComparer();
     for (TreeItem item : tree.getAllItems()) {
-      if (comparer.equals((M) item.getData(), model)) {
+      if (comparer.equals((M) item.getModel(), model)) {
         return item;
       }
     }
@@ -84,7 +82,7 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
   public List<M> getCheckedSelection() {
     List<M> selection = new ArrayList<M>();
     for (TreeItem item : tree.getChecked()) {
-      selection.add((M) item.getData());
+      selection.add((M) item.getModel());
     }
     return selection;
   }
@@ -219,7 +217,7 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
         loadChildren(item, false);
       }
     }
-    
+
     if (isAutoSelect() && list.size() > 0) {
       setSelection(list.get(0));
     }
@@ -237,7 +235,7 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
       item.setLeaf(store.getChildCount(model) == 0);
     }
 
-    item.setData(model);
+    setModel(item, model);
     return item;
   }
 
@@ -255,7 +253,7 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
     List<TreeItem> selItems = tree.getSelectedItems();
     List<M> selected = new ArrayList<M>();
     for (TreeItem item : selItems) {
-      selected.add((M) item.getData());
+      selected.add((M) item.getModel());
     }
     return selected;
   }
@@ -290,13 +288,10 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
   }
 
   protected void loadChildren(final TreeItem item, boolean expand) {
-    activeItem = item;
-    activeExpand = expand;
-
     if (loader == null) {
-      M model = (M) item.getData();
+      M model = (M) item.getModel();
       List<M> children = store.getChildren(model);
-      renderChildren(children);
+      renderChildren(model, children);
       return;
     }
     // if there is an async call out for my children already, Make
@@ -310,7 +305,11 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
       item.getUI().onLoadingChange(true);
     }
 
-    loader.loadChildren((ModelData) item.getData());
+    if (expand) {
+      item.setData("expand", expand);
+    }
+
+    loader.loadChildren((ModelData) item.getModel());
   }
 
   @Override
@@ -323,18 +322,20 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
     } else {
       item = (TreeItem) findItem(parent);
     }
-    
+
     if (item == null) {
       return;
     }
-    
-    item.setLeaf(false);
+
     if (item.isRendered() && !item.isRoot()) {
       item.getUI().updateJointStyle();
     }
-    
+
     if (item.isRoot() || item.getData("loaded") != null) {
       List<M> children = tse.children;
+      if (children.size() > 0) {
+        item.setLeaf(false);
+      }
       for (int i = children.size() - 1; i >= 0; i--) {
         item.add(createItem(children.get(i)), tse.index);
       }
@@ -344,6 +345,7 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
   protected void onBeforeExpand(TreeEvent te) {
     TreeItem item = te.item;
     if (item.getData("loaded") == null) {
+      item.setData("expand", true);
       te.doit = false;
       loadChildren(item, true);
     }
@@ -352,7 +354,7 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
   protected void onCollapse(TreeEvent te) {
     if (!caching) {
       TreeItem item = te.item;
-      store.removeAll((M) item.getData());
+      store.removeAll((M) item.getModel());
       item.setData("loaded", null);
       item.setLeaf(false);
       markChildrenRendered(item, false);
@@ -361,6 +363,7 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
 
   @Override
   protected void onDataChanged(StoreEvent se) {
+    super.onDataChanged(se);
     TreeStoreEvent te = (TreeStoreEvent) se;
     if (te.parent == null) {
       createAll();
@@ -375,7 +378,7 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
     if (store.isFiltered() && expandOnFilter) {
       tree.setAnimate(false);
       tree.expandAll();
-    } else if (!store.isFiltered() && expandOnFilter){
+    } else if (!store.isFiltered() && expandOnFilter) {
       tree.collapseAll();
       tree.setAnimate(true);
     }
@@ -390,7 +393,7 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
   }
 
   protected void onRenderChildren(TreeStoreEvent te) {
-    renderChildren(te.children);
+    renderChildren((M) te.parent, te.children);
   }
 
   @Override
@@ -408,36 +411,37 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
     tree.removeAll();
   }
 
-  protected void renderChildren(List<M> children) {
-    TreeItem parent = activeItem;
-    boolean expand = activeExpand;
+  protected void renderChildren(M parent, List<M> children) {
+    TreeItem p = (TreeItem) findItem(parent);
+    p.setData("loaded", true);
+    p.enable();
 
-    parent.setData("loaded", true);
-    parent.enable();
-    if (parent.isRendered()) {
-      parent.getUI().onLoadingChange(false);
+    p.removeAll();
+
+    if (p.isRendered()) {
+      p.getUI().onLoadingChange(false);
     }
 
-    boolean f = parent.getData("force") != null;
-    parent.setData("force", null);
+    boolean f = p.getData("force") != null;
+    p.setData("force", null);
 
     for (M child : children) {
       TreeItem item = createItem(child);
-      parent.add(item);
+      p.add(item);
       if (f) {
         item.setData("force", true);
         loadChildren(item, false);
       }
     }
 
-    if (!f && parent.hasChildren() && expand) {
-      parent.setExpanded(true);
-    } else if (!parent.hasChildren()) {
-      parent.setLeaf(true);
+    if (!f && p.hasChildren() && p.getData("expand") != null) {
+      p.setExpanded(true);
+    } else if (!p.hasChildren()) {
+      p.setLeaf(true);
     }
 
-    if (parent.isRendered()) {
-      parent.getUI().updateJointStyle();
+    if (p.isRendered()) {
+      p.getUI().updateJointStyle();
     }
   }
 
@@ -457,7 +461,7 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
 
   protected void update(TreeItem item, M model) {
     if (item != null) {
-      item.setData(model);
+      setModel(item, model);
       String txt = getTextValue(model, displayProperty);
       if (txt == null && displayProperty != null) {
         txt = model.get(displayProperty);
@@ -469,7 +473,7 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
       String style = (styleProvider == null) ? null : styleProvider.getStringValue(model,
           displayProperty);
 
-      item.addStyleName(style);
+      item.setTextStyle(style);
       item.setText(txt);
       item.setIconStyle(icon);
     }
@@ -477,7 +481,7 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
   }
 
   private void filterItems(TreeItem item) {
-    if (item.isRoot() || isOrDecendantSelected(null, (M) item.getData())) {
+    if (item.isRoot() || isOrDecendantSelected(null, (M) item.getModel())) {
       item.setVisible(true);
       int count = item.getItemCount();
       for (int i = 0; i < count; i++) {
@@ -495,7 +499,7 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
     TreeItem item = (TreeItem) findItem(model);
     if (item != null) {
       for (TreeItem child : item.getItems()) {
-        boolean result = isOrDecendantSelected(model, (M) child.getData());
+        boolean result = isOrDecendantSelected(model, (M) child.getModel());
         if (result) {
           return true;
         }

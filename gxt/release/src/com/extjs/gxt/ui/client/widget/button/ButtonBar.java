@@ -16,6 +16,7 @@ import com.extjs.gxt.ui.client.event.ButtonBarEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.layout.TableData;
 import com.extjs.gxt.ui.client.widget.layout.TableRowLayout;
@@ -24,6 +25,7 @@ import com.google.gwt.user.client.Element;
 /**
  * A horizontal row of buttons.
  * 
+ * <dl>
  * <dt><b>Events:</b></dt>
  * <dd><b>Select</b> : ButtonBarEvent(buttonBar, button)<br>
  * <div>Fires when a button is selected.</div>
@@ -82,7 +84,7 @@ public class ButtonBar extends Container<Button> {
   private Listener listener = new Listener() {
     public void handleEvent(BaseEvent be) {
       if (be instanceof ButtonEvent) {
-        ButtonEvent e = (ButtonEvent)be;
+        ButtonEvent e = (ButtonEvent) be;
         switch (be.type) {
           case Events.BeforeSelect:
             buttonPressed = e.button;
@@ -168,7 +170,7 @@ public class ButtonBar extends Container<Button> {
     if (button instanceof FillButton) {
       data.setWidth("100%");
     }
-    button.setData(data);
+    WidgetHelper.setLayoutData(button, data);
 
     if (!(button instanceof ButtonAdapter)) {
       button.setMinWidth(buttonWidth);

@@ -436,20 +436,23 @@ public class ContentPanel extends LayoutContainer {
   }
 
   /**
-   * @param animCollapse the animCollapse to set
+   * Sets whether exand and collapse is animating (defaults to true, pre-render).
+   * @param animCollapse true to enable animations
    */
   public void setAnimCollapse(boolean animCollapse) {
+    assertPreRender();
     this.animCollapse = animCollapse;
   }
 
   /**
    * True to display an interior border on the body element of the panel, false
-   * to hide it (defaults to true). This only applies when
+   * to hide it (defaults to true, pre-render). This only applies when
    * {@link #setBodyBorder(boolean)} == true.
    * 
    * @param insetBorder true to display the interior border
    */
   public void setInsetBorder(boolean insetBorder) {
+    assertPreRender();
     this.insetBorder = insetBorder;
   }
 
@@ -465,44 +468,47 @@ public class ContentPanel extends LayoutContainer {
   }
   
   /**
-   * A style name that is added to the panel's body element.
+   * A style name that is added to the panel's body element (pre-render).
    * 
    * @param style the style name
    */
   public void setBodyStyleName(String style) {
+    assertPreRender();
     this.bodyStyleName = style;
   }
 
   /**
    * True to display the borders of the panel's body element, false to hide them
-   * (defaults to true). By default, the border is a 2px wide inset border, but
+   * (defaults to true, pre-render). By default, the border is a 2px wide inset border, but
    * this can be further altered by setting {@link #setBodyBorder(boolean)} to
    * false.
    * 
    * @param bodyBorder true for a body border
    */
   public void setBodyBorder(boolean bodyBorder) {
+    assertPreRender();
     this.bodyBorder = bodyBorder;
   }
 
   /**
-   * Sets the panel's bottom component. The component's natural height will be
+   * Sets the panel's bottom component (pre-render). The component's natural height will be
    * used and will not be changed by the panel.
    * 
    * @param bottomComponent the bottom component
    */
   public void setBottomComponent(Component bottomComponent) {
-    assert !rendered : "method call only be called before the component is rendered";
+    assertPreRender();
     this.bottomComponent = bottomComponent;
   }
 
   /**
    * Sets the button alignment of any buttons added to this panel (defaults to
-   * RIGHT).
+   * RIGHT, pre-render).
    * 
    * @param buttonAlign the button alignment
    */
   public void setButtonAlign(HorizontalAlignment buttonAlign) {
+    assertPreRender();
     this.buttonAlign = buttonAlign;
   }
 
@@ -515,6 +521,7 @@ public class ContentPanel extends LayoutContainer {
    * @param collapsible the collapsible to set
    */
   public void setCollapsible(boolean collapsible) {
+    assertPreRender();
     this.collapsible = collapsible;
   }
 
@@ -609,20 +616,22 @@ public class ContentPanel extends LayoutContainer {
   /**
    * True to allow expanding and collapsing the panel (when {@link #collapsible} =
    * true) by clicking anywhere in the header bar, false to allow it only by
-   * clicking to tool button (defaults to false).
+   * clicking to tool button (defaults to false, pre-render).
    * 
    * @param titleCollapse the titleCollapse to set
    */
   public void setTitleCollapse(boolean titleCollapse) {
+    assertPreRender();
     this.titleCollapse = titleCollapse;
   }
 
   /**
-   * Sets the panel's top component.
+   * Sets the panel's top component (pre-render).
    * 
    * @param topComponent the component
    */
   public void setTopComponent(Component topComponent) {
+    assertPreRender();
     this.topComponent = topComponent;
   }
 
@@ -668,13 +677,6 @@ public class ContentPanel extends LayoutContainer {
     }
     if (iconStyle != null) {
       setIconStyle(iconStyle);
-    }
-    if (collapsed) {
-      boolean anim = animCollapse;
-      collapsed = false;
-      setAnimCollapse(false);
-      collapse();
-      setAnimCollapse(anim);
     }
   }
 
@@ -889,6 +891,14 @@ public class ContentPanel extends LayoutContainer {
     if (titleCollapse) {
       head.setStyleAttribute("cursor", "pointer");
       el().addEventsSunk(Event.ONCLICK);
+    }
+    
+    if (collapsed) {
+      boolean anim = animCollapse;
+      collapsed = false;
+      setAnimCollapse(false);
+      collapse();
+      setAnimCollapse(anim);
     }
   }
 

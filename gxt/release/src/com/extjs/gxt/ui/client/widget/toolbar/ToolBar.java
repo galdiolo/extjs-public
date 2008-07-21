@@ -7,12 +7,12 @@
  */
 package com.extjs.gxt.ui.client.widget.toolbar;
 
-import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.event.ToolBarEvent;
+import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.layout.TableData;
 import com.extjs.gxt.ui.client.widget.layout.TableRowLayout;
@@ -112,7 +112,7 @@ public class ToolBar extends Container<ToolItem> {
     if (added) {
       TableData data = new TableData();
       data.setVerticalAlign(VerticalAlignment.MIDDLE);
-      item.setData(data);
+      WidgetHelper.setLayoutData(item, data);
       if (item instanceof FillToolItem) {
         data.setWidth("100%");
       }
@@ -154,13 +154,10 @@ public class ToolBar extends Container<ToolItem> {
     addStyleName(baseStyle + " x-small-editor");
     setStyleAttribute("paddingRight", "8px");
     
-    int h = XDOM.isVisibleBox ? 28 : 23;
-    el().setHeight(h);
-
     TableRowLayout layout = new TableRowLayout();
+    layout.setCellSpacing(0);
     setLayout(layout);
     layout();
-
   }
 
 }

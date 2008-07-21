@@ -14,8 +14,4 @@ public interface ThemeNames extends Messages {
 
   public static ThemeNames NAMES = (ThemeNames) GWT.create(ThemeNames.class);
 
-  public String slate();
-  
-  public String darkGray();
-
 }

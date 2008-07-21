@@ -1,9 +1,9 @@
 .tree-folder {
-  background: url(../images/gxt/icons/folder-closed.png) no-repeat -1px -1px;
+  background: url(../images/gxt/icons/folder-closed.gif) no-repeat -1px -1px;
 }
 
 .tree-folder-open {
-  background: url(../images/gxt/icons/folder.png) no-repeat -1px -1px;
+  background: url(../images/gxt/icons/folder.gif) no-repeat -1px -1px;
 }
 
 .my-treetbl-tree {

@@ -60,11 +60,11 @@ public class TreeTableView {
   }
 
   public int getCellIndex(Element target) {
-    String index = DOM.getElementProperty(target, "index");
+    String index = target.getAttribute("index");
     if (index == null) {
       target = DOM.getParent(target);
       while (target != null && target != null) {
-        index = DOM.getElementProperty(target, "index");
+        index = target.getAttribute("index");
         if (index == null) {
           target = DOM.getParent(target);
         } else {

@@ -73,7 +73,7 @@ public class LabelField extends Field {
 
   @Override
   public void setValue(Object value) {
-    setText(value.toString());
+    setText(value != null ? value.toString() : "");
   }
 
   @Override

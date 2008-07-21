@@ -56,7 +56,7 @@ public class ColumnLayout extends Layout {
     // so we need to make 2 passes
     for (int i = 0; i < count; i++) {
       Component c = container.getItem(i);
-      ColumnData data = (ColumnData) c.getData();
+      ColumnData data = (ColumnData) getLayoutData(c);
       if (data.getWidth() > 1) {
         pw -= data.getWidth();
       }
@@ -66,7 +66,7 @@ public class ColumnLayout extends Layout {
 
     for (int i = 0; i < count; i++) {
       Component c = container.getItem(i);
-      ColumnData data = (ColumnData) c.getData();
+      ColumnData data = (ColumnData) getLayoutData(c);
       if (data.getWidth() < 1) {
         setSize(c, (int) (data.getWidth() * pw), -1);
       } else {

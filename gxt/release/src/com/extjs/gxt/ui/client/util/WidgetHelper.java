@@ -7,6 +7,9 @@
  */
 package com.extjs.gxt.ui.client.util;
 
+import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.widget.Component;
+import com.extjs.gxt.ui.client.widget.layout.LayoutData;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -25,6 +28,18 @@ public class WidgetHelper {
       doDetachNative(widget);
     }
   }
+  
+  public static native void setLayoutData(Component c, LayoutData data) /*-{
+    c.@com.extjs.gxt.ui.client.widget.Component::layoutData = data;
+  }-*/;
+  
+  public static native LayoutData getLayoutData(Component c) /*-{
+    return c.@com.extjs.gxt.ui.client.widget.Component::layoutData;
+  }-*/;
+  
+  public static native void setModel(Component c, ModelData model) /*-{
+    c.@com.extjs.gxt.ui.client.widget.Component::model = model;
+  }-*/;
   
   static native void doAttachNative(Widget widget) /*-{
     widget.@com.google.gwt.user.client.ui.Widget::onAttach()();

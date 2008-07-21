@@ -24,10 +24,10 @@ public class TableRowLayout extends TableLayout {
 
   @Override
   protected Element getNextCell(Component component) {
-    TableData data = (TableData) component.getData();
+    TableData data = (TableData)getLayoutData(component);
     if (data == null) {
       data = new TableData();
-      component.setData(data);
+      setLayoutData(component, data);
     }
     
     if (component.getData("width") != null) {

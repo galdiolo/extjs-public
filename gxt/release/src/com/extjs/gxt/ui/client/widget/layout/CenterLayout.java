@@ -11,8 +11,8 @@ package com.extjs.gxt.ui.client.widget.layout;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.core.El;
-import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.Component;
+import com.extjs.gxt.ui.client.widget.Container;
 import com.google.gwt.user.client.Element;
 
 /**
@@ -49,7 +49,7 @@ public class CenterLayout extends TableLayout {
   }
 
   protected Element getNextCell(Component c) {
-    c.setData(data);
+    setLayoutData(c, data);
     return super.getNextCell(c);
   }
 

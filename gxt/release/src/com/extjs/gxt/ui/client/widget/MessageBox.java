@@ -7,6 +7,9 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -91,7 +94,6 @@ public class MessageBox {
    */
   public static MessageBox alert(String title, String msg, Listener<WindowEvent> callback) {
     MessageBox box = new MessageBox();
-    box.setModal(false);
     box.setTitle(title);
     box.setMessage(msg);
     box.callback = callback;
@@ -218,6 +220,7 @@ public class MessageBox {
   private ProgressBar progressBar;
   private TextField textBox;
   private TextArea textArea;
+  private Map<Integer, Listener> listeners;
   
   /**
    * Adds a listener that will be called when the message box is closed.
@@ -225,7 +228,12 @@ public class MessageBox {
    * @param listener the callback listener
    */
   public void addCallback(Listener listener) {
-    dialog.addListener(Events.Hide, listener);
+    if (dialog == null) {
+      if (listeners == null) listeners = new HashMap<Integer, Listener>();
+      listeners.put(Events.Hide, listener);
+    } else {
+      dialog.addListener(Events.Hide, listener);
+    }
   }
 
   /**
@@ -235,7 +243,8 @@ public class MessageBox {
    * @param listener the listener
    */
   public void addListener(int event, Listener listener) {
-    dialog.addListener(event, listener);
+    if (listeners == null) listeners = new HashMap<Integer, Listener>();
+    listeners.put(event, listener);
   }
 
   /**
@@ -325,7 +334,7 @@ public class MessageBox {
       dialog.setMinimizable(false);
       dialog.setMaximizable(false);
       dialog.setClosable(false);
-      dialog.setModal(true);
+      dialog.setModal(modal);
       dialog.setButtonAlign(HorizontalAlignment.CENTER);
       dialog.setMinHeight(80);
       dialog.setPlain(true);
@@ -340,6 +349,12 @@ public class MessageBox {
           dialog.setFocusWidget(dialog.getButtonBar().getButtonById(Dialog.YES));
         } else if (getButtons().contains(Dialog.OK)) {
           dialog.setFocusWidget(dialog.getButtonBar().getButtonById(Dialog.OK));
+        }
+      }
+      
+      if (listeners != null) {
+        for (Integer type : listeners.keySet()) {
+          dialog.addListener(type, listeners.get(type));
         }
       }
     }
@@ -510,13 +525,16 @@ public class MessageBox {
    * @param iconStyle the icon style
    */
   public void setIcon(String iconStyle) {
-    El el = El.fly(iconEl);
-    if (iconStyle != null) {
-      el.removeStyleName("x-hidden");
-      el.replaceStyleName(this.icon, iconStyle);
-    } else {
-      el.replaceStyleName(this.icon, "x-hidden");
-      icon = "";
+    this.icon = iconStyle;
+    if (iconEl != null) {
+      El el = El.fly(iconEl);
+      if (iconStyle != null) {
+        el.removeStyleName("x-hidden");
+        el.replaceStyleName(this.icon, iconStyle);
+      } else {
+        el.replaceStyleName(this.icon, "x-hidden");
+        icon = "";
+      }
     }
   }
 

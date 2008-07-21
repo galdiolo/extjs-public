@@ -58,8 +58,7 @@ public class AppView extends View {
 
     BorderLayoutData data = new BorderLayoutData(LayoutRegion.CENTER);
     data.setMargins(new Margins(5, 5, 5, 0));
-    centerPanel.setData(data);
-    viewport.add(centerPanel);
+    viewport.add(centerPanel, data);
     Registry.register("centerPanel", centerPanel);
   }
 
@@ -68,12 +67,11 @@ public class AppView extends View {
     data.setMargins(new Margins(5, 5, 5, 5));
     data.setCollapsible(true);
     westPanel = new ContentPanel();
-    westPanel.setData(data);
 
     ToolBar toolBar = new ToolBar();
     westPanel.setTopComponent(toolBar);
 
-    viewport.add(westPanel);
+    viewport.add(westPanel, data);
     Registry.register("westPanel", westPanel);
   }
 
@@ -89,7 +87,6 @@ public class AppView extends View {
 
     BorderLayoutData data = new BorderLayoutData(LayoutRegion.NORTH, 33);
     data.setMargins(new Margins());
-    northPanel.setData(data);
     viewport.add(northPanel, data);
     Registry.register("northPanel", northPanel);
   }

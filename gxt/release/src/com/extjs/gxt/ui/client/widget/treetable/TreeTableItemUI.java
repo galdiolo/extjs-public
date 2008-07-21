@@ -147,7 +147,7 @@ public class TreeTableItemUI extends TreeItemUI {
       updateCellValues(i, cells[i], cm.getColumn(i).getAlignment());
     }
 
-    boolean checkable = getTreeTableItem().getTreeTable().isCheckable();
+    boolean checkable = getTreeTableItem().getTreeTable().getCheckable();
     El.fly(checkEl).setVisible(checkable);
 
     onValuesChanged(getTreeTableItem().getTreeTable(),

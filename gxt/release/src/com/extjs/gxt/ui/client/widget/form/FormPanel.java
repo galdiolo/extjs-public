@@ -124,7 +124,7 @@ public class FormPanel extends ContentPanel {
   }
 
   /**
-   * Sets all of the panel's read only state.
+   * Sets all of the panel's fields read only state.
    * 
    * @param readOnly true for read only
    */
@@ -137,7 +137,7 @@ public class FormPanel extends ContentPanel {
   @Override
   protected void onRemove(Component item) {
     super.onRemove(item);
-    if (rendered) {
+    if (rendered && item.isRendered()) {
       El wrap = item.el().findParentNode(".x-form-item", 3);
       if (wrap != null) {
         wrap.removeFromParent();
@@ -157,7 +157,6 @@ public class FormPanel extends ContentPanel {
       layout.setLabelAlign(labelAlign);
       setLayout(layout);
     }
-    layout();
   }
 
   private void getChildFields(Container<Component> c, List<Field> fields) {

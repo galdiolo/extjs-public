@@ -14,7 +14,7 @@ import com.extjs.gxt.ui.client.widget.SplitBar;
 /**
  * Layout data describing a "region" in a border panel.
  */
-public class BorderLayoutData {
+public class BorderLayoutData extends LayoutData {
 
   private int minSize = 50;
   private boolean floatable = true;

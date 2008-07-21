@@ -12,7 +12,7 @@ import com.extjs.gxt.ui.client.util.Margins;
 /**
  * Layout data for <code>FitLayout</code>
  */
-public class FitData extends LayoutData {
+public class FitData extends MarginData {
 
   public FitData() {
     super();

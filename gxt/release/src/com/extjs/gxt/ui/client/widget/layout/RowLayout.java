@@ -9,6 +9,7 @@ package com.extjs.gxt.ui.client.widget.layout;
 
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
@@ -20,15 +21,8 @@ import com.extjs.gxt.ui.client.widget.Layout;
  * percentage.
  * 
  * <p/> Each components margin may also be specified using a RowData instance.
- * Only 1 component should specify a margin on adjacent sides. The following
- * code would provide a 4px margin for 3 components aligned vertically:
- * 
- * <code><pre>
- * child1.setStyleAttribute("margin", "4px");
- * child2.setStyleAttribute("margin", "0 4px");
- * child3.setStyleAttribute("margin", "4px");
- * </pre></code>
- * 
+ * Only 1 component should specify a margin on adjacent sides.
+ *  
  * @see RowData
  */
 public class RowLayout extends Layout {
@@ -71,10 +65,6 @@ public class RowLayout extends Layout {
   }
 
   protected void layoutHorizontal(El target) {
-    for (Component c : this.container.getItems()) {
-      c.addStyleName("x-column");
-    }
-
     Size size = target.getStyleSize();
 
     int w = size.width;
@@ -87,7 +77,13 @@ public class RowLayout extends Layout {
     // so we need to make 2 passes
     for (int i = 0; i < count; i++) {
       Component c = container.getItem(i);
-      RowData data = (RowData) c.getData();
+      c.el().makePositionable(true);
+      c.el().setStyleAttribute("margin", "0px");
+      RowData data = (RowData)getLayoutData(c);
+      if (data == null) {
+        data = new RowData();
+        setLayoutData(c, data);
+      }
       if (data.getWidth() > 1) {
         pw -= data.getWidth();
       } else if (data.getWidth() == -1) {
@@ -97,13 +93,12 @@ public class RowLayout extends Layout {
 
     pw = pw < 0 ? 0 : pw;
 
+    int x = 0;
+
     for (int i = 0; i < count; i++) {
       Component c = container.getItem(i);
-      RowData data = (RowData) c.getData();
-      if (data == null) {
-        data = new RowData();
-        c.setData(data);
-      }
+      RowData data = (RowData)getLayoutData(c);
+
       double height = data.getHeight();
 
       if (height > 0 && height <= 1) {
@@ -114,13 +109,34 @@ public class RowLayout extends Layout {
         height = c.el().getHeight(true);
       }
 
+      
       double width = data.getWidth();
+      double fw = width;
       if (width > 0 && width <= 1) {
         width = width * pw;
+        fw = width;
+      } else if (width == -1) {
+        fw = c.getOffsetWidth();
+      } 
+
+      int tx = x;
+      int ty = 0;
+      int tw = (int) width;
+      int th = (int) height;
+
+      Margins m = data.getMargins();
+      if (m != null) {
+        tx += m.left;
+        tw -= m.left;
+        ty += m.top;
+        th -= m.top;
+        tw -= m.right;
+        th -= m.bottom;
       }
-
-      setSize(c, (int) width, (int) height);
-
+      
+      c.el().setLeftTop(tx, ty);
+      setSize(c, tw, th);
+      x += fw;
     }
   }
 
@@ -137,10 +153,10 @@ public class RowLayout extends Layout {
     // so we need to make 2 passes
     for (int i = 0; i < count; i++) {
       Component c = container.getItem(i);
-      RowData data = (RowData) c.getData();
+      RowData data = (RowData)getLayoutData(c);
       if (data == null) {
         data = new RowData();
-        c.setData(data);
+        setLayoutData(c, data);
       }
 
       if (data.getHeight() > 1) {
@@ -156,7 +172,7 @@ public class RowLayout extends Layout {
 
     for (int i = 0; i < count; i++) {
       Component c = container.getItem(i);
-      RowData data = (RowData) c.getData();
+      RowData data = (RowData)getLayoutData(c);
 
       double width = data.getWidth();
 

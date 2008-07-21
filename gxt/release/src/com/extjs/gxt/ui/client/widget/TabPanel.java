@@ -29,10 +29,6 @@ import com.google.gwt.user.client.Event;
 /**
  * A basic tab container.
  * 
- * <p>
- * When using a tab panel as a selection provider the model element for each tab
- * item should be set as the item's data {@link DataListItem#setData(Object)}.
- * </p>
  * <dl>
  * <dt><b>Events:</b></dt>
  * 

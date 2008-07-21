@@ -77,22 +77,20 @@ public class TreeItemUI {
   }
 
   public void animCollapse() {
-    containerEl.slideOut(Direction.UP, new FxConfig(animDuration,
-        new Listener<FxEvent>() {
-          public void handleEvent(FxEvent fe) {
-            afterCollapse();
-          }
-        }));
+    containerEl.slideOut(Direction.UP, new FxConfig(animDuration, new Listener<FxEvent>() {
+      public void handleEvent(FxEvent fe) {
+        afterCollapse();
+      }
+    }));
     item.tree.disableEvents(true);
   }
 
   public void animExpand() {
-    containerEl.slideIn(Direction.DOWN, new FxConfig(animDuration,
-        new Listener<FxEvent>() {
-          public void handleEvent(FxEvent fe) {
-            afterExpand();
-          }
-        }));
+    containerEl.slideIn(Direction.DOWN, new FxConfig(animDuration, new Listener<FxEvent>() {
+      public void handleEvent(FxEvent fe) {
+        afterExpand();
+      }
+    }));
     item.tree.disableEvents(true);
   }
 
@@ -189,7 +187,7 @@ public class TreeItemUI {
       fly(iconDivEl).setIconStyle(item.iconStyle);
       return;
     }
-    if (!item.leaf) {
+    if (!item.isLeaf()) {
       String s = "";
       if (item.isExpanded() && item.tree.getOpenNodeIconStyle() != null) {
         s = item.tree.getOpenNodeIconStyle();
@@ -241,18 +239,21 @@ public class TreeItemUI {
 
   public void onTextStyleChange(String style) {
     if (textStyle != null) {
-      fly(textEl).removeStyleName(textStyle);
+      fly(textSpanEl).removeStyleName(textStyle);
     }
     textStyle = style;
     if (style != null) {
-      fly(textEl).addStyleName(style);
+      fly(textSpanEl).addStyleName(style);
     }
   }
 
   public void removeItem(TreeItem child) {
     containerEl.dom.removeChild(child.getElement());
     if (item.getItemCount() == 0) {
-       item.setExpanded(false);
+      boolean b = item.tree.getAnimate();
+      item.tree.setAnimate(false);
+      item.setExpanded(false);
+      item.tree.setAnimate(b);
     }
   }
 
@@ -308,7 +309,7 @@ public class TreeItemUI {
       return;
     }
 
-    if (!item.leaf) {
+    if (!item.isLeaf()) {
       String cls = item.isExpanded() ? classTreeOpen : classTreeClose;
       jointDivEl.setClassName(cls);
     } else {

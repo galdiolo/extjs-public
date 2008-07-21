@@ -69,7 +69,7 @@ public class OverviewPage extends LayoutContainer {
   @Override
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
-    
+
     setScrollMode(Scroll.AUTO);
 
     ExplorerModel model = (ExplorerModel) Registry.get("model");
@@ -78,7 +78,7 @@ public class OverviewPage extends LayoutContainer {
 
     StringBuffer sb = new StringBuffer();
     sb.append("<div class='sample-box'>");
-    sb.append("<div class='thumbd'><img src='{path}' width=120 height90></div>");
+    sb.append("<div class='thumbd'><img src='{path}' width=120 height=90></div>");
     sb.append("<div>{name}</div>");
     sb.append("</div>");
 
@@ -91,9 +91,12 @@ public class OverviewPage extends LayoutContainer {
     dataView.setTemplate(sb.toString());
     dataView.addListener(Events.SelectionChange, new Listener<DataViewEvent>() {
       public void handleEvent(DataViewEvent be) {
-        ModelData record = (ModelData) dataView.getSelectedItem().getData();
-        Entry entry = (Entry) record;
-        Explorer.showPage(entry);
+        if (dataView.getSelectedItem() != null) {
+          ModelData record = dataView.getSelectedItem().getModel();
+          Entry entry = (Entry) record;
+          Explorer.showPage(entry);
+          dataView.getSelectionModel().deselectAll();
+        }
       }
     });
 

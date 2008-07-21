@@ -22,7 +22,7 @@ import com.google.gwt.user.client.Timer;
  * A standard tooltip implementation for providing additional information when
  * hovering over a target element.
  */
-public class ToolTip extends Tip {
+public class ToolTip extends Tip implements Listener<ComponentEvent> {
 
   private int showDelay = 500;
   private int[] mouseOffset = new int[] {10, 10};
@@ -234,35 +234,32 @@ public class ToolTip extends Tip {
     return new Point(x, y);
   }
 
+  public void handleEvent(ComponentEvent ce) {
+    Element source = target.getElement();
+    switch (ce.getEventType()) {
+      case Event.ONMOUSEOVER:
+        Element from = DOM.eventGetFromElement(ce.event);
+        if (from != null && !DOM.isOrHasChild(source, from)) {
+          onTargetOver(ce);
+        }
+        break;
+      case Event.ONMOUSEOUT:
+        Element to = DOM.eventGetToElement(ce.event);
+        if (to != null && !DOM.isOrHasChild(source, to)) {
+          onTargetOut(ce);
+        }
+        break;
+      case Event.ONMOUSEMOVE:
+        onMouseMove(ce);
+        break;
+    }
+  }
+
   private void initTarget(final Component target) {
     this.target = target;
-    Listener<ComponentEvent> l = new Listener<ComponentEvent>() {
-
-      public void handleEvent(ComponentEvent ce) {
-        Element source = target.getElement();
-        switch (ce.getEventType()) {
-          case Event.ONMOUSEOVER:
-            Element from = DOM.eventGetFromElement(ce.event);
-            if (!DOM.isOrHasChild(source, from)) {
-              onTargetOver(ce);
-            }
-            break;
-          case Event.ONMOUSEOUT:
-            Element to = DOM.eventGetToElement(ce.event);
-            if (!DOM.isOrHasChild(source, to)) {
-              onTargetOut(ce);
-            }
-            break;
-          case Event.ONMOUSEMOVE:
-            onMouseMove(ce);
-            break;
-        }
-      }
-
-    };
-    target.addListener(Event.ONMOUSEOVER, l);
-    target.addListener(Event.ONMOUSEOUT, l);
-    target.addListener(Event.ONMOUSEMOVE, l);
+    target.addListener(Event.ONMOUSEOVER, this);
+    target.addListener(Event.ONMOUSEOUT, this);
+    target.addListener(Event.ONMOUSEMOVE, this);
     target.el().addEventsSunk(Event.MOUSEEVENTS);
   }
 

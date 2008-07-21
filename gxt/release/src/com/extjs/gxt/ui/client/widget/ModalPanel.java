@@ -12,6 +12,7 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.PreviewEvent;
 import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.util.BaseEventPreview;
+import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -44,10 +45,9 @@ public class ModalPanel extends BoxComponent {
    * Hides the panel.
    */
   public void hide() {
-    super.onHide();
+    super.hide();
     el().setZIndex(-1);
     eventPreview.remove();
-    RootPanel.get().remove(component);
     RootPanel.get().remove(this);
   }
 
@@ -85,7 +85,6 @@ public class ModalPanel extends BoxComponent {
   public void show(Component component) {
     this.component = component;
     RootPanel.get().add(this);
-    RootPanel.get().add(component);
 
     el().makePositionable(true);
     el().updateZIndex(0);
@@ -97,6 +96,18 @@ public class ModalPanel extends BoxComponent {
     eventPreview.getIgnoreList().add(component.getElement());
 
     eventPreview.add();
+  }
+
+  @Override
+  protected void doAttachChildren() {
+    super.doAttachChildren();
+    WidgetHelper.doAttach(component);
+  }
+
+  @Override
+  protected void doDetachChildren() {
+    super.doDetachChildren();
+    WidgetHelper.doDetach(component);
   }
 
   @Override
@@ -115,7 +126,7 @@ public class ModalPanel extends BoxComponent {
 
       @Override
       protected boolean onAutoHide(PreviewEvent pe) {
-        if (isBlink() && !blinking) {
+        if (blink && !blinking) {
           blinking = true;
           component.el().blink(new FxConfig(new Listener<FxEvent>() {
             public void handleEvent(FxEvent fe) {

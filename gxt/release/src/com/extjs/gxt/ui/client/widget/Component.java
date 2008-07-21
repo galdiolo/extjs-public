@@ -15,6 +15,7 @@ import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -22,6 +23,7 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.Observable;
 import com.extjs.gxt.ui.client.event.WidgetListener;
 import com.extjs.gxt.ui.client.state.StateManager;
+import com.extjs.gxt.ui.client.widget.layout.LayoutData;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.tips.ToolTip;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
@@ -226,6 +228,7 @@ public abstract class Component extends Widget implements Observable {
   protected String stateId;
 
   protected boolean hasListeners;
+  protected ToolTip toolTip;
 
   private El el;
   private Map<String, Object> state;
@@ -236,7 +239,6 @@ public abstract class Component extends Widget implements Observable {
   private HashMap dataMap;
   private BaseObservable observable;
   private String styles = "";
-  private ToolTip toolTip;
   private int disableTextSelection = Style.DEFAULT;
   private int disableContextMenu = Style.DEFAULT;
   private int borders = Style.DEFAULT;
@@ -248,6 +250,9 @@ public abstract class Component extends Widget implements Observable {
   private boolean enableState = true;
   private boolean focused;
   private boolean afterRender;
+  private boolean setElementRender;
+  private LayoutData layoutData;
+  private ModelData model;
 
   /**
    * Creates a new component..
@@ -440,6 +445,9 @@ public abstract class Component extends Widget implements Observable {
   /**
    * Returns the application defined data associated with the component, or
    * <code>null</code> if it has not been set.
+   * 
+   * @return the data
+   * @deprecated Use {@link #getData(String)}
    */
   public Object getData() {
     return data;
@@ -492,6 +500,20 @@ public abstract class Component extends Widget implements Observable {
    */
   public String getItemId() {
     return itemId != null ? itemId : getId();
+  }
+
+
+  protected LayoutData getLayoutData() {
+    return layoutData;
+  }
+
+  /**
+   * Returns the component's model.
+   * 
+   * @return the model
+   */
+  public ModelData getModel() {
+    return model;
   }
 
   /**
@@ -582,7 +604,9 @@ public abstract class Component extends Widget implements Observable {
 
     // hack to receive keyboard events in safari
     if (GXT.isSafari && type == Event.ONCLICK && focusable) {
-      focus();
+      if (getElement().getTagName().equals("input") || event.getTarget().getPropertyString("__eventBits") == null) {
+        focus();
+      }
     }
 
     ComponentEvent ce = createComponentEvent(event);
@@ -632,8 +656,8 @@ public abstract class Component extends Widget implements Observable {
 
   /**
    * Called when the component is in a LayoutContainer and the container's
-   * layout executes. This method will not be called on container
-   * instances.  Default implementation does nothing.
+   * layout executes. This method will not be called on container instances.
+   * Default implementation does nothing.
    */
   public void recalculate() {
 
@@ -730,10 +754,13 @@ public abstract class Component extends Widget implements Observable {
 
     createStyles(baseStyle);
 
-    if (index == -1) {
-      index = DOM.getChildCount(target);
+    if (!setElementRender) {
+      if (index == -1) {
+        index = DOM.getChildCount(target);
+      }
+
+      onRender(target, index);
     }
-    onRender(target, index);
 
     if (el == null)
       throw new RuntimeException(getClass().getName() + " must call setElement in onRender");
@@ -827,8 +854,15 @@ public abstract class Component extends Widget implements Observable {
    * Sets the application defined component data.
    * 
    * @param data the widget data
+   * @deprecated use {@link #setData(String, Object)}
    */
   public void setData(Object data) {
+    if (data instanceof LayoutData) {
+      throw new IllegalArgumentException("Use setLayoutData to set layout data");
+    }
+    if (data instanceof ModelData) {
+      throw new IllegalArgumentException("Use setModel to set models");
+    }
     this.data = data;
   }
 
@@ -847,6 +881,10 @@ public abstract class Component extends Widget implements Observable {
   public void setElement(Element elem) {
     el = new El(elem);
     super.setElement(elem);
+    if (!rendered) {
+      setElementRender = true;
+      render(null);
+    }
   }
 
   /**
@@ -934,6 +972,7 @@ public abstract class Component extends Widget implements Observable {
     }
   }
 
+  @Override
   public void setStyleName(String style) {
     if (rendered) {
       super.setStyleName(style);
@@ -942,6 +981,7 @@ public abstract class Component extends Widget implements Observable {
     }
   }
 
+  @Override
   public void setTitle(String title) {
     this.title = title;
     if (rendered) {
@@ -1012,6 +1052,7 @@ public abstract class Component extends Widget implements Observable {
     }
   }
 
+  @Override
   public String toString() {
     return el != null ? el.toString() : super.toString();
   }
@@ -1049,20 +1090,20 @@ public abstract class Component extends Widget implements Observable {
 
   }
 
-  /**
-   * Called before the component has been rendered.
-   * 
-   * <p/> This method can be used to lazily alter this component pre-render
-   */
-  protected void beforeRender() {
-  }
-
   protected void applyState(Map<String, Object> state) {
 
   }
 
   protected void assertPreRender() {
     assert !afterRender : "Method must be called before the component is rendered";
+  }
+
+  /**
+   * Called before the component has been rendered.
+   * 
+   * <p/> This method can be used to lazily alter this component pre-render
+   */
+  protected void beforeRender() {
   }
 
   /**
@@ -1141,6 +1182,7 @@ public abstract class Component extends Widget implements Observable {
     super.onAttach();
   }
 
+  @Override
   protected void onDetach() {
     super.onDetach();
     if (disableTextSelection > 0) {
@@ -1168,6 +1210,7 @@ public abstract class Component extends Widget implements Observable {
     disableEvents = false;
   }
 
+  @Override
   protected void onLoad() {
     super.onLoad();
     fireEvent(Events.Attach);
@@ -1234,7 +1277,7 @@ public abstract class Component extends Widget implements Observable {
   }
 
   protected void setEl(El el) {
-    this.el = el;
+    this.el = el; 
   }
 
   protected void setElement(Element elem, Element parent, int index) {
@@ -1244,6 +1287,14 @@ public abstract class Component extends Widget implements Observable {
 
   protected void setFiresEvents(boolean firesEvents) {
     observable.setFiresEvents(firesEvents);
+  }
+
+  protected void setLayoutData(LayoutData data) {
+    this.layoutData = data;
+  }
+
+  protected void setModel(ModelData model) {
+    this.model = model;
   }
 
   private native Element createHiddenInput() /*-{

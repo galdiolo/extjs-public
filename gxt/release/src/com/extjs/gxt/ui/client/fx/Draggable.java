@@ -26,7 +26,6 @@ import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.EventPreview;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.KeyboardListener;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Adds drag behavior to any widget. Drag operations can be initiated from the
@@ -77,47 +76,49 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class Draggable extends BaseObservable {
 
+  protected int conX, conY, conWidth, conHeight;
+  protected int dragStartX, dragStartY;
+  protected int lastX, lastY;
+  protected Rectangle startBounds;
+  protected El proxyEl;
+
+  // config
   private boolean updateZIndex = true;
   private boolean sizeProxyToSource = true;
-  private Component container;
   private boolean constrainHorizontal;
   private boolean moveAfterProxyDrag = true;
   private boolean constrainVertical;
   private boolean constrainClient = true;
-  private String proxyStyle = "x-drag-proxy";
   private boolean useProxy = true;
+  private int xLeft = Style.DEFAULT, xRight = Style.DEFAULT;
+  private int xTop = Style.DEFAULT, xBottom = Style.DEFAULT;
+  private String proxyStyle = "x-drag-proxy";
+  private Component container;
   private Component dragWidget;
   private Component handle;
   private boolean dragging;
   private boolean enabled = true;
-  private int dragStartX, dragStartY;
-  private int lastX, lastY;
   private int clientWidth, clientHeight;
-  private int conX, conY, conWidth, conHeight;
-  private Rectangle startBounds;
-  private El proxyEl;
   private EventPreview preview;
   private DragEvent dragEvent;
-  private int xLeft = Style.DEFAULT, xRight = Style.DEFAULT;
-  private int xTop = Style.DEFAULT, xBottom = Style.DEFAULT;
 
   /**
    * Creates a new draggable instance.
    * 
-   * @param dragWidget the widget to be dragged
+   * @param dragComponent the component to be dragged
    */
-  public Draggable(Component dragWidget) {
-    this(dragWidget, dragWidget);
+  public Draggable(Component dragComponent) {
+    this(dragComponent, dragComponent);
   }
 
   /**
    * Create a new draggable instance.
    * 
-   * @param dragWidget the widget to be dragged
-   * @param handle the widget drags will be initiated from
+   * @param dragComponent the component to be dragged
+   * @param handle the component drags will be initiated from
    */
-  public Draggable(final Component dragWidget, final Component handle) {
-    this.dragWidget = dragWidget;
+  public Draggable(final Component dragComponent, final Component handle) {
+    this.dragWidget = dragComponent;
     this.handle = handle;
 
     handle.addListener(Event.ONMOUSEDOWN, new Listener<ComponentEvent>() {
@@ -172,6 +173,9 @@ public class Draggable extends BaseObservable {
     addListener(Events.DragEnd, listener);
   }
 
+  /**
+   * Cancels the drag if running.
+   */
   public void cancelDrag() {
     if (dragging) {
       DOM.removeEventPreview(preview);
@@ -205,7 +209,7 @@ public class Draggable extends BaseObservable {
    * 
    * @return the drag handle
    */
-  public Widget getDragHandle() {
+  public Component getDragHandle() {
     return handle;
   }
 
@@ -214,7 +218,7 @@ public class Draggable extends BaseObservable {
    * 
    * @return the drag widget
    */
-  public Widget getDragWidget() {
+  public Component getDragWidget() {
     return dragWidget;
   }
 
@@ -368,6 +372,11 @@ public class Draggable extends BaseObservable {
     this.moveAfterProxyDrag = moveAfterProxyDrag;
   }
 
+  /**
+   * Sets the proxy element.
+   * 
+   * @param element the proxy element
+   */
   public void setProxy(Element element) {
     proxyEl = new El(element);
   }
@@ -433,15 +442,7 @@ public class Draggable extends BaseObservable {
     xBottom = bottom;
   }
 
-  protected El createProxy() {
-    proxyEl = new El(DOM.createDiv());
-    proxyEl.setVisibility(false);
-    proxyEl.dom.setClassName(getProxyStyle());
-    proxyEl.disableTextSelection(true);
-    return proxyEl;
-  }
-
-  private void afterDrag() {
+  protected void afterDrag() {
     El.fly(XDOM.getBody()).removeStyleName("x-unselectable");
     DeferredCommand.addCommand(new Command() {
       public void execute() {
@@ -450,7 +451,15 @@ public class Draggable extends BaseObservable {
     });
   }
 
-  private void onMouseDown(ComponentEvent ce) {
+  protected El createProxy() {
+    proxyEl = new El(DOM.createDiv());
+    proxyEl.setVisibility(false);
+    proxyEl.dom.setClassName(getProxyStyle());
+    proxyEl.disableTextSelection(true);
+    return proxyEl;
+  }
+
+  protected void onMouseDown(ComponentEvent ce) {
     if (!enabled) {
       return;
     }
@@ -485,7 +494,7 @@ public class Draggable extends BaseObservable {
     }
   }
 
-  private void onMouseMove(Event event) {
+  protected void onMouseMove(Event event) {
     if (proxyEl != null) {
       proxyEl.setVisibility(true);
     }
@@ -547,7 +556,7 @@ public class Draggable extends BaseObservable {
       lastX = left;
       lastY = top;
 
-      if (isUseProxy()) {
+      if (useProxy) {
         proxyEl.setLeftTop(left, top);
       } else {
         dragWidget.el().setPagePosition(left, top);
@@ -568,7 +577,7 @@ public class Draggable extends BaseObservable {
 
   }
 
-  private void startDrag(Event event) {
+  protected void startDrag(Event event) {
     XDOM.getBodyEl().addStyleName("x-unselectable");
 
     dragWidget.el().makePositionable();
@@ -620,7 +629,7 @@ public class Draggable extends BaseObservable {
     }
   }
 
-  private void stopDrag(Event event) {
+  protected void stopDrag(Event event) {
     if (dragging) {
       DOM.removeEventPreview(preview);
       dragging = false;

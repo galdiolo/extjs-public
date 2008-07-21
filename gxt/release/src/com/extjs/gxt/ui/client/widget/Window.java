@@ -8,6 +8,7 @@
 package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.core.El;
@@ -29,12 +30,17 @@ import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.ToolButton;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
  * A specialized content panel intended for use as an application window.
+ * 
+ * <p /> The window is automatically registered with the <code>WindowManager</code>
+ * when created. The window should be unregistered with the WindownManager when
+ * it is no longer used.
  * 
  * <dl>
  * <dt><b>Events:</b></dt>
@@ -185,11 +191,11 @@ public class Window extends ContentPanel {
    * otherwise the window itself will receive focus.
    */
   public void focus() {
-    if (getFocusWidget() != null) {
-      if (getFocusWidget() instanceof Component) {
-        ((Component) getFocusWidget()).focus();
+    if (focusWidget != null) {
+      if (focusWidget instanceof Component) {
+        ((Component) focusWidget).focus();
       } else {
-        fly(getFocusWidget().getElement()).focus();
+        fly(focusWidget.getElement()).focus();
       }
     } else {
       super.focus();
@@ -265,11 +271,10 @@ public class Window extends ContentPanel {
       return;
     }
     hidden = true;
-    
 
     restoreSize = getSize();
     restorePos = getPosition(true);
-    
+
     super.onHide();
 
     RootPanel.get().remove(this);
@@ -567,6 +572,12 @@ public class Window extends ContentPanel {
     this.onEsc = onEsc;
   }
 
+  @Override
+  public void setPagePosition(int x, int y) {
+    super.setPagePosition(x, y);
+    positioned = true;
+  }
+
   /**
    * True to render the window body with a transparent background so that it
    * will blend into the framing elements, false to add a lighter background
@@ -577,6 +588,12 @@ public class Window extends ContentPanel {
    */
   public void setPlain(boolean plain) {
     this.plain = plain;
+  }
+
+  @Override
+  public void setPosition(int left, int top) {
+    super.setPosition(left, top);
+    positioned = true;
   }
 
   /**
@@ -613,40 +630,22 @@ public class Window extends ContentPanel {
   /**
    * Sends this window to the back of (lower z-index than) any other visible
    * windows.
-   * 
-   * @return this
    */
-  public Window toBack() {
+  public void toBack() {
     manager.sendToBack(this);
-    return this;
   }
 
   /**
    * Brings this window to the front of any other visible windows.
-   * 
-   * @return this
    */
-  public Window toFront() {
+  public void toFront() {
     manager.bringToFront(this);
     focus();
-    return this;
   }
 
   protected void afterRender() {
     super.afterRender();
     el().setVisible(false);
-  }
-
-  @Override
-  public void setPagePosition(int x, int y) {
-    super.setPagePosition(x, y);
-    positioned = true;
-  }
-
-  @Override
-  public void setPosition(int left, int top) {
-    super.setPosition(left, top);
-    positioned = true;
   }
 
   protected void afterShow() {
@@ -655,8 +654,7 @@ public class Window extends ContentPanel {
       modalPanel.show(this);
       el().makePositionable(true);
     }
-    
-    
+
     if (maximized) {
       maximize();
     }
@@ -687,6 +685,15 @@ public class Window extends ContentPanel {
 
     }
     toFront();
+
+    // missing cursor workaround
+    if (GXT.isGecko) {
+      El e = el().selectNode(".x-window-bwrap");
+      if (e != null) {
+        e.dom.getStyle().setProperty("overflow", "auto");
+        e.dom.getStyle().setProperty("position", "static");
+      }
+    }
 
     if (focusWidget != null) {
       if (focusWidget instanceof Component) {
@@ -742,6 +749,14 @@ public class Window extends ContentPanel {
     }
   }
 
+  @Override
+  protected void onClick(ComponentEvent ce) {
+    super.onClick(ce);
+    if (manager.getActive() != this) {
+      manager.bringToFront(this);
+    }
+  }
+
   protected void onKeyPress(PreviewEvent be) {
     int keyCode = be.getKeyCode();
     if (onEsc && keyCode == KeyboardListener.KEY_ESCAPE) {
@@ -757,6 +772,7 @@ public class Window extends ContentPanel {
 
     if (manager == null) {
       manager = WindowManager.get();
+      manager.register(this);
     }
 
     if (isPlain()) {
@@ -807,6 +823,8 @@ public class Window extends ContentPanel {
     if (height != -1) {
       setHeight(Math.max(getMinHeight(), height));
     }
+
+    el().addEventsSunk(Event.ONCLICK);
   }
 
   private void beforeResize() {

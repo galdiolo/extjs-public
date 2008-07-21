@@ -116,7 +116,7 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
     sb.append("<table id='{id}' class='{style}' cellpadding=0 cellspacing=0><tbody><tr>");
     sb.append("<td class='{style}-l'><div>&nbsp;</div></td>");
     sb.append("<td class='{style}-icon' style='{icon}'><div class='x-icon-btn {iconStyle}'></div></td>");
-    sb.append("<td class='{style}-c'><span class='{style}-text'>{text}</span></td>");
+    sb.append("<td class='{style}-c'><span class='{style}-text {textStyle}'>{text}</span></td>");
     sb.append("<td class='{style}-r'><div>&nbsp;</div></td>");
     sb.append("</tr></tbody></table>");
     defaultItemTemplate = new Template(sb.toString());
@@ -316,6 +316,7 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
         case Event.ONCLICK:
           onClick(item, dle);
       }
+      item.onComponentEvent(ce);
     }
   }
 
@@ -430,10 +431,12 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
   public void sort(Comparator<DataListItem> comparator) {
     List<DataListItem> list = getItems();
     Collections.sort(list, comparator);
-    int count = getItemCount();
-    for (int i = 0; i < count; i++) {
-      DataListItem item = getItem(i);
-      inner.dom.appendChild(item.getElement());
+    if (rendered) {
+      int count = getItemCount();
+      for (int i = 0; i < count; i++) {
+        DataListItem item = getItem(i);
+        inner.dom.appendChild(item.getElement());
+      }
     }
   }
 
@@ -532,11 +535,12 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
     Params p = new Params();
     p.set("style", itemStyle);
     p.set("iconStyle", item.getIconStyle());
+    p.set("textStyle", item.getTextStyle() != null ? item.getTextStyle() : "");
     p.set("icon", item.getIconStyle() != null ? "" : "display: none");
     p.set("text", item.getText());
     p.set("id", item.getId());
     item.setElement(itemTemplate.create(p), target, index);
-
+    
     if (!GXT.isIE) {
       item.el().setTabIndex(0);
     }

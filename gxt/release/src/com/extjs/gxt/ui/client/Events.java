@@ -153,6 +153,11 @@ public class Events {
    * Blur event type (value is 140).
    */
   public static final int Blur = 140;
+  
+  /**
+   * Blur event type (value is 142).
+   */
+  public static final int BodyScroll = 142;
 
   /**
    * BrowserEvent event type (value is 142).
@@ -273,6 +278,11 @@ public class Events {
    * HeaderChange event type (value is 382).
    */
   public static final int HeaderChange = 382;
+  
+  /**
+   * HeaderContextMenu event type (value is 385).
+   */
+  public static final int HeaderContextMenu = 385;
   
   /**
    * HiddenChange event type (value is 384).

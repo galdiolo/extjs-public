@@ -27,6 +27,7 @@ import com.google.gwt.user.client.Event;
 /**
  * A button component.
  * 
+ * <dl>
  * <dt><b>Events:</b></dt>
  * 
  * <dd><b>BeforeSelect</b> : ButtonEvent(button, event)<br>

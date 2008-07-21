@@ -154,7 +154,7 @@ public class GXT {
     isIE = ua.indexOf("msie") != -1;
     isIE7 = ua.indexOf("msie 7") != -1;
     isIE6 = isIE && !isIE7;
-    isGecko = ua.indexOf("gecko") != -1;
+    isGecko = ua.indexOf("gecko") != -1 && ua.indexOf("like gecko") == -1;
     isMac = ua.indexOf("macintosh") != -1 || ua.indexOf("mac os x") != -1;
     isLinux = ua.indexOf("linux") != -1;
 
@@ -229,7 +229,8 @@ public class GXT {
   }
 
   private static native void initInternal() /*-{
-    $wnd.Ext = {};
+    $wnd.GXT = {};
+    $wnd.GXT.Ext = {};
     @com.extjs.gxt.ui.client.core.Ext::load()();
   }-*/;
 

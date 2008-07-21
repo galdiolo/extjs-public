@@ -8,7 +8,9 @@
 package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
+import com.extjs.gxt.ui.client.widget.layout.LayoutData;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
@@ -117,7 +119,7 @@ public class LayoutContainer extends ScrollContainer<Component> {
    *          it will be wrapped in a WidgetComponent
    * @param layoutData the layout data
    */
-  public boolean add(Widget widget, Object layoutData) {
+  public boolean add(Widget widget, LayoutData layoutData) {
     return insert(widget, getItemCount(), layoutData);
   }
 
@@ -209,10 +211,10 @@ public class LayoutContainer extends ScrollContainer<Component> {
    * @param index the index at which the component will be inserted in
    * @param layoutData the component's layout data
    */
-  public boolean insert(Widget widget, int index, Object layoutData) {
+  public boolean insert(Widget widget, int index, LayoutData layoutData) {
     Component component = wrapWidget(widget);
     if (layoutData != null) {
-      component.setData(layoutData);
+      component.setLayoutData(layoutData);
     }
     boolean added = super.insert(component, index);
     return added;
@@ -269,6 +271,16 @@ public class LayoutContainer extends ScrollContainer<Component> {
    */
   public void setLayout(Layout layout) {
     super.setLayout(layout);
+  }
+  
+  /**
+   * Sets the component's layout data.
+   * 
+   * @param component the component
+   * @param layoutData the layou data
+   */
+  public void setLayoutData(Component component, LayoutData layoutData) {
+    WidgetHelper.setLayoutData(component, layoutData);
   }
 
   /**

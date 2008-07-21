@@ -18,6 +18,7 @@ import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.Items;
+import com.google.gwt.user.client.DOM;
 
 /**
  * Concrete selection model. 3 selection models are supported:
@@ -192,6 +193,8 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
     if (singleSelect) {
       if (items.size() > 0) {
         select(items.get(0));
+      } else if (selected.size() > 0){
+        deselectAll();
       }
     } else {
       doSelect(new Items(items), false, false);
@@ -239,11 +242,12 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
   }
 
   protected void deselectAll(boolean supressEvent) {
+    boolean change = selected.size() > 0;
     for (T item : selected) {
       onSelectChange(item, false);
     }
     selected.clear();
-    if (!supressEvent) {
+    if (!supressEvent && change) {
       fireSelectionChanged();
     }
   }
@@ -284,14 +288,15 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
 
   protected void doSelect(final Items<T> items, boolean keepExisting, boolean supressEvent) {
     createContainerEvent(container);
+    List<T> previous = new ArrayList<T>(selected);
     if (!items.isSingle()) {
       if (!keepExisting) {
-        deselectAll();
+        deselectAll(true);
       }
       for (Object item : items.getItems(container)) {
         doSelect(new Items((Component) item), true, true);
       }
-      if (!supressEvent) {
+      if (!supressEvent && hasSelectionChanged(previous, selected)) {
         fireSelectionChanged();
       }
     } else {
@@ -303,21 +308,30 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
         onSelectChange(item, true);
         selected.add(item);
         selectedItem = item;
-        if (!supressEvent) {
+        if (!supressEvent && hasSelectionChanged(previous, selected)) {
           fireSelectionChanged();
         }
       }
     }
+  }
+  
+  private boolean hasSelectionChanged(List<T> prevSel, List<T> newSel) {
+    if (prevSel.size() != newSel.size()) {
+      return true;
+    } else {
+      for (T sel : prevSel) {
+        if (!newSel.contains(sel)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   protected void doSelectChange(T item, boolean select) {
     if (container instanceof Selectable) {
       ((Selectable) container).onSelectChange(item, select);
     }
-  }
-
-  protected void doMultiSelect(Items items, boolean keepExisting, boolean supressEvent) {
-
   }
 
   protected void doSingleSelect(T item, int index, ContainerEvent ce) {
@@ -457,6 +471,7 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
   protected void fireSelectionChanged() {
     ContainerEvent event = createContainerEvent(container);
     event.selected = getSelectedItems();
+    event.event = DOM.eventGetCurrentEvent();
     container.fireEvent(Events.SelectionChange, event);
   }
 

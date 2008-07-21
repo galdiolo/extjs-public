@@ -9,6 +9,7 @@ package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.button.IconButton;
 import com.google.gwt.user.client.Element;
@@ -22,9 +23,9 @@ public class DataListItem extends Component {
 
   protected DataList list;
   protected IconButton checkBtn;
-  
+
   private boolean checked;
-  private String text, iconStyle;
+  private String text, iconStyle, textStyle;
 
   /**
    * Creates a new list item.
@@ -52,6 +53,15 @@ public class DataListItem extends Component {
   }
 
   /**
+   * Returns the icon style.
+   * 
+   * @return the icon style
+   */
+  public String getIconStyle() {
+    return iconStyle;
+  }
+
+  /**
    * Returns the item's parent list.
    * 
    * @return the list
@@ -61,12 +71,38 @@ public class DataListItem extends Component {
   }
 
   /**
+   * Returns the item's text.
+   * 
+   * @return the text
+   */
+  public String getText() {
+    return text;
+  }
+
+  /**
+   * Returns the item's text style.
+   * 
+   * @return the text style
+   */
+  public String getTextStyle() {
+    return textStyle;
+  }
+
+  /**
    * Returns <code>true</code> if the item is checked.
    * 
    * @return the checked state
    */
   public boolean isChecked() {
     return checked;
+  }
+
+  @Override
+  public void onComponentEvent(ComponentEvent ce) {
+    super.onComponentEvent(ce);
+    if (toolTip != null) {
+      toolTip.handleEvent(ce);
+    }
   }
 
   /**
@@ -89,16 +125,7 @@ public class DataListItem extends Component {
       list.onCheckChange(this, checked);
     }
   }
-
-  /**
-   * Returns the item's text.
-   * 
-   * @return the text
-   */
-  public String getText() {
-    return text;
-  }
-
+  
   /**
    * Sets the item's icon style.
    * 
@@ -126,12 +153,21 @@ public class DataListItem extends Component {
   }
 
   /**
-   * Returns the icon style.
+   * Sets the item's text style.
    * 
-   * @return the icon style
+   * @param textStyle the text style name
    */
-  public String getIconStyle() {
-    return iconStyle;
+  public void setTextStyle(String textStyle) {
+    if (!rendered) {
+      this.textStyle = textStyle;
+    } else {
+      El elem = el().selectNode("." + list.itemStyle + "-text");
+      if (this.textStyle != null) {
+        elem.removeStyleName(this.textStyle);
+      }
+      this.textStyle = textStyle;
+      elem.addStyleName(textStyle);
+    }
   }
 
   protected void onRender(Element target, int index) {

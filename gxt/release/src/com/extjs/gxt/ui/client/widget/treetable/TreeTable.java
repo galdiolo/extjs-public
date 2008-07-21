@@ -81,7 +81,6 @@ public class TreeTable extends Tree implements BaseTable {
   protected TreeTableView view;
 
   private boolean columnContextMenu;
-  private boolean checkable;
   private boolean horizontalScroll = true;
   private int lastLeft;
   private Size lastSize;
@@ -186,15 +185,6 @@ public class TreeTable extends Tree implements BaseTable {
     return header;
   }
 
-  /**
-   * Returns true if check boxes are enabled.
-   * 
-   * @return the check box state
-   */
-  public boolean isCheckable() {
-    return checkable;
-  }
-
   public void onBrowserEvent(Event event) {
     super.onBrowserEvent(event);
     int type = DOM.eventGetType(event);
@@ -222,15 +212,6 @@ public class TreeTable extends Tree implements BaseTable {
    */
   public void scrollIntoView(TreeTableItem item) {
     item.el().scrollIntoView(view.getScrollEl().dom, false);
-  }
-
-  /**
-   * Sets whether items shoud have a check box (defaults to false, pre-render).
-   * 
-   * @param checkable true to enable checbox
-   */
-  public void setCheckable(boolean checkable) {
-    this.checkable = checkable;
   }
 
   /**

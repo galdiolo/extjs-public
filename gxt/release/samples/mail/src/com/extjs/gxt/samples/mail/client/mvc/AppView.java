@@ -74,7 +74,6 @@ public class AppView extends View {
 
     BorderLayoutData data = new BorderLayoutData(LayoutRegion.NORTH, 33);
     data.setMargins(new Margins());
-    northPanel.setData(data);
     viewport.add(northPanel, data);
   }
 

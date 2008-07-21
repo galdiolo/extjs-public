@@ -388,9 +388,10 @@ public class TreeTableItem extends TreeItem {
 
     TreeTableEvent evt = new TreeTableEvent(treeTable);
     evt.item = this;
-    evt.index = index;
+    evt.rowIndex = treeTable.indexOf(this);
+    evt.cellIndex = index;
     evt.event = ce.event;
-
+    
     treeTable.fireEvent(Events.CellClick, evt);
     treeTable.fireEvent(Events.RowClick, evt);
   }
@@ -405,7 +406,8 @@ public class TreeTableItem extends TreeItem {
     TreeTableEvent evt = new TreeTableEvent(treeTable);
     evt.item = this;
     evt.event = ce.event;
-    evt.index = index;
+    evt.cellIndex = index;
+    evt.rowIndex = treeTable.indexOf(this);
 
     treeTable.fireEvent(Events.CellDoubleClick, evt);
     treeTable.fireEvent(Events.RowDoubleClick, evt);

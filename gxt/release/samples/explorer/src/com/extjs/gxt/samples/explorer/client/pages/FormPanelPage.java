@@ -14,6 +14,7 @@ import java.util.List;
 import com.extjs.gxt.samples.resources.client.Stock;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -28,6 +29,7 @@ import com.extjs.gxt.ui.client.widget.form.RadioGroup;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.form.TimeField;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.ui.RootPanel;
 
@@ -38,6 +40,13 @@ public class FormPanelPage extends LayoutContainer implements EntryPoint {
   }
 
   public FormPanelPage() {
+    // next 2 line is only used to pass layout to containing container
+    // this will have NO effect outside of the explorer demo
+    setData("layout", new FitLayout());
+    
+    setScrollMode(Scroll.AUTO);
+    
+    
     FormPanel panel = new FormPanel();
     panel.setFrame(true);
     panel.setFieldWidth(210);

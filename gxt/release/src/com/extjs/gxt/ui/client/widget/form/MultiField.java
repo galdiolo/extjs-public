@@ -21,7 +21,7 @@ import com.google.gwt.user.client.Event;
 /**
  * A field that displays multiple fields in a single row.
  */
-public class MultiField<F extends Field> extends Field {
+public class MultiField<F extends Field> extends Field<F> {
 
   protected List<F> fields;
   protected HorizontalPanel hp;
@@ -35,9 +35,19 @@ public class MultiField<F extends Field> extends Field {
     baseStyle = "x-form-group";
     invalidStyle = "none";
   }
-  
+
+  /**
+   * Creates a new checkbox group.
+   * 
+   * @param fieldLabel the field label
+   * @param fields the field(s) to add
+   */
   public MultiField(String fieldLabel, F... fields) {
-    
+    this();
+    setFieldLabel(fieldLabel);
+    for (F f : fields) {
+      add(f);
+    }
   }
 
   /**
@@ -173,6 +183,8 @@ public class MultiField<F extends Field> extends Field {
         return false;
       }
     }
+
+    clearInvalid();
     return true;
   }
 }

@@ -242,46 +242,49 @@ public class Resizable extends BaseObservable {
   }
 
   protected void init() {
-    handleList = new ArrayList<ResizeHandle>();
-    if (handles.equals("all")) {
-      handles = "n s e w ne nw se sw";
-    }
-    String[] temp = handles.split(" ");
-    for (int i = 0; i < temp.length; i++) {
-      if ("n".equals(temp[i])) {
-        create(Dir.N, "north");
-      } else if ("nw".equals(temp[i])) {
-        create(Dir.NW, "northwest");
-      } else if ("e".equals(temp[i])) {
-        create(Dir.E, "east");
-      } else if ("w".equals(temp[i])) {
-        create(Dir.W, "west");
-      } else if ("se".equals(temp[i])) {
-        create(Dir.SE, "southeast");
-      } else if ("s".equals(temp[i])) {
-        create(Dir.S, "south");
-      } else if ("ne".equals(temp[i])) {
-        create(Dir.NE, "northeast");
-      } else if ("sw".equals(temp[i])) {
-        create(Dir.SW, "southwest");
+    if (handleList == null) {
+      resize.el().makePositionable();
+      handleList = new ArrayList<ResizeHandle>();
+      if (handles.equals("all")) {
+        handles = "n s e w ne nw se sw";
       }
-    }
-
-    preview = new EventPreview() {
-      public boolean onEventPreview(Event event) {
-        switch (DOM.eventGetType(event)) {
-          case Event.ONMOUSEMOVE:
-            int x = DOM.eventGetClientX(event);
-            int y = DOM.eventGetClientY(event);
-            handleMouseMove(x, y);
-            break;
-          case Event.ONMOUSEUP:
-            handleMouseUp(event);
-            break;
+      String[] temp = handles.split(" ");
+      for (int i = 0; i < temp.length; i++) {
+        if ("n".equals(temp[i])) {
+          create(Dir.N, "north");
+        } else if ("nw".equals(temp[i])) {
+          create(Dir.NW, "northwest");
+        } else if ("e".equals(temp[i])) {
+          create(Dir.E, "east");
+        } else if ("w".equals(temp[i])) {
+          create(Dir.W, "west");
+        } else if ("se".equals(temp[i])) {
+          create(Dir.SE, "southeast");
+        } else if ("s".equals(temp[i])) {
+          create(Dir.S, "south");
+        } else if ("ne".equals(temp[i])) {
+          create(Dir.NE, "northeast");
+        } else if ("sw".equals(temp[i])) {
+          create(Dir.SW, "southwest");
         }
-        return false;
       }
-    };
+
+      preview = new EventPreview() {
+        public boolean onEventPreview(Event event) {
+          switch (DOM.eventGetType(event)) {
+            case Event.ONMOUSEMOVE:
+              int x = DOM.eventGetClientX(event);
+              int y = DOM.eventGetClientY(event);
+              handleMouseMove(x, y);
+              break;
+            case Event.ONMOUSEUP:
+              handleMouseUp(event);
+              break;
+          }
+          return false;
+        }
+      };
+    }
   }
 
   protected void onAttach() {

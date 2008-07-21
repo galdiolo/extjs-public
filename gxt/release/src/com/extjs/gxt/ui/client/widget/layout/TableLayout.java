@@ -244,10 +244,10 @@ public class TableLayout extends Layout {
   }
 
   protected Element getNextCell(Component widget) {
-    TableData data = (TableData) widget.getData();
+    TableData data = (TableData)getLayoutData(widget);
     if (data == null) {
       data = new TableData();
-      widget.setData(data);
+      setLayoutData(widget, data);
     }
 
     TableCellElement td = DOM.createTD().cast();
@@ -340,7 +340,7 @@ public class TableLayout extends Layout {
     }
 
     if (height != null) {
-      table.setPropertyString("height", height);
+      table.setAttribute("height", height);
     }
 
     tbody = DOM.createTBody();

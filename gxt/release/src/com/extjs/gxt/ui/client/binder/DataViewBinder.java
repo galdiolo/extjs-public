@@ -46,7 +46,7 @@ public class DataViewBinder<M extends ModelData> extends StoreBinder<ListStore<M
   @Override
   public Component findItem(M model) {
     for (DataViewItem item : view.getItems()) {
-      if (store.getModelComparer().equals((M) item.getData(), model)) {
+      if (store.getModelComparer().equals((M) item.getModel(), model)) {
         return item;
       }
     }
@@ -91,7 +91,7 @@ public class DataViewBinder<M extends ModelData> extends StoreBinder<ListStore<M
       }
     }
     DataViewItem item = new DataViewItem(values);
-    item.setData(model);
+    setModel(item, model);
     return item;
   }
 
@@ -101,7 +101,7 @@ public class DataViewBinder<M extends ModelData> extends StoreBinder<ListStore<M
 
     List<DataViewItem> sel = view.getSelectedItems();
     for (DataViewItem item : sel) {
-      selection.add((M) item.getData());
+      selection.add((M) item.getModel());
     }
     return selection;
   }
@@ -123,7 +123,7 @@ public class DataViewBinder<M extends ModelData> extends StoreBinder<ListStore<M
   protected void onFilter(StoreEvent se) {
     if (store.isFiltered()) {
       for (DataViewItem item : view.getItems()) {
-        M m = (M) item.getData();
+        M m = (M) item.getModel();
         item.setVisible(store.contains(m));
       }
     } else {
@@ -182,7 +182,7 @@ public class DataViewBinder<M extends ModelData> extends StoreBinder<ListStore<M
   protected void update(M model) {
     DataListItem item = (DataListItem) findItem(model);
     if (item != null) {
-      item.setData(model);
+      setModel(item, model);
     }
   }
 

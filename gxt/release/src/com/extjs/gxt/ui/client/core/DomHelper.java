@@ -22,7 +22,7 @@ public class DomHelper {
    * @return the new element
    */
   public static native Element append(Element elem, String html) /*-{
-    return $wnd.Ext.DomHelper.append(elem, html, false);
+    return $wnd.GXT.Ext.DomHelper.append(elem, html, false);
   }-*/;
 
   /**
@@ -33,7 +33,7 @@ public class DomHelper {
    * @return the new element
    */
   public static native Element insertAfter(Element elem, String html) /*-{
-     return $wnd.Ext.DomHelper.doInsert(elem, html, false, "afterEnd", "nextSibling");
+     return $wnd.GXT.Ext.DomHelper.doInsert(elem, html, false, "afterEnd", "nextSibling");
    }-*/;
 
   /**
@@ -44,7 +44,7 @@ public class DomHelper {
    * @return the new element
    */
   public static native Element insertBefore(Element elem, String html) /*-{
-     return $wnd.Ext.DomHelper.doInsert(elem, html, false, "beforeBegin");
+     return $wnd.GXT.Ext.DomHelper.doInsert(elem, html, false, "beforeBegin");
    }-*/;
 
   /**
@@ -55,7 +55,7 @@ public class DomHelper {
    * @return the new element
    */
   public static native Element insertFirst(Element elem, String html) /*-{
-     return $wnd.Ext.DomHelper.doInsert(elem, html, false, "afterBegin", "firstChild");
+     return $wnd.GXT.Ext.DomHelper.doInsert(elem, html, false, "afterBegin", "firstChild");
    }-*/;
 
   /**
@@ -68,7 +68,7 @@ public class DomHelper {
    * @return the new element
    */
   public static native Element insertHtml(String where, Element el, String html) /*-{
-    return $wnd.Ext.DomHelper.insertHtml(where, el, html);
+    return $wnd.GXT.Ext.DomHelper.insertHtml(where, el, html);
   }-*/;
 
   /**
@@ -79,7 +79,7 @@ public class DomHelper {
    * @return the new element
    */
   public static native Element overwrite(Element elem, String html) /*-{
-    $wnd.Ext.DomHelper.overwite(elem, html);
+    $wnd.GXT.Ext.DomHelper.overwite(elem, html);
   }-*/;
 
 }

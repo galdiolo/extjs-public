@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.binder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.Events;
@@ -23,7 +24,7 @@ import com.extjs.gxt.ui.client.store.Store;
 import com.extjs.gxt.ui.client.store.StoreEvent;
 import com.extjs.gxt.ui.client.store.StoreFilter;
 import com.extjs.gxt.ui.client.store.StoreListener;
-import com.extjs.gxt.ui.client.util.Util;
+import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.Component;
 
 /**
@@ -195,6 +196,9 @@ public abstract class StoreBinder<S extends Store<M>, C extends Component, M ext
   }
 
   public void setSelection(List<M> selection) {
+    if (selection == null) {
+      selection = new ArrayList<M>();
+    }
     setSelectionFromProvider(selection);
   }
 
@@ -204,7 +208,11 @@ public abstract class StoreBinder<S extends Store<M>, C extends Component, M ext
    * @param selection the selection
    */
   public void setSelection(M selection) {
-    setSelection(Util.createList(selection));
+    List<M> sel = new ArrayList<M>();
+    if (selection != null) {
+      sel.add(selection);
+    }
+    setSelection(sel);
   }
 
   /**
@@ -294,6 +302,10 @@ public abstract class StoreBinder<S extends Store<M>, C extends Component, M ext
     if (mask && component != null && component.isRendered()) {
       component.el().unmask();
     }
+  }
+  
+  protected void setModel(Component c, ModelData model) {
+    WidgetHelper.setModel(c, model);
   }
 
   protected void onFilter(StoreEvent se) {

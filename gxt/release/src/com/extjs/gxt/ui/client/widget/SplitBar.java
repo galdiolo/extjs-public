@@ -122,8 +122,6 @@ public class SplitBar extends BoxComponent {
     this.resizeWidget = resizeWidget;
     this.resizeEl = resizeWidget.el();
 
-    super.shim = true;
-
     listener = new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent ce) {
         switch (ce.type) {
@@ -149,19 +147,15 @@ public class SplitBar extends BoxComponent {
       }
     };
 
-    resizeWidget.addListener(Events.Attach, listener);
-    resizeWidget.addListener(Events.Detach, listener);
-    resizeWidget.addListener(Events.Resize, listener);
-
-    setElement(DOM.createDiv());
-    rendered = true;
-
     if (style == LayoutRegion.SOUTH || style == LayoutRegion.NORTH) {
       setStyleName("x-hsplitbar");
     } else {
       setStyleName("x-vsplitbar");
     }
-    el().makePositionable(true);
+
+    resizeWidget.addListener(Events.Attach, listener);
+    resizeWidget.addListener(Events.Detach, listener);
+    resizeWidget.addListener(Events.Resize, listener);
 
     draggable = new Draggable(this);
     draggable.setUpdateZIndex(false);
@@ -186,7 +180,7 @@ public class SplitBar extends BoxComponent {
     draggable.addListener(Events.DragEnd, dragListener);
     draggable.addListener(Events.DragCancel, dragListener);
 
-    sinkEvents(Event.MOUSEEVENTS);
+   
 
     if (resizeWidget.isAttached()) {
       BaseEvent be = createComponentEvent(null);
@@ -199,6 +193,16 @@ public class SplitBar extends BoxComponent {
         sync();
       }
     });
+    
+    setElement(DOM.createDiv());
+    el().makePositionable(true);
+    sinkEvents(Event.MOUSEEVENTS);
+  }
+
+  @Override
+  protected void onAttach() {
+    // TODO Auto-generated method stub
+    super.onAttach();
   }
 
   /**
@@ -481,7 +485,7 @@ public class SplitBar extends BoxComponent {
     SplitBarEvent se = new SplitBarEvent(this);
     se.dragEvent = de;
     fireEvent(Events.DragStart, se);
-    
+
     el().updateZIndex(0);
 
     shim.setVisible(true);

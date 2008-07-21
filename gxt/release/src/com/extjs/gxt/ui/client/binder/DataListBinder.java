@@ -62,7 +62,7 @@ public class DataListBinder<M extends ModelData> extends StoreBinder<ListStore<M
   @Override
   public Component findItem(M model) {
     for (DataListItem item : list.getItems()) {
-      if (store.getModelComparer().equals((M) item.getData(), model)) {
+      if (store.getModelComparer().equals((M) item.getModel(), model)) {
         return item;
       }
     }
@@ -72,7 +72,7 @@ public class DataListBinder<M extends ModelData> extends StoreBinder<ListStore<M
   public List<M> getCheckedSelection() {
     List<M> selection = new ArrayList<M>();
     for (DataListItem item : list.getChecked()) {
-      selection.add((M) item.getData());
+      selection.add((M) item.getModel());
     }
     return selection;
   }
@@ -85,7 +85,7 @@ public class DataListBinder<M extends ModelData> extends StoreBinder<ListStore<M
   public String getDisplayProperty() {
     return displayProperty;
   }
-  
+
   /**
    * Returns the data list.
    * 
@@ -157,7 +157,10 @@ public class DataListBinder<M extends ModelData> extends StoreBinder<ListStore<M
     DataListItem item = new DataListItem();
     item.setText(getTextValue(model, displayProperty, true));
     item.setIconStyle(getIconValue(model, displayProperty));
-    item.setData(model);
+    String style = (styleProvider == null) ? null : styleProvider.getStringValue(model,
+        displayProperty);
+    item.setTextStyle(style);
+    setModel(item, model);
     return item;
   }
 
@@ -173,10 +176,10 @@ public class DataListBinder<M extends ModelData> extends StoreBinder<ListStore<M
   @Override
   protected List<M> getSelectionFromComponent() {
     List<M> selection = new ArrayList<M>();
-    
+
     List<DataListItem> sel = list.getSelectedItems();
     for (DataListItem item : sel) {
-      selection.add((M) item.getData());
+      selection.add((M) item.getModel());
     }
     return selection;
   }
@@ -203,14 +206,15 @@ public class DataListBinder<M extends ModelData> extends StoreBinder<ListStore<M
 
   @Override
   protected void onDataChanged(StoreEvent se) {
+    super.onDataChanged(se);
     createAll();
   }
-  
+
   @Override
   protected void onFilter(StoreEvent se) {
     if (store.isFiltered()) {
       for (DataListItem item : list.getItems()) {
-        M m = (M) item.getData();
+        M m = (M) item.getModel();
         item.setVisible(store.contains(m));
       }
     } else {
@@ -233,8 +237,8 @@ public class DataListBinder<M extends ModelData> extends StoreBinder<ListStore<M
     if (list.getItemCount() > 0) {
       list.sort(new Comparator<DataListItem>() {
         public int compare(DataListItem o1, DataListItem o2) {
-          int idx1 = store.indexOf((M)o1.getData());
-          int idx2 = store.indexOf((M)o2.getData());
+          int idx1 = store.indexOf((M) o1.getModel());
+          int idx2 = store.indexOf((M) o2.getModel());
           return idx1 < idx2 ? -1 : 1;
         }
       });
@@ -269,9 +273,13 @@ public class DataListBinder<M extends ModelData> extends StoreBinder<ListStore<M
   protected void update(M model) {
     DataListItem item = (DataListItem) findItem(model);
     if (item != null) {
-      item.setData(model);
+      setModel(item, model);
       item.setText(getTextValue(model, displayProperty, true));
       item.setIconStyle(getIconValue(model, displayProperty));
+      String style = (styleProvider == null) ? null : styleProvider.getStringValue(model,
+          displayProperty);
+      item.setTextStyle(style);
+
     }
   }
 

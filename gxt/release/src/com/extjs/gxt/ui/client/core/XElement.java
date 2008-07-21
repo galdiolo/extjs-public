@@ -22,7 +22,7 @@ final class XElement extends JavaScriptObject {
   }
   
   public static native XElement create(Element elem) /*-{
-    return new $wnd.Ext.Element(elem);
+    return new $wnd.GXT.Ext.Element(elem);
   }-*/;
   
   protected XElement() {
