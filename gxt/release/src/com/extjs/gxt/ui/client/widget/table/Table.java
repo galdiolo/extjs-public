@@ -566,6 +566,7 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
    */
   public void setTableHeader(TableHeader header) {
     if (!isRendered()) {
+      header.table = this;
       this.header = header;
     }
   }
@@ -672,7 +673,10 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
   }
 
   protected void onKeyPress(TableEvent te) {
-    fireEvent(Events.KeyPress, te);
+    TableEvent e = new TableEvent(this);
+    e.event = te.event;
+    e.item = te.item;
+    fireEvent(Events.KeyPress, e);
   }
 
   @Override

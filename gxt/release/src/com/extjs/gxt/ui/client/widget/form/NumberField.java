@@ -90,7 +90,7 @@ public class NumberField extends TextField<Number> {
     }
   }
 
-  private String baseChars = "0123456789";
+  private String baseChars = "0123456789`abcdefghi";
   private String decimalSeparator = ".";
   private boolean allowNegative = true;
   private boolean allowDecimals = true;

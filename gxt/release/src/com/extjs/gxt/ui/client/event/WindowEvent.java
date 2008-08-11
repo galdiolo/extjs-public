@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.event;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
+import com.google.gwt.user.client.Event;
 
 /**
  * Window event type.
@@ -32,6 +33,11 @@ public class WindowEvent extends ComponentEvent {
   public WindowEvent(Window window) {
     super(window);
     this.window = window;
+  }
+  
+  public WindowEvent(Window window, Event event) {
+    this(window);
+    this.event = event;
   }
 
   public WindowEvent(Window window, Button buttonClicked) {

@@ -15,6 +15,7 @@ import com.extjs.gxt.ui.client.event.ToolBarEvent;
 import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
+import com.extjs.gxt.ui.client.widget.tips.ToolTip;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.google.gwt.user.client.Element;
 
@@ -79,6 +80,18 @@ public class TextToolItem extends ToolItem {
     addListener(Events.Select, listener);
   }
 
+  @Override
+  protected void doAttachChildren() {
+    super.doAttachChildren();
+    WidgetHelper.doAttach(button);
+  }
+
+  @Override
+  protected void doDetachChildren() {
+    super.doDetachChildren();
+    WidgetHelper.doDetach(button);
+  }
+
   /**
    * Returns the item's icon style.
    * 
@@ -87,7 +100,7 @@ public class TextToolItem extends ToolItem {
   public String getIconStyle() {
     return button.getIconStyle();
   }
-
+  
   /**
    * Returns the item's menu (if it has one).
    * 
@@ -98,12 +111,53 @@ public class TextToolItem extends ToolItem {
   }
 
   /**
+   * Returns the button's text.
+   * 
+   * @return the text
+   */
+  public String getText() {
+    return button.getText();
+  }
+
+  /**
    * Returns the item's parent tool bar.
    * 
    * @return the toolbar
    */
   public ToolBar getToolBar() {
     return toolBar;
+  }
+
+  @Override
+  public ToolTip getToolTip() {
+    return button.getToolTip();
+  }
+
+  protected void onButtonSelect(ButtonEvent be) {
+    ToolBarEvent evt = new ToolBarEvent(toolBar, this);
+    evt.event = be.event;
+    fireEvent(Events.Select, evt);
+  }
+
+  @Override
+  protected void onDisable() {
+    button.disable();
+  }
+
+  @Override
+  protected void onEnable() {
+    button.enable();
+  }
+
+  @Override
+  protected void onRender(Element target, int index) {
+    button.render(target, index);
+    button.addListener(Events.Select, new Listener<ButtonEvent>() {
+      public void handleEvent(ButtonEvent be) {
+        onButtonSelect(be);
+      }
+    });
+    setElement(button.getElement());
   }
 
   /**
@@ -150,45 +204,6 @@ public class TextToolItem extends ToolItem {
   @Override
   public void setToolTip(ToolTipConfig config) {
     button.setToolTip(config);
-  }
-
-  @Override
-  protected void doAttachChildren() {
-    super.doAttachChildren();
-    WidgetHelper.doAttach(button);
-  }
-
-  @Override
-  protected void doDetachChildren() {
-    super.doDetachChildren();
-    WidgetHelper.doDetach(button);
-  }
-
-  protected void onButtonSelect(ButtonEvent be) {
-    ToolBarEvent evt = new ToolBarEvent(toolBar, this);
-    evt.event = be.event;
-    fireEvent(Events.Select, evt);
-  }
-
-  @Override
-  protected void onDisable() {
-    button.disable();
-  }
-
-  @Override
-  protected void onEnable() {
-    button.enable();
-  }
-
-  @Override
-  protected void onRender(Element target, int index) {
-    button.render(target, index);
-    button.addListener(Events.Select, new Listener<ButtonEvent>() {
-      public void handleEvent(ButtonEvent be) {
-        onButtonSelect(be);
-      }
-    });
-    setElement(button.getElement());
   }
 
 }

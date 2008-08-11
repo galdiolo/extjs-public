@@ -39,6 +39,7 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.RootPanel;
 
@@ -171,8 +172,14 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     list.setHeight("auto");
     list.hide();
     eventPreview.remove();
-    view.getSelectionModel().deselectAll();
-
+    // do not clear selections before key processing
+    Timer t = new Timer() {
+      @Override
+      public void run() {
+        view.getSelectionModel().deselectAll();
+      }
+    };
+    t.schedule(100);
     fireEvent(Events.Collapse, new FieldEvent(this));
   }
 
@@ -583,7 +590,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
       protected void onClick(PreviewEvent pe) {
         Element target = DOM.eventGetTarget(pe.event);
         if (DOM.isOrHasChild(view.getElement(), target)) {
-          onViewClick(false);
+          onViewClick(true);
         }
       }
     };
@@ -591,7 +598,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     new KeyNav(this) {
       public void onDown(ComponentEvent ce) {
         if (!isExpanded()) {
-          onTriggerClick(null);
+          onTriggerClick(ce);
         } else {
           selectNext();
         }
@@ -626,7 +633,14 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
 
       assert store != null;
 
-      view = new DataView();
+      view = new DataView() {
+        @Override
+        public void scrollIntoView(DataViewItem item) {
+          if (rendered) {
+            item.el().scrollIntoView(list.getElement(), false);
+          }
+        }
+      };
 
       view.setSelectOnOver(true);
       view.setBorders(false);

@@ -215,7 +215,9 @@ public class TimeField extends ComboBox<ModelData> {
   @Override
   protected void initList() {
     DateWrapper min = minValue != null ? new DateWrapper(minValue) : new DateWrapper();
-    min = min.clearTime();
+    if (minValue == null) {
+      min = min.clearTime();
+    }
 
     DateWrapper max = maxValue != null ? new DateWrapper(maxValue) : new DateWrapper();
     if (maxValue == null) {

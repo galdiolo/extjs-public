@@ -227,6 +227,8 @@ public class PagingToolBar extends Component implements Listener {
   protected Label displayText;
   protected TextBox pageText;
   protected PagingToolBarMessages msgs;
+  
+  private LoadEvent<PagingLoadConfig, PagingLoadResult> renderEvent;
 
   /**
    * Creates a new paging tool bar with the given page size.
@@ -403,6 +405,10 @@ public class PagingToolBar extends Component implements Listener {
   }
 
   protected void onLoad(LoadEvent<PagingLoadConfig, PagingLoadResult> event) {
+    if (!rendered) {
+      renderEvent = event;
+      return;
+    }
     PagingLoadResult result = event.data;
     start = event.data.getOffset();
     totalLength = result.getTotalLength();
@@ -554,6 +560,11 @@ public class PagingToolBar extends Component implements Listener {
 
     if (XDOM.isVisibleBox) {
       toolBar.setHeight(25);
+    }
+    
+    if (renderEvent != null) {
+      onLoad(renderEvent);
+      renderEvent = null;
     }
   }
 

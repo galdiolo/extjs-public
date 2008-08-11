@@ -228,7 +228,7 @@ public class TextField<D> extends Field<D> {
    * @param length the number of characters to be selected
    */
   public void select(int start, int length) {
-    impl.setSelectionRange(getElement(), start, length);
+    impl.setSelectionRange(getInputEl().dom, start, length);
   }
 
   /**
@@ -336,7 +336,7 @@ public class TextField<D> extends Field<D> {
   @Override
   public void setValue(D value) {
     if (rendered && emptyText != null && !emptyText.equals("")) {
-      removeStyleName(emptyStyle);
+      getInputEl().removeStyleName(emptyStyle);
     }
     super.setValue(value);
     applyEmptyText();

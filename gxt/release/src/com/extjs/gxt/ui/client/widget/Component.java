@@ -804,7 +804,11 @@ public abstract class Component extends Widget implements Observable {
     }
 
     if (focused) {
-      focus();
+      DeferredCommand.addCommand(new Command() {
+        public void execute() {
+          focus();
+        }
+      });
     }
 
     if (borders != Style.DEFAULT) {

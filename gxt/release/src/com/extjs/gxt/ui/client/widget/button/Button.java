@@ -15,6 +15,7 @@ import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.util.TextMetrics;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
@@ -208,7 +209,6 @@ public class Button extends Component {
   @Override
   public void onComponentEvent(ComponentEvent ce) {
     Element source = ce.component.getElement();
-    ce.stopEvent();
     super.onComponentEvent(ce);
     ButtonEvent be = (ButtonEvent) ce;
     switch (ce.type) {
@@ -227,12 +227,15 @@ public class Button extends Component {
         onMouseOut(ce);
         break;
       case Event.ONMOUSEDOWN:
+        ce.stopEvent();
         onMouseDown(ce);
         break;
       case Event.ONMOUSEUP:
+        ce.stopEvent();
         onMouseUp(ce);
         break;
       case Event.ONCLICK:
+        ce.stopEvent();
         onClick(ce);
         break;
       case Event.ONFOCUS:
@@ -492,7 +495,7 @@ public class Button extends Component {
   }
 
   protected void onMouseOut(ComponentEvent ce) {
-    
+
   }
 
   protected void onMouseOver(ComponentEvent ce) {
@@ -523,10 +526,18 @@ public class Button extends Component {
     if (menu != null) {
       this.el().child("tr").addStyleName("x-btn-with-menu");
     }
-    
+
     if (getFocusEl() != null) {
       getFocusEl().addEventsSunk(Event.FOCUSEVENTS);
     }
+
+    KeyNav<ButtonEvent> keyNav = new KeyNav<ButtonEvent>(this) {
+      @Override
+      public void onEnter(ButtonEvent ce) {
+        onClick(ce);
+      }
+    };
+    keyNav.setCancelBubble(false);
 
     el().addEventsSunk(Event.ONCLICK | Event.MOUSEEVENTS);
   }

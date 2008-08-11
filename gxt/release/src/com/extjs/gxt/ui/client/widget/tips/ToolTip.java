@@ -36,7 +36,7 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
   private Timer hideTimer;
   private Component target;
   private Point targetXY;
-  private ToolTipConfig config;
+  private String configTitle, configText;
 
   /**
    * Creates a new tool tip.
@@ -63,8 +63,7 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
    */
   public ToolTip(Component target, ToolTipConfig config) {
     this();
-    this.config = config;
-    this.trackMouse = config.isTrackMouse();
+    updateConfig(config);
     initTarget(target);
   }
 
@@ -86,6 +85,46 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
     return hideDelay;
   }
 
+  /**
+   * Returns the mouse offsets.
+   * 
+   * @return the mouse offsets
+   */
+  public int[] getMouseOffset() {
+    return mouseOffset;
+  }
+
+  /**
+   * Returns the show delay.
+   * 
+   * @return the show delay
+   */
+  public int getShowDelay() {
+    return showDelay;
+  }
+
+  public void handleEvent(ComponentEvent ce) {
+    Element source = target.getElement();
+    switch (ce.getEventType()) {
+      case Event.ONMOUSEOVER:
+        Element from = DOM.eventGetFromElement(ce.event);
+        if (from != null && !DOM.isOrHasChild(source, from)) {
+          onTargetOver(ce);
+        }
+        break;
+      case Event.ONMOUSEOUT:
+        Element to = DOM.eventGetToElement(ce.event);
+        if (to != null && !DOM.isOrHasChild(source, to)) {
+          onTargetOut(ce);
+        }
+        break;
+      case Event.ONMOUSEMOVE:
+        onMouseMove(ce);
+        break;
+    }
+  }
+
+  @Override
   public void hide() {
     clearTimer("dismiss");
     lastActive = new Date();
@@ -99,6 +138,15 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
    */
   public boolean isAutoHide() {
     return autoHide;
+  }
+
+  /**
+   * Returns true if mouse tracking is enabled.
+   * 
+   * @return the track mouse state
+   */
+  public boolean isTrackMouse() {
+    return trackMouse;
   }
 
   /**
@@ -134,22 +182,54 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
     this.hideDelay = hideDelay;
   }
 
+  /**
+   * An XY offset from the mouse position where the tooltip should be shown
+   * (defaults to [10,10]).
+   * 
+   * @param mouseOffset the mouse offsets
+   */
+  public void setMouseOffset(int[] mouseOffset) {
+    this.mouseOffset = mouseOffset;
+  }
+
+  /**
+   * Delay in milliseconds before the tooltip displays after the mouse enters
+   * the target element (defaults to 500).
+   * 
+   * @param showDelay the show delay in milliseconds
+   */
+  public void setShowDelay(int showDelay) {
+    this.showDelay = showDelay;
+  }
+
+  /**
+   * True to have the tooltip follow the mouse as it moves over the target
+   * element (defaults to false).
+   * 
+   * @param trackMouse the track mouse state
+   */
+  public void setTrackMouse(boolean trackMouse) {
+    this.trackMouse = trackMouse;
+  }
+
+  @Override
   public void show() {
     super.show();
     showAt(getTargetXY());
   }
 
+  @Override
   public void showAt(int x, int y) {
     lastActive = new Date();
     clearTimers();
     super.showAt(x, y);
-    if (getDismissDelay() != -1 && isAutoHide()) {
+    if (dismissDelay > 0 && autoHide) {
       dismissTimer = new Timer() {
         public void run() {
           hide();
         }
       };
-      dismissTimer.schedule(getDismissDelay());
+      dismissTimer.schedule(dismissDelay);
     }
   }
 
@@ -157,20 +237,17 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
    * Updates the tool tip with the given config.
    * 
    * @param config the tool tip config
-   * @return this
    */
-  public ToolTip update(ToolTipConfig config) {
-    this.config = config;
+  public void update(ToolTipConfig config) {
     if (!hidden) {
       updateContent();
     }
-    return this;
   }
 
   protected void updateContent() {
-    getHeader().setText(config.getTitle() == null ? "" : config.getTitle());
-    if (config.getText() != null) {
-      fly(getElement("body")).update(config.getText());
+    getHeader().setText(configTitle == null ? "" : configTitle);
+    if (configText != null) {
+      fly(getElement("body")).update(configText);
     }
   }
 
@@ -223,7 +300,7 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
         showTimer.schedule(getShowDelay());
       }
 
-    } else if (!hidden && !isAutoHide()) {
+    } else if (!hidden && autoHide) {
       show();
     }
   }
@@ -234,33 +311,12 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
     return new Point(x, y);
   }
 
-  public void handleEvent(ComponentEvent ce) {
-    Element source = target.getElement();
-    switch (ce.getEventType()) {
-      case Event.ONMOUSEOVER:
-        Element from = DOM.eventGetFromElement(ce.event);
-        if (from != null && !DOM.isOrHasChild(source, from)) {
-          onTargetOver(ce);
-        }
-        break;
-      case Event.ONMOUSEOUT:
-        Element to = DOM.eventGetToElement(ce.event);
-        if (to != null && !DOM.isOrHasChild(source, to)) {
-          onTargetOut(ce);
-        }
-        break;
-      case Event.ONMOUSEMOVE:
-        onMouseMove(ce);
-        break;
-    }
-  }
-
   private void initTarget(final Component target) {
     this.target = target;
     target.addListener(Event.ONMOUSEOVER, this);
     target.addListener(Event.ONMOUSEOUT, this);
     target.addListener(Event.ONMOUSEMOVE, this);
-    target.el().addEventsSunk(Event.MOUSEEVENTS);
+    target.sinkEvents(Event.MOUSEEVENTS);
   }
 
   private void onMouseMove(ComponentEvent ce) {
@@ -275,7 +331,7 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
       return;
     }
     clearTimer("show");
-    if (isAutoHide()) {
+    if (autoHide) {
       delayHide();
     }
   }
@@ -289,61 +345,14 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
     delayShow();
   }
 
-  /**
-   * True to have the tooltip follow the mouse as it moves over the target
-   * element (defaults to false).
-   * 
-   * @param trackMouse the track mouse state
-   */
-  public void setTrackMouse(boolean trackMouse) {
-    this.trackMouse = trackMouse;
-  }
-
-  /**
-   * Returns true if mouse tracking is enabled.
-   * 
-   * @return the track mouse state
-   */
-  public boolean isTrackMouse() {
-    return trackMouse;
-  }
-
-  /**
-   * Delay in milliseconds before the tooltip displays after the mouse enters
-   * the target element (defaults to 500).
-   * 
-   * @param showDelay the show delay in milliseconds
-   */
-  public void setShowDelay(int showDelay) {
-    this.showDelay = showDelay;
-  }
-
-  /**
-   * Returns the show delay.
-   * 
-   * @return the show delay
-   */
-  public int getShowDelay() {
-    return showDelay;
-  }
-
-  /**
-   * An XY offset from the mouse position where the tooltip should be shown
-   * (defaults to [10,10]).
-   * 
-   * @param mouseOffset the mouse offsets
-   */
-  public void setMouseOffset(int[] mouseOffset) {
-    this.mouseOffset = mouseOffset;
-  }
-
-  /**
-   * Returns the mouse offsets.
-   * 
-   * @return the mouse offsets
-   */
-  public int[] getMouseOffset() {
-    return mouseOffset;
+  private void updateConfig(ToolTipConfig config) {
+    configTitle = config.getTitle();
+    configText = config.getText();
+    trackMouse = config.isTrackMouse();
+    autoHide = config.isAutoHide();
+    showDelay = config.getShowDelay();
+    hideDelay = config.getHideDelay();
+    dismissDelay = config.getDismissDelay();
   }
 
 }

@@ -128,6 +128,10 @@
   zoom: 1;
 }
 
+.x-info-bc {
+  font-size: 0px; 
+}
+
 .x-info-bc .x-info-footer {
   padding-bottom: 6px;
 }

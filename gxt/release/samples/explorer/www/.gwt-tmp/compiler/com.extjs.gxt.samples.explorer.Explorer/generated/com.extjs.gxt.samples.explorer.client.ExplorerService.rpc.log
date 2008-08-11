@@ -1,4 +1,4 @@
-Reachable types computed on: Wed Jul 16 23:22:46 EDT 2008
+Reachable types computed on: Tue Aug 05 11:22:28 EDT 2008
 com.extjs.gxt.samples.explorer.client.model.Post
    Serialization status
       Instantiable
@@ -150,6 +150,16 @@ com.google.gwt.i18n.client.impl.ConstantMap.OrderedConstantSet<java.lang.String>
       'com.extjs.gxt.samples.explorer.client.model.Post' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.PagingLoadResult<Data>'
       Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.explorer.client.model.Post>'
 
+com.google.gwt.i18n.client.impl.ConstantMap.OrderedConstantSet<T>
+   Serialization status
+      Not serializable
+   Path
+      'com.google.gwt.i18n.client.impl.ConstantMap.OrderedConstantSet<T>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
+      'java.util.List<java.lang.String>' is reachable from field '_list' of type 'com.extjs.gxt.ui.client.data.RpcMap'
+      'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
+      'com.extjs.gxt.samples.explorer.client.model.Post' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.PagingLoadResult<Data>'
+      Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.explorer.client.model.Post>'
+
 com.google.gwt.i18n.client.impl.ConstantMap.OrderedConstantSet<java.util.Map.Entry<java.lang.String, java.lang.String>>
    Serialization status
       Not serializable
@@ -157,16 +167,6 @@ com.google.gwt.i18n.client.impl.ConstantMap.OrderedConstantSet<java.util.Map.Ent
       'com.google.gwt.i18n.client.impl.ConstantMap.OrderedConstantSet<java.util.Map.Entry<java.lang.String, java.lang.String>>' is reachable from field 'entries' of type 'com.google.gwt.i18n.client.impl.ConstantMap'
       'com.google.gwt.i18n.client.impl.ConstantMap' is reachable as a subtype of type 'interface java.util.Map<java.lang.String, java.lang.String>'
       'java.util.Map<java.lang.String, java.lang.String>' is reachable from field '_map' of type 'com.extjs.gxt.ui.client.data.RpcMap'
-      'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
-      'com.extjs.gxt.samples.explorer.client.model.Post' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.PagingLoadResult<Data>'
-      Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.explorer.client.model.Post>'
-
-com.google.gwt.i18n.client.impl.ConstantMap.OrderedConstantSet<T>
-   Serialization status
-      Not serializable
-   Path
-      'com.google.gwt.i18n.client.impl.ConstantMap.OrderedConstantSet<T>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
-      'java.util.List<java.lang.String>' is reachable from field '_list' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.samples.explorer.client.model.Post' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.PagingLoadResult<Data>'
       Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.explorer.client.model.Post>'
@@ -559,7 +559,7 @@ java.util.AbstractHashMap<K, V>
    Serialization status
       Not serializable
    Path
-      'java.util.IdentityHashMap<K, V>' is reachable as a subtype of type 'interface java.util.Map<java.lang.String, java.lang.String>'
+      'java.util.LinkedHashMap<K, V>' is reachable as a subtype of type 'interface java.util.Map<java.lang.String, java.lang.String>'
       'java.util.Map<java.lang.String, java.lang.String>' is reachable from field '_map' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.samples.explorer.client.model.Post' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.PagingLoadResult<Data>'
@@ -569,7 +569,7 @@ java.util.AbstractHashMap<K, V>
    Serialization status
       Not serializable
    Path
-      'java.util.LinkedHashMap<K, V>' is reachable as a subtype of type 'interface java.util.Map<java.lang.String, java.lang.String>'
+      'java.util.IdentityHashMap<K, V>' is reachable as a subtype of type 'interface java.util.Map<java.lang.String, java.lang.String>'
       'java.util.Map<java.lang.String, java.lang.String>' is reachable from field '_map' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.samples.explorer.client.model.Post' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.PagingLoadResult<Data>'
@@ -625,7 +625,7 @@ java.util.AbstractList<E>
    Serialization status
       Not serializable
    Path
-      'java.util.ArrayList<E>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
+      'java.util.AbstractList<E>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
       'java.util.List<java.lang.String>' is reachable from field '_list' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.samples.explorer.client.model.Post' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.PagingLoadResult<Data>'
@@ -645,7 +645,7 @@ java.util.AbstractList<E>
    Serialization status
       Not serializable
    Path
-      'java.util.AbstractList<E>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
+      'java.util.ArrayList<E>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
       'java.util.List<java.lang.String>' is reachable from field '_list' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.samples.explorer.client.model.Post' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.PagingLoadResult<Data>'
@@ -688,7 +688,7 @@ java.util.AbstractSequentialList<E>
    Serialization status
       Not serializable
    Path
-      'java.util.LinkedList<E>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
+      'java.util.AbstractSequentialList<E>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
       'java.util.List<java.lang.String>' is reachable from field '_list' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.samples.explorer.client.model.Post' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.PagingLoadResult<Data>'
@@ -698,7 +698,7 @@ java.util.AbstractSequentialList<E>
    Serialization status
       Not serializable
    Path
-      'java.util.AbstractSequentialList<E>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
+      'java.util.LinkedList<E>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
       'java.util.List<java.lang.String>' is reachable from field '_list' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.samples.explorer.client.model.Post' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.PagingLoadResult<Data>'
@@ -708,7 +708,7 @@ java.util.AbstractSet<E>
    Serialization status
       Not serializable
    Path
-      'java.util.HashSet<E>' is reachable as a subtype of type 'interface java.util.Set<java.lang.String>'
+      'java.util.AbstractSet<E>' is reachable as a subtype of type 'interface java.util.Set<java.lang.String>'
       'java.util.Set<java.lang.String>' is reachable from field '_set' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.samples.explorer.client.model.Post' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.PagingLoadResult<Data>'
@@ -718,7 +718,7 @@ java.util.AbstractSet<E>
    Serialization status
       Not serializable
    Path
-      'java.util.AbstractSet<E>' is reachable as a subtype of type 'interface java.util.Set<java.lang.String>'
+      'java.util.HashSet<E>' is reachable as a subtype of type 'interface java.util.Set<java.lang.String>'
       'java.util.Set<java.lang.String>' is reachable from field '_set' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.samples.explorer.client.model.Post' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.PagingLoadResult<Data>'
@@ -847,9 +847,9 @@ java.util.EnumSet<E>.EnumSetImpl<E>
 
 java.util.HashMap<K, V>
    Serialization status
-      Instantiable
+      Field serializable
    Path
-      'java.util.HashMap<K, V>' is reachable as a subtype of type 'interface java.util.Map<java.lang.String, java.lang.String>'
+      'java.util.LinkedHashMap<K, V>' is reachable as a subtype of type 'interface java.util.Map<java.lang.String, java.lang.String>'
       'java.util.Map<java.lang.String, java.lang.String>' is reachable from field '_map' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.samples.explorer.client.model.Post' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.PagingLoadResult<Data>'
@@ -857,9 +857,9 @@ java.util.HashMap<K, V>
 
 java.util.HashMap<K, V>
    Serialization status
-      Field serializable
+      Instantiable
    Path
-      'java.util.LinkedHashMap<K, V>' is reachable as a subtype of type 'interface java.util.Map<java.lang.String, java.lang.String>'
+      'java.util.HashMap<K, V>' is reachable as a subtype of type 'interface java.util.Map<java.lang.String, java.lang.String>'
       'java.util.Map<java.lang.String, java.lang.String>' is reachable from field '_map' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.samples.explorer.client.model.Post' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.PagingLoadResult<Data>'

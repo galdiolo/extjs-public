@@ -15,6 +15,7 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Text;
+import com.extjs.gxt.ui.client.widget.layout.TableData;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 
@@ -51,11 +52,12 @@ public class MultiField<F extends Field> extends Field<F> {
   }
 
   /**
-   * Adds a field.
+   * Adds a field (pre-render).
    * 
    * @param field the field to add
    */
   public void add(F field) {
+    assertPreRender();
     fields.add(field);
   }
 
@@ -153,7 +155,10 @@ public class MultiField<F extends Field> extends Field<F> {
     hp.setStyleAttribute("paddingTop", "3px");
 
     for (Field f : fields) {
-      hp.add(f);
+      TableData data = (TableData)WidgetHelper.getLayoutData(f);
+      if (data == null) data = new TableData();
+      data.setStyle("position: static");
+      hp.add(f, data);
       if (f.getFieldLabel() != null) {
         Text lbl = new Text(f.getFieldLabel());
         lbl.setStyleName("x-form-group-label");

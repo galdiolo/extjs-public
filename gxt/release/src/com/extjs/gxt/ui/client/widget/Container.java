@@ -167,7 +167,7 @@ public abstract class Container<T extends Component> extends BoxComponent {
    * 
    * @return an iterator
    */
-  public Iterator iterator() {
+  public Iterator<T> iterator() {
     return items.iterator();
   }
 

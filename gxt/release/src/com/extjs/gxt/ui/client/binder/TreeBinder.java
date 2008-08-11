@@ -339,6 +339,13 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
       for (int i = children.size() - 1; i >= 0; i--) {
         item.add(createItem(children.get(i)), tse.index);
       }
+    } else if (item.getData("loaded") == null){
+      if (item.isLeaf()) {
+        item.setLeaf(false);
+        if (item.isRendered()) {
+          item.getUI().updateJointStyle();
+        }
+      }
     }
   }
 

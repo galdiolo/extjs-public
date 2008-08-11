@@ -872,6 +872,10 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
   z-index: 100;
 }
 
+.ext-ie .x-btn-icon .x-btn-center .x-btn-text {
+  height: auto;
+}
+
 .icon-wait {
   background: url(../images/gxt/icons/wait.gif) no-repeat !important;
 }
@@ -1420,6 +1424,10 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
   background: transparent url(../images/default/panel/left-right.gif) repeat-y right 0;
   padding-right: 6px;
   zoom: 1;
+}
+
+.x-info-bc {
+  font-size: 0px; 
 }
 
 .x-info-bc .x-info-footer {

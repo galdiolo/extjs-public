@@ -309,10 +309,12 @@ public class ListStore<M extends ModelData> extends Store<M> {
    * @param model the model to remove
    */
   public void remove(M model) {
+    int index = indexOf(model);
     if (all.remove(model)) {
       unregisterModel(model);
       StoreEvent se = createStoreEvent();
       se.model = model;
+      se.index = index;
       fireEvent(Remove, se);
     }
   }

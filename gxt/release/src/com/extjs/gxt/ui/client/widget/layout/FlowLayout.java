@@ -22,7 +22,7 @@ import com.extjs.gxt.ui.client.widget.Layout;
  */
 public class FlowLayout extends Layout {
 
-  private Margins margins = new Margins();
+  private Margins margins;
   private boolean removePositioning = false;
 
   /**
@@ -99,7 +99,9 @@ public class FlowLayout extends Layout {
   @Override
   protected void onLayout(Container container, El target) {
     super.onLayout(container, target);
-    applyMargins(target, margins);
+    if (margins != null) {
+      applyMargins(target, margins);
+    }
   }
 
   @Override

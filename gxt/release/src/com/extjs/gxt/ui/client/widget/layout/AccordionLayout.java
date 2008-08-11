@@ -31,7 +31,7 @@ public class AccordionLayout extends FitLayout {
   private boolean titleCollapse = true;
   private boolean fill = true;
   private boolean hideCollapseTool = false;
-  private boolean autoWidth = true;
+  private boolean autoWidth;
   private boolean activeOnTop = false;
 
   private Listener listener;
@@ -104,6 +104,11 @@ public class AccordionLayout extends FitLayout {
     }
     activeItem = item;
     markExpanded((ContentPanel) activeItem);
+    
+    if (activeOnTop) {
+      target.insertChild(item.getElement(), 0);
+    }
+    
     layout();
     DeferredCommand.addCommand(new Command() {
       public void execute() {
@@ -125,7 +130,7 @@ public class AccordionLayout extends FitLayout {
 
   /**
    * True to set each contained item's width to 'auto', false to use the item's
-   * current width (defaults to true).
+   * current width (defaults to false).
    * 
    * @param autoWidth true for auto width
    */
@@ -215,6 +220,7 @@ public class AccordionLayout extends FitLayout {
         if (cp != item) {
           hh += (cp.getOffsetHeight() - El.fly(cp.getElement("bwrap")).getHeight());
           cp.el().setWidth(size.width);
+          cp.el().setHeight("auto");
         }
       }
       size.height -= hh;

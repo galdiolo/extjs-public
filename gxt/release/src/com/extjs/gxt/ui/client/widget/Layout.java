@@ -35,6 +35,7 @@ import com.google.gwt.user.client.ui.Widget;
 public abstract class Layout extends BaseObservable {
 
   protected Container<Component> container;
+  protected El target;
   protected Component activeItem;
   protected boolean renderHidden;
   protected boolean monitorResize;
@@ -161,6 +162,7 @@ public abstract class Layout extends BaseObservable {
   }
 
   protected void onLayout(Container container, El target) {
+    this.target = target;
     renderAll(container, target);
   }
 

@@ -161,6 +161,7 @@ public class WindowManager {
       for (int i = 0; i < accessList.size(); i++) {
         Window w = (Window) accessList.get(i);
         w.el().updateZIndex(0);
+        front = w;
       }
     }
   }

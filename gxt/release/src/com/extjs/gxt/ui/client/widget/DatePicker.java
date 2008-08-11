@@ -533,9 +533,10 @@ public class DatePicker extends BoxComponent {
     if (messages.getMaxText() == null) {
       messages.setMaxText(GXT.MESSAGES.datePicker_maxText());
     }
-
-    String tt = messages.getTodayText() != null ? messages.getTodayText()
-        : myMessages.datePicker_todayText();
+    
+    if (messages.getTodayText() == null) {
+      messages.setTodayText(GXT.MESSAGES.datePicker_todayText());
+    }
 
     header = new Header();
     header.render(getElement());
@@ -582,7 +583,7 @@ public class DatePicker extends BoxComponent {
     footer.setStyleName("x-date-bottom");
     footer.setWidth(175);
 
-    todayBtn = new Button(tt, new SelectionListener<ComponentEvent>() {
+    todayBtn = new Button(messages.getTodayText(), new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         selectToday();
       }

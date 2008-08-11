@@ -170,7 +170,7 @@ public class TableView {
 
     cm.addListener(Events.HeaderChange, l);
     cm.addListener(Events.WidthChange, l);
-
+    cm.addListener(Events.HiddenChange, l);
   }
 
   public void onHighlightRow(TableItem item, boolean highlight) {

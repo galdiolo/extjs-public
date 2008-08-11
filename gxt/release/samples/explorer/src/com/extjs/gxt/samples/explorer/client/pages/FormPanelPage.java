@@ -106,7 +106,7 @@ public class FormPanelPage extends LayoutContainer implements EntryPoint {
     check2.setValue(true);
 
     CheckBox check3 = new CheckBox();
-    check3.setFieldLabel("Blue");
+    check3.setBoxLabel("Blue");
 
     CheckBoxGroup checkGroup = new CheckBoxGroup();
     checkGroup.setFieldLabel("Music");
@@ -117,12 +117,12 @@ public class FormPanelPage extends LayoutContainer implements EntryPoint {
 
     Radio radio = new Radio();
     radio.setName("radio");
-    radio.setFieldLabel("Red");
+    radio.setBoxLabel("Red");
     radio.setValue(true);
 
     Radio radio2 = new Radio();
     radio2.setName("radio");
-    radio2.setFieldLabel("Blue");
+    radio2.setBoxLabel("Blue");
 
     RadioGroup radioGroup = new RadioGroup("test");
     radioGroup.setFieldLabel("Favorite Color");

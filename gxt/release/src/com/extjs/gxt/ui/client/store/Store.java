@@ -318,7 +318,7 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
    * Cancel outstanding changes on all changed records.
    */
   public void rejectChanges() {
-    for (Record r : modified) {
+    for (Record r : new ArrayList<Record>(modified)) {
       r.reject(false);
     }
     modified.clear();

@@ -33,5 +33,9 @@ public class BaseListLoadResult<Data> implements ListLoadResult<Data>, Serializa
   public List<Data> getData() {
     return list;
   }
+  
+  public void setData(List<Data> list) {
+    this.list = list;
+  }
 
 }

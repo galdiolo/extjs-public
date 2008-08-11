@@ -29,6 +29,7 @@
   <body>
     <h1>Ext GWT Library Release Notes</h1>
     <ul>
+      <li><a href="#Release_Notes_1.0.2">Release 1.0.2</a></li>
       <li><a href="#Release_Notes_1.0.1">Release 1.0.1</a></li>
       <li><a href="#Release_Notes_1.0">Release 1.0</a></li>
       <li><a href="#Release_Notes_1.0-rc2">Release 1.0 RC2</a></li>
@@ -37,6 +38,45 @@
       <li><a href="#Release_Notes_1.0-beta4">Release 1.0 Beta 4</a></li>
       <li><a href="#Release_Notes_1.0-beta3">Release 1.0 Beta 3</a></li>
       <li><a href="#Release_Notes_1.0-beta2">Release 1.0 Beta 2</a></li>
+    </ul>
+    <h2><a name="Release_Notes_1.0.2">Release Notes Current</a></h2>
+    <h3>General Changes &amp; Enhancements</h3>
+    <ul>
+    	<li>Slate theme removed from Themes module</li>
+    	<li>Added HeaderContextMenu event to Table</li>
+    	<li>Added enter key support to Button</li>
+    </ul>
+    
+    <h3>API Changes</h3>
+    <ul>
+    	<li>WindowManager register method no longer public</li>
+    </ul>
+    
+    <h3>Bug Fixes</h3>
+    <ul>
+		<li>ComboBox down key null pointer</li>
+		<li>Modal window opening another modal window not masking first window</li>
+		<li>All data in ToolTipConfig not being applied to ToolTip</li>
+		<li>Error in polish properties file</li>
+		<li>ToolTip dismissDelay execption when set to 0</li>
+		<li>TableView not listening for TableColumnModel HiddenChange</li>
+		<li>ConcurrentMod exceptio when calling Store rejectChanges</li>
+		<li>ComboBox not scrolling into view</li>
+		<li>NumberField not accepting numeric key pad key presses</li>
+		<li>FlowLayout clearing margins</li>
+		<li>Emptyt text style not clearing on setValue of ComboBox</li>
+		<li>ComboBox tab not selecting value from list in FF</li>
+		<li>ComboBox losing focus after selecting item in list</li>
+		<li>ListStore remove not setting index in event</li>
+		<li>DatePicker today tooltip showing null</li>
+		<li>TooTip exception when target component not rendered</li>
+		<li>TextToolItem not overriding getToolTip</li>
+		<li>Container iterator() now parameterized</li>
+		<li>PagingToolBar exception when load event received before render</li>
+		<li>TimeField clearing time of configured min value</li>
+		<li>AccordionLayout active on top not working</li>
+		<li>Window not closing on escape key</li>
+		<li>Info bottom frame to tall in IE</li>
     </ul>
     
     <h2><a name="Release_Notes_1.0.1">Release Notes 1.0.1 Current</a></h2>

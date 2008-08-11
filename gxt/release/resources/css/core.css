@@ -7,6 +7,10 @@
   z-index: 100;
 }
 
+.ext-ie .x-btn-icon .x-btn-center .x-btn-text {
+  height: auto;
+}
+
 .icon-wait {
   background: url(../images/gxt/icons/wait.gif) no-repeat !important;
 }

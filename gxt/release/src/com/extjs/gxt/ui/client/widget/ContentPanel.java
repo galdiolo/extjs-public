@@ -803,7 +803,10 @@ public class ContentPanel extends LayoutContainer {
       bbar.setVisible(false);
 
       El e = fly(bw).lastChild().firstChild().firstChild();
-      foot = e.createChild("<div class=" + footerStyle + "></div>");
+      
+      if (footer) {
+        foot = e.createChild("<div class=" + footerStyle + "></div>");
+      }
 
       if (!headerVisible) {
         head.setVisible(false);
