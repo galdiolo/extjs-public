@@ -1,0 +1,36 @@
+.x-form-label {
+  padding: 2 3 3 0px;
+  font-size: 12px;
+}
+
+.ext-ie .x-small-editor .x-form-text {
+  margin: 0px !important;
+}
+
+.ext-ie .x-form-text {
+  margin: 0px !important; 
+}
+
+.ext-ie .x-form-text {  
+  POSITION: relative;
+  TOP: -1px
+}
+
+.x-form-group .x-form-check-wrap {
+  float: left;
+  padding-right: 2px;
+}
+
+.x-form-group .x-form-check-wrap .x-form-group-label {
+  float: left;
+}
+
+.x-form-group .x-form-radio-wrap {
+  float: left;
+  padding-right: 2px;
+}
+
+.x-form-group-label, .x-form-cb-label {
+  font:normal 12px tahoma, arial, helvetica, sans-serif;
+  padding-right: 10px;
+}
