@@ -22,7 +22,6 @@ import com.extjs.gxt.ui.client.event.SplitBarEvent;
 import com.extjs.gxt.ui.client.fx.Draggable;
 import com.extjs.gxt.ui.client.util.DelayedTask;
 import com.extjs.gxt.ui.client.util.Rectangle;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -128,14 +127,14 @@ public class SplitBar extends BoxComponent {
           case Events.Attach:
             if (!disabled) {
               el().insertBefore(resizeEl.dom);
-              WidgetHelper.doAttach(SplitBar.this);
+              ComponentHelper.doAttach(SplitBar.this);
               sync();
               attachedBars.add(SplitBar.this);
             }
             break;
           case Events.Detach:
             if (!disabled) {
-              WidgetHelper.doDetach(SplitBar.this);
+              ComponentHelper.doDetach(SplitBar.this);
               el().removeFromParent();
               attachedBars.remove(SplitBar.this);
             }
@@ -197,12 +196,6 @@ public class SplitBar extends BoxComponent {
     setElement(DOM.createDiv());
     el().makePositionable(true);
     sinkEvents(Event.MOUSEEVENTS);
-  }
-
-  @Override
-  protected void onAttach() {
-    // TODO Auto-generated method stub
-    super.onAttach();
   }
 
   /**

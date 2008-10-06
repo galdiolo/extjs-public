@@ -64,14 +64,13 @@ public class BoxComponent extends Component {
    */
   protected Layer layer;
 
-  protected Size attachSize = new Size(-1, -1);
   protected Size lastSize;
+  protected String width, height;
 
   private boolean shadow = false;
   private boolean deferHeight;
   private boolean autoHeight;
   private boolean autoWidth;
-  private String width, height;
   private int left = Style.DEFAULT, top = Style.DEFAULT;
   private int pageX = Style.DEFAULT, pageY = Style.DEFAULT;
   private boolean boxReady;
@@ -284,7 +283,7 @@ public class BoxComponent extends Component {
     el().setXY(pageX, pageY);
     onPosition(pageX, pageY);
     if (hasListeners) {
-      BoxComponentEvent ce = new BoxComponentEvent(this);
+      BoxComponentEvent ce = (BoxComponentEvent) createComponentEvent(null);
       ce.x = pageX;
       ce.y = pageY;
       fireEvent(Events.Move, ce);
@@ -343,7 +342,7 @@ public class BoxComponent extends Component {
         pel.setTop(ay);
       }
       onPosition(ax, ay);
-      BoxComponentEvent be = new BoxComponentEvent(this);
+      BoxComponentEvent be = (BoxComponentEvent) createComponentEvent(null);
       be.x = ax;
       be.y = ay;
       fireEvent(Events.Move, be);
@@ -378,34 +377,32 @@ public class BoxComponent extends Component {
    * @param height the new height to set
    */
   public void setSize(int width, int height) {
-    if (width != Style.DEFAULT) {
-      attachSize.width = width;
-    }
-    if (height != Style.DEFAULT) {
-      attachSize.height = height;
-    }
-
     if (!boxReady) {
+      if (width != -1) {
+        this.width = width + "px";
+      }
+      if (height != -1) {
+        this.height = height + "px";
+      }
+
       return;
     }
 
     if (autoWidth) {
-      width = -1;
       setStyleAttribute("width", "auto");
-    } else if (attachSize.width != Style.DEFAULT) {
-      el().setWidth(attachSize.width, adjustSize);
+    } else {
+      el().setWidth(width, adjustSize);
     }
     if (autoHeight) {
-      height = -1;
       setStyleAttribute("height", "auto");
-    } else if (attachSize.height != Style.DEFAULT) {
-      el().setHeight(attachSize.height, adjustSize);
+    } else {
+      el().setHeight(height, adjustSize);
     }
 
     onResize(width, height);
 
     if (hasListeners) {
-      BoxComponentEvent ce = new BoxComponentEvent(this);
+      BoxComponentEvent ce = (BoxComponentEvent) createComponentEvent(null);
       ce.width = width;
       ce.height = height;
       fireEvent(Events.Resize, ce);
@@ -420,11 +417,29 @@ public class BoxComponent extends Component {
    * @param height the new height to set
    */
   public void setSize(String width, String height) {
-    this.width = width;
-    this.height = height;
-
     if (!boxReady) {
+      if (width != null && !width.equals(Style.UNDEFINED)) {
+        this.width = width;
+      }
+      if (height != null && !height.equals(Style.UNDEFINED)) {
+        this.height = height;
+      }
       return;
+    }
+
+    if (width == null) {
+      width = Style.UNDEFINED;
+    }
+    if (height == null) {
+      height = Style.UNDEFINED;
+    }
+
+    if (!width.equals(Style.UNDEFINED)) {
+      width = addUnitsInternal(width, "px");
+    }
+
+    if (!height.equals(Style.UNDEFINED)) {
+      height = addUnitsInternal(height, "px");
     }
 
     if (autoWidth) {
@@ -438,13 +453,32 @@ public class BoxComponent extends Component {
       el().setHeight(height);
     }
 
-    int w = autoWidth ? -1 : getOffsetWidth();
-    int h = autoHeight ? -1 : getOffsetHeight();
+    int w = -1;
+    int h = -1;
+
+    if (width.indexOf("px") != -1) {
+      w = Integer.parseInt(width.substring(0, width.indexOf("px")));
+    } else if (autoWidth || width.equals("auto")) {
+      w = -1;
+    } else if (!width.equals(Style.UNDEFINED)){
+      w = getOffsetWidth();
+    }
+
+    if (height.indexOf("px") != -1) {
+      h = Integer.parseInt(height.substring(0, height.indexOf("px")));
+    } else if (autoWidth || height.equals("auto")) {
+      h = -1;
+    } else if (!height.equals(Style.UNDEFINED)){
+      h = getOffsetHeight();
+    }
 
     onResize(w, h);
 
     if (hasListeners) {
-      fireEvent(Events.Resize, new BoxComponentEvent(this, w, h));
+      BoxComponentEvent evt = (BoxComponentEvent) createComponentEvent(null);
+      evt.width = w;
+      evt.height = h;
+      fireEvent(Events.Resize, evt);
     }
   }
 
@@ -472,15 +506,11 @@ public class BoxComponent extends Component {
     super.afterRender();
     boxReady = true;
 
-    if (getShadow() || shim) {
+    if (shadow || shim) {
       layer = new Layer(getElement());
       layer.enableShadow(getShadow());
-      layer.enableShim();
+      if (shim) layer.enableShim();
       setEl(layer);
-    }
-
-    if (attachSize.width != -1 || attachSize.height != -1) {
-      setSize(attachSize.width, attachSize.height);
     }
 
     if (width != null || height != null) {
@@ -528,6 +558,17 @@ public class BoxComponent extends Component {
     return el();
   }
 
+  @Override
+  protected void onDetach() {
+    super.onDetach();
+    if (shadow && layer != null) {
+      layer.hideShadow();
+    }
+    if (shim && layer != null) {
+      layer.hideShim();
+    }
+  }
+
   /**
    * Called after the component is moved, this method is empty by default but
    * can be implemented by any subclass that needs to perform custom logic after
@@ -555,5 +596,18 @@ public class BoxComponent extends Component {
   private Point adjustPosition(Point point) {
     return point;
   }
+
+  private static native String addUnitsInternal(String v, String defaultUnit) /*-{
+   if(v === "" || v == "auto"){
+   return v;
+   }
+   if(v === undefined){
+   return '';
+   }
+   if(typeof v == "number" || !/\d+(px|em|%|en|ex|pt|in|cm|mm|pc)$/i.test(v)){
+   return v + (defaultUnit || 'px');
+   }
+   return v;
+   }-*/;
 
 }

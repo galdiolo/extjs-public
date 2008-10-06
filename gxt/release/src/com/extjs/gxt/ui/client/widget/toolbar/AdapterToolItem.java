@@ -7,8 +7,8 @@
  */
 package com.extjs.gxt.ui.client.widget.toolbar;
 
-import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.Component;
+import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -52,13 +52,13 @@ public class AdapterToolItem extends ToolItem {
   @Override
   protected void doAttachChildren() {
     super.doAttachChildren();
-    WidgetHelper.doAttach(widget);
+    ComponentHelper.doAttach(widget);
   }
 
   @Override
   protected void doDetachChildren() {
     super.doDetachChildren();
-    WidgetHelper.doDetach(widget);
+    ComponentHelper.doDetach(widget);
   }
 
 }

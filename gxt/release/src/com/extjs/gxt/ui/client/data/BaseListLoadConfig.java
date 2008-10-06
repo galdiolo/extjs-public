@@ -8,6 +8,8 @@
 package com.extjs.gxt.ui.client.data;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Default <code>ListLoadConfig</code> implementation.
@@ -16,6 +18,7 @@ import java.io.Serializable;
  */
 public class BaseListLoadConfig extends BaseModelData implements ListLoadConfig, Serializable {
 
+  protected Map<String, String> params = new HashMap<String, String>();
   protected SortInfo sortInfo = new SortInfo();
 
   public SortInfo getSortInfo() {
@@ -24,6 +27,14 @@ public class BaseListLoadConfig extends BaseModelData implements ListLoadConfig,
 
   public void setSortInfo(SortInfo sortInfo) {
     this.sortInfo = sortInfo;
+  }
+
+  public Map<String, String> getParams() {
+    return params;
+  }
+
+  public void setParams(Map<String, String> params) {
+    this.params = params;
   }
 
 }

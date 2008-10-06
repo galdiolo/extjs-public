@@ -75,12 +75,18 @@ public class Shadow extends BoxComponent {
     this.target = target;
     if (!rendered) {
       render(XDOM.getBody());
-    }
+    } 
     el().insertBefore(target);
     el().setVisible(true);
     sync(fly(target).getBounds());
   }
   
+  @Override
+  protected void onHide() {
+    super.onHide();
+    el().removeFromParent();
+  }
+
   public void show(Widget widget) {
     show(widget.getElement());
   }

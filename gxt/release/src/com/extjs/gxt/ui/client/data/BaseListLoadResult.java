@@ -26,6 +26,11 @@ public class BaseListLoadResult<Data> implements ListLoadResult<Data>, Serializa
 
   }
 
+  /**
+   * Creates a new list load result.
+   * 
+   * @param list the data
+   */
   public BaseListLoadResult(List<Data> list) {
     this.list = list;
   }
@@ -33,7 +38,7 @@ public class BaseListLoadResult<Data> implements ListLoadResult<Data>, Serializa
   public List<Data> getData() {
     return list;
   }
-  
+
   public void setData(List<Data> list) {
     this.list = list;
   }

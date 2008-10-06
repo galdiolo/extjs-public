@@ -9,11 +9,9 @@ package com.extjs.gxt.ui.client.widget.table;
 
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Style;
-import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.TableEvent;
 import com.extjs.gxt.ui.client.widget.Component;
-import com.extjs.gxt.ui.client.widget.tips.ToolTip;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -24,8 +22,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class TableItem extends Component {
 
-  String[] toolTips;
-  ToolTip cellToolTip;
+  private String[] toolTips;
   boolean hasWidgets;
   String[] cellStyles;
   boolean cellsRendered;
@@ -39,15 +36,6 @@ public class TableItem extends Component {
    */
   public TableItem(Object[] values) {
     this.values = values;
-  }
-
-  /**
-   * Returns the item's cell tooltip.
-   * 
-   * @return the tooltip
-   */
-  public ToolTip getCellToolTip() {
-    return cellToolTip;
   }
 
   /**
@@ -79,11 +67,7 @@ public class TableItem extends Component {
   }
 
   public void onComponentEvent(ComponentEvent ce) {
-    // Pass along the event to the related cell tooltip if it exists
-    // so that we don't consume the event before the tooltip processes it
-    if (cellToolTip != null) {
-      // cellToolTip.handleEvent(be);
-    }
+    table.getView().onItemEvent((TableEvent)ce);
     switch (ce.type) {
       case Event.ONDBLCLICK:
         onDoubleClick(ce);
@@ -114,6 +98,11 @@ public class TableItem extends Component {
     }
   }
 
+  /**
+   * Returns the cell styles.
+   * 
+   * @return the cell styles
+   */
   public String[] getCellStyles() {
     return cellStyles;
   }
@@ -127,7 +116,6 @@ public class TableItem extends Component {
   public void setCellToolTip(int index, String text) {
     if (toolTips == null) toolTips = new String[values.length];
     toolTips[index] = text;
-    initCellToolTips();
   }
 
   /**
@@ -137,7 +125,15 @@ public class TableItem extends Component {
    */
   public void setCellToolTips(String[] toolTips) {
     this.toolTips = toolTips;
-    initCellToolTips();
+  }
+  
+  /**
+   * Returns the cell tool tips.
+   * 
+   * @return the cell tool tip
+   */
+  public String[] getCellToolTips() {
+    return toolTips;
   }
 
   /**
@@ -179,35 +175,10 @@ public class TableItem extends Component {
     this.table = table;
   }
 
-  protected void initCellToolTips() {
-    if (cellToolTip == null && isRendered()) {
-      cellToolTip = new ToolTip(this);
-      cellToolTip.setTrackMouse(true);
-    }
-  }
-
-  protected void onCellMouseOver(ComponentEvent ce) {
-    Element target = ce.getTarget();
-
-    int index = table.getView().getCellIndex(target);
-    if (index == Style.DEFAULT) {
-      return;
-    }
-
-    if (cellToolTip != null) {
-      if (toolTips != null && toolTips[index] != null && toolTips[index].length() > 0) {
-//         cellToolTip.setText(null, toolTips[index]);
-        // cellToolTip.setVisible(true);
-        // } else {
-        // cellToolTip.setVisible(false);
-      }
-    }
-  }
-
   protected void onClick(ComponentEvent ce) {
     Element target = ce.getTarget();
 
-    int index = table.getView().getCellIndex(target);
+    int index = table.getView().findCellIndex(target);
     if (index == Style.DEFAULT) {
       return;
     }
@@ -225,7 +196,7 @@ public class TableItem extends Component {
   protected void onDoubleClick(ComponentEvent ce) {
     Element target = ce.getTarget();
 
-    int index = table.getView().getCellIndex(target);
+    int index = table.getView().findCellIndex(target);
     if (index == Style.DEFAULT) {
       return;
     }
@@ -238,19 +209,23 @@ public class TableItem extends Component {
     table.fireEvent(Events.RowDoubleClick, evt);
   }
 
-  protected void onMouseOut(BaseEvent be) {
-    table.getView().onHighlightRow(this, false);
+  protected void onMouseOut(ComponentEvent be) {
+    Element to = DOM.eventGetToElement(be.event);
+    if (to != null && !DOM.isOrHasChild(getElement(), to)) {
+      table.getView().onHighlightRow(this, false);
+    }
   }
 
   protected void onMouseOver(ComponentEvent ce) {
-    table.getView().onHighlightRow(this, true);
-    onCellMouseOver(ce);
+    Element from = DOM.eventGetFromElement(ce.event);
+    if (from != null && !DOM.isOrHasChild(getElement(), from)) {
+      table.getView().onHighlightRow(this, true);
+    }
   }
 
   @Override
   protected void onRender(Element target, int index) {
-    setElement(DOM.createDiv());
-    el().insertInto(target, index);
+    setElement(DOM.createDiv(), target, index);
   }
 
   protected void onSelectChange(boolean select) {

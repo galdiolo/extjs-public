@@ -22,14 +22,13 @@ class RootTreeItem extends TreeItem {
     ui = new TreeItemUI(this);
     ui.containerEl = new El(getElement());
     setData("loaded", true);
-    ui.containerEl.setStyleAttribute("padding", "4px");
+    setStyleName("my-root-item");
     return ui;
   }
 
   @Override
   protected void onRender(Element target, int index) {
     setElement(DOM.createDiv(), target, index);
-    setStyleAttribute("padding", "4 0 0 4px");
     getTreeItemUI();
   }
 

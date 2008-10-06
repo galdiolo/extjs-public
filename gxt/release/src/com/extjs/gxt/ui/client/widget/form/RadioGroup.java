@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.widget.form;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.google.gwt.user.client.Element;
 
 /**
@@ -14,14 +15,30 @@ import com.google.gwt.user.client.Element;
  */
 public class RadioGroup extends MultiField<Radio> {
 
+  /**
+   * TextField Messages.
+   */
+  public class RadioGroupMessages extends FieldMessages {
+    private String selectionRequired = GXT.MESSAGES.textField_blankText();
+
+    public String getSelectionRequired() {
+      return selectionRequired;
+    }
+
+    public void setSelectionRequired(String selectionRequired) {
+      this.selectionRequired = selectionRequired;
+    }
+  }
+
   private static int autoId = 0;
   private String groupName;
+  private boolean selectionRequired;
 
   /**
    * Creates a new radio group.
    */
   public RadioGroup() {
-    this.groupName = "gxt.RadioGroup." + (autoId++);
+    this("gxt.RadioGroup." + (autoId++));
   }
 
   /**
@@ -31,6 +48,12 @@ public class RadioGroup extends MultiField<Radio> {
    */
   public RadioGroup(String name) {
     this.groupName = name;
+    messages = new RadioGroupMessages();
+  }
+
+  @Override
+  public RadioGroupMessages getMessages() {
+    return (RadioGroupMessages) messages;
   }
 
   /**
@@ -46,14 +69,46 @@ public class RadioGroup extends MultiField<Radio> {
     return null;
   }
 
+  /**
+   * Returns true if a selection is required.
+   * 
+   * @return the selection required state
+   */
+  public boolean isSelectionRequired() {
+    return selectionRequired;
+  }
+
   @Override
+  @SuppressWarnings("deprecation")
   public boolean isValid() {
+    if (selectionRequired) {
+      boolean sel = false;
+      for (Radio radio : fields) {
+        if (radio.getValue()) {
+          sel = true;
+        }
+      }
+      if (!sel) {
+        markInvalid(getMessages().getSelectionRequired());
+        return false;
+      }
+    }
     for (Radio radio : fields) {
       if (!radio.isValid()) {
         return false;
       }
     }
     return true;
+  }
+
+  /**
+   * Sets whether a selecton is required when validating the group (defaults to
+   * false).
+   * 
+   * @param selectionRequired true to require a selection
+   */
+  public void setSelectionRequired(boolean selectionRequired) {
+    this.selectionRequired = selectionRequired;
   }
 
   @Override
@@ -64,23 +119,24 @@ public class RadioGroup extends MultiField<Radio> {
       }
     }
   }
-  
+
+  protected void onRadioClick(Radio radio) {
+    for (Radio r : fields) {
+      if (r == radio) {
+        r.setValue(true);
+      } else if (r.getValue()) {
+        r.setValue(false);
+      }
+    }
+  }
+
   protected void onRadioSelected(Radio radio) {
     for (Radio r : fields) {
       if (r != radio && r.getValue()) {
         r.setValue(false);
       }
     }
-  }
-
-  protected void onRadioClick(Radio radio) {
-    for (Radio r : fields) {
-      if (r == radio) {
-        r.setValue(true);
-      } else if (r.getValue()){
-        r.setValue(false);
-      }
-    }
+    clearInvalid();
   }
 
   @Override

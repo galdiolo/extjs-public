@@ -23,7 +23,7 @@ public class DataListItem extends Component {
 
   protected DataList list;
   protected IconButton checkBtn;
-
+  protected String iconSelector = ".x-icon-btn";
   private boolean checked;
   private String text, iconStyle, textStyle;
 
@@ -133,8 +133,10 @@ public class DataListItem extends Component {
    */
   public void setIconStyle(String iconStyle) {
     if (rendered) {
-      El elem = el().selectNode("." + "x-icon-btn");
-      elem.replaceStyleName(this.iconStyle, iconStyle);
+      El elem = el().selectNode(iconSelector);
+      if (elem != null) {
+        elem.replaceStyleName(this.iconStyle, iconStyle);
+      }
     }
     this.iconStyle = iconStyle;
   }

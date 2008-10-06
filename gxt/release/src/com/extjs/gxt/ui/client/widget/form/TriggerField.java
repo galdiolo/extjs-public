@@ -13,7 +13,9 @@ import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.FieldEvent;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.EventListener;
@@ -38,8 +40,27 @@ public class TriggerField<Data> extends TextField<Data> {
   protected El trigger;
   protected El input;
   protected EventListener triggerListener;
-  
+
   private String triggerStyle;
+  private boolean hideTrigger;
+
+  /**
+   * Returns true if the trigger is hidden.
+   * 
+   * @return the hide trigger state
+   */
+  public boolean isHideTrigger() {
+    return hideTrigger;
+  }
+
+  /**
+   * True to hide the trigger (defaults to false, pre-render).
+   * 
+   * @param hideTrigger true to hide the trigger
+   */
+  public void setHideTrigger(boolean hideTrigger) {
+    this.hideTrigger = hideTrigger;
+  }
 
   @Override
   public Element getElement() {
@@ -70,7 +91,11 @@ public class TriggerField<Data> extends TextField<Data> {
 
   @Override
   protected void alignErrorIcon() {
-    errorIcon.el().alignTo(wrap.dom, "tl-tr", new int[] {1, 1});
+    DeferredCommand.addCommand(new Command() {
+      public void execute() {
+        errorIcon.el().alignTo(wrap.dom, "tl-tr", new int[] {1, 1});
+      }
+    });
   }
 
   @Override
@@ -133,7 +158,7 @@ public class TriggerField<Data> extends TextField<Data> {
     input = new El(DOM.createInputText());
     wrap = new El(DOM.createDiv());
     wrap.dom.setClassName("x-form-field-wrap");
-    
+
     input.addStyleName(fieldStyle);
 
     trigger = new El(DOM.createImg());
@@ -142,6 +167,10 @@ public class TriggerField<Data> extends TextField<Data> {
     wrap.dom.appendChild(input.dom);
     wrap.dom.appendChild(trigger.dom);
     setElement(wrap.dom, target, index);
+
+    if (hideTrigger) {
+      trigger.setVisible(false);
+    }
 
     super.onRender(target, index);
 
@@ -161,7 +190,11 @@ public class TriggerField<Data> extends TextField<Data> {
   @Override
   protected void onResize(int width, int height) {
     if (width != Style.DEFAULT) {
-      getInputEl().setWidth(this.adjustWidth("input", width - trigger.getWidth()));
+      int tw = trigger.getWidth();
+      if (!hideTrigger && tw == 0) { // need to look into why 0 is returned
+        tw = 17;
+      }
+      getInputEl().setWidth(this.adjustWidth("input", width - tw));
       wrap.setWidth(getInputEl().getWidth() + trigger.getWidth(), true);
     }
   }

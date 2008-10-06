@@ -10,11 +10,14 @@ package com.extjs.gxt.ui.client.widget.form;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
+import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
-import com.extjs.gxt.ui.client.widget.Text;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.layout.TableData;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -25,8 +28,11 @@ import com.google.gwt.user.client.Event;
 public class MultiField<F extends Field> extends Field<F> {
 
   protected List<F> fields;
-  protected HorizontalPanel hp;
+  protected LayoutContainer lc;
   protected Validator validator;
+  protected Orientation orientation = Orientation.HORIZONTAL;
+
+  private int spacing;
 
   /**
    * Creates a new checkbox group.
@@ -97,12 +103,41 @@ public class MultiField<F extends Field> extends Field<F> {
   }
 
   /**
+   * Returns the fields orientation.
+   * 
+   * @return the orientation
+   */
+  public Orientation getOrientation() {
+    return (orientation);
+  }
+
+  /**
+   * Returns the field's spacing.
+   * 
+   * @return the spacing
+   */
+  public int getSpacing() {
+    return spacing;
+  }
+
+  /**
    * Returns the field's validator.
    * 
    * @return the validator
    */
   public Validator getValidator() {
     return validator;
+  }
+
+  @Override
+  public boolean isValid() {
+    boolean ret = super.isValid();
+    for (Field f : fields) {
+      if (!f.isValid()) {
+        return false;
+      }
+    }
+    return ret;
   }
 
   @Override
@@ -116,10 +151,37 @@ public class MultiField<F extends Field> extends Field<F> {
   }
 
   @Override
+  public void reset() {
+    for (Field f : fields) {
+      f.reset();
+    }
+  }
+
+  /**
+   * Sets the fields orientation (defaults to horizontal).
+   * 
+   * @param orientation the orientation
+   */
+  public void setOrientation(Orientation orientation) {
+    this.orientation = orientation;
+  }
+
+  @Override
   public void setReadOnly(boolean readOnly) {
     for (Field field : fields) {
       field.setReadOnly(readOnly);
     }
+  }
+
+  /**
+   * Sets the amount of spacing between fields. Spacing is applied to the right
+   * of each field for horizontal orientataion and applied to the bottom of each
+   * field for vertical orientation (defaults to 0, pre-render).
+   * 
+   * @param spacing the spacing in pixels
+   */
+  public void setSpacing(int spacing) {
+    this.spacing = spacing;
   }
 
   /**
@@ -133,12 +195,12 @@ public class MultiField<F extends Field> extends Field<F> {
 
   @Override
   protected void doAttachChildren() {
-    WidgetHelper.doAttach(hp);
+    ComponentHelper.doAttach(lc);
   }
 
   @Override
   protected void doDetachChildren() {
-    WidgetHelper.doDetach(hp);
+    ComponentHelper.doDetach(lc);
   }
 
   @Override
@@ -151,40 +213,45 @@ public class MultiField<F extends Field> extends Field<F> {
 
   @Override
   protected void onRender(Element target, int index) {
-    hp = new HorizontalPanel();
-    hp.setStyleAttribute("paddingTop", "3px");
+    boolean vertical = orientation == Orientation.VERTICAL;
+    if (vertical) {
+      lc = new VerticalPanel();
+    } else {
+      lc = new HorizontalPanel();
+    }
+    if (GXT.isIE) lc.setStyleAttribute("position", "relative");
 
-    for (Field f : fields) {
-      TableData data = (TableData)WidgetHelper.getLayoutData(f);
-      if (data == null) data = new TableData();
-      data.setStyle("position: static");
-      hp.add(f, data);
-      if (f.getFieldLabel() != null) {
-        Text lbl = new Text(f.getFieldLabel());
-        lbl.setStyleName("x-form-group-label");
-        hp.add(lbl);
+    for (int i = 0, len = fields.size(); i < len; i++) {
+      Field f = fields.get(i);
+      boolean last = i == (fields.size() - 1);
+      TableData data = (TableData) ComponentHelper.getLayoutData(f);
+      if (data == null) {
+        data = new TableData();
       }
+      String style = "position: static;";
+
+      if (vertical && !last && spacing > 0) {
+        style += "paddingBottom:" + spacing + ";";
+      } else if (!vertical && spacing > 0) {
+        style += "paddingRight:" + spacing + ";";
+      }
+      data.setStyle(style);
+
+      lc.add(f, data);
     }
 
-    hp.render(target, index);
-    setElement(hp.getElement());
+    lc.render(target, index);
+    setElement(lc.getElement());
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   protected boolean validateValue(String value) {
     // validate multi field
     if (validator != null) {
       String msg = validator.validate(this, value);
       if (msg != null) {
         markInvalid(msg);
-        return false;
-      }
-    }
-
-    // validate fields
-    for (Field f : fields) {
-      if (!f.validateValue(value)) {
-        markInvalid("sdfdsffd");
         return false;
       }
     }

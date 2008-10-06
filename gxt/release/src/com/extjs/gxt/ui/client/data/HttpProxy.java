@@ -31,11 +31,22 @@ public class HttpProxy<C, D> implements DataProxy<C, D> {
   public HttpProxy(RequestBuilder builder) {
     this.builder = builder;
   }
-
+  
   public void load(final DataReader<C, D> reader, final C loadConfig,
       final AsyncCallback<D> callback) {
     try {
-      builder.sendRequest(generateUrl(loadConfig), new RequestCallback() {
+      String data = null;
+      if (builder.getHTTPMethod().equals("POST")) {
+        data = generateUrl(loadConfig);
+      } else {
+        String url = builder.getUrl();
+        url = url + (url.indexOf("?") == -1 ? "?" : "&");
+        String params = generateUrl(loadConfig);
+        url += params;
+        setUrl(builder, url);
+      }
+
+      builder.sendRequest(data, new RequestCallback() {
         public void onError(Request request, Throwable exception) {
           callback.onFailure(exception);
         }
@@ -64,7 +75,10 @@ public class HttpProxy<C, D> implements DataProxy<C, D> {
     StringBuffer sb = new StringBuffer();
     if (loadConfig instanceof ListLoadConfig) {
       ListLoadConfig cfg = (ListLoadConfig) loadConfig;
-      sb.append("&sortField=" + cfg.getSortInfo().getSortField());
+      String field = cfg.getSortInfo().getSortField();
+      if (field != null) {
+        sb.append("&sortField=" + cfg.getSortInfo().getSortField());
+      }
       sb.append("&sortDir=" + cfg.getSortInfo().getSortDir());
     }
     if (loadConfig instanceof PagingLoadConfig) {
@@ -72,7 +86,13 @@ public class HttpProxy<C, D> implements DataProxy<C, D> {
       sb.append("&start=" + cfg.getOffset());
       sb.append("&limit=" + cfg.getLimit());
     }
-
+    if (sb.length() > 0) {
+      return sb.substring(1, sb.length());
+    }
     return sb.toString();
   }
+
+  private native void setUrl(RequestBuilder rb, String url) /*-{
+    rb.@com.google.gwt.http.client.RequestBuilder::url = url;
+  }-*/;
 }

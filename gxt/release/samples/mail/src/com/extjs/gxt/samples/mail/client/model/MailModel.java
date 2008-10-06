@@ -10,9 +10,9 @@ package com.extjs.gxt.samples.mail.client.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.samples.resources.client.Folder;
-import com.extjs.gxt.samples.resources.client.MailItem;
 import com.extjs.gxt.samples.resources.client.TestData;
+import com.extjs.gxt.samples.resources.client.model.Folder;
+import com.extjs.gxt.samples.resources.client.model.MailItem;
 import com.extjs.gxt.ui.client.data.BaseTreeModel;
 
 public class MailModel extends BaseTreeModel {

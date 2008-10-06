@@ -9,6 +9,7 @@ package com.extjs.gxt.ui.client.widget.tips;
 
 import java.util.Date;
 
+import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.Point;
@@ -35,8 +36,9 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
   private Timer showTimer;
   private Timer hideTimer;
   private Component target;
+  private Element targetElem;
   private Point targetXY;
-  private String configTitle, configText;
+  private ToolTipConfig config;
 
   /**
    * Creates a new tool tip.
@@ -104,7 +106,7 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
   }
 
   public void handleEvent(ComponentEvent ce) {
-    Element source = target.getElement();
+    Element source = getTargetElement();
     switch (ce.getEventType()) {
       case Event.ONMOUSEOVER:
         Element from = DOM.eventGetFromElement(ce.event);
@@ -239,15 +241,35 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
    * @param config the tool tip config
    */
   public void update(ToolTipConfig config) {
+    updateConfig(config);
     if (!hidden) {
       updateContent();
     }
   }
 
+  /**
+   * Returns the tool tip config.
+   * 
+   * @return the config
+   */
+  public ToolTipConfig getConfig() {
+    if (config == null) {
+      config = new ToolTipConfig();
+    }
+    return config;
+  }
+
   protected void updateContent() {
-    getHeader().setText(configTitle == null ? "" : configTitle);
-    if (configText != null) {
-      fly(getElement("body")).update(configText);
+    if (config.getTemplate() != null) {
+      Template t = config.getTemplate();
+      t.overwrite(getBody().dom, config.getParams());
+    } else {
+      String title = config.getTitle();
+      String text = config.getText();
+      getHeader().setText(title == null ? "" : title);
+      if (text != null) {
+        getBody().update(text);
+      }
     }
   }
 
@@ -336,18 +358,53 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
     }
   }
 
+  private Element getTargetElement() {
+    return targetElem != null ? targetElem : target.getElement();
+  }
+
   private void onTargetOver(ComponentEvent ce) {
-    if (disabled || !ce.within(target.getElement())) {
+    if (disabled || !config.isEnabled() || !ce.within(getTargetElement())) {
       return;
     }
+
     clearTimer("hide");
     targetXY = ce.getXY();
     delayShow();
   }
 
   private void updateConfig(ToolTipConfig config) {
-    configTitle = config.getTitle();
-    configText = config.getText();
+    this.config = config;
+
+    Element t = config.getTarget();
+    if (t != null && t != targetElem) {
+      targetElem = t;
+      clearTimers();
+    }
+
+    if (config.getTemplate() != null) {
+      if (!config.isEnabled()) {
+        clearTimers();
+        hide();
+      }
+    } else {
+      String title = config.getTitle();
+      String text = config.getText();
+
+      // element getAttribute returns the string "null"
+      if (text != null && (text.equals("null") || text.equals(""))) {
+        text = null;
+      }
+
+      if (title != null && (title.equals("") || title.equals("null"))) {
+        title = null;
+      }
+
+      if (!config.isEnabled() || (text == null)) {
+        clearTimers();
+        hide();
+      }
+    }
+
     trackMouse = config.isTrackMouse();
     autoHide = config.isAutoHide();
     showDelay = config.getShowDelay();

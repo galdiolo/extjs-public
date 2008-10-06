@@ -7,6 +7,8 @@
  */
 package com.extjs.gxt.ui.client.util;
 
+import java.util.List;
+
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.core.CompositeElement;
 import com.extjs.gxt.ui.client.event.BaseObservable;
@@ -49,6 +51,43 @@ import com.google.gwt.user.client.EventPreview;
  */
 public class BaseEventPreview extends BaseObservable implements EventPreview {
 
+  private static int lastX, lastY;
+
+  /**
+   * Returns the last client x value when a base event preview is on top of the
+   * preview stack.
+   * 
+   * @return the last client y value
+   */
+  public static int getLastClientX() {
+    return lastX;
+  }
+
+  /**
+   * Returns the last xy value when a base event preview is on top of the
+   * preview stack.
+   * 
+   * @return the last client x and client y
+   */
+  public static Point getLastXY() {
+    return new Point(lastX, lastY);
+  }
+
+  /**
+   * Returns the last client y value when a base event preview is on top of the
+   * preview stack.
+   * 
+   * @return the last client y value
+   */
+  public static int getLastClientY() {
+    return lastY;
+  }
+
+  private static native List getPreviewStack() /*-{
+      var stack = @com.google.gwt.user.client.DOM::sEventPreviewStack;
+      return stack;
+     }-*/;
+
   private CompositeElement ignoreList = new CompositeElement();
   private boolean autoHide = true;
   private boolean autoHideAllowEvent;
@@ -60,6 +99,15 @@ public class BaseEventPreview extends BaseObservable implements EventPreview {
     DOM.addEventPreview(this);
     onAdd();
     fireEvent(Events.Add);
+  }
+
+  /**
+   * Returns the ignore list.
+   * 
+   * @return this list
+   */
+  public CompositeElement getIgnoreList() {
+    return ignoreList;
   }
 
   /**
@@ -81,30 +129,28 @@ public class BaseEventPreview extends BaseObservable implements EventPreview {
   }
 
   public boolean onEventPreview(Event event) {
-    PreviewEvent be = new PreviewEvent(this, event);
-    be.type = DOM.eventGetType(event);
-    be.event = event;
-    if (autoHide && onAutoHidePreview(be)) {
+    PreviewEvent pe = new PreviewEvent(this, event);
+    pe.type = DOM.eventGetType(event);
+    pe.event = event;
+
+    lastX = pe.getClientX();
+    lastY = pe.getClientY();
+
+    if (autoHide && onAutoHidePreview(pe)) {
       remove();
     }
-    return onPreview(be);
+    return onPreview(pe);
   }
 
   /**
-   * Called when a preview event is received.
-   * 
-   * @param pe the component event
-   * @return true to allow the event
+   * Pushes the event preview to the stop of the stack.
    */
-  public boolean onPreview(PreviewEvent pe) {
-    switch (pe.type) {
-      case Event.ONKEYPRESS:
-        onPreviewKeyPress(pe);
-        break;
-      case Event.ONCLICK:
-        onClick(pe);
+  public void push() {
+    List l = getPreviewStack();
+    if (l != null && l.contains(this)) {
+      remove();
+      add();
     }
-    return true;
   }
 
   /**
@@ -134,6 +180,18 @@ public class BaseEventPreview extends BaseObservable implements EventPreview {
    */
   public void setAutoHideCancelEvent(boolean autoHideAllowEvent) {
     this.autoHideAllowEvent = autoHideAllowEvent;
+  }
+
+  /**
+   * List of elements to be ignored when autoHide is enabled. An example of
+   * usage would be a menu item that displays a sub menu. When the sub menu is
+   * displayed, the menu item is added to the ignore list so that the sub menu
+   * will not close when the mousing over the item.
+   * 
+   * @param ignoreList the ignore list
+   */
+  public void setIgnoreList(CompositeElement ignoreList) {
+    this.ignoreList = ignoreList;
   }
 
   protected void onAdd() {
@@ -175,33 +233,29 @@ public class BaseEventPreview extends BaseObservable implements EventPreview {
 
   }
 
+  /**
+   * Called when a preview event is received.
+   * 
+   * @param pe the component event
+   * @return true to allow the event
+   */
+  protected boolean onPreview(PreviewEvent pe) {
+    switch (pe.type) {
+      case Event.ONKEYPRESS:
+        onPreviewKeyPress(pe);
+        break;
+      case Event.ONCLICK:
+        onClick(pe);
+    }
+    return true;
+  }
+
   protected void onPreviewKeyPress(PreviewEvent pe) {
     fireEvent(Events.KeyPress, pe);
   }
 
   protected void onRemove() {
 
-  }
-
-  /**
-   * List of elements to be ignored when autoHide is enabled. An example of
-   * usage would be a menu item that displays a sub menu. When the sub menu is
-   * displayed, the menu item is added to the ignore list so that the sub menu
-   * will not close when the mousing over the item.
-   * 
-   * @param ignoreList the ignore list
-   */
-  public void setIgnoreList(CompositeElement ignoreList) {
-    this.ignoreList = ignoreList;
-  }
-
-  /**
-   * Returns the ignore list.
-   * 
-   * @return this list
-   */
-  public CompositeElement getIgnoreList() {
-    return ignoreList;
   }
 
 }

@@ -106,9 +106,12 @@ public class TreeTableBinder<M extends ModelData> extends TreeBinder<M> {
   @Override
   protected void update(M model) {
     TreeTableItem item = (TreeTableItem) findItem(model);
-    updateItemValues(item);
-    updateItemStyles(item);
-    super.update(item, model);
+    if (item != null) {
+      setModel(item, model);
+      updateItemValues(item);
+      updateItemStyles(item);
+      super.update(item, model);
+    }
   }
 
   private void filterItems(TreeItem item) {

@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.core.El;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.button.IconButton;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -98,6 +97,17 @@ public class Header extends Component {
   }
 
   /**
+   * Removes the header's icon style.
+   */
+  public void removeIconStyle() {
+    this.iconStyle = "";
+    if (rendered) {
+      textEl.removeStyleName("x-panel-icon");
+      iconBtn.setVisible(false);
+    }
+  }
+
+  /**
    * Removes a tool.
    * 
    * @param tool the tool to remove
@@ -150,12 +160,12 @@ public class Header extends Component {
 
   @Override
   protected void doAttachChildren() {
-    WidgetHelper.doAttach(widgetPanel);
+    ComponentHelper.doAttach(widgetPanel);
   }
 
   @Override
   protected void doDetachChildren() {
-    WidgetHelper.doDetach(widgetPanel);
+    ComponentHelper.doDetach(widgetPanel);
   }
 
   @Override
@@ -167,6 +177,7 @@ public class Header extends Component {
 
     iconBtn = new IconButton();
     iconBtn.setVisible(false);
+    iconBtn.setStyleAttribute("cursor", "default");
     iconBtn.setStyleAttribute("position", "absolute");
     iconBtn.setStyleAttribute("marginLeft", "0px");
     iconBtn.setWidth(20);
@@ -187,13 +198,15 @@ public class Header extends Component {
 
     textEl = new El(DOM.createSpan());
     getElement().appendChild(textEl.dom);
-    
+
     if (textStyle != null) {
       setTextStyle(textStyle);
     }
 
     if (text != null) {
       setText(text);
+    } else {
+      setText("&#160;");
     }
 
     if (iconStyle != null) {

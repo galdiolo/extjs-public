@@ -15,7 +15,7 @@ import com.google.gwt.user.client.Event;
  * 
  * @see Field
  */
-public class FieldEvent extends ComponentEvent {
+public class FieldEvent extends BoxComponentEvent {
 
   /**
    * The source field.
@@ -43,7 +43,7 @@ public class FieldEvent extends ComponentEvent {
   }
   
   public FieldEvent(Field field, Event event) {
-    super(field);
+    this(field);
     this.event = event;
   }
 

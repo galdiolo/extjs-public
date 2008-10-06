@@ -57,13 +57,24 @@ import com.extjs.gxt.ui.client.widget.Layout;
 public class AnchorLayout extends Layout {
 
   private Size anchorSize;
-
+  
+  public AnchorLayout() {
+    monitorResize = true;
+  }
+  
+  protected int adjustWidthAnchor(int width, Component comp) {
+    return width;
+  }
+  
   @Override
   protected void onLayout(Container container, El target) {
     super.onLayout(container, target);
 
+    Size size = target.getStyleSize();
     Rectangle rect = target.getBounds(true);
-
+    rect.width = size.width;
+    rect.height = size.height;
+    
     int w = rect.width, h = rect.height;
 
     if (w < 20 || h < 20) {
@@ -71,7 +82,7 @@ public class AnchorLayout extends Layout {
     }
 
     int aw, ah;
-
+    
     if (anchorSize != null) {
       aw = anchorSize.width;
       ah = anchorSize.height;
@@ -102,6 +113,8 @@ public class AnchorLayout extends Layout {
           
           cw -= comp.el().getMargins("lr");
           ch -= comp.el().getMargins("tb");
+          
+          cw = adjustWidthAnchor(cw, comp);
           
           setSize(comp, cw, ch);
         }

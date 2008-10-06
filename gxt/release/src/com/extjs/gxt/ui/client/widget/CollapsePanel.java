@@ -14,7 +14,6 @@ import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.Rectangle;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.button.ToolButton;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.FillLayout;
@@ -100,7 +99,7 @@ public class CollapsePanel extends ContentPanel {
   @Override
   protected void doDetachChildren() {
     super.doDetachChildren();
-    WidgetHelper.doDetach(collapseBtn);
+    ComponentHelper.doDetach(collapseBtn);
   }
 
   @Override

@@ -73,6 +73,15 @@ import com.google.gwt.user.client.Event;
  * </ul>
  * </dd>
  * 
+ * <dd><b>BeforeSelect</b> : DateListEvent(dataList, item)<br>
+ * <div>Fires before a item is selected. Listeners can set the <code>doit</code>
+ * field to <code>false</code> to cancel the action.</div>
+ * <ul>
+ * <li>dataList : this</li>
+ * <li>item : the selected item</li>
+ * </ul>
+ * </dd>
+ * 
  * <dd><b>SelectionChange</b> : DateListEvent(dataList, selected)<br>
  * <div>Fires after the selection changes.</div>
  * <ul>
@@ -136,6 +145,7 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
   private El inner;
   private List<DataListItem> checked;
   private DataListSelectionModel sm;
+  private boolean trackMouseOver = true;
 
   /**
    * Creates a new single select list.
@@ -146,11 +156,12 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
     itemStyle = "my-list-item";
     attachChildren = false;
     checked = new ArrayList<DataListItem>();
-    setScrollMode(Scroll.AUTO);
+    setScrollMode(Scroll.AUTOY);
     sm = new DataListSelectionModel(SelectionMode.SINGLE);
     sm.bind(this);
   }
-
+  
+  
   /**
    * Creates then adds an item to the list. Fires the <i>BeforeAdd</i> event
    * before inserting, then fires the <i>Add</i> event after the widget has
@@ -161,6 +172,8 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
   public boolean add(DataListItem component) {
     return super.add(component);
   }
+
+
 
   /**
    * Creates then adds an item to the list. Fires the <i>BeforeAdd</i> event
@@ -174,6 +187,8 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
     DataListItem item = new DataListItem(text);
     return add(item) ? item : null;
   }
+
+
 
   /**
    * Returns an array of checked items.
@@ -249,6 +264,15 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
    */
   public boolean isFlat() {
     return flat;
+  }
+
+  /**
+   * Returns true if rows are highlighted on mouse over.
+   * 
+   * @return the track mouse state
+   */
+  public boolean isTrackMouseOver() {
+    return trackMouseOver;
   }
 
   /**
@@ -424,6 +448,16 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
   }
 
   /**
+   * True to highlight items when the mouse is over (defaults to true).
+   * 
+   * @param trackMouseOver true to highlight items on mouse over
+   */
+  public void setTrackMouseOver(boolean trackMouseOver) {
+    assertPreRender();
+    this.trackMouseOver = trackMouseOver;
+  }
+
+  /**
    * Sorts the data list.
    * 
    * @param comparator the comparator
@@ -474,9 +508,9 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
   }
 
   protected void onClick(DataListItem item, DataListEvent dle) {
-    dle.stopEvent();
     El e = item.el().selectNode(".my-list-item-icon");
-    if (dle.within(e.dom)) {
+    if (checkable && dle.within(e.dom)) {
+      dle.stopEvent();
       item.setChecked(!item.isChecked());
     }
   }
@@ -486,7 +520,9 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
   }
 
   protected void onOverChange(DataListItem item, boolean over, DataListEvent e) {
-    item.el().setStyleName(itemStyle + "-over", over);
+    if (trackMouseOver) {
+      item.el().setStyleName(itemStyle + "-over", over);
+    }
   }
 
   @Override
@@ -561,12 +597,10 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
   protected void onResize(int width, int height) {
     if (height != Style.DEFAULT) {
       height -= el().getBorderWidth("tb");
-      height -= 2;// inner padding
       inner.setHeight(height, true);
     }
     if (width != Style.DEFAULT) {
       width -= el().getBorderWidth("lr");
-      width -= 2;// inner padding
       inner.setWidth(width, true);
     }
   }

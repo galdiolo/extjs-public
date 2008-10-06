@@ -102,6 +102,16 @@ public class Dialog extends Window {
   }
 
   /**
+   * Returns the button by id.
+   * 
+   * @param id the button id
+   * @return the button
+   */
+  public Button getButtonById(String id) {
+    return getButtonBar().getButtonById(id);
+  }
+
+  /**
    * Returns the last pressed button.
    * 
    * @return the button or <code>null</code> if no button pressed
@@ -156,31 +166,33 @@ public class Dialog extends Window {
     if (!buttonsInitialized) {
 
       buttonsInitialized = true;
-      if (getButtons().indexOf(OK) != -1) {
+      if (buttons.indexOf(OK) != -1) {
         okBtn = new Button(okText);
         okBtn.setItemId(OK);
+        setFocusWidget(okBtn);
         addButton(okBtn);
       }
 
-      if (getButtons().indexOf(YES) != -1) {
+      if (buttons.indexOf(YES) != -1) {
         yesBtn = new Button(yesText);
         yesBtn.setItemId(YES);
+        setFocusWidget(yesBtn);
         addButton(yesBtn);
       }
 
-      if (getButtons().indexOf(NO) != -1) {
+      if (buttons.indexOf(NO) != -1) {
         noBtn = new Button(noText);
         noBtn.setItemId(NO);
         addButton(noBtn);
       }
 
-      if (getButtons().indexOf(CANCEL) != -1) {
+      if (buttons.indexOf(CANCEL) != -1) {
         cancelBtn = new Button(cancelText);
         cancelBtn.setItemId(CANCEL);
         addButton(cancelBtn);
       }
 
-      if (getButtons().indexOf("close") != -1) {
+      if (buttons.indexOf("close") != -1) {
         closeBtn = new Button(closeText);
         closeBtn.setItemId("close");
         addButton(closeBtn);
@@ -199,7 +211,7 @@ public class Dialog extends Window {
     if (button == closeBtn) {
       hide(button);
     }
-    if (isHideOnButtonClick()) {
+    if (hideOnButtonClick) {
       hide(button);
     }
   }

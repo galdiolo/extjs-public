@@ -27,7 +27,6 @@ import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.messages.MyMessages;
 import com.extjs.gxt.ui.client.util.DateWrapper;
 import com.extjs.gxt.ui.client.util.Size;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.IconButton;
 import com.extjs.gxt.ui.client.widget.layout.TableData;
@@ -51,8 +50,7 @@ import com.google.gwt.user.client.ui.TableListener;
  * <li>datePicker : this</li>
  * <li>date : the selected date</li>
  * </ul>
- * </dd>
- * </dt>
+ * </dd> </dt>
  */
 public class DatePicker extends BoxComponent {
 
@@ -244,13 +242,13 @@ public class DatePicker extends BoxComponent {
   class Header extends Component {
 
     protected void doAttachChildren() {
-      WidgetHelper.doAttach(monthBtn);
+      ComponentHelper.doAttach(monthBtn);
       prevBtn.onAttach();
       nextBtn.onAttach();
     }
 
     protected void doDetachChildren() {
-      WidgetHelper.doDetach(monthBtn);
+      ComponentHelper.doDetach(monthBtn);
       prevBtn.onDetach();
       nextBtn.onDetach();
     }
@@ -398,6 +396,9 @@ public class DatePicker extends BoxComponent {
    * @param maxDate the max date
    */
   public void setMaxDate(Date maxDate) {
+    if (maxDate != null) {
+      maxDate = new DateWrapper(maxDate).clearTime().asDate();
+    }
     this.maxDate = maxDate;
   }
 
@@ -416,6 +417,9 @@ public class DatePicker extends BoxComponent {
    * @param minDate the min date
    */
   public void setMinDate(Date minDate) {
+    if (minDate != null) {
+      minDate = new DateWrapper(minDate).clearTime().asDate();
+    }
     this.minDate = minDate;
   }
 
@@ -461,7 +465,7 @@ public class DatePicker extends BoxComponent {
     super.doAttachChildren();
     header.onAttach();
     footer.onAttach();
-    WidgetHelper.doAttach(grid);
+    ComponentHelper.doAttach(grid);
   }
 
   @Override
@@ -469,7 +473,7 @@ public class DatePicker extends BoxComponent {
     super.doDetachChildren();
     header.onDetach();
     footer.onDetach();
-    WidgetHelper.doDetach(grid);
+    ComponentHelper.doDetach(grid);
     monthPicker.setVisible(false);
   }
 
@@ -533,7 +537,7 @@ public class DatePicker extends BoxComponent {
     if (messages.getMaxText() == null) {
       messages.setMaxText(GXT.MESSAGES.datePicker_maxText());
     }
-    
+
     if (messages.getTodayText() == null) {
       messages.setTodayText(GXT.MESSAGES.datePicker_todayText());
     }
@@ -548,7 +552,7 @@ public class DatePicker extends BoxComponent {
     days.setBorderWidth(0);
 
     String[] dn = constants.narrowWeekdays();
-    firstDOW = Integer.parseInt(constants.firstDayOfTheWeek()) - 1;
+    firstDOW = startDay != 0 ? startDay : Integer.parseInt(constants.firstDayOfTheWeek()) - 1;
 
     days.setHTML(0, 0, "<span>" + dn[(0 + firstDOW) % 7] + "</span>");
     days.setHTML(0, 1, "<span>" + dn[(1 + firstDOW) % 7]);
@@ -581,7 +585,10 @@ public class DatePicker extends BoxComponent {
     footer.setHorizontalAlign(HorizontalAlignment.CENTER);
 
     footer.setStyleName("x-date-bottom");
-    footer.setWidth(175);
+
+    if (GXT.isIE) {
+      footer.setWidth(175);
+    }
 
     todayBtn = new Button(messages.getTodayText(), new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
@@ -736,7 +743,7 @@ public class DatePicker extends BoxComponent {
       }
       int days = date.getDaysInMonth();
       DateWrapper firstOfMonth = date.getFirstDayOfMonth();
-      int startingPos = firstOfMonth.getDayInWeek() - startDay - firstDOW;
+      int startingPos = firstOfMonth.getDayInWeek() - firstDOW;
 
       if (startingPos <= startDay) {
         startingPos += 7;

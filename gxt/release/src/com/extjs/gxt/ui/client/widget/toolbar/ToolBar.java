@@ -12,7 +12,7 @@ import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.event.ToolBarEvent;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
+import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.layout.TableData;
 import com.extjs.gxt.ui.client.widget.layout.TableRowLayout;
@@ -96,6 +96,7 @@ public class ToolBar extends Container<ToolItem> {
    * Returns the button alignment.
    * 
    * @return the button alignment
+   * @deprecated use a FillToolItem as the first item to right align the toolbar
    */
   public HorizontalAlignment getButtonAlign() {
     return buttonAlign;
@@ -112,7 +113,7 @@ public class ToolBar extends Container<ToolItem> {
     if (added) {
       TableData data = new TableData();
       data.setVerticalAlign(VerticalAlignment.MIDDLE);
-      WidgetHelper.setLayoutData(item, data);
+      ComponentHelper.setLayoutData(item, data);
       if (item instanceof FillToolItem) {
         data.setWidth("100%");
       }
@@ -130,9 +131,10 @@ public class ToolBar extends Container<ToolItem> {
   }
 
   /**
-   * Specifies the cell's horizontal alignment (defaults to LEFT).
+   * Specifies the button alignment (defaults to LEFT).
    * 
    * @param buttonAlign the button alignment
+   * @deprecated use a FillToolItem as the first item to right align the toolbar
    */
   public void setButtonAlign(HorizontalAlignment buttonAlign) {
     this.buttonAlign = buttonAlign;

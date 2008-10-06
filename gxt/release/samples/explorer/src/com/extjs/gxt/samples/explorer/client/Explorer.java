@@ -7,8 +7,11 @@
  */
 package com.extjs.gxt.samples.explorer.client;
 
-import com.extjs.gxt.samples.explorer.client.model.Entry;
-import com.extjs.gxt.samples.explorer.client.model.ExplorerModel;
+import com.extjs.gxt.samples.client.ExampleService;
+import com.extjs.gxt.samples.client.ExampleServiceAsync;
+import com.extjs.gxt.samples.client.FileService;
+import com.extjs.gxt.samples.client.FileServiceAsync;
+import com.extjs.gxt.samples.client.examples.model.Entry;
 import com.extjs.gxt.samples.explorer.client.mvc.AppController;
 import com.extjs.gxt.samples.explorer.client.mvc.ContentController;
 import com.extjs.gxt.samples.explorer.client.mvc.NavigationController;
@@ -25,13 +28,8 @@ public class Explorer implements EntryPoint {
   private Dispatcher dispatcher;
   private ExplorerModel model;
 
-  public Explorer() {
-    model = new ExplorerModel();
-    Registry.register("model", model);
-  }
-
   public void onModuleLoad() {
-    ExplorerServiceAsync service = (ExplorerServiceAsync) GWT.create(ExplorerService.class);
+    ExampleServiceAsync service = (ExampleServiceAsync) GWT.create(ExampleService.class);
     ServiceDefTarget endpoint = (ServiceDefTarget) service;
     String moduleRelativeURL = GWT.getModuleBaseURL() + "service";
     endpoint.setServiceEntryPoint(moduleRelativeURL);
@@ -42,6 +40,9 @@ public class Explorer implements EntryPoint {
     moduleRelativeURL = GWT.getModuleBaseURL() + "fileservice";
     endpoint.setServiceEntryPoint(moduleRelativeURL);
     Registry.register("fileservice", fileservice);
+    
+    model = new ExplorerModel();
+    Registry.register("model", model);
 
     dispatcher = Dispatcher.get();
     dispatcher.addController(new AppController());
@@ -63,7 +64,7 @@ public class Explorer implements EntryPoint {
   }
 
   public static void showPage(Entry entry) {
-    AppEvent appEvent = new AppEvent(AppEvents.ShowPage, entry);
+    AppEvent<Entry> appEvent = new AppEvent<Entry>(AppEvents.ShowPage, entry);
     appEvent.historyEvent = true;
     appEvent.token = entry.getId();
     Dispatcher.forwardEvent(appEvent);

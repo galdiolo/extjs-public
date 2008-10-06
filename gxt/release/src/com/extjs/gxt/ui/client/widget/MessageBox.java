@@ -14,7 +14,9 @@ import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.WindowEvent;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.extjs.gxt.ui.client.widget.form.TextField;
@@ -25,8 +27,8 @@ import com.google.gwt.user.client.Element;
  * 
  * <p>
  * Note that the MessageBox is asynchronous. Unlike a regular JavaScript
- * <code>alert</code> (which will halt browser execution), showing a
- * MessageBox will not cause the code to stop.
+ * <code>alert</code> (which will halt browser execution), showing a MessageBox
+ * will not cause the code to stop.
  * </p>
  */
 public class MessageBox {
@@ -200,7 +202,6 @@ public class MessageBox {
     return box;
   }
 
-
   private Listener<WindowEvent> callback;
   private String icon = "";
   private MessageBoxType type;
@@ -218,12 +219,13 @@ public class MessageBox {
   private Element iconEl;
   private Element msgEl;
   private ProgressBar progressBar;
-  private TextField textBox;
+  private TextField<String> textBox;
   private TextArea textArea;
   private Map<Integer, Listener> listeners;
-  
+
   /**
-   * Adds a listener that will be called when the message box is closed.
+   * Adds a listener that will be called when the message box is closed. Note
+   * that the listener will be based a MessageBoxEvent.
    * 
    * @param listener the callback listener
    */
@@ -243,8 +245,12 @@ public class MessageBox {
    * @param listener the listener
    */
   public void addListener(int event, Listener listener) {
-    if (listeners == null) listeners = new HashMap<Integer, Listener>();
-    listeners.put(event, listener);
+    if (dialog == null) {
+      if (listeners == null) listeners = new HashMap<Integer, Listener>();
+      listeners.put(event, listener);
+    } else {
+      dialog.addListener(event, listener);
+    }
   }
 
   /**
@@ -326,6 +332,21 @@ public class MessageBox {
           super.initTools();
         }
 
+        @Override
+        protected ComponentEvent previewEvent(int type, ComponentEvent ce) {
+          if (type == Events.Hide) {
+            WindowEvent we = (WindowEvent) ce;
+            MessageBoxEvent e = new MessageBoxEvent(MessageBox.this, this, we.buttonClicked);
+            if (textBox != null) {
+              e.value = textBox.getValue();
+            } else if (textArea != null) {
+              e.value = textArea.getValue();
+            }
+            return e;
+          }
+          return super.previewEvent(type, ce);
+        }
+
       };
 
       dialog.setHeading(getTitle());
@@ -333,6 +354,7 @@ public class MessageBox {
       dialog.setConstrain(true);
       dialog.setMinimizable(false);
       dialog.setMaximizable(false);
+      dialog.setMinWidth(minWidth);
       dialog.setClosable(false);
       dialog.setModal(modal);
       dialog.setButtonAlign(HorizontalAlignment.CENTER);
@@ -351,7 +373,7 @@ public class MessageBox {
           dialog.setFocusWidget(dialog.getButtonBar().getButtonById(Dialog.OK));
         }
       }
-      
+
       if (listeners != null) {
         for (Integer type : listeners.keySet()) {
           dialog.addListener(type, listeners.get(type));
@@ -413,6 +435,15 @@ public class MessageBox {
    */
   public String getProgressText() {
     return progressText;
+  }
+
+  /**
+   * Returns the box's text area.
+   * 
+   * @return the text area
+   */
+  public TextArea getTextArea() {
+    return textArea;
   }
 
   /**

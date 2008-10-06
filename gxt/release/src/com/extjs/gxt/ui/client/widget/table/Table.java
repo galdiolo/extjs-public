@@ -22,7 +22,7 @@ import com.extjs.gxt.ui.client.event.TableListener;
 import com.extjs.gxt.ui.client.util.DelayedTask;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.util.Size;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
+import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.selection.Selectable;
@@ -143,6 +143,15 @@ import com.google.gwt.user.client.ui.Widget;
  * <li>table : this</li>
  * <li>colIndex : the column index</li>
  * <li>sortDir : the sort direction</li>
+ * </ul>
+ * </dd>
+ * 
+ * <dd><b>BeforeSelect</b> : TableEvent(table, item)<br>
+ * <div>Fires before a item is selected. Listeners can set the <code>doit</code>
+ * field to <code>false</code> to cancel the action.</div>
+ * <ul>
+ * <li>table : this</li>
+ * <li>item : the selected item</li>
  * </ul>
  * </dd>
  * 
@@ -612,8 +621,23 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
   }
 
   @Override
+  public TableItem findItem(Element elem) {
+    if (rendered && view != null) {
+      int idx = view.findRowIndex(elem);
+      TableItem item = idx != -1 ? getItem(idx) : super.findItem(elem);
+      return item;
+    }
+    return super.findItem(elem);
+  }
+
+  @Override
   protected ComponentEvent createComponentEvent(Event event) {
-    return new TableEvent(this, (event == null) ? null : findItem(DOM.eventGetTarget(event)));
+    TableEvent te = new TableEvent(this, (event == null) ? null : findItem(DOM.eventGetTarget(event)));
+    if (view != null && event != null) {
+      te.cellIndex = view.findCellIndex((Element)event.getTarget());
+    }
+   
+    return te;
   }
 
   @Override
@@ -622,7 +646,7 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
   }
 
   protected void doAttachChildren() {
-    if (header != null) WidgetHelper.doAttach(header);
+    if (header != null) ComponentHelper.doAttach(header);
     if (!bulkRender) {
       int count = getItemCount();
       for (int i = 0; i < count; i++) {
@@ -632,7 +656,7 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
           for (int j = 0; j < ct; j++) {
             Object obj = item.getValue(j);
             if (obj != null && obj instanceof Widget) {
-              WidgetHelper.doAttach((Widget) item.getValue(j));
+              ComponentHelper.doAttach((Widget) item.getValue(j));
             }
           }
         }
@@ -641,7 +665,7 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
   }
 
   protected void doDetachChildren() {
-    if (header != null) WidgetHelper.doDetach(header);
+    if (header != null) ComponentHelper.doDetach(header);
     if (!getBulkRender()) {
       int count = getItemCount();
       for (int i = 0; i < count; i++) {
@@ -651,7 +675,7 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
           for (int j = 0; j < ct; j++) {
             Object obj = item.getValue(j);
             if (obj != null && obj instanceof Widget) {
-              WidgetHelper.doDetach((Widget) item.getValue(j));
+              ComponentHelper.doDetach((Widget) item.getValue(j));
             }
           }
         }
@@ -709,7 +733,7 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
   }
 
   @Override
-  protected void onAttach() {
+  public void onAttach() {
     super.onAttach();
     header.resizeColumns(false, true);
   }

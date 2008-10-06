@@ -16,10 +16,11 @@ import com.extjs.gxt.ui.client.event.ButtonBarEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
+import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.layout.TableData;
 import com.extjs.gxt.ui.client.widget.layout.TableRowLayout;
+import com.google.gwt.dom.client.TableElement;
 import com.google.gwt.user.client.Element;
 
 /**
@@ -78,6 +79,7 @@ import com.google.gwt.user.client.Element;
 public class ButtonBar extends Container<Button> {
 
   private int buttonWidth = 75;
+  private int cellSpacing = -1;
   private HorizontalAlignment buttonAlign = HorizontalAlignment.LEFT;
   private Button buttonPressed;
   private El inner;
@@ -155,6 +157,15 @@ public class ButtonBar extends Container<Button> {
   }
 
   /**
+   * Returns the cell spacing.
+   * 
+   * @return the cell spacing
+   */
+  public int getCellSpacing() {
+    return cellSpacing;
+  }
+
+  /**
    * Inserts a button at the specified location. Fires the <i>BeforeAdd</i>
    * event before inserting, then fires the <i>Add</i> event after the widget
    * has been inserted.
@@ -170,7 +181,7 @@ public class ButtonBar extends Container<Button> {
     if (button instanceof FillButton) {
       data.setWidth("100%");
     }
-    WidgetHelper.setLayoutData(button, data);
+    ComponentHelper.setLayoutData(button, data);
 
     if (!(button instanceof ButtonAdapter)) {
       button.setMinWidth(buttonWidth);
@@ -216,6 +227,25 @@ public class ButtonBar extends Container<Button> {
     this.buttonWidth = buttonWidth;
   }
 
+  /**
+   * Sets the cell spacing (pre-render).
+   * 
+   * @param cellSpacing the cell spacing
+   */
+  public void setCellSpacing(int cellSpacing) {
+    this.cellSpacing = cellSpacing;
+  }
+
+  @Override
+  protected ContainerEvent createContainerEvent(Button item) {
+    return new ButtonBarEvent(this, item);
+  }
+
+  @Override
+  protected El getLayoutTarget() {
+    return inner;
+  }
+
   protected void onButtonPressed(ButtonEvent be) {
     Button btn = be.button;
     buttonPressed = btn;
@@ -239,11 +269,6 @@ public class ButtonBar extends Container<Button> {
   }
 
   @Override
-  protected El getLayoutTarget() {
-    return inner;
-  }
-
-  @Override
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
 
@@ -254,20 +279,20 @@ public class ButtonBar extends Container<Button> {
 
     StringBuffer sb = new StringBuffer();
     sb.append("<div class=x-panel-btn-ct>");
-    sb.append("<table width=100%><tr><td class=inner-cell align=" + align + "></td></tr></table>");
+    sb.append("<table width=100% cellpadding=100 cellspacing=0><tr><td class=inner-cell align=" + align + "></td></tr></table>");
 
     setElement(XDOM.create(sb.toString()), target, index);
 
     inner = el().selectNode(".inner-cell");
+    
+    TableElement tbl = el().selectNode("table").dom.cast();
+    if (cellSpacing != -1) {
+      tbl.setCellSpacing(cellSpacing);
+    }
 
     TableRowLayout layout = new TableRowLayout();
     setLayout(layout);
     layout();
-  }
-
-  @Override
-  protected ContainerEvent createContainerEvent(Button item) {
-    return new ButtonBarEvent(this, item);
   }
 
 }

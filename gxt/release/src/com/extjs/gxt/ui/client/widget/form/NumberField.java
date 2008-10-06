@@ -20,6 +20,17 @@ import com.google.gwt.user.client.ui.KeyboardListener;
 /**
  * Numeric text field that provides automatic keystroke filtering and numeric
  * validation.
+ * 
+ * <p>
+ * When the field wraps any thing other than Double, either
+ * {@link #setPropertyEditorType(Class)} or
+ * {@link #setPropertyEditor(PropertyEditor)} should be called with the
+ * appropriate number type.
+ * 
+ * <pre><code>
+ * NumberField<Integer> field = new NumberField<Integer>;
+ * field.setPropertyEdtiorType(Integer.class);
+ * </code></pre>
  */
 public class NumberField extends TextField<Number> {
 
@@ -90,13 +101,14 @@ public class NumberField extends TextField<Number> {
     }
   }
 
-  private String baseChars = "0123456789`abcdefghi";
+  private String baseChars = "0123456789";
   private String decimalSeparator = ".";
   private boolean allowNegative = true;
   private boolean allowDecimals = true;
   private List<Character> allowed;
   private double minValue = Double.NEGATIVE_INFINITY;
   private double maxValue = Double.MAX_VALUE;
+  private int lastKeyCode;
 
   /**
    * Creates a new number field.
@@ -180,6 +192,16 @@ public class NumberField extends TextField<Number> {
   }
 
   /**
+   * Returns the number property editor number type.
+   * 
+   * @see NumberPropertyEditor#setType(Class)
+   * @return the number type
+   */
+  public Class getPropertyEditorType() {
+    return getPropertyEditor().getType();
+  }
+
+  /**
    * Sets whether decimal value are allowed (defaults to true).
    * 
    * @param allowDecimals true to allow negative values
@@ -244,16 +266,29 @@ public class NumberField extends TextField<Number> {
     this.minValue = minValue;
   }
 
+  /**
+   * Specifies the number type used when converting a String to a Number
+   * instance (defaults to Double).
+   * 
+   * @param type the number type (Short, Integer, Long, Float, Double).
+   */
+  public void setPropertyEditorType(Class type) {
+    getPropertyEditor().setType(type);
+  }
+
   @Override
   protected void onKeyDown(FieldEvent fe) {
     super.onKeyDown(fe);
+    // must key code in key code as gwt returns character in key press
+    lastKeyCode = fe.getKeyCode();
+  }
+
+  @Override
+  protected void onKeyPress(FieldEvent fe) {
+    super.onKeyPress(fe);
     char key = (char) fe.getKeyCode();
-    
-    if (fe.getKeyCode() == 190) {
-      key = '.';
-    }
-    
-    if (fe.isSpecialKey() || key == KeyboardListener.KEY_BACKSPACE || key == KeyboardListener.KEY_DELETE) {
+
+    if ((fe.isSpecialKey(lastKeyCode) || lastKeyCode == KeyboardListener.KEY_BACKSPACE || lastKeyCode == KeyboardListener.KEY_DELETE)) {
       return;
     }
 
@@ -269,6 +304,7 @@ public class NumberField extends TextField<Number> {
     for (int i = 0; i < baseChars.length(); i++) {
       allowed.add(baseChars.charAt(i));
     }
+
     if (allowNegative) {
       allowed.add('-');
     }
@@ -280,10 +316,16 @@ public class NumberField extends TextField<Number> {
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   protected boolean validateValue(String value) {
+    // validator should run after super rules
+    Validator tv = validator;
+    validator = null;
     if (!super.validateValue(value)) {
+      validator = tv;
       return false;
     }
+    validator = tv;
     if (value.length() < 1) { // if it's blank and textfield didn't flag it then
       // its valid it's valid
       return true;
@@ -291,10 +333,11 @@ public class NumberField extends TextField<Number> {
 
     String v = value.replace(decimalSeparator, ".");
 
-    Double d = null;
+    Number d = null;
     try {
       d = getPropertyEditor().convertStringValue(value);
     } catch (Exception e) {
+      System.out.println(e);
       String error = "";
       if (getMessages().getNanText() == null) {
         error = GXT.MESSAGES.numberField_nanText(v);
@@ -304,7 +347,7 @@ public class NumberField extends TextField<Number> {
       markInvalid(error);
       return false;
     }
-    if (d < minValue) {
+    if (d.doubleValue() < minValue) {
       String error = "";
       if (getMessages().getMinText() == null) {
         error = GXT.MESSAGES.numberField_minText(minValue);
@@ -315,7 +358,7 @@ public class NumberField extends TextField<Number> {
       return false;
     }
 
-    if (d > maxValue) {
+    if (d.doubleValue() > maxValue) {
       String error = "";
       if (getMessages().getMaxText() == null) {
         error = GXT.MESSAGES.numberField_maxText(maxValue);
@@ -325,6 +368,15 @@ public class NumberField extends TextField<Number> {
       markInvalid(error);
       return false;
     }
+
+    if (validator != null) {
+      String msg = validator.validate(this, value);
+      if (msg != null) {
+        markInvalid(msg);
+        return false;
+      }
+    }
+
     return true;
   }
 }

@@ -103,12 +103,11 @@ public class GXT {
    * @return the theme id
    */
   public static String getThemeId() {
-    Map map = StateManager.get().getMap("theme");
+    Map map = StateManager.get().getMap(GWT.getModuleBaseURL() + "theme");
     if (map != null) {
       return map.get("id").toString();
-    } else {
-      return null;
     }
+    return null;
   }
 
   /**
@@ -117,7 +116,7 @@ public class GXT {
    * @return the user agent
    */
   public native static String getUserAgent() /*-{
-      return $wnd.navigator.userAgent.toLowerCase();
+    return $wnd.navigator.userAgent.toLowerCase();
     }-*/;
 
   /**
@@ -149,6 +148,7 @@ public class GXT {
     initialized = true;
 
     String ua = getUserAgent();
+
     isSafari = ua.indexOf("webkit") != -1;
     isOpera = ua.indexOf("opera") != -1;
     isIE = ua.indexOf("msie") != -1;
@@ -185,16 +185,18 @@ public class GXT {
     CookieProvider provider = new CookieProvider("/", null, null, false);
     StateManager.get().setProvider(provider);
 
-    Map theme = StateManager.get().getMap("theme");
+    Map theme = StateManager.get().getMap(GWT.getModuleBaseURL() + "theme");
     if ((defaultTheme != null && forceTheme) || (theme == null && defaultTheme != null)) {
       theme = defaultTheme.asMap();
     }
     if (theme != null) {
       String themeId = theme.get("id").toString();
       String fileName = theme.get("file").toString();
-      CSS.addStyleSheet(themeId, "css/" + fileName);
+      if (!fileName.equalsIgnoreCase("ext-all.css")) {
+        CSS.addStyleSheet(themeId, GWT.getModuleBaseURL() + "css/" + fileName);
+      }
       cls += " x-theme-" + themeId;
-      StateManager.get().set("theme", theme);
+      StateManager.get().set(GWT.getModuleBaseURL() + "theme", theme);
     }
 
     XDOM.getBody().setClassName(cls);
@@ -224,7 +226,7 @@ public class GXT {
    * @param theme the new theme name.
    */
   public static void switchTheme(Theme theme) {
-    StateManager.get().set("theme", theme.asMap());
+    StateManager.get().set(GWT.getModuleBaseURL() + "theme", theme.asMap());
     XDOM.reload();
   }
 
@@ -232,10 +234,10 @@ public class GXT {
     $wnd.GXT = {};
     $wnd.GXT.Ext = {};
     @com.extjs.gxt.ui.client.core.Ext::load()();
-  }-*/;
+    }-*/;
 
   private static native boolean isSecure() /*-{
     return $wnd.location.href.toLowerCase().indexOf("https") === 0;
-  }-*/;
+    }-*/;
 
 }

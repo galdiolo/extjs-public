@@ -1,7 +1,6 @@
 <module>
   <inherits name='com.extjs.gxt.samples.resources.Resources' />
+  <inherits name='com.extjs.gxt.samples.Examples' />
   <inherits name='com.extjs.gxt.themes.Themes' />
-  <servlet path="/service" class="com.extjs.gxt.samples.explorer.server.ExplorerServiceImpl"/>
-  <servlet path="/fileservice" class="com.extjs.gxt.samples.explorer.server.FileServiceImpl"/>
   <entry-point class='com.extjs.gxt.samples.explorer.client.Explorer' />
 </module>

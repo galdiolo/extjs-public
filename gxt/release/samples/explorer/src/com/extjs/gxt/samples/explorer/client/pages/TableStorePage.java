@@ -10,8 +10,8 @@ package com.extjs.gxt.samples.explorer.client.pages;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.samples.resources.client.Stock;
 import com.extjs.gxt.samples.resources.client.TestData;
+import com.extjs.gxt.samples.resources.client.model.Stock;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.binder.TableBinder;
@@ -42,8 +42,6 @@ public class TableStorePage extends LayoutContainer implements EntryPoint {
   }
 
   public TableStorePage() {
-    setMonitorResize(false);
-
     setLayout(new FlowLayout(10));
     setMonitorResize(false);
 

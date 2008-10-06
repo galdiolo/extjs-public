@@ -11,7 +11,6 @@ import com.extjs.gxt.ui.client.fx.Draggable;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Event;
 
 /**
  * Draggable event type.
@@ -22,7 +21,7 @@ import com.google.gwt.user.client.Event;
  * 
  * @see Draggable
  */
-public class DragEvent extends BaseEvent {
+public class DragEvent extends DomEvent {
 
   /**
    * The draggable instance.
@@ -33,11 +32,6 @@ public class DragEvent extends BaseEvent {
    * The component being dragged.
    */
   public Component component;
-
-  /**
-   * The DOM event.
-   */
-  public Event event;
 
   /**
    * The current height.
@@ -67,5 +61,9 @@ public class DragEvent extends BaseEvent {
   public Element getTarget() {
     return DOM.eventGetTarget(event);
   }
-
+  
+  public DragEvent(Draggable draggable) {
+    this.draggable = draggable;
+  }
+  
 }

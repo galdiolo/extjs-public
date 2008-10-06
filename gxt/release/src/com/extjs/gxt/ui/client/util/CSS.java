@@ -7,8 +7,8 @@
  */
 package com.extjs.gxt.ui.client.util;
 
-
 import com.extjs.gxt.ui.client.XDOM;
+import com.google.gwt.dom.client.Node;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 
@@ -45,7 +45,30 @@ public class CSS {
     DOM.setElementProperty(link, "href", url);
     DOM.setElementProperty(link, "disabled", "");
     Element elem = XDOM.getHead();
-    DOM.appendChild(elem, link);
+
+    Element all = null;
+    for (int i = 0; i < elem.getChildNodes().getLength(); i++) {
+      Node node = elem.getChildNodes().getItem(i).cast();
+      if (node instanceof Element) {
+        Element child = (Element) node;
+        String tag = child.getTagName();
+        if (tag != null && child.getTagName().equalsIgnoreCase("link")) {
+          String href = child.getAttribute("href");
+          if (href.length() != 0 && href.indexOf("ext-all.css") != -1) {
+            all = child;
+            break;
+          }
+        }
+      }
+    }
+
+    if (all != null) {
+      int idx = DOM.getChildIndex(elem, all);
+      DOM.insertChild(elem, link, idx + 1);
+    } else {
+      DOM.appendChild(elem, link);
+    }
+
   }
 
   /**
@@ -57,14 +80,14 @@ public class CSS {
   native public static void setRules(Element style, String cssStr) /*-{
    style.setAttribute("type", "text/css");
    if(style.styleSheet){// IE
-    style.styleSheet.cssText = cssStr;
+   style.styleSheet.cssText = cssStr;
    } else {// w3c
-    while (style.firstChild) {
-     style.removeChild(style.firstChild);
-    }
-    var cssText = $doc.createTextNode(cssStr);
-    style.appendChild(cssText);
+   while (style.firstChild) {
+   style.removeChild(style.firstChild);
    }
-  }-*/;
+   var cssText = $doc.createTextNode(cssStr);
+   style.appendChild(cssText);
+   }
+   }-*/;
 
 }

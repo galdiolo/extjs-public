@@ -105,6 +105,7 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
 public class ListStore<M extends ModelData> extends Store<M> {
 
   protected ListLoader loader;
+  protected ListLoadConfig config;
 
   /**
    * Creates a new store.
@@ -142,6 +143,8 @@ public class ListStore<M extends ModelData> extends Store<M> {
   }
 
   protected void onLoad(LoadEvent le) {
+    this.config = (ListLoadConfig)le.config;
+    
     Object data = le.data;
     
     removeAll();
@@ -236,7 +239,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
    */
   public List<M> getRange(int start, int end) {
     List<M> temp = new ArrayList<M>();
-    for (int i = start; i < end; i++) {
+    for (int i = start; i <= end; i++) {
       temp.add(getAt(i));
     }
     return temp;
@@ -275,8 +278,14 @@ public class ListStore<M extends ModelData> extends Store<M> {
    * @param model the model
    * @return the index
    */
-  public int indexOf(ModelData model) {
-    return all.indexOf(model);
+  public int indexOf(M model) {
+    for (int i = 0; i < all.size(); i++) {
+      M m = all.get(i);
+      if (equals(model, m)) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   /**
@@ -360,6 +369,22 @@ public class ListStore<M extends ModelData> extends Store<M> {
    */
   public void sort(String field, SortDir sortDir) {
     SortInfo prev = new SortInfo(sortInfo.getSortField(), sortInfo.getSortDir());
+    
+    if (sortDir == null) {
+      if (sortInfo.getSortField() != null && !sortInfo.getSortField().equals(field)) {
+        sortInfo.setSortDir(SortDir.NONE);
+      }
+      switch (sortInfo.getSortDir()) {
+        case ASC:
+          sortDir = SortDir.DESC;
+          break;
+        case DESC:
+        case NONE:
+          sortDir = SortDir.ASC;
+          break;
+      }
+      
+    }
 
     sortInfo.setSortField(field);
     sortInfo.setSortDir(sortDir);
@@ -381,6 +406,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
       }
     } else {
       applySort(false);
+      fireEvent(DataChanged, createStoreEvent());
     }
   }
 
@@ -399,6 +425,19 @@ public class ListStore<M extends ModelData> extends Store<M> {
       if (!supressEvent) {
         fireEvent(Sort, createStoreEvent());
       }
+    }
+  }
+  
+  protected void sortData(final String field, SortDir direction) {
+    direction = direction == null ? SortDir.ASC : direction;
+    storeSorter = storeSorter == null ? new StoreSorter() : storeSorter;
+    Collections.sort(all, new Comparator<M>() {
+      public int compare(M m1, M m2) {
+        return storeSorter.compare(ListStore.this, m1, m2, field);
+      }
+    });
+    if (direction == SortDir.DESC) {
+      Collections.reverse(all);
     }
   }
 

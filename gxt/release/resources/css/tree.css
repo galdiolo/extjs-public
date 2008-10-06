@@ -11,6 +11,10 @@
   font-size: 11px;
 }
 
+.my-root-item {
+  padding: 4px; 
+}
+
 .my-treeitem,.my-treeitem table,.my-treeitem table td {
   -moz-outline: none;
   -moz-user-focus: normal;

@@ -32,5 +32,13 @@ public class BaseEvent {
    * allowed.
    */
   public boolean doit = true;
+  
+  public BaseEvent() {
+    
+  }
+  
+  public BaseEvent(Object source) {
+    this.source = source;
+  }
 
 }

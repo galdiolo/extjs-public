@@ -22,7 +22,7 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
  * 
  * @see LayoutContainer
  */
-public class ContainerEvent<C extends Container, I extends Component> extends ComponentEvent {
+public class ContainerEvent<C extends Container, I extends Component> extends BoxComponentEvent {
 
   /**
    * The source container.

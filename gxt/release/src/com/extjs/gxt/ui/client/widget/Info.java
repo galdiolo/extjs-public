@@ -37,8 +37,18 @@ public class Info extends ContentPanel {
   }
 
   /**
-   * Displays a message with the given text. All {0},{1}... values in text will
-   * be replaced with values.
+   * Displays a message with the given title and text.
+   * 
+   * @param title the title
+   * @param text the text
+   */
+  public static void display(String title, String text) {
+    display(new InfoConfig(title, text));
+  }
+
+  /**
+   * Displays a message with the given title and text. All {0},{1}... values in
+   * text will be replaced with values.
    * 
    * @param title the message title
    * @param text the message

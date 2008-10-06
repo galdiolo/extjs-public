@@ -19,11 +19,11 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SplitBarEvent;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.util.Rectangle;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
-import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.CollapsePanel;
 import com.extjs.gxt.ui.client.widget.Component;
+import com.extjs.gxt.ui.client.widget.ComponentHelper;
+import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Layout;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -34,15 +34,15 @@ import com.extjs.gxt.ui.client.widget.button.ToolButton;
  * This is a multi-pane, application-oriented UI layout style that supports
  * multiple regions, automatic split bars between regions and built-in expanding
  * and collapsing of regions.
+ * 
+ * <p>
+ * A component in the center region is required.
+ * </p>
  */
 public class BorderLayout extends Layout {
 
   protected Map<LayoutRegion, SplitBar> splitBars;
 
-  /**
-   * True to enabled state (defaults to true). When true, expand / collapse and
-   * size state is persisted across user sessions.
-   */
   private boolean enableState = true;
   private Listener collapseListener;
   private int minimumSize = 100;
@@ -50,6 +50,7 @@ public class BorderLayout extends Layout {
   private BoxComponent west, east, center;
   private boolean rendered;
   private LayoutContainer layoutContainer;
+  private String containerStyle = "x-border-layout-ct";
 
   public BorderLayout() {
     monitorResize = true;
@@ -73,6 +74,16 @@ public class BorderLayout extends Layout {
   }
 
   /**
+   * Sets the CSS style name to be added to the layout's container (defaults to
+   * 'x-border-layout-ct').
+   * 
+   * @param style the style name
+   */
+  public void setContainerStyle(String style) {
+    this.containerStyle = style;
+  }
+
+  /**
    * True to enabled state (defaults to true). When true, expand / collapse and
    * size state is persisted across user sessions.
    * 
@@ -92,7 +103,7 @@ public class BorderLayout extends Layout {
     layoutContainer = (LayoutContainer) container;
     if (!rendered) {
       target.makePositionable();
-      target.addStyleName("x-border-layout-ct");
+      target.addStyleName(containerStyle);
       int count = container.getItemCount();
       for (int i = 0; i < count; i++) {
         Component c = container.getItem(i);
@@ -123,6 +134,10 @@ public class BorderLayout extends Layout {
     west = getRegionWidget(LayoutRegion.WEST);
     east = getRegionWidget(LayoutRegion.EAST);
     center = getRegionWidget(LayoutRegion.CENTER);
+
+    if (center == null) {
+      throw new RuntimeException("A component in the CENTER region is required.");
+    }
 
     if (north != null) {
       BorderLayoutData data = (BorderLayoutData) getLayoutData(north);
@@ -242,7 +257,7 @@ public class BorderLayout extends Layout {
     BorderLayoutData collapseData = new BorderLayoutData(data.getRegion());
     collapseData.setSize(24);
     collapseData.setMargins(data.getMargins());
-    WidgetHelper.setLayoutData(cp, collapseData);
+    ComponentHelper.setLayoutData(cp, collapseData);
     cp.setData("panel", panel);
     panel.setData("collapse", cp);
     return cp;
@@ -326,8 +341,7 @@ public class BorderLayout extends Layout {
                   break;
                 }
                 case NORTH:
-                  int max = south.getOffsetHeight() + center.getOffsetHeight()
-                      - minimumSize;
+                  int max = south.getOffsetHeight() + center.getOffsetHeight() - minimumSize;
                   max = Math.min(max, data.getMaxSize());
                   fBar.setMaxSize(max);
                   break;

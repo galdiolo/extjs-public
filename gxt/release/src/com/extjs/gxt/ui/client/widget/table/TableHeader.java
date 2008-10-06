@@ -23,9 +23,9 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.event.TableEvent;
 import com.extjs.gxt.ui.client.event.TreeTableEvent;
 import com.extjs.gxt.ui.client.util.DelayedTask;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.Component;
+import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.SplitBar;
 import com.extjs.gxt.ui.client.widget.menu.CheckMenuItem;
 import com.extjs.gxt.ui.client.widget.menu.Item;
@@ -80,7 +80,9 @@ public class TableHeader extends BoxComponent {
   public void sort(int index, SortDir dir) {
     TableColumn column = table.getColumn(index);
     column.sortDir = dir;
-    onSortChange(column, dir);
+    if (rendered) {
+      onSortChange(column, dir);
+    }
   }
 
   public void addColumn(TableColumnUI ui) {
@@ -103,14 +105,14 @@ public class TableHeader extends BoxComponent {
   protected void doAttachChildren() {
     int count = columns.size() - 1;
     for (int i = 0; i < count; i++) {
-      WidgetHelper.doAttach(getColumnUI(i));
+      ComponentHelper.doAttach(getColumnUI(i));
     }
   }
 
   protected void doDetachChildren() {
     int count = columns.size() - 1;
     for (int i = 0; i < count; i++) {
-      WidgetHelper.doDetach(getColumnUI(i));
+      ComponentHelper.doDetach(getColumnUI(i));
     }
   }
 
@@ -121,6 +123,16 @@ public class TableHeader extends BoxComponent {
   public void init(BaseTable table) {
     this.table = table;
     this.columnModel = this.table.getColumnModel();
+    
+    columns = new ArrayList<TableColumnUI>();
+    int cols = columnModel.getColumnCount();
+    for (int i = 0; i < cols; i++) {
+      TableColumnUI columnUI = createTableColumnUI(i);
+      addColumn(columnUI);
+    }
+    endColumn = createTableColumnUI(cols);
+    endColumn.end = true;
+    addColumn(endColumn);
   }
 
   public void onColumnClick(TableColumnUI columnUI, ComponentEvent e) {
@@ -158,15 +170,7 @@ public class TableHeader extends BoxComponent {
     setElement(XDOM.create(html), target, index);
     headerRow = el().selectNode(".my-tbl-header-row").dom;
 
-    columns = new ArrayList<TableColumnUI>();
-    int cols = columnModel.getColumnCount();
-    for (int i = 0; i < cols; i++) {
-      TableColumnUI columnUI = createTableColumnUI(i);
-      addColumn(columnUI);
-    }
-    endColumn = createTableColumnUI(cols);
-    endColumn.end = true;
-    addColumn(endColumn);
+
 
     disableContextMenu(true);
   }
@@ -303,6 +307,9 @@ public class TableHeader extends BoxComponent {
       ui.setVisible(true);
     }
     int w = columnModel.getWidthInPixels(column.index);
+    if (w < 1) {
+      return;
+    }
 
     if (w != ui.lastWidth) {
       Element td = DOM.getParent(ui.getElement());

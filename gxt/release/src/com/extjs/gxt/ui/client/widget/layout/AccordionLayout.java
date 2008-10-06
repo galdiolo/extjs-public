@@ -205,7 +205,7 @@ public class AccordionLayout extends FitLayout {
     cp.addListener(Events.BeforeExpand, listener);
     cp.addListener(Events.Collapse, new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent ce) {
-        updateStyles();
+        layout();
       }
     });
   }
@@ -224,7 +224,13 @@ public class AccordionLayout extends FitLayout {
         }
       }
       size.height -= hh;
-      setSize(item, size.width, size.height);
+      ContentPanel cp = (ContentPanel)item;
+      if (cp.isExpanded()) {
+        setSize(item, size.width, size.height);
+      } else {
+        setSize(item, size.width, -1);
+        cp.el().setHeight("auto");
+      }
     }
   }
 

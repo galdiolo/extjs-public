@@ -18,7 +18,6 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.util.Markup;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.extjs.gxt.ui.client.widget.button.ToolButton;
@@ -92,7 +91,6 @@ public class ContentPanel extends LayoutContainer {
   protected Header head;
   protected ButtonBar buttonBar;
   protected El body, bwrap;
-  protected String title;
 
   private String bodyStyle, bodyStyleName;
   private boolean headerVisible = true;
@@ -100,8 +98,6 @@ public class ContentPanel extends LayoutContainer {
   private boolean footer, titleCollapse;
   private HorizontalAlignment buttonAlign = HorizontalAlignment.RIGHT;
   private boolean animCollapse = true;
-  private String expandTool = "x-tool-plus";
-  private String collapseTool = "x-tool-minus";
   private boolean collapsible;
   private boolean bodyBorder = true, insetBorder = true;
   private Component topComponent;
@@ -114,7 +110,6 @@ public class ContentPanel extends LayoutContainer {
   private String tbarStyle, bbarStyle;
   private String bodStyle;
   private String collapseStyle;
-  private String iconStyle;
   private El foot, tbar, bbar;
 
   /**
@@ -127,11 +122,6 @@ public class ContentPanel extends LayoutContainer {
     head = new Header();
   }
 
-  public void setButtonBar(ButtonBar buttonBar) {
-    assertPreRender();
-    this.buttonBar = buttonBar;
-  }
-  
   /**
    * Creates a new content panel.
    * 
@@ -159,8 +149,7 @@ public class ContentPanel extends LayoutContainer {
   public void collapse() {
     if (rendered) {
       if (collapsible && !collapsed && !animating) {
-        ComponentEvent ce = new ComponentEvent(this);
-        if (fireEvent(Events.BeforeCollapse, ce)) {
+        if (fireEvent(Events.BeforeCollapse)) {
           onCollapse();
         }
       }
@@ -176,8 +165,7 @@ public class ContentPanel extends LayoutContainer {
    */
   public void expand() {
     if (rendered && getCollapsible() && isCollapsed()) {
-      ComponentEvent ce = new ComponentEvent(this);
-      if (fireEvent(Events.BeforeExpand, ce)) {
+      if (fireEvent(Events.BeforeExpand)) {
         removeStyleName(collapseStyle);
         onExpand();
       }
@@ -191,6 +179,15 @@ public class ContentPanel extends LayoutContainer {
    */
   public boolean getAnimCollapse() {
     return animCollapse;
+  }
+
+  /**
+   * Returns the panel's body element.
+   * 
+   * @return the body
+   */
+  public El getBody() {
+    return body;
   }
 
   /**
@@ -344,6 +341,24 @@ public class ContentPanel extends LayoutContainer {
   }
 
   /**
+   * Returns the panel's heading.
+   * 
+   * @return the heading
+   */
+  public String getHeading() {
+    return head.getText();
+  }
+
+  /**
+   * Returns the panel's icon style.
+   * 
+   * @return the icon style
+   */
+  public String getIconStyle() {
+    return head.getIconStyle();
+  }
+
+  /**
    * Returns the height in pixels of the body element (not including the height
    * of any framing elements). For the frame height see {@link #getFrameHeight}.
    * 
@@ -379,9 +394,10 @@ public class ContentPanel extends LayoutContainer {
    * Returns the panel's title text.
    * 
    * @return the title text
+   * @deprecated use {@link #getHeading()}
    */
   public String getTitleText() {
-    return title;
+    return head.getText();
   }
 
   /**
@@ -436,7 +452,9 @@ public class ContentPanel extends LayoutContainer {
   }
 
   /**
-   * Sets whether exand and collapse is animating (defaults to true, pre-render).
+   * Sets whether exand and collapse is animating (defaults to true,
+   * pre-render).
+   * 
    * @param animCollapse true to enable animations
    */
   public void setAnimCollapse(boolean animCollapse) {
@@ -445,15 +463,16 @@ public class ContentPanel extends LayoutContainer {
   }
 
   /**
-   * True to display an interior border on the body element of the panel, false
-   * to hide it (defaults to true, pre-render). This only applies when
-   * {@link #setBodyBorder(boolean)} == true.
+   * True to display the borders of the panel's body element, false to hide them
+   * (defaults to true, pre-render). By default, the border is a 2px wide inset
+   * border, but this can be further altered by setting
+   * {@link #setBodyBorder(boolean)} to false.
    * 
-   * @param insetBorder true to display the interior border
+   * @param bodyBorder true for a body border
    */
-  public void setInsetBorder(boolean insetBorder) {
+  public void setBodyBorder(boolean bodyBorder) {
     assertPreRender();
-    this.insetBorder = insetBorder;
+    this.bodyBorder = bodyBorder;
   }
 
   /**
@@ -466,7 +485,7 @@ public class ContentPanel extends LayoutContainer {
     assertPreRender();
     this.bodyStyle = bodyStyle;
   }
-  
+
   /**
    * A style name that is added to the panel's body element (pre-render).
    * 
@@ -478,21 +497,8 @@ public class ContentPanel extends LayoutContainer {
   }
 
   /**
-   * True to display the borders of the panel's body element, false to hide them
-   * (defaults to true, pre-render). By default, the border is a 2px wide inset border, but
-   * this can be further altered by setting {@link #setBodyBorder(boolean)} to
-   * false.
-   * 
-   * @param bodyBorder true for a body border
-   */
-  public void setBodyBorder(boolean bodyBorder) {
-    assertPreRender();
-    this.bodyBorder = bodyBorder;
-  }
-
-  /**
-   * Sets the panel's bottom component (pre-render). The component's natural height will be
-   * used and will not be changed by the panel.
+   * Sets the panel's bottom component (pre-render). The component's natural
+   * height will be used and will not be changed by the panel.
    * 
    * @param bottomComponent the bottom component
    */
@@ -510,6 +516,11 @@ public class ContentPanel extends LayoutContainer {
   public void setButtonAlign(HorizontalAlignment buttonAlign) {
     assertPreRender();
     this.buttonAlign = buttonAlign;
+  }
+
+  public void setButtonBar(ButtonBar buttonBar) {
+    assertPreRender();
+    this.buttonBar = buttonBar;
   }
 
   /**
@@ -582,10 +593,7 @@ public class ContentPanel extends LayoutContainer {
    * @param text the title text
    */
   public void setHeading(String text) {
-    this.title = text;
-    if (head != null) {
-      head.setText(text);
-    }
+    head.setText(text);
   }
 
   /**
@@ -597,7 +605,7 @@ public class ContentPanel extends LayoutContainer {
   public void setHideCollapseTool(boolean hideCollapseTool) {
     this.hideCollapseTool = hideCollapseTool;
     if (rendered) {
-      collapseBtn.setVisible(true);
+      collapseBtn.setVisible(!hideCollapseTool);
     }
   }
 
@@ -607,10 +615,19 @@ public class ContentPanel extends LayoutContainer {
    * @param iconStyle the icon style
    */
   public void setIconStyle(String iconStyle) {
-    this.iconStyle = iconStyle;
-    if (rendered) {
-      head.setIconStyle(iconStyle);
-    }
+    head.setIconStyle(iconStyle);
+  }
+
+  /**
+   * True to display an interior border on the body element of the panel, false
+   * to hide it (defaults to true, pre-render). This only applies when
+   * {@link #setBodyBorder(boolean)} == true.
+   * 
+   * @param insetBorder true to display the interior border
+   */
+  public void setInsetBorder(boolean insetBorder) {
+    assertPreRender();
+    this.insetBorder = insetBorder;
   }
 
   /**
@@ -657,27 +674,18 @@ public class ContentPanel extends LayoutContainer {
     el().setHeight("auto");
     ComponentEvent ce = new ComponentEvent(this);
     fireEvent(Events.Collapse, ce);
-    fireEvent(Events.Resize, ce);
   }
 
   protected void afterExpand() {
     collapsed = false;
     animating = false;
-    layout();
     ComponentEvent ce = new ComponentEvent(this);
     fireEvent(Events.Expand, ce);
-    fireEvent(Events.Resize, ce);
   }
 
   @Override
   protected void afterRender() {
     super.afterRender();
-    if (title != null) {
-      setHeading(title);
-    }
-    if (iconStyle != null) {
-      setIconStyle(iconStyle);
-    }
   }
 
   protected void createStyles(String baseStyle) {
@@ -688,7 +696,7 @@ public class ContentPanel extends LayoutContainer {
     bodStyle = baseStyle + "-body";
     bbarStyle = baseStyle + "-bbar";
     footerStyle = baseStyle + "-footer";
-    collapseStyle = baseStyle + "-collapse";
+    collapseStyle = baseStyle + "-collapsed";
   }
 
   @Override
@@ -707,17 +715,15 @@ public class ContentPanel extends LayoutContainer {
   @Override
   protected void doDetachChildren() {
     super.doDetachChildren();
-    if (head != null) WidgetHelper.doDetach(head);
-    if (buttonBar != null && buttonBar.isAttached()) {
-      WidgetHelper.doDetach(buttonBar);
-    }
-    if (topComponent != null) WidgetHelper.doDetach(topComponent);
-    if (bottomComponent != null) WidgetHelper.doDetach(bottomComponent);
+    ComponentHelper.doDetach(head);
+    ComponentHelper.doDetach(buttonBar);
+    ComponentHelper.doDetach(topComponent);
+    ComponentHelper.doDetach(bottomComponent);
   }
 
   protected void initTools() {
     if (collapsible && !hideCollapseTool) {
-      collapseBtn = new ToolButton(collapseTool);
+      collapseBtn = new ToolButton("x-tool-toggle");
       collapseBtn.addListener(Events.Select, new Listener<ComponentEvent>() {
         public void handleEvent(ComponentEvent ce) {
           ce.stopEvent();
@@ -735,9 +741,6 @@ public class ContentPanel extends LayoutContainer {
   }
 
   protected void onCollapse() {
-    if (collapseBtn != null) {
-      collapseBtn.changeStyle(expandTool);
-    }
     if (animCollapse && !animating) {
       animating = true;
       bwrap.slideOut(Direction.UP, new FxConfig(300, new Listener<FxEvent>() {
@@ -752,9 +755,6 @@ public class ContentPanel extends LayoutContainer {
   }
 
   protected void onExpand() {
-    if (collapseBtn != null) {
-      collapseBtn.changeStyle(collapseTool);
-    }
     if (animCollapse && !animating) {
       animating = true;
       bwrap.slideIn(Direction.DOWN, new FxConfig(300, new Listener<FxEvent>() {
@@ -795,18 +795,17 @@ public class ContentPanel extends LayoutContainer {
       DOM.appendChild(bw, bl);
 
       Element mc = fly(bw).getSubChild(3);
-      tbar = fly(mc).createChild("<div class=" + tbarStyle + "></div>");
-      body = fly(mc).createChild("<div class=" + bodStyle + "></div>");
-      bbar = fly(mc).createChild("<div class=" + bbarStyle + "></div>");
 
-      tbar.setVisible(false);
-      bbar.setVisible(false);
+      if (topComponent != null) {
+        tbar = fly(mc).createChild("<div class=" + tbarStyle + "></div>");
+      }
+      body = fly(mc).createChild("<div class=" + bodStyle + "></div>");
+      if (bottomComponent != null) {
+        bbar = fly(mc).createChild("<div class=" + bbarStyle + "></div>");
+      }
 
       El e = fly(bw).lastChild().firstChild().firstChild();
-      
-      if (footer) {
-        foot = e.createChild("<div class=" + footerStyle + "></div>");
-      }
+      foot = e.createChild("<div class=" + footerStyle + "></div>");
 
       if (!headerVisible) {
         head.setVisible(false);
@@ -824,26 +823,22 @@ public class ContentPanel extends LayoutContainer {
       bwrap = el().createChild("<div class=" + bwrapStyle + "></div>");
 
       Element bw = bwrap.dom;
-      tbar = fly(bw).createChild("<div class=" + tbarStyle + "></div>");
+      if (topComponent != null) {
+        tbar = fly(bw).createChild("<div class=" + tbarStyle + "></div>");
+      }
       body = fly(bw).createChild("<div class=" + bodStyle + "></div>");
-      bbar = fly(bw).createChild("<div class=" + bbarStyle + "></div>");
+      if (bottomComponent != null) {
+        bbar = fly(bw).createChild("<div class=" + bbarStyle + "></div>");
+      }
       foot = fly(bw).createChild("<div class=" + footerStyle + "></div>");
 
-      tbar.setVisible(false);
-      bbar.setVisible(false);
-
-      if (!isHeaderVisible()) {
+      if (!headerVisible) {
         head.setVisible(false);
         body.addStyleName(bodStyle + "-noheader");
         if (tbar != null) {
           tbar.addStyleName(tbarStyle + "-noheader");
         }
       }
-    }
-
-    if (head != null) {
-      String t = title != null ? title : "&#160;";
-      head.setText(t);
     }
 
     if (footer && buttonBar.getItemCount() > 0) {
@@ -872,7 +867,7 @@ public class ContentPanel extends LayoutContainer {
     if (bodyStyle != null) {
       body.applyStyles(bodyStyle);
     }
-    
+
     if (bodyStyleName != null) {
       body.addStyleName(bodyStyleName);
     }
@@ -882,12 +877,10 @@ public class ContentPanel extends LayoutContainer {
     }
 
     if (topComponent != null) {
-      tbar.setVisible(true);
       topComponent.render(tbar.dom);
     }
 
     if (bottomComponent != null) {
-      bbar.setVisible(true);
       bottomComponent.render(bbar.dom);
     }
 
@@ -895,7 +888,7 @@ public class ContentPanel extends LayoutContainer {
       head.setStyleAttribute("cursor", "pointer");
       el().addEventsSunk(Event.ONCLICK);
     }
-    
+
     if (collapsed) {
       boolean anim = animCollapse;
       collapsed = false;
@@ -909,14 +902,16 @@ public class ContentPanel extends LayoutContainer {
   protected void onResize(final int width, final int height) {
     super.onResize(width, height);
     if (isAutoWidth()) {
-      body.setWidth("auto");
+      getLayoutTarget().setWidth("auto");
     } else if (width != -1) {
-      body.setWidth(width - getFrameWidth(), true);
+      getLayoutTarget().setWidth(width - getFrameWidth(), true);
     }
-    if (isAutoHeight()) {
-      body.setHeight("auto");
-    } else if (height != -1) {
-      body.setHeight(height - getFrameHeight(), true);
+    if (!collapsed) {
+      if (isAutoHeight()) {
+        getLayoutTarget().setHeight("auto");
+      } else if (height != -1) {
+        getLayoutTarget().setHeight(height - getFrameHeight(), true);
+      }
     }
   }
 

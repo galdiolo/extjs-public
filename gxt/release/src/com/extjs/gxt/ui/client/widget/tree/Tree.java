@@ -85,6 +85,15 @@ import com.google.gwt.user.client.Event;
  * </ul>
  * </dd>
  * 
+ * <dd><b>BeforeSelect</b> : TreeEvent(tree, item)<br>
+ * <div>Fires before a item is selected. Listeners can set the <code>doit</code>
+ * field to <code>false</code> to cancel the action.</div>
+ * <ul>
+ * <li>tree : this</li>
+ * <li>item : the selected item</li>
+ * </ul>
+ * </dd>
+ * 
  * <dd><b>SelectionChange</b> : TreeEvent(tree, selected)<br>
  * <div>Fires after a item has been removed.</div>
  * <ul>
@@ -152,16 +161,14 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
   protected TreeItem root;
   protected TreeSelectionModel sm;
   protected boolean isViewer;
-  private String openNodeIconStyle = "tree-folder-open";
-  private String nodeIconStyle = "tree-folder";
-  private String itemStyle = "my-treeitem";
-  private String itemImageStyle;
+  
   private CheckCascade checkStyle = CheckCascade.PARENTS;
   private CheckNodes checkNodes = CheckNodes.BOTH;
   private boolean animate = true;
   private boolean checkable;
   private int indentWidth = 18;
   private Map<String, TreeItem> nodeHash;
+  private TreeStyle style = new TreeStyle();
 
   /**
    * Creates a new single select tree.
@@ -175,6 +182,15 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
     nodeHash = new HashMap<String, TreeItem>();
     setSelectionModel(new TreeSelectionModel());
   }
+  
+  /**
+   * Returns the tree's style.
+   * 
+   * @return the tree style
+   */
+  public TreeStyle getStyle() {
+    return style;
+  }
 
   /**
    * Collapses all item's.
@@ -185,7 +201,7 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
     root.setExpanded(false, true);
     if (anim) animate = true;
   }
-  
+
   /**
    * Expands all item's.
    */
@@ -239,7 +255,7 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
    * @return the matching tree item or <code>null</code> if no match
    */
   public TreeItem findItem(Element element) {
-    Element elem = fly(element).findParentElement("." + itemStyle, 15);
+    Element elem = fly(element).findParentElement("." + style.getItemStyle(), 15);
     if (elem != null) {
       String id = elem.getId();
       if (id != null && !id.equals("")) {
@@ -349,27 +365,30 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
    * Returns the item icon style.
    * 
    * @return the icon style
+   * @deprecated see {@link TreeStyle#getLeafIconStyle()}
    */
   public String getItemIconStyle() {
-    return itemImageStyle;
+    return style.getLeafIconStyle();
   }
 
   /**
    * Returns the node icon style.
    * 
    * @return the icon style
+   * @deprecated see {@link TreeStyle#getNodeCloseIconStyle()}
    */
   public String getNodeIconStyle() {
-    return nodeIconStyle;
+    return style.getNodeCloseIconStyle();
   }
 
   /**
    * Returns the open node icon style.
    * 
    * @return the icon style
+   * @deprecated see {@link TreeStyle#getNodeOpenIconStyle()}
    */
   public String getOpenNodeIconStyle() {
-    return openNodeIconStyle;
+    return style.getNodeOpenIconStyle();
   }
 
   /**
@@ -501,9 +520,10 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
    * override this value by setting the the item's icon style.
    * 
    * @param itemImageStyle the image style
+   * @deprecated see {@link TreeStyle#setLeafIconStyle(String)}
    */
   public void setItemIconStyle(String itemImageStyle) {
-    this.itemImageStyle = itemImageStyle;
+    style.setLeafIconStyle(itemImageStyle);
   }
 
   /**
@@ -512,9 +532,10 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
    * the the item's icon style.
    * 
    * @param nodeIconStyle the node icon style
+   * @deprecated see {@link TreeStyle#setNodeCloseIconStyle(String)}
    */
   public void setNodeIconStyle(String nodeIconStyle) {
-    this.nodeIconStyle = nodeIconStyle;
+    style.setNodeCloseIconStyle(nodeIconStyle);
   }
 
   /**
@@ -523,9 +544,10 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
    * setting the the item's icon style.
    * 
    * @param openNodeIconStyle the open node icon style
+   * @deprecated see {@link TreeStyle#setNodeOpenIconStyle(String)}
    */
   public void setOpenNodeIconStyle(String openNodeIconStyle) {
-    this.openNodeIconStyle = openNodeIconStyle;
+    style.setNodeOpenIconStyle(openNodeIconStyle);
   }
 
   public void setSelectedItem(TreeItem item) {

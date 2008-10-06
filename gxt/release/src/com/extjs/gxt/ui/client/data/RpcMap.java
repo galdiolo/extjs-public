@@ -34,7 +34,7 @@ import java.util.Set;
  * Long, Float, Double, Date, Boolean, and arrays of these types.  As well as List, Set and Map
  */
 @SuppressWarnings("unused")
-public class RpcMap implements Map<String, Object> {
+public class RpcMap {
 
   private Byte _byte;
   private Short _short;
@@ -61,6 +61,10 @@ public class RpcMap implements Map<String, Object> {
   
   private transient Map<String, Object> map = new HashMap<String, Object>();
 
+  public Map<String, Object> getTransientMap() {
+    return map;
+  }
+  
   public void clear() {
     map.clear();
   }
@@ -73,7 +77,7 @@ public class RpcMap implements Map<String, Object> {
     return map.containsValue(value);
   }
 
-  public Set<Entry<String, Object>> entrySet() {
+  public Set<Map.Entry<String, Object>> entrySet() {
     return map.entrySet();
   }
 

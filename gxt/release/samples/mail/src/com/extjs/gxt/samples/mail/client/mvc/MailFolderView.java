@@ -8,7 +8,7 @@
 package com.extjs.gxt.samples.mail.client.mvc;
 
 import com.extjs.gxt.samples.mail.client.AppEvents;
-import com.extjs.gxt.samples.resources.client.Folder;
+import com.extjs.gxt.samples.resources.client.model.Folder;
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.binder.TreeBinder;
@@ -60,7 +60,7 @@ public class MailFolderView extends View {
     });
 
     tree = new Tree();
-    tree.setItemIconStyle("tree-folder");
+    tree.getStyle().setLeafIconStyle("tree-folder");
 
     loader = new BaseTreeLoader(new TreeModelReader());
     store = new TreeStore<Folder>(loader);

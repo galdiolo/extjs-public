@@ -23,7 +23,7 @@ import com.extjs.gxt.ui.client.widget.DataViewItem;
 
 /**
  * Binds a data view and a store.
- * 
+ *
  * @param <M> the model type
  */
 public class DataViewBinder<M extends ModelData> extends StoreBinder<ListStore<M>, DataView, M> {
@@ -33,7 +33,7 @@ public class DataViewBinder<M extends ModelData> extends StoreBinder<ListStore<M
 
   /**
    * Creates a new data view binder.
-   * 
+   *
    * @param view the data view
    * @param store the list store
    */
@@ -55,7 +55,7 @@ public class DataViewBinder<M extends ModelData> extends StoreBinder<ListStore<M
 
   /**
    * Returns the binder's store.
-   * 
+   *
    * @return the store
    */
   public ListStore getStore() {
@@ -64,7 +64,7 @@ public class DataViewBinder<M extends ModelData> extends StoreBinder<ListStore<M
 
   /**
    * Returns the data view.
-   * 
+   *
    * @return this view
    */
   public DataView getView() {
@@ -180,7 +180,7 @@ public class DataViewBinder<M extends ModelData> extends StoreBinder<ListStore<M
 
   @Override
   protected void update(M model) {
-    DataListItem item = (DataListItem) findItem(model);
+    DataViewItem item = (DataViewItem) findItem(model);
     if (item != null) {
       setModel(item, model);
     }

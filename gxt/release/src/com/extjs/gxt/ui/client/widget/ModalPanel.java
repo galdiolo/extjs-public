@@ -7,12 +7,14 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
+import com.extjs.gxt.ui.client.XDOM;
+import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.FxEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.PreviewEvent;
 import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.util.BaseEventPreview;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
+import com.extjs.gxt.ui.client.util.Size;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -89,7 +91,7 @@ public class ModalPanel extends BoxComponent {
     el().makePositionable(true);
     el().updateZIndex(0);
     component.el().updateZIndex(0);
-    
+
     super.show();
 
     eventPreview.getIgnoreList().removeAll();
@@ -101,13 +103,13 @@ public class ModalPanel extends BoxComponent {
   @Override
   protected void doAttachChildren() {
     super.doAttachChildren();
-    WidgetHelper.doAttach(component);
+    ComponentHelper.doAttach(component);
   }
 
   @Override
   protected void doDetachChildren() {
     super.doDetachChildren();
-    WidgetHelper.doDetach(component);
+    ComponentHelper.doDetach(component);
   }
 
   @Override
@@ -115,7 +117,21 @@ public class ModalPanel extends BoxComponent {
     super.onRender(target, index);
     setElement(DOM.createDiv());
     el().insertInto(target, index);
-    el().setSize("100%", "100%");
+
+    El body = XDOM.getBodyEl();
+    int width = body.dom.getScrollWidth();
+    int height = body.dom.getScrollHeight();
+    Size vp = XDOM.getViewportSize();
+
+    String w = "100%";
+    String h = "100%";
+    if (width > vp.width) {
+      w = width + "px";
+    }
+    if (height > vp.height) {
+      h = height + "px";
+    }
+    el().setSize(w, h);
 
     eventPreview = new BaseEventPreview() {
 

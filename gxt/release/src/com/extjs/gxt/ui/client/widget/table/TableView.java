@@ -12,14 +12,15 @@ import java.util.Comparator;
 
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.GXT;
-import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.TableEvent;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
+import com.extjs.gxt.ui.client.widget.ComponentHelper;
+import com.extjs.gxt.ui.client.widget.tips.ToolTip;
+import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -41,6 +42,10 @@ public class TableView {
     bodyHTML = sb.toString();
   }
 
+  public static native void markRendered(TableItem item) /*-{
+   item.@com.extjs.gxt.ui.client.widget.Component::rendered = true;
+   }-*/;
+
   // styles
   protected String baseStyle = "my-tbl-item";
   protected String overStyle = baseStyle + "-over";
@@ -49,28 +54,18 @@ public class TableView {
   protected String cellOverflowStyle = cellStyle + "-" + "overflow";
   protected String textStyle = cellStyle + "-text";
   protected String widgetStyle = cellStyle + "-widget";
+  protected String rowSelector = ".my-tbl-item";
 
+  protected String cellSelector = ".my-tbl-item-cell";
   protected TableColumnModel cm;
   protected El dataEl, scrollEl;
   protected Table table;
   protected int scrollBarWidth;
 
-  public El getDataEl() {
-    return dataEl;
-  }
-
-  /**
-   * Sorts the table items based on the current order.
-   */
-  public void reorderItems() {
-    dataEl.removeChildren();
-    int numRows = table.getItemCount();
-    for (int i = 0; i < numRows; i++) {
-      TableItem item = table.getItem(i);
-      dataEl.dom.appendChild(item.getElement());
-    }
-    table.getSelectionModel().refresh();
-  }
+  private TableItem overItem;
+  private int overCol;
+  private ToolTip toolTip;
+  private boolean enableCellTooltips;
 
   public void applyCellStyles(TableItem item) {
     if (item.cellStyles != null) {
@@ -80,20 +75,80 @@ public class TableView {
     }
   }
 
+  public void bulkRender() {
+    int count = table.getItemCount();
+    int cols = cm.getColumnCount();
+
+    TableColumn[] columns = new TableColumn[cols];
+    int[] widths = new int[cols];
+    String[] align = new String[cols];
+    for (int i = 0; i < columns.length; i++) {
+      columns[i] = cm.getColumn(i);
+      widths[i] = cm.getWidthInPixels(i) - (table.getVerticalLines() && !XDOM.isVisibleBox ? 1 : 0);
+      columns[i].lastWidth = widths[i];
+      HorizontalAlignment ha = columns[i].getAlignment();
+      switch (ha) {
+        case LEFT:
+          align[i] = "left";
+          break;
+        case CENTER:
+          align[i] = "center";
+          break;
+        case RIGHT:
+          align[i] = "right";
+          break;
+      }
+    }
+
+    StringBuffer sb = new StringBuffer();
+
+    for (int i = 0; i < count; i++) {
+      TableItem item = table.getItem(i);
+      item.init(table);
+      markRendered(item);
+      Object[] values = item.getValues();
+      Object[] styles = item.getCellStyles();
+      Object[] svalues = new Object[cols];
+      String[] tips = item.getCellToolTips();
+      if (tips != null) {
+        enableCellTooltips = true;
+      }
+      for (int k = 0; k < cols; k++) {
+        svalues[k] = table.getRenderedValue(item, k, values[k]);
+      }
+
+      sb.append("<div class=my-tbl-item><table cellpadding=0 cellspacing=0 tabIndex=1><tr>");
+      for (int j = 0; j < cols; j++) {
+        String display = columns[j].isHidden() ? "none" : "static";
+        String tip = tips == null ? "" : "qtip='" + tips[j] + "'";
+        sb.append("<td " + tip + " class='" + cellStyle + " my-tbl-td-" + j + "' style='display: "
+            + display + ";width: " + widths[j] + "px' index=" + j + "><div class='"
+            + cellOverflowStyle + " my-tbl-td-inner-" + j + "' style='width:" + widths[j]
+            + "'><div class='my-tbl-td-cell-" + j + " " + textStyle
+            + (styles == null ? "" : " " + styles[j]) + "' style='text-align:" + align[j] + "'>"
+            + svalues[j] + "</div></div></td>");
+
+      }
+      sb.append("</tr></table></div>");
+    }
+
+    dataEl.dom.setInnerHTML(sb.toString());
+
+    Element[] elems = dataEl.select(".my-tbl-item");
+    int ct = table.getItemCount();
+    for (int i = 0; i < ct; i++) {
+      TableItem item = table.getItem(i);
+      item.setElement(elems[i]);
+      applyCellStyles(item);
+    }
+
+  }
+
   public void clearHoverStyles() {
     int count = table.getItemCount();
     for (int i = 0; i < count; i++) {
       TableItem item = table.getItem(i);
-      item.onMouseOut(null);
-    }
-  }
-
-  public void onSelectItem(TableItem item, boolean select) {
-    if (select) {
-      item.addStyleName(selStyle);
-    } else {
-      item.removeStyleName(selStyle);
-      item.removeStyleName(overStyle);
+      onHighlightRow(item, false);
     }
   }
 
@@ -112,22 +167,11 @@ public class TableView {
     });
 
     reorderItems();
+    updateIndexes(0);
   }
 
-  public int getCellIndex(Element target) {
-    String index = target.getAttribute("index");
-    if (index == null) {
-      target = DOM.getParent(target);
-      while (target != null) {
-        index = target.getAttribute("index");
-        if (index == null) {
-          target = DOM.getParent(target);
-        } else {
-          break;
-        }
-      }
-    }
-    return index == null ? Style.DEFAULT : Integer.parseInt(index);
+  public El getDataEl() {
+    return dataEl;
   }
 
   public El getScrollEl() {
@@ -171,6 +215,50 @@ public class TableView {
     cm.addListener(Events.HeaderChange, l);
     cm.addListener(Events.WidthChange, l);
     cm.addListener(Events.HiddenChange, l);
+
+  }
+
+  protected void onItemEvent(TableEvent te) {
+    TableItem item = te.item;
+    int col = te.cellIndex;
+
+    if (enableCellTooltips) {
+      switch (te.type) {
+        case Event.ONMOUSEOVER:
+        case Event.ONMOUSEOUT:
+          if (item != null && col != -1) {
+            Element cell = getCell(item, col);
+            if (cell != null) {
+              if (overItem == item && overCol == col) {
+                return;
+              }
+              overItem = item;
+              overCol = col;
+              String tip = cell.getAttribute("qtip");
+              if (tip.equals("null")) {
+                tip = null;
+              }
+              if (toolTip == null) {
+                toolTip = table.getToolTip();
+                if (toolTip == null) {
+                  toolTip = new ToolTip(table);
+                }
+              }
+
+              ToolTipConfig config = toolTip.getConfig();
+              config.setText(tip);
+              config.setTarget(cell);
+              config.setEnabled(tip != null);
+              toolTip.update(config);
+            }
+          }
+          break;
+      }
+    }
+  }
+
+  protected Element getCell(TableItem item, int cell) {
+    return item.el().select("td.my-tbl-item-cell")[cell];
   }
 
   public void onHighlightRow(TableItem item, boolean highlight) {
@@ -181,10 +269,21 @@ public class TableView {
     }
   }
 
+  public void onSelectItem(TableItem item, boolean select) {
+    if (select) {
+      item.addStyleName(selStyle);
+    } else {
+      item.removeStyleName(selStyle);
+      item.removeStyleName(overStyle);
+    }
+  }
+
   public void removeItem(TableItem item) {
+    int idx = table.indexOf(item);
     if (item.isRendered()) {
       item.el().removeFromParent();
     }
+    updateIndexes(idx);
   }
 
   public void render() {
@@ -207,74 +306,11 @@ public class TableView {
 
     DOM.sinkEvents(scrollEl.dom, Event.ONSCROLL);
 
-    table.disableTextSelection(true);
+    if (!GXT.isGecko) {
+      table.disableTextSelection(true);
+    }
 
     table.el().addEventsSunk(Event.ONCLICK | Event.ONDBLCLICK | Event.MOUSEEVENTS | Event.KEYEVENTS);
-  }
-
-  public void bulkRender() {
-    int count = table.getItemCount();
-    int cols = cm.getColumnCount();
-
-    TableColumn[] columns = new TableColumn[cols];
-    int[] widths = new int[cols];
-    String[] align = new String[cols];
-    for (int i = 0; i < columns.length; i++) {
-      columns[i] = cm.getColumn(i);
-      widths[i] = cm.getWidthInPixels(i) - (table.getVerticalLines() && !XDOM.isVisibleBox ? 1 : 0);
-      columns[i].lastWidth = widths[i];
-      HorizontalAlignment ha = columns[i].getAlignment();
-      switch (ha) {
-        case LEFT:
-          align[i] = "left";
-          break;
-        case CENTER:
-          align[i] = "center";
-          break;
-        case RIGHT:
-          align[i] = "right";
-          break;
-      }
-    }
-
-    StringBuffer sb = new StringBuffer();
-
-    for (int i = 0; i < count; i++) {
-      TableItem item = table.getItem(i);
-      item.init(table);
-      markRendered(item);
-      Object[] values = item.getValues();
-      Object[] styles = item.getCellStyles();
-      Object[] svalues = new Object[cols];
-      for (int k = 0; k < cols; k++) {
-        svalues[k] = table.getRenderedValue(item, k, values[k]);
-      }
-
-      sb.append("<div class=my-tbl-item><table cellpadding=0 cellspacing=0 tabIndex=1><tr>");
-      for (int j = 0; j < cols; j++) {
-        String display = columns[j].isHidden() ? "none" : "static";
-        sb.append("<td class='" + cellStyle + "my-tbl-td-" + j + "' style='display: " + display
-            + ";width: " + widths[j] + "px' index=" + j + "><div class='" + cellOverflowStyle
-            + " my-tbl-td-inner-" + j + "' style='width:" + widths[j]
-            + "'><div class='my-tbl-td-cell-" + j + " " + textStyle
-            + (styles == null ? "" : " " + styles[j]) + "' style='text-align:" + align[j] + "'>"
-            + svalues[j] + "</div></div></td>");
-
-      }
-      sb.append("</tr></table></div>");
-
-    }
-
-    dataEl.dom.setInnerHTML(sb.toString());
-
-    Element[] elems = dataEl.select(".my-tbl-item");
-    int ct = table.getItemCount();
-    for (int i = 0; i < ct; i++) {
-      TableItem item = table.getItem(i);
-      item.setElement(elems[i]);
-      applyCellStyles(item);
-    }
-
   }
 
   public void renderItem(TableItem item, int index) {
@@ -284,7 +320,11 @@ public class TableView {
     int cols = cm.getColumnCount();
     Object[] values = item.getValues();
     Object[] styles = item.getCellStyles();
+    String[] tips = item.getCellToolTips();
     Object[] svalues = new Object[cols];
+    if (tips != null) {
+      enableCellTooltips = true;
+    }
     for (int i = 0; i < cols; i++) {
       if (!item.hasWidgets && values[i] instanceof Widget) {
         item.hasWidgets = true;
@@ -312,8 +352,9 @@ public class TableView {
       } else if (align == HorizontalAlignment.RIGHT) {
         salign = "right";
       }
-      sb.append("<td class=" + cellStyle + " style='display: " + display + ";width: " + w
-          + "px' index=" + i + "><div class=" + cellOverflowStyle + " style='width:" + w
+      String tip = tips == null ? "" : "qtip='" + tips[i] + "'";
+      sb.append("<td " + tip + " class=" + cellStyle + " style='display: " + display + ";width: "
+          + w + "px' index=" + i + "><div class=" + cellOverflowStyle + " style='width:" + w
           + "'><div class='" + textStyle + (styles == null ? "" : " " + styles[i])
           + "' style='text-align:" + salign + "'>" + svalues[i] + "</div></div></td>");
     }
@@ -332,7 +373,7 @@ public class TableView {
           textEl.dom.setClassName(widgetStyle);
           textEl.dom.appendChild(w.getElement());
           if (table.isAttached()) {
-            WidgetHelper.doAttach(w);
+            ComponentHelper.doAttach(w);
           }
         }
       }
@@ -340,6 +381,8 @@ public class TableView {
     applyCellStyles(item);
 
     item.cellsRendered = true;
+
+    updateIndexes(index);
   }
 
   public void renderItems() {
@@ -351,7 +394,9 @@ public class TableView {
         TableItem item = table.getItem(i);
         renderItem(item, i);
       }
+
     }
+    updateIndexes(0);
   }
 
   public void renderItemValue(TableItem item, int index, Object value) {
@@ -367,7 +412,7 @@ public class TableView {
         XDOM.setStyleName(textElem, widgetStyle);
         DOM.appendChild(textElem, widget.getElement());
         if (table.isAttached()) {
-          WidgetHelper.doAttach(widget);
+          ComponentHelper.doAttach(widget);
         }
       } else {
         String s = table.getRenderedValue(item, index, value);
@@ -375,6 +420,19 @@ public class TableView {
       }
     }
     applyCellStyles(item);
+  }
+
+  /**
+   * Sorts the table items based on the current order.
+   */
+  public void reorderItems() {
+    dataEl.removeChildren();
+    int numRows = table.getItemCount();
+    for (int i = 0; i < numRows; i++) {
+      TableItem item = table.getItem(i);
+      dataEl.dom.appendChild(item.getElement());
+    }
+    table.getSelectionModel().refresh();
   }
 
   public void resize() {
@@ -472,8 +530,53 @@ public class TableView {
     doSort(index, direction);
   }
 
-  public static native void markRendered(TableItem item) /*-{
-   item.@com.extjs.gxt.ui.client.widget.Component::rendered = true;
-   }-*/;
+  protected Element findCell(Element elem) {
+    if (elem == null) {
+      return null;
+    }
+    return fly(elem).findParentElement(cellSelector, 3);
+  }
+
+  protected int findCellIndex(Element elem) {
+    Element cell = findCell(elem);
+    if (cell != null) {
+      return getCellIndex(cell);
+    }
+    return -1;
+  }
+
+  protected Element findRow(Element el) {
+    if (el == null) {
+      return null;
+    }
+    return fly(el).findParentElement(rowSelector, 10);
+  }
+
+  protected int findRowIndex(Element elem) {
+    Element r = findRow(elem);
+    return r != null ? r.getPropertyInt("rowIndex") : -1;
+  }
+
+  protected El fly(Element elem) {
+    return El.fly(elem);
+  }
+
+  protected int getCellIndex(Element elem) {
+    if (elem != null) {
+      String index = elem.getAttribute("index");
+      if (index.length() != 0) {
+        return Integer.parseInt(index);
+      }
+    }
+    return -1;
+  }
+
+  private void updateIndexes(int start) {
+    int count = table.getItemCount();
+    for (int i = start; i < count; i++) {
+      TableItem item = table.getItem(i);
+      item.getElement().setPropertyInt("rowIndex", i);
+    }
+  }
 
 }

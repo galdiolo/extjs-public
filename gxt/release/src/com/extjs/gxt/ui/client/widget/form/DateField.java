@@ -12,11 +12,17 @@ import java.util.Date;
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.util.BaseEventPreview;
+import com.extjs.gxt.ui.client.util.DateWrapper;
 import com.extjs.gxt.ui.client.util.Format;
+import com.extjs.gxt.ui.client.util.KeyNav;
+import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.widget.DatePicker;
 import com.extjs.gxt.ui.client.widget.menu.DateMenu;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.user.client.Element;
 
 /**
  * Provides a date input field with a {@link DatePicker} dropdown and automatic
@@ -96,6 +102,7 @@ public class DateField extends TriggerField<Date> {
   private Date minValue;
   private Date maxValue;
   private DateMenu menu;
+  private BaseEventPreview focusPreview;
 
   /**
    * Creates a new date field.
@@ -105,6 +112,55 @@ public class DateField extends TriggerField<Date> {
     propertyEditor = new DateTimePropertyEditor();
     messages = new DateFieldMessages();
     setTriggerStyle("x-form-date-trigger");
+  }
+
+  @Override
+  protected void onRender(Element target, int index) {
+    super.onRender(target, index);
+    focusPreview = new BaseEventPreview();
+    
+    new KeyNav(this) {
+      public void onDown(ComponentEvent ce) {
+        if (menu == null || !menu.isAttached()) {
+          expand();
+        }
+      }
+    };
+  }
+
+  private void doBlur(ComponentEvent ce) {
+    if (menu != null && menu.isVisible()) {
+      menu.hide();
+    }
+    super.onBlur(ce);
+    focusPreview.remove();
+  }
+
+  /**
+   * Returns the field's date picker.
+   * 
+   * @return the date picker
+   */
+  public DatePicker getDatePicker() {
+    if (menu == null) {
+      menu = new DateMenu();
+ 
+      menu.addListener(Events.Select, new Listener<ComponentEvent>() {
+        public void handleEvent(ComponentEvent ce) {
+          focusValue = getValue();
+          setValue(menu.getDate());
+          fireChangeEvent(focusValue, getValue());
+          menu.hide();
+          el().blur();
+        }
+      });
+      menu.addListener(Events.Hide, new Listener<ComponentEvent>() {
+        public void handleEvent(ComponentEvent be) {
+          focus();
+        }
+      });
+    }
+    return menu.getDatePicker();
   }
 
   /**
@@ -135,57 +191,39 @@ public class DateField extends TriggerField<Date> {
     return (DateTimePropertyEditor) propertyEditor;
   }
 
-  /**
-   * Sets the field's max value.
-   * 
-   * @param maxValue the max value
-   */
-  public void setMaxValue(Date maxValue) {
-    this.maxValue = maxValue;
-  }
-
-  /**
-   * The maximum date allowed.
-   * 
-   * @param minValue the max value
-   */
-  public void setMinValue(Date minValue) {
-    this.minValue = minValue;
-  }
-
   @Override
-  public void setRawValue(String value) {
-    super.setRawValue(value);
-  }
-
-  @Override
-  protected void onBlur(ComponentEvent ce) {
-    String v = getRawValue();
-    try {
-      setValue(getPropertyEditor().convertStringValue(v));
-    } catch (Exception e) {
-
-    }
-    super.onBlur(ce);
-  }
-
-  @Override
-  protected void onTriggerClick(ComponentEvent ce) {
-    super.onTriggerClick(ce);
-    if (disabled || isReadOnly()) {
+  protected void onBlur(final ComponentEvent ce) {
+    Rectangle rec = trigger.getBounds();
+    if (rec.contains(BaseEventPreview.getLastClientX(), BaseEventPreview.getLastClientY())) {
+      ce.stopEvent();
       return;
     }
-    if (menu == null) {
-      menu = new DateMenu();
-      menu.addListener(Events.Select, new Listener<ComponentEvent>() {
-        public void handleEvent(ComponentEvent ce) {
-          focusValue = getValue();
-          setValue(menu.getDate());
-          fireChangeEvent(focusValue, getValue());
-        }
-      });
+    if (menu != null && menu.isVisible()) {
+      return;
     }
-    DatePicker picker = menu.getDatePicker();
+    hasFocus = false;
+    doBlur(ce);
+  }
+  
+  @Override
+  protected void onFocus(ComponentEvent ce) {
+    super.onFocus(ce);
+    focusPreview.add();
+  }
+
+  @Override
+  protected void onKeyPress(FieldEvent fe) {
+    super.onKeyPress(fe);
+    int code = fe.event.getKeyCode();
+    if (code == 8 || code == 9) {
+      if (menu != null && menu.isAttached()) {
+        menu.hide();
+      }
+    }
+  }
+  
+  protected void expand() {
+    DatePicker picker = getDatePicker();
 
     Object v = getValue();
     Date d = null;
@@ -199,9 +237,50 @@ public class DateField extends TriggerField<Date> {
     picker.setMaxDate(maxValue);
 
     menu.show(wrap.dom, "tl-bl?");
+    menu.focus();
   }
 
   @Override
+  protected void onTriggerClick(ComponentEvent ce) {
+    super.onTriggerClick(ce);
+    if (disabled || isReadOnly()) {
+      return;
+    }
+
+    expand();
+  }
+
+  /**
+   * Sets the field's max value.
+   * 
+   * @param maxValue the max value
+   */
+  public void setMaxValue(Date maxValue) {
+    if (maxValue != null) {
+      maxValue = new DateWrapper(maxValue).clearTime().asDate();
+    }
+    this.maxValue = maxValue;
+  }
+
+  /**
+   * The maximum date allowed.
+   * 
+   * @param minValue the max value
+   */
+  public void setMinValue(Date minValue) {
+    if (minValue != null) {
+      minValue = new DateWrapper(minValue).clearTime().asDate();
+    }
+    this.minValue = minValue;
+  }
+
+  @Override
+  public void setRawValue(String value) {
+    super.setRawValue(value);
+  }
+
+  @Override
+  @SuppressWarnings("deprecation")
   protected boolean validateValue(String value) {
     if (!super.validateValue(value)) {
       return false;
@@ -233,7 +312,6 @@ public class DateField extends TriggerField<Date> {
     }
 
     if (minValue != null && date.before(minValue)) {
-
       String error = null;
       if (getMessages().getMinText() != null) {
         error = Format.substitute(getMessages().getMinText(), format.format(minValue));

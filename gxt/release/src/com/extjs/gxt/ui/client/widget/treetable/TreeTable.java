@@ -17,7 +17,7 @@ import com.extjs.gxt.ui.client.event.TreeTableEvent;
 import com.extjs.gxt.ui.client.util.DelayedTask;
 import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.util.StyleTemplate;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
+import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.table.BaseTable;
 import com.extjs.gxt.ui.client.widget.table.TableColumn;
 import com.extjs.gxt.ui.client.widget.table.TableColumnModel;
@@ -276,11 +276,11 @@ public class TreeTable extends Tree implements BaseTable {
   }
 
   protected void doAttachChildren() {
-    WidgetHelper.doAttach(header);
+    ComponentHelper.doAttach(header);
   }
 
   protected void doDetachChildren() {
-    WidgetHelper.doDetach(header);
+    ComponentHelper.doDetach(header);
   }
 
   protected String getRenderedValue(TreeTableItem item, int column, Object value) {

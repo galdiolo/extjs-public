@@ -10,8 +10,8 @@ package com.extjs.gxt.samples.explorer.client.pages;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.samples.explorer.client.ExplorerServiceAsync;
-import com.extjs.gxt.samples.resources.client.Stock;
+import com.extjs.gxt.samples.client.ExampleServiceAsync;
+import com.extjs.gxt.samples.resources.client.model.Stock;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.binder.TableBinder;
@@ -28,18 +28,16 @@ import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.table.Table;
 import com.extjs.gxt.ui.client.widget.table.TableColumn;
 import com.extjs.gxt.ui.client.widget.table.TableColumnModel;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-public class PagingTablePage extends LayoutContainer  {
+public class PagingTablePage extends LayoutContainer {
 
   @Override
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
 
-    final ExplorerServiceAsync service = (ExplorerServiceAsync) Registry.get("service");
+    final ExampleServiceAsync service = (ExampleServiceAsync) Registry.get("service");
 
     if (service == null) {
       MessageBox box = new MessageBox();
@@ -95,13 +93,8 @@ public class PagingTablePage extends LayoutContainer  {
     panel.add(table);
     panel.setSize(600, 450);
     panel.setBottomComponent(toolBar);
-    
-    // load after rendering
-    DeferredCommand.addCommand(new Command(){
-      public void execute() {
-        loader.load(0, 50);
-      }
-    });
+
+    loader.load(0, 50);
 
     add(panel);
   }

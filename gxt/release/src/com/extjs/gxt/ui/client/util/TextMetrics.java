@@ -54,7 +54,7 @@ public class TextMetrics {
     El copy = new El(el);
     this.el.setStyleAttribute("fontSize", copy.getStyleAttribute("fontSize"));
     this.el.setStyleAttribute("fontStyle", copy.getStyleAttribute("fontStyle"));
-    this.el.setStyleAttribute("fontWeight", DOM.getStyleAttribute(el, "fontWeight"));
+    this.el.setStyleAttribute("fontFamily", copy.getStyleAttribute("fontFamily"));
   }
 
   /**

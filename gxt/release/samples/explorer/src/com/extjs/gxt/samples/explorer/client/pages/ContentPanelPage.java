@@ -38,10 +38,10 @@ public class ContentPanelPage extends LayoutContainer implements EntryPoint {
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
 
-    Listener listener = new Listener<ComponentEvent>() {
+    Listener<ComponentEvent> listener = new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent ce) {
         ContentPanel cp = (ContentPanel) ce.component;
-        String n = cp.getTitleText();
+        String n = cp.getHeading();
         if (ce.type == Events.Expand) {
           Info.display("Panel Change", "The '{0}' panel was expanded", n);
         } else {

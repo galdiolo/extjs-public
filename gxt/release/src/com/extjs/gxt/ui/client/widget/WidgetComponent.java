@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
-import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -50,12 +49,12 @@ public class WidgetComponent extends BoxComponent {
   @Override
   public void onAttach() {
     super.onAttach();
-    WidgetHelper.doAttach(widget);
+    ComponentHelper.doAttach(widget);
   }
 
   @Override
   protected void onDetach() {
     super.onDetach();
-    WidgetHelper.doDetach(widget);
+    ComponentHelper.doDetach(widget);
   }
 }

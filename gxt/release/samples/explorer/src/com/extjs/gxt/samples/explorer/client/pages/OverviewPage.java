@@ -7,9 +7,9 @@
  */
 package com.extjs.gxt.samples.explorer.client.pages;
 
+import com.extjs.gxt.samples.client.ExamplesModel;
+import com.extjs.gxt.samples.client.examples.model.Entry;
 import com.extjs.gxt.samples.explorer.client.Explorer;
-import com.extjs.gxt.samples.explorer.client.model.Entry;
-import com.extjs.gxt.samples.explorer.client.model.ExplorerModel;
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.Style.Scroll;
@@ -19,18 +19,11 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.DataView;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.Element;
 
 public class OverviewPage extends LayoutContainer {
 
   private DataView dataView;
-
-  public OverviewPage() {
-    // next line is only used to pass layout to containing container
-    // this will have NO effect outside of the explorer demo
-    setData("layout", new FitLayout());
-  }
 
   @Override
   protected void onRender(Element parent, int pos) {
@@ -38,7 +31,7 @@ public class OverviewPage extends LayoutContainer {
 
     setScrollMode(Scroll.AUTO);
 
-    ExplorerModel model = (ExplorerModel) Registry.get("model");
+    ExamplesModel model = (ExamplesModel) Registry.get("model");
     ListStore store = new ListStore();
     store.add(model.getEntries());
 

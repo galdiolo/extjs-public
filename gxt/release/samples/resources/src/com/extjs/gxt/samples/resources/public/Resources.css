@@ -2,6 +2,152 @@
   font-family: arial, helvetica, tahoma, sans-serif;
 }
 
+.x-theme-slate #demo-header {
+  background: #1E4176 url(images/bg/slate-hd-bg.gif) repeat-x scroll 0pt;
+}
+
+/* chooser */
+
+#img-chooser-dlg .details{ 
+    padding: 10px; 
+    text-align: center; 
+} 
+#img-chooser-dlg .details-info{ 
+    border-top: 1px solid #cccccc; 
+    font: 11px Arial, Helvetica, sans-serif; 
+    margin-top: 5px; 
+    padding-top: 5px; 
+    text-align: left; 
+} 
+#img-chooser-dlg .details-info b{ 
+    color: #555555; 
+    display: block; 
+    margin-bottom: 4px; 
+} 
+#img-chooser-dlg .details-info span{ 
+    display: block; 
+    margin-bottom: 5px; 
+    margin-left: 5px; 
+} 
+
+#img-chooser-view{ 
+    background: white; 
+    font: 11px Arial, Helvetica, sans-serif;
+} 
+#img-chooser-view .thumb{ 
+    background: #dddddd; 
+    padding: 3px; 
+} 
+#img-chooser-view .thumb img{ 
+    height: 60px; 
+    width: 80px; 
+} 
+#img-chooser-view .thumb-wrap{ 
+    float: left; 
+    margin: 4px; 
+    margin-right: 0; 
+    padding: 5px;
+} 
+#img-chooser-view .thumb-wrap span{ 
+    display: block; 
+    overflow: hidden; 
+    text-align: center; 
+} 
+#img-chooser-view .x-view-over{
+    border:1px solid #dddddd; 
+    background: #efefef repeat-x left top; 
+    padding: 4px; 
+}
+#img-chooser-view .x-view-selected{ 
+    background: #DFEDFF; 
+    border: 1px solid #6593cf; 
+    padding: 4px; 
+} 
+#img-chooser-view .x-view-selected .thumb{ 
+    background:transparent; 
+}to
+#img-chooser-view .x-view-selected span{ 
+    color:#1A4D8F;
+}
+#img-chooser-view .loading-indicator { 
+    font-size:11px; 
+    background-image:url('../../resources/images/grid/loading.gif'); 
+    background-repeat: no-repeat; 
+    background-position: left; 
+    padding-left:20px; 
+    margin:10px; 
+} 
+
+
+/* list view */
+
+
+#images-view .x-panel-body{
+	background: white;
+	font: 11px Arial, Helvetica, sans-serif;
+}
+#images-view .thumb{
+	background: #dddddd;
+	padding: 3px;
+}
+#images-view .thumb img{
+	height: 60px;
+	width: 80px;
+}
+#images-view .thumb-wrap{
+	float: left;
+	margin: 4px;
+	margin-right: 0;
+	padding: 5px;
+}
+#images-view .thumb-wrap span{
+	display: block;
+	overflow: hidden;
+	text-align: center;
+}
+
+#images-view .x-view-over{
+    border:1px solid #dddddd;
+    background: #efefef url(images/default/grid/row-over.gif) repeat-x left top;
+	padding: 4px;
+}
+
+#images-view .x-view-selected{
+	background: #eff5fb no-repeat right bottom;
+	border:1px solid #99bbe8;
+	padding: 4px;
+}
+#images-view .x-view-selected .thumb{
+	background:transparent;
+}
+
+#images-view .loading-indicator {
+	font-size:11px;
+	background-image:url('resources/images/default/grid/loading.gif');
+	background-repeat: no-repeat;
+	background-position: left;
+	padding-left:20px;
+	margin:10px;
+}
+
+/* totals grid */
+.x-grid3-body .x-grid3-td-cost {
+    background-color:#F1F2F4;
+}
+.x-grid3-summary-row {
+  background:#F1F2F4 none repeat scroll 0% 50%;
+  border-left:1px solid #FFFFFF;
+  border-right:1px solid #FFFFFF;
+  color:#333333;
+}
+.x-grid3-summary-row .x-grid3-cell-inner {
+  font-weight:bold;
+  padding-bottom:4px;
+}
+.x-grid3-cell-inner {
+  font-family:"segoe ui",tahoma,arial,sans-serif;
+}
+
 #demo-header {
   background: #1E4176 url(images/bg/hd-bg.gif) repeat-x scroll 0pt;
   border: 0pt none;
@@ -164,7 +310,7 @@
 }
 
 .icon-table {
-   background-image: url(images/icons/table.png) !important;
+   background: url(images/icons/table.png) 2px 50% no-repeat !important;
 }
 
 .icon-delete {
@@ -212,7 +358,7 @@
 }
 
 .icon-text {
-  background-image: url(images/icons/text.gif) !important;
+  background: url(images/icons/text.gif) no-repeat 0 -1 !important;
 }
 
 .icon-add-disabled {
@@ -236,7 +382,7 @@
 }
 
 .icon-list {
-  background-image: url(images/icons/list.gif) !important;
+  background: url(images/icons/list.gif) no-repeat !important;
 }
 
 .icon-feed {
@@ -256,7 +402,7 @@
 }
 
 .icon-printer {
-  background-image: url(images/icons/printer.png) !important;
+  background: url(images/icons/printer.png) no-repeat !important;
 }
 
 .icon-page-code {
@@ -273,4 +419,8 @@
 
 .icon-tabs {
   background: url(images/icons/tabs.gif) no-repeat;
+}
+
+.x-grid3-row-body p {
+    margin:5px 5px 10px 5px !important;
 }

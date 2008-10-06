@@ -16,7 +16,7 @@ import com.extjs.gxt.ui.client.event.BaseObservable;
 /**
  * A local storage of objects stored by id.
  */
-public class Registry extends BaseObservable {
+public final class Registry extends BaseObservable {
 
   protected static Map<String, Object> map = new HashMap<String, Object>();
 

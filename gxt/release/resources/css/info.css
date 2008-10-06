@@ -85,6 +85,7 @@
 .x-info-bc {
   background: transparent url(../images/default/panel/top-bottom.gif) repeat-x 0 bottom;
   zoom: 1;
+  font-size: 0px;
 }
 
 .x-info-bc .x-info-footer {
@@ -128,15 +129,11 @@
   zoom: 1;
 }
 
-.x-info-bc {
-  font-size: 0px; 
-}
-
 .x-info-bc .x-info-footer {
   padding-bottom: 6px;
 }
 
-.x-info-nofooter .x-info-bc {
+.x-info-nofooter .x-info-bc,.x-panel-nofooter .x-info-bc {
   height: 6px;
   font-size: 0;
   line-height: 0;

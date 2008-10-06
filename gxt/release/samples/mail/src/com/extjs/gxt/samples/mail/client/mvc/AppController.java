@@ -9,7 +9,7 @@ package com.extjs.gxt.samples.mail.client.mvc;
 
 import com.extjs.gxt.samples.mail.client.AppEvents;
 import com.extjs.gxt.samples.mail.client.MailServiceAsync;
-import com.extjs.gxt.samples.resources.client.Folder;
+import com.extjs.gxt.samples.resources.client.model.Folder;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.mvc.AppEvent;
 import com.extjs.gxt.ui.client.mvc.Controller;
@@ -46,7 +46,7 @@ public class AppController extends Controller {
   }
 
   protected void onError(AppEvent ae) {
-    System.out.println("error");
+    System.out.println("error: " + ae.data);
   }
 
   private void onInit(AppEvent event) {

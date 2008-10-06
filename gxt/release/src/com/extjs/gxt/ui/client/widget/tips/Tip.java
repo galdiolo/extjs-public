@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.ui.client.widget.tips;
 
-import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Point;
@@ -131,13 +130,14 @@ public class Tip extends ContentPanel {
     updateContent();
     el().setVisibility(true);
     el().setVisible(true);
-    if (attachSize.width == Style.DEFAULT) {
+    if (width == null) {
       Element body = getElement("body");
-      int bw = fly(body).getTextWidth() + 1;
-      if (title != null) {
+      int bw = fly(body).getTextWidth();
+      if (getHeading() != null) {
         bw = Math.max(bw, head.el().child("span").getTextWidth());
       }
       bw += getFrameWidth() + (closable ? 20 : 0) + fly(body).getPadding("lr");
+      
       setWidth(Util.constrain(bw, minWidth, maxWidth));
     }
     Point p = new Point(x, y);
@@ -156,7 +156,7 @@ public class Tip extends ContentPanel {
 
   @Override
   protected void onRender(Element parent, int pos) {
-    if (isClosable()) {
+    if (closable) {
       setHeaderVisible(true);
       head.addTool(new ToolButton("x-tool-close", new SelectionListener<ComponentEvent>() {
         public void componentSelected(ComponentEvent ce) {

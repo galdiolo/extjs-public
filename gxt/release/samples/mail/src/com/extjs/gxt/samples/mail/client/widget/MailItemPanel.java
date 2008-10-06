@@ -7,7 +7,7 @@
  */
 package com.extjs.gxt.samples.mail.client.widget;
 
-import com.extjs.gxt.samples.resources.client.MailItem;
+import com.extjs.gxt.samples.resources.client.model.MailItem;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.util.Params;

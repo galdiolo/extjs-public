@@ -229,7 +229,7 @@ public class TimeField extends ComboBox<ModelData> {
       BaseModelData r = new BaseModelData();
       r.set("text", getFormat().format(min.asDate()));
       times.add(r);
-      min = min.addMinutes(getIncrement());
+      min = min.addMinutes(increment);
     }
 
     ListStore store = new ListStore();

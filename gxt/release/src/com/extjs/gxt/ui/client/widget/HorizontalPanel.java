@@ -35,7 +35,8 @@ public class HorizontalPanel extends LayoutContainer {
   private TableRowLayout layout;
 
   public HorizontalPanel() {
-    setMonitorResize(true);
+    // do not recreate table structure on resize
+    setMonitorResize(false);
   }
 
   /**

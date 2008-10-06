@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.ui.client.util;
 
-import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.BaseObservable;
@@ -18,22 +17,31 @@ import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.KeyboardListener;
 
 /**
- * Convenient helper class to process a component's key events.
+ * Provides a convenient wrapper for normalized keyboard navigation. Provides an
+ * easy way to implement custom navigation schemes for any UI component.
  */
-public class KeyNav<E extends ComponentEvent> extends BaseObservable implements
-    Listener<E> {
+public class KeyNav<E extends ComponentEvent> extends BaseObservable implements Listener<E> {
 
   private static int keyEvent;
   private Component component;
-  private boolean cancelBubble = true;
+  private boolean cancelBubble;
   private boolean preventDefault = false;
 
   static {
-    if (GXT.isIE) {
+    // mods press up
+    // Safari no yes
+    // IE yes yes
+    // FF yes no
+    // Opera yes no
+
+    // nav press down
+    // IE no yes
+    // FF yes yes
+    // Safari no yes
+    // Opera yes yes
+    if (GXT.isIE || GXT.isSafari) {
       keyEvent = Event.ONKEYDOWN;
-    } else if (GXT.isSafari) {
-      keyEvent = Event.ONKEYUP;
-    } else {
+    } else  {
       keyEvent = Event.ONKEYPRESS;
     }
   }
@@ -86,16 +94,7 @@ public class KeyNav<E extends ComponentEvent> extends BaseObservable implements
     }
     if (target != null) {
       target.addListener(keyEvent, this);
-      if (target.isRendered()) {
-        target.el().addEventsSunk(Event.KEYEVENTS);
-      } else {
-        target.addListener(Events.Render, new Listener<ComponentEvent>() {
-          public void handleEvent(ComponentEvent be) {
-            removeListener(Events.Render, this);
-            target.el().addEventsSunk(Event.KEYEVENTS);
-          }
-        });
-      }
+      target.sinkEvents(keyEvent);
     }
     this.component = target;
   }
@@ -118,18 +117,24 @@ public class KeyNav<E extends ComponentEvent> extends BaseObservable implements
     return component;
   }
 
+  /**
+   * Returns true if the default event action is being cancelled.
+   * 
+   * @return true if preventing default
+   */
   public boolean getPreventDefault() {
     return preventDefault;
   }
 
   public void handleEvent(ComponentEvent ce) {
-    if (cancelBubble) {
-      ce.cancelBubble();
-    }
-    if (preventDefault) {
-      ce.preventDefault();
-    }
     if (ce.type == keyEvent) {
+      if (cancelBubble) {
+        ce.cancelBubble();
+      }
+      if (preventDefault) {
+        ce.preventDefault();
+      }
+
       int code = ce.getKeyCode();
 
       E e = (E) ce;
@@ -279,7 +284,8 @@ public class KeyNav<E extends ComponentEvent> extends BaseObservable implements
   }
 
   /**
-   * True to stop event bubbling (defaults to true).
+   * True to stop event bubbling when the key nav intercepts a key (defaults to
+   * false).
    * 
    * @param cancelBubble the cancel bubble state
    */
@@ -287,6 +293,12 @@ public class KeyNav<E extends ComponentEvent> extends BaseObservable implements
     this.cancelBubble = cancelBubble;
   }
 
+  /**
+   * True to prevent the default action of the key event when the key nav
+   * intercepts a key (defaults to false).
+   * 
+   * @param preventDefault true to prevent the default
+   */
   public void setPreventDefault(boolean preventDefault) {
     this.preventDefault = preventDefault;
   }

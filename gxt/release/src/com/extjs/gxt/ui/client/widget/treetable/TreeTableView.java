@@ -11,7 +11,7 @@ import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.core.El;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
+import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.table.TableColumnModel;
 import com.extjs.gxt.ui.client.widget.table.TableItem;
 import com.google.gwt.user.client.DOM;
@@ -61,11 +61,11 @@ public class TreeTableView {
 
   public int getCellIndex(Element target) {
     String index = target.getAttribute("index");
-    if (index == null) {
+    if (index != null && index.length() == 0) {
       target = DOM.getParent(target);
       while (target != null && target != null) {
         index = target.getAttribute("index");
-        if (index == null) {
+        if (index != null && index.length() == 0) {
           target = DOM.getParent(target);
         } else {
           break;
@@ -121,7 +121,7 @@ public class TreeTableView {
         XDOM.setStyleName(textElem, widgetStyle);
         DOM.appendChild(textElem, widget.getElement());
         if (treeTable.isAttached()) {
-          WidgetHelper.doAttach(widget);
+          ComponentHelper.doAttach(widget);
         }
       } else {
         String s = treeTable.getRenderedValue(item, index, value);

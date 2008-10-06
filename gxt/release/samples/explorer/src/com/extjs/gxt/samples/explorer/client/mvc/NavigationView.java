@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import com.extjs.gxt.samples.client.examples.model.Entry;
 import com.extjs.gxt.samples.explorer.client.AppEvents;
 import com.extjs.gxt.samples.explorer.client.Explorer;
-import com.extjs.gxt.samples.explorer.client.model.Entry;
-import com.extjs.gxt.samples.explorer.client.model.ExplorerModel;
-import com.extjs.gxt.samples.resources.client.Folder;
+import com.extjs.gxt.samples.explorer.client.ExplorerModel;
+import com.extjs.gxt.samples.resources.client.model.Folder;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.binder.DataListBinder;
@@ -132,7 +132,7 @@ public class NavigationView extends View {
 
   private void createTreeContent() {
     Tree tree = new Tree();
-    tree.setItemIconStyle("icon-list");
+    tree.getStyle().setLeafIconStyle("icon-list");
 
     TreeLoader loader = new BaseTreeLoader(new TreeModelReader());
     treeStore = new TreeStore<ModelData>(loader);

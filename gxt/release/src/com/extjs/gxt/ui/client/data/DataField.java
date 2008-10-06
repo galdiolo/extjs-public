@@ -36,7 +36,8 @@ public class DataField {
   public Class type;
 
   /**
-   * Format is used when converting raw data to object instances.
+   * Format is used when converting raw data to object instances. For dates, a
+   * format of "timestamp" can be used to convert timestamps.
    */
   public String format;
 

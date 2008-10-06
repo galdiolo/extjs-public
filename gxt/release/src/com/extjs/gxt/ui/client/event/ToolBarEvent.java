@@ -25,5 +25,4 @@ public class ToolBarEvent extends ContainerEvent<ToolBar, ToolItem> {
     super(container);
   }
 
-
 }

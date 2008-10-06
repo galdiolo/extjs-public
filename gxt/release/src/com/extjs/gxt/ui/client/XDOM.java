@@ -23,18 +23,17 @@ import com.google.gwt.user.client.ui.RootPanel;
  * 
  * @see DOM
  */
-public class XDOM {
+public final class XDOM {
 
   /**
    * Returns true if the browser uses a visible box.
    */
   public static boolean isVisibleBox;
 
-  static El bodyEl = new El(getBody());
-  
+  private static El bodyEl = new El(getBody());
   private static int scrollBarHeight = Style.DEFAULT;
-  private static int AUTO_ID = 0;
-  private static int Z_INDEX = 1000;
+  private static int autoId = 0;
+  private static int zIndexId = 1000;
 
   static {
     GXT.init();
@@ -171,7 +170,7 @@ public class XDOM {
    * @return the z-index
    */
   public static int getTopZIndex() {
-    return ++Z_INDEX;
+    return ++zIndexId;
   }
 
   /**
@@ -180,7 +179,7 @@ public class XDOM {
    * @return the id
    */
   public static String getUniqueId() {
-    return "my-" + AUTO_ID++;
+    return "x-auto-" + autoId++;
   }
 
   /**

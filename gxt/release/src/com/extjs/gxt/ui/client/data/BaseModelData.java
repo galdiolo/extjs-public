@@ -8,12 +8,9 @@
 package com.extjs.gxt.ui.client.data;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,9 +39,8 @@ public class BaseModelData implements ModelData, Serializable {
   }
 
   public <X> X get(String property) {
-    if (allowNestedValues && property.indexOf(".") != -1) {
-      List<String> paths = Arrays.asList(property.split("\\."));
-      return (X) getNestedValue(this, paths);
+    if (allowNestedValues && NestedModelUtil.isNestedProperty(property)) {
+      return (X)NestedModelUtil.getNestedValue(this, property);
     }
     return map == null ? null : (X) map.get(property);
   }
@@ -64,7 +60,7 @@ public class BaseModelData implements ModelData, Serializable {
   public Map<String, Object> getProperties() {
     HashMap<String, Object> newMap = new HashMap<String, Object>();
     if (map != null) {
-      newMap.putAll(map);
+      newMap.putAll(map.getTransientMap());
     }
     return newMap;
   }
@@ -75,6 +71,15 @@ public class BaseModelData implements ModelData, Serializable {
       set.addAll(map.keySet());
     }
     return set;
+  }
+
+  /**
+   * Returns true if nested values are enabled.
+   * 
+   * @return the nested values state
+   */
+  public boolean isAllowNestedValues() {
+    return allowNestedValues;
   }
 
   public <X> X remove(String property) {
@@ -91,11 +96,19 @@ public class BaseModelData implements ModelData, Serializable {
     if (map == null) {
       map = new RpcMap();
     }
-    if (allowNestedValues && property.indexOf(".") != -1) {
-      List<String> paths = Arrays.asList(property.split("\\."));
-      return (X) setNestedValue(this, paths, value);
+    if (allowNestedValues && NestedModelUtil.isNestedProperty(property)) {
+      NestedModelUtil.setNestedValue(this, property, value);
     }
     return (X) map.put(property, value);
+  }
+
+  /**
+   * Sets whether nested properties are enabled (defaults to true).
+   * 
+   * @param allowNestedValues true to enable nested properties
+   */
+  public void setAllowNestedValues(boolean allowNestedValues) {
+    this.allowNestedValues = allowNestedValues;
   }
 
   /**
@@ -114,31 +127,4 @@ public class BaseModelData implements ModelData, Serializable {
     return map == null ? "empty" : map.toString();
   }
 
-  protected <X> X getNestedValue(ModelData model, List<String> paths) {
-    if (paths.size() == 1) {
-      return (X) model.get(paths.get(0));
-    } else {
-      Object obj = model.get(paths.get(0));
-      if (obj != null && obj instanceof ModelData) {
-        ArrayList<String> tmp = new ArrayList<String>(paths);
-        tmp.remove(0);
-        return (X) getNestedValue((ModelData) obj, tmp);
-      }
-    }
-    return null;
-  }
-
-  protected <X> X setNestedValue(ModelData model, List<String> paths, Object value) {
-    if (paths.size() == 1) {
-      return (X) model.set(paths.get(0), value);
-    } else {
-      Object data = model.get(paths.get(0));
-      if (data != null && data instanceof ModelData) {
-        ArrayList<String> tmp = new ArrayList<String>(paths);
-        tmp.remove(0);
-        return (X) setNestedValue((ModelData) data, tmp, value);
-      }
-    }
-    return null;
-  }
 }

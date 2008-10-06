@@ -3,8 +3,16 @@
   padding: 0px;
 }
 
+.x-portlet {
+    margin-bottom:10px;
+}
+
 .ext-el-mask {
   z-index: 100;
+}
+
+.x-hide {
+  display: none;
 }
 
 .ext-ie .x-btn-icon .x-btn-center .x-btn-text {
@@ -15,8 +23,10 @@
   background: url(../images/gxt/icons/wait.gif) no-repeat !important;
 }
 
-.x-panel-btns-right {
-  float: none;
+.x-portal-insert div {
+  height: 4px;
+  font-size: 0px;
+  border: 2px dotted blue;
 }
 
 .x-panel-icon {
@@ -25,15 +35,17 @@
 
 .x-icon-btn {
   width: 16px;
-  height: 16px;
+  height: 18px;
   overflow: hidden;
+  background-repeat: no-repeat;
+  cursor: pointer;
 }
 
 .x-modal {
   position: absolute;
   z-index: 10;
   background-color: black;
-  filter: alpha(opacity =               10);
+  filter: alpha(opacity =                   10);
   opacity: .1;
   left: 0px;
   top: 0px;
@@ -53,6 +65,10 @@
 
 .x-border {
   border: 1px solid #99BBE8;
+}
+
+.x-border-top {
+  border-top: 1px solid #99BBE8;
 }
 
 .x-layout-popup {
@@ -96,8 +112,7 @@
   background-color: #d9e8fb;
 }
 
-.x-layout-collapsed-west .x-layout-collapsed-tools,.x-layout-collapsed-east .x-layout-collapsed-tools
-  {
+.x-layout-collapsed-west .x-layout-collapsed-tools,.x-layout-collapsed-east .x-layout-collapsed-tools {
   position: absolute;
   top: 0;
   left: 0;
@@ -117,7 +132,7 @@
 .x-drag-proxy {
   border: 1px dashed #3b5a82;
   background-color: #EDEDED;
-  filter: alpha(opacity =                   50);
+  filter: alpha(opacity =                       50);
   opacity: .5;
   background-color: #c3daf9;
   z-index: 20000;
@@ -210,17 +225,11 @@
   overflow: hidden;
 }
 
-.x-icon-btn {
-  width: 16px;
-  height: 16px;
-  overflow: hidden;
-}
-
 .x-modal {
   position: absolute;
   z-index: 10;
   background-color: black;
-  filter: alpha(opacity =               10);
+  filter: alpha(opacity =                   10);
   opacity: .1;
   left: 0px;
   top: 0px;
@@ -258,8 +267,7 @@
   background-color: #d9e8fb;
 }
 
-.x-layout-collapsed-west .x-layout-collapsed-tools,.x-layout-collapsed-east .x-layout-collapsed-tools
-  {
+.x-layout-collapsed-west .x-layout-collapsed-tools,.x-layout-collapsed-east .x-layout-collapsed-tools {
   position: absolute;
   top: 0;
   left: 0;
@@ -286,7 +294,7 @@
 }
 
 .x-splitbar-shim {
-  filter: alpha(opacity =                       1);
+  filter: alpha(opacity =                           1);
   opacity: 0;
   position: absolute;
   width: 100%;
@@ -303,7 +311,7 @@
 .x-drag-proxy {
   border: 1px dashed #3b5a82;
   background-color: #EDEDED;
-  filter: alpha(opacity =                   50);
+  filter: alpha(opacity =                       50);
   opacity: .5;
   background-color: #c3daf9;
   z-index: 20000;
@@ -314,5 +322,5 @@
 }
 
 .ext-ie .x-toolbar {
-  padding-bottom: 0px;
+  padding-bottom: 1px;
 }

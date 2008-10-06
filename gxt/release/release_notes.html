@@ -29,8 +29,7 @@
   <body>
     <h1>Ext GWT Library Release Notes</h1>
     <ul>
-      <li><a href="#Release_Notes_1.0.2">Release 1.0.2</a></li>
-      <li><a href="#Release_Notes_1.0.1">Release 1.0.1</a></li>
+      <li><a href="#Release_Notes_Current">Release 1.1 Current</a></li>
       <li><a href="#Release_Notes_1.0">Release 1.0</a></li>
       <li><a href="#Release_Notes_1.0-rc2">Release 1.0 RC2</a></li>
       <li><a href="#Release_Notes_1.0-rc1">Release 1.0 RC1</a></li>
@@ -39,69 +38,109 @@
       <li><a href="#Release_Notes_1.0-beta3">Release 1.0 Beta 3</a></li>
       <li><a href="#Release_Notes_1.0-beta2">Release 1.0 Beta 2</a></li>
     </ul>
-    <h2><a name="Release_Notes_1.0.2">Release Notes Current</a></h2>
+    <h2><a name="Release_Notes_Current">Release Notes 1.1 Current</a></h2>
+
     <h3>General Changes &amp; Enhancements</h3>
     <ul>
     	<li>Slate theme removed from Themes module</li>
     	<li>Added HeaderContextMenu event to Table</li>
-    	<li>Added enter key support to Button</li>
+    	<li>SimpleComboBox</li>
+    	<li>Record behavior has been updated and works slightly different than 1.0</li>
+        <li>Added enter key support to Button</li>
+        <li>Added spacing config to multi field</li>
+        <li>Grays text on disabled menu items</li>
+        <li>BeanModel now delegate equals and hashCode to their wrapped bean</li>
+        <li>Using GWT 1.5.2</li>
+        <li>Added FieldSet checkbox collapse</li>
+        <li>Slate theme was donated to Ext JS and is now bundled</li>
     </ul>
-    
+
     <h3>API Changes</h3>
     <ul>
+    	<li>ComponentPlugin interface and component support</li>
+    	<li>Added setDirty method to Record</li>
     	<li>WindowManager register method no longer public</li>
+    	<li>Added orientation to MultiField</li>
+        <li>Added AUTOX and AUTOY to Sroll enumeration</li>
+        <li>Added getDatePicker() to DateField</li>
+        <li>Container iterator() now parameterized</li>
+        <li>AdapterField no loger overrides isValid</li>
+        <li>Added required functionality to RadioGroup</li>
+        <li>Added setOffset and setTotalCount to PagingLoadResult</li>
+        <li>Added addInputStyleName and removeInputStyleName to Field</li>
+        <li>KeyNav default value for cancelBubble changed to false</li>
+        <li>Added getResizable to Window</li>
+        <li>Added ResizeListener</li>
+        <li>Added locked functionality to AbstractSelectionModel</li>
+        <li>AbsoluteLayout fully implemented</li>
+        <li>AbsoluteData x and y changed to left and top</li>
+        <li>setButtonAlign and getButtonAlign deprecated in ToolBar</li>
+        <li>Field markInvalid marked deprecated.</li>
+        <li>Removed MessageBox maxWidth</li>
+        <li>Add TabItem setAutoLoad</li>
+        <li>Add Field.setHideLabel(boolean hide)</li>
+        <li>Added DataView setContainerTagName</li>
+        <li>BaseModelData no longer overrides equals and hashCode</li>
     </ul>
     
     <h3>Bug Fixes</h3>
     <ul>
-		<li>ComboBox down key null pointer</li>
-		<li>Modal window opening another modal window not masking first window</li>
-		<li>All data in ToolTipConfig not being applied to ToolTip</li>
+    	<li>Model element not set on Record update events</li>
+    	<li>Send to back not working</li>
+    	<li>El center not taking scroll offsets into account</li>
+    	<li>DOM event not passed in Table ColumnClick event</li>
+    	<li>TextMetrics not returning correct width</li>
+    	<li>ComboBox down key support</li>
+    	<li>Modal window opening another modal window not masking first window</li>
+    	<li>All data in ToolTipConfig not being applied to ToolTip</li>
 		<li>Error in polish properties file</li>
 		<li>ToolTip dismissDelay execption when set to 0</li>
 		<li>TableView not listening for TableColumnModel HiddenChange</li>
 		<li>ConcurrentMod exceptio when calling Store rejectChanges</li>
 		<li>ComboBox not scrolling into view</li>
 		<li>NumberField not accepting numeric key pad key presses</li>
-		<li>FlowLayout clearing margins</li>
-		<li>Emptyt text style not clearing on setValue of ComboBox</li>
-		<li>ComboBox tab not selecting value from list in FF</li>
-		<li>ComboBox losing focus after selecting item in list</li>
-		<li>ListStore remove not setting index in event</li>
-		<li>DatePicker today tooltip showing null</li>
-		<li>TooTip exception when target component not rendered</li>
-		<li>TextToolItem not overriding getToolTip</li>
-		<li>Container iterator() now parameterized</li>
-		<li>PagingToolBar exception when load event received before render</li>
-		<li>TimeField clearing time of configured min value</li>
-		<li>AccordionLayout active on top not working</li>
-		<li>Window not closing on escape key</li>
-		<li>Info bottom frame to tall in IE</li>
+        <li>FlowLayout clearing margins</li>
+        <li>Emptyt text style not clearing on setValue of ComboBox</li>
+        <li>ComboBox tab not selecting value from list in FF</li>
+        <li>ComboBox losing focus after selecting item in list</li>
+        <li>ListStore remove not setting index in event</li>
+        <li>DatePicker today tooltip showing null</li>
+        <li>TooTip exception when target component not rendered</li>
+        <li>TextToolItem not overriding getToolTip</li>
+        <li>Container iterator() now parameterized</li>
+        <li>PagingToolBar exception when load event received before render</li>
+        <li>TimeField clearing time of configured min value</li>
+        <li>AccordionLayout active on top not working</li>
+        <li>Window not closing on escape key</li>
+        <li>Info bottom frame to tall in IE</li>
+        <li>MultiField validation issues with validation child fields</li>
+        <li>WindowManager and Window not setting active window</li>
+        <li>Field name not being set if called pre-render</li>
+        <li>DatePicker / DateField not clearing time for min max values</li>
+        <li>Popup not adding itself to ignore list of base event preview</li>
+        <li>DataListSelectionModel null pointer on click not over item</li>
+        <li>Radio fires change event on click, not on blur</li>
+        <li>AbsoluteLayout not setting children position: absolute</li>
+        <li>NumberField key handling issues</li>
+        <li>AccordionLayout bug when layout called with all collapsed panels</li>
+        <li>MultiField not overriding reset</li>
+        <li>Field cancelling bubbling on key events</li>
+        <li>DatePicker startDay error</li>
+        <li>Resizable not firing ResizeStart</li>
+        <li>NumberField validator executing before base rules</li>
+        <li>expand all / collapse bug in Tree</li>
+        <li>TableHeader sort fails pre-rener</li>
+        <li>Window not respecting setShadow(false)</li>
+        <li>Validator not being executed with NumberField</li>
+        <li>Escape key not closing window</li>
+        <li>ComboBox up / down arrows not scrolling into view</li>
+        <li>ContentPanel hideCollapseTool now working</li>
+        <li>HttpProxy always using POST</li>
+        <li>DataList throwing exception when clicking icon</li>
+        <li>ModelPanel not convering entire document when document height &gt; body height</li>
     </ul>
     
-    <h2><a name="Release_Notes_1.0.1">Release Notes 1.0.1 Current</a></h2>
-    <h3>General Changes &amp; Enhancements</h3>
-    <ul>
-    	<li>Slate theme removed from Themes module</li>
-    	<li>Added HeaderContextMenu event to Table</li>
-    </ul>
-    
-    <h3>API Changes</h3>
-    <ul>
-    	<li>WindowManager register method no longer public</li>
-    </ul>
-    
-    <h3>Bug Fixes</h3>
-    <ul>
-    	<li>Model element not set on Record update events</li>
-    	<li>Firefox initial render issue with Resizable south region</li>
-    	<li>Send to back not working</li>
-    	<li>El center not taking scroll offsets into account</li>
-    	<li>DOM event not passed in Grid ColumnClick</li>
-    	<li>TextMetrics not returning correct width</li>
-    </ul>
-    
-    <h2><a name="Release_Notes_1.0">Release Notes 1.0</a></h2>
+    <h2><a name="Release_Notes_1.0">Release Notes 1.0 Final</a></h2>
     
     <h3>API Changes</h3>
     <ul>
@@ -128,7 +167,6 @@
     	<li>Null pointer FormPanel onRemove</li>
     	<li>DataListBinder not using style provider</li>
     	<li>FadeIn not setting opacity to 0 when starting effect</li>
-    	<li>ModelPropertyEditor getStringValue not returning String</li>
     </ul>
     
     

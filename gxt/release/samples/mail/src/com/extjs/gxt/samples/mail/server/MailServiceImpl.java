@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.samples.mail.client.MailService;
-import com.extjs.gxt.samples.resources.client.Folder;
-import com.extjs.gxt.samples.resources.client.MailItem;
 import com.extjs.gxt.samples.resources.client.TestData;
+import com.extjs.gxt.samples.resources.client.model.Folder;
+import com.extjs.gxt.samples.resources.client.model.MailItem;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 public class MailServiceImpl extends RemoteServiceServlet implements MailService {

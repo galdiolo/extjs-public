@@ -7,13 +7,17 @@
  */
 package com.extjs.gxt.ui.client.widget.form;
 
+import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 
 /**
- * Single checkbox field.
+ * Single checkbox field. Unlike other fields, checkbox fires change events when
+ * the radios state is changed, not on blur.
  * 
  * <dl>
  * <dt>Events:</dt>
@@ -87,7 +91,7 @@ public class CheckBox extends Field<Boolean> {
       validate();
     }
   }
-  
+
   @Override
   protected El getInputEl() {
     return input;
@@ -97,6 +101,24 @@ public class CheckBox extends Field<Boolean> {
   protected El getStyleEl() {
     return input;
   }
+  
+  @Override
+  protected void initValue() {
+    if (value != null) {
+      setRawValue(value.toString());
+    }
+  }
+
+  @Override
+  protected void onBlur(ComponentEvent be) {
+    if (!GXT.isOpera && focusStyle != null) {
+      getFocusEl().removeStyleName(focusStyle);
+    }
+    hasFocus = false;
+    fireEvent(Events.Blur, new FieldEvent(this));
+  }
+  
+  
 
   @Override
   protected void onClick(ComponentEvent ce) {
@@ -109,7 +131,7 @@ public class CheckBox extends Field<Boolean> {
     focusValue = v;
     fireChangeEvent(!v, v);
   }
-  
+
   @Override
   protected void onRender(Element target, int index) {
     if (this instanceof Radio) {
@@ -126,7 +148,7 @@ public class CheckBox extends Field<Boolean> {
     wrap.dom.appendChild(input.dom);
     setElement(wrap.dom, target, index);
 
-    if (getBoxLabel() != null) {
+    if (boxLabel != null) {
       Element div = DOM.createDiv();
       div.setClassName("x-form-cb-label");
       div.setInnerHTML(boxLabel);
@@ -139,7 +161,7 @@ public class CheckBox extends Field<Boolean> {
   }
 
   private native void setValueInternal(Boolean b) /*-{
-    this.@com.extjs.gxt.ui.client.widget.form.Field::value = b;
-  }-*/;
+   this.@com.extjs.gxt.ui.client.widget.form.Field::value = b;
+   }-*/;
 
 }

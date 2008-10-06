@@ -37,24 +37,14 @@ public class Record {
   protected RpcMap modified;
 
   /**
-   * Contains a list of the proeprty names for those properties that have been
-   * removed
+   * The wrapped model.
    */
-  protected Set<String> removed;
-
   protected ModelData model;
 
   private boolean dirty;
   private transient Store store;
   private boolean editing;
   private String error;
-
-  /**
-   * Creates a new record.
-   */
-  Record() {
-    this(new BaseModelData());
-  }
 
   /**
    * Creates a new record.
@@ -78,34 +68,54 @@ public class Record {
   /**
    * Begin an edit. While in edit mode, no events are relayed to the containing
    * store.
-   * 
-   * Succesive calls to beginEdit without calling endEdit or cancelEdit are
-   * no-ops
    */
   public void beginEdit() {
     editing = true;
+    modified = new RpcMap();
   }
 
   /**
    * Cancels all changes made in the current edit operation.
    */
   public void cancelEdit() {
-    reject(false);
+    editing = false;
+    modified = null;
   }
 
   /**
-   * End an edit. If any data was modified, the containing store is notified.
+   * Usually called by the {@link ListStore} which owns the Record. Commits all
+   * changes made to the Record since either creation, or the last commit
+   * operation.
+   * 
+   * @param silent true to skip notification of the owning store of the change
    */
-  public void endEdit() {
-    commit(false);
+  public void commit(boolean silent) {
+    dirty = false;
+    modified = null;
+    editing = false;
+    if (store != null && !silent) {
+      store.afterCommit(this);
+    }
   }
 
-  public Object get(String property) {
-    // access to property values through the get method will see any modified
-    // properties
-    if (modified != null && modified.containsKey(property)) {
-      return modified.get(property);
+  /**
+   * End an edit. If any data was modified, the model is updated and the
+   * containing store is notified.
+   */
+  public void endEdit() {
+    editing = false;
+    if (dirty && store != null) {
+      store.afterEdit(this);
     }
+  }
+
+  /**
+   * Returns the value for the property.
+   * 
+   * @param property the property name
+   * @return the value
+   */
+  public Object get(String property) {
     return model.get(property);
   }
 
@@ -113,14 +123,12 @@ public class Record {
    * Gets a map of only the fields that have been modified since this record was
    * created or commited.
    * 
-   * Any removed properties will not be in the returned map
-   * 
    * @return the changed fields
    */
   public Map<String, Object> getChanges() {
     Map<String, Object> changed = new HashMap<String, Object>();
     if (modified != null) {
-      changed.putAll(modified);
+      changed.putAll(modified.getTransientMap());
     }
     return changed;
   }
@@ -145,9 +153,6 @@ public class Record {
       if (modified != null) {
         names.addAll(modified.keySet());
       }
-      if (removed != null) {
-        names.removeAll(removed);
-      }
     }
     return names;
   }
@@ -162,22 +167,44 @@ public class Record {
   }
 
   /**
-   * Removes a field.
+   * Returns true if the record is being updated.
    * 
-   * @param property the name of the field to remove
+   * @return the editing state
    */
-  public Object remove(String property) {
-    Object oldValue = get(property);
-    if (!editing) {
-      if (store != null) store.afterEdit(this);
-      return oldValue;
-    } else {
-      dirty = true;
-      if (removed == null) removed = new HashSet<String>();
-      if (modified != null) modified.remove(property);
-      removed.add(property);
+  public boolean isEditing() {
+    return editing;
+  }
+
+  /**
+   * Returns true if the field passed has been modified since the load or last
+   * commit.
+   * 
+   * @param property the property name
+   * @return true if modified
+   */
+  public boolean isModified(String property) {
+    return modified != null && modified.containsKey(property);
+  }
+
+  /**
+   * Usually called by the {@link ListStore} which owns the Record. Rejects all
+   * changes made to the Record since either creation, or the last commit
+   * operation. Modified fields are reverted to their original values.
+   * 
+   * @param silent true to skip notification of the owning store of the change
+   */
+  public void reject(boolean silent) {
+    if (modified != null) {
+      for (String p : modified.keySet()) {
+        model.set(p, modified.get(p));
+      }
     }
-    return oldValue;
+    dirty = false;
+    modified = null;
+    editing = false;
+    if (store != null && !silent) {
+      store.afterReject(this);
+    }
   }
 
   /**
@@ -186,22 +213,34 @@ public class Record {
    * @param name the name of the field to set
    * @param value the value of the field to set
    */
-  public Object set(String name, Object value) {
-    Object oldValue = get(name);
-    if (!editing) {
-      model.set(name, value);
-      if (store != null) {
-        store.afterEdit(this);
-      }
-    } else {
-      if (oldValue != null && oldValue.equals(value)) {
-        return oldValue;
-      }
-      dirty = true;
-      if (modified == null) modified = new RpcMap();
-      modified.put(name, value);
+  public void set(String name, Object value) {
+    if (model.get(name) != null && model.<Object>get(name).equals(value)) {
+      return;
     }
-    return oldValue;
+    dirty = true;
+    if (modified == null) {
+      modified = new RpcMap();
+    }
+
+    if (!modified.containsKey(name)) {
+      modified.put(name, model.get(name));
+    }
+
+    model.set(name, value);
+
+    if (!editing && store != null) {
+      store.afterEdit(this);
+    }
+  }
+
+  /**
+   * Manually sets the dirty state of the record. Typically, the dirty state is
+   * managed by the record itself.
+   * 
+   * @param dirty the dirty state
+   */
+  public void setDirty(boolean dirty) {
+    this.dirty = dirty;
   }
 
   protected void clearError() {
@@ -214,51 +253,6 @@ public class Record {
 
   protected void join(Store store) {
     this.store = store;
-  }
-
-  /**
-   * Usually called by the {@link ListStore} which owns the Record. Commits all
-   * changes made to the Record since either creation, or the last commit
-   * operation.
-   * 
-   * @param silent true to skip notification of the owning store of the change
-   */
-  void commit(boolean silent) {
-    if (modified != null) {
-      for (String property : modified.keySet()) {
-        model.set(property, modified.get(property));
-      }
-    }
-
-    if (removed != null) {
-      for (String property : removed) {
-        model.remove(property);
-      }
-    }
-
-    editing = false;
-    dirty = false;
-    modified = null;
-    removed = null;
-    if (store != null && !silent) {
-      store.afterCommit(this);
-    }
-  }
-
-  /**
-   * Usually called by the {@link ListStore} which owns the Record. Rejects all
-   * changes made to the Record since either creation, or the last commit
-   * operation. Modified fields are reverted to their original values.
-   * 
-   * @param silent true to skip notification of the owning store of the change
-   */
-  void reject(boolean silent) {
-    modified = null;
-    removed = null;
-    editing = false;
-    if (store != null && !silent) {
-      store.afterReject(this);
-    }
   }
 
 }

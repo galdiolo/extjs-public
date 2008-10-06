@@ -21,10 +21,6 @@ public class BasePagingLoadResult<Data> extends BaseListLoadResult<Data> impleme
   protected int offset = 0;
   protected int totalLength = 0;
 
-  BasePagingLoadResult() {
-
-  }
-
   /**
    * Creates a new paging load result.
    * 
@@ -47,12 +43,24 @@ public class BasePagingLoadResult<Data> extends BaseListLoadResult<Data> impleme
     this.totalLength = totalLength;
   }
 
+  BasePagingLoadResult() {
+
+  }
+
   public int getOffset() {
     return offset;
   }
 
   public int getTotalLength() {
     return totalLength;
+  }
+
+  public void setOffset(int offset) {
+    this.offset = offset;
+  }
+
+  public void setTotalLength(int totalLength) {
+    this.totalLength = totalLength;
   }
 
 }

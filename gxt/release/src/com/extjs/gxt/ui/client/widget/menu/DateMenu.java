@@ -9,7 +9,7 @@ package com.extjs.gxt.ui.client.widget.menu;
 
 import java.util.Date;
 
-import com.extjs.gxt.ui.client.util.WidgetHelper;
+import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.DatePicker;
 
 /**
@@ -53,13 +53,13 @@ public class DateMenu extends Menu {
   @Override
   protected void doAttachChildren() {
     super.doAttachChildren();
-    WidgetHelper.doAttach(picker);
+    ComponentHelper.doAttach(picker);
   }
 
   @Override
   protected void doDetachChildren() {
     super.doDetachChildren();
-    WidgetHelper.doDetach(picker);
+    ComponentHelper.doDetach(picker);
   }
 
 }

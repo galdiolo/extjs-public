@@ -14,14 +14,17 @@ import java.util.List;
 import java.util.Stack;
 
 import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.event.BaseEvent;
+import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.WindowManagerEvent;
 
 /**
  * An object that represents a group of {@link Window} instances and provides
  * z-order management and window activation behavior.
  */
-public class WindowManager {
+public class WindowManager extends BaseObservable {
 
   private static WindowManager instance;
 
@@ -132,6 +135,8 @@ public class WindowManager {
     list.remove(window);
     window.removeListener(Events.Hide, listener);
     accessList.remove(window);
+    activateLast();
+    fireEvent(Events.Unregister, new WindowManagerEvent(this, window));
   }
 
   protected void register(Window window) {
@@ -139,6 +144,7 @@ public class WindowManager {
     accessList.push(window);
     window.setData("_gxtdate", System.currentTimeMillis());
     window.addListener(Events.Hide, listener);
+    fireEvent(Events.Register, new WindowManagerEvent(this, window));
   }
 
   private void activateLast() {
@@ -160,9 +166,9 @@ public class WindowManager {
       }
       for (int i = 0; i < accessList.size(); i++) {
         Window w = (Window) accessList.get(i);
-        w.el().updateZIndex(0);
-        front = w;
+        w.updateZIndex(XDOM.getTopZIndex());
       }
+      activateLast();
     }
   }
 
@@ -174,6 +180,7 @@ public class WindowManager {
       front = window;
       if (window != null) {
         window.setActive(true);
+        window.focus();
       }
     }
   }

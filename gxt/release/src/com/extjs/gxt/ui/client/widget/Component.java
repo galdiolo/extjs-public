@@ -7,7 +7,9 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.extjs.gxt.ui.client.Events;
@@ -253,6 +255,8 @@ public abstract class Component extends Widget implements Observable {
   private boolean setElementRender;
   private LayoutData layoutData;
   private ModelData model;
+  private int events;
+  private List<ComponentPlugin> plugins;
 
   /**
    * Creates a new component..
@@ -289,6 +293,19 @@ public abstract class Component extends Widget implements Observable {
       hasBrowserListener = true;
     }
     observable.addListener(eventType, listener);
+  }
+
+  /**
+   * Adds a component plugin.
+   * 
+   * @param plugin the component plugin
+   */
+  public void addPlugin(ComponentPlugin plugin) {
+    assertPreRender();
+    if (plugins == null) {
+      plugins = new ArrayList<ComponentPlugin>();
+    }
+    plugins.add(plugin);
   }
 
   /**
@@ -383,12 +400,14 @@ public abstract class Component extends Widget implements Observable {
    * @return <code>false</code> if any listeners return <code>false</code>
    */
   public boolean fireEvent(int type) {
+    if (disableEvents) return true;
     ComponentEvent be = createComponentEvent(null);
     be.type = type;
     return fireEvent(type, be);
   }
 
   public boolean fireEvent(int eventType, BaseEvent be) {
+    if (disableEvents) return true;
     return observable.fireEvent(eventType, be);
   }
 
@@ -400,9 +419,10 @@ public abstract class Component extends Widget implements Observable {
    * @return <code>false</code> if any listeners return <code>false</code>
    */
   public boolean fireEvent(int type, ComponentEvent ce) {
-    return observable.fireEvent(type, ce);
+    if (disableEvents) return true;
+    return observable.fireEvent(type, previewEvent(type, ce));
   }
-
+  
   /**
    * Returns the global flyweight instance.
    * 
@@ -471,7 +491,7 @@ public abstract class Component extends Widget implements Observable {
     // a gwt panel. a proxy element is returned and the component will be
     // rendered when it is attached
     if (!rendered) {
-      dummy = DOM.createDiv();
+      if (dummy == null) dummy = DOM.createDiv();
       return dummy;
     }
     return super.getElement();
@@ -500,11 +520,6 @@ public abstract class Component extends Widget implements Observable {
    */
   public String getItemId() {
     return itemId != null ? itemId : getId();
-  }
-
-
-  protected LayoutData getLayoutData() {
-    return layoutData;
   }
 
   /**
@@ -604,7 +619,8 @@ public abstract class Component extends Widget implements Observable {
 
     // hack to receive keyboard events in safari
     if (GXT.isSafari && type == Event.ONCLICK && focusable) {
-      if (getElement().getTagName().equals("input") || event.getTarget().getPropertyString("__eventBits") == null) {
+      if (getElement().getTagName().equals("input")
+          || event.getTarget().getPropertyString("__eventBits") == null) {
         focus();
       }
     }
@@ -619,11 +635,6 @@ public abstract class Component extends Widget implements Observable {
 
     // dom event type
     ce.type = type;
-
-    // listeners can cancel event
-    if (hasListeners && !fireEvent(ce.type, ce)) {
-      return;
-    }
 
     int tt = GXT.isSafari ? Event.ONMOUSEDOWN : Event.ONMOUSEUP;
     if (ce.type == tt && ce.isRightClick()) {
@@ -642,6 +653,11 @@ public abstract class Component extends Widget implements Observable {
     }
 
     onComponentEvent(ce);
+
+    if (hasListeners) {
+      fireEvent(type, ce);
+    }
+
   }
 
   /**
@@ -698,12 +714,12 @@ public abstract class Component extends Widget implements Observable {
   public void removeStyleName(String style) {
     if (rendered) {
       fly(getStyleElement()).removeStyleName(style);
-    } else if (style != null) {
-      String[] s = style.split(" ");
-      style = "";
+    } else if (style != null && cls != null) {
+      String[] s = cls.split(" ");
+      cls = "";
       for (int i = 0; i < s.length; i++) {
         if (!s[i].equals(style)) {
-          style += " " + s[i];
+          cls += " " + s[i];
         }
       }
     }
@@ -750,6 +766,12 @@ public abstract class Component extends Widget implements Observable {
 
     beforeRender();
 
+    if (plugins != null) {
+      for (ComponentPlugin plugin : plugins) {
+        plugin.init(this);
+      }
+    }
+
     rendered = true;
 
     createStyles(baseStyle);
@@ -764,6 +786,10 @@ public abstract class Component extends Widget implements Observable {
 
     if (el == null)
       throw new RuntimeException(getClass().getName() + " must call setElement in onRender");
+
+    if (events != 0) {
+      el().addEventsSunk(events);
+    }
 
     if (id == null) {
       id = el.getId();
@@ -1057,6 +1083,15 @@ public abstract class Component extends Widget implements Observable {
   }
 
   @Override
+  public void sinkEvents(int eventBitsToAdd) {
+    if (!rendered) {
+      this.events = this.events | eventBitsToAdd;
+    } else {
+      super.sinkEvents(eventBitsToAdd);
+    }
+  }
+
+  @Override
   public String toString() {
     return el != null ? el.toString() : super.toString();
   }
@@ -1154,10 +1189,15 @@ public abstract class Component extends Widget implements Observable {
     return focusEl == null ? el : focusEl;
   }
 
+  protected LayoutData getLayoutData() {
+    return layoutData;
+  }
+
   protected void initState() {
     String sid = stateId != null ? stateId : getId();
-    state = StateManager.get().getMap(sid);
-    if (state != null) {
+    Map st = StateManager.get().getMap(sid);
+    if (st != null) {
+      state = st;
       ComponentEvent ce = createComponentEvent(null);
       ce.state = state;
       if (fireEvent(Events.BeforeStateRestore, ce)) {
@@ -1172,10 +1212,14 @@ public abstract class Component extends Widget implements Observable {
     // added to a gwt panel, not rendered
     if (!rendered) {
       // render and swap the proxy element
+      String widgetIndex = dummy.getPropertyString("__widgetID");
       Element parent = DOM.getParent(dummy);
       int index = DOM.getChildIndex(parent, dummy);
-      DOM.removeChild(parent, dummy);
+      parent.removeChild(dummy);
       render(parent, index);
+      if (widgetIndex != null) {
+        getElement().setPropertyInt("__widgetID", Integer.parseInt(widgetIndex));
+      }
     }
     if (disableTextSelection > 0) {
       el.disableTextSelection(disableTextSelection == 1);
@@ -1261,6 +1305,10 @@ public abstract class Component extends Widget implements Observable {
     disableEvents = true;
   }
 
+  protected ComponentEvent previewEvent(int type, ComponentEvent ce) {
+    return ce;
+  }
+
   protected void removeStyleOnOver(Element elem) {
     if (overElements != null) {
       overElements.remove(fly(elem).getId());
@@ -1281,7 +1329,7 @@ public abstract class Component extends Widget implements Observable {
   }
 
   protected void setEl(El el) {
-    this.el = el; 
+    this.el = el;
   }
 
   protected void setElement(Element elem, Element parent, int index) {
@@ -1304,6 +1352,7 @@ public abstract class Component extends Widget implements Observable {
   private native Element createHiddenInput() /*-{
    var input = $doc.createElement('input');
    input.type = 'text';
+   input.className = '_focus';
    input.style.opacity = 0;
    input.style.zIndex = -1;
    input.style.height = '1px';

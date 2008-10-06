@@ -51,6 +51,9 @@ class Ext {
   native static String callString(Element dom, String method, String value) /*-{
     return $wnd.GXT._el.fly(dom)[method](value);
   }-*/;
+  
+  
+ 
 
   private native static void loadExt() /*-{
     var document = $doc;
@@ -106,6 +109,13 @@ class Ext {
             }
           return o;
         },
+        
+        isArray : function(v){
+            return v && typeof v.pop == 'function';
+        },
+        
+        
+        
         id : function(el, prefix){
           prefix = prefix || "ext-gen";
           el = Ext.getDom(el);
@@ -1994,13 +2004,17 @@ class Ext {
           }
           };
        }();
+       
+       
+    
+       
    }-*/;
 
   private native static void loadTemplate() /*-{
-       var Ext = $wnd.GXT.Ext;
-      Ext.Template = function(html){
+    var Ext = $wnd.GXT.Ext;
+    Ext.Template = function(html){
         var a = arguments;
-        if(html instanceof Array){
+        if(Ext.isArray(html)){
             html = html.join("");
         }else if(a.length > 1){
             var buf = [];
@@ -2013,146 +2027,294 @@ class Ext {
             }
             html = buf.join('');
         }
-   
+      
         this.html = html;
         if(this.compiled){
-            this.compile();   
+            this.compile();
         }
-     };
-     Ext.Template.prototype = {
-   
-        applyTemplate : function(values){
-            if(this.compiled){
-                return this.compiled(values);
-            }
-            var useF = this.disableFormats !== true;
-            var fm = Ext.util.Format, tpl = this;
-            var fn = function(m, name, format, args){
-                if(format && useF){
-                    if(format.substr(0, 5) == "this."){
-                        return tpl.call(format.substr(5), values[name], values);
-                    }else{
-                        if(args){
-                            // quoted values are required for strings in compiled templates, 
-                            // but for non compiled we need to strip them
-                            // quoted reversed for jsmin
-                            var re = /^\s*['"](.*)["']\s*$/;
-                            args = args.split(',');
-                            for(var i = 0, len = args.length; i < len; i++){
-                                args[i] = args[i].replace(re, "$1");
-                            }
-                            args = [values[name]].concat(args);
-                        }else{
-                            args = [values[name]];
+    };
+      
+    
+    Ext.Template.prototype = {
+    
+    applyTemplate : function(values){
+        if(this.compiled){
+            return this.compiled(values);
+        }
+        var useF = this.disableFormats !== true;
+        var fm = Ext.util.Format, tpl = this;
+        var fn = function(m, name, format, args){
+            if(format && useF){
+                if(format.substr(0, 5) == "this."){
+                    return tpl.call(format.substr(5), values[name], values);
+                }else{
+                    if(args){
+                        // quoted values are required for strings in compiled templates,
+                        // but for non compiled we need to strip them
+                        // quoted reversed for jsmin
+                        var re = /^\s*['"](.*)["']\s*$/;
+                        args = args.split(',');
+                        for(var i = 0, len = args.length; i < len; i++){
+                            args[i] = args[i].replace(re, "$1");
                         }
-                        return fm[format].apply(fm, args);
-                    }
-                }else{
-                    return values[name] !== undefined ? values[name] : "";
-                }
-            };
-            return this.html.replace(this.re, fn);
-        },
-        
-   
-        set : function(html, compile){
-            this.html = html;
-            this.compiled = null;
-            if(compile){
-                this.compile();
-            }
-            return this;
-        },
-   
-        disableFormats : true,
-        
-   
-        re : /\{([\w-]+)(?:\:([\w\.]*)(?:\((.*?)?\))?)?\}/g,
-        
-   
-        compile : function(){
-            var fm = Ext.util.Format;
-            var useF = this.disableFormats !== true;
-            var sep = Ext.isGecko ? "+" : ",";
-            var fn = function(m, name, format, args){
-                if(format && useF){
-                    args = args ? ',' + args : "";
-                    if(format.substr(0, 5) != "this."){
-                        format = "fm." + format + '(';
+                        args = [values[name]].concat(args);
                     }else{
-                        format = 'this.call("'+ format.substr(5) + '", ';
-                        args = ", values";
+                        args = [values[name]];
                     }
-                }else{
-                    args= ''; format = "(values['" + name + "'] == undefined ? '' : ";
+                    return fm[format].apply(fm, args);
                 }
-                return "'"+ sep + format + "values['" + name + "']" + args + ")"+sep+"'";
-            };
-            var body;
-            // branched to use + in gecko and [].join() in others
-            if(Ext.isGecko){
-                body = "this.compiled = function(values){ return '" +
-                       this.html.replace(/\\/g, '\\\\').replace(/(\r\n|\n)/g, '\\n').replace(/'/g, "\\'").replace(this.re, fn) +
-                        "';};";
             }else{
-                body = ["this.compiled = function(values){ return ['"];
-                body.push(this.html.replace(/\\/g, '\\\\').replace(/(\r\n|\n)/g, '\\n').replace(/'/g, "\\'").replace(this.re, fn));
-                body.push("'].join('');};");
-                body = body.join('');
+                return values[name] !== undefined ? values[name] : "";
             }
-            eval(body);
-            return this;
-        },
-        
-        // private function used to call members
-        call : function(fnName, value, allValues){
-            return this[fnName](value, allValues);
-        },
-        
-   
-        insertFirst: function(el, values, returnElement){
-            return this.doInsert('afterBegin', el, values, returnElement);
-        },
-   
-   
-        insertBefore: function(el, values, returnElement){
-            return this.doInsert('beforeBegin', el, values, returnElement);
-        },
-   
-   
-        insertAfter : function(el, values, returnElement){
-            return this.doInsert('afterEnd', el, values, returnElement);
-        },
-        
-   
-        append : function(el, values, returnElement){
-            return this.doInsert('beforeEnd', el, values, returnElement);
-        },
-   
-        doInsert : function(where, el, values, returnEl){
-            //el = Ext.getDom(el);
-            var newNode = Ext.DomHelper.insertHtml(where, el, this.applyTemplate(values));
-            return returnEl ? Ext.get(newNode, true) : newNode;
-        },
-   
-   
-        overwrite : function(el, values, returnElement){
-            el = Ext.getDom(el);
-            el.innerHTML = this.applyTemplate(values);
-            return returnElement ? Ext.get(el.firstChild, true) : el.firstChild;
+        };
+        return this.html.replace(this.re, fn);
+    },
+       
+    set : function(html, compile){
+        this.html = html;
+        this.compiled = null;
+        if(compile){
+            this.compile();
         }
-     };
-   
-     Ext.Template.prototype.apply = Ext.Template.prototype.applyTemplate;
-   
-     // backwards compat
-     Ext.DomHelper.Template = Ext.Template;
-   
-   
-     Ext.Template.from = function(el, config){
+        return this;
+    },
+       
+    disableFormats : false,
+            
+    re : /\{([\w-]+)(?:\:([\w\.]*)(?:\((.*?)?\))?)?\}/g,
+            
+       
+    compile : function(){
+        var fm = Ext.util.Format;
+        var useF = this.disableFormats !== true;
+        var sep = Ext.isGecko ? "+" : ",";
+        var fn = function(m, name, format, args){
+            if(format && useF){
+                args = args ? ',' + args : "";
+                if(format.substr(0, 5) != "this."){
+                    format = "fm." + format + '(';
+                }else{
+                    format = 'this.call("'+ format.substr(5) + '", ';
+                    args = ", values";
+                }
+            }else{
+                args= ''; format = "(values['" + name + "'] == undefined ? '' : ";
+            }
+            return "'"+ sep + format + "values['" + name + "']" + args + ")"+sep+"'";
+        };
+        var body;
+        // branched to use + in gecko and [].join() in others
+        if(Ext.isGecko){
+            body = "this.compiled = function(values){ return '" +
+                   this.html.replace(/\\/g, '\\\\').replace(/(\r\n|\n)/g, '\\n').replace(/'/g, "\\'").replace(this.re, fn) +
+                    "';};";
+        }else{
+            body = ["this.compiled = function(values){ return ['"];
+            body.push(this.html.replace(/\\/g, '\\\\').replace(/(\r\n|\n)/g, '\\n').replace(/'/g, "\\'").replace(this.re, fn));
+            body.push("'].join('');};");
+            body = body.join('');
+        }
+        eval(body);
+        return this;
+    },
+    
+    call : function(fnName, value, allValues){
+        return this[fnName](value, allValues);
+    },
+     
+    insertFirst: function(el, values, returnElement){
+        return this.doInsert('afterBegin', el, values, returnElement);
+    },
+     
+    insertBefore: function(el, values, returnElement){
+        return this.doInsert('beforeBegin', el, values, returnElement);
+    },
+     
+    insertAfter : function(el, values, returnElement){
+        return this.doInsert('afterEnd', el, values, returnElement);
+    },
+     
+    append : function(el, values, returnElement){
+        return this.doInsert('beforeEnd', el, values, returnElement);
+    },
+    
+    doInsert : function(where, el, values, returnEl){
         el = Ext.getDom(el);
-        return new Ext.Template(el.value || el.innerHTML, config || '');
-     };
+        var newNode = Ext.DomHelper.insertHtml(where, el, this.applyTemplate(values));
+        return returnEl ? Ext.get(newNode, true) : newNode;
+    },
+    
+    overwrite : function(el, values, returnElement){
+        el = Ext.getDom(el);
+        el.innerHTML = this.applyTemplate(values);
+        return returnElement ? Ext.get(el.firstChild, true) : el.firstChild;
+    }
+    };
+     
+    Ext.Template.prototype.apply = Ext.Template.prototype.applyTemplate;
+     
+    // backwards compat
+    Ext.DomHelper.Template = Ext.Template;
+     
+    Ext.Template.from = function(el, config){
+      el = Ext.getDom(el);
+      return new Ext.Template(el.value || el.innerHTML, config || '');
+    };
+    
+Ext.XTemplate = function(){
+    Ext.XTemplate.superclass.constructor.apply(this, arguments);
+    var s = this.html;
+
+    s = ['<tpl>', s, '</tpl>'].join('');
+
+    var re = /<tpl\b[^>]*>((?:(?=([^<]+))\2|<(?!tpl\b[^>]*>))*?)<\/tpl>/;
+
+    var nameRe = /^<tpl\b[^>]*?for="(.*?)"/;
+    var ifRe = /^<tpl\b[^>]*?if="(.*?)"/;
+    var execRe = /^<tpl\b[^>]*?exec="(.*?)"/;
+    var m, id = 0;
+    var tpls = [];
+
+    while(m = s.match(re)){
+       var m2 = m[0].match(nameRe);
+       var m3 = m[0].match(ifRe);
+       var m4 = m[0].match(execRe);
+       var exp = null, fn = null, exec = null;
+       var name = m2 && m2[1] ? m2[1] : '';
+       if(m3){
+           exp = m3 && m3[1] ? m3[1] : null;
+           if(exp){
+               fn = new Function('values', 'parent', 'xindex', 'xcount', 'with(values){ return '+(Ext.util.Format.htmlDecode(exp))+'; }');
+           }
+       }
+       if(m4){
+           exp = m4 && m4[1] ? m4[1] : null;
+           if(exp){
+               exec = new Function('values', 'parent', 'xindex', 'xcount', 'with(values){ '+(Ext.util.Format.htmlDecode(exp))+'; }');
+           }
+       }
+       if(name){
+           switch(name){
+               case '.': name = new Function('values', 'parent', 'with(values){ return values; }'); break;
+               case '..': name = new Function('values', 'parent', 'with(values){ return parent; }'); break;
+               default: name = new Function('values', 'parent', 'with(values){ return '+name+'; }');
+           }
+       }
+       tpls.push({
+            id: id,
+            target: name,
+            exec: exec,
+            test: fn,
+            body: m[1]||''
+        });
+       s = s.replace(m[0], '{xtpl'+ id + '}');
+       ++id;
+    }
+    for(var i = tpls.length-1; i >= 0; --i){
+        this.compileTpl(tpls[i]);
+    }
+    this.master = tpls[tpls.length-1];
+    this.tpls = tpls;
+};
+
+Ext.extend(Ext.XTemplate, Ext.Template, {
+    // private
+    re : /\{([\w-\.\#]+)(?:\:([\w\.]*)(?:\((.*?)?\))?)?(\s?[\+\-\*\\]\s?[\d\.\+\-\*\\\(\)]+)?\}/g,
+    // private
+    codeRe : /\{\[((?:\\\]|.|\n)*?)\]\}/g,
+
+    // private
+    applySubTemplate : function(id, values, parent, xindex, xcount){
+        var t = this.tpls[id];
+        if(t.test && !t.test.call(this, values, parent, xindex, xcount)){
+            return '';
+        }
+        if(t.exec && t.exec.call(this, values, parent, xindex, xcount)){
+            return '';
+        }
+        var vs = t.target ? t.target.call(this, values, parent) : values;
+        parent = t.target ? values : parent;
+        if(t.target && Ext.isArray(vs)){
+            var buf = [];
+            for(var i = 0, len = vs.length; i < len; i++){
+                buf[buf.length] = t.compiled.call(this, vs[i], parent, i+1, len);
+            }
+            return buf.join('');
+        }
+        return t.compiled.call(this, vs, parent, xindex, xcount);
+    },
+
+    compileTpl : function(tpl){
+        var fm = Ext.util.Format;
+        var useF = this.disableFormats !== true;
+        var sep = Ext.isGecko ? "+" : ",";
+        var fn = function(m, name, format, args, math){
+            if(name.substr(0, 4) == 'xtpl'){
+                return "'"+ sep +'this.applySubTemplate('+name.substr(4)+', values, parent, xindex, xcount)'+sep+"'";
+            }
+            var v;
+            if(name === '.'){
+                v = 'values';
+            }else if(name === '#'){
+                v = 'xindex';
+            }else if(name.indexOf('.') != -1){
+                v = name;
+            }else{
+                v = "values['" + name + "']";
+            }
+            if(math){
+                v = '(' + v + math + ')';
+            }
+            if(format && useF){
+                args = args ? ',' + args : "";
+                if(format.substr(0, 5) != "this."){
+                    format = "fm." + format + '(';
+                }else{
+                    format = 'this.call("'+ format.substr(5) + '", ';
+                    args = ", values";
+                }
+            }else{
+                args= ''; format = "("+v+" === undefined ? '' : ";
+            }
+            return "'"+ sep + format + v + args + ")"+sep+"'";
+        };
+        var codeFn = function(m, code){
+            return "'"+ sep +'('+code+')'+sep+"'";
+        };
+        
+        var tempBody = tpl.body;
+        var tempTpl = tpl;
+        var body;
+        // branched to use + in gecko and [].join() in others
+        if(Ext.isGecko){
+            body = "var fm = $wnd.GXT.Ext.util.Format;var temp = function(values, parent, xindex, xcount){ return '" +
+                   tempBody.replace(/(\r\n|\n)/g, '\\n').replace(/'/g, "\\'").replace(this.re, fn).replace(this.codeRe, codeFn) +
+                    "';};";
+        }else{
+            body = ["var fm = $wnd.GXT.Ext.util.Format;var temp = function(values, parent, xindex, xcount){ return ['"];
+            body.push(tempBody.replace(/(\r\n|\n)/g, '\\n').replace(/'/g, "\\'").replace(this.re, fn).replace(this.codeRe, codeFn));
+            body.push("'].join('');};");
+            body = body.join('');
+        }
+        eval(body);
+        tempTpl.compiled = temp;
+        return this;
+    },
+
+    applyTemplate : function(values){
+        return this.master.compiled.call(this, values, {}, 1, 1);
+    },
+
+    compile : function(){return this;}
+
+});
+    
+Ext.XTemplate.prototype.apply = Ext.XTemplate.prototype.applyTemplate; 
+    
+Ext.XTemplate.from = function(el){
+    el = Ext.getDom(el);
+    return new Ext.XTemplate(el.value || el.innerHTML);
+};  
    }-*/;
   
   private static native void loadAdapter() /*-{
@@ -2307,7 +2469,13 @@ class Ext {
   private static native void loadDate() /*-{
   
 var Ext = $wnd.GXT.Ext;  
-  
+
+Date.prototype.dateFormat = function(format) {
+  var s = @com.extjs.gxt.ui.client.util.DateWrapper::format(FLjava/lang/String;)(this.getTime(), format);
+  return s;
+};
+
+
 Date.prototype.getFirstDateOfMonth = function() {
     return new Date(this.getFullYear(), this.getMonth(), 1);
 };

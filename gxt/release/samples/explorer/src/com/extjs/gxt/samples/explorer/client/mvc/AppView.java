@@ -7,12 +7,14 @@
  */
 package com.extjs.gxt.samples.explorer.client.mvc;
 
+import com.extjs.gxt.themes.client.Slate;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
 import com.extjs.gxt.ui.client.mvc.AppEvent;
 import com.extjs.gxt.ui.client.mvc.Controller;
 import com.extjs.gxt.ui.client.mvc.View;
 import com.extjs.gxt.ui.client.util.Margins;
+import com.extjs.gxt.ui.client.util.ThemeManager;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.HtmlContainer;
 import com.extjs.gxt.ui.client.widget.Viewport;
@@ -81,6 +83,8 @@ public class AppView extends View {
 
     northPanel = new HtmlContainer(sb.toString());
     northPanel.setEnableState(false);
+    
+    ThemeManager.register(Slate.SLATE);
     ThemeSelector selector = new ThemeSelector();
     selector.setWidth(125);
     northPanel.add(selector, "#demo-theme");

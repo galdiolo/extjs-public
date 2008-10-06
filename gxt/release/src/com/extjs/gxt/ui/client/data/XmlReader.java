@@ -8,6 +8,7 @@
 package com.extjs.gxt.ui.client.data;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.extjs.gxt.ui.client.core.DomQuery;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -48,7 +49,7 @@ public class XmlReader<C> implements DataReader<C, ListLoadResult<ModelData>> {
 
   public ListLoadResult read(C loadConfig, Object data) {
     Document doc = XMLParser.parse((String) data);
-    
+
     NodeList list = doc.getElementsByTagName(modelType.recordName);
     ArrayList<ModelData> records = new ArrayList<ModelData>();
     for (int i = 0; i < list.getLength(); i++) {
@@ -74,9 +75,12 @@ public class XmlReader<C> implements DataReader<C, ListLoadResult<ModelData>> {
         totalCount = Integer.parseInt(sTot);
       }
     }
-
-    return new BasePagingLoadResult(records, ((PagingLoadConfig) loadConfig).getOffset(),
-        totalCount);
+    ListLoadResult result = newLoadResult(loadConfig, records);
+    if (result instanceof PagingLoadResult) {
+      PagingLoadResult r = (PagingLoadResult) result;
+      r.setTotalLength(totalCount);
+    }
+    return result;
   }
 
   protected native JavaScriptObject getJsObject(Element elem) /*-{
@@ -85,6 +89,16 @@ public class XmlReader<C> implements DataReader<C, ListLoadResult<ModelData>> {
 
   protected String getValue(Element elem, String name) {
     return DomQuery.selectValue(name, getJsObject(elem));
+  }
+
+  /**
+   * Template method that provides load result.
+   * 
+   * @param models the models
+   * @return the load result
+   */
+  protected ListLoadResult newLoadResult(C loadConfig, List<ModelData> models) {
+    return new BaseListLoadResult(models);
   }
 
   /**

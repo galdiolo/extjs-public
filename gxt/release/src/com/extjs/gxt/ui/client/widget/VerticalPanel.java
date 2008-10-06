@@ -14,8 +14,8 @@ import com.extjs.gxt.ui.client.widget.layout.TableLayout;
 import com.google.gwt.user.client.Element;
 
 /**
- * A {@link LayoutContainer} that lays out its children in a single column using a
- * {@link TableLayout}. Each child widget can control its cell's properties
+ * A {@link LayoutContainer} that lays out its children in a single column using
+ * a {@link TableLayout}. Each child widget can control its cell's properties
  * using an associated {@link TableData} instance.
  */
 public class VerticalPanel extends LayoutContainer {
@@ -31,6 +31,7 @@ public class VerticalPanel extends LayoutContainer {
    * Creates a new vertical panel.
    */
   public VerticalPanel() {
+    // do not recreate table structure on resize
     setMonitorResize(false);
   }
 
@@ -43,6 +44,11 @@ public class VerticalPanel extends LayoutContainer {
     return horizontalAlign;
   }
 
+  /**
+   * Returns the panel's spacing.
+   * 
+   * @return the spacing
+   */
   public int getSpacing() {
     return spacing;
   }
@@ -71,7 +77,7 @@ public class VerticalPanel extends LayoutContainer {
   public VerticalAlignment getVerticalAlign() {
     return verticalAlign;
   }
-  
+
   /**
    * Sets the horizontal cell alignment (defaults to LEFT).
    * 

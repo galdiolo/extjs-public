@@ -59,7 +59,7 @@ public class BaseListLoader<C extends ListLoadConfig, D extends ListLoadResult> 
    * 
    * @param proxy the data proxy
    */
-  public BaseListLoader(DataProxy proxy) {
+  public BaseListLoader(DataProxy<C, D> proxy) {
     super(proxy);
   }
 
@@ -69,7 +69,7 @@ public class BaseListLoader<C extends ListLoadConfig, D extends ListLoadResult> 
    * @param proxy the data proxy
    * @param reader the data reader
    */
-  public BaseListLoader(DataProxy proxy, DataReader reader) {
+  public BaseListLoader(DataProxy<C, D> proxy, DataReader<C, D> reader) {
     super(proxy, reader);
   }
 

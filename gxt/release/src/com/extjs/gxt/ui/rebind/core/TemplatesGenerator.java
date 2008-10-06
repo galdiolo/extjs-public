@@ -133,7 +133,6 @@ public class TemplatesGenerator extends Generator {
 
         sw.commit(logger);
       }
-      // System.out.println(composer.getCreatedClassName());
       return composer.getCreatedClassName();
     }
 

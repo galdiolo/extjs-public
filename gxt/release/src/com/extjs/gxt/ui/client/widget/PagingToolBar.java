@@ -7,8 +7,10 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.extjs.gxt.ui.client.GXT;
-import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.data.ListLoader;
 import com.extjs.gxt.ui.client.data.LoadEvent;
 import com.extjs.gxt.ui.client.data.Loader;
@@ -22,12 +24,12 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.messages.MyMessages;
 import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.util.Util;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.toolbar.AdapterToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.FillToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.TextToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
+import com.extjs.gxt.ui.client.widget.toolbar.ToolItem;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.KeyboardListener;
@@ -219,6 +221,7 @@ public class PagingToolBar extends Component implements Listener {
   }
 
   protected PagingLoader loader;
+  protected PagingLoadConfig config;
   protected int start, pageSize, totalLength;
   protected int activePage = -1, pages;
   protected ToolBar toolBar;
@@ -227,8 +230,11 @@ public class PagingToolBar extends Component implements Listener {
   protected Label displayText;
   protected TextBox pageText;
   protected PagingToolBarMessages msgs;
-  
+  protected boolean showToolTips = true;
+
+  private boolean reuseConfig = true;
   private LoadEvent<PagingLoadConfig, PagingLoadResult> renderEvent;
+  private List<ToolItem> items = new ArrayList<ToolItem>();
 
   /**
    * Creates a new paging tool bar with the given page size.
@@ -238,6 +244,18 @@ public class PagingToolBar extends Component implements Listener {
   public PagingToolBar(final int pageSize) {
     this.pageSize = pageSize;
     msgs = new PagingToolBarMessages();
+  }
+
+  /**
+   * Adds an item to the end of the tool bar (pre-render). Can be used to add custom
+   * components to the tool bar. Use {@link AdapterToolItem} to adapt and
+   * component to be used in the tool bar.
+   * 
+   * @param item the item to add
+   */
+  public void add(ToolItem item) {
+    assertPreRender();
+    items.add(item);
   }
 
   /**
@@ -253,6 +271,7 @@ public class PagingToolBar extends Component implements Listener {
     }
     this.loader = loader;
     if (loader != null) {
+      loader.setLimit(pageSize);
       loader.addListener(Loader.BeforeLoad, this);
       loader.addListener(Loader.Load, this);
       loader.addListener(Loader.LoadException, this);
@@ -274,7 +293,7 @@ public class PagingToolBar extends Component implements Listener {
    * Moves to the first page.
    */
   public void first() {
-    loader.load(0, pageSize);
+    doLoadRequest(0, pageSize);
   }
 
   /**
@@ -327,29 +346,46 @@ public class PagingToolBar extends Component implements Listener {
         break;
     }
   }
-  
-  
+
+  /**
+   * Returns true if the previous load config is reused.
+   * 
+   * @return the reuse config state
+   */
+  public boolean isReuseConfig() {
+    return reuseConfig;
+  }
+
+  /**
+   * Returns true if tooltip are enabled.
+   * 
+   * @return the show tooltip state
+   */
+  public boolean isShowToolTips() {
+    return showToolTips;
+  }
+
   /**
    * Moves to the last page.
    */
   public void last() {
     int extra = totalLength % pageSize;
     int lastStart = extra > 0 ? (totalLength - extra) : totalLength - pageSize;
-    loader.load(lastStart, pageSize);
+    doLoadRequest(lastStart, pageSize);
   }
 
   /**
    * Moves to the last page.
    */
   public void next() {
-    loader.load(start + pageSize, pageSize);
+    doLoadRequest(start + pageSize, pageSize);
   }
 
   /**
    * Moves the the previos page.
    */
   public void previous() {
-    loader.load(Math.max(0, start - pageSize), pageSize);
+    doLoadRequest(Math.max(0, start - pageSize), pageSize);
   }
 
   /**
@@ -357,6 +393,16 @@ public class PagingToolBar extends Component implements Listener {
    */
   public void refresh() {
     loader.load(start, pageSize);
+  }
+
+  /**
+   * Removes the item from the toolbar (pre-render).
+   * 
+   * @param item the item to remove
+   */
+  public void remove(ToolItem item) {
+    assertPreRender();
+    items.remove(item);
   }
 
   /**
@@ -396,12 +442,41 @@ public class PagingToolBar extends Component implements Listener {
     this.pageSize = pageSize;
   }
 
+  /**
+   * True to reuse the previous load config (defaults to true).
+   * 
+   * @param reuseConfig true to reuse the load config
+   */
+  public void setReuseConfig(boolean reuseConfig) {
+    this.reuseConfig = reuseConfig;
+  }
+
+  /**
+   * Sets if the button tool tips should be displayed (defaults to true,
+   * pre-render).
+   * 
+   * @param showToolTips true to show tool tips
+   */
+  public void setShowToolTips(boolean showToolTips) {
+    this.showToolTips = showToolTips;
+  }
+
   protected void doAttachChildren() {
-    WidgetHelper.doAttach(toolBar);
+    ComponentHelper.doAttach(toolBar);
   }
 
   protected void doDetachChildren() {
-    WidgetHelper.doDetach(toolBar);
+    ComponentHelper.doDetach(toolBar);
+  }
+
+  protected void doLoadRequest(int offset, int limit) {
+    if (reuseConfig && config != null) {
+      config.setOffset(offset);
+      config.setLimit(pageSize);
+      loader.load(config);
+    } else {
+      loader.load(offset, limit);
+    }
   }
 
   protected void onLoad(LoadEvent<PagingLoadConfig, PagingLoadResult> event) {
@@ -409,8 +484,9 @@ public class PagingToolBar extends Component implements Listener {
       renderEvent = event;
       return;
     }
+    config = event.config;
     PagingLoadResult result = event.data;
-    start = event.data.getOffset();
+    start = result.getOffset();
     totalLength = result.getTotalLength();
     activePage = (int) Math.ceil((double) (start + pageSize) / pageSize);
     pageText.setText(String.valueOf((int) activePage));
@@ -473,7 +549,7 @@ public class PagingToolBar extends Component implements Listener {
 
     first = new TextToolItem();
     first.setIconStyle("x-tbar-page-first");
-    first.setToolTip(msgs.getFirstText());
+    if (showToolTips) first.setToolTip(msgs.getFirstText());
     first.addSelectionListener(new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         first();
@@ -482,7 +558,7 @@ public class PagingToolBar extends Component implements Listener {
 
     prev = new TextToolItem();
     prev.setIconStyle("x-tbar-page-prev");
-    prev.setToolTip(msgs.getPrevText());
+    if (showToolTips) prev.setToolTip(msgs.getPrevText());
     prev.addSelectionListener(new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         previous();
@@ -491,7 +567,7 @@ public class PagingToolBar extends Component implements Listener {
 
     next = new TextToolItem();
     next.setIconStyle("x-tbar-page-next");
-    next.setToolTip(msgs.getNextText());
+    if (showToolTips) next.setToolTip(msgs.getNextText());
     next.addSelectionListener(new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         next();
@@ -500,7 +576,7 @@ public class PagingToolBar extends Component implements Listener {
 
     last = new TextToolItem();
     last.setIconStyle("x-tbar-page-last");
-    last.setToolTip(msgs.getLastText());
+    if (showToolTips) last.setToolTip(msgs.getLastText());
     last.addSelectionListener(new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         last();
@@ -509,7 +585,7 @@ public class PagingToolBar extends Component implements Listener {
 
     refresh = new TextToolItem();
     refresh.setIconStyle("x-tbar-loading");
-    refresh.setToolTip(msgs.getRefreshText());
+    if (showToolTips) refresh.setToolTip(msgs.getRefreshText());
     refresh.addSelectionListener(new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         refresh();
@@ -552,16 +628,17 @@ public class PagingToolBar extends Component implements Listener {
     toolBar.add(last);
     toolBar.add(new SeparatorToolItem());
     toolBar.add(refresh);
+    
+    for (ToolItem item : items) {
+      toolBar.add(item);
+    }
+    
     toolBar.add(new FillToolItem());
     toolBar.add(new AdapterToolItem(displayText));
 
     toolBar.render(target, index);
     setElement(toolBar.getElement());
 
-    if (XDOM.isVisibleBox) {
-      toolBar.setHeight(25);
-    }
-    
     if (renderEvent != null) {
       onLoad(renderEvent);
       renderEvent = null;

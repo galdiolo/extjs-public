@@ -9,8 +9,8 @@ package com.extjs.gxt.samples.mail.client;
 
 import java.util.List;
 
-import com.extjs.gxt.samples.resources.client.Folder;
-import com.extjs.gxt.samples.resources.client.MailItem;
+import com.extjs.gxt.samples.resources.client.model.Folder;
+import com.extjs.gxt.samples.resources.client.model.MailItem;
 import com.google.gwt.user.client.rpc.RemoteService;
 
 public interface MailService extends RemoteService {

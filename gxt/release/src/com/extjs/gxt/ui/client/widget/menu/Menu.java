@@ -102,6 +102,7 @@ public class Menu extends Container<Item> {
 
   protected KeyNav keyNav;
   protected Item parentItem;
+  protected BaseEventPreview eventPreview;
 
   private String subMenuAlign = "tl-tr-?";
   private String defaultAlign = "tl-bl?";
@@ -113,7 +114,6 @@ public class Menu extends Container<Item> {
   private String menuList;
   private String menuListItem;
   private Element ul;
-  private BaseEventPreview eventPreview;
   private boolean constrainViewport = true;
 
   /**
@@ -134,6 +134,8 @@ public class Menu extends Container<Item> {
     };
     eventPreview.setAutoHideCancelEvent(false);
   }
+  
+
 
   /**
    * Adds a item to the menu.
@@ -372,11 +374,11 @@ public class Menu extends Container<Item> {
   public void showAt(int x, int y) {
     MenuEvent me = new MenuEvent(this);
     if (fireEvent(Events.BeforeShow, me)) {
-      if (!rendered) {
-        render(XDOM.getBody());
-      }
       RootPanel.get().add(this);
       el().makePositionable(true);
+      
+      // add menu to ignore list
+      eventPreview.getIgnoreList().add(getElement());
       
       onShow();
       setPagePosition(x, y);
@@ -539,7 +541,12 @@ public class Menu extends Container<Item> {
   private void onMouseOut(ComponentEvent ce) {
     Item item = findItem(ce.getTarget());
     if (item != null) {
-      if (item == activeItem && activeItem.shouldDeactivate(ce)) {
+      if (item == activeItem && !ce.within(getElement()) && activeItem.shouldDeactivate(ce)) {
+        activeItem.deactivate();
+        activeItem = null;
+      }
+    } else {
+      if (activeItem != null && activeItem.shouldDeactivate(ce)) {
         activeItem.deactivate();
         activeItem = null;
       }

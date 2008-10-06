@@ -96,6 +96,12 @@
   -moz-user-focus: normal;
 }
 
+.my-tbl-item td {
+  -moz-user-select: none;
+  -moz-outline: none;
+  -moz-user-focus: normal;
+}
+
 .my-tbl-vlines .my-tbl-data .my-tbl-item-cell-overflow {
   border-right: 1px solid #EDEDED;
 }
@@ -103,12 +109,16 @@
 .my-tbl-data .my-tbl-item-cell-overflow {
   white-space: nowrap;
   overflow: hidden;
+  -moz-outline: none;
+  -moz-user-focus: normal;
 }
 
 .my-tbl-data .my-tbl-item-cell-text {
   padding: 3 4 3 4px;
   font-family: arial, tahoma, helvetica, sans-serif;
   font-size: 11px;
+  -moz-outline: none;
+  -moz-user-focus: normal;
 }
 
 .my-tbl-data .my-tbl-item-cell-widget {

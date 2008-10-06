@@ -18,9 +18,11 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
  * <dt>Events:</dt>
  * 
  * <dd><b>Change</b> : FieldEvent(field)<br>
- * <div>Fires when this field receives input focus.</div>
+ * <div>Fires when the radio's value changes.</div>
  * <ul>
  * <li>field : this</li>
+ * <li>oldValue : the old value</li>
+ * <li>value : the new value</li>
  * </ul>
  * </dd>
  * </dl>
@@ -40,7 +42,13 @@ public class Radio extends CheckBox {
 
   @Override
   public void setValue(Boolean value) {
+    boolean old = getValue();
+    if (value == null) {
+      value = new Boolean(false);
+    }
     super.setValue(value);
+    // fire change event when value is changed, not on blur
+    fireChangeEvent(old, value);
     if (value && group != null) {
       group.onRadioSelected(this);
     }
@@ -54,6 +62,9 @@ public class Radio extends CheckBox {
     }
     if (group != null) {
       group.onRadioClick(this);
+    } else {
+      focusValue = !getValue();
+      setValue(true);
     }
   }
 

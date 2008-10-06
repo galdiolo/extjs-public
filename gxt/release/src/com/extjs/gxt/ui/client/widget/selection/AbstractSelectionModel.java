@@ -41,6 +41,7 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
   protected KeyNav keyNav;
   protected SelectionMode mode;
   protected boolean singleSelect, simpleSelect, multiSelect;
+  protected boolean locked;
 
   /**
    * Creates a new single-select selection model.
@@ -60,23 +61,6 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
     singleSelect = mode == SelectionMode.SINGLE;
     simpleSelect = mode == SelectionMode.SIMPLE;
     multiSelect = mode == SelectionMode.MULTI;
-  }
-
-  public void selectAll() {
-    if (singleSelect) {
-      doSelect(new Items(0), false, false);
-    } else {
-      doSelect(new Items(0, container.getItemCount()), false, false);
-    }
-  }
-
-  /**
-   * Returns the selection mode.
-   * 
-   * @return the selection mode
-   */
-  public SelectionMode getSelectionMode() {
-    return mode;
   }
 
   public void bind(C container) {
@@ -120,6 +104,7 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
   }
 
   public void deselect(T item) {
+    if (locked) return;
     if (singleSelect) {
       if (selectedItem == item) {
         deselectAll();
@@ -147,6 +132,15 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
     return new ArrayList<T>(selected);
   }
 
+  /**
+   * Returns the selection mode.
+   * 
+   * @return the selection mode
+   */
+  public SelectionMode getSelectionMode() {
+    return mode;
+  }
+
   public void handleEvent(ContainerEvent ce) {
     switch (ce.type) {
       case Events.OnClick:
@@ -162,6 +156,15 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
         onRemove(ce);
         break;
     }
+  }
+
+  /**
+   * Returns true if selections are locked.
+   * 
+   * @return the locked state
+   */
+  public boolean isLocked() {
+    return locked;
   }
 
   public boolean isSelected(T item) {
@@ -193,7 +196,7 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
     if (singleSelect) {
       if (items.size() > 0) {
         select(items.get(0));
-      } else if (selected.size() > 0){
+      } else if (selected.size() > 0) {
         deselectAll();
       }
     } else {
@@ -214,6 +217,27 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
   public void select(T item) {
     doSelect(new Items(item), false, false);
   }
+
+  public void selectAll() {
+    if (singleSelect) {
+      doSelect(new Items(0), false, false);
+    } else {
+      doSelect(new Items(0, container.getItemCount()), false, false);
+    }
+  }
+
+  /**
+   * Sets whether selections are locked.
+   * 
+   * @param locked true to lock
+   */
+  public void setLocked(boolean locked) {
+    this.locked = locked;
+  }
+
+  protected native ContainerEvent createContainerEvent(Container container) /*-{
+   return container.@com.extjs.gxt.ui.client.widget.Container::createContainerEvent(Lcom/extjs/gxt/ui/client/widget/Component;)(null);
+   }-*/;
 
   protected void createKeyNav(Container tree) {
     keyNav = new KeyNav<ContainerEvent>() {
@@ -242,6 +266,7 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
   }
 
   protected void deselectAll(boolean supressEvent) {
+    if (locked) return;
     boolean change = selected.size() > 0;
     for (T item : selected) {
       onSelectChange(item, false);
@@ -253,6 +278,7 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
   }
 
   protected void doDeselect(Items<T> items) {
+    if (locked) return;
     boolean change = false;
     for (T item : items.getItems(container)) {
       if (isSelected(item)) {
@@ -270,6 +296,7 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
   }
 
   protected void doMultiSelect(T item, ContainerEvent ce) {
+    if (locked) return;
     int index = container.indexOf(item);
     if (ce.isShiftKey() && selectedItem != null) {
       int last = container.indexOf(selectedItem);
@@ -287,6 +314,7 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
   }
 
   protected void doSelect(final Items<T> items, boolean keepExisting, boolean supressEvent) {
+    if (locked) return;
     createContainerEvent(container);
     List<T> previous = new ArrayList<T>(selected);
     if (!items.isSingle()) {
@@ -305,30 +333,22 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
       }
       T item = items.getItem(container);
       if (item != null) {
-        onSelectChange(item, true);
-        selected.add(item);
-        selectedItem = item;
-        if (!supressEvent && hasSelectionChanged(previous, selected)) {
-          fireSelectionChanged();
+        ContainerEvent ce = createContainerEvent(container);
+        ce.item = item;
+        if (container.fireEvent(Events.BeforeSelect, ce)) {
+          onSelectChange(item, true);
+          selected.add(item);
+          selectedItem = item;
+          if (!supressEvent && hasSelectionChanged(previous, selected)) {
+            fireSelectionChanged();
+          }
         }
       }
     }
-  }
-  
-  private boolean hasSelectionChanged(List<T> prevSel, List<T> newSel) {
-    if (prevSel.size() != newSel.size()) {
-      return true;
-    } else {
-      for (T sel : prevSel) {
-        if (!newSel.contains(sel)) {
-          return true;
-        }
-      }
-    }
-    return false;
   }
 
   protected void doSelectChange(T item, boolean select) {
+    if (locked) return;
     if (container instanceof Selectable) {
       ((Selectable) container).onSelectChange(item, select);
     }
@@ -348,6 +368,13 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
     } else {
       doSelect(new Items(item), false, false);
     }
+  }
+
+  protected void fireSelectionChanged() {
+    ContainerEvent event = createContainerEvent(container);
+    event.selected = getSelectedItems();
+    event.event = DOM.eventGetCurrentEvent();
+    container.fireEvent(Events.SelectionChange, event);
   }
 
   protected void hookPreRender(T item, boolean select) {
@@ -378,6 +405,7 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
   }
 
   protected void onClick(ContainerEvent ce) {
+    if (locked) return;
     T item = (T) ce.item;
     if (item != null) {
       if (simpleSelect) {
@@ -395,6 +423,7 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
   }
 
   protected void onContextMenu(ContainerEvent ce) {
+    if (locked) return;
     T item = container.findItem(ce.getTarget());
     if (item != null) {
       if (selected.size() > 1 && selected.contains(item)) {
@@ -468,15 +497,17 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
     return null;
   }
 
-  protected void fireSelectionChanged() {
-    ContainerEvent event = createContainerEvent(container);
-    event.selected = getSelectedItems();
-    event.event = DOM.eventGetCurrentEvent();
-    container.fireEvent(Events.SelectionChange, event);
+  private boolean hasSelectionChanged(List<T> prevSel, List<T> newSel) {
+    if (prevSel.size() != newSel.size()) {
+      return true;
+    } else {
+      for (T sel : prevSel) {
+        if (!newSel.contains(sel)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
-
-  protected native ContainerEvent createContainerEvent(Container container) /*-{
-   return container.@com.extjs.gxt.ui.client.widget.Container::createContainerEvent(Lcom/extjs/gxt/ui/client/widget/Component;)(null);
-   }-*/;
 
 }

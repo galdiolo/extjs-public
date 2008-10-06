@@ -14,43 +14,52 @@ import com.extjs.gxt.ui.client.Style;
  */
 public class AbsoluteData extends AnchorData {
 
-  private int x = Style.DEFAULT;
-  private int y = Style.DEFAULT;
-
-  /**
-   * Returns the x coordinate value.
-   * 
-   * @return the x value
-   */
-  public int getX() {
-    return x;
+  private int left = Style.DEFAULT;
+  private int top = Style.DEFAULT;
+  
+  public AbsoluteData() {
+    
+  }
+  
+  public AbsoluteData(int left, int top) {
+    this.left = left;
+    this.top = top;
   }
 
   /**
-   * Returns the y coordinate value
+   * Returns the left coordinate value.
    * 
-   * @return the y value
+   * @return the left value
    */
-  public int getY() {
-    return y;
+  public int getLeft() {
+    return left;
   }
 
   /**
-   * Sets the x position (defaults to DEFAULT).
+   * Returns the left value.
    * 
-   * @param x the x coordinate value
+   * @return the left value
    */
-  public void setX(int x) {
-    this.x = x;
+  public int getTop() {
+    return top;
   }
 
   /**
-   * Sets the y posittion (defaults to DEFAULT).
+   * Sets the left property (defaults to DEFAULT).
    * 
-   * @param y coordinate value
+   * @param left the left value
    */
-  public void setY(int y) {
-    this.y = y;
+  public void setLeft(int left) {
+    this.left = left;
+  }
+
+  /**
+   * Sets the top position (defaults to DEFAULT).
+   * 
+   * @param top the top value
+   */
+  public void setTop(int top) {
+    this.top = top;
   }
 
 }

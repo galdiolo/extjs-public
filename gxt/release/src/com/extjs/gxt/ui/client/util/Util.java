@@ -8,9 +8,12 @@
 package com.extjs.gxt.ui.client.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.js.JsArray;
 import com.extjs.gxt.ui.client.js.JsObject;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -19,6 +22,21 @@ import com.google.gwt.core.client.JavaScriptObject;
  * Various utility functions.
  */
 public class Util {
+
+  /**
+   * Truncate a string and add an ellipsis ('...') to the end if it exceeds the
+   * specified length.
+   * 
+   * @param value the string to truncate
+   * @param len the maximum length to allow before truncating
+   * @return the converted text
+   */
+  public static String ellipse(String value, int len) {
+    if (value != null && value.length() > len) {
+      return value.substring(0, len - 3) + "...";
+    }
+    return value;
+  }
 
   /**
    * Constrains the value by a min and max value.
@@ -47,6 +65,25 @@ public class Util {
       components[i] = (Component) list.get(i);
     }
     return components;
+  }
+
+  /**
+   * Creates a new list from the given collection.
+   * 
+   * @param collection the collection
+   * @return the list
+   */
+  public static List createList(Collection collection) {
+    if (collection instanceof List) {
+      return (List) collection;
+    }
+    List list = new ArrayList();
+    Iterator it = collection.iterator();
+    while (it.hasNext()) {
+      list.add(it.next());
+
+    }
+    return list;
   }
 
   /**
@@ -80,12 +117,65 @@ public class Util {
    * @return the javascript object
    */
   public static JavaScriptObject getJsObject(ModelData model) {
+    return getJsObject(model, 0);
+  }
+
+  /**
+   * Returns the model's data as a javascript object.
+   * 
+   * @param model the model
+   * @param maxDepth the maxiumum number of sub models to process
+   * @return the javascript object
+   */
+  public static JavaScriptObject getJsObject(ModelData model, int maxDepth) {
     JsObject jsObj = new JsObject();
     for (String key : model.getPropertyNames()) {
       Object value = model.get(key);
-      jsObj.set(key, value);
+      if (value == null) continue;
+      if (maxDepth > 0) {
+        if (value instanceof Collection) {
+          JsArray jsArray = new JsArray();
+          Collection c = (Collection) value;
+          for (Object obj : c) {
+            if (obj instanceof ModelData) {
+              jsArray.add(getJsObject((ModelData) obj, maxDepth - 1));
+            }
+          }
+          jsObj.set(key, jsArray);
+        } else if (value instanceof Object[]) {
+          JsArray jsArray = new JsArray();
+          Object[] c = (Object[]) value;
+          for (Object obj : c) {
+            if (obj instanceof ModelData) {
+              jsArray.add(getJsObject((ModelData) obj, maxDepth - 1));
+            }
+          }
+          jsObj.set(key, jsArray);
+        } else if (value instanceof ModelData) {
+          jsObj.set(key, getJsObject((ModelData) value, maxDepth - 1));
+        } else {
+          jsObj.set(key, value);
+        }
+      } else {
+        jsObj.set(key, value);
+      }
     }
     return jsObj.getJsObject();
+  }
+
+  /**
+   * Returns the list of models as a javascript array.
+   * 
+   * @param models the list of models
+   * @param maxDepth the maxiumum number of sub models to process
+   * @return the javascript array object
+   */
+  public static JavaScriptObject getJsObjects(List<ModelData> models, int maxDepth) {
+    JsArray js = new JsArray();
+    for (ModelData m : models) {
+      js.add(getJsObject(m, maxDepth));
+    }
+    return js.getJsObject();
   }
 
   /**
@@ -101,7 +191,6 @@ public class Util {
         return i;
       }
     }
-
     return -1;
   }
 

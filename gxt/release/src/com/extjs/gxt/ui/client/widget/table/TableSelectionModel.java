@@ -25,6 +25,7 @@ public class TableSelectionModel extends AbstractSelectionModel<Table, TableItem
 
   @Override
   protected void doSelectChange(TableItem item, boolean select) {
+    if (locked) return;
     container.getView().onSelectItem(item, select);
   }
 

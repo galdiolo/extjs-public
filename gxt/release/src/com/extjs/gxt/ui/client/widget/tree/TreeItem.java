@@ -119,8 +119,8 @@ public class TreeItem extends Component {
   protected boolean childrenRendered;
 
   TreeItem parentItem;
-  
-  String text, iconStyle;
+
+  String text, iconStyle, itemStyleName;
   private boolean leaf = true;
   private List<TreeItem> children;
   private String textStyle;
@@ -168,6 +168,13 @@ public class TreeItem extends Component {
       item.setTree(tree);
 
       tree.registerItem(item);
+      if (children.contains(item)) {
+        children.remove(item);
+        if (childrenRendered) {
+          item.el().removeFromParent();
+        }
+      }
+
       children.add(index, item);
       leaf = false;
 
@@ -258,6 +265,15 @@ public class TreeItem extends Component {
    */
   public List<TreeItem> getItems() {
     return new ArrayList<TreeItem>(children);
+  }
+
+  /**
+   * Returns the item's style name.
+   * 
+   * @return the style name
+   */
+  public String getItemStyleName() {
+    return itemStyleName;
   }
 
   /**
@@ -456,7 +472,7 @@ public class TreeItem extends Component {
           }
         }
       }
-      
+
     }
   }
 
@@ -542,6 +558,16 @@ public class TreeItem extends Component {
   }
 
   /**
+   * Sets a style name that will be added to the tree item's element, not the
+   * container element.
+   * 
+   * @param itemStyleName the style name
+   */
+  public void setItemStyleName(String itemStyleName) {
+    this.itemStyleName = itemStyleName;
+  }
+
+  /**
    * Sets the item's leaf state. The leaf state allows a tree item to specify if
    * it has children before the children have been realized.
    * 
@@ -575,6 +601,10 @@ public class TreeItem extends Component {
     }
   }
 
+  public void setUI(TreeItemUI ui) {
+    this.ui = ui;
+  }
+
   /**
    * Toggles the item's expand state.
    */
@@ -583,7 +613,7 @@ public class TreeItem extends Component {
   }
 
   public String toString() {
-    return "tree: " + (text != null ? text  : "" + " ") + el();
+    return "tree: " + (text != null ? text : "" + " ") + el();
   }
 
   protected boolean fireEvent(int type, TreeEvent te) {
@@ -600,17 +630,20 @@ public class TreeItem extends Component {
    * @return the ui
    */
   protected TreeItemUI getTreeItemUI() {
-    return new TreeItemUI(this);
+    if (ui == null) {
+      ui = new TreeItemUI(this);
+    }
+    return ui;
   }
 
   protected void onRender(Element target, int index) {
     ui = getTreeItemUI();
     ui.render(target, index);
-    
+
     if (textStyle != null) {
       ui.onTextStyleChange(textStyle);
     }
-    
+
     if (expandOnRender) {
       boolean anim = tree.getAnimate();
       tree.setAnimate(false);

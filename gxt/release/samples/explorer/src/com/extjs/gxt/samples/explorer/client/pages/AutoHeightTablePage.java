@@ -10,8 +10,8 @@ package com.extjs.gxt.samples.explorer.client.pages;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.samples.resources.client.Stock;
 import com.extjs.gxt.samples.resources.client.TestData;
+import com.extjs.gxt.samples.resources.client.model.Stock;
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Scroll;

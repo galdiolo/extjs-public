@@ -20,7 +20,6 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.TabPanelEvent;
 import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.util.Params;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.layout.CardLayout;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -319,7 +318,10 @@ public class TabPanel extends Container<TabItem> {
       if (rendered) {
         renderItem(item, index);
         if (isAttached()) {
-          WidgetHelper.doAttach(item.header);
+          ComponentHelper.doAttach(item.header);
+        }
+        if (activeItem == null && autoSelect) {
+          setSelection(item);
         }
         delegateUpdates();
       }
@@ -347,16 +349,16 @@ public class TabPanel extends Container<TabItem> {
 
   public void onComponentEvent(ComponentEvent ce) {
     super.onComponentEvent(ce);
-    ce.cancelBubble();
     if (ce.type == Event.ONCLICK) {
       El target = ce.getTargetEl();
       if (target.is(".x-tab-scroller-left")) {
+        ce.cancelBubble();
         onScrollLeft();
       }
       if (target.is(".x-tab-scroller-right")) {
+        ce.cancelBubble();
         onScrollRight();
       }
-
     }
   }
 
@@ -377,7 +379,7 @@ public class TabPanel extends Container<TabItem> {
           item.header.removeStyleName("x-tab-strip-active");
           strip.dom.removeChild(item.header.getElement());
           if (item.header.isAttached()) {
-            WidgetHelper.doDetach(item.header);
+            ComponentHelper.doDetach(item.header);
           }
         }
         if (item == activeItem) {
@@ -561,6 +563,7 @@ public class TabPanel extends Container<TabItem> {
         scrollToTab(item, getAnimScroll());
       }
       fireEvent(Events.Select, tpe);
+      item.fireEvent(Events.Select, tpe);
     }
   }
 
@@ -619,7 +622,7 @@ public class TabPanel extends Container<TabItem> {
   protected void doAttachChildren() {
     super.doAttachChildren();
     for (TabItem item : getItems()) {
-      WidgetHelper.doAttach(item.header);
+      ComponentHelper.doAttach(item.header);
     }
   }
 
@@ -627,7 +630,7 @@ public class TabPanel extends Container<TabItem> {
   protected void doDetachChildren() {
     super.doDetachChildren();
     for (TabItem item : getItems()) {
-      WidgetHelper.doDetach(item.header);
+      ComponentHelper.doDetach(item.header);
     }
   }
 
@@ -643,7 +646,7 @@ public class TabPanel extends Container<TabItem> {
       TabItem item = activeItem;
       activeItem = null;
       setSelection(item);
-    } else if (activeItem == null && isAutoSelect() && getItemCount() > 0) {
+    } else if (activeItem == null && autoSelect && getItemCount() > 0) {
       setSelection(getItem(0));
     }
     if (resizeTabs) {

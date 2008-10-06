@@ -24,8 +24,8 @@ import com.extjs.gxt.ui.client.store.Store;
 import com.extjs.gxt.ui.client.store.StoreEvent;
 import com.extjs.gxt.ui.client.store.StoreFilter;
 import com.extjs.gxt.ui.client.store.StoreListener;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.Component;
+import com.extjs.gxt.ui.client.widget.ComponentHelper;
 
 /**
  * Base class for all binders.
@@ -305,7 +305,7 @@ public abstract class StoreBinder<S extends Store<M>, C extends Component, M ext
   }
   
   protected void setModel(Component c, ModelData model) {
-    WidgetHelper.setModel(c, model);
+    ComponentHelper.setModel(c, model);
   }
 
   protected void onFilter(StoreEvent se) {

@@ -31,6 +31,19 @@ public abstract class Controller {
     }
     view.handleEvent(event);
   }
+  
+  /**
+   * Forward an event to a view. Ensures the view is initialized before
+   * forwarding the event.
+   * 
+   * @param view the view to forward the event
+   * @param type the event type
+   * @param data the event data
+   */
+  public static void forwardToView(View view, int type, Object data) {
+    AppEvent e = new AppEvent(type, data);
+    forwardToView(view, e);
+  }
 
   protected Controller parent;
   protected List<Controller> children;

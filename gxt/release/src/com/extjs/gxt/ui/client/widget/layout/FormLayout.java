@@ -13,12 +13,18 @@ import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.util.Params;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
+import com.extjs.gxt.ui.client.widget.form.AdapterField;
 import com.extjs.gxt.ui.client.widget.form.Field;
+import com.extjs.gxt.ui.client.widget.form.LabelField;
 import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
 import com.google.gwt.user.client.Element;
 
 /**
- * Layout for form fields and their labels.
+ * Layout for form fields and their labels. FormLayout will only render Field
+ * subclasses. All other components will be ignored.
+ * 
+ * <p/> To add a component that is not a Field subclass, see
+ * {@link AdapterField}. To add plain text see {@link LabelField}.
  */
 public class FormLayout extends AnchorLayout {
 
@@ -30,13 +36,34 @@ public class FormLayout extends AnchorLayout {
   private Template fieldTemplate;
   private String labelStyle;
   private String elementStyle;
+  private int labelPad = 10;
   private int padding = 10;
+  private int labelAdjust;
 
   /**
    * Creates a new form layout.
    */
   public FormLayout() {
 
+  }
+
+  /**
+   * Returns the label pad.
+   * 
+   * @return the label pad
+   */
+  public int getLabelPad() {
+    return labelPad;
+  }
+
+  /**
+   * The default padding in pixels for field labels (defaults to 10). labelPad
+   * only applies if labelWidth is also specified, otherwise it will be ignored.
+   * 
+   * @param labelPad the label pad
+   */
+  public void setLabelPad(int labelPad) {
+    this.labelPad = labelPad;
   }
 
   public FormLayout(LabelAlign labelAlign) {
@@ -108,13 +135,15 @@ public class FormLayout extends AnchorLayout {
     if (hideLabels) {
       labelStyle = "display:none";
       elementStyle = "padding-left:0;";
+      labelAdjust = 0;
     } else {
       labelStyle = "width:" + labelWidth + "px";
       elementStyle = "padding-left:" + (labelWidth + 5) + "px";
-
+      labelAdjust = labelWidth;
       if (labelAlign == LabelAlign.TOP) {
         labelStyle = "width:auto;";
         elementStyle = "padding-left:0;";
+        labelAdjust = 0;
       }
     }
 
@@ -202,7 +231,6 @@ public class FormLayout extends AnchorLayout {
   protected void renderComponent(Component component, int index, El target) {
     if (component instanceof Field) {
       Field f = (Field) component;
-
       renderField((Field) component, index, target);
       FormData formData = (FormData) getLayoutData(f);
       if (formData == null) {
@@ -221,6 +249,16 @@ public class FormLayout extends AnchorLayout {
     }
   }
 
+  @Override
+  protected int adjustWidthAnchor(int width, Component comp) {
+    if (comp instanceof Field) {
+      Field f = (Field) comp;
+      int adj = XDOM.isVisibleBox ? padding : (padding / 2);
+      return width - (f.isHideLabel() ? 0 : (labelAdjust + adj));
+    }
+    return super.adjustWidthAnchor(width, comp);
+  }
+
   private void renderField(Field field, int index, El target) {
     if (field != null && !field.isRendered()) {
       String ls = field.getLabelSeparator() != null ? field.getLabelSeparator() : labelSeperator;
@@ -232,11 +270,11 @@ public class FormLayout extends AnchorLayout {
       p.add(labelStyle);
       p.add(elementStyle);
       p.add(ls);
-      p.add(hideLabels ? "x-hide-label" : "");
+      p.add(field.isHideLabel() ? "x-hide-label" : "");
       p.add("x-form-clear-left");
       p.add(field.getLabelStyle());
 
-      fieldTemplate.append(target.dom, p);
+      fieldTemplate.insert(target.dom, index, p);
 
       Element parent = XDOM.getElementById("x-form-el-" + field.getId());
       field.render(parent);

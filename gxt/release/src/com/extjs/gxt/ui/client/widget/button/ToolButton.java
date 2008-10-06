@@ -58,6 +58,7 @@ public class ToolButton extends IconButton {
   @Override
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
+    removeStyleName("x-icon-btn");
     addStyleName("x-tool");
     // mark element to not start drags
     addStyleName("x-nodrag");

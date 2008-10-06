@@ -14,6 +14,7 @@ com.extjs.gxt.ui.client.widget
 com.extjs.gxt.ui.client.widget.button
 com.extjs.gxt.ui.client.widget.custom
 com.extjs.gxt.ui.client.widget.form
+com.extjs.gxt.ui.client.widget.grid
 com.extjs.gxt.ui.client.widget.layout
 com.extjs.gxt.ui.client.widget.menu
 com.extjs.gxt.ui.client.widget.selection

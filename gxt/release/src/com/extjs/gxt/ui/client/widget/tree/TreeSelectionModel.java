@@ -44,6 +44,7 @@ public class TreeSelectionModel extends AbstractSelectionModel<Tree, TreeItem> {
   
   @Override
   protected void doMultiSelect(TreeItem item, ContainerEvent ce) {
+    if (locked) return;
     if (ce.isShiftKey() && selectedItem != null) {
       // not implemented
     } else {
@@ -151,6 +152,7 @@ public class TreeSelectionModel extends AbstractSelectionModel<Tree, TreeItem> {
 
   @Override
   protected void onSelectChange(TreeItem item, boolean select) {
+    if (locked) return;
     if (!container.isRendered()) {
       hookPreRender(item, select);
       return;

@@ -18,7 +18,7 @@ import com.google.gwt.user.client.Event;
  * @see Window
  * @see Dialog
  */
-public class WindowEvent extends ComponentEvent {
+public class WindowEvent extends BoxComponentEvent {
 
   /**
    * The source window.

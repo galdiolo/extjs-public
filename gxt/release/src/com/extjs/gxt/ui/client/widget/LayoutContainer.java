@@ -8,7 +8,6 @@
 package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.core.El;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.LayoutData;
 import com.google.gwt.user.client.DOM;
@@ -280,7 +279,7 @@ public class LayoutContainer extends ScrollContainer<Component> {
    * @param layoutData the layou data
    */
   public void setLayoutData(Component component, LayoutData layoutData) {
-    WidgetHelper.setLayoutData(component, layoutData);
+    ComponentHelper.setLayoutData(component, layoutData);
   }
 
   /**

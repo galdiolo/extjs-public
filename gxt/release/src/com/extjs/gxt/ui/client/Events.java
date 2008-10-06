@@ -14,6 +14,10 @@ import com.google.gwt.user.client.Event;
  */
 public class Events {
 
+  protected Events() {
+    
+  }
+  
   /**
    * DOM ONCLICK event type.
    */
@@ -65,6 +69,11 @@ public class Events {
   public static final int Activate = 10;
 
   /**
+   * AfterEdit event type (value is 11).
+   */
+  public static final int AfterEdit = 11;
+
+  /**
    * AfterLayout event type (value is 12).
    */
   public static final int AfterLayout = 12;
@@ -75,7 +84,7 @@ public class Events {
   public static final int Add = 20;
 
   /**
-   * ArrowClick event type (value is 22);
+   * ArrowClick event type (value is 22).
    */
   public static final int ArrowClick = 22;
 
@@ -103,6 +112,16 @@ public class Events {
    * BeforeCollapse event type (value is 70).
    */
   public static final int BeforeCollapse = 70;
+  
+  /**
+   * BeforeComplete event type (value is 71).
+   */
+  public static final int BeforeComplete = 71;
+  
+  /**
+   * BeforeEdit event type (value is 72).
+   */
+  public static final int BeforeEdit = 72;
 
   /**
    * BeforeExpand event type (value is 80).
@@ -145,19 +164,29 @@ public class Events {
   public static final int BeforeStateSave = 122;
 
   /**
+   * BeforeSubmit event type (value is 124).
+   */
+  public static final int BeforeSubmit = 124;
+
+  /**
    * BeforeShow event type (value is 130).
    */
   public static final int BeforeShow = 130;
 
   /**
+   * BeforeStartEdit event type (value is 132).
+   */
+  public static final int BeforeStartEdit = 132;
+
+  /**
    * Blur event type (value is 140).
    */
   public static final int Blur = 140;
-  
+
   /**
-   * Blur event type (value is 142).
+   * Blur event type (value is 141).
    */
-  public static final int BodyScroll = 142;
+  public static final int BodyScroll = 141;
 
   /**
    * BrowserEvent event type (value is 142).
@@ -173,6 +202,11 @@ public class Events {
    * CellDoubleClick event type (value is 160).
    */
   public static final int CellDoubleClick = 160;
+
+  /**
+   * CellMouseDown event type (value is 164).
+   */
+  public static final int CellMouseDown = 164;
 
   /**
    * Change event type (value is 170).
@@ -203,6 +237,16 @@ public class Events {
    * ColumnClick event type (value is 220).
    */
   public static final int ColumnClick = 220;
+
+  /**
+   * ColumnResize event type (value is 222).
+   */
+  public static final int ColumnResize = 222;
+
+  /**
+   * Complete event type (value is 224).
+   */
+  public static final int Complete = 224;
 
   /**
    * ContextMenu event type (value is 230).
@@ -243,6 +287,11 @@ public class Events {
    * DragStart event type (value is 320).
    */
   public static final int DragStart = 320;
+  
+  /**
+   * Drop event type (value is 322).
+   */
+  public static final int Drop = 322;
 
   /**
    * EffectCancel event type (value is 330).
@@ -273,21 +322,36 @@ public class Events {
    * Focus event type (value is 380).
    */
   public static final int Focus = 380;
-  
+
   /**
    * HeaderChange event type (value is 382).
    */
   public static final int HeaderChange = 382;
-  
+
+  /**
+   * HeaderClick event type (value is 383).
+   */
+  public static final int HeaderClick = 383;
+
   /**
    * HeaderContextMenu event type (value is 385).
    */
   public static final int HeaderContextMenu = 385;
-  
+
   /**
-   * HiddenChange event type (value is 384).
+   * HeaderDoubleClick event type (value is 384).
    */
-  public static final int HiddenChange = 384;
+  public static final int HeaderDoubleClick = 384;
+
+  /**
+   * HeaderMouseDown event type (value is 386).
+   */
+  public static final int HeaderMouseDown = 386;
+
+  /**
+   * HiddenChange event type (value is 388).
+   */
+  public static final int HiddenChange = 388;
 
   /**
    * Hide event type (value is 390).
@@ -303,12 +367,12 @@ public class Events {
    * KeyPress event type (value is 420).
    */
   public static final int KeyPress = 420;
- 
+
   /**
    * KeyUp event type (value is 425).
    */
   public static final int KeyUp = 425;
-  
+
   /**
    * KeyDown event type (value is 430).
    */
@@ -343,6 +407,16 @@ public class Events {
    * Open event type (value is 540).
    */
   public static final int Open = 540;
+  
+  /**
+   * Refresh event type (value is 548).
+   */
+  public static final int Refresh = 548;
+
+  /**
+   * Register event type (value is 549).
+   */
+  public static final int Register = 549;
 
   /**
    * Remove event type (value is 550).
@@ -380,9 +454,19 @@ public class Events {
   public static final int RowClick = 610;
 
   /**
-   * RowDoubleClick event type (value 620).
+   * RowDoubleClick event type (value is 620).
    */
   public static final int RowDoubleClick = 620;
+
+  /**
+   * RowMouseDown event type (value is 624).
+   */
+  public static final int RowMouseDown = 624;
+
+  /**
+   * RowUpdated event type (value is 626).
+   */
+  public static final int RowUpdated = 626;
 
   /**
    * Scroll event type (value is 630).
@@ -410,6 +494,16 @@ public class Events {
   public static final int SortChange = 670;
 
   /**
+   * SpecialKey event type (value is 672).
+   */
+  public static final int SpecialKey = 672;
+
+  /**
+   * StartEdit event type value is (674).
+   */
+  public static final int StartEdit = 674;
+
+  /**
    * StateChange event type (value is 680).
    */
   public static final int StateChange = 680;
@@ -423,17 +517,22 @@ public class Events {
    * StateRestore event type (value is 684).
    */
   public static final int StateRestore = 684;
+  
+  /**
+   * Submit event type (value is 686).
+   */
+  public static final int Submit = 686;
 
   /**
    * Toggle event type (value is 690).
    */
   public static final int Toggle = 690;
-  
+
   /**
    * TriggerClick event type (value is 692);
    */
   public static final int TriggerClick = 692;
-  
+
   /**
    * TwinTriggerClick event type (value is 694);
    */
@@ -445,10 +544,25 @@ public class Events {
   public static final int Update = 700;
 
   /**
+   * Unregister event type (value is 702).
+   */
+  public static final int Unregister = 702;
+
+  /**
    * Valid event type (value is 710).
    */
   public static final int Valid = 710;
   
+  /**
+   * Validate drop event type (value is 715).
+   */
+  public static final int ValidateDrop = 715;
+
+  /**
+   * ValidateEdit event type (value is 711).
+   */
+  public static final int ValidateEdit = 711;
+
   /**
    * WidthChange event type (value is 712).
    */
@@ -468,6 +582,11 @@ public class Events {
    * BeforeOrphan event type (value is 740).
    */
   public static final int BeforeOrphan = 740;
+
+  /**
+   * BeforeQuery event type (value is 742).
+   */
+  public static final int BeforeQuery = 742;
 
   /**
    * Orphan event type (value is 750).

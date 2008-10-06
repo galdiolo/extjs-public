@@ -117,6 +117,7 @@ public class TextField<D> extends Field<D> {
   private static TextBoxImpl impl = (TextBoxImpl) GWT.create(TextBoxImpl.class);
 
   protected String emptyStyle = "x-form-empty-field";
+  protected Validator validator;
 
   private boolean password;
   private boolean allowBlank = true;
@@ -124,7 +125,6 @@ public class TextField<D> extends Field<D> {
   private boolean selectOnFocus = false;
   private int minLength = 0;
   private int maxLength = Integer.MAX_VALUE;
-  private Validator validator;
   private DelayedTask validationTask;
 
   /**
@@ -142,7 +142,7 @@ public class TextField<D> extends Field<D> {
   public boolean getAllowBlank() {
     return allowBlank;
   }
-
+  
   /**
    * Returns the cursor position.
    * 
@@ -150,6 +150,15 @@ public class TextField<D> extends Field<D> {
    */
   public int getCursorPos() {
     return impl.getCursorPos(getInputEl().dom);
+  }
+
+  /**
+   * Returns the field's max length.
+   * 
+   * @return the max length
+   */
+  public int getMaxLength() {
+    return maxLength;
   }
   
   @Override
@@ -362,6 +371,7 @@ public class TextField<D> extends Field<D> {
       String v = getInputEl().getValue();
       if (emptyText.equals(v)) {
         setRawValue("");
+        select(0, 0);
       }
       getInputEl().removeStyleName(emptyStyle);
     }
@@ -373,6 +383,12 @@ public class TextField<D> extends Field<D> {
   @Override
   protected void onKeyPress(FieldEvent fe) {
     super.onKeyPress(fe);
+
+  }
+
+  @Override
+  protected void onKeyUp(FieldEvent fe) {
+    super.onKeyUp(fe);
     if (validationTask != null) {
       validationTask.delay(validationDelay);
     }
@@ -407,7 +423,12 @@ public class TextField<D> extends Field<D> {
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   protected boolean validateValue(String value) {
+    boolean result = super.validateValue(value);
+    if (!result) {
+      return false;
+    }
     int length = value.length();
     if (value.length() < 1 || value.equals("")) {
       if (allowBlank) {

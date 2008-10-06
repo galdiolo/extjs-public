@@ -37,6 +37,10 @@ public abstract class Item extends Component {
   protected Menu parentMenu;
 
   private String activeStyle = "x-menu-item-active";
+  
+  public Item() {
+    disabledStyle = "x-item-disabled";
+  }
 
   /**
    * Adds a selection listener.
@@ -127,7 +131,7 @@ public abstract class Item extends Component {
   }
 
   protected void handleClick(ComponentEvent be) {
-    if (hideOnClick) {
+    if (hideOnClick && parentMenu != null) {
       parentMenu.hide(true);
     }
   }
@@ -137,6 +141,24 @@ public abstract class Item extends Component {
     me.item = this;
     if (!disabled && fireEvent(Events.Select, me)) {
       handleClick(be);
+    }
+  }
+
+  @Override
+  protected void onDisable() {
+    super.onDisable();
+    El li = el().getParent();
+    if (li != null) {
+      li.addStyleName(disabledStyle);
+    }
+  }
+
+  @Override
+  protected void onEnable() {
+    super.onEnable();
+    El li = el().getParent();
+    if (li != null) {
+      li.removeStyleName(disabledStyle);
     }
   }
 

@@ -32,7 +32,7 @@ public class Style {
    * Scroll enumeration.
    */
   public enum Scroll {
-    AUTO("auto"), ALWAYS("scroll"), NONE("hidden");
+    AUTO("auto"), AUTOX("auto"), AUTOY("auto"), ALWAYS("scroll"), NONE("hidden");
     private final String value;
 
     private Scroll(String value) {

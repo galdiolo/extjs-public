@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -49,15 +50,14 @@ public class BaseTreeLoader<M extends ModelData> extends BaseLoader<M, List<M>> 
     TreeLoader<M> {
 
   protected ModelData lastConfig;
-
-  private boolean loadingChildren;
+  protected List<M> children = new ArrayList<M>();
 
   /**
    * Creates a new tree loader instance.
    * 
    * @param proxy the data reader
    */
-  public BaseTreeLoader(DataProxy proxy) {
+  public BaseTreeLoader(DataProxy<M, List<M>> proxy) {
     super(proxy);
   }
 
@@ -66,7 +66,7 @@ public class BaseTreeLoader<M extends ModelData> extends BaseLoader<M, List<M>> 
    * 
    * @param reader the data reader
    */
-  public BaseTreeLoader(DataReader reader) {
+  public BaseTreeLoader(DataReader<M, List<M>> reader) {
     super(reader);
   }
 
@@ -76,12 +76,12 @@ public class BaseTreeLoader<M extends ModelData> extends BaseLoader<M, List<M>> 
    * @param proxy the data proxy
    * @param reader the data reader
    */
-  public BaseTreeLoader(DataProxy proxy, DataReader reader) {
+  public BaseTreeLoader(DataProxy<M, List<M>> proxy, DataReader<M, List<M>> reader) {
     super(proxy, reader);
   }
 
   public boolean loadChildren(M parent) {
-    loadingChildren = true;
+    children.add(parent);
     return load(parent);
   }
 
@@ -110,16 +110,21 @@ public class BaseTreeLoader<M extends ModelData> extends BaseLoader<M, List<M>> 
   @Override
   protected void onLoadFailure(M loadConfig, Throwable t) {
     TreeLoadEvent evt = new TreeLoadEvent(this, loadConfig, t);
-    if (loadingChildren) evt.parent = loadConfig;
-    loadingChildren = false;
+    if (loadConfig != null && children.contains(loadConfig)) {
+      evt.parent = loadConfig;
+      children.remove(loadConfig);
+    }
+
     fireEvent(LoadException, evt);
   }
 
   @Override
   protected void onLoadSuccess(M loadConfig, List<M> result) {
     TreeLoadEvent evt = new TreeLoadEvent(this, loadConfig, result);
-    if (loadingChildren) evt.parent = loadConfig;
-    loadingChildren = false;
+    if (loadConfig != null && children.contains(loadConfig)) {
+      evt.parent = loadConfig;
+      children.remove(loadConfig);
+    }
     fireEvent(Load, evt);
   }
 

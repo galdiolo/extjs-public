@@ -7,9 +7,8 @@
  */
 package com.extjs.gxt.samples.explorer.client.mvc;
 
+import com.extjs.gxt.samples.client.examples.model.Entry;
 import com.extjs.gxt.samples.explorer.client.AppEvents;
-import com.extjs.gxt.samples.explorer.client.Explorer;
-import com.extjs.gxt.samples.explorer.client.model.Entry;
 import com.extjs.gxt.samples.explorer.client.pages.Page;
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Registry;
@@ -43,26 +42,21 @@ public class ContentView extends View {
 
       public void handleEvent(TabPanelEvent be) {
         TabItem item = be.item;
-        Entry entry = (Entry)item.getModel();
+        Entry entry = (Entry)item.getData("entry");
         Dispatcher.forwardEvent(AppEvents.HidePage, entry);
       }
 
-    });
-    tabPanel.addListener(Events.BeforeSelect, new Listener<TabPanelEvent>() {
-      public void handleEvent(TabPanelEvent be) {
-        Entry entry = (Entry)be.item.getData("entry");
-        if (entry.getPage() != current) {
-          be.doit = false;
-          Explorer.showPage(entry);
-        }
-      }
     });
     ContentPanel center = (ContentPanel) Registry.get("centerPanel");
     center.add(tabPanel);
   }
 
   public void onShowPage(Entry entry) {
-    Page page = entry.getPage();
+    Page page = entry.get("page");
+    if (page == null) {
+      page = new Page(entry);
+      entry.set("page", page);
+    }
     if (page == current) {
       return;
     }
@@ -72,7 +66,7 @@ public class ContentView extends View {
     if (item == null) {
       item = new TabItem();
       item.setData("entry", entry);
-      item.setClosable(page.isClosable());
+      item.setClosable(entry.isClosable());
       item.setId(page.getId());
       item.setText(entry.getName());
       item.setLayout(new FitLayout());

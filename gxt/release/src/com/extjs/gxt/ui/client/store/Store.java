@@ -109,10 +109,11 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
   protected SortInfo sortInfo = new SortInfo();
   protected StoreSorter storeSorter;
   protected String filterProperty;
+  protected String filterBeginsWidth;
 
+  protected boolean filtersEnabled;
   private List<M> snapshot;
   private List<StoreFilter> filters;
-  protected boolean filtersEnabled;
   private ModelComparer<M> comparer = DefaultModelComparer.DFFAULT;
   private ChangeListener changeListener;
   private boolean monitorChanges;
@@ -135,15 +136,14 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
    * @param listener the listener to add
    */
   public void addStoreListener(StoreListener listener) {
-    StoreTypedListener tl = new StoreTypedListener(listener);
-    addListener(Filter, tl);
-    addListener(Sort, tl);
-    addListener(BeforeDataChanged, tl);
-    addListener(DataChanged, tl);
-    addListener(Add, tl);
-    addListener(Remove, tl);
-    addListener(Update, tl);
-    addListener(Clear, tl);
+    addListener(Filter, listener);
+    addListener(Sort, listener);
+    addListener(BeforeDataChanged, listener);
+    addListener(DataChanged, listener);
+    addListener(Add, listener);
+    addListener(Remove, listener);
+    addListener(Update, listener);
+    addListener(Clear, listener);
   }
 
   /**
@@ -161,17 +161,25 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
     filtersEnabled = true;
     filtered = new ArrayList<M>();
     for (M items : snapshot) {
+      if (filterBeginsWidth != null) {
+        Object o = items.get(property);
+        if (o != null) {
+          if (!o.toString().toLowerCase().startsWith(filterBeginsWidth.toLowerCase())) {
+            continue;
+          }
+        }
+      }
       if (!isFiltered(items, property)) {
         filtered.add(items);
       }
     }
     all = filtered;
-
-    fireEvent(Filter, createStoreEvent());
-
+    
     if (storeSorter != null) {
       applySort(false);
     }
+
+    fireEvent(Filter, createStoreEvent());
   }
 
   /**
@@ -191,7 +199,8 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
    * the operation parameter is {@link RecordUpdate#COMMIT}.
    */
   public void commitChanges() {
-    for (Record r : modified) {
+    List<Record> mod = new ArrayList(modified);
+    for (Record r : mod) {
       r.commit(false);
     }
     modified = new ArrayList<Record>();
@@ -214,6 +223,19 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
    */
   public void filter(String property) {
     filterProperty = property;
+    filterBeginsWidth = null;
+    applyFilters(property);
+  }
+  
+  /**
+   * Filters the store using the given property.
+   * 
+   * @param property the property to filter by
+   * @param beginsWith a string the value should begin with
+   */
+  public void filter(String property, String beginsWith) {
+    filterProperty = property;
+    filterBeginsWidth = beginsWith;
     applyFilters(property);
   }
 
@@ -231,6 +253,52 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
       }
     }
     return null;
+  }
+
+  /**
+   * Returns true if the two models are equal as defined by the model comparer.
+   * 
+   * @param model1 the first model
+   * @param model2 the second model
+   * @return true if equals
+   */
+  public boolean equals(M model1, M model2) {
+    return comparer.equals(model1, model2);
+  }
+
+  /**
+   * Returns the first model whose property matches the given value.
+   * 
+   * @param property the property name
+   * @param value the value to match
+   * @return the model or null if no match
+   */
+  public M findModel(String property, Object value) {
+    for (M m : all) {
+      Object val = m.get(property);
+      if (val == value || (val != null && val.equals(value))) {
+        return m;
+      }
+    }
+    return null;
+  }
+  
+  /**
+   * Returns a list of all matching models whose property matches the given value.
+   * 
+   * @param property the property name
+   * @param value the value to match
+   * @return the list of matching models
+   */
+  public List<M> findModels(String property, Object value) {
+    List<M> models = new ArrayList<M>();
+    for (M m : all) {
+      Object val = m.get(property);
+      if (val == value || (val != null && val.equals(value))) {
+        models.add(m);
+      }
+    }
+    return models;
   }
 
   /**
@@ -274,15 +342,15 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
    * Returns the record instance for the item. Records are created on-demand and
    * are cleared after a stores modifications are accepted or rejected.
    * 
-   * @param item the item
+   * @param model the item
    * @return the record for the item
    */
-  public Record getRecord(M item) {
-    Record record = recordMap.get(item);
+  public Record getRecord(M model) {
+    Record record = recordMap.get(model);
     if (record == null) {
-      record = new Record(item);
+      record = new Record(model);
       record.join(this);
-      recordMap.put(item, record);
+      recordMap.put(model, record);
     }
     return record;
   }
@@ -294,6 +362,16 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
    */
   public StoreSorter getStoreSorter() {
     return storeSorter;
+  }
+
+  /**
+   * Returns true if a record exists for the given model.
+   * 
+   * @param model the model
+   * @return true if a record exists
+   */
+  public boolean hasRecord(M model) {
+    return recordMap.containsKey(model);
   }
 
   /**
@@ -468,7 +546,12 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
 
   protected void onModelChange(ChangeEvent ce) {
     if (ce.type == ChangeEventSource.Update) {
-      update((M) ce.source);
+      // ignore updates when in edit mode
+      M m = (M) ce.source;
+      boolean rec = hasRecord(m);
+      if (!rec || (rec && !getRecord(m).isEditing())) {
+        update((M) ce.source);
+      }
     }
   }
 
@@ -483,6 +566,16 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
     }
   }
 
+  protected void swapModelInstance(M oldModel, M newModel) {
+    int index = all.indexOf(oldModel);
+    if (index != -1) {
+      all.remove(oldModel);
+      all.add(index, newModel);
+      unregisterModel(oldModel);
+      registerModel(newModel);
+    }
+  }
+
   /**
    * Subclasses must unregister any model instance being removed from the store.
    * 
@@ -494,16 +587,6 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
     }
     if (recordMap.containsKey(model)) {
       recordMap.remove(model);
-    }
-  }
-
-  protected void swapModelInstance(M oldModel, M newModel) {
-    int index = all.indexOf(oldModel);
-    if (index != -1) {
-      all.remove(oldModel);
-      all.add(index, newModel);
-      unregisterModel(oldModel);
-      registerModel(newModel);
     }
   }
 

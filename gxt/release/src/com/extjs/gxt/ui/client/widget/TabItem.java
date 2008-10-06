@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.widget;
 import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Frame;
@@ -32,6 +33,14 @@ import com.google.gwt.user.client.ui.Frame;
  * 
  * <dd><b>Close</b> : TabPanelEvent(tabPanel, item)<br>
  * <div>Fires after an item is closed by the user clicking the close icon.</div>
+ * <ul>
+ * <li>tabPanel : this</li>
+ * <li>item : the item that was closed.</li>
+ * </ul>
+ * </dd>
+ * 
+ * <dd><b>Select</b> : TabPanelEvent(tabPanel, item)<br>
+ * <div>Fires after the item is selected.</div>
  * <ul>
  * <li>tabPanel : this</li>
  * <li>item : the item that was closed.</li>
@@ -119,6 +128,7 @@ public class TabItem extends LayoutContainer {
 
   private String textStyle;
   private boolean closable;
+  private RequestBuilder autoLoad;
 
   /**
    * Creates a new tab item.
@@ -211,6 +221,15 @@ public class TabItem extends LayoutContainer {
   }
 
   /**
+   * Sends a remote request and sets the item's content using the returned HTML.
+   * 
+   * @param requestBuilder the request builder
+   */
+  public void setAutoLoad(RequestBuilder requestBuilder) {
+    this.autoLoad = requestBuilder;
+  }
+
+  /**
    * Sets whether the tab may be closed (defaults to false).
    * 
    * @param closable the closabable state
@@ -264,6 +283,14 @@ public class TabItem extends LayoutContainer {
   @Override
   public String toString() {
     return el() != null ? el().toString() : super.toString();
+  }
+
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
+    if (autoLoad != null) {
+      el().load(autoLoad);
+    }
   }
 
 }

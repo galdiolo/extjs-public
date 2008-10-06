@@ -15,9 +15,10 @@ import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.ContainerEvent;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -65,9 +66,10 @@ public abstract class Container<T extends Component> extends BoxComponent {
    */
   protected boolean monitorWindowResize = false;
 
+  protected boolean layoutExecuted;
+  
   private Layout layout;
   private List<T> items;
-  private boolean layoutExecuted;
 
   /**
    * Creates a new container.
@@ -253,7 +255,7 @@ public abstract class Container<T extends Component> extends BoxComponent {
 
     for (Component c : items) {
       if (attachChildren && c.isRendered() && !c.isAttached()) {
-        WidgetHelper.doAttach(c);
+        ComponentHelper.doAttach(c);
       }
       if (c instanceof LayoutContainer) {
         ((LayoutContainer) c).layout();
@@ -343,7 +345,13 @@ public abstract class Container<T extends Component> extends BoxComponent {
   protected void onAttach() {
     super.onAttach();
     if (!layoutExecuted) {
-      layout();
+      DeferredCommand.addCommand(new Command() {
+        public void execute() {
+          if (!layoutExecuted) {
+            layout();
+          } 
+        }
+      });
     }
   }
 
@@ -358,7 +366,7 @@ public abstract class Container<T extends Component> extends BoxComponent {
   protected final void orphan(T child) {
     assert (child.getParent() == this);
     if (child.isAttached()) {
-      WidgetHelper.doDetach(child);
+      ComponentHelper.doDetach(child);
       assert !child.isAttached() : "Failure of " + getClass() + " to call super.onDetach()";
     }
     setParent(null, child);
@@ -404,7 +412,7 @@ public abstract class Container<T extends Component> extends BoxComponent {
         component.fireEvent(Events.Orphan, componentEvent);
         fireEvent(Events.Remove, containerEvent);
 
-        if (isRendered() && layoutOnChange) {
+        if (rendered && layoutOnChange) {
           layout();
         }
         return true;

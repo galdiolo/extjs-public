@@ -7,8 +7,8 @@
  */
 package com.extjs.gxt.ui.client.widget.menu;
 
-import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.Component;
+import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -50,12 +50,12 @@ public class AdapterMenuItem extends Item {
 
   protected void doAttachChildren() {
     super.doAttachChildren();
-    WidgetHelper.doAttach(widget);
+    ComponentHelper.doAttach(widget);
   }
 
   protected void doDetachChildren() {
     super.doDetachChildren();
-    WidgetHelper.doDetach(widget);
+    ComponentHelper.doDetach(widget);
   }
 
 }

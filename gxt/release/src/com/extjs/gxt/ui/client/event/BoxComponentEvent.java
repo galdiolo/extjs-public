@@ -8,6 +8,7 @@
 package com.extjs.gxt.ui.client.event;
 
 import com.extjs.gxt.ui.client.widget.BoxComponent;
+import com.google.gwt.user.client.Event;
 
 /**
  * BoxComponent event type.
@@ -55,6 +56,17 @@ public class BoxComponentEvent extends ComponentEvent {
    */
   public BoxComponentEvent(BoxComponent component) {
     super(component);
+    this.boxComponent = component;
+  }
+
+  /**
+   * Creates a new event.
+   * 
+   * @param component the event source
+   * @param event the event
+   */
+  public BoxComponentEvent(BoxComponent component, Event event) {
+    super(component, event);
     this.boxComponent = component;
   }
 

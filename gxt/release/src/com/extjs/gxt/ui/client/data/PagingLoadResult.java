@@ -15,6 +15,13 @@ package com.extjs.gxt.ui.client.data;
 public interface PagingLoadResult<Data> extends ListLoadResult<Data> {
 
   /**
+   * Returns the current offset of the results.
+   * 
+   * @return the offset
+   */
+  public int getOffset();
+
+  /**
    * Returns the total count. This value will not equal the number of records
    * being returned when paging is used.
    * 
@@ -23,9 +30,16 @@ public interface PagingLoadResult<Data> extends ListLoadResult<Data> {
   public int getTotalLength();
 
   /**
-   * Returns the current offset of the results.
+   * Sets the offset.
    * 
-   * @return the offset
+   * @param offset the offset
    */
-  public int getOffset();
+  public void setOffset(int offset);
+
+  /**
+   * Sets the total length.
+   * 
+   * @param totalLength the total length
+   */
+  public void setTotalLength(int totalLength);
 }

@@ -14,9 +14,8 @@ import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.KeyListener;
-import com.extjs.gxt.ui.client.util.KeyNav;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
+import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.button.IconButton;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.google.gwt.user.client.Command;
@@ -77,6 +76,14 @@ import com.google.gwt.user.client.Event;
  * </ul>
  * </dd>
  * 
+ * <dd><b>SpecialKey</b> : FieldEvent(field)<br>
+ * <div>Fires when any key related to navigation (arrows, tab, enter, esc, etc.)
+ * is pressed.</div>
+ * <ul>
+ * <li>field : this</li>
+ * </ul>
+ * </dd>
+ * 
  * </dl>
  * 
  * 
@@ -112,6 +119,7 @@ public abstract class Field<D> extends BoxComponent {
 
   }
 
+  protected String forceInvalidText;
   protected boolean autoValidate;
   protected int validationDelay = 250;
   protected String emptyText;
@@ -134,6 +142,8 @@ public abstract class Field<D> extends BoxComponent {
   private D originalValue;
   private int tabIndex = 0;
   private String labelSeparator;
+  private String inputStyle;
+  private boolean hideLabel;
 
   /**
    * Creates a new field.
@@ -141,6 +151,22 @@ public abstract class Field<D> extends BoxComponent {
   protected Field() {
     adjustSize = false;
     propertyEditor = (PropertyEditor<D>) PropertyEditor.DEFAULT;
+  }
+
+  /**
+   * Adds a CSS style name to the input element of this field.
+   * 
+   * @param style the style name
+   */
+  public void addInputStyleName(String style) {
+    if (rendered) {
+      El inputEl = getInputEl();
+      if (inputEl != null) {
+        inputEl.addStyleName(style);
+      }
+    } else {
+      inputStyle = inputStyle == null ? style : inputStyle + " " + style;
+    }
   }
 
   /**
@@ -162,9 +188,14 @@ public abstract class Field<D> extends BoxComponent {
       return;
     }
     getInputEl().removeStyleName(invalidStyle);
+
+    if (forceInvalidText != null) {
+      forceInvalidText = null;
+    }
+
     if ("side".equals(messageTarget)) {
       if (errorIcon != null && errorIcon.isAttached()) {
-        WidgetHelper.doDetach(errorIcon);
+        ComponentHelper.doDetach(errorIcon);
         errorIcon.setVisible(false);
       }
     } else if ("title".equals(messageTarget)) {
@@ -186,6 +217,19 @@ public abstract class Field<D> extends BoxComponent {
     if (rendered) {
       onFocus(new FieldEvent(this));
     }
+  }
+
+  /**
+   * Forces the field to be invalid using the given error message. When using
+   * this feature, {@link #clearInvalid()} must be called to clear the error.
+   * Also, no other validation logic will execute.
+   * 
+   * @param msg the error text
+   */
+  @SuppressWarnings("deprecation")
+  public void forceInvalid(String msg) {
+    forceInvalidText = msg;
+    markInvalid(msg);
   }
 
   /**
@@ -344,6 +388,15 @@ public abstract class Field<D> extends BoxComponent {
   }
 
   /**
+   * Returns true if the label is hidden.
+   * 
+   * @return the hidel label state
+   */
+  public boolean isHideLabel() {
+    return hideLabel;
+  }
+
+  /**
    * Returns the read only state.
    * 
    * @return <code>true</code> if read only, otherwise <code>false</code>
@@ -369,6 +422,9 @@ public abstract class Field<D> extends BoxComponent {
    * Mark this field as invalid.
    * 
    * @param msg the validation message
+   * @deprecated to directly set an error message see
+   *             {@link #forceInvalid(String)}. Visibility of markInvalid will
+   *             be changed to protected in a future release.
    */
   public void markInvalid(String msg) {
     if (!rendered) {
@@ -386,7 +442,7 @@ public abstract class Field<D> extends BoxComponent {
         errorIcon.el().setVisibility(true);
       }
       if (!errorIcon.isAttached()) {
-        WidgetHelper.doAttach(errorIcon);
+        ComponentHelper.doAttach(errorIcon);
       }
 
       errorIcon.el().setVisible(true);
@@ -399,6 +455,7 @@ public abstract class Field<D> extends BoxComponent {
       setTitle(msg);
     } else if ("tooltip".equals(messageTarget)) {
       setToolTip(msg);
+      getToolTip().addStyleName("x-form-invalid-tip");
     } else {
       Element elem = DOM.getElementById(messageTarget);
       if (elem != null) {
@@ -430,7 +487,38 @@ public abstract class Field<D> extends BoxComponent {
         break;
       case Event.ONKEYDOWN:
         onKeyDown(fe);
+        if (GXT.isIE || GXT.isSafari) {
+          fireKey(fe);
+        }
         break;
+      case Event.ONKEYPRESS:
+        onKeyPress(fe);
+        if (!GXT.isIE && !GXT.isSafari) {
+          fireKey(fe);
+        }
+        break;
+    }
+  }
+
+  /**
+   * Removes a CSS style name from the input element of this field.
+   * 
+   * @param style the style name
+   */
+  public void removeInputStyleName(String style) {
+    if (rendered) {
+      El inputEl = getInputEl();
+      if (inputEl != null) {
+        inputEl.removeStyleName(style);
+      }
+    } else if (style != null) {
+      String[] s = inputStyle.split(" ");
+      inputStyle = "";
+      for (int i = 0; i < s.length; i++) {
+        if (!s[i].equals(style)) {
+          inputStyle += " " + s[i];
+        }
+      }
     }
   }
 
@@ -480,14 +568,20 @@ public abstract class Field<D> extends BoxComponent {
   public void setFieldLabel(String fieldLabel) {
     this.fieldLabel = fieldLabel;
     if (rendered) {
-      El elem = el().findParent(".x-form-item", 5);
-      if (elem != null ) {
-        elem = elem.firstChild();
-        if (elem != null) {
-          elem.setInnerHtml(fieldLabel + labelSeparator);
-        }
+      El elem = findLabelElement();
+      if (elem != null) {
+        elem.setInnerHtml(fieldLabel + labelSeparator);
       }
     }
+  }
+
+  /**
+   * True to completely hide the label element (defaults to false, pre-render).
+   * 
+   * @param hideLabel true to hide the label
+   */
+  public void setHideLabel(boolean hideLabel) {
+    this.hideLabel = hideLabel;
   }
 
   /**
@@ -685,7 +779,7 @@ public abstract class Field<D> extends BoxComponent {
     super.doDetachChildren();
     if (errorIcon != null && errorIcon.isAttached()) {
       errorIcon.setVisible(false);
-      WidgetHelper.doDetach(errorIcon);
+      ComponentHelper.doDetach(errorIcon);
     }
   }
 
@@ -726,7 +820,8 @@ public abstract class Field<D> extends BoxComponent {
       validate();
     }
 
-    if ((focusValue == null && getValue() != null) || (focusValue != null && !focusValue.equals(getValue()))) {
+    if ((focusValue == null && getValue() != null)
+        || (focusValue != null && !focusValue.equals(getValue()))) {
       fireChangeEvent(focusValue, getValue());
     }
     fireEvent(Events.Blur, new FieldEvent(this));
@@ -759,8 +854,17 @@ public abstract class Field<D> extends BoxComponent {
     }
   }
 
+  @Override
+  protected void onHide() {
+    super.onHide();
+    El lbl = findLabelElement();
+    if (lbl != null) {
+      lbl.setVisible(false);
+    }
+  }
+  
   protected void onKeyDown(FieldEvent fe) {
-
+     fireEvent(Events.KeyDown, new FieldEvent(this, fe.event));
   }
 
   protected void onKeyPress(FieldEvent fe) {
@@ -780,8 +884,8 @@ public abstract class Field<D> extends BoxComponent {
     String type = getInputEl().dom.getAttribute("type");
     getInputEl().addStyleName("x-form-" + type);
 
-    if (getName() != null) {
-      getInputEl().dom.setPropertyString("name", getName());
+    if (name != null) {
+      getInputEl().dom.setAttribute("name", name);
     }
 
     if (readOnly) {
@@ -796,12 +900,10 @@ public abstract class Field<D> extends BoxComponent {
       onDisable();
     }
 
-    new KeyNav<FieldEvent>(this) {
-      @Override
-      public void onKeyPress(FieldEvent ce) {
-        Field.this.onKeyPress(ce);
-      }
-    };
+    if (inputStyle != null) {
+      addInputStyleName(inputStyle);
+      inputStyle = null;
+    }
 
     originalValue = value;
 
@@ -811,14 +913,44 @@ public abstract class Field<D> extends BoxComponent {
     initValue();
   }
 
+  @Override
+  protected void onShow() {
+    super.onShow();
+    El lbl = findLabelElement();
+    if (lbl != null) {
+      lbl.setVisible(true);
+    }
+  }
+
   /**
    * Subclasses should provide the validation implementation by overriding this.
    * 
    * @param value the value to validate
    * @return <code>true</code> for valid
    */
+  @SuppressWarnings("deprecation")
   protected boolean validateValue(String value) {
+    if (forceInvalidText != null) {
+      markInvalid(forceInvalidText);
+      return false;
+    }
     return true;
+  }
+
+  private El findLabelElement() {
+    if (rendered) {
+      El elem = el().findParent(".x-form-item", 5);
+      if (elem != null) {
+        return elem.firstChild();
+      }
+    }
+    return null;
+  }
+
+  private void fireKey(FieldEvent fe) {
+    if (fe.isSpecialKey()) {
+      fireEvent(Events.SpecialKey, fe);
+    }
   }
 
 }

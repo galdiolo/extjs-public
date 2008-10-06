@@ -24,19 +24,10 @@
   margin: 2px 0pt 0pt 0px;
 }
 
-.my-list .my-list-inner {
-  padding: 1px;
-}
-
-.my-list-flat .my-list-inner {
-  padding: 0px;
-}
-
 .my-list-flat {
   border: 1px solid #6593cf;
   -moz-outline: none;
   -moz-user-focus: normal;
-  padding: 1px;
   background-color: white;
   cursor: default;
 }

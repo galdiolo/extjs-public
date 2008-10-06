@@ -9,7 +9,9 @@ package com.extjs.gxt.ui.client.data;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
@@ -36,10 +38,15 @@ public class JsonReader<C> implements DataReader<C, ListLoadResult<ModelData>> {
   }
 
   public ListLoadResult read(C loadConfig, Object data) {
-    JSONObject jsonRoot = (JSONObject) JSONParser.parse((String) data);
+    JSONObject jsonRoot = null;
+    if (data instanceof JavaScriptObject) {
+      jsonRoot = new JSONObject((JavaScriptObject) data);
+    } else {
+      jsonRoot = (JSONObject) JSONParser.parse((String) data);
+    }
     JSONArray root = (JSONArray) jsonRoot.get(modelType.root);
     int size = root.size();
-    ArrayList<ModelData> records = new ArrayList<ModelData>();
+    ArrayList<ModelData> models = new ArrayList<ModelData>();
     for (int i = 0; i < size; i++) {
       JSONObject obj = (JSONObject) root.get(i);
       ModelData model = newModelInstance();
@@ -54,16 +61,34 @@ public class JsonReader<C> implements DataReader<C, ListLoadResult<ModelData>> {
         } else if (value.isBoolean() != null) {
           model.set(field.name, value.isBoolean().booleanValue());
         } else if (value.isNumber() != null) {
-          model.set(field.name, value.isNumber().doubleValue());
+          if (field.type != null) {
+            Double d = value.isNumber().doubleValue();
+            if (field.type.equals(Integer.class)) {
+              model.set(field.name, d.intValue());
+            } else if (field.type.equals(Long.class)) {
+              model.set(field.name, d.longValue());
+            } else if (field.type.equals(Float.class)) {
+              model.set(field.name, d.floatValue());
+            } else {
+              model.set(field.name, d);
+            }
+          } else {
+            model.set(field.name, value.isNumber().doubleValue());
+          }
         } else if (value.isObject() != null) {
           // nothing
         } else if (value.isString() != null) {
           String s = value.isString().stringValue();
           if (field.type != null) {
             if (field.type.equals(Date.class)) {
-              DateTimeFormat format = DateTimeFormat.getFormat(field.format);
-              Date d = format.parse(s);
-              model.set(field.name, d);
+              if (field.format.equals("timestamp")) {
+                Date d = new Date(Long.parseLong(s) * 1000);
+                model.set(field.name, d);
+              } else {
+                DateTimeFormat format = DateTimeFormat.getFormat(field.format);
+                Date d = format.parse(s);
+                model.set(field.name, d);
+              }
             }
           } else {
             model.set(field.name, s);
@@ -73,9 +98,40 @@ public class JsonReader<C> implements DataReader<C, ListLoadResult<ModelData>> {
           model.set(field.name, null);
         }
       }
-      records.add(model);
+      models.add(model);
     }
-    return new BaseListLoadResult(records);
+
+    ListLoadResult result = newLoadResult(loadConfig, models);
+    if (result instanceof PagingLoadResult) {
+      PagingLoadResult r = (PagingLoadResult) result;
+      int tc = getTotalCount(jsonRoot);
+      if (tc != -1) {
+        r.setTotalLength(tc);
+      }
+    }
+    return result;
+  }
+
+  protected int getTotalCount(JSONObject root) {
+    JSONValue v = root.get(modelType.totalName);
+    if (v != null) {
+      if (v.isNumber() != null) {
+        return (int) v.isNumber().doubleValue();
+      } else if (v.isString() != null) {
+        return Integer.parseInt(v.isString().stringValue());
+      }
+    }
+    return -1;
+  }
+
+  /**
+   * Template method that provides load result.
+   * 
+   * @param models the models
+   * @return the load result
+   */
+  protected ListLoadResult newLoadResult(C loadConfig, List<ModelData> models) {
+    return new BaseListLoadResult(models);
   }
 
   /**

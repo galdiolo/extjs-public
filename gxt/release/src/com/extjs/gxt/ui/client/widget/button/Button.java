@@ -208,8 +208,9 @@ public class Button extends Component {
 
   @Override
   public void onComponentEvent(ComponentEvent ce) {
-    Element source = ce.component.getElement();
     super.onComponentEvent(ce);
+    Element source = ce.component.getElement();
+
     ButtonEvent be = (ButtonEvent) ce;
     switch (ce.type) {
       case Event.ONMOUSEOVER:
@@ -346,7 +347,7 @@ public class Button extends Component {
    */
   public void showMenu() {
     if (menu != null) {
-      menu.show(getElement(), getMenuAlign());
+      menu.show(getElement(), menuAlign);
       ButtonEvent be = new ButtonEvent(this);
       be.menu = menu;
       fireEvent(Events.MenuShow, be);
@@ -531,13 +532,13 @@ public class Button extends Component {
       getFocusEl().addEventsSunk(Event.FOCUSEVENTS);
     }
 
-    KeyNav<ButtonEvent> keyNav = new KeyNav<ButtonEvent>(this) {
+    KeyNav nav = new KeyNav<ButtonEvent>(this) {
       @Override
       public void onEnter(ButtonEvent ce) {
-        onClick(ce);
+        // onClick(ce);
       }
     };
-    keyNav.setCancelBubble(false);
+    nav.setCancelBubble(false);
 
     el().addEventsSunk(Event.ONCLICK | Event.MOUSEEVENTS);
   }

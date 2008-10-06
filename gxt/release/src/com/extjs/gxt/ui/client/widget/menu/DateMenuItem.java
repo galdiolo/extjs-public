@@ -29,7 +29,7 @@ public class DateMenuItem extends Item {
     picker.addListener(Events.Select, new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent ce) {
         parentMenu.fireEvent(Events.Select, ce);
-        parentMenu.hide();
+        parentMenu.hide(true);
       }
     });
   }

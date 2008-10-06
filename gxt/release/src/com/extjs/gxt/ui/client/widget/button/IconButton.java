@@ -33,10 +33,6 @@ import com.google.gwt.user.client.Event;
  * <li>event : the dom event</li>
  * </ul>
  * </dd>
- * 
- * <dt><b>CSS:</b></dt>
- * <dd>.my-icon-btn (the button itself)</dd>
- * </dl>
  */
 public class IconButton extends BoxComponent {
 
@@ -48,7 +44,7 @@ public class IconButton extends BoxComponent {
    * {@link #changeStyle(String)} must be called to initialize the button.
    */
   public IconButton() {
-    this("none");
+    this("");
   }
 
   /**
@@ -135,7 +131,7 @@ public class IconButton extends BoxComponent {
 
   protected void onRender(Element target, int index) {
     setElement(DOM.createDiv(), target, index);
-    addStyleName("x-tool");
+    addStyleName("x-icon-btn");
     addStyleName("x-nodrag");
     addStyleName(style);
     sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS);

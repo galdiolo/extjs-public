@@ -190,7 +190,7 @@ public class Draggable extends BaseObservable {
         dragWidget.el().setPagePosition(startBounds.x, startBounds.y);
       }
 
-      fireEvent(Events.DragCancel);
+      fireEvent(Events.DragCancel, new DragEvent(this));
       afterDrag();
     }
   }
@@ -517,7 +517,7 @@ public class Draggable extends BaseObservable {
         left = Math.max(left, 0);
         top = Math.max(top, 0);
 
-        left = Math.min(clientWidth - width, left);
+        left = Math.max(0, Math.min(clientWidth - width, left));
 
         if (Math.min(clientHeight - height, top) > 0) {
           top = Math.max(2, Math.min(clientHeight - height, top));
@@ -586,8 +586,7 @@ public class Draggable extends BaseObservable {
       dragWidget.el().updateZIndex(0);
     }
 
-    DragEvent de = new DragEvent();
-    de.draggable = this;
+    DragEvent de = new DragEvent(this);
     de.component = dragWidget;
     de.event = event;
     de.x = startBounds.x;
@@ -598,8 +597,7 @@ public class Draggable extends BaseObservable {
     fireEvent(Events.DragStart, de);
 
     if (dragEvent == null) {
-      dragEvent = new DragEvent();
-      dragEvent.draggable = this;
+      dragEvent = new DragEvent(this);
     }
 
     dragging = true;
@@ -643,8 +641,7 @@ public class Draggable extends BaseObservable {
         DOM.removeChild(body, proxyEl.dom);
         proxyEl = null;
       }
-      DragEvent de = new DragEvent();
-      de.draggable = this;
+      DragEvent de = new DragEvent(this);
       de.component = dragWidget;
       de.event = event;
       de.x = lastX;

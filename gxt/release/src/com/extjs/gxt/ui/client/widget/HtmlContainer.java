@@ -12,7 +12,6 @@ import com.extjs.gxt.ui.client.data.Loader;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.event.HtmlContainerEvent;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -67,6 +66,7 @@ public class HtmlContainer extends Container<Component> {
    */
   public HtmlContainer(Element elem) {
     this.elem = elem;
+    this.elem.getStyle().setProperty("display", "block");
   }
 
   /**
@@ -195,7 +195,7 @@ public class HtmlContainer extends Container<Component> {
         getElement().appendChild(item.getElement());
       }
       if (isAttached() && !item.isAttached()) {
-        WidgetHelper.doAttach(item);
+        ComponentHelper.doAttach(item);
       }
     }
   }

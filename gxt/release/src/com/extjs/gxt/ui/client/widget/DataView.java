@@ -90,7 +90,7 @@ import com.google.gwt.user.client.Event;
  * 
  * </dt>
  */
-public class DataView extends Container<DataViewItem> implements Selectable<DataViewItem> {
+public class DataView extends ScrollContainer<DataViewItem> implements Selectable<DataViewItem> {
 
   /**
    * Data view selection model.
@@ -119,6 +119,7 @@ public class DataView extends Container<DataViewItem> implements Selectable<Data
   private String defaultTemplate = "<div class=x-view-item>{text}</div>";
   private DataViewBinder binder;
   private boolean selectOnHover;
+  private String containerTagName = "div";
 
   /**
    * Creates a new data view.
@@ -151,6 +152,15 @@ public class DataView extends Container<DataViewItem> implements Selectable<Data
    */
   public DataViewBinder getBinder() {
     return binder;
+  }
+
+  /**
+   * Returns the container's tag name.
+   * 
+   * @return the container tag anme
+   */
+  public String getContainerTagName() {
+    return containerTagName;
   }
 
   @Override
@@ -271,6 +281,15 @@ public class DataView extends Container<DataViewItem> implements Selectable<Data
   @Override
   public boolean remove(DataViewItem component) {
     return super.remove(component);
+  }
+
+  /**
+   * Sets the container's tag name (defaults to 'div', pre-render).
+   * @param containerTagName
+   */
+  public void setContainerTagName(String containerTagName) {
+    assertPreRender();
+    this.containerTagName = containerTagName;
   }
 
   @Override
@@ -399,11 +418,10 @@ public class DataView extends Container<DataViewItem> implements Selectable<Data
         item.el().addStyleName(overStyle);
       }
     }
-   
   }
 
   protected void onRender(Element target, int index) {
-    setElement(DOM.createDiv(), target, index);
+    setElement(DOM.createElement(containerTagName), target, index);
     setStyleAttribute("overflow", "auto");
 
     renderAll();

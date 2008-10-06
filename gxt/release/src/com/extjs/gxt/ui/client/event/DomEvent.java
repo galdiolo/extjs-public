@@ -199,7 +199,26 @@ public class DomEvent extends BaseEvent {
    * @return the special state
    */
   public boolean isSpecialKey() {
+    return isSpecialKey(getKeyCode());
+  }
+
+  /**
+   * Returns true if the key is a "navigation" key.
+   * 
+   * @return the nav state
+   */
+  public boolean isNavKeyPress() {
     int k = getKeyCode();
+    return (k >= 33 && k <= 40) || k == 13 || k == 9 || k == 2;
+  }
+
+  /**
+   * Returns true if the key is a "special" key.
+   * 
+   * @param k the key code
+   * @return the special state
+   */
+  public boolean isSpecialKey(int k) {
     return k == 17 || k == 9 || k == 13 || k == 40 || k == 27 || (k == 16) || (k == 17)
         || (k >= 18 && k <= 20) || (k >= 33 && k <= 35) || (k >= 36 && k <= 39)
         || (k >= 44 && k <= 45);

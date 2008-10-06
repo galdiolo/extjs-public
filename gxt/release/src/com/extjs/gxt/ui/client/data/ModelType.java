@@ -30,6 +30,11 @@ public class ModelType {
    * The name of the property that contains the 'total number of records' value
    */
   public String totalName;
+  
+  /**
+   * The id property.
+   */
+  public String id;
 
   private List<DataField> fields;
 

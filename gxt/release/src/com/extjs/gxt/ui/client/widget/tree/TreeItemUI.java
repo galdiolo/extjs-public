@@ -25,14 +25,15 @@ import com.google.gwt.user.client.Event;
 
 public class TreeItemUI {
 
-  public static String styleTreeOver = "my-tree-over";
-  public static String styleTreeJointOver = "my-tree-joint-over";
-  public static String styleTreeChecked = "my-tree-checked";
-  public static String styleTreeNotChecked = "my-tree-notchecked";
-  public static String styleTreeLoading = "my-tree-loading";
-  public static String styleTreeSelected = "my-tree-sel";
-  public static String classTreeOpen = "my-tree-open";
-  public static String classTreeClose = "my-tree-close";
+  public String styleTreeOver = "my-tree-over";
+  public String styleTreeJointOver = "my-tree-joint-over";
+  public String styleTreeChecked = "my-tree-checked";
+  public String styleTreeNotChecked = "my-tree-notchecked";
+  public String styleTreeLoading = "my-tree-loading";
+  public String styleTreeSelected = "my-tree-sel";
+  public String styleTreeItem = "";
+  public String classTreeOpen = "my-tree-open";
+  public String classTreeClose = "my-tree-close";
 
   private static Template template;
 
@@ -66,6 +67,7 @@ public class TreeItemUI {
 
   public void afterCollapse() {
     item.tree.disableEvents(false);
+    containerEl.dom.getStyle().setProperty("marginTop", "0");
     itemEl.removeStyleName(styleTreeJointOver);
     item.fireEvent(Events.Collapse, new TreeEvent(item.tree, item));
   }
@@ -187,23 +189,23 @@ public class TreeItemUI {
       fly(iconDivEl).setIconStyle(item.iconStyle);
       return;
     }
+    TreeStyle ts = item.tree.getStyle();
     if (!item.isLeaf()) {
       String s = "";
-      if (item.isExpanded() && item.tree.getOpenNodeIconStyle() != null) {
-        s = item.tree.getOpenNodeIconStyle();
-      } else if (item.isExpanded() && item.tree.getOpenNodeIconStyle() != null) {
-        s = item.tree.getNodeIconStyle();
+      if (item.isExpanded() && ts.getNodeOpenIconStyle() != null) {
+        s = ts.getNodeOpenIconStyle();
+      } else if (item.isExpanded() && ts.getNodeOpenIconStyle() != null) {
+        s = ts.getNodeCloseIconStyle();
       } else if (!item.isExpanded()) {
-        s = item.tree.getNodeIconStyle();
+        s = ts.getNodeCloseIconStyle();
       }
       fly(iconEl).setStyleAttribute("display", "");
       iconDivEl.setClassName(s);
     } else {
       fly(iconEl).setStyleAttribute("display", "");
-      iconDivEl.setClassName(item.tree.getItemIconStyle());
+      iconDivEl.setClassName(ts.getLeafIconStyle());
       return;
     }
-
   }
 
   public void onLoadingChange(boolean loading) {
@@ -264,6 +266,7 @@ public class TreeItemUI {
 
     item.el().insertInto(target, index);
     itemEl = item.el().firstChild();
+    itemEl.addStyleName(styleTreeItem);
 
     El el = item.el();
 
@@ -277,9 +280,12 @@ public class TreeItemUI {
     iconDivEl = iconEl.getFirstChild().cast();
     textEl = iconEl.getNextSiblingElement().cast();
     textSpanEl = textEl.getFirstChildElement().cast();
-    Element tbl = el.dom.getFirstChildElement().cast();
-    containerEl = new El(DOM.getNextSibling(tbl));
+    containerEl = el.getChild(1);
     containerEl.makePositionable();
+    
+    if (item.getItemStyleName() != null) {
+      item.el().firstChild().addStyleName(item.getItemStyleName());
+    }
 
     fly(checkEl).setVisible(item.tree.getCheckable());
 
@@ -308,12 +314,30 @@ public class TreeItemUI {
     if (item.root) {
       return;
     }
+    
+    TreeStyle style = item.tree.getStyle();
 
     if (!item.isLeaf()) {
-      String cls = item.isExpanded() ? classTreeOpen : classTreeClose;
+      String s = null;
+      if (item.isExpanded()) {
+        s = style.getJointOpenIconStyle() != null ? style.getJointOpenIconStyle() : classTreeOpen;
+      } else {
+        boolean children = false;
+        boolean binder = item.tree != null ? item.tree.getData("binder") != null : false;
+        boolean loaded = item.getData("loaded") != null;
+        if ((binder && !loaded) || (binder && item.hasChildren())) {
+          children = true;
+        }
+        if (!binder && item.hasChildren()) {
+          children = true;
+        }
+        s = children ? (style.getJointCloseIconStyle() != null ? style.getJointCloseIconStyle() :classTreeClose) : "";
+      }
+      String cls = s;
       jointDivEl.setClassName(cls);
+      jointDivEl.getStyle().setProperty("display", "");
     } else {
-      jointDivEl.setClassName("none");
+      jointDivEl.getStyle().setProperty("display", "none");
     }
 
     if (item.tree.getCheckable()) {

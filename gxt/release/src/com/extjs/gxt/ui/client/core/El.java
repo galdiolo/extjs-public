@@ -18,12 +18,17 @@ import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.fx.Move;
 import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.util.Markup;
+import com.extjs.gxt.ui.client.util.Padding;
 import com.extjs.gxt.ui.client.util.Point;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.util.Region;
 import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.util.TextMetrics;
 import com.extjs.gxt.ui.client.util.Util;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
@@ -61,6 +66,11 @@ public class El {
     return addUnitsInternal(value, "px");
   }
 
+  public static El fly(com.google.gwt.dom.client.Element element) {
+    global.dom = (Element) element;
+    return global;
+  }
+
   /**
    * Gets the globally shared flyweight El, with the passed node as the active
    * element. Do not store a reference to this element - the dom node can be
@@ -73,42 +83,59 @@ public class El {
     global.dom = element;
     return global;
   }
-  
-  public static El fly(com.google.gwt.dom.client.Element element) {
-    global.dom = (Element)element;
-    return global;
-  }
 
   private static native String addUnitsInternal(String v, String defaultUnit) /*-{
-   if(v === "" || v == "auto"){
-   return v;
-   }
-   if(v === undefined){
-   return '';
-   }
-   if(typeof v == "number" || !/\d+(px|em|%|en|ex|pt|in|cm|mm|pc)$/i.test(v)){
-   return v + (defaultUnit || 'px');
-   }
-   return v;
-   }-*/;
+      if(v === "" || v == "auto"){
+      return v;
+      }
+      if(v === undefined){
+      return '';
+      }
+      if(typeof v == "number" || !/\d+(px|em|%|en|ex|pt|in|cm|mm|pc)$/i.test(v)){
+      return v + (defaultUnit || 'px');
+      }
+      return v;
+      }-*/;
 
   private native static void disableContextMenuInternal(Element elem, boolean disable) /*-{
-   if (disable) {
-   elem.oncontextmenu = function() {  return false};
-   } else {
-   elem.oncontextmenu = null;
-   }
-   }-*/;
+      if (disable) {
+      elem.oncontextmenu = function() {  return false};
+      } else {
+      elem.oncontextmenu = null;
+      }
+      }-*/;
 
   private native static void disableTextSelectInternal(Element e, boolean disable)/*-{
-   if (disable) {
-   e.ondrag = function () { return false; };
-   e.onselectstart = function () { return false; };
-   } else {
-   e.ondrag = null;
-   e.onselectstart = null;
-   }
-   }-*/;
+         if (disable) {
+           e.ondrag = function (evt) {
+            var targ;
+            if (!e) var e = $wnd.event;
+            if (e.target) targ = e.target;
+            else if (e.srcElement) targ = e.srcElement;
+            if (targ.nodeType == 3) // defeat Safari bug
+            targ = targ.parentNode;
+            if (targ.tagName == 'INPUT') {
+              return true;
+            }
+            return false; 
+           };
+           e.onselectstart = function (e) { 
+            var targ;
+            if (!e) var e = $wnd.event;
+            if (e.target) targ = e.target;
+            else if (e.srcElement) targ = e.srcElement;
+            if (targ.nodeType == 3) // defeat Safari bug
+            targ = targ.parentNode;
+            if (targ.tagName == 'INPUT') {
+              return true;
+            }
+            return false; 
+           };
+         } else {
+           e.ondrag = null;
+           e.onselectstart = null;
+         }
+         }-*/;
 
   /**
    * The wrapped dom element.
@@ -287,6 +314,38 @@ public class El {
   }
 
   /**
+   * Centers the element.
+   * 
+   * @param constrainViewport true to contstrain the element position to the
+   *          viewport.
+   * @return this
+   */
+  public El center(boolean constrainViewport) {
+    Element container = null;
+    int width = container == null ? Window.getClientWidth() : container.getOffsetWidth();
+    int height = container == null ? Window.getClientHeight() : container.getOffsetHeight();
+
+    if (container == null) {
+      container = XDOM.getBody();
+    }
+
+    int w = getWidth();
+    int h = getHeight();
+
+    int left = (width / 2) - (w / 2) + container.getScrollTop();
+    int top = (height / 2) - (h / 2) + container.getScrollLeft();
+
+    if (constrainViewport) {
+      left = Math.max(5, left);
+      top = Math.max(5, top);
+    }
+
+    setLeftTop(left, top);
+    sync(true);
+    return this;
+  }
+
+  /**
    * Centers an element.
    * 
    * @param container the container element
@@ -322,7 +381,7 @@ public class El {
     Element child = DomQuery.selectNode(selector, dom);
     return child == null ? null : new El(child);
   }
-  
+
   /**
    * Selects a single child at any depth below this element based on the passed
    * CSS selector.
@@ -350,17 +409,17 @@ public class El {
    * @return this
    */
   public native El click() /*-{
-   var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-   if (dom.click) {
-   dom.click();
-   }
-   else {
-   var event = $doc.createEvent("MouseEvents");
-   event.initEvent('click', true, true, $wnd, 0, 0, 0, 0, 0, false, false, false, false, 1, dom);
-   dom.dispatchEvent(event);    
-   }
-   return this;
-   }-*/;
+      var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+      if (dom.click) {
+      dom.click();
+      }
+      else {
+      var event = $doc.createEvent("MouseEvents");
+      event.initEvent('click', true, true, $wnd, 0, 0, 0, 0, 0, false, false, false, false, 1, dom);
+      dom.dispatchEvent(event);    
+      }
+      return this;
+      }-*/;
 
   /**
    * Clips overflow on the element.
@@ -388,9 +447,9 @@ public class El {
    * @return the new element
    */
   public native Element cloneNode(boolean deep) /*-{
-   var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-   return dom.cloneNode(deep);
-   }-*/;
+      var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+      return dom.cloneNode(deep);
+      }-*/;
 
   /**
    * Creates and adds a child using the HTML fragment.
@@ -403,15 +462,29 @@ public class El {
   }
 
   /**
+   * Creates and inserts a child using the HTML fragment.
+   * 
+   * @param html the html fragment
+   * @param insertBefore a child element of this element
+   * @return the new child
+   */
+  public El createChild(String html, Element insertBefore) {
+    Element element = XDOM.create(html);
+    int idx = DOM.getChildIndex(dom, insertBefore);
+    insertChild(element, idx);
+    return new El(element);
+  }
+
+  /**
    * Disables the element.
    * 
    * @return this
    */
   public native El disable() /*-{
-   var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-   dom.disabled = true;
-   return this;
-   }-*/;
+      var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+      dom.disabled = true;
+      return this;
+      }-*/;
 
   /**
    * Enables and disables the browsers default context menu for the specified
@@ -430,8 +503,8 @@ public class El {
   /**
    * Enables or disables text selection for the element. A circular reference
    * will be created when disabling text selection. Disabling should be cleared
-   * when the element is detached. See the <code>Component</code> source for
-   * an example.
+   * when the element is detached. See the <code>Component</code> source for an
+   * example.
    * 
    * @param disable true to disable, false to enable
    * @return this
@@ -462,10 +535,10 @@ public class El {
    * @return this
    */
   public native El enable()/*-{
-   var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-   dom.disabled = false;
-   return this;
-   }-*/;
+         var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+         dom.disabled = false;
+         return this;
+         }-*/;
 
   /**
    * Convenience method for setVisibilityMode(VisibilityMode.DISPLAY).
@@ -532,8 +605,8 @@ public class El {
     }
     return new El(elem);
   }
-  
-  /**   
+
+  /**
    * Looks at this node and then at parent nodes for a match of the passed
    * simple selector (e.g. div.some-class or span:first-child).
    * 
@@ -598,8 +671,8 @@ public class El {
    * 
    * @param anchor the specified anchor position (defaults to "c"). See
    *          {@link #alignTo} for details on supported anchor positions.
-   * @param local <code>true</code> to get the local (element
-   *          top/left-relative) anchor position instead of page coordinates
+   * @param local <code>true</code> to get the local (element top/left-relative)
+   *          anchor position instead of page coordinates
    * @return the position
    */
   public Point getAnchorXY(String anchor, boolean local) {
@@ -610,8 +683,8 @@ public class El {
    * Returns the width of the border(s) for the specified side(s).
    * 
    * @param sides can be t, l, r, b or any combination of those to add multiple
-   *          values. For example, passing lr would get the border (l)eft width +
-   *          the border (r)ight width.
+   *          values. For example, passing lr would get the border (l)eft width
+   *          + the border (r)ight width.
    * @return the width of the sides passed added together
    */
   public int getBorderWidth(String sides) {
@@ -683,6 +756,15 @@ public class El {
    */
   public int getChildIndex(Element child) {
     return DOM.getChildIndex(dom, child);
+  }
+
+  /**
+   * Returns the element's client height property.
+   * 
+   * @return the client width value
+   */
+  public int getClientHeight() {
+    return DOM.getElementPropertyInt(dom, "clientHeight");
   }
 
   /**
@@ -859,8 +941,8 @@ public class El {
    * Gets the width of the padding(s) for the specified side(s).
    * 
    * @param sides can be t, l, r, b or any combination of those to add multiple
-   *          values. For example, passing lr would get the border (l)eft width +
-   *          the border (r)ight width.
+   *          values. For example, passing lr would get the border (l)eft width
+   *          + the border (r)ight width.
    * @return the width of the sides passed added together
    */
   public int getPadding(String sides) {
@@ -1104,12 +1186,12 @@ public class El {
    * @return the location
    */
   public native Point getXY() /*-{
-   var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-   $wnd.dom = dom;
-   var xy = $wnd.GXT._el.fly(dom).getXY();
-   var p = @com.extjs.gxt.ui.client.util.Point::newInstance(II)(xy[0],xy[1]);
-   return p;
-   }-*/;
+      var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+      $wnd.dom = dom;
+      var xy = $wnd.GXT._el.fly(dom).getXY();
+      var p = @com.extjs.gxt.ui.client.util.Point::newInstance(II)(xy[0],xy[1]);
+      return p;
+      }-*/;
 
   /**
    * Gets the current Y position of the element based on page coordinates.
@@ -1348,8 +1430,24 @@ public class El {
    *         <code>false</code>
    */
   public boolean isVisible() {
+    return isVisible(false);
+  }
+
+  /**
+   * Returns whether the element is currently visible using the CSS display
+   * property.
+   * 
+   * @param blockOnly true to only test
+   * 
+   * @return true if visible
+   */
+  public boolean isVisible(boolean blockOnly) {
     String v = getStyleAttribute("visibility");
     String d = getStyleAttribute("display");
+    if (blockOnly) {
+      return d != null && d.equals("block");
+    }
+
     if (v != null && v.equals("hidden")) {
       return false;
     } else if (d != null && d.equals("none")) {
@@ -1366,6 +1464,34 @@ public class El {
    */
   public El lastChild() {
     return El.fly(DOM.getChild(dom, DOM.getChildCount(dom) - 1));
+  }
+
+  /**
+   * Retrieves the data using the request builder and updates the element'c
+   * contents.
+   * <p>
+   * This method is subject to change.
+   * 
+   * @param builder the request builder
+   */
+  public Request load(RequestBuilder builder) {
+    try {
+      builder.setCallback(new RequestCallback() {
+
+        public void onError(Request request, Throwable exception) {
+          setInnerHtml(exception.getMessage());
+        }
+
+        public void onResponseReceived(Request request, Response response) {
+          setInnerHtml(response.getText());
+        }
+
+      });
+      return builder.send();
+    } catch (Exception e) {
+      setInnerHtml(e.getMessage());
+      return null;
+    }
   }
 
   /**
@@ -1400,6 +1526,7 @@ public class El {
    * @return the mask element
    */
   public El mask(String message) {
+    makePositionable();
     if (_maskMsg != null) {
       _maskMsg.remove();
     }
@@ -1414,11 +1541,16 @@ public class El {
 
     appendChild(_mask.dom);
 
-    _maskMsg = new El("<div class='ext-el-mask-msg' style='z-index: 100'><div style='background-color: white'></div></div>");
+    _maskMsg = new El(
+        "<div class='ext-el-mask-msg' style='z-index: 100'><div style='background-color: white'></div></div>");
     _maskMsg.firstChild().setInnerHtml(message);
     _maskMsg.setDisplayed(true);
 
     appendChild(_maskMsg.dom);
+
+    if (GXT.isIE && !(GXT.isIE && GXT.isStrict)) {
+      _mask.setWidth(getClientWidth());
+    }
 
     _maskMsg.center(dom);
 
@@ -1530,38 +1662,38 @@ public class El {
    * @param hscroll <code>false</code> to disable horizontal scrolling.
    */
   public native void scrollIntoView(Element container, boolean hscroll) /*-{
-   var elem = this.@com.extjs.gxt.ui.client.core.El::dom;
-   var c = container || $doc.body;
-   var o = this.@com.extjs.gxt.ui.client.core.El::offsetsTo(Lcom/google/gwt/user/client/Element;)(container);
-   var l = o.@com.extjs.gxt.ui.client.util.Point::x;
-   var t = o.@com.extjs.gxt.ui.client.util.Point::y;
-   l = l + c.scrollLeft;
-   t = t + c.scrollTop;
-   var b = t + elem.offsetHeight;
-   var r = l + elem.offsetWidth;
-   
-   var ch = c.clientHeight;
-   var ct = parseInt(c.scrollTop, 10);
-   var cl = parseInt(c.scrollLeft, 10);
-   var cb = ct + ch;
-   var cr = cl + c.clientWidth;
-   
-   if (t < ct){
-   c.scrollTop = t;
-   }else if(b > cb){
-   c.scrollTop = b-ch;
-   }
-   c.scrollTop = c.scrollTop; 
-   
-   if(hscroll !== false){
-   if(l < cl){
-   c.scrollLeft = l;
-   } else if(r > cr){
-   c.scrollLeft = r-c.clientWidth;
-   }
-   c.scrollLeft = c.scrollLeft;
-   }
-   }-*/;
+      var elem = this.@com.extjs.gxt.ui.client.core.El::dom;
+      var c = container || $doc.body;
+      var o = this.@com.extjs.gxt.ui.client.core.El::offsetsTo(Lcom/google/gwt/user/client/Element;)(container);
+      var l = o.@com.extjs.gxt.ui.client.util.Point::x;
+      var t = o.@com.extjs.gxt.ui.client.util.Point::y;
+      l = l + c.scrollLeft;
+      t = t + c.scrollTop;
+      var b = t + elem.offsetHeight;
+      var r = l + elem.offsetWidth;
+      
+      var ch = c.clientHeight;
+      var ct = parseInt(c.scrollTop, 10);
+      var cl = parseInt(c.scrollLeft, 10);
+      var cb = ct + ch;
+      var cr = cl + c.clientWidth;
+      
+      if (t < ct){
+      c.scrollTop = t;
+      }else if(b > cb){
+      c.scrollTop = b-ch;
+      }
+      c.scrollTop = c.scrollTop; 
+      
+      if(hscroll !== false){
+      if(l < cl){
+      c.scrollLeft = l;
+      } else if(r > cr){
+      c.scrollLeft = r-c.clientWidth;
+      }
+      c.scrollLeft = c.scrollLeft;
+      }
+      }-*/;
 
   /**
    * Scrolls this element the specified scroll point.
@@ -1629,8 +1761,9 @@ public class El {
   public El setBorders(boolean show) {
     if (show) {
       addStyleName("x-border");
+      setStyleAttribute("borderWidth", "1px");
     } else {
-      setStyleAttribute("border", "none");
+      setStyleAttribute("borderWidth", "0px");
     }
     return this;
   }
@@ -1751,18 +1884,18 @@ public class El {
    * @param focus the new focus state
    */
   public native El setFocus(boolean focus) /*-{
-   var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-   try {
-   if (focus) {
-   dom.focus();
-   } else {
-   dom.blur();
-   }
-   } 
-   catch(err) {
-   }
-   return this;
-   }-*/;
+      var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+      try {
+      if (focus) {
+      dom.focus();
+      } else {
+      dom.blur();
+      }
+      } 
+      catch(err) {
+      }
+      return this;
+      }-*/;
 
   /**
    * Sets the elements height.
@@ -1873,6 +2006,20 @@ public class El {
   public El setLeftTop(int left, int top) {
     setLeft(left);
     setTop(top);
+    return this;
+  }
+
+  /**
+   * Sets the elements's padding.
+   * 
+   * @param padding the padding
+   * @return this
+   */
+  public El setPadding(Padding padding) {
+    setStyleAttribute("paddingLeft", padding.left);
+    setStyleAttribute("paddingTop", padding.top);
+    setStyleAttribute("paddingRight", padding.right);
+    setStyleAttribute("paddingBottom", padding.bottom);
     return this;
   }
 
@@ -2094,7 +2241,7 @@ public class El {
    * Sets the element's visibility mode. When setVisible() is called it will use
    * this to determine whether to set the visibility or the display property.
    * 
-   * @param visMode {value {link VisMode#VISIBILITY}} or {@link VisMode#DISPLAY}
+   * @param visMode value {link VisMode#VISIBILITY}} or {@link VisMode#DISPLAY}
    * @return this
    */
   public El setVisibilityMode(VisMode visMode) {
@@ -2221,10 +2368,10 @@ public class El {
    * @return this
    */
   public native El setY(int y) /*-{
-   var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-   $wnd.GXT._el.fly(dom).setY(y);
-   return this;
-   }-*/;
+      var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+      $wnd.GXT._el.fly(dom).setY(y);
+      return this;
+      }-*/;
 
   /**
    * Sets the element's z-index.
@@ -2327,12 +2474,11 @@ public class El {
    * @param bounds the original bounds
    */
   public void unwrap(Element child, Rectangle bounds) {
-    El.fly(child).setTop(bounds.y);
-    El.fly(child).setLeft(bounds.x);
-
-    Element p = DOM.getParent(dom);
-    DOM.removeChild(p, dom);
-    DOM.appendChild(p, child);
+    El.fly(child).setLeftTop(bounds.x, bounds.y);
+    Element p = dom.getParentElement().cast();
+    int pos = DOM.getChildIndex(p, dom);
+    p.removeChild(dom);
+    DOM.insertChild(p, child, pos);
   }
 
   /**

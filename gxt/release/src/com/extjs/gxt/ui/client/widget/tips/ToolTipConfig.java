@@ -9,7 +9,11 @@ package com.extjs.gxt.ui.client.widget.tips;
 
 import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.util.Params;
+import com.google.gwt.user.client.Element;
 
+/**
+ * Configuration information for a tool tip.
+ */
 public class ToolTipConfig {
 
   private String text;
@@ -22,6 +26,8 @@ public class ToolTipConfig {
   private Params params;
   private String title;
   private boolean autoHide = true;
+  private Element target;
+  private boolean enabled = true;
 
   /**
    * Creates a new tool tip config.
@@ -96,6 +102,15 @@ public class ToolTipConfig {
   }
 
   /**
+   * Returns the element the configuration will be applied to.
+   * 
+   * @return the target element
+   */
+  public Element getTarget() {
+    return target;
+  }
+
+  /**
    * Returns the template.
    * 
    * @return the template
@@ -132,6 +147,15 @@ public class ToolTipConfig {
   }
 
   /**
+   * Returns true if the tool tip is enabled.
+   * 
+   * @return true for enabled
+   */
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  /**
    * Returns true if mouse tracking is enabled.
    * 
    * @return the mouse track state
@@ -159,6 +183,15 @@ public class ToolTipConfig {
    */
   public void setDismissDelay(int dismissDelay) {
     this.dismissDelay = dismissDelay;
+  }
+
+  /**
+   * Sets whether the tool tip is enabled (defaults to true).
+   * 
+   * @param enabled true to enable
+   */
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
   }
 
   /**
@@ -202,6 +235,16 @@ public class ToolTipConfig {
   }
 
   /**
+   * Sets an optional sub-element of the target component that the configuration
+   * should be applied to.
+   * 
+   * @param target the target element
+   */
+  public void setTarget(Element target) {
+    this.target = target;
+  }
+
+  /**
    * A optional template to be used to render the tool tip. The {@link #params}
    * will be applied to the template. If specified, {@link #title} and
    * {@link #text} will be added to the params before being applied to the
@@ -240,5 +283,5 @@ public class ToolTipConfig {
   public void setTrackMouse(boolean trackMouse) {
     this.trackMouse = trackMouse;
   }
-
+  
 }

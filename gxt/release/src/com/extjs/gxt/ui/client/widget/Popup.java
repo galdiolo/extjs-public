@@ -418,6 +418,8 @@ public class Popup extends LayoutContainer {
     super.onRender(target, index);
     setStyleAttribute("zIndex", "100");
     el().makePositionable(true);
+    
+    preview.getIgnoreList().add(getElement());
   }
 
   protected Popup onShowPopup() {

@@ -116,7 +116,22 @@ public class ScrollContainer<T extends Component> extends Container<T> {
   public void setScrollMode(Scroll scroll) {
     this.scrollMode = scroll;
     if (rendered) {
-      getLayoutTarget().setStyleAttribute("overflow", scrollMode.value().toLowerCase());
+      switch (scroll) {
+        case AUTO:
+        case ALWAYS:
+        case NONE:
+          getLayoutTarget().setStyleAttribute("overflow", scrollMode.value().toLowerCase());
+          break;
+        case AUTOX:
+          getLayoutTarget().setStyleAttribute("overflowX", scrollMode.value().toLowerCase());
+          getLayoutTarget().setStyleAttribute("overflowY", "hidden");
+          break;
+        case AUTOY:
+          getLayoutTarget().setStyleAttribute("overflowY", scrollMode.value().toLowerCase());
+          getLayoutTarget().setStyleAttribute("overflowX", "hidden");
+          break;
+      }
+      
     }
   }
 

@@ -17,11 +17,12 @@ import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.ResizeEvent;
+import com.extjs.gxt.ui.client.event.ResizeListener;
 import com.extjs.gxt.ui.client.util.Point;
 import com.extjs.gxt.ui.client.util.Rectangle;
-import com.extjs.gxt.ui.client.util.WidgetHelper;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.Component;
+import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -53,10 +54,11 @@ import com.google.gwt.user.client.ui.RootPanel;
  * <dt><b>Events:</b></dt>
  * 
  * <dd><b>ResizeStart</b> : (source, widget, event) <br>
- * Fires after a resize operation has started.
+ * Fires before a resize operation start. Listeners can set the
+ * <code>doit</code> field to <code>false</code> to cancel the action.
  * <ul>
  * <li>source : this</li>
- * <li>widget : resize widget</li>
+ * <li>component : resize widget</li>
  * <li>event : the dom event</li>
  * </ul>
  * </dd>
@@ -81,13 +83,6 @@ public class Resizable extends BaseObservable {
 
     public Dir dir;
 
-    @Override
-    protected void onRender(Element target, int index) {
-      super.onRender(target, index);
-      setElement(DOM.createDiv(), target, index);
-      sinkEvents(Event.MOUSEEVENTS);
-    }
-
     public void onBrowserEvent(Event event) {
       switch (DOM.eventGetType(event)) {
         case Event.ONMOUSEDOWN:
@@ -96,6 +91,13 @@ public class Resizable extends BaseObservable {
           handleMouseDown(event, this);
           break;
       }
+    }
+
+    @Override
+    protected void onRender(Element target, int index) {
+      super.onRender(target, index);
+      setElement(DOM.createDiv(), target, index);
+      sinkEvents(Event.MOUSEEVENTS);
     }
   }
 
@@ -145,7 +147,6 @@ public class Resizable extends BaseObservable {
   private Listener listener;
   private String handles;
   private Rectangle startBox;
-
   private Point startPoint;
 
   /**
@@ -198,6 +199,16 @@ public class Resizable extends BaseObservable {
   }
 
   /**
+   * Adds a resize listener.
+   * 
+   * @param listener the listener
+   */
+  public void addResizeListener(ResizeListener listener) {
+    addListener(Events.ResizeStart, listener);
+    addListener(Events.ResizeEnd, listener);
+  }
+
+  /**
    * Returns <code>true</code> if if resizing.
    * 
    * @return the resize state
@@ -222,7 +233,17 @@ public class Resizable extends BaseObservable {
       DOM.removeChild(resize.getElement(), handle.getElement());
     }
   }
-
+  
+  /**
+   * Removes a resize listener.
+   * 
+   * @param listener the listener
+   */
+  public void removeResizeListener(ResizeListener listener) {
+    removeListener(Events.ResizeStart, listener);
+    removeListener(Events.ResizeEnd, listener);
+  }
+  
   /**
    * Enables or disables the drag handles.
    * 
@@ -242,8 +263,8 @@ public class Resizable extends BaseObservable {
   }
 
   protected void init() {
+    resize.el().makePositionable();
     if (handleList == null) {
-      resize.el().makePositionable();
       handleList = new ArrayList<ResizeHandle>();
       if (handles.equals("all")) {
         handles = "n s e w ne nw se sw";
@@ -284,18 +305,20 @@ public class Resizable extends BaseObservable {
           return false;
         }
       };
+
     }
+
   }
 
   protected void onAttach() {
     for (ResizeHandle handle : handleList) {
-      WidgetHelper.doAttach(handle);
+      ComponentHelper.doAttach(handle);
     }
   }
 
   protected void onDetach() {
     for (ResizeHandle handle : handleList) {
-      WidgetHelper.doDetach(handle);
+      ComponentHelper.doDetach(handle);
     }
   }
 
@@ -319,6 +342,10 @@ public class Resizable extends BaseObservable {
 
   private void handleMouseDown(Event event, ResizeHandle handle) {
     if (!enabled) {
+      return;
+    }
+
+    if (!fireEvent(Events.ResizeStart, new ResizeEvent(this, resize, event))) {
       return;
     }
 

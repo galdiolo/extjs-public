@@ -40,7 +40,7 @@ public class BaseLoader<C, D> extends BaseObservable implements Loader<C> {
    * @param reader an optional data reader, if null, null will be passed to
    *          proxy.load(Reader, Loadconfig, Datacallback)
    */
-  public BaseLoader(DataProxy<C, D> proxy, DataReader reader) {
+  public BaseLoader(DataProxy<C, D> proxy, DataReader<C, D> reader) {
     this(proxy);
     this.reader = reader;
   }
@@ -50,15 +50,14 @@ public class BaseLoader<C, D> extends BaseObservable implements Loader<C> {
    * 
    * @param reader the reader
    */
-  public BaseLoader(DataReader reader) {
+  public BaseLoader(DataReader<C, D> reader) {
     this.reader = reader;
   }
 
   public void addLoadListener(LoadListener listener) {
-    LoadTypedListener tl = new LoadTypedListener(listener);
-    addListener(BeforeLoad, tl);
-    addListener(LoadException, tl);
-    addListener(Load, tl);
+    addListener(BeforeLoad, listener);
+    addListener(LoadException, listener);
+    addListener(Load, listener);
   }
 
   /**

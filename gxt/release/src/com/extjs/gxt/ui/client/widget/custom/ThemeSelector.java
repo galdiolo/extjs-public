@@ -25,7 +25,6 @@ public class ThemeSelector extends ComboBox<Theme> {
 
   public ThemeSelector() {
     setEditable(false);
-    setValueField("id");
     setDisplayField("name");
     setWidth("100px");
   }
@@ -41,7 +40,7 @@ public class ThemeSelector extends ComboBox<Theme> {
     if (theme == null) {
       setValue(Theme.BLUE);
     }
-    Theme r = findModel(getValueField(), theme);
+    Theme r = findModel("id", theme);
     if (r != null) {
       setValue(r);
     }

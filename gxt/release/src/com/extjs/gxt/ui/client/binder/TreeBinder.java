@@ -261,6 +261,7 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
   @Override
   protected void hook() {
     super.hook();
+    component.setData("binder", true);
     component.addListener(Events.CheckChange, new Listener<TreeEvent>() {
       public void handleEvent(TreeEvent be) {
         if (!silent) {

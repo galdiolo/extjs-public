@@ -28,13 +28,33 @@ import com.extjs.gxt.ui.client.widget.Layout;
  * @see ColumnData
  */
 public class ColumnLayout extends Layout {
-  
+
   protected El innerCt;
-  
+  protected boolean adjustForScroll = false;
+
   public ColumnLayout() {
     setExtraStyle("x-column");
   }
 
+  /**
+   * Returns true if ajust for scroll is enabled.
+   * 
+   * @return the adjust for scroll state
+   */
+  public boolean isAdjustForScroll() {
+    return adjustForScroll;
+  }
+
+  /**
+   * True to ajust the container width calculations to account for the scroll
+   * bar (defaults to false).
+   * 
+   * @param adjustForScroll the adjust for scroll state
+   */
+  public void setAdjustForScroll(boolean adjustForScroll) {
+    this.adjustForScroll = adjustForScroll;
+  }
+  
   @Override
   protected void onLayout(Container container, El target) {
     if (innerCt == null) {
@@ -44,10 +64,10 @@ public class ColumnLayout extends Layout {
     }
 
     renderAll(container, innerCt);
-    
+
     Size size = target.getSize(true);
 
-    int w = size.width;
+    int w = size.width - (adjustForScroll ? 19 : 0);
     int pw = w;
 
     int count = container.getItemCount();
@@ -57,6 +77,7 @@ public class ColumnLayout extends Layout {
     for (int i = 0; i < count; i++) {
       Component c = container.getItem(i);
       ColumnData data = (ColumnData) getLayoutData(c);
+
       if (data.getWidth() > 1) {
         pw -= data.getWidth();
       }

@@ -34,6 +34,15 @@ public class FormData extends AnchorData {
   }
 
   /**
+   * Creates a new form data instance.
+   * 
+   * @param anchorSpec the anchor spec
+   */
+  public FormData(String anchorSpec) {
+    super(anchorSpec);
+  }
+
+  /**
    * Returns the height.
    * 
    * @return the height
