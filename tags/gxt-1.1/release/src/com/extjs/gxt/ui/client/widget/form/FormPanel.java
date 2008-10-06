@@ -1,0 +1,439 @@
+/*
+ * Ext GWT - Ext for GWT
+ * Copyright(c) 2007, 2008, Ext JS, LLC.
+ * licensing@extjs.com
+ * 
+ * http://extjs.com/license
+ */
+package com.extjs.gxt.ui.client.widget.form;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.XDOM;
+import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.event.FormEvent;
+import com.extjs.gxt.ui.client.widget.Component;
+import com.extjs.gxt.ui.client.widget.Container;
+import com.extjs.gxt.ui.client.widget.ContentPanel;
+import com.extjs.gxt.ui.client.widget.layout.FormLayout;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.GWT.UncaughtExceptionHandler;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.DeferredCommand;
+import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.ui.impl.FormPanelImpl;
+import com.google.gwt.user.client.ui.impl.FormPanelImplHost;
+
+/**
+ * A panel for displaying form wigets. By default, FormPanel uses a FormLayout,
+ * but this may be overridden when using nested layouts. See {@link FormLayout}
+ * for more documentation.
+ * 
+ * <p/>FormPanel supports nested layout containers. Fields should only be added
+ * to layout containers with a form layout. The form panel settings only apply
+ * to the panel's direct children.
+ * 
+ * <dl>
+ * <dt><b>Events:</b></dt>
+ * 
+ * <dd><b>BeforeSubmit</b> : FormEvent(this)<br>
+ * <div>Fires before the form is submitted. Only applies when using HTML
+ * submits. Listeners can set the <code>doit</code> field to
+ * <code>false</code> to cancel the action.</div>
+ * <ul>
+ * <li>formPanel : this</li>
+ * </ul>
+ * </dd>
+ * 
+ * <dd><b>Submit</b> : FormEvent(this, resultHtml)<br>
+ * <div>Fires after the form has been submitted. Only applies when using HTML
+ * submits.</div>
+ * <ul>
+ * <li>formPanel : this</li>
+ * <li>resultHtml : the response html</li>
+ * </ul>
+ * </dd>
+ * 
+ * </dl>
+ */
+public class FormPanel extends ContentPanel implements FormPanelImplHost {
+
+  /**
+   * Form encoding enumeration.
+   */
+  public enum Encoding {
+    MULTIPART("multipart/form-data"), URLENCODED("application/x-www-form-urlencoded");
+    private final String value;
+
+    private Encoding(String value) {
+      this.value = value;
+    }
+
+    public String value() {
+      return value;
+    }
+  }
+
+  /**
+   * Label alignment enumeration.
+   */
+  public enum LabelAlign {
+    LEFT, TOP, RIGHT;
+  }
+
+  /**
+   * Form method enumeration.
+   */
+  public enum Method {
+    GET, POST;
+  }
+
+  private static FormPanelImpl impl = GWT.create(FormPanelImpl.class);
+  private static int formId = 0;
+  private LabelAlign labelAlign = LabelAlign.LEFT;
+  private int labelWidth = 75;
+  private int fieldWidth = 210;
+  private El form;
+  private Method method = Method.GET;
+  private Encoding encoding;
+  private String action, frameName;
+  private Element iframe;
+  private String target;
+
+  /**
+   * Creates a new form panel.
+   */
+  public FormPanel() {
+    frameName = "gxt.formpanel-" + (++formId);
+    setTarget(frameName);
+  }
+
+  /**
+   * Returns the form's action.
+   * 
+   * @return the action url
+   */
+  public String getAction() {
+    return action;
+  }
+
+  /**
+   * Returns the encoding.
+   * 
+   * @return the encoding
+   */
+  public Encoding getEncoding() {
+    return encoding;
+  }
+
+  /**
+   * Returns all of the panel's child fields. Nested containers are included in
+   * the returned list.
+   * 
+   * @return the fields
+   */
+  public List<Field> getFields() {
+    List<Field> fields = new ArrayList<Field>();
+    getChildFields(this, fields);
+    return fields;
+  }
+
+  /**
+   * Returns the field width.
+   * 
+   * @return the field width
+   */
+  public int getFieldWidth() {
+    return fieldWidth;
+  }
+
+  /**
+   * Returns the label alignment.
+   * 
+   * @return the label alignment
+   */
+  public LabelAlign getLabelAlign() {
+    return labelAlign;
+  }
+
+  /**
+   * Returns the default width.
+   * 
+   * @return the label width
+   */
+  public int getLabelWidth() {
+    return labelWidth;
+  }
+
+  @Override
+  public El getLayoutTarget() {
+    return form;
+  }
+
+  /**
+   * Returns the form's method. Only applies when using standard HTML form
+   * submits.
+   * 
+   * @return the method the method
+   */
+  public Method getMethod() {
+    return method;
+  }
+
+  /**
+   * Gets the form's "target".
+   * 
+   * @return the form's target.
+   */
+  public String getTarget() {
+    return target;
+  }
+
+  /**
+   * Returns true if any of the form's fields are dirty.
+   * 
+   * @return true for dirty
+   */
+  public boolean isDirty() {
+    for (Field f : getFields()) {
+      if (f.isDirty()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Returns the form's valid state by querying all child fields.
+   * 
+   * @return true if value
+   */
+  public boolean isValid() {
+    boolean valid = true;
+    for (Field f : getFields()) {
+      if (!f.isValid()) {
+        valid = false;
+      }
+    }
+    return valid;
+  }
+
+  public boolean onFormSubmit() {
+    UncaughtExceptionHandler handler = GWT.getUncaughtExceptionHandler();
+    if (handler != null) {
+      return onFormSubmitAndCatch(handler);
+    } else {
+      return onFormSubmitImpl();
+    }
+  }
+
+  public void onFrameLoad() {
+    UncaughtExceptionHandler handler = GWT.getUncaughtExceptionHandler();
+    if (handler != null) {
+      onFrameLoadAndCatch(handler);
+    } else {
+      onFrameLoadImpl();
+    }
+  }
+
+  /**
+   * Sets the action of the form.
+   * 
+   * @param url the action
+   */
+  public void setAction(String url) {
+    this.action = url;
+    if (rendered) {
+      form.dom.setAttribute("action", url);
+    }
+  }
+
+  /**
+   * Sets the encoding used for submitting this form.
+   * 
+   * @param encoding the encoding
+   */
+  public void setEncoding(Encoding encoding) {
+    this.encoding = encoding;
+    if (rendered) {
+      impl.setEncoding(form.dom, encoding.value);
+    }
+  }
+
+  /**
+   * Sets the default field width (defaults to 210).
+   * 
+   * @param fieldWidth the field width
+   */
+  public void setFieldWidth(int fieldWidth) {
+    this.fieldWidth = fieldWidth;
+  }
+
+  /**
+   * Sets the label alignment.
+   * 
+   * @param align the alignment
+   */
+  public void setLabelAlign(LabelAlign align) {
+    this.labelAlign = align;
+  }
+
+  /**
+   * Sets the default label width.
+   * 
+   * @param labelWidth the label width
+   */
+  public void setLabelWidth(int labelWidth) {
+    this.labelWidth = labelWidth;
+  }
+
+  /**
+   * Specifies if the form will be submitted using an HTTP Post or Get request
+   * (defaults to GET).
+   * 
+   * @param method the method
+   */
+  public void setMethod(Method method) {
+    this.method = method;
+    if (rendered) {
+      form.dom.setAttribute("method", method.name().toLowerCase());
+    }
+  }
+
+  /**
+   * Sets all of the panel's fields read only state.
+   * 
+   * @param readOnly true for read only
+   */
+  public void setReadOnly(boolean readOnly) {
+    for (Field f : getFields()) {
+      f.setReadOnly(readOnly);
+    }
+  }
+
+  /**
+   * Submits the form.
+   */
+  public void submit() {
+    if (fireEvent(Events.BeforeSubmit, new FormEvent(this))) {
+      impl.submit(form.dom, iframe);
+    }
+  }
+
+  @Override
+  protected void onAttach() {
+    super.onAttach();
+    layout();
+    createFrame();
+    XDOM.getBody().appendChild(iframe);
+    impl.hookEvents(iframe, form.dom, this);
+  }
+
+  @Override
+  protected void onDetach() {
+    super.onDetach();
+    impl.unhookEvents(iframe, form.dom);
+    XDOM.getBody().removeChild(iframe);
+    iframe = null;
+  }
+
+  @Override
+  protected void onRemove(Component item) {
+    super.onRemove(item);
+    if (rendered && item.isRendered()) {
+      El wrap = item.el().findParentNode(".x-form-item", 3);
+      if (wrap != null) {
+        wrap.removeFromParent();
+      }
+    }
+  }
+
+  @Override
+  protected void onRender(Element target, int index) {
+    super.onRender(target, index);
+    body.setStyleAttribute("background", "none");
+
+    form = new El(DOM.createForm());
+    body.appendChild(form.dom);
+
+    setMethod(method);
+    setTarget(this.target);
+
+    if (encoding != null) {
+      setEncoding(encoding);
+    }
+    if (action != null) {
+      setAction(action);
+    }
+
+    if (getLayout() == null) {
+      FormLayout layout = new FormLayout();
+      layout.setDefaultWidth(fieldWidth);
+      layout.setLabelWidth(labelWidth);
+      layout.setLabelAlign(labelAlign);
+      setLayout(layout);
+    }
+
+    form.addEventsSunk(Event.ONLOAD);
+  }
+
+  private void createFrame() {
+    Element dummy = DOM.createDiv();
+    DOM.setInnerHTML(dummy, "<iframe src=\"javascript:''\" name='" + frameName
+        + "' style='position:absolute;width:0;height:0;border:0'>");
+
+    iframe = DOM.getFirstChild(dummy);
+  }
+
+  private void getChildFields(Container<Component> c, List<Field> fields) {
+    for (Component comp : c.getItems()) {
+      if (comp instanceof Field) {
+        fields.add((Field) comp);
+      } else if (comp instanceof Container) {
+        getChildFields((Container) comp, fields);
+      }
+    }
+
+  }
+
+  private boolean onFormSubmitAndCatch(UncaughtExceptionHandler handler) {
+    try {
+      return onFormSubmitImpl();
+    } catch (Throwable e) {
+      handler.onUncaughtException(e);
+      return false;
+    }
+  }
+
+  private boolean onFormSubmitImpl() {
+    return fireEvent(Events.BeforeSubmit, new FormEvent(this));
+  }
+
+  private void onFrameLoadAndCatch(UncaughtExceptionHandler handler) {
+    try {
+      onFrameLoadImpl();
+    } catch (Throwable e) {
+      handler.onUncaughtException(e);
+    }
+  }
+
+  private void onFrameLoadImpl() {
+    DeferredCommand.addCommand(new Command() {
+      public void execute() {
+        fireEvent(Events.Submit, new FormEvent(FormPanel.this, impl.getContents(iframe)));
+      }
+    });
+  }
+
+  private void setTarget(String target) {
+    this.target = target;
+    if (rendered) {
+      form.dom.setPropertyString("target", target);
+    }
+  }
+
+}

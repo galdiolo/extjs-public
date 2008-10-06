@@ -1,0 +1,131 @@
+.my-list {
+  border: 1px solid #99BBE8;
+  -moz-outline: none;
+  -moz-user-focus: normal;
+  background-color: white;
+  font-family: "Myriad Pro", "Myriad Web", "Tahoma", "Helvetica", "Arial", sans-serif;
+}
+
+.my-list-notchecked {
+  background: url(../images/gxt/tree/notchecked.gif) no-repeat 0px 0px !important;
+  margin: 3px 0pt 0pt 0px;
+}
+
+.my-list-checked {
+  background: url(../images/gxt/tree/checked.gif) no-repeat 0px 0px !important;
+  margin: 3px 0pt 0pt 0px;
+}
+
+.ext-ie .my-list-notchecked {
+  margin: 2px 0pt 0pt 0px;
+}
+
+.ext-ie .my-list-checked {
+  margin: 2px 0pt 0pt 0px;
+}
+
+.my-list-flat {
+  border: 1px solid #6593cf;
+  -moz-outline: none;
+  -moz-user-focus: normal;
+  background-color: white;
+  cursor: default;
+}
+
+.my-list-item {
+  cursor: pointer;
+  -moz-outline: none;
+  -moz-user-focus: normal;
+}
+
+.my-list-flat .my-list-item {
+  height: 19px;
+  border: 1px solid white;
+}
+
+.my-list-flat .my-list-item-over {
+  background-color: #F1F1F1;
+  border: 1px dotted #B5B4B4;
+}
+
+.my-list-flat .my-list-item-sel {
+  background-color: #DFE8F6;
+  border: 1px dotted #9EB8ED;
+}
+
+.my-list-flat .my-list-item-over .my-list-item-l {
+  background: none;
+}
+
+.my-list-flat .my-list-item-over .my-list-item-icon,.my-list-flat .my-list-item-over .my-list-item-ml,.my-list-flat .my-list-item-over .my-list-item-c
+  {
+  background: none;
+}
+
+.my-list-flat .my-list-item-over .my-list-item-r {
+  background: none;
+}
+
+.my-list-flat .my-list-item-sel .my-list-item-l {
+  background: none;
+}
+
+.my-list-flat .my-list-item-sel .my-list-item-icon,.my-list-flat .my-list-item-sel .my-list-item-ml,.my-list-flat .my-list-item-sel .my-list-item-c
+  {
+  background: none;
+}
+
+.my-list-flat .my-list-item-sel .my-list-item-r {
+  background: none;
+}
+
+.my-list-item-text {
+  font-size: 11px;
+  padding-top: 3px;
+  padding-left: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  line-height: 19px;
+}
+
+.my-list-item-l div {
+  width: 5px;
+}
+
+.my-list-item-ml {
+  width: 18px;
+}
+
+.my-list-item-c {
+  width: 100%;
+}
+
+.my-list-item-r div {
+  width: 3px;
+}
+
+.my-list-item-over .my-list-item-l {
+  background: url(../images/gxt/shared/select-19-bg.gif) no-repeat left -57px;
+}
+
+.my-list-item-over .my-list-item-icon,.my-list-item-over .my-list-item-check,.my-list-item-over .my-list-item-c
+  {
+  background: url(../images/gxt/shared/select-19-bg.gif) repeat-x left -95px;
+}
+
+.my-list-item-over .my-list-item-r {
+  background: url(../images/gxt/shared/select-19-bg.gif) no-repeat right -76px;
+}
+
+.my-list-item-sel .my-list-item-l {
+  background: url(../images/gxt/shared/select-19-bg.gif) no-repeat left 0px;
+}
+
+.my-list-item-sel .my-list-item-icon,.my-list-item-sel .my-list-item-check,.my-list-item-sel .my-list-item-c
+  {
+  background: url(../images/gxt/shared/select-19-bg.gif) left -38px;
+}
+
+.my-list-item-sel .my-list-item-r {
+  background: url(../images/gxt/shared/select-19-bg.gif) no-repeat right -19px;
+}

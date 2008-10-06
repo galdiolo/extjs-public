@@ -1,0 +1,1 @@
+The Ext GWT Help Center URL is http://extjs.com/helpcenter/index.jsp.
