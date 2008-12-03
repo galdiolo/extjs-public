@@ -27,21 +27,26 @@ public class TreeSelectionModel extends AbstractSelectionModel<Tree, TreeItem> {
   public TreeSelectionModel(SelectionMode mode) {
     super(mode);
   }
-  
+
   @Override
-  protected void onClick(ContainerEvent ce) {
-    TreeItem item = (TreeItem)ce.item;
+  protected void onMouseDown(ContainerEvent ce) {
+    TreeItem item = (TreeItem) ce.item;
     if (item != null) {
       if (!ce.within(item.getUI().getJointEl()) && !ce.within(item.getUI().getCheckEl())) {
-        if (isSelected(item) && ce.isControlKey()) {
-          deselect(item);
+        if (singleSelect) {
+          doSelect(new Items(item), false, false);
         } else {
-          doSelect(new Items(item), ce.isControlKey(), false);
+          if (isSelected(item) && ce.isControlKey()) {
+            deselect(item);
+          } else {
+            doSelect(new Items(item), ce.isControlKey(), false);
+          }
         }
+
       }
     }
   }
-  
+
   @Override
   protected void doMultiSelect(TreeItem item, ContainerEvent ce) {
     if (locked) return;

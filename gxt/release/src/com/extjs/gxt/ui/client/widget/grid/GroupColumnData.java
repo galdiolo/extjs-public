@@ -15,17 +15,17 @@ import com.extjs.gxt.ui.client.data.ModelData;
 public class GroupColumnData extends ColumnData {
 
   public String group;
-  
+
   public String field;
-  
+
   public Object gvalue;
-  
+
   public String text;
-  
+
   public String groupId;
-  
+
   public int startRow;
-  
+
   public List<ModelData> models = new ArrayList<ModelData>();
-  
+
 }

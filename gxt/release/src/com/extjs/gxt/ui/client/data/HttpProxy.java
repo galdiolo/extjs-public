@@ -22,6 +22,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class HttpProxy<C, D> implements DataProxy<C, D> {
 
   protected RequestBuilder builder;
+  protected String initUrl;
 
   /**
    * Creates a new HttpProxy.
@@ -30,8 +31,9 @@ public class HttpProxy<C, D> implements DataProxy<C, D> {
    */
   public HttpProxy(RequestBuilder builder) {
     this.builder = builder;
+    this.initUrl = builder.getUrl();
   }
-  
+
   public void load(final DataReader<C, D> reader, final C loadConfig,
       final AsyncCallback<D> callback) {
     try {
@@ -39,7 +41,7 @@ public class HttpProxy<C, D> implements DataProxy<C, D> {
       if (builder.getHTTPMethod().equals("POST")) {
         data = generateUrl(loadConfig);
       } else {
-        String url = builder.getUrl();
+        String url = initUrl;
         url = url + (url.indexOf("?") == -1 ? "?" : "&");
         String params = generateUrl(loadConfig);
         url += params;
@@ -52,6 +54,10 @@ public class HttpProxy<C, D> implements DataProxy<C, D> {
         }
 
         public void onResponseReceived(Request request, Response response) {
+          if (response.getStatusCode() != Response.SC_OK) {
+            callback.onFailure(new RuntimeException("HttpProxy: Invalid status code " + response.getStatusCode()));
+            return;
+          }
           String text = response.getText();
           try {
             D data = null;
@@ -93,6 +99,6 @@ public class HttpProxy<C, D> implements DataProxy<C, D> {
   }
 
   private native void setUrl(RequestBuilder rb, String url) /*-{
-    rb.@com.google.gwt.http.client.RequestBuilder::url = url;
-  }-*/;
+      rb.@com.google.gwt.http.client.RequestBuilder::url = url;
+    }-*/;
 }

@@ -18,8 +18,8 @@ import com.extjs.gxt.ui.client.store.StoreFilter;
 import com.extjs.gxt.ui.client.widget.form.TriggerField;
 
 /**
- * A <code>TriggerField</code> that filters its bound stores based on the
- * value of the field.
+ * A <code>TriggerField</code> that filters its bound stores based on the value
+ * of the field.
  * 
  * @param <M> the model type
  */

@@ -9,5 +9,5 @@ public class ExplorerModel extends ExamplesModel {
   public ExplorerModel() {
     set("overview", new Entry("Overview", new OverviewPage(), true, false));
   }
-  
+
 }

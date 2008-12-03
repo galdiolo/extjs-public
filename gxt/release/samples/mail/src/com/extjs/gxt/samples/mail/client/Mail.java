@@ -21,24 +21,26 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 public class Mail implements EntryPoint {
 
+  public static final String SERVICE = "service";
+  
   public void onModuleLoad() {
     GXT.setDefaultTheme(Theme.GRAY, true);
     GXT.hideLoadingPanel("loading");
-    
+
     MailServiceAsync service = (MailServiceAsync) GWT.create(MailService.class);
     ServiceDefTarget endpoint = (ServiceDefTarget) service;
     String moduleRelativeURL = GWT.getModuleBaseURL() + "service";
     endpoint.setServiceEntryPoint(moduleRelativeURL);
-    Registry.register("service", service);
-    
+    Registry.register(SERVICE, service);
+
     Dispatcher dispatcher = Dispatcher.get();
     dispatcher.addController(new AppController());
     dispatcher.addController(new MailController());
     dispatcher.addController(new TaskController());
     dispatcher.addController(new ContactController());
-    
-    dispatcher.dispatch(AppEvents.Login); 
-    
+
+    dispatcher.dispatch(AppEvents.Login);
+
   }
 
 }

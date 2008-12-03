@@ -30,6 +30,10 @@ import com.google.gwt.user.client.ui.RootPanel;
 
 public class AppView extends View {
 
+  public static final String WEST_PANEL = "west";
+  public static final String VIEWPORT = "viewport";
+  public static final String CENTER_PANEL = "center";
+  
   private Viewport viewport;
   private ContentPanel west;
   private LayoutContainer center;
@@ -58,13 +62,13 @@ public class AppView extends View {
     createCenter();
 
     // registry serves as a global context
-    Registry.register("viewport", viewport);
-    Registry.register("west", west);
-    Registry.register("center", center);
+    Registry.register(VIEWPORT, viewport);
+    Registry.register(WEST_PANEL, west);
+    Registry.register(CENTER_PANEL, center);
 
     RootPanel.get().add(viewport);
   }
-  
+
   private void createNorth() {
     StringBuffer sb = new StringBuffer();
     sb.append("<div id='demo-header' class='x-small-editor'><div id='demo-theme'></div><div id=demo-title>Ext GWT Mail Demo</div></div>");

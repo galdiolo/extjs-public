@@ -39,9 +39,9 @@ public class KeyNav<E extends ComponentEvent> extends BaseObservable implements 
     // FF yes yes
     // Safari no yes
     // Opera yes yes
-    if (GXT.isIE || GXT.isSafari) {
+    if (GXT.isIE || GXT.isSafari || GXT.isGecko) {
       keyEvent = Event.ONKEYDOWN;
-    } else  {
+    } else {
       keyEvent = Event.ONKEYPRESS;
     }
   }
@@ -128,6 +128,9 @@ public class KeyNav<E extends ComponentEvent> extends BaseObservable implements 
 
   public void handleEvent(ComponentEvent ce) {
     if (ce.type == keyEvent) {
+      if (component.getElement() != ce.event.getCurrentTarget()) {
+        return;
+      }
       if (cancelBubble) {
         ce.cancelBubble();
       }

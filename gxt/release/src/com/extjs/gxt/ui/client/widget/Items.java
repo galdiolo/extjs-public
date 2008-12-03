@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * A selection of items in a container. The selection can be specified with an
- * index, a range, a single item, an array, and a list. Allows
+ * index, a range, a single item, an array, and a list.
  * 
  * @param <T> the child type
  */
@@ -26,23 +26,18 @@ public class Items<T extends Component> {
    * @param index the index of the item
    */
   public Items(int index) {
-    this(index, index+1);
+    this(index, index);
   }
 
   /**
-   * Creates a items instance with a range "start <= index < end"
+   * Creates a items instance with a range.
    * 
    * @param start the start index
    * @param end the end index
    */
   public Items(int start, int end) {
-    if (end > start) {
-      this.start = start;
-      this.end = end;
-    } else {
-      this.start = end;
-      this.end = start;
-    }
+    this.start = start;
+    this.end = end;
   }
 
   /**
@@ -88,14 +83,22 @@ public class Items<T extends Component> {
    * @return the selected items
    */
   public List<T> getItems(Container c) {
-    List<T> temp = new ArrayList<T>();
-    if (start > -1) {
-      for (int i = start; i < end; i++) {
-        temp.add((T) c.getItem(i));
-      }
-      return temp;
+    List temp = new ArrayList<T>();
+
+    if (start == -1 && end == -1) {
+      return items;
     }
-    return items;
+
+    if (start <= end) {
+      for (int i = start; i <= end; i++) {
+        temp.add(c.getItem(i));
+      }
+    } else {
+      for (int i = start; i >= end; i--) {
+        temp.add(c.getItem(i));
+      }
+    }
+    return temp;
   }
 
   /**
@@ -104,6 +107,9 @@ public class Items<T extends Component> {
    * @return true for single, false otherwise
    */
   public boolean isSingle() {
-    return ((end-start) == 1 || items.size() == 1);
+    if (start == -1 && end == -1) {
+      return items.size() == 1;
+    }
+    return ((end - start) == 0 || items.size() == 1);
   }
 }

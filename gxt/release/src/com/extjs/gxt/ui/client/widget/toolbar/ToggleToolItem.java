@@ -14,7 +14,6 @@ import com.extjs.gxt.ui.client.event.ToolBarEvent;
 import com.extjs.gxt.ui.client.widget.button.ToggleButton;
 import com.google.gwt.user.client.Element;
 
-
 /**
  * A 2-state tool bar item.
  * 
@@ -32,7 +31,7 @@ import com.google.gwt.user.client.Element;
  * </dl>
  */
 public class ToggleToolItem extends TextToolItem {
-  
+
   /**
    * True to start pressed.
    */
@@ -100,7 +99,7 @@ public class ToggleToolItem extends TextToolItem {
     });
     super.onRender(target, index);
   }
-  
+
   protected void onButtonToggle(ButtonEvent be) {
     ToolBarEvent evt = new ToolBarEvent(toolBar, this);
     evt.event = be.event;

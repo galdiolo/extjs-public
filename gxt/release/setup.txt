@@ -6,9 +6,9 @@ Add the following stylesheet to your host page.
 
 <link rel="stylesheet" type="text/css" href="css/ext-all.css" />
 
-Ext GWT requires the following doctype.
+Ext GWT requires no doctype or the following doctype (quirksmode).
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 Eclipse Setup (should be similiar for other development enviornments)
 These instructions assume you have a existing project and launch confifuration.
@@ -25,3 +25,4 @@ These instructions assume you have a existing project and launch confifuration.
 	b. Select your appropriate launch configuration under 'Java Application'.
 	c. Select the 'Classpath' tab.
 	d. Add the gxt.jar to the classpath.
+

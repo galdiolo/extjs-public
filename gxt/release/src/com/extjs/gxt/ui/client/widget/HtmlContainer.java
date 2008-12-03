@@ -26,12 +26,30 @@ import com.google.gwt.user.client.ui.Widget;
  * A specialized container whose contents can be specified as an existing
  * element, an html fragment, or a remote url. When adding children a css
  * selector is used to identify the element the child will be inserted into.
+ * </p>
+ * 
+ * Code snippet:
+ * 
+ * <pre>{@code
+   HtmlContainer hc = new HtmlContainer(
+     "<div class=text style='padding:5px'>"
+     + "<h1>Heading1</h1>"
+     + "<i>Some text</i></br>"
+     + "<div class=b1></div>"
+     + "<u>Final text</u></div>");
+   hc.add(new Button("Test"), "div.b1");
+   hc.setBorders(true);
+   hc.setSize(200, 100);
+   hc.setPosition(10, 10);
+   RootPanel.get().add(hc);
+ * }</pre>
  */
 public class HtmlContainer extends Container<Component> {
 
   /**
    * The method used when requesting remote content (defaults to
-   * RequestBuilder.GET). Only applies when specifying a {@link #setUrl(String)}.
+   * RequestBuilder.GET). Only applies when specifying a {@link #setUrl(String)}
+   * .
    */
   public Method httpMethod = RequestBuilder.GET;
 
@@ -88,13 +106,12 @@ public class HtmlContainer extends Container<Component> {
   }
 
   /**
-   * Adds a component to this Container. Fires the <i>BeforeAdd</i> event
-   * before adding, then fires the <i>Add</i> event after the component has
-   * been added.
+   * Adds a component to this Container. Fires the <i>BeforeAdd</i> event before
+   * adding, then fires the <i>Add</i> event after the component has been added.
    * 
    * @param widget the widget to add. If the widget is not a Component it will
-   *            be wrapped in a WidgetComponent
-   * @param selector the css selector used to identify the components parent
+   *          be wrapped in a WidgetComponent
+   * @param selector the css selector (ie div.class) used to identify the components parent
    */
   public void add(Widget widget, String selector) {
     Component component = wrapWidget(widget);
@@ -112,7 +129,6 @@ public class HtmlContainer extends Container<Component> {
   public String getTagName() {
     return tagName;
   }
-
 
   /**
    * Sets the container's inner html.

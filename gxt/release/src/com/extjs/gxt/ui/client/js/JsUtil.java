@@ -29,10 +29,10 @@ public class JsUtil {
    * @return the new javascript object
    */
   public static native JavaScriptObject eval(String code) /*-{
-    var x = eval(code);
-    return x[0];
-  }-*/;
-  
+     var x = eval(code);
+     return x[0];
+   }-*/;
+
   /**
    * Returns <code>true</code> if the value is a integer.
    * 
@@ -92,9 +92,11 @@ public class JsUtil {
     return jsArray.getJsObject();
 
   }
-  
+
   /**
-   * Coverts a map into a javascript object, setting all values as properties. Map keys must be strings.
+   * Coverts a map into a javascript object, setting all values as properties.
+   * Map keys must be strings.
+   * 
    * @param params the parameters
    * @return the new javascript object
    */
@@ -105,9 +107,9 @@ public class JsUtil {
       String k = keys.next();
       Object v = params.get(k);
       if (v instanceof Params) {
-        v = ((Params)v).getValues();
+        v = ((Params) v).getValues();
       } else if (v instanceof ModelData) {
-        v = new Params(((ModelData)v).getProperties()).getValues();
+        v = new Params(((ModelData) v).getProperties()).getValues();
       }
       obj.set(k, v);
     }
@@ -122,8 +124,8 @@ public class JsUtil {
    * @return the element
    */
   private static native Element getElement(JavaScriptObject jsArray, int index) /*-{ 
-    return jsArray[index]; 
-    }-*/;
+     return jsArray[index]; 
+     }-*/;
 
   /**
    * Returns the length of a javascript array.
@@ -133,6 +135,6 @@ public class JsUtil {
    * @return the array length
    */
   private static native int getLength(JavaScriptObject jsArray) /*-{
-    return jsArray.length;
-    }-*/;
+     return jsArray.length;
+     }-*/;
 }

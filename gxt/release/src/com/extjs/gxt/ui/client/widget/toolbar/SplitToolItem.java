@@ -12,7 +12,6 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.widget.button.SplitButton;
 
-
 /**
  * A split button tool item.
  * 
@@ -25,8 +24,7 @@ import com.extjs.gxt.ui.client.widget.button.SplitButton;
  * <li>item : the menu</li>
  * <li>event : the dom event</li>
  * </ul>
- * </dd>
- * </dt>
+ * </dd> </dt>
  */
 public class SplitToolItem extends TextToolItem {
 

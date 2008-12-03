@@ -40,7 +40,7 @@ public class BaseModelData implements ModelData, Serializable {
 
   public <X> X get(String property) {
     if (allowNestedValues && NestedModelUtil.isNestedProperty(property)) {
-      return (X)NestedModelUtil.getNestedValue(this, property);
+      return (X) NestedModelUtil.getNestedValue(this, property);
     }
     return map == null ? null : (X) map.get(property);
   }
@@ -120,11 +120,6 @@ public class BaseModelData implements ModelData, Serializable {
     for (String property : properties.keySet()) {
       set(property, properties.get(property));
     }
-  }
-
-  @Override
-  public String toString() {
-    return map == null ? "empty" : map.toString();
   }
 
 }

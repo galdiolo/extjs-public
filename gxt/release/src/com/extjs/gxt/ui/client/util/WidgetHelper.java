@@ -23,20 +23,20 @@ public class WidgetHelper {
   public static void doAttach(Widget widget) {
     ComponentHelper.doAttach(widget);
   }
-  
+
   public static void doDetach(Widget widget) {
     ComponentHelper.doDetach(widget);
   }
-  
-  public static void setLayoutData(Component c, LayoutData data){
+
+  public static void setLayoutData(Component c, LayoutData data) {
     ComponentHelper.setLayoutData(c, data);
   }
-  
+
   public static LayoutData getLayoutData(Component c) {
     return ComponentHelper.getLayoutData(c);
   }
-  
-  public static void setModel(Component c, ModelData model){
+
+  public static void setModel(Component c, ModelData model) {
     ComponentHelper.setModel(c, model);
   }
 

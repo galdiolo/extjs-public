@@ -209,8 +209,8 @@ public class BoxComponent extends Component {
   }
 
   /**
-   * Sets the component's size. This method fires the <i>Move</i> and <i>Resize</i>
-   * events. element.
+   * Sets the component's size. This method fires the <i>Move</i> and
+   * <i>Resize</i> events. element.
    * 
    * @param x the x coordinate
    * @param y the y coordinate
@@ -223,8 +223,8 @@ public class BoxComponent extends Component {
   }
 
   /**
-   * Sets the component's size. This method fires the <i>Move</i> and <i>Resize</i>
-   * events. element.
+   * Sets the component's size. This method fires the <i>Move</i> and
+   * <i>Resize</i> events. element.
    * 
    * @param bounds the update box
    */
@@ -264,8 +264,7 @@ public class BoxComponent extends Component {
 
   /**
    * Sets the page XY position of the component. To set the left and top
-   * instead, use {@link #setPosition}. This method fires the <i>Move</i>
-   * event.
+   * instead, use {@link #setPosition}. This method fires the <i>Move</i> event.
    * 
    * @param x the x coordinate
    * @param y the y coordinate
@@ -292,8 +291,7 @@ public class BoxComponent extends Component {
 
   /**
    * Sets the page XY position of the component. To set the left and top
-   * instead, use {@link #setPosition}. This method fires the <i>Move</i>
-   * event.
+   * instead, use {@link #setPosition}. This method fires the <i>Move</i> event.
    * 
    * @param point the new location
    */
@@ -370,8 +368,8 @@ public class BoxComponent extends Component {
   }
 
   /**
-   * Sets the width and height of the component. This method fires the <i>Resize</i>
-   * event.
+   * Sets the width and height of the component. This method fires the
+   * <i>Resize</i> event.
    * 
    * @param width the new width to set
    * @param height the new height to set
@@ -410,8 +408,8 @@ public class BoxComponent extends Component {
   }
 
   /**
-   * Sets the width and height of the component. This method fires the <i>Resize</i>
-   * event.
+   * Sets the width and height of the component. This method fires the
+   * <i>Resize</i> event.
    * 
    * @param width the new width to set
    * @param height the new height to set
@@ -460,15 +458,15 @@ public class BoxComponent extends Component {
       w = Integer.parseInt(width.substring(0, width.indexOf("px")));
     } else if (autoWidth || width.equals("auto")) {
       w = -1;
-    } else if (!width.equals(Style.UNDEFINED)){
+    } else if (!width.equals(Style.UNDEFINED)) {
       w = getOffsetWidth();
     }
 
     if (height.indexOf("px") != -1) {
       h = Integer.parseInt(height.substring(0, height.indexOf("px")));
-    } else if (autoWidth || height.equals("auto")) {
+    } else if (autoHeight || height.equals("auto")) {
       h = -1;
-    } else if (!height.equals(Style.UNDEFINED)){
+    } else if (!height.equals(Style.UNDEFINED)) {
       h = getOffsetHeight();
     }
 
@@ -483,8 +481,7 @@ public class BoxComponent extends Component {
   }
 
   /**
-   * Sets the width of the component. This method fires the <i>Resize</i>
-   * event.
+   * Sets the width of the component. This method fires the <i>Resize</i> event.
    * 
    * @param width the new width to set
    */
@@ -493,8 +490,7 @@ public class BoxComponent extends Component {
   }
 
   /**
-   * Sets the width of the component. This method fires the <i>Resize</i>
-   * event.
+   * Sets the width of the component. This method fires the <i>Resize</i> event.
    * 
    * @param width the new width to set
    */
@@ -598,16 +594,16 @@ public class BoxComponent extends Component {
   }
 
   private static native String addUnitsInternal(String v, String defaultUnit) /*-{
-   if(v === "" || v == "auto"){
-   return v;
-   }
-   if(v === undefined){
-   return '';
-   }
-   if(typeof v == "number" || !/\d+(px|em|%|en|ex|pt|in|cm|mm|pc)$/i.test(v)){
-   return v + (defaultUnit || 'px');
-   }
-   return v;
-   }-*/;
+    if(v === "" || v == "auto"){
+    return v;
+    }
+    if(v === undefined){
+    return '';
+    }
+    if(typeof v == "number" || !/\d+(px|em|%|en|ex|pt|in|cm|mm|pc)$/i.test(v)){
+    return v + (defaultUnit || 'px');
+    }
+    return v;
+    }-*/;
 
 }

@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.ui.client.widget.button;
 
-
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
@@ -68,7 +67,6 @@ public class IconButton extends BoxComponent {
     this(style);
     addSelectionListener(listener);
   }
-
 
   /**
    * @param listener

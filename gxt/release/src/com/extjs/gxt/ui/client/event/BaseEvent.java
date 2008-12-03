@@ -23,20 +23,26 @@ public class BaseEvent {
   public int type;
 
   /**
-   * The source object.
+   * The object that fired the event.
    */
   public Object source;
 
   /**
    * Depending on the event, a flag indicating whether the operation should be
-   * allowed.
+   * allowed. The source object will document if a particular event may be
+   * canceled.
    */
   public boolean doit = true;
-  
+
   public BaseEvent() {
-    
+
   }
-  
+
+  /**
+   * Creates a new base event instance.
+   * 
+   * @param source the source object
+   */
   public BaseEvent(Object source) {
     this.source = source;
   }

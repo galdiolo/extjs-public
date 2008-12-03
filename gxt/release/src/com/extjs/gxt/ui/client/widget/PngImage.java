@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
-
 import com.extjs.gxt.ui.client.widget.impl.PngImageImpl;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Image;

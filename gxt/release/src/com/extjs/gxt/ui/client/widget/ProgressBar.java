@@ -38,7 +38,7 @@ import com.google.gwt.user.client.Timer;
  * progress.
  * </p>
  */
-public class ProgressBar extends Component {
+public class ProgressBar extends BoxComponent {
 
   private String text = "";
   private int duration = Style.DEFAULT;
@@ -148,6 +148,9 @@ public class ProgressBar extends Component {
     if (text != null) {
       updateText(text);
     }
+    if (!rendered) {
+      return this;
+    }
     double w = Math.floor(value * el().firstChild().getWidth());
     progressBar.setWidth((int) w);
     if (textTopElem != null) {
@@ -165,7 +168,9 @@ public class ProgressBar extends Component {
    */
   public void updateText(String text) {
     this.text = text != null ? text : "&#160;";
-    textEl.setInnerHtml(this.text);
+    if (rendered) {
+      textEl.setInnerHtml(this.text);
+    }
   }
 
   @Override
@@ -197,6 +202,10 @@ public class ProgressBar extends Component {
     if (text != null) {
       updateText(text);
     }
+    if (value > 0) {
+      updateProgress(value, text);
+    }
+    
   }
 
   /**

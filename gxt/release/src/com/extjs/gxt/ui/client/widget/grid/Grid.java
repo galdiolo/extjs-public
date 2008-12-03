@@ -8,6 +8,7 @@
 package com.extjs.gxt.ui.client.widget.grid;
 
 import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.ModelStringProvider;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -167,8 +168,7 @@ import com.google.gwt.user.client.Event;
  * <li>grid : this</li>
  * <li>sortInfo : the sort field and direction</li>
  * </ul>
- * </dd>
- * </dl>
+ * </dd> </dl>
  * 
  * @param <M> the model type
  */
@@ -190,6 +190,7 @@ public class Grid<M extends ModelData> extends BoxComponent {
   private boolean enableColumnResize = true;
   private boolean hideHeaders;
   private boolean loadMask;
+  private boolean viewReady;
 
   /**
    * Creates a new grid.
@@ -205,8 +206,6 @@ public class Grid<M extends ModelData> extends BoxComponent {
     baseStyle = "x-grid-panel";
     setSelectionModel(new GridSelectionModel<M>());
   }
-
-  // TODO add model string provider
 
   /**
    * Returns the auto expand column id.
@@ -280,10 +279,20 @@ public class Grid<M extends ModelData> extends BoxComponent {
     return view;
   }
 
+  /**
+   * Returns true if column resizing is enabled.
+   * 
+   * @return true if resizing is enabled
+   */
   public boolean isEnableColumnResize() {
     return enableColumnResize;
   }
 
+  /**
+   * Returns true if the header is hidden.
+   * 
+   * @return true for hidden
+   */
   public boolean isHideHeaders() {
     return hideHeaders;
   }
@@ -316,12 +325,6 @@ public class Grid<M extends ModelData> extends BoxComponent {
   }
 
   @Override
-  public void onAttach() {
-    super.onAttach();
-    view.layout();
-  }
-
-  @Override
   public void onComponentEvent(ComponentEvent ce) {
     super.onComponentEvent(ce);
     switch (ce.type) {
@@ -337,6 +340,27 @@ public class Grid<M extends ModelData> extends BoxComponent {
     }
 
     view.handleComponentEvent(ce);
+  }
+
+  /**
+   * Reconfigures the grid to use a different Store and Column Model. The View
+   * will be bound to the new objects and refreshed.
+   * 
+   * @param store the new store
+   * @param cm the new column model
+   */
+  public void reconfigure(ListStore<M> store, ColumnModel cm) {
+    if (loadMask && rendered) {
+      el().mask(GXT.MESSAGES.loadMask_msg());
+    }
+    view.initData(store, cm);
+    this.store = store;
+    this.cm = cm;
+    // rebind the sm
+    setSelectionModel(sm);
+    if (rendered) {
+      view.refresh(true);
+    }
   }
 
   /**
@@ -411,6 +435,11 @@ public class Grid<M extends ModelData> extends BoxComponent {
     this.minColumnWidth = minColumnWidth;
   }
 
+  /**
+   * Sets the grid selection model.
+   * 
+   * @param sm the selection mdoel
+   */
   public void setSelectionModel(GridSelectionModel<M> sm) {
     if (this.sm != null) {
       this.sm.bindGrid(null);
@@ -440,13 +469,11 @@ public class Grid<M extends ModelData> extends BoxComponent {
   }
 
   /**
-   * True to highlight rows when the mouse is over (defaults to true,
-   * pre-render).
+   * True to highlight rows when the mouse is over (defaults to true).
    * 
    * @param trackMouseOver true to highlight rows on mouse over
    */
   public void setTrackMouseOver(boolean trackMouseOver) {
-    assertPreRender();
     this.trackMouseOver = trackMouseOver;
   }
 
@@ -457,6 +484,8 @@ public class Grid<M extends ModelData> extends BoxComponent {
    */
   public void setView(GridView view) {
     this.view = view;
+    // rebind the sm
+    setSelectionModel(sm);
   }
 
   @Override
@@ -470,15 +499,22 @@ public class Grid<M extends ModelData> extends BoxComponent {
   }
 
   @Override
-  protected void doAttachChildren() {
-    super.doAttachChildren();
-    view.doAttach();
-  }
-
-  @Override
   protected void doDetachChildren() {
     super.doDetachChildren();
     view.doDetach();
+  }
+
+  @Override
+  protected void onAttach() {
+    super.onAttach();
+    if (!viewReady) {
+      view.init(this);
+      view.render();
+      viewReady = true;
+      view.resize();
+      view.afterRender();
+    }
+    view.doAttach();
   }
 
   protected void onClick(GridEvent e) {
@@ -545,13 +581,13 @@ public class Grid<M extends ModelData> extends BoxComponent {
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
     setElement(DOM.createDiv(), target, index);
-    view.init(this);
-    view.render();
+
+    el().setStyleAttribute("position", "relative");
   }
 
   @Override
   protected void onResize(int width, int height) {
-    if (isAttached()) {
+    if (isAttached() && viewReady) {
       view.layout();
     }
   }

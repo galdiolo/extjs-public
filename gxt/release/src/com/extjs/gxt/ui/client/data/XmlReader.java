@@ -84,8 +84,8 @@ public class XmlReader<C> implements DataReader<C, ListLoadResult<ModelData>> {
   }
 
   protected native JavaScriptObject getJsObject(Element elem) /*-{
-   return elem.@com.google.gwt.xml.client.impl.DOMItem::getJsObject()();
-   }-*/;
+    return elem.@com.google.gwt.xml.client.impl.DOMItem::getJsObject()();
+    }-*/;
 
   protected String getValue(Element elem, String name) {
     return DomQuery.selectValue(name, getJsObject(elem));

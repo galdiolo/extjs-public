@@ -11,6 +11,17 @@ import com.extjs.gxt.ui.client.data.ModelData;
 
 /**
  * Listener for selection changes.
+ * 
+ * <pre>
+    TableBinder<Stock> binder = new TableBinder&lt;Stock>(tbl, store);
+    binder.addSelectionChangedListener(new SelectionChangedListener&lt;Stock>() {
+      public void selectionChanged(SelectionChangedEvent&lt;Stock> se) {
+        List&lt;Stock> sel = se.getSelection();
+      }
+    });
+ * </pre>
+ *
+ * @param <M> the model type being selected
  */
 public abstract class SelectionChangedListener<M extends ModelData> implements
     Listener<SelectionChangedEvent<M>> {

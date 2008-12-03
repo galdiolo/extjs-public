@@ -166,7 +166,6 @@ public class TableColumnUI extends BoxComponent {
     if (column != null) {
       addStyleName("my-tbl-col-" + column.getId());
     }
-    
 
     // TODO: remove hardcoded height
     el().setHeight(24);

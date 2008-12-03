@@ -10,7 +10,6 @@ package com.extjs.gxt.ui.client.util;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Manages the libraries themes. The BLUE and GRAY themes are registered when
  * the application is initialized.

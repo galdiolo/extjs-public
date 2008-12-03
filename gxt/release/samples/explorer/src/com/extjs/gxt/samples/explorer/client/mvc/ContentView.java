@@ -22,6 +22,7 @@ import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.TabItem;
 import com.extjs.gxt.ui.client.widget.TabPanel;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.google.gwt.user.client.History;
 
 public class ContentView extends View {
 
@@ -42,12 +43,21 @@ public class ContentView extends View {
 
       public void handleEvent(TabPanelEvent be) {
         TabItem item = be.item;
-        Entry entry = (Entry)item.getData("entry");
+        Entry entry = (Entry) item.getData("entry");
         Dispatcher.forwardEvent(AppEvents.HidePage, entry);
       }
 
     });
-    ContentPanel center = (ContentPanel) Registry.get("centerPanel");
+    tabPanel.addListener(Events.Select, new Listener<TabPanelEvent>() {
+      public void handleEvent(TabPanelEvent be) {
+        String token = History.getToken();
+        Entry entry = (Entry)be.item.getData("entry");
+        if (token != null && (!token.equals(entry.getId()))) {
+          History.newItem(entry.getId(), false);
+        }
+      }
+    });
+    ContentPanel center = (ContentPanel) Registry.get(AppView.CENTER_PANEL);
     center.add(tabPanel);
   }
 

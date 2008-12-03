@@ -28,24 +28,25 @@ public class Template {
 
   private native static Element appendInternal(JavaScriptObject t, Element el,
       JavaScriptObject values) /*-{
-   return t.append(el, values);
-   }-*/;
+    return t.append(el, values);
+    }-*/;
+
   private native static String applyInternal(JavaScriptObject t, JavaScriptObject values) /*-{
-   return t.applyTemplate(values);
-   }-*/;
+    return t.applyTemplate(values);
+    }-*/;
 
   private native static JavaScriptObject create(String html) /*-{
-   return new $wnd.GXT.Ext.Template(html);
-   }-*/;
+    return new $wnd.GXT.Ext.Template(html);
+    }-*/;
 
   private native static String getHtml(JavaScriptObject t) /*-{
-   return t.html;
-   }-*/;
+    return t.html;
+    }-*/;
 
   private native static Element insertInternal(String method, JavaScriptObject t, Element el,
       JavaScriptObject values) /*-{
-   return t[method](el, values);
-   }-*/;
+    return t[method](el, values);
+    }-*/;
 
   private JavaScriptObject t;
 
@@ -111,9 +112,9 @@ public class Template {
    * overhead.
    */
   public native void compile() /*-{
-   var t = this.@com.extjs.gxt.ui.client.core.Template::t;
-   t.compile();
-   }-*/;
+    var t = this.@com.extjs.gxt.ui.client.core.Template::t;
+    t.compile();
+    }-*/;
 
   /**
    * Creates a new element.
@@ -149,7 +150,8 @@ public class Template {
   }
 
   /**
-   * Applies the supplied values to the template and inserts the new node(s) at the given index.
+   * Applies the supplied values to the template and inserts the new node(s) at
+   * the given index.
    * 
    * @param el the context element
    * @param index the insert index
@@ -213,7 +215,7 @@ public class Template {
   public Element overwrite(Element el, Params values) {
     return insertInternal("overwrite", t, el, values.getValues());
   }
-  
+
   /**
    * Applies the supplied values to the template and overwrites the content of
    * el with the new node(s).
@@ -233,9 +235,9 @@ public class Template {
    * @param compile <code>true<code> to compile
    */
   public native void set(String html, boolean compile) /*-{
-   var t = this.@com.extjs.gxt.ui.client.core.Template::t;
-   t.set(html, compile);
-   }-*/;
+    var t = this.@com.extjs.gxt.ui.client.core.Template::t;
+    t.set(html, compile);
+    }-*/;
 
   /**
    * Sets the string provider for the template.

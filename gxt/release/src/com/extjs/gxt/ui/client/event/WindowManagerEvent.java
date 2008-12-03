@@ -26,7 +26,7 @@ public class WindowManagerEvent extends BaseEvent {
     super(manager);
     this.manager = manager;
   }
-  
+
   public WindowManagerEvent(WindowManager manager, Window window) {
     this(manager);
     this.window = window;

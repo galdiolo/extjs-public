@@ -31,8 +31,7 @@ public class MultiField<F extends Field> extends Field<F> {
   protected LayoutContainer lc;
   protected Validator validator;
   protected Orientation orientation = Orientation.HORIZONTAL;
-
-  private int spacing;
+  protected int spacing;
 
   /**
    * Creates a new checkbox group.

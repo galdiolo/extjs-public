@@ -47,12 +47,13 @@ import com.google.gwt.user.client.Event;
  * </ul>
  * </dd>
  * 
- * <dd><b>BeforeRemove</b> : DateListEvent(dataList, item)<br>
+ * <dd><b>BeforeRemove</b> : DateListEvent(dataList, item, index)<br>
  * <div>Fires before an item is removed. Listeners can set the <code>doit</code>
  * field to <code>false</code> to cancel the action.</div>
  * <ul>
  * <li>dataList : this</li>
  * <li>item : the item being removed</li>
+ * <li>index : the index of the item being removed</li>
  * </ul>
  * </dd>
  * 
@@ -65,11 +66,12 @@ import com.google.gwt.user.client.Event;
  * </ul>
  * </dd>
  * 
- * <dd><b>Remove</b> : DateListEvent(dataList, item)<br>
+ * <dd><b>Remove</b> : DateListEvent(dataList, item, index)<br>
  * <div>Fires after an item has been removed.</div>
  * <ul>
  * <li>dataList : this</li>
  * <li>item : the item that was removed</li>
+ * <li>index : the index of hte item that was removed</li>
  * </ul>
  * </dd>
  * 
@@ -146,6 +148,7 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
   private List<DataListItem> checked;
   private DataListSelectionModel sm;
   private boolean trackMouseOver = true;
+  private DataListItem overItem;
 
   /**
    * Creates a new single select list.
@@ -160,12 +163,11 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
     sm = new DataListSelectionModel(SelectionMode.SINGLE);
     sm.bind(this);
   }
-  
-  
+
   /**
    * Creates then adds an item to the list. Fires the <i>BeforeAdd</i> event
-   * before inserting, then fires the <i>Add</i> event after the widget has
-   * been inserted.
+   * before inserting, then fires the <i>Add</i> event after the widget has been
+   * inserted.
    * 
    * @param component the dataListItem to add
    */
@@ -173,12 +175,10 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
     return super.add(component);
   }
 
-
-
   /**
    * Creates then adds an item to the list. Fires the <i>BeforeAdd</i> event
-   * before inserting, then fires the <i>Add</i> event after the widget has
-   * been inserted.
+   * before inserting, then fires the <i>Add</i> event after the widget has been
+   * inserted.
    * 
    * @param text the item's text
    * @return the newly created item, or null if the add was cancelled
@@ -187,8 +187,6 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
     DataListItem item = new DataListItem(text);
     return add(item) ? item : null;
   }
-
-
 
   /**
    * Returns an array of checked items.
@@ -226,9 +224,9 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
   }
 
   /**
-   * Inserts an item into the list at the given index. Fires the <i>BeforeAdd</i>
-   * event before inserting, then fires the <i>Add</i> event after the widget
-   * has been inserted.
+   * Inserts an item into the list at the given index. Fires the
+   * <i>BeforeAdd</i> event before inserting, then fires the <i>Add</i> event
+   * after the widget has been inserted.
    * 
    * @param item the item
    * @param index the insert location
@@ -286,7 +284,7 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
 
     Collections.sort(selected, new Comparator<DataListItem>() {
       public int compare(DataListItem o1, DataListItem o2) {
-        return indexOf(o1) > indexOf(o2) ? 1 : 0;
+        return indexOf(o1) < indexOf(o2) ? 1 : 0;
       }
     });
 
@@ -328,18 +326,24 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
   public void onComponentEvent(ComponentEvent ce) {
     super.onComponentEvent(ce);
     DataListItem item = findItem(ce.getTarget());
-    if (item != null) {
-      DataListEvent dle = (DataListEvent) ce;
-      switch (ce.type) {
-        case Event.ONMOUSEOVER:
+    DataListEvent dle = (DataListEvent) ce;
+    switch (ce.type) {
+      case Event.ONMOUSEOVER:
+        if (item != null) {
           onOverChange(item, true, dle);
-          break;
-        case Event.ONMOUSEOUT:
-          onOverChange(item, false, dle);
-          break;
-        case Event.ONCLICK:
+        }
+        break;
+      case Event.ONMOUSEOUT:
+        if (overItem != null) {
+          onOverChange(overItem, false, dle);
+        }
+        break;
+      case Event.ONCLICK:
+        if (item != null) {
           onClick(item, dle);
-      }
+        }
+    }
+    if (item != null) {
       item.onComponentEvent(ce);
     }
   }
@@ -363,6 +367,7 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
     DataListEvent dle = new DataListEvent(this);
     dle.item = item;
     if (fireEvent(Events.BeforeRemove, dle)) {
+      checked.remove(item);
       item.list = null;
       boolean result = super.remove(item);
       fireEvent(Events.Remove, dle);
@@ -522,6 +527,11 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
   protected void onOverChange(DataListItem item, boolean over, DataListEvent e) {
     if (trackMouseOver) {
       item.el().setStyleName(itemStyle + "-over", over);
+      if (over) {
+        overItem = item;
+      } else {
+        overItem = null;
+      }
     }
   }
 
@@ -576,7 +586,7 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
     p.set("text", item.getText());
     p.set("id", item.getId());
     item.setElement(itemTemplate.create(p), target, index);
-    
+
     if (!GXT.isIE) {
       item.el().setTabIndex(0);
     }

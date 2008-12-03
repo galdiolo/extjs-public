@@ -17,13 +17,12 @@ import com.extjs.gxt.ui.client.data.ModelStringProvider;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.store.StoreEvent;
 import com.extjs.gxt.ui.client.widget.Component;
-import com.extjs.gxt.ui.client.widget.DataListItem;
 import com.extjs.gxt.ui.client.widget.DataView;
 import com.extjs.gxt.ui.client.widget.DataViewItem;
 
 /**
- * Binds a data view and a store.
- *
+ * A <code>StoreBinder</code> implementation for DataView.
+ * 
  * @param <M> the model type
  */
 public class DataViewBinder<M extends ModelData> extends StoreBinder<ListStore<M>, DataView, M> {
@@ -33,7 +32,7 @@ public class DataViewBinder<M extends ModelData> extends StoreBinder<ListStore<M
 
   /**
    * Creates a new data view binder.
-   *
+   * 
    * @param view the data view
    * @param store the list store
    */
@@ -55,7 +54,7 @@ public class DataViewBinder<M extends ModelData> extends StoreBinder<ListStore<M
 
   /**
    * Returns the binder's store.
-   *
+   * 
    * @return the store
    */
   public ListStore getStore() {
@@ -64,7 +63,7 @@ public class DataViewBinder<M extends ModelData> extends StoreBinder<ListStore<M
 
   /**
    * Returns the data view.
-   *
+   * 
    * @return this view
    */
   public DataView getView() {
@@ -148,7 +147,7 @@ public class DataViewBinder<M extends ModelData> extends StoreBinder<ListStore<M
       int count = store.getCount();
       for (int i = 0; i < count; i++) {
         M m = store.getAt(i);
-        DataListItem item = (DataListItem) findItem(m);
+        DataViewItem item = (DataViewItem) findItem(m);
         parent.dom.appendChild(item.getElement());
       }
     }

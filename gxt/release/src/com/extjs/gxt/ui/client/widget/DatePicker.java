@@ -298,6 +298,8 @@ public class DatePicker extends BoxComponent {
 
   }
 
+  protected Button todayBtn;
+
   private int firstDOW;
   private Date minDate;
   private Date maxDate;
@@ -309,7 +311,7 @@ public class DatePicker extends BoxComponent {
   private HorizontalPanel footer;
   private DateWrapper activeDate, value;
   private int mpSelMonth, mpSelYear;
-  private Button todayBtn, monthBtn;
+  private Button monthBtn;
   private Element[] cells;
   private Element[] textNodes;
   private IconButton prevBtn, nextBtn;

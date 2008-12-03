@@ -1,11 +1,12 @@
-Reachable types computed on: Thu Sep 18 00:14:48 EDT 2008
+Reachable types computed on: Mon Dec 01 16:33:55 EST 2008
 com.extjs.gxt.samples.client.examples.model.FileModel
    Serialization status
       Instantiable
    Path
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 com.extjs.gxt.samples.client.examples.model.FileModel[]
@@ -21,8 +22,9 @@ com.extjs.gxt.samples.client.examples.model.FolderModel
       Instantiable
    Path
       'com.extjs.gxt.samples.client.examples.model.FolderModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 com.extjs.gxt.samples.client.examples.model.FolderModel[]
@@ -39,8 +41,9 @@ com.extjs.gxt.ui.client.data.BaseModelData
    Path
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 com.extjs.gxt.ui.client.data.RpcMap
@@ -51,8 +54,9 @@ com.extjs.gxt.ui.client.data.RpcMap
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 com.google.gwt.i18n.client.impl.ConstantMap
@@ -65,8 +69,9 @@ com.google.gwt.i18n.client.impl.ConstantMap
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 com.google.gwt.i18n.client.impl.DateRecord
@@ -79,8 +84,9 @@ com.google.gwt.i18n.client.impl.DateRecord
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 com.google.gwt.i18n.client.impl.DateRecord[]
@@ -92,8 +98,9 @@ com.google.gwt.i18n.client.impl.DateRecord[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException
@@ -113,8 +120,9 @@ java.lang.Boolean
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.lang.Boolean[]
@@ -126,8 +134,9 @@ java.lang.Boolean[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.lang.Byte
@@ -140,8 +149,9 @@ java.lang.Byte
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.lang.Byte[]
@@ -153,8 +163,9 @@ java.lang.Byte[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.lang.Double
@@ -167,8 +178,9 @@ java.lang.Double
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.lang.Double[]
@@ -180,8 +192,9 @@ java.lang.Double[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.lang.Exception
@@ -203,8 +216,9 @@ java.lang.Float
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.lang.Float[]
@@ -216,8 +230,9 @@ java.lang.Float[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.lang.Integer
@@ -230,8 +245,9 @@ java.lang.Integer
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.lang.Integer[]
@@ -243,8 +259,9 @@ java.lang.Integer[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.lang.Long
@@ -257,8 +274,9 @@ java.lang.Long
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.lang.Long[]
@@ -270,8 +288,9 @@ java.lang.Long[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.lang.Number
@@ -285,8 +304,9 @@ java.lang.Number
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.lang.RuntimeException
@@ -307,8 +327,9 @@ java.lang.Short
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.lang.Short[]
@@ -320,8 +341,9 @@ java.lang.Short[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.lang.String
@@ -342,8 +364,9 @@ java.lang.String[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.lang.Throwable
@@ -366,8 +389,9 @@ java.sql.Date
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.sql.Date[]
@@ -379,8 +403,9 @@ java.sql.Date[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.sql.Time
@@ -393,8 +418,9 @@ java.sql.Time
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.sql.Time[]
@@ -406,8 +432,9 @@ java.sql.Time[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.sql.Timestamp
@@ -420,8 +447,9 @@ java.sql.Timestamp
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.sql.Timestamp[]
@@ -433,8 +461,9 @@ java.sql.Timestamp[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>
@@ -454,8 +483,9 @@ java.util.ArrayList<java.lang.String>
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>
@@ -475,8 +505,9 @@ java.util.Arrays.ArrayList<java.lang.String>
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.util.Date
@@ -489,8 +520,9 @@ java.util.Date
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.util.Date[]
@@ -502,38 +534,39 @@ java.util.Date[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.util.HashMap<java.lang.String, java.lang.String>
    Serialization status
       Instantiable
    Path
-      'java.util.HashMap<java.lang.String, java.lang.String>' is reachable as a supertype of type 'class java.util.LinkedHashMap<java.lang.String, java.lang.String>'
-      'java.util.LinkedHashMap<java.lang.String, java.lang.String>' is reachable as a subtype of type 'interface java.util.Map<java.lang.String, java.lang.String>'
+      'java.util.HashMap<java.lang.String, java.lang.String>' is reachable as a subtype of type 'interface java.util.Map<java.lang.String, java.lang.String>'
       'java.util.Map<java.lang.String, java.lang.String>' is reachable from field '_map' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.util.HashSet<java.lang.String>
    Serialization status
       Instantiable
    Path
-      'java.util.HashSet<java.lang.String>' is reachable as a supertype of type 'class java.util.LinkedHashSet<java.lang.String>'
-      'java.util.LinkedHashSet<java.lang.String>' is reachable as a subtype of type 'interface java.util.Set<java.lang.String>'
+      'java.util.HashSet<java.lang.String>' is reachable as a subtype of type 'interface java.util.Set<java.lang.String>'
       'java.util.Set<java.lang.String>' is reachable from field '_set' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.util.IdentityHashMap<java.lang.String, java.lang.String>
@@ -546,8 +579,9 @@ java.util.IdentityHashMap<java.lang.String, java.lang.String>
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.util.LinkedHashMap<java.lang.String, java.lang.String>
@@ -560,8 +594,9 @@ java.util.LinkedHashMap<java.lang.String, java.lang.String>
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.util.LinkedHashSet<java.lang.String>
@@ -574,8 +609,16 @@ java.util.LinkedHashSet<java.lang.String>
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+
+java.util.LinkedList<com.extjs.gxt.samples.client.examples.model.FileModel>
+   Serialization status
+      Instantiable
+   Path
+      'java.util.LinkedList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.util.LinkedList<java.lang.String>
@@ -588,15 +631,9 @@ java.util.LinkedList<java.lang.String>
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
-      Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
-
-java.util.LinkedList<com.extjs.gxt.samples.client.examples.model.FileModel>
-   Serialization status
-      Instantiable
-   Path
-      'java.util.LinkedList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.util.Stack<com.extjs.gxt.samples.client.examples.model.FileModel>
@@ -616,28 +653,32 @@ java.util.Stack<java.lang.String>
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
       'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
-      Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
-
-java.util.Vector<java.lang.String>
-   Serialization status
-      Instantiable
-   Path
-      'java.util.Vector<java.lang.String>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
-      'java.util.List<java.lang.String>' is reachable from field '_list' of type 'com.extjs.gxt.ui.client.data.RpcMap'
-      'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
-      'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
-      'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
-      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.ArrayList<E>'
-      'java.util.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 
 java.util.Vector<com.extjs.gxt.samples.client.examples.model.FileModel>
    Serialization status
       Instantiable
    Path
-      'java.util.Vector<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      'java.util.Vector<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a supertype of type 'class java.util.Stack<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      'java.util.Stack<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+      Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
+
+java.util.Vector<java.lang.String>
+   Serialization status
+      Instantiable
+   Path
+      'java.util.Vector<java.lang.String>' is reachable as a supertype of type 'class java.util.Stack<java.lang.String>'
+      'java.util.Stack<java.lang.String>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
+      'java.util.List<java.lang.String>' is reachable from field '_list' of type 'com.extjs.gxt.ui.client.data.RpcMap'
+      'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
+      'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
+      'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.FileModel'
+      Type 'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from array type 'com.extjs.gxt.samples.client.examples.model.FileModel[]'
+      'com.extjs.gxt.samples.client.examples.model.FileModel' is reachable from type argument 0 of type 'java.util.Arrays.ArrayList<E>'
+      'java.util.Arrays.ArrayList<com.extjs.gxt.samples.client.examples.model.FileModel>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.FileModel>'
 

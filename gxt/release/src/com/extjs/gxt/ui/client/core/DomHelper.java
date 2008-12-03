@@ -22,8 +22,8 @@ public class DomHelper {
    * @return the new element
    */
   public static native Element append(Element elem, String html) /*-{
-    return $wnd.GXT.Ext.DomHelper.append(elem, html, false);
-  }-*/;
+     return $wnd.GXT.Ext.DomHelper.append(elem, html, false);
+   }-*/;
 
   /**
    * Creates new DOM element(s) and inserts them after el.
@@ -33,8 +33,8 @@ public class DomHelper {
    * @return the new element
    */
   public static native Element insertAfter(Element elem, String html) /*-{
-     return $wnd.GXT.Ext.DomHelper.doInsert(elem, html, false, "afterEnd", "nextSibling");
-   }-*/;
+      return $wnd.GXT.Ext.DomHelper.doInsert(elem, html, false, "afterEnd", "nextSibling");
+    }-*/;
 
   /**
    * Creates new DOM element(s) and inserts them before el.
@@ -44,8 +44,8 @@ public class DomHelper {
    * @return the new element
    */
   public static native Element insertBefore(Element elem, String html) /*-{
-     return $wnd.GXT.Ext.DomHelper.doInsert(elem, html, false, "beforeBegin");
-   }-*/;
+      return $wnd.GXT.Ext.DomHelper.doInsert(elem, html, false, "beforeBegin");
+    }-*/;
 
   /**
    * Creates new DOM element(s) and inserts them as the first child of el.
@@ -55,21 +55,21 @@ public class DomHelper {
    * @return the new element
    */
   public static native Element insertFirst(Element elem, String html) /*-{
-     return $wnd.GXT.Ext.DomHelper.doInsert(elem, html, false, "afterBegin", "firstChild");
-   }-*/;
+      return $wnd.GXT.Ext.DomHelper.doInsert(elem, html, false, "afterBegin", "firstChild");
+    }-*/;
 
   /**
    * Inserts an HTML fragment into the DOM.
    * 
    * @param where where to insert the html in relation to el - beforeBegin,
-   *            afterBegin, beforeEnd, afterEnd.
+   *          afterBegin, beforeEnd, afterEnd.
    * @param el the context element
    * @param html the HTML fragment
    * @return the new element
    */
   public static native Element insertHtml(String where, Element el, String html) /*-{
-    return $wnd.GXT.Ext.DomHelper.insertHtml(where, el, html);
-  }-*/;
+     return $wnd.GXT.Ext.DomHelper.insertHtml(where, el, html);
+   }-*/;
 
   /**
    * Creates new DOM element(s) and overwrites the contents of el with them.
@@ -79,7 +79,7 @@ public class DomHelper {
    * @return the new element
    */
   public static native Element overwrite(Element elem, String html) /*-{
-    $wnd.GXT.Ext.DomHelper.overwite(elem, html);
-  }-*/;
+     $wnd.GXT.Ext.DomHelper.overwite(elem, html);
+   }-*/;
 
 }

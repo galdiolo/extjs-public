@@ -81,15 +81,14 @@ public class SimpleComboBox<T> extends ComboBox<SimpleComboValue<T>> {
   public T getSimpleValue() {
     SimpleComboValue c = getValue();
     if (c != null) {
-      return c.<T>get("value");
+      return c.<T> get("value");
     }
     try {
-      return (T)getRawValue();
-    }
-    catch (Exception e) {
+      return (T) getRawValue();
+    } catch (Exception e) {
       return null;
     }
-    
+
   }
 
   /**
@@ -104,7 +103,7 @@ public class SimpleComboBox<T> extends ComboBox<SimpleComboValue<T>> {
       }
     }
   }
-  
+
   /**
    * Removes all the values.
    */

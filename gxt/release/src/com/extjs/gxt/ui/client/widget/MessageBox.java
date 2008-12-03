@@ -18,6 +18,7 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.WindowEvent;
+import com.extjs.gxt.ui.client.widget.Window.CloseAction;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.google.gwt.user.client.Element;
@@ -104,7 +105,7 @@ public class MessageBox {
     box.show();
     return box;
   }
-
+  
   /**
    * Displays a confirmation message box with Yes and No buttons (comparable to
    * JavaScript's confirm).
@@ -121,6 +122,26 @@ public class MessageBox {
     box.callback = callback;
     box.icon = QUESTION;
     box.setButtons(YESNO);
+    box.show();
+    return box;
+  }
+
+  /**
+   * Displays a standard read-only message box with an OK button (comparable to
+   * the basic JavaScript alert prompt).
+   * 
+   * @param title the title bar text
+   * @param msg the message box body text
+   * @param callback listener to be called when the box is closed
+   * @return the new message box instance
+   */
+  public static MessageBox info(String title, String msg, Listener<WindowEvent> callback) {
+    MessageBox box = new MessageBox();
+    box.setTitle(title);
+    box.setMessage(msg);
+    box.callback = callback;
+    box.setButtons(OK);
+    box.icon = INFO;
     box.show();
     return box;
   }
@@ -156,7 +177,20 @@ public class MessageBox {
    * @return the new message box
    */
   public static MessageBox prompt(String title, String msg) {
-    return prompt(title, msg, false);
+    return prompt(title, msg, false, null);
+  }
+  
+  /**
+   * Displays a message box with OK and Cancel buttons prompting the user to
+   * enter some text (comparable to JavaScript's prompt).
+   * 
+   * @param title the title bar text
+   * @param msg the message box body text
+   * @param multiline true for a multi-line text aread
+   * @return the new message box
+   */
+  public static MessageBox prompt(String title, String msg, boolean multiline) {
+    return prompt(title, msg, multiline, null);
   }
 
   /**
@@ -168,15 +202,31 @@ public class MessageBox {
    * @param multiline true for a multi-line text aread
    * @return the new message box
    */
-  public static MessageBox prompt(String title, String msg, boolean multiline) {
+  public static MessageBox prompt(String title, String msg, boolean multiline, Listener<WindowEvent> callback) {
     MessageBox box = new MessageBox();
     box.setTitle(title);
     box.setMessage(msg);
     box.setType(MessageBoxType.PROMPT);
     box.setButtons(Dialog.OKCANCEL);
     box.setType(multiline ? MessageBoxType.MULTIPROMPT : MessageBoxType.PROMPT);
+    if (callback != null) {
+      box.addCallback(callback);
+    }
     box.show();
     return box;
+  }
+  
+  /**
+   * Displays a message box with OK and Cancel buttons prompting the user to
+   * enter some text (comparable to JavaScript's prompt).
+   * 
+   * @param title the title bar text
+   * @param msg the message box body text
+   * @param callback the callback
+   * @return the new message box
+   */
+  public static MessageBox prompt(String title, String msg, Listener<WindowEvent> callback) {
+    return prompt(title, msg, false, callback);
   }
 
   /**
@@ -212,7 +262,7 @@ public class MessageBox {
   private String progressText = "";
   private int minProgressWidth = 250;
   private String message = "&#160;";
-  private boolean closable = true;
+  private boolean closable;
   private String title;
   private String buttons = OK;
   private Dialog dialog;
@@ -232,9 +282,9 @@ public class MessageBox {
   public void addCallback(Listener listener) {
     if (dialog == null) {
       if (listeners == null) listeners = new HashMap<Integer, Listener>();
-      listeners.put(Events.Hide, listener);
+      listeners.put(Events.Close, listener);
     } else {
-      dialog.addListener(Events.Hide, listener);
+      dialog.addListener(Events.Close, listener);
     }
   }
 
@@ -250,6 +300,15 @@ public class MessageBox {
       listeners.put(event, listener);
     } else {
       dialog.addListener(event, listener);
+    }
+  }
+
+  /**
+   * Closes the message box.
+   */
+  public void close() {
+    if (dialog.isVisible()) {
+      dialog.close();
     }
   }
 
@@ -328,19 +387,22 @@ public class MessageBox {
 
         @Override
         protected void initTools() {
-          setClosable(false);
+          setClosable(closable);
           super.initTools();
         }
 
         @Override
         protected ComponentEvent previewEvent(int type, ComponentEvent ce) {
-          if (type == Events.Hide) {
+          if (ce instanceof WindowEvent) {
             WindowEvent we = (WindowEvent) ce;
             MessageBoxEvent e = new MessageBoxEvent(MessageBox.this, this, we.buttonClicked);
-            if (textBox != null) {
-              e.value = textBox.getValue();
-            } else if (textArea != null) {
-              e.value = textArea.getValue();
+            if (type == Events.Close || type == Events.BeforeClose) {
+              if (textBox != null) {
+                e.value = textBox.getValue();
+              } else if (textArea != null) {
+                e.value = textArea.getValue();
+              }
+
             }
             return e;
           }
@@ -348,7 +410,7 @@ public class MessageBox {
         }
 
       };
-
+      dialog.setData("messageBox", true);
       dialog.setHeading(getTitle());
       dialog.setResizable(false);
       dialog.setConstrain(true);
@@ -363,8 +425,9 @@ public class MessageBox {
       dialog.setFooter(true);
       dialog.setButtons(getButtons());
       dialog.setHideOnButtonClick(true);
+      dialog.setCloseAction(CloseAction.CLOSE);
       if (callback != null) {
-        dialog.addListener(Events.Hide, callback);
+        dialog.addListener(Events.Close, callback);
       }
       if (getButtons() != null) {
         if (getButtons().contains(Dialog.YES)) {
@@ -475,11 +538,11 @@ public class MessageBox {
 
   /**
    * Hides the message box if it is displayed.
+   * 
+   * @deprecated use {@link #close()}
    */
   public void hide() {
-    if (dialog.isVisible()) {
-      dialog.hide();
-    }
+    close();
   }
 
   /**

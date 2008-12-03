@@ -11,7 +11,8 @@ import com.extjs.gxt.ui.client.data.BaseModelData;
 
 public class Task extends BaseModelData {
 
-  public Task(int id, String project, int taskId, String desc, double estimate, double rate, String due) {
+  public Task(int id, String project, int taskId, String desc, double estimate, double rate,
+      String due) {
     set("id", id);
     set("project", project);
     set("taskId", taskId);
@@ -22,11 +23,11 @@ public class Task extends BaseModelData {
   }
 
   public Double getEstimate() {
-    return (Double)get("estimate");
+    return (Double) get("estimate");
   }
-  
+
   public double getRate() {
-    return (Double)get("rate");
+    return (Double) get("rate");
   }
-  
+
 }

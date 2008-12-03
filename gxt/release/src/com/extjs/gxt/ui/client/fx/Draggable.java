@@ -101,6 +101,7 @@ public class Draggable extends BaseObservable {
   private int clientWidth, clientHeight;
   private EventPreview preview;
   private DragEvent dragEvent;
+  private int startDragDistance = 2;
 
   /**
    * Creates a new draggable instance.
@@ -229,6 +230,15 @@ public class Draggable extends BaseObservable {
    */
   public String getProxyStyle() {
     return proxyStyle;
+  }
+
+  /**
+   * Returns the number of pixels the cursor must move before dragging begins.
+   * 
+   * @return the distance in pixels
+   */
+  public int getStartDragDistance() {
+    return startDragDistance;
   }
 
   /**
@@ -401,6 +411,16 @@ public class Draggable extends BaseObservable {
   }
 
   /**
+   * Specifies how far the cursor must move after mousedown to start dragging
+   * (defaults to 2).
+   * 
+   * @param startDragDistance the start distance in pixels
+   */
+  public void setStartDragDistance(int startDragDistance) {
+    this.startDragDistance = startDragDistance;
+  }
+
+  /**
    * True if the CSS z-index should be updated on the widget being dragged.
    * Setting this value to <code>true</code> will ensure that the dragged
    * element is always displayed over all other widgets (defaults to true).
@@ -468,6 +488,8 @@ public class Draggable extends BaseObservable {
     if (s != null && s.indexOf("x-nodrag") != -1) {
       return;
     }
+    
+    ce.preventDefault();
 
     startBounds = dragWidget.el().getBounds();
 
@@ -475,7 +497,6 @@ public class Draggable extends BaseObservable {
     dragStartY = ce.getClientY();
 
     dragWidget.enableEvents(false);
-    startDrag(ce.event);
 
     DOM.addEventPreview(preview);
 
@@ -492,16 +513,33 @@ public class Draggable extends BaseObservable {
     if (proxyEl != null) {
       proxyEl.setVisibility(true);
     }
+
+    if (startDragDistance == 0) {
+      startDrag(ce.event);
+    }
   }
 
   protected void onMouseMove(Event event) {
-    if (proxyEl != null) {
-      proxyEl.setVisibility(true);
+    String cls = event.getTarget().getClassName();
+    if (cls.contains("x-insert")) {
+      return;
     }
+
     int x = DOM.eventGetClientX(event);
     int y = DOM.eventGetClientY(event);
 
+    if (!dragging && Math.abs(dragStartX - x) > startDragDistance) {
+      startDrag(event);
+    }
+    if (!dragging && Math.abs(dragStartY - y) > startDragDistance) {
+      startDrag(event);
+    }
+
     if (dragging) {
+      if (proxyEl != null) {
+        proxyEl.setVisibility(true);
+      }
+
       int left = startBounds.x + (x - dragStartX);
       int top = startBounds.y + (y - dragStartY);
 
@@ -556,18 +594,22 @@ public class Draggable extends BaseObservable {
       lastX = left;
       lastY = top;
 
-      if (useProxy) {
-        proxyEl.setLeftTop(left, top);
-      } else {
-        dragWidget.el().setPagePosition(left, top);
-      }
-
       if (hasListeners()) {
         dragEvent.source = this;
         dragEvent.component = dragWidget;
         dragEvent.event = event;
         dragEvent.doit = true;
+        dragEvent.x = x;
+        dragEvent.y = y;
         fireEvent(Events.DragMove, dragEvent);
+      }
+
+      if (useProxy) {
+        int tl = (hasListeners() && dragEvent.x != x) ? dragEvent.x : left;
+        int tt = (hasListeners() && dragEvent.y != y) ? dragEvent.y : top;
+        proxyEl.setLeftTop(tl, tt);
+      } else {
+        dragWidget.el().setPagePosition(left, top);
       }
 
       if (!dragEvent.doit) {
@@ -579,7 +621,7 @@ public class Draggable extends BaseObservable {
 
   protected void startDrag(Event event) {
     XDOM.getBodyEl().addStyleName("x-unselectable");
-
+    XDOM.getBodyEl().addStyleName("x-dd-cursor");
     dragWidget.el().makePositionable();
 
     if (updateZIndex) {
@@ -591,10 +633,15 @@ public class Draggable extends BaseObservable {
     de.event = event;
     de.x = startBounds.x;
     de.y = startBounds.y;
+    de.doit = true;
 
     lastX = startBounds.x;
     lastY = startBounds.y;
-    fireEvent(Events.DragStart, de);
+
+    if (!fireEvent(Events.DragStart, de)) {
+      stopDrag(event);
+      return;
+    }
 
     if (dragEvent == null) {
       dragEvent = new DragEvent(this);
@@ -628,8 +675,12 @@ public class Draggable extends BaseObservable {
   }
 
   protected void stopDrag(Event event) {
+    XDOM.getBodyEl().removeStyleName("x-unselectable");
+    XDOM.getBodyEl().removeStyleName("x-dd-cursor");
+    dragWidget.enableEvents(true);
+    DOM.removeEventPreview(preview);
+
     if (dragging) {
-      DOM.removeEventPreview(preview);
       dragging = false;
       if (isUseProxy()) {
         if (isMoveAfterProxyDrag()) {

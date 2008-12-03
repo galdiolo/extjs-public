@@ -65,7 +65,7 @@ public class TwinTriggerField extends TriggerField {
     wrap.dom.setClassName("x-form-field-wrap");
 
     trigger = new El(DOM.createImg());
-    trigger.dom.setClassName("x-form-trigger");
+    trigger.dom.setClassName("x-form-trigger " + triggerStyle);
     trigger.dom.setPropertyString("src", GXT.BLANK_IMAGE_URL);
 
     twinTrigger = DOM.createImg();

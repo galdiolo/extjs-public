@@ -9,6 +9,7 @@ package com.extjs.gxt.samples.explorer.client;
 
 import com.extjs.gxt.samples.client.ExampleService;
 import com.extjs.gxt.samples.client.ExampleServiceAsync;
+import com.extjs.gxt.samples.client.Examples;
 import com.extjs.gxt.samples.client.FileService;
 import com.extjs.gxt.samples.client.FileServiceAsync;
 import com.extjs.gxt.samples.client.examples.model.Entry;
@@ -25,6 +26,8 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 public class Explorer implements EntryPoint {
 
+  public static final String MODEL = "model";
+  
   private Dispatcher dispatcher;
   private ExplorerModel model;
 
@@ -33,16 +36,16 @@ public class Explorer implements EntryPoint {
     ServiceDefTarget endpoint = (ServiceDefTarget) service;
     String moduleRelativeURL = GWT.getModuleBaseURL() + "service";
     endpoint.setServiceEntryPoint(moduleRelativeURL);
-    Registry.register("service", service);
+    Registry.register(Examples.SERVICE, service);
 
     FileServiceAsync fileservice = (FileServiceAsync) GWT.create(FileService.class);
     endpoint = (ServiceDefTarget) fileservice;
     moduleRelativeURL = GWT.getModuleBaseURL() + "fileservice";
     endpoint.setServiceEntryPoint(moduleRelativeURL);
-    Registry.register("fileservice", fileservice);
-    
+    Registry.register(Examples.FILE_SERVICE, fileservice);
+
     model = new ExplorerModel();
-    Registry.register("model", model);
+    Registry.register(MODEL, model);
 
     dispatcher = Dispatcher.get();
     dispatcher.addController(new AppController());

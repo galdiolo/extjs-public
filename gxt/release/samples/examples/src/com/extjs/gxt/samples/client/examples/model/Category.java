@@ -14,15 +14,15 @@ public class Category extends BaseTreeModel {
 
   protected Category() {
   }
-  
+
   public Category(String name) {
     set("name", name);
   }
-  
+
   public String getName() {
     return (String) get("name");
   }
-  
+
   public String toString() {
     return getName();
   }
@@ -30,7 +30,7 @@ public class Category extends BaseTreeModel {
   public void addEntry(String title, LayoutContainer page) {
     add(new Entry(title, page));
   }
-  
+
   public void addEntry(String title, LayoutContainer page, boolean fill) {
     add(new Entry(title, page, fill));
   }

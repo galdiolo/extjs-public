@@ -25,7 +25,6 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Frame;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * ContentPanel is a component container that has specific functionality and
@@ -33,8 +32,27 @@ import com.google.gwt.user.client.ui.Widget;
  * application-oriented user interfaces. The Panel contains bottom and top
  * toolbars, along with separate header, footer and body sections. It also
  * provides built-in expandable and collapsible behavior, along with a variety
- * of prebuilt tool buttons that can be wired up to provide other customized
- * behavior.
+ * of pre-built tool buttons that can be wired up to provide other customized
+ * behavior.</p>
+ * 
+ * Code snippet:
+ * 
+ * <pre>
+ ContentPanel cp = new ContentPanel();
+ cp.setHeading("Folder Contents");
+ cp.setSize(250,140);
+ cp.setPosition(10, 10);
+ cp.setCollapsible(true);
+ cp.setFrame(true);
+ cp.setBodyStyle("backgroundColor: white;");
+ cp.getHeader().addTool(new ToolButton("x-tool-gear"));
+ cp.getHeader().addTool(new ToolButton("x-tool-close"));
+ cp.addText(getBogusText());
+ cp.addButton(new Button("Ok"));
+ cp.setIconStyle("tree-folder-open");
+ RootPanel.get().add(cp);
+ cp.layout();
+ * </pre>
  * 
  * <dl>
  * <dt><b>Events:</b></dt>
@@ -99,7 +117,7 @@ public class ContentPanel extends LayoutContainer {
   private HorizontalAlignment buttonAlign = HorizontalAlignment.RIGHT;
   private boolean animCollapse = true;
   private boolean collapsible;
-  private boolean bodyBorder = true, insetBorder = true;
+  private boolean bodyBorder = true;
   private Component topComponent;
   private Component bottomComponent;
   private boolean animating;
@@ -148,7 +166,7 @@ public class ContentPanel extends LayoutContainer {
    */
   public void collapse() {
     if (rendered) {
-      if (collapsible && !collapsed && !animating) {
+      if (!collapsed && !animating) {
         if (fireEvent(Events.BeforeCollapse)) {
           onCollapse();
         }
@@ -164,7 +182,7 @@ public class ContentPanel extends LayoutContainer {
    * expanding.
    */
   public void expand() {
-    if (rendered && getCollapsible() && isCollapsed()) {
+    if (rendered && collapsed) {
       if (fireEvent(Events.BeforeExpand)) {
         removeStyleName(collapseStyle);
         onExpand();
@@ -236,6 +254,15 @@ public class ContentPanel extends LayoutContainer {
   }
 
   /**
+   * Returns the panel's collapse button.
+   * 
+   * @return the collapse button
+   */
+  public ToolButton getCollapseBtn() {
+    return collapseBtn;
+  }
+
+  /**
    * Returns true if the panel is collapsible.
    * 
    * @return the collapsible state
@@ -301,7 +328,7 @@ public class ContentPanel extends LayoutContainer {
       Element ft = bwrap.dom.getLastChild().cast();
       h += (fly(hd).getHeight() + fly(ft).getHeight());
       Element mc = bwrap.subChild(3).dom;
-      h += fly(mc).getFrameWidth("tb");
+      h += fly(mc).getFrameWidth("tb") + 1;
     } else {
       if (head != null) {
         h += head.getOffsetHeight();
@@ -409,13 +436,6 @@ public class ContentPanel extends LayoutContainer {
     return topComponent;
   }
 
-  public Widget getWidget(String field) {
-    if ("collapseBtn".equals(field)) {
-      return collapseBtn;
-    }
-    return null;
-  }
-
   /**
    * Returns <code>true</code> if the panel is expanded.
    * 
@@ -464,9 +484,7 @@ public class ContentPanel extends LayoutContainer {
 
   /**
    * True to display the borders of the panel's body element, false to hide them
-   * (defaults to true, pre-render). By default, the border is a 2px wide inset
-   * border, but this can be further altered by setting
-   * {@link #setBodyBorder(boolean)} to false.
+   * (defaults to true, pre-render). Only applies to non-framed panels.
    * 
    * @param bodyBorder true for a body border
    */
@@ -610,7 +628,11 @@ public class ContentPanel extends LayoutContainer {
   }
 
   /**
-   * Sets the header's icon style.
+   * Sets the item's icon style. The style name should match a CSS style that
+   * specifies a background image using the following format:
+   * 
+   * <pre><code> .my-icon { background: url(images/icons/my-icon.png) no-repeat
+   * center left !important; } </code></pre>
    * 
    * @param iconStyle the icon style
    */
@@ -624,15 +646,15 @@ public class ContentPanel extends LayoutContainer {
    * {@link #setBodyBorder(boolean)} == true.
    * 
    * @param insetBorder true to display the interior border
+   * @deprecated behavior not implemented
    */
   public void setInsetBorder(boolean insetBorder) {
     assertPreRender();
-    this.insetBorder = insetBorder;
   }
 
   /**
-   * True to allow expanding and collapsing the panel (when {@link #collapsible} =
-   * true) by clicking anywhere in the header bar, false to allow it only by
+   * True to allow expanding and collapsing the panel (when {@link #collapsible}
+   * = true) by clicking anywhere in the header bar, false to allow it only by
    * clicking to tool button (defaults to false, pre-render).
    * 
    * @param titleCollapse the titleCollapse to set
@@ -735,7 +757,7 @@ public class ContentPanel extends LayoutContainer {
   }
 
   protected void onClick(ComponentEvent ce) {
-    if (head != null && ce.within(head.getElement())) {
+    if (head != null && ce.within(head.getElement()) && collapsible) {
       setExpanded(!isExpanded());
     }
   }
@@ -860,10 +882,6 @@ public class ContentPanel extends LayoutContainer {
       }
     }
 
-    if (!insetBorder) {
-      body.setBorders(false);
-    }
-
     if (bodyStyle != null) {
       body.applyStyles(bodyStyle);
     }
@@ -878,10 +896,12 @@ public class ContentPanel extends LayoutContainer {
 
     if (topComponent != null) {
       topComponent.render(tbar.dom);
+      topComponent.setStyleAttribute("position", "static");
     }
 
     if (bottomComponent != null) {
       bottomComponent.render(bbar.dom);
+      bottomComponent.setStyleAttribute("position", "static");
     }
 
     if (titleCollapse) {

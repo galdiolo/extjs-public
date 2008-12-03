@@ -213,7 +213,8 @@ public class BeanModelGenerator extends Generator {
             }
           }
         }
-        // swap returnType as generic types were not matching (beans.contains(returnType))
+        // swap returnType as generic types were not matching
+        // (beans.contains(returnType))
         if (returnType != null) {
           String t = returnType.getQualifiedSourceName();
           if (t.indexOf("extends") == -1) {
@@ -223,6 +224,12 @@ public class BeanModelGenerator extends Generator {
         if (beans.contains(returnType)) {
           sw.println("if (value != null) {");
           sw.println("    BeanModel nestedModel = nestedModels.get(s);");
+          sw.println("    if (nestedModel != null) {");
+          sw.println("      Object bean = nestedModel.getBean();");
+          sw.println("      if (!bean.equals(value)){");
+          sw.println("        nestedModel = null;");
+          sw.println("      }");
+          sw.println("    }");
           sw.println("    if (nestedModel == null) {");
           sw.println("        nestedModel = " + BeanModelLookup.class.getCanonicalName()
               + ".get().getFactory(" + returnType.getQualifiedSourceName()

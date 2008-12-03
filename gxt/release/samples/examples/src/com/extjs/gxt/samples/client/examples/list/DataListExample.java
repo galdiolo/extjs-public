@@ -29,12 +29,15 @@ import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
+import com.google.gwt.user.client.Element;
 
 public class DataListExample extends LayoutContainer {
 
   private int count;
-  
-  public DataListExample() {
+
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
     HorizontalPanel hp = new HorizontalPanel();
     hp.setSpacing(8);
 
@@ -141,5 +144,5 @@ public class DataListExample extends LayoutContainer {
     vp.add(hp);
     add(vp);
   }
-  
+
 }

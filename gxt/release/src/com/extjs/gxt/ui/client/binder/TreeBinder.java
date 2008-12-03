@@ -28,7 +28,7 @@ import com.extjs.gxt.ui.client.widget.tree.Tree;
 import com.extjs.gxt.ui.client.widget.tree.TreeItem;
 
 /**
- * A store binder for Trees.
+ * A <code>StoreBinder</code> implementation for Trees.
  * 
  * @param <M> the model type
  */
@@ -97,6 +97,24 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
   }
 
   /**
+   * Returns the binder's tree.
+   * 
+   * @return the tree
+   */
+  public Tree getTree() {
+    return tree;
+  }
+
+  /**
+   * Returns the binder's tree store.
+   * 
+   * @return the tree store
+   */
+  public TreeStore getTreeStore() {
+    return store;
+  }
+
+  /**
    * Returns true if auto load is enabled.
    * 
    * @return the auto load state
@@ -149,8 +167,8 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
 
   /**
    * Sets whether the children should be cached after first being retrieved from
-   * the store (defaults to true). When <code>false</code>, the tree items
-   * will be removed when collapsed.
+   * the store (defaults to true). When <code>false</code>, the tree items will
+   * be removed when collapsed.
    * 
    * @param caching the caching state
    */
@@ -232,7 +250,7 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
     if (loader != null) {
       item.setLeaf(!loader.hasChildren(model));
     } else {
-      item.setLeaf(store.getChildCount(model) == 0);
+      item.setLeaf(!hasChildren(model));
     }
 
     setModel(item, model);
@@ -256,6 +274,10 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
       selected.add((M) item.getModel());
     }
     return selected;
+  }
+
+  protected boolean hasChildren(M parent) {
+    return store.getChildCount(parent) != 0;
   }
 
   @Override
@@ -340,8 +362,8 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
       for (int i = children.size() - 1; i >= 0; i--) {
         item.add(createItem(children.get(i)), tse.index);
       }
-    } else if (item.getData("loaded") == null){
-      if (item.isLeaf()) {
+    } else if (item.getData("loaded") == null) {
+      if (hasChildren((M) item.getModel())) {
         item.setLeaf(false);
         if (item.isRendered()) {
           item.getUI().updateJointStyle();
@@ -424,7 +446,9 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
     p.setData("loaded", true);
     p.enable();
 
+    boolean leaf = p.isLeaf();
     p.removeAll();
+    p.setLeaf(leaf);
 
     if (p.isRendered()) {
       p.getUI().onLoadingChange(false);
@@ -444,7 +468,7 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
 
     if (!f && p.hasChildren() && p.getData("expand") != null) {
       p.setExpanded(true);
-    } else if (!p.hasChildren()) {
+    } else if (p.isLeaf()) {
       p.setLeaf(true);
     }
 
@@ -517,7 +541,7 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
   }
 
   private native void markChildrenRendered(TreeItem item, boolean rendered) /*-{
-   item.@com.extjs.gxt.ui.client.widget.tree.TreeItem::childrenRendered = rendered;
-   }-*/;
+      item.@com.extjs.gxt.ui.client.widget.tree.TreeItem::childrenRendered = rendered;
+      }-*/;
 
 }

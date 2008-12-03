@@ -13,13 +13,16 @@ import java.util.List;
 
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.ContainerEvent;
+import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.util.DelayedTask;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.WindowResizeListener;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -27,7 +30,7 @@ import com.google.gwt.user.client.ui.Widget;
  * Containers handle the basic behavior of containing components, namely
  * managing, attaching, and detaching the child widgets.
  * 
- * <p/> When children are added to a container they are not physcially added to
+ * <p/> When children are added to a container they are not physically added to
  * the DOM of the container. Subclasses are responsible for connecting the child
  * components.
  * 
@@ -67,15 +70,33 @@ public abstract class Container<T extends Component> extends BoxComponent {
   protected boolean monitorWindowResize = false;
 
   protected boolean layoutExecuted;
-  
+  protected boolean layoutOnAttach = true;
+
   private Layout layout;
   private List<T> items;
+  private DelayedTask windowResizeTask;
 
   /**
    * Creates a new container.
    */
   public Container() {
     items = new ArrayList<T>();
+  }
+
+  @Override
+  public void disable() {
+    super.disable();
+    for (Component c : items) {
+      c.disable();
+    }
+  }
+
+  @Override
+  public void enable() {
+    super.enable();
+    for (Component c : items) {
+      c.enable();
+    }
   }
 
   /**
@@ -204,6 +225,16 @@ public abstract class Container<T extends Component> extends BoxComponent {
     return insert(item, getItemCount());
   }
 
+  protected int adjustIndex(T child, int beforeIndex) {
+    if (child.getParent() == this) {
+      int idx = indexOf(child);
+      if (idx < beforeIndex) {
+        beforeIndex--;
+      }
+    }
+    return beforeIndex;
+  }
+
   /**
    * Sets the child's parent to this container. In order to support lazy
    * rendering this method uses JSNI to simply set the child parent without
@@ -281,7 +312,7 @@ public abstract class Container<T extends Component> extends BoxComponent {
   protected El getLayoutTarget() {
     return el();
   }
-
+  
   /**
    * Addss a item into the container. Fires the <i>BeforeAdd</i> event before
    * inserting, then fires the <i>Add</i> event after the widget has been
@@ -296,6 +327,8 @@ public abstract class Container<T extends Component> extends BoxComponent {
     if (fireEvent(Events.BeforeAdd, containerEvent)) {
       ComponentEvent componentEvent = item.createComponentEvent(null);
       if (item.fireEvent(Events.BeforeAdopt, componentEvent)) {
+        index = adjustIndex(item, index);
+        item.removeFromParent();
         onInsert(item, index);
         items.add(index, item);
         adopt(item);
@@ -336,6 +369,7 @@ public abstract class Container<T extends Component> extends BoxComponent {
    */
   protected boolean layout() {
     if (!rendered) {
+      layoutOnAttach = true;
       return false;
     }
     return doLayout();
@@ -344,14 +378,8 @@ public abstract class Container<T extends Component> extends BoxComponent {
   @Override
   protected void onAttach() {
     super.onAttach();
-    if (!layoutExecuted) {
-      DeferredCommand.addCommand(new Command() {
-        public void execute() {
-          if (!layoutExecuted) {
-            layout();
-          } 
-        }
-      });
+    if (!layoutExecuted && layoutOnAttach) {
+      layout();
     }
   }
 
@@ -361,6 +389,27 @@ public abstract class Container<T extends Component> extends BoxComponent {
 
   protected void onRemove(T item) {
 
+  }
+
+  @Override
+  protected void onRender(Element target, int index) {
+    super.onRender(target, index);
+    if (monitorWindowResize) {
+      windowResizeTask = new DelayedTask(new Listener<BaseEvent>() {
+        public void handleEvent(BaseEvent be) {
+          onWindowResize(Window.getClientWidth(), Window.getClientHeight());
+        }
+      });
+      Window.addWindowResizeListener(new WindowResizeListener() {
+        public void onWindowResized(int width, int height) {
+          windowResizeTask.delay(400);
+        }
+      });
+    }
+  }
+
+  protected void onWindowResize(int width, int height) {
+    layout();
   }
 
   protected final void orphan(T child) {
@@ -387,6 +436,7 @@ public abstract class Container<T extends Component> extends BoxComponent {
   protected boolean remove(T component, boolean force) {
     ContainerEvent containerEvent = createContainerEvent(component);
     containerEvent.item = component;
+    containerEvent.index = indexOf(component);
     if (fireEvent(Events.BeforeRemove, containerEvent) || force) {
       ComponentEvent componentEvent = component.createComponentEvent(null);
       if (component.fireEvent(Events.BeforeOrphan, componentEvent) || force) {
@@ -477,7 +527,7 @@ public abstract class Container<T extends Component> extends BoxComponent {
   }
 
   private native void setParent(Widget parent, Widget child) /*-{
-   child.@com.google.gwt.user.client.ui.Widget::parent = parent;
+     child.@com.google.gwt.user.client.ui.Widget::parent = parent;
    }-*/;
 
 }

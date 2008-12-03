@@ -31,6 +31,7 @@ import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.form.TimeField;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
+import com.google.gwt.user.client.Element;
 
 public class FormsExample extends LayoutContainer {
 
@@ -39,7 +40,11 @@ public class FormsExample extends LayoutContainer {
   public FormsExample() {
     vp = new VerticalPanel();
     vp.setSpacing(10);
+  }
 
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
     createForm1();
     createForm2();
     add(vp);
@@ -59,7 +64,7 @@ public class FormsExample extends LayoutContainer {
     TextField<String> email = new TextField<String>();
     email.setFieldLabel("Email");
     simple.add(email);
-    
+
     List<Stock> stocks = TestData.getStocks();
     Collections.sort(stocks, new Comparator<Stock>() {
       public int compare(Stock arg0, Stock arg1) {
@@ -134,12 +139,12 @@ public class FormsExample extends LayoutContainer {
     FieldSet fieldSet = new FieldSet();
     fieldSet.setHeading("User Information");
     fieldSet.setCheckboxToggle(true);
-    
+
     FormLayout layout = new FormLayout();
     layout.setLabelWidth(75);
     layout.setPadding(4);
     fieldSet.setLayout(layout);
-    
+
     TextField<String> firstName = new TextField<String>();
     firstName.setFieldLabel("First Name");
     firstName.setAllowBlank(false);
@@ -156,18 +161,18 @@ public class FormsExample extends LayoutContainer {
     TextField<String> email = new TextField<String>();
     email.setFieldLabel("Email");
     fieldSet.add(email);
-    
+
     form2.add(fieldSet);
-    
+
     fieldSet = new FieldSet();
     fieldSet.setHeading("Phone Numbers");
     fieldSet.setCollapsible(true);
-    
+
     layout = new FormLayout();
     layout.setLabelWidth(75);
     layout.setPadding(4);
     fieldSet.setLayout(layout);
-    
+
     TextField<String> field = new TextField<String>();
     field.setFieldLabel("Home");
     fieldSet.add(field);
@@ -175,15 +180,15 @@ public class FormsExample extends LayoutContainer {
     field = new TextField<String>();
     field.setFieldLabel("Business");
     fieldSet.add(field);
-    
+
     field = new TextField<String>();
     field.setFieldLabel("Mobile");
     fieldSet.add(field);
-    
+
     field = new TextField<String>();
     field.setFieldLabel("Fax");
     fieldSet.add(field);
-    
+
     form2.add(fieldSet);
     form2.setButtonAlign(HorizontalAlignment.CENTER);
     form2.addButton(new Button("Save"));

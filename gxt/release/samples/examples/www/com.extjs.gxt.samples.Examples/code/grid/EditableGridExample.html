@@ -74,10 +74,10 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 
 public class EditableGridExample extends LayoutContainer {
-  
+
   public EditableGridExample() {
-setLayout(new FlowLayout(10));
-    
+    setLayout(new FlowLayout(10));
+
     List<Stock> stocks = TestData.getStocks();
     for (Stock s : stocks) {
       DateWrapper w = new DateWrapper();
@@ -180,7 +180,7 @@ setLayout(new FlowLayout(10));
       public void componentSelected(ToolBarEvent ce) {
         Plant plant = new Plant();
         plant.setName("New Plant 1");
-        plant.setLight("Mostly Shade");
+        plant.setLight("Mostly Shady");
         plant.setPrice(0);
         plant.setAvailable(new DateWrapper().clearTime().asDate());
         plant.setIndoor(false);

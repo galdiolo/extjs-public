@@ -38,6 +38,14 @@ public class Util {
     return value;
   }
 
+  public static List subList(List list, int start, int end) {
+    List temp = new ArrayList();
+    for (int i = start; i < end; i++) {
+      temp.add(list.get(i));
+    }
+    return temp;
+  }
+
   /**
    * Constrains the value by a min and max value.
    * 

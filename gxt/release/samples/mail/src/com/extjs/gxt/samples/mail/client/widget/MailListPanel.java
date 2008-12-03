@@ -32,7 +32,7 @@ public class MailListPanel extends ContentPanel {
   private Table table;
   private ListStore<MailItem> store;
   private TableBinder<MailItem> binder;
-  
+
   public MailListPanel() {
     ToolBar toolBar = new ToolBar();
     TextToolItem create = new TextToolItem("Create");
@@ -44,7 +44,6 @@ public class MailListPanel extends ContentPanel {
     toolBar.add(reply);
 
     setTopComponent(toolBar);
-    
 
     List<TableColumn> columns = new ArrayList<TableColumn>();
     columns.add(new TableColumn("sender", "Sender", .2f));
@@ -56,7 +55,7 @@ public class MailListPanel extends ContentPanel {
     table = new Table(cm);
     table.setSelectionMode(SelectionMode.MULTI);
     table.setBorders(false);
-    
+
     add(table);
 
     store = new ListStore<MailItem>();
@@ -69,21 +68,21 @@ public class MailListPanel extends ContentPanel {
         showMailItem(m);
       }
     });
-    
+
     setLayout(new FitLayout());
   }
-  
+
   public ListStore<MailItem> getStore() {
     return store;
   }
-  
+
   public TableBinder<MailItem> getBinder() {
     return binder;
   }
-  
+
   private void showMailItem(MailItem item) {
     AppEvent evt = new AppEvent(AppEvents.ViewMailItem, item);
     Dispatcher.forwardEvent(evt);
   }
-  
+
 }

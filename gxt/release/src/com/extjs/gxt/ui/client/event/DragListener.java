@@ -37,7 +37,7 @@ public class DragListener implements Listener<DragEvent> {
    * @param de the drag event
    */
   public void dragStart(DragEvent de) {
-    
+
   }
 
   /**
@@ -46,7 +46,7 @@ public class DragListener implements Listener<DragEvent> {
    * @param de the drag event
    */
   public void dragMove(DragEvent de) {
-    
+
   }
 
   /**
@@ -55,7 +55,7 @@ public class DragListener implements Listener<DragEvent> {
    * @param de the drag event
    */
   public void dragEnd(DragEvent de) {
-    
+
   }
 
   /**
@@ -64,7 +64,7 @@ public class DragListener implements Listener<DragEvent> {
    * @param de the drag event
    */
   public void dragCancel(DragEvent de) {
-    
+
   }
 
 }

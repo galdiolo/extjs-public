@@ -12,7 +12,6 @@ import java.util.Map;
 
 import com.extjs.gxt.ui.client.event.BaseObservable;
 
-
 /**
  * A local storage of objects stored by id.
  */
@@ -27,7 +26,7 @@ public final class Registry extends BaseObservable {
    * @return the object or <code>null</code> if no match
    */
   public static <X> X get(String id) {
-    return (X)map.get(id);
+    return (X) map.get(id);
   }
 
   /**

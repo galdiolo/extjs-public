@@ -35,7 +35,7 @@ public class TreeTableHeader extends TableHeader {
       super.doTableComponentResize();
     }
   }
-  
+
   protected void doTableComponentResizeCells(int columnIndex) {
     if (table instanceof TreeTable) {
       ((TreeTable) table).getView().resizeCells(columnIndex);
@@ -43,7 +43,7 @@ public class TreeTableHeader extends TableHeader {
       super.doTableComponentResizeCells(columnIndex);
     }
   }
-  
+
   protected void doTableComponentShowColumn(int index, boolean show) {
     if (table instanceof TreeTable) {
       ((TreeTable) table).getView().showColumn(index, show);

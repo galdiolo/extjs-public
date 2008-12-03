@@ -80,6 +80,10 @@ public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSe
   protected void handleMouseDown(ListViewEvent e) {
     if (locked) return;
     M sel = store.getAt(e.index);
+    
+    if (isSelected(sel) && !e.isControlKey()) {
+      return;
+    }
 
     if (selectionMode == SelectionMode.SINGLE) {
       if (isSelected(sel) && e.isControlKey()) {

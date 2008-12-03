@@ -27,11 +27,11 @@ public class FileModel extends BaseModelData {
   public void setPath(String path) {
     set("path", path);
   }
-  
+
   public String getPath() {
     return get("path");
   }
-  
+
   public String getName() {
     return get("name");
   }

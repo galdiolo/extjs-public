@@ -8,6 +8,7 @@
 package com.extjs.gxt.samples.client.examples.view;
 
 import com.extjs.gxt.samples.client.ExampleServiceAsync;
+import com.extjs.gxt.samples.client.Examples;
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.data.BaseListLoader;
@@ -37,7 +38,7 @@ public class ListViewExample extends LayoutContainer {
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
 
-    final ExampleServiceAsync service = (ExampleServiceAsync) Registry.get("service");
+    final ExampleServiceAsync service = (ExampleServiceAsync) Registry.get(Examples.SERVICE);
 
     RpcProxy proxy = new RpcProxy() {
       @Override
@@ -50,8 +51,6 @@ public class ListViewExample extends LayoutContainer {
     ListStore<BeanModel> store = new ListStore<BeanModel>(loader);
     loader.load();
 
-
-
     final ContentPanel panel = new ContentPanel();
     panel.setCollapsible(true);
     panel.setAnimCollapse(false);
@@ -61,9 +60,9 @@ public class ListViewExample extends LayoutContainer {
     panel.setWidth(535);
     panel.setAutoHeight(true);
     panel.setLayout(new FitLayout());
-    
+
     panel.setBodyBorder(false);
-    
+
     ListView<BeanModel> view = new ListView<BeanModel>() {
       @Override
       protected BeanModel prepareData(BeanModel model) {
@@ -77,25 +76,25 @@ public class ListViewExample extends LayoutContainer {
     view.setTemplate(getTemplate());
     view.setStore(store);
     view.setItemSelector("div.thumb-wrap");
-    view.setOverStyle("x-view-over");
-    view.getSelectionModel().addListener(Events.SelectionChange, new Listener<SelectionEvent<BeanModel>>() {
-    
-      public void handleEvent(SelectionEvent<BeanModel> be) {
-        panel.setHeading("Simple ListView (" + be.selection.size() + " items selected)");
-      }
-    
-    });
+    view.getSelectionModel().addListener(Events.SelectionChange,
+        new Listener<SelectionEvent<BeanModel>>() {
+
+          public void handleEvent(SelectionEvent<BeanModel> be) {
+            panel.setHeading("Simple ListView (" + be.selection.size() + " items selected)");
+          }
+
+        });
     panel.add(view);
     add(panel);
   }
 
   private native String getTemplate() /*-{
-   return ['<tpl for=".">',
-   '<div class="thumb-wrap" id="{name}">',
-   '<div class="thumb"><img src="{path}" title="{name}"></div>',
-   '<span class="x-editable">{shortName}</span></div>',
-   '</tpl>',
-   '<div class="x-clear"></div>'].join("");
-   
-   }-*/;
+    return ['<tpl for=".">',
+    '<div class="thumb-wrap" id="{name}" style="border: 1px solid white">',
+    '<div class="thumb"><img src="{path}" title="{name}"></div>',
+    '<span class="x-editable">{shortName}</span></div>',
+    '</tpl>',
+    '<div class="x-clear"></div>'].join("");
+    
+    }-*/;
 }

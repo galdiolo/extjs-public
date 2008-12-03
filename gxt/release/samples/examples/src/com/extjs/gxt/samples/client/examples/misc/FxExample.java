@@ -20,9 +20,9 @@ import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 
 public class FxExample extends LayoutContainer {
-  
+
   private ContentPanel cp;
-  
+
   public FxExample() {
 
     ButtonBar buttonBar = new ButtonBar();
@@ -43,7 +43,7 @@ public class FxExample extends LayoutContainer {
     buttonBar.add(new Button("Move", new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         Rectangle rect = cp.el().getBounds();
-        cp.el().setXY(rect.x + 50, rect.x + 50, FxConfig.NONE);
+        cp.el().setXY(rect.x + 50, rect.y + 50, FxConfig.NONE);
       }
     }));
 

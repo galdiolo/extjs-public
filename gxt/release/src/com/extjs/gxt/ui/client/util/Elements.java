@@ -74,7 +74,7 @@ public class Elements {
     type = ARRAY;
     isArray = true;
   }
-  
+
   public Elements(List<Element> elements) {
     this(elements.toArray(new Element[0]));
   }

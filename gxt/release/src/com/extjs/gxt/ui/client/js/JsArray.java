@@ -25,28 +25,30 @@ public class JsArray implements JsWrapper {
   public JsArray() {
     jsArray = create();
   }
- 
+
   public JavaScriptObject getJsObject() {
     return jsArray;
   }
 
   /**
    * Adds a string value to the array.
+   * 
    * @param value the value to add
    */
   public native void add(String value) /*-{
-    var js = this.@com.extjs.gxt.ui.client.js.JsArray::jsArray;
-    js[js.length] = value;
-  }-*/;
-  
+     var js = this.@com.extjs.gxt.ui.client.js.JsArray::jsArray;
+     js[js.length] = value;
+   }-*/;
+
   /**
    * Adds a object to the array.
+   * 
    * @param value the object to add
    */
   public native void add(Object value) /*-{
-    var js = this.@com.extjs.gxt.ui.client.js.JsArray::jsArray;
-    js[js.length] = value;
-  }-*/;
+     var js = this.@com.extjs.gxt.ui.client.js.JsArray::jsArray;
+     js[js.length] = value;
+   }-*/;
 
   /**
    * Adds a native javascript object to the array.
@@ -54,27 +56,27 @@ public class JsArray implements JsWrapper {
    * @param object the object to add
    */
   public native void add(JavaScriptObject object) /*-{
-     var js = this.@com.extjs.gxt.ui.client.js.JsArray::jsArray;
-     js[js.length] = object;
-   }-*/;
+      var js = this.@com.extjs.gxt.ui.client.js.JsArray::jsArray;
+      js[js.length] = object;
+    }-*/;
 
   /**
    * Returns the size of the array.
+   * 
    * @return the size
    */
   public native int size() /*-{
-     var js = this.@com.extjs.gxt.ui.client.js.JsArray::jsArray;
-     return js.length;
-   }-*/;
+      var js = this.@com.extjs.gxt.ui.client.js.JsArray::jsArray;
+      return js.length;
+    }-*/;
 
   protected native JavaScriptObject create() /*-{
-   return new Array();
-   }-*/;
+    return new Array();
+    }-*/;
 
   public static native JavaScriptObject eval(String code) /*-{
-   var x = eval(code);
-   return x[0];
-   }-*/;
+    var x = eval(code);
+    return x[0];
+    }-*/;
 
 }
-

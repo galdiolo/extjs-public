@@ -136,10 +136,10 @@
 }
 
 .my-tbl-item-sel {
-  background-image: none;
-  background-color: #D9E1ED;
-  border-top: 1px dotted #9EB8ED;
-  border-bottom: 1px dotted #9EB8ED;
+  background-image: none !important;
+  background-color: #D9E1ED !important;
+  border-top: 1px dotted #9EB8ED !important;
+  border-bottom: 1px dotted #9EB8ED !important;
 }
 
 .ext-ie .my-tbl TD .x-form-text {

@@ -31,7 +31,8 @@ import java.util.Set;
  * generated for any type you add to this map
  * 
  * RpcMap ensures that the following types are supported Byte, Short, Integer,
- * Long, Float, Double, Date, Boolean, and arrays of these types.  As well as List, Set and Map
+ * Long, Float, Double, Date, Boolean, and arrays of these types. As well as
+ * List, Set and Map
  */
 @SuppressWarnings("unused")
 public class RpcMap {
@@ -58,13 +59,12 @@ public class RpcMap {
   private Set<String> _set;
   private Map<String, String> _map;
 
-  
   private transient Map<String, Object> map = new HashMap<String, Object>();
 
   public Map<String, Object> getTransientMap() {
     return map;
   }
-  
+
   public void clear() {
     map.clear();
   }

@@ -23,7 +23,7 @@ public class DraggableExample extends LayoutContainer {
   @Override
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
-    
+
     HorizontalPanel vp = new HorizontalPanel();
     vp.setVerticalAlign(VerticalAlignment.TOP);
     vp.setSpacing(10);
@@ -74,5 +74,5 @@ public class DraggableExample extends LayoutContainer {
       ct.layout();
     }
   }
-  
+
 }

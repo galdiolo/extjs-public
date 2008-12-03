@@ -52,8 +52,8 @@ public class Text extends BoxComponent {
   }
 
   /**
-   * The HTML tag name that will wrap the text (defaults to 'div', pre-render). For inline
-   * behavior set the tag name to 'span'.
+   * The HTML tag name that will wrap the text (defaults to 'div', pre-render).
+   * For inline behavior set the tag name to 'span'.
    * 
    * @param tagName the tag name
    */

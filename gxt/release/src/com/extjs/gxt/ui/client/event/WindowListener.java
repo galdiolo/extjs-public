@@ -25,6 +25,9 @@ public class WindowListener implements Listener<WindowEvent> {
       case Events.Hide:
         windowHide(we);
         break;
+      case Events.Close:
+        windowClose(we);
+        break;
       case Events.Maximize:
         windowMaximize(we);
         break;
@@ -33,6 +36,9 @@ public class WindowListener implements Listener<WindowEvent> {
         break;
       case Events.Restore:
         windowRestore(we);
+        break;
+      case Events.Show:
+        windowShow(we);
         break;
     }
   }
@@ -47,11 +53,11 @@ public class WindowListener implements Listener<WindowEvent> {
   }
 
   /**
-   * Fires after the window is hidden.
+   * Fires after a window is closed.
    * 
    * @param we the window event
    */
-  public void windowHide(WindowEvent we) {
+  public void windowClose(WindowEvent we) {
 
   }
 
@@ -61,6 +67,24 @@ public class WindowListener implements Listener<WindowEvent> {
    * @param we the window event
    */
   public void windowDeactivate(WindowEvent we) {
+
+  }
+
+  /**
+   * Fires after the window is hidden.
+   * 
+   * @param we the window event
+   */
+  public void windowHide(WindowEvent we) {
+
+  }
+
+  /**
+   * Fires after a window is opened.
+   * 
+   * @param we the window event
+   */
+  public void windowShow(WindowEvent we) {
 
   }
 

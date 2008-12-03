@@ -11,15 +11,15 @@ import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.util.Margins;
 
 /**
- * Layout data for <code>RowLayout</code> that controls the width and height
- * of a widget.
+ * Layout data for <code>RowLayout</code> that controls the width and height of
+ * a widget.
  * 
  * <p/> The height and width of each component can be specified with a RowData
  * instance. There are 3 types of values:
  * 
  * <ul>
- * <li>Values less than or equal to 1 are treated as percentages, with 1 =
- * 100%.</li>
+ * <li>Values less than or equal to 1 are treated as percentages, with 1 = 100%.
+ * </li>
  * <li>Values greater than 1 are treated as pixels.</li>
  * <li>Values equal to Style.DEFAULT (-1) will use the component's computed
  * height.</li>

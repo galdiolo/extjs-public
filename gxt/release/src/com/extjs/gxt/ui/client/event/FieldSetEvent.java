@@ -13,16 +13,16 @@ import com.google.gwt.user.client.Event;
 public class FieldSetEvent extends ContainerEvent {
 
   public FieldSet fieldSet;
-  
+
   public FieldSetEvent(FieldSet fieldSet) {
     super(fieldSet);
     this.fieldSet = fieldSet;
   }
-  
+
   public FieldSetEvent(FieldSet fieldSet, Event event) {
     this(fieldSet);
     this.event = event;
-    
+
   }
 
 }

@@ -14,8 +14,7 @@ import com.extjs.gxt.ui.client.event.FieldSetEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
-import com.extjs.gxt.ui.client.widget.Container;
-import com.extjs.gxt.ui.client.widget.Layout;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.ToolButton;
 import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.user.client.DOM;
@@ -59,7 +58,7 @@ import com.google.gwt.user.client.Event;
  * </dd>
  * </dl>
  */
-public class FieldSet extends Container {
+public class FieldSet extends LayoutContainer {
 
   private El body;
   private ToolButton collapseBtn;
@@ -77,11 +76,6 @@ public class FieldSet extends Container {
   public FieldSet() {
     baseStyle = "x-fieldset";
     enableLayout = true;
-  }
-
-  @Override
-  public boolean add(Component item) {
-    return super.add(item);
   }
 
   /**
@@ -160,11 +154,6 @@ public class FieldSet extends Container {
     }
   }
 
-  @Override
-  public boolean remove(Component item) {
-    return super.remove(item);
-  }
-
   /**
    * The name to assign to the fieldset's checkbox if
    * {@link #setCheckboxToggle(boolean)} = true.
@@ -222,11 +211,6 @@ public class FieldSet extends Container {
   }
 
   @Override
-  public void setLayout(Layout layout) {
-    super.setLayout(layout);
-  }
-
-  @Override
   protected ComponentEvent createComponentEvent(Event event) {
     return new FieldSetEvent(this, event);
   }
@@ -244,12 +228,12 @@ public class FieldSet extends Container {
   }
 
   @Override
-  protected El getLayoutTarget() {
+  public El getLayoutTarget() {
     return body;
   }
 
   protected void onClick(ComponentEvent ce) {
-    if (checkboxToggle && ce.getTarget() == (Element)checkbox.cast()) {
+    if (checkboxToggle && ce.getTarget() == (Element) checkbox.cast()) {
       setExpanded(!isExpanded());
     }
   }
@@ -261,7 +245,6 @@ public class FieldSet extends Container {
     FieldSetEvent fe = new FieldSetEvent(this);
     fireEvent(Events.Collapse, fe);
     fireEvent(Events.Resize, fe);
-
   }
 
   protected void onExpand() {
@@ -276,7 +259,6 @@ public class FieldSet extends Container {
 
   @Override
   protected void onRender(Element parent, int pos) {
-    super.onRender(parent, pos);
     setElement(DOM.createFieldSet(), parent, pos);
     sinkEvents(Event.ONCLICK);
 
@@ -285,12 +267,12 @@ public class FieldSet extends Container {
 
     if (checkboxToggle) {
       checkbox = DOM.createInputCheck().cast();
-      
+
       if (checkboxName != null) {
         checkbox.setAttribute("name", checkboxName);
       }
       legend.appendChild(checkbox);
-      checkbox.setChecked(true);
+      checkbox.setChecked(!collapsed);
     }
 
     if (!checkboxToggle && collapsible) {
@@ -317,6 +299,21 @@ public class FieldSet extends Container {
 
     if (collapsed) {
       onCollapse();
+    }
+  }
+
+  @Override
+  protected void onResize(int width, int height) {
+    super.onResize(width, height);
+    if (isAutoWidth()) {
+      getLayoutTarget().setWidth("auto");
+    } else if (width != -1) {
+      getLayoutTarget().setWidth(width - el().getFrameWidth("lr"), true);
+    }
+    if (isAutoHeight()) {
+      getLayoutTarget().setHeight("auto");
+    } else if (height != -1) {
+      getLayoutTarget().setHeight(height - el().getFrameWidth("tb"), true);
     }
   }
 

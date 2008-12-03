@@ -43,18 +43,18 @@ public class AutoHeightTablePage extends LayoutContainer implements EntryPoint {
   public void onModuleLoad() {
     RootPanel.get().add(this);
   }
-  
+
   public AutoHeightTablePage() {
     // next line is only used to pass layout to containing container
     // this will have NO effect outside of the explorer demo
     setData("layout", new FitLayout());
-    
+
     setScrollMode(Scroll.AUTO);
-    
+
     LayoutContainer inner = new LayoutContainer();
     inner.setLayout(new FlowLayout(8));
     add(inner);
-    
+
     NumberFormat currency = NumberFormat.getCurrencyFormat();
     final NumberFormat number = NumberFormat.getFormat("0.00");
 
@@ -96,11 +96,10 @@ public class AutoHeightTablePage extends LayoutContainer implements EntryPoint {
     tbl.setSelectionMode(SelectionMode.MULTI);
     tbl.setHorizontalScroll(true);
 
-
     ToolBar toolBar = new ToolBar();
     toolBar.setStyleAttribute("background", "none");
     toolBar.setStyleAttribute("border", "none");
-    
+
     final NumberField rows = new NumberField();
     rows.setValue(5);
     rows.setWidth(40);
@@ -109,11 +108,11 @@ public class AutoHeightTablePage extends LayoutContainer implements EntryPoint {
     TextToolItem item = new TextToolItem();
     item.setText("Create Table");
     item.addListener(Events.Select, new Listener<ToolBarEvent>() {
-    
+
       public void handleEvent(ToolBarEvent be) {
         tbl.removeAll();
         List<Stock> stocks = TestData.getStocks();
-        
+
         int count = Math.min(40, rows.getValue().intValue());
         for (int i = 0; i < count; i++) {
           Stock stock = stocks.get(i);
@@ -129,10 +128,10 @@ public class AutoHeightTablePage extends LayoutContainer implements EntryPoint {
         }
         tbl.recalculate();
       }
-    
+
     });
     toolBar.add(item);
-    
+
     inner.add(toolBar);
     inner.add(new Html("<br>"));
     inner.add(tbl);

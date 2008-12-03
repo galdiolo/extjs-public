@@ -9,6 +9,7 @@ package com.extjs.gxt.samples.client.examples.tree;
 
 import java.util.List;
 
+import com.extjs.gxt.samples.client.Examples;
 import com.extjs.gxt.samples.client.FileServiceAsync;
 import com.extjs.gxt.samples.client.examples.model.FileModel;
 import com.extjs.gxt.samples.client.examples.model.FolderModel;
@@ -35,7 +36,7 @@ public class AsyncTreeExample extends LayoutContainer {
 
     setLayout(new FlowLayout(10));
 
-    final FileServiceAsync service = (FileServiceAsync) Registry.get("fileservice");
+    final FileServiceAsync service = (FileServiceAsync) Registry.get(Examples.FILE_SERVICE);
 
     // data proxy
     RpcProxy<FileModel, List<FileModel>> proxy = new RpcProxy<FileModel, List<FileModel>>() {
@@ -71,7 +72,7 @@ public class AsyncTreeExample extends LayoutContainer {
         return super.compare(store, m1, m2, property);
       }
     });
-    
+
     Tree tree = new Tree();
 
     TreeBinder<FileModel> binder = new TreeBinder<FileModel>(tree, store);

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.samples.client.ExampleServiceAsync;
+import com.extjs.gxt.samples.client.Examples;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.data.BasePagingLoader;
@@ -36,9 +37,8 @@ public class PagingBeanModelGridExample extends LayoutContainer {
   @Override
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
-    final ExampleServiceAsync service = (ExampleServiceAsync) Registry.get("service");
+    final ExampleServiceAsync service = (ExampleServiceAsync) Registry.get(Examples.SERVICE);
 
-    
     if (service == null) {
       MessageBox box = new MessageBox();
       box.setButtons(MessageBox.OK);
@@ -48,10 +48,10 @@ public class PagingBeanModelGridExample extends LayoutContainer {
       box.show();
       return;
     }
-    
+
     FlowLayout layout = new FlowLayout(10);
     setLayout(layout);
-  
+
     RpcProxy proxy = new RpcProxy() {
       @Override
       public void load(Object loadConfig, AsyncCallback callback) {
@@ -96,8 +96,8 @@ public class PagingBeanModelGridExample extends LayoutContainer {
     panel.add(grid);
     panel.setSize(600, 350);
     panel.setBottomComponent(toolBar);
-    
+
     add(panel);
-  
+
   }
 }

@@ -42,12 +42,12 @@ import com.extjs.gxt.ui.client.Style.SortDir;
  * </ul>
  * </dd>
  * </dl>
- *
+ * 
  * @param <C> the list load config type
  * @param <D> the list load result type
  */
-public class BaseListLoader<C extends ListLoadConfig, D extends ListLoadResult> extends BaseLoader<C, D> implements
-    ListLoader<C> {
+public class BaseListLoader<C extends ListLoadConfig, D extends ListLoadResult> extends
+    BaseLoader<C, D> implements ListLoader<C> {
 
   private boolean remoteSort;
   private String sortField;
@@ -113,7 +113,7 @@ public class BaseListLoader<C extends ListLoadConfig, D extends ListLoadResult> 
    * implementation of LoadConfig
    */
   protected C newLoadConfig() {
-    return (C)new BaseListLoadConfig();
+    return (C) new BaseListLoadConfig();
   }
 
   /**
@@ -126,9 +126,9 @@ public class BaseListLoader<C extends ListLoadConfig, D extends ListLoadResult> 
     config.getSortInfo().setSortDir(sortDir);
     return config;
   }
-  
+
   private native void setLastConfigInternal(C lastConfig) /*-{
-    this.@com.extjs.gxt.ui.client.data.BaseLoader::lastConfig = lastConfig;
-  }-*/;
+     this.@com.extjs.gxt.ui.client.data.BaseLoader::lastConfig = lastConfig;
+   }-*/;
 
 }

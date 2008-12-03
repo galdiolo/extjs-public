@@ -18,11 +18,11 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 public class ContactView extends View {
 
   private ContactPanel panel;
-  
+
   public ContactView(Controller controller) {
     super(controller);
   }
-  
+
   @Override
   protected void initialize() {
     panel = new ContactPanel();
@@ -31,7 +31,7 @@ public class ContactView extends View {
   @Override
   protected void handleEvent(AppEvent event) {
     if (event.type == AppEvents.NavContacts) {
-      LayoutContainer wrapper = (LayoutContainer) Registry.get("center");
+      LayoutContainer wrapper = (LayoutContainer) Registry.get(AppView.CENTER_PANEL);
       wrapper.removeAll();
       wrapper.add(panel);
       wrapper.layout();

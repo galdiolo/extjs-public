@@ -7,11 +7,9 @@
  */
 package com.extjs.gxt.ui.client.widget.impl;
 
-
 import com.extjs.gxt.ui.client.widget.PngImage;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
-
 
 /**
  * PNG support.

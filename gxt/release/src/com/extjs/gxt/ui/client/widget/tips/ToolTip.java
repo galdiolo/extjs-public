@@ -9,9 +9,11 @@ package com.extjs.gxt.ui.client.widget.tips;
 
 import java.util.Date;
 
+import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.util.Params;
 import com.extjs.gxt.ui.client.util.Point;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.google.gwt.user.client.DOM;
@@ -25,6 +27,9 @@ import com.google.gwt.user.client.Timer;
  */
 public class ToolTip extends Tip implements Listener<ComponentEvent> {
 
+  protected Component target;
+  protected Point targetXY;
+
   private int showDelay = 500;
   private int[] mouseOffset = new int[] {10, 10};
   private boolean trackMouse;
@@ -35,10 +40,9 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
   private Timer dismissTimer;
   private Timer showTimer;
   private Timer hideTimer;
-  private Component target;
-  private Element targetElem;
-  private Point targetXY;
-  private ToolTipConfig config;
+  private Template template;
+  private Params params;
+  protected String title, text;
 
   /**
    * Creates a new tool tip.
@@ -106,8 +110,8 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
   }
 
   public void handleEvent(ComponentEvent ce) {
-    Element source = getTargetElement();
-    switch (ce.getEventType()) {
+    Element source = target.getElement();
+    switch (ce.type) {
       case Event.ONMOUSEOVER:
         Element from = DOM.eventGetFromElement(ce.event);
         if (from != null && !DOM.isOrHasChild(source, from)) {
@@ -122,6 +126,10 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
         break;
       case Event.ONMOUSEMOVE:
         onMouseMove(ce);
+        break;
+      case Events.Hide:
+      case Events.Detach:
+        hide();
         break;
     }
   }
@@ -247,33 +255,7 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
     }
   }
 
-  /**
-   * Returns the tool tip config.
-   * 
-   * @return the config
-   */
-  public ToolTipConfig getConfig() {
-    if (config == null) {
-      config = new ToolTipConfig();
-    }
-    return config;
-  }
-
-  protected void updateContent() {
-    if (config.getTemplate() != null) {
-      Template t = config.getTemplate();
-      t.overwrite(getBody().dom, config.getParams());
-    } else {
-      String title = config.getTitle();
-      String text = config.getText();
-      getHeader().setText(title == null ? "" : title);
-      if (text != null) {
-        getBody().update(text);
-      }
-    }
-  }
-
-  private void clearTimer(String timer) {
+  protected void clearTimer(String timer) {
     if (timer.equals("hide")) {
       if (hideTimer != null) {
         hideTimer.cancel();
@@ -292,24 +274,13 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
     }
   }
 
-  private void clearTimers() {
+  protected void clearTimers() {
     clearTimer("show");
     clearTimer("dismiss");
     clearTimer("hide");
   }
 
-  private void delayHide() {
-    if (!hidden && hideTimer == null) {
-      hideTimer = new Timer() {
-        public void run() {
-          hide();
-        }
-      };
-      hideTimer.schedule(getHideDelay());
-    }
-  }
-
-  private void delayShow() {
+  protected void delayShow() {
     if (hidden && showTimer == null) {
       if ((new Date().getTime() - lastActive.getTime()) < quickShowInterval) {
         show();
@@ -327,6 +298,57 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
     }
   }
 
+  protected void onMouseMove(ComponentEvent ce) {
+    targetXY = ce.getXY();
+    if (!hidden && trackMouse) {
+      setPagePosition(getTargetXY());
+    }
+  }
+
+  protected void onTargetOut(ComponentEvent ce) {
+    if (disabled) {
+      return;
+    }
+    clearTimer("show");
+    if (autoHide) {
+      delayHide();
+    }
+  }
+
+  protected void onTargetOver(ComponentEvent ce) {
+    if (disabled || !ce.within(target.getElement())) {
+      return;
+    }
+
+    clearTimer("hide");
+    targetXY = ce.getXY();
+    delayShow();
+  }
+
+  protected void updateContent() {
+    if (template != null) {
+      template.overwrite(getBody().dom, params);
+    } else {
+      String title = this.title;
+      String text = this.text;
+      getHeader().setText(title == null ? "" : title);
+      if (text != null) {
+        getBody().update(text);
+      }
+    }
+  }
+
+  private void delayHide() {
+    if (!hidden && hideTimer == null) {
+      hideTimer = new Timer() {
+        public void run() {
+          hide();
+        }
+      };
+      hideTimer.schedule(getHideDelay());
+    }
+  }
+
   private Point getTargetXY() {
     int x = targetXY.x + getMouseOffset()[0];
     int y = targetXY.y + getMouseOffset()[1];
@@ -338,73 +360,21 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
     target.addListener(Event.ONMOUSEOVER, this);
     target.addListener(Event.ONMOUSEOUT, this);
     target.addListener(Event.ONMOUSEMOVE, this);
+    target.addListener(Events.Hide, this);
+    target.addListener(Events.Detach, this);
     target.sinkEvents(Event.MOUSEEVENTS);
   }
 
-  private void onMouseMove(ComponentEvent ce) {
-    targetXY = ce.getXY();
-    if (!hidden && trackMouse) {
-      setPagePosition(getTargetXY());
-    }
-  }
-
-  private void onTargetOut(ComponentEvent ce) {
-    if (disabled) {
-      return;
-    }
-    clearTimer("show");
-    if (autoHide) {
-      delayHide();
-    }
-  }
-
-  private Element getTargetElement() {
-    return targetElem != null ? targetElem : target.getElement();
-  }
-
-  private void onTargetOver(ComponentEvent ce) {
-    if (disabled || !config.isEnabled() || !ce.within(getTargetElement())) {
-      return;
-    }
-
-    clearTimer("hide");
-    targetXY = ce.getXY();
-    delayShow();
-  }
-
   private void updateConfig(ToolTipConfig config) {
-    this.config = config;
-
-    Element t = config.getTarget();
-    if (t != null && t != targetElem) {
-      targetElem = t;
+    if (!config.isEnabled()) {
       clearTimers();
+      hide();
     }
 
-    if (config.getTemplate() != null) {
-      if (!config.isEnabled()) {
-        clearTimers();
-        hide();
-      }
-    } else {
-      String title = config.getTitle();
-      String text = config.getText();
-
-      // element getAttribute returns the string "null"
-      if (text != null && (text.equals("null") || text.equals(""))) {
-        text = null;
-      }
-
-      if (title != null && (title.equals("") || title.equals("null"))) {
-        title = null;
-      }
-
-      if (!config.isEnabled() || (text == null)) {
-        clearTimers();
-        hide();
-      }
-    }
-
+    template = config.getTemplate();
+    params = config.getParams();
+    text = config.getText();
+    title = config.getTitle();
     trackMouse = config.isTrackMouse();
     autoHide = config.isAutoHide();
     showDelay = config.getShowDelay();

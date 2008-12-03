@@ -17,8 +17,7 @@ public interface Validator<Data, F extends Field<Data>> {
    * 
    * @param field the field
    * @param value the value to validate
-   * @return <code>null</code> if validation passes, otherwise the error
-   *         message
+   * @return <code>null</code> if validation passes, otherwise the error message
    */
   public String validate(F field, String value);
 

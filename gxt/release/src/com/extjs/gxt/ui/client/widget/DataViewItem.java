@@ -17,11 +17,11 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 public class DataViewItem extends Component {
 
   protected Map<String, Object> properties;
-  
+
   public DataViewItem(Map<String, Object> properties) {
     this.properties = properties;
   }
-  
+
   public Map<String, Object> getValues() {
     return properties;
   }
@@ -33,5 +33,5 @@ public class DataViewItem extends Component {
       toolTip.handleEvent(ce);
     }
   }
-  
+
 }

@@ -14,10 +14,35 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 
+/**
+ * A <code>BaseEvent</code> that wraps a browser event and provides a set of DOM
+ * related method.
+ * 
+ * <pre>
+    Button btn = new Button();
+    btn.addListener(Event.ONCLICK, new Listener&lt;ButtonEvent>() {
+      public void handleEvent(ButtonEvent be) {
+        // ButtonEvent is a DomEvent subclass
+        
+        // retrieve the event target
+        Element target = be.getTarget();
+        
+        // get the mouse location
+        Point point = be.getXY();
+        
+        // is the control key pressed?
+        boolean control = be.isControlKey();
+        
+        // cancel event bubbling
+        be.cancelBubble();
+      }
+    });
+ * </pre>
+ */
 public class DomEvent extends BaseEvent {
 
   /**
-   * The dom event.
+   * The DOM event.
    */
   public Event event;
 
@@ -25,6 +50,10 @@ public class DomEvent extends BaseEvent {
 
   protected DomEvent() {
 
+  }
+
+  public DomEvent(Object source) {
+    super(source);
   }
 
   /**
@@ -242,8 +271,8 @@ public class DomEvent extends BaseEvent {
   }
 
   /**
-   * Returns <code>true</code> if the target of this event equals or is a
-   * child of the given element.
+   * Returns <code>true</code> if the target of this event equals or is a child
+   * of the given element.
    * 
    * @param element the element
    * @return the within state
@@ -251,6 +280,26 @@ public class DomEvent extends BaseEvent {
   public boolean within(Element element) {
     if (event != null) {
       return DOM.isOrHasChild(element, getTarget());
+    }
+    return false;
+  }
+
+  /**
+   * Returns <code>true</code> if the target of this event equals or is a child
+   * of the given element.
+   * 
+   * @param element the element
+   * @param toElement true to use {@link Event#getToElement()}
+   * @return the within state
+   */
+  public boolean within(Element element, boolean toElement) {
+    if (!toElement) {
+      return within(element);
+    } else {
+      if (event != null) {
+        Element to = event.getToElement().cast();
+        return DOM.isOrHasChild(element, to);
+      }
     }
     return false;
   }

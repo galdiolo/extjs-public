@@ -47,18 +47,6 @@ public class Info extends ContentPanel {
   }
 
   /**
-   * Displays a message with the given title and text. All {0},{1}... values in
-   * text will be replaced with values.
-   * 
-   * @param title the message title
-   * @param text the message
-   * @param values the values to be substituted
-   */
-  public static void display(String title, String text, String... values) {
-    display(new InfoConfig(title, text, new Params((Object[]) values)));
-  }
-
-  /**
    * Displays a message with the given title and text. The passed parameters
    * will be applied to both the title and text before being displayed.
    * 
@@ -69,6 +57,18 @@ public class Info extends ContentPanel {
   public static void display(String title, String text, Params params) {
     InfoConfig config = new InfoConfig(title, text, params);
     display(config);
+  }
+
+  /**
+   * Displays a message with the given title and text. All {0},{1}... values in
+   * text will be replaced with values.
+   * 
+   * @param title the message title
+   * @param text the message
+   * @param values the values to be substituted
+   */
+  public static void display(String title, String text, String... values) {
+    display(new InfoConfig(title, text, new Params((Object[]) values)));
   }
 
   private static int firstAvail() {
@@ -93,8 +93,8 @@ public class Info extends ContentPanel {
     infoStack.push(info);
   }
 
-  private InfoConfig config;
-  private int level;
+  protected InfoConfig config;
+  protected int level;
 
   /**
    * Creates a new info instance.
@@ -121,23 +121,7 @@ public class Info extends ContentPanel {
     onShowInfo();
   }
 
-  private void afterHide() {
-    layer.hideShadow();
-    RootPanel.get().remove(this);
-    slots.set(level, null);
-    push(this);
-  }
-
-  private void afterShow() {
-    Timer t = new Timer() {
-      public void run() {
-        afterHide();
-      }
-    };
-    t.schedule(config.display);
-  }
-
-  private void onShowInfo() {
+  protected void onShowInfo() {
     RootPanel.get().add(this);
     el().makePositionable(true);
 
@@ -154,11 +138,27 @@ public class Info extends ContentPanel {
     afterShow();
   }
 
-  private Point position() {
+  protected Point position() {
     Size s = XDOM.getViewportSize();
     int left = (s.width - config.width - 10);
     int top = s.height - config.height - 10 - (level * (config.height + 10));
     return new Point(left, top);
+  }
+
+  private void afterHide() {
+    layer.hideShadow();
+    RootPanel.get().remove(this);
+    slots.set(level, null);
+    push(this);
+  }
+
+  private void afterShow() {
+    Timer t = new Timer() {
+      public void run() {
+        afterHide();
+      }
+    };
+    t.schedule(config.display);
   }
 
   private void setText() {

@@ -164,6 +164,10 @@ public class TreeItem extends Component {
     te.item = item;
     te.index = index;
     if (fireEvent(Events.BeforeAdd, te)) {
+      if (item.parentItem != null && item.parentItem != this) {
+        item.parentItem.remove(item);
+      }
+
       item.parentItem = this;
       item.setTree(tree);
 
@@ -182,12 +186,21 @@ public class TreeItem extends Component {
         Element target = root ? getContainer() : ui.containerEl.dom;
         if (item.isRendered()) {
           fly(target).insertChild(item.getElement(), index);
+          item.getUI().update();
+          // need to register all rendered child items
+          List<TreeItem> list = new ArrayList();
+          getAllChildren(list, item);
+          for (TreeItem ti : list) {
+            tree.registerItem(ti);
+          }
+
         } else {
           item.render(target, index);
         }
       }
 
       if (rendered && !root) {
+        ui.containerEl.setVisible(true);
         ui.updateJointStyle();
         ui.onIconStyleChange(getIconStyle());
       }
@@ -387,11 +400,33 @@ public class TreeItem extends Component {
     return root;
   }
 
+  /**
+   * Returns the item next sibling.
+   * 
+   * @return the next sibling
+   */
+  public TreeItem nextSibling() {
+    if (parentItem == null) return null;
+    int index = parentItem.indexOf(this);
+    return parentItem.getItem(index + 1);
+  }
+
   public void onComponentEvent(ComponentEvent ce) {
     // delegate event handling to ui
     if (ui != null) {
       ui.handleEvent((TreeEvent) ce);
     }
+  }
+
+  /**
+   * Returns the item's previous sibling.
+   * 
+   * @return the previous sibling
+   */
+  public TreeItem previousSibling() {
+    if (parentItem == null) return null;
+    int index = parentItem.indexOf(this);
+    return parentItem.getItem(index - 1);
   }
 
   /**
@@ -409,6 +444,7 @@ public class TreeItem extends Component {
     if (fireEvent(Events.BeforeRemove, te)) {
       children.remove(item);
       tree.unregisterItem(item);
+
       item.tree = null;
       item.parentItem = null;
       if (rendered && item.rendered) {
@@ -546,7 +582,14 @@ public class TreeItem extends Component {
   }
 
   /**
-   * Sets the item's icon style.
+   * Sets the item's icon style. The style name should match a CSS style that
+   * specifies a background image using the following format:
+   * 
+   * <pre><code>
+   * .my-icon {
+   *    background: url(images/icons/my-icon.png) no-repeat center left !important;
+   * }
+   * </code></pre>
    * 
    * @param style the icon style
    */
@@ -690,18 +733,6 @@ public class TreeItem extends Component {
     return getItem(getItemCount() - 1);
   }
 
-  TreeItem nextSibling() {
-    if (parentItem == null) return null;
-    int index = parentItem.indexOf(this);
-    return parentItem.getItem(index + 1);
-  }
-
-  TreeItem previousSibling() {
-    if (parentItem == null) return null;
-    int index = parentItem.indexOf(this);
-    return parentItem.getItem(index - 1);
-  }
-
   private void clearCheckChildren(TreeItem parent) {
     for (int i = 0; i < parent.getItemCount(); i++) {
       TreeItem sub = parent.getItem(i);
@@ -714,6 +745,24 @@ public class TreeItem extends Component {
     for (int i = 0; i < getItemCount(); i++) {
       TreeItem item = getItem(i);
       item.setExpanded(true, deep);
+    }
+  }
+
+  public List<TreeItem> getItems(boolean deep) {
+    if (deep) {
+      List list = new ArrayList();
+      getAllChildren(list, this);
+      return list;
+    } else {
+      return getItems();
+    }
+  }
+
+  private void getAllChildren(List<TreeItem> list, TreeItem parent) {
+    list.add(parent);
+    for (TreeItem child : parent.getItems()) {
+      list.add(child);
+      getAllChildren(list, child);
     }
   }
 

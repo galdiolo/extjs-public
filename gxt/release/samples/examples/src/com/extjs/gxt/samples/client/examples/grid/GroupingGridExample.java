@@ -24,10 +24,14 @@ import com.extjs.gxt.ui.client.widget.grid.GroupingView;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.user.client.Element;
 
 public class GroupingGridExample extends LayoutContainer {
 
-  public GroupingGridExample() {
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
+
     setLayout(new FlowLayout(10));
 
     GroupingStore<Stock> store = new GroupingStore<Stock>();
@@ -75,5 +79,5 @@ public class GroupingGridExample extends LayoutContainer {
 
     add(panel);
   }
-  
+
 }

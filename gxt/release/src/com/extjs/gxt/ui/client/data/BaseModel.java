@@ -71,6 +71,7 @@ public class BaseModel extends BaseModelData implements Model, Serializable {
 
   /**
    * Creates a new base model.
+   * 
    * @param properties the initial values
    */
   public BaseModel(Map<String, Object> properties) {
@@ -105,7 +106,7 @@ public class BaseModel extends BaseModelData implements Model, Serializable {
   @Override
   public <X> X remove(String name) {
     if (map.containsKey(name)) {
-      X oldValue = (X)super.remove(name);
+      X oldValue = (X) super.remove(name);
       notifyPropertyChanged(name, null, oldValue);
       return oldValue;
     }
@@ -129,7 +130,7 @@ public class BaseModel extends BaseModelData implements Model, Serializable {
   public <X> X set(String name, X value) {
     Object oldValue = super.set(name, value);
     notifyPropertyChanged(name, value, oldValue);
-    return (X)oldValue;
+    return (X) oldValue;
   }
 
   public void setSilent(boolean silent) {

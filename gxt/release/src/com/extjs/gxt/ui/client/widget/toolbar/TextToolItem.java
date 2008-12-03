@@ -20,15 +20,15 @@ import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.google.gwt.user.client.Element;
 
 /**
- * A tool item with an optional text and icon style.
+ * A tool item with optional text and icon style.
  * 
  * <dl>
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>Select</b> : ToolBarEvent(toolBar, item, event)<br>
+ * <dd><b>Select</b> : ToolBarEvent(container, item, event)<br>
  * <div>Fires after the item is selected.</div>
  * <ul>
- * <li>toolBar : the parent tolbar</li>
+ * <li>container : the parent tool bar</li>
  * <li>item : this</li>
  * <li>event : the dom event</li>
  * </ul>
@@ -142,7 +142,14 @@ public class TextToolItem extends ToolItem {
   }
 
   /**
-   * Sets the item's icon style.
+   * Sets the item's icon style. The style name should match a CSS style that
+   * specifies a background image using the following format:
+   * 
+   * <pre><code>
+   * .my-icon {
+   *    background: url(images/icons/my-icon.png) no-repeat center left !important;
+   * }
+   * </code></pre>
    * 
    * @param iconStyle the icon style
    */

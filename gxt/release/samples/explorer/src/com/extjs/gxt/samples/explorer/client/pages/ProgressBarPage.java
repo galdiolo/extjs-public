@@ -32,7 +32,7 @@ public class ProgressBarPage extends LayoutContainer implements EntryPoint {
     super.onRender(parent, pos);
 
     ButtonBar buttonBar = new ButtonBar();
-  
+
     buttonBar.add(new Button("Progress", new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
         final MessageBox box = MessageBox.progress("Please wait", "Loading items...",
@@ -47,7 +47,7 @@ public class ProgressBarPage extends LayoutContainer implements EntryPoint {
             i += 5;
             if (i > 105) {
               cancel();
-              box.hide();
+              box.close();
               Info.display("Message", "Items were loaded", "");
             }
           }
@@ -58,13 +58,13 @@ public class ProgressBarPage extends LayoutContainer implements EntryPoint {
 
     buttonBar.add(new Button("Wait", new SelectionListener<ComponentEvent>() {
       public void componentSelected(ComponentEvent ce) {
-        final MessageBox box = MessageBox.wait("Progress",
-            "Saving your data, please wait...", "Saving...");
+        final MessageBox box = MessageBox.wait("Progress", "Saving your data, please wait...",
+            "Saving...");
         Timer t = new Timer() {
           @Override
           public void run() {
             Info.display("Message", "Your fake data was saved", "");
-            box.hide();
+            box.close();
           }
         };
         t.schedule(5000);

@@ -11,7 +11,7 @@ package com.extjs.gxt.ui.client.fx;
  * Effect interface defines the lifecyle methods for an effect.
  */
 public interface Effect {
-  
+
   /**
    * Fires after the effect is cancelled.
    */

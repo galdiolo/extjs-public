@@ -7,7 +7,7 @@ public class LayoutEvent extends BaseEvent {
 
   public Container container;
   public Layout layout;
-  
+
   public LayoutEvent(Container container, Layout layout) {
     this.container = container;
     this.layout = layout;

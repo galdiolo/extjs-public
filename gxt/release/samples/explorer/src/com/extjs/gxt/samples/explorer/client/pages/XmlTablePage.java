@@ -37,9 +37,9 @@ public class XmlTablePage extends LayoutContainer implements EntryPoint {
   public void onModuleLoad() {
     RootPanel.get().add(this);
   }
-  
+
   public XmlTablePage() {
-    
+
   }
 
   @Override

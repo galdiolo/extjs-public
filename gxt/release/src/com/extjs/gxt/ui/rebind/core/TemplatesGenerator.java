@@ -102,7 +102,7 @@ public class TemplatesGenerator extends Generator {
       composer = new ClassSourceFileComposerFactory(genPackageName, genClassName);
       if (type.isAssignableTo(markupType)) {
         composer.setSuperclass(MarkupBase.class.getName());
-      }  else {
+      } else {
         composer.setSuperclass(TemplatesBase.class.getName());
       }
       composer.addImplementedInterface(type.getQualifiedSourceName());
@@ -127,7 +127,7 @@ public class TemplatesGenerator extends Generator {
             createTemplatesMethod(method);
           } else if (type.isAssignableTo(markupType)) {
             createMarkupMethod(method);
-          } 
+          }
 
         }
 
@@ -189,8 +189,7 @@ public class TemplatesGenerator extends Generator {
           && method.getReturnType().isInterface().isAssignableTo(markupType);
       final boolean returnsTemplate = method.getReturnType() == templateType;
 
-
-      if (!(returnsTemplate || returnString || returnsMarkup )) {
+      if (!(returnsTemplate || returnString || returnsMarkup)) {
         logger.log(TreeLogger.ERROR, "Method " + method.getName() + " does not return "
             + templateType + " or " + stringType + " or " + markupType);
         throw new UnableToCompleteException();
@@ -259,7 +258,7 @@ public class TemplatesGenerator extends Generator {
 
         sw.println("return template;");
 
-      } 
+      }
 
       sw.outdent();
       sw.println("}");

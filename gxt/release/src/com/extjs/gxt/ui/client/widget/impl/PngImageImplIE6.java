@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.ui.client.widget.impl;
 
-
 import com.extjs.gxt.ui.client.widget.PngImage;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -35,14 +34,9 @@ public class PngImageImplIE6 extends PngImageImpl {
 
     if (isPng) {
       Element div = DOM.createDiv();
-      DOM.setInnerHTML(
-          div,
-          "<div id='d' style=\"position: relative;width:"
-              + width
-              + "px;height:"
-              + height
-              + "px;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='"
-              + url + "', sizingMethod='scale')\"></div>");
+      DOM.setInnerHTML(div, "<div id='d' style=\"position: relative;width:" + width + "px;height:"
+          + height + "px;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + url
+          + "', sizingMethod='scale')\"></div>");
 
       return DOM.getFirstChild(div);
     } else {

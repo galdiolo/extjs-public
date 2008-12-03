@@ -13,9 +13,9 @@ import com.extjs.gxt.ui.client.event.BaseEvent;
 
 /**
  * <code>AppEvents</code> are used to pass messages between
- * <code>Controllers</code> and <code>Views</code>. All events have a
- * specific type which are used to identify the event. Typically, applications
- * will define all application events in a constants class.
+ * <code>Controllers</code> and <code>Views</code>. All events have a specific
+ * type which are used to identify the event. Typically, applications will
+ * define all application events in a constants class.
  */
 public class AppEvent<Data> extends BaseEvent {
 
@@ -35,9 +35,9 @@ public class AppEvent<Data> extends BaseEvent {
    * dispatcher.
    */
   public boolean historyEvent;
-  
+
   private HashMap dataMap;
-  
+
   /**
    * Creates a new app event.
    * 
@@ -46,7 +46,7 @@ public class AppEvent<Data> extends BaseEvent {
   public AppEvent(int type) {
     this.type = type;
   }
-  
+
   /**
    * Creates a new app event.
    * 
@@ -70,7 +70,7 @@ public class AppEvent<Data> extends BaseEvent {
     this.token = token;
     historyEvent = true;
   }
-  
+
   /**
    * Returns the application defined property for the given name, or
    * <code>null</code> if it has not been set.

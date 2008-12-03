@@ -45,7 +45,7 @@ public class Shadow extends BoxComponent {
   public static void push(Shadow shadow) {
     shadowStack.push(shadow);
   }
-  
+
   public enum ShadowPosition {
     DROP, SIDES, FRAME;
   }
@@ -75,12 +75,12 @@ public class Shadow extends BoxComponent {
     this.target = target;
     if (!rendered) {
       render(XDOM.getBody());
-    } 
+    }
     el().insertBefore(target);
     el().setVisible(true);
     sync(fly(target).getBounds());
   }
-  
+
   @Override
   protected void onHide() {
     super.onHide();
@@ -124,15 +124,14 @@ public class Shadow extends BoxComponent {
     } else {
       setElement(XDOM.create(Markup.SHADOW));
     }
-    
+
     el().enableDisplayMode("block");
-    
+
     DOM.appendChild(parent, getElement());
 
     if (GXT.isIE) {
       setStyleAttribute("filter", "progid:DXImageTransform.Microsoft.alpha("
-          + "opacity=50) progid:DXImageTransform.Microsoft.Blur(pixelradius=" + offset
-          + ")");
+          + "opacity=50) progid:DXImageTransform.Microsoft.Blur(pixelradius=" + offset + ")");
     }
 
     adjusts = new Rectangle();

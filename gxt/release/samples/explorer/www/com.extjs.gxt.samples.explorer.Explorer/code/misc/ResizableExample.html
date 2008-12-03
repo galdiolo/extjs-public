@@ -66,14 +66,14 @@ public class ResizableExample extends LayoutContainer {
 
     Draggable d = new Draggable(cp);
     if (getParent() instanceof Component) {
-      d.setContainer((Component)getParent());
+      d.setContainer((Component) getParent());
     }
     new Resizable(cp);
 
     setLayout(new FlowLayout(10));
     add(cp);
   }
-  
+
 }</textarea>
 </body>
 </html>

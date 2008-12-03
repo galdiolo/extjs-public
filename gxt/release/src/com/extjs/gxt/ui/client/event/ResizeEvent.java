@@ -36,7 +36,7 @@ public class ResizeEvent extends BaseEvent {
   public ResizeEvent(Resizable resizable) {
     this.resizable = resizable;
   }
-  
+
   public ResizeEvent(Resizable resizable, Component component, Event event) {
     this.resizable = resizable;
     this.component = component;

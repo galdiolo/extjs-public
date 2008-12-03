@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.ui.client.util;
 
-
 import com.extjs.gxt.ui.client.event.Listener;
 import com.google.gwt.user.client.Timer;
 
@@ -36,7 +35,7 @@ public class DelayedTask {
       timer.cancel();
     }
   }
-  
+
   /**
    * Cancels any running timers and starts a new one.
    * 

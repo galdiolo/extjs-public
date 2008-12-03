@@ -35,8 +35,8 @@ import com.google.gwt.user.client.Element;
  */
 public class TaskBar extends LayoutContainer {
 
-  private StartBox startBox; // west
-  private TasksButtonsPanel tbPanel; // center
+  protected StartBox startBox; // west
+  protected TasksButtonsPanel tbPanel; // center
 
   public TaskBar() {
     setId("ux-taskbar");
@@ -50,6 +50,15 @@ public class TaskBar extends LayoutContainer {
   }
 
   /**
+   * Returns the bar's buttons.
+   * 
+   * @return the buttons
+   */
+  public List<TaskButton> getButtons() {
+    return tbPanel.getItems();
+  }
+
+  /**
    * Adds a button.
    * 
    * @param win the window
@@ -59,6 +68,17 @@ public class TaskBar extends LayoutContainer {
     return tbPanel.addButton(win);
   }
 
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
+    setStyleAttribute("zIndex", "10");
+  }
+
+  /**
+   * Returns the bar's start menu.
+   * 
+   * @return the start menu
+   */
   public StartMenu getStartMenu() {
     return (StartMenu) startBox.startBtn.getMenu();
   }
@@ -135,12 +155,12 @@ class StartButton extends Button {
   }
 
   private native String getButtonTemplate() /*-{
-    return [
-    '<table border="0" cellpadding="0" cellspacing="0" class="x-btn-wrap"><tbody><tr>',
-    '<td class="ux-startbutton-left"><i>&#160;</i></td><td class="ux-startbutton-center"><em unselectable="on"><button class="x-btn-text" type="{1}" style="height:30px;">{0}</button></em></td><td class="ux-startbutton-right"><i>&#160;</i></td>',
-    '</tr></tbody></table>'
-    ].join("");
-    }-*/;
+     return [
+     '<table border="0" cellpadding="0" cellspacing="0" class="x-btn-wrap"><tbody><tr>',
+     '<td class="ux-startbutton-left"><i>&#160;</i></td><td class="ux-startbutton-center"><em unselectable="on"><button class="x-btn-text" type="{1}" style="height:30px;">{0}</button></em></td><td class="ux-startbutton-right"><i>&#160;</i></td>',
+     '</tr></tbody></table>'
+     ].join("");
+   }-*/;
 }
 
 class TaskButton extends Button {
@@ -169,12 +189,12 @@ class TaskButton extends Button {
   }
 
   private native String getButtonTemplate() /*-{
-    return [
-    '<table border="0" cellpadding="0" cellspacing="0" class="x-btn-wrap"><tbody><tr>',
-    '<td class="ux-taskbutton-left"><i>&#160;</i></td><td class="ux-taskbutton-center"><em unselectable="on"><button class="x-btn-text" type="{1}" style="height:28px;">{0}</button></em></td><td class="ux-taskbutton-right"><i>&#160;</i></td>',
-    '</tr></tbody></table>'
-    ].join("");
-    }-*/;
+     return [
+     '<table border="0" cellpadding="0" cellspacing="0" class="x-btn-wrap"><tbody><tr>',
+     '<td class="ux-taskbutton-left"><i>&#160;</i></td><td class="ux-taskbutton-center"><em unselectable="on"><button class="x-btn-text" type="{1}" style="height:28px;">{0}</button></em></td><td class="ux-taskbutton-right"><i>&#160;</i></td>',
+     '</tr></tbody></table>'
+     ].join("");
+   }-*/;
 
 }
 
@@ -197,6 +217,10 @@ class TasksButtonsPanel extends BoxComponent {
   TasksButtonsPanel() {
     setId("ux-taskbuttons-panel");
     items = new ArrayList<TaskButton>();
+  }
+
+  public List<TaskButton> getItems() {
+    return items;
   }
 
   public TaskButton addButton(Window win) {

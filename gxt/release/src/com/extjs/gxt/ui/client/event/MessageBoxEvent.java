@@ -9,7 +9,6 @@ package com.extjs.gxt.ui.client.event;
 
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.MessageBox;
-import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 
 public class MessageBoxEvent extends WindowEvent {
@@ -22,15 +21,16 @@ public class MessageBoxEvent extends WindowEvent {
    * The dialog intance.
    */
   public Dialog dialog;
-  
+
   /**
    * The field value. Only applies to prompt and multi-prompt message boxes.
    */
   public String value;
 
-  public MessageBoxEvent(MessageBox messageBox, Window window, Button buttonClicked) {
+  public MessageBoxEvent(MessageBox messageBox, Dialog window, Button buttonClicked) {
     super(window, buttonClicked);
     this.messageBox = messageBox;
+    this.dialog = window;
   }
 
 }

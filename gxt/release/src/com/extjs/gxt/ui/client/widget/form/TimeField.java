@@ -134,6 +134,19 @@ public class TimeField extends ComboBox<ModelData> {
   }
 
   /**
+   * Returns the current date value.
+   * 
+   * @return the value
+   */
+  public Date getDateValue() {
+    ModelData value = getValue();
+    if (value != null) {
+      return format.parse((String) value.get("text"));
+    }
+    return null;
+  }
+
+  /**
    * Returns the date time format.
    * 
    * @return the date time format

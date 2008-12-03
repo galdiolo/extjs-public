@@ -106,8 +106,8 @@ public class BaseTreeModel<T extends TreeModel> extends BaseModel implements Tre
   }
 
   /**
-   * Inserts a child to the model and fires an
-   * {@link ChangeEventSource#Add} event.
+   * Inserts a child to the model and fires an {@link ChangeEventSource#Add}
+   * event.
    * 
    * @param child the child to be inserted
    * @param index the location to insert the child
@@ -115,14 +115,11 @@ public class BaseTreeModel<T extends TreeModel> extends BaseModel implements Tre
   public void insert(T child, int index) {
     adopt(child);
     children.add(index, child);
-    if (index == getChildCount() - 1) {
-      fireEvent(Add, child);
-    } else {
-      ChangeEvent evt = new ChangeEvent(Add, this);
-      evt.item = child;
-      evt.index = index;
-      notify(evt);
-    }
+    ChangeEvent evt = new ChangeEvent(Add, this);
+    evt.parent = this;
+    evt.item = child;
+    evt.index = index;
+    notify(evt);
   }
 
   public boolean isLeaf() {
@@ -133,6 +130,7 @@ public class BaseTreeModel<T extends TreeModel> extends BaseModel implements Tre
   public void notify(ChangeEvent evt) {
     super.notify(evt);
     if (parent != null && parent instanceof ChangeEventSource) {
+      evt.source = parent;
       ((ChangeEventSource) parent).notify(evt);
     }
   }
@@ -157,7 +155,10 @@ public class BaseTreeModel<T extends TreeModel> extends BaseModel implements Tre
   public void remove(T child) {
     child.setParent(null);
     children.remove(child);
-    fireEvent(Remove, child);
+    ChangeEvent evt = new ChangeEvent(Remove, this);
+    evt.parent = this;
+    evt.item = child;
+    notify(evt);
   }
 
   public void removeAll() {

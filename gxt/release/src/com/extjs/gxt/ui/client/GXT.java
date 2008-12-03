@@ -9,8 +9,6 @@ package com.extjs.gxt.ui.client;
 
 import java.util.Map;
 
-import com.extjs.gxt.ui.client.core.El;
-import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.messages.MyMessages;
 import com.extjs.gxt.ui.client.state.CookieProvider;
 import com.extjs.gxt.ui.client.state.StateManager;
@@ -96,6 +94,7 @@ public class GXT {
   private static boolean initialized;
   private static Theme defaultTheme;
   private static boolean forceTheme;
+  private static Version version;
 
   /**
    * Returns the current theme id.
@@ -116,8 +115,20 @@ public class GXT {
    * @return the user agent
    */
   public native static String getUserAgent() /*-{
-    return $wnd.navigator.userAgent.toLowerCase();
-    }-*/;
+     return $wnd.navigator.userAgent.toLowerCase();
+     }-*/;
+
+  /**
+   * Returns the version information.
+   * 
+   * @return the version information
+   */
+  public static Version getVersion() {
+    if (version == null) {
+      version = new Version();
+    }
+    return version;
+  }
 
   /**
    * Hides the loading panel.
@@ -127,14 +138,13 @@ public class GXT {
   public static void hideLoadingPanel(String id) {
     final Element loading = XDOM.getElementById(id);
     if (loading != null) {
-      final El l = new El(loading);
       Timer t = new Timer() {
         @Override
         public void run() {
-          l.fadeOut(FxConfig.NONE);
+          loading.getStyle().setProperty("display", "none");
         }
       };
-      t.schedule(1000);
+      t.schedule(500);
     }
   }
 
@@ -210,7 +220,7 @@ public class GXT {
    * 
    * @param theme the default theme
    * @param force true to force the theme, ignoring the the theme saved with the
-   *            state manager
+   *          state manager
    */
   public static void setDefaultTheme(Theme theme, boolean force) {
     defaultTheme = theme;
@@ -231,13 +241,13 @@ public class GXT {
   }
 
   private static native void initInternal() /*-{
-    $wnd.GXT = {};
-    $wnd.GXT.Ext = {};
-    @com.extjs.gxt.ui.client.core.Ext::load()();
-    }-*/;
+     $wnd.GXT = {};
+     $wnd.GXT.Ext = {};
+     @com.extjs.gxt.ui.client.core.Ext::load()();
+     }-*/;
 
   private static native boolean isSecure() /*-{
-    return $wnd.location.href.toLowerCase().indexOf("https") === 0;
-    }-*/;
+     return $wnd.location.href.toLowerCase().indexOf("https") === 0;
+     }-*/;
 
 }

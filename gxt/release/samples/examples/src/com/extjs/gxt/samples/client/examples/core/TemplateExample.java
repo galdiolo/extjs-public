@@ -1,3 +1,10 @@
+/*
+ * Ext GWT - Ext for GWT
+ * Copyright(c) 2007, 2008, Ext JS, LLC.
+ * licensing@extjs.com
+ * 
+ * http://extjs.com/license
+ */
 package com.extjs.gxt.samples.client.examples.core;
 
 import java.util.ArrayList;
@@ -82,23 +89,23 @@ public class TemplateExample extends LayoutContainer {
   }
 
   private native String getBasicTemplate() /*-{
-   return ['<p>Name: {name}</p>',
-   '<p>Company: {company}</p>',
-   '<p>Location: {location}</p>'].join("");
-   }-*/;
+    return ['<p>Name: {name}</p>',
+    '<p>Company: {company}</p>',
+    '<p>Location: {location}</p>'].join("");
+    }-*/;
 
   private native String getTemplate() /*-{
-   var html = [
-   '<p>Name: {name}</p>',
-   '<p>Company: {company}</p>',
-   '<p>Location: {location}</p>',
-   '<p>Kids: ',
-   '<tpl for="kids" if="name==\'Darrell Meyer\'">',
-   '<tpl if="age &gt; 1"><p>{#}. {parent.name}\'s kid - {name}</p></tpl>',
-   '</tpl></p>'
-   ];
-   return html.join("");
+    var html = [
+    '<p>Name: {name}</p>',
+    '<p>Company: {company}</p>',
+    '<p>Location: {location}</p>',
+    '<p>Kids: ',
+    '<tpl for="kids" if="name==\'Darrell Meyer\'">',
+    '<tpl if="age &gt; 1"><p>{#}. {parent.name}\'s kid - {name}</p></tpl>',
+    '</tpl></p>'
+    ];
+    return html.join("");
 
-   }-*/;
+    }-*/;
 
 }

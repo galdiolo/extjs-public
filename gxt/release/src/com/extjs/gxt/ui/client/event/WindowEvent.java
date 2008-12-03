@@ -34,7 +34,7 @@ public class WindowEvent extends BoxComponentEvent {
     super(window);
     this.window = window;
   }
-  
+
   public WindowEvent(Window window, Event event) {
     this(window);
     this.event = event;

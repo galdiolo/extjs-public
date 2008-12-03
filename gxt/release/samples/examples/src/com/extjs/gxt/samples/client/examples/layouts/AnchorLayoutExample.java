@@ -23,44 +23,44 @@ public class AnchorLayoutExample extends LayoutContainer {
 
   public AnchorLayoutExample() {
     setLayout(new FlowLayout(10));
-    
+
     final Window w = new Window();
     w.setPlain(true);
     w.setSize(500, 300);
     w.setHeading("Resize Me");
     w.setLayout(new FitLayout());
-    
+
     FormPanel panel = new FormPanel();
     panel.setBorders(false);
     panel.setBodyBorder(false);
     panel.setLabelWidth(55);
     panel.setHeaderVisible(false);
-    
+
     TextField<String> field = new TextField<String>();
     field.setFieldLabel("Sent To");
     panel.add(field, new FormData("100%"));
-    
+
     field = new TextField<String>();
     field.setFieldLabel("Subject");
     panel.add(field, new FormData("100%"));
-    
+
     TextArea area = new TextArea();
     area.setHideLabel(true);
     panel.add(area, new FormData("100% -53"));
-    
+
     w.addButton(new Button("Send"));
     w.addButton(new Button("Cancel"));
     w.add(panel);
-    
+
     Button b = new Button("Open", new SelectionListener<ButtonEvent>() {
-    
+
       @Override
       public void componentSelected(ButtonEvent ce) {
         w.show();
       }
-    
+
     });
     add(b);
   }
-  
+
 }

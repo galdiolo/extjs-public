@@ -22,15 +22,15 @@ public class DatePickerExample extends LayoutContainer {
   public DatePickerExample() {
     setLayout(new FlowLayout(10));
     final DatePicker picker = new DatePicker();
-    picker.addListener(Events.Select,  new Listener<ComponentEvent>() {
-    
+    picker.addListener(Events.Select, new Listener<ComponentEvent>() {
+
       public void handleEvent(ComponentEvent be) {
         String d = DateTimeFormat.getShortDateFormat().format(picker.getValue());
         Info.display("Date Selected", "You selected {0}.", new Params(d));
       }
-    
+
     });
     add(picker);
   }
-  
+
 }

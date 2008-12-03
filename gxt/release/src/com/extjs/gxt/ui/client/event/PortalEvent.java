@@ -13,9 +13,9 @@ import com.extjs.gxt.ui.client.widget.custom.Portlet;
 public class PortalEvent extends ContainerEvent<Portal, Portlet> {
 
   public Portal portal;
-  
+
   public Portlet portlet;
-  
+
   public int startColumn;
 
   public int startRow;
@@ -29,7 +29,8 @@ public class PortalEvent extends ContainerEvent<Portal, Portlet> {
     this.portal = portal;
   }
 
-  public PortalEvent(Portal portal, Portlet portlet, int startColumn, int startRow, int column, int row) {
+  public PortalEvent(Portal portal, Portlet portlet, int startColumn, int startRow, int column,
+      int row) {
     super(portal);
     this.portlet = portlet;
     this.startColumn = startColumn;

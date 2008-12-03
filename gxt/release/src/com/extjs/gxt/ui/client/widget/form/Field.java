@@ -46,7 +46,7 @@ import com.google.gwt.user.client.Event;
  * </dd>
  * 
  * <dd><b>Change</b> : FieldEvent(field, value, oldValue)<br>
- * <div>Fires just before the field blurs if the field value has changed.</div>
+ * <div>Fires after the field's value is changed.</div>
  * <ul>
  * <li>field : this</li>
  * <li>value : the new value</li>
@@ -133,13 +133,13 @@ public abstract class Field<D> extends BoxComponent {
   protected PropertyEditor<D> propertyEditor;
   protected boolean hasFocus;
   protected Object focusValue;
+  protected D originalValue;
 
   private String labelStyle = "";
   private String name;
   private String fieldLabel = "";
   private String messageTarget = "side";
   private boolean validateOnBlur = true;
-  private D originalValue;
   private int tabIndex = 0;
   private String labelSeparator;
   private String inputStyle;
@@ -202,6 +202,9 @@ public abstract class Field<D> extends BoxComponent {
       setTitle("");
     } else if ("tooltip".equals(messageTarget)) {
       hideToolTip();
+      if (toolTip != null) {
+        toolTip.disable();
+      }
     } else {
       Element elem = DOM.getElementById(messageTarget);
       if (elem != null) {
@@ -305,6 +308,16 @@ public abstract class Field<D> extends BoxComponent {
   }
 
   /**
+   * Returns the original value of the field, which is the value of the field
+   * when it is first rendered.
+   * 
+   * @return the orignal value
+   */
+  public D getOriginalValue() {
+    return originalValue;
+  }
+
+  /**
    * Retuns the field's property editor.
    * 
    * @return the property editor
@@ -369,9 +382,9 @@ public abstract class Field<D> extends BoxComponent {
   }
 
   /**
-   * Returns <code>true</code> if this field is dirty. A field is dirty, if
-   * the current value is different than it's original value. The original value
-   * is the value of the field when the field is rendered. Disabled and
+   * Returns <code>true</code> if this field is dirty. A field is dirty, if the
+   * current value is different than it's original value. The original value is
+   * the value of the field when the field is rendered. Disabled and
    * pre-rendered fields are never dirty.
    * 
    * @return the dirty state
@@ -456,6 +469,7 @@ public abstract class Field<D> extends BoxComponent {
     } else if ("tooltip".equals(messageTarget)) {
       setToolTip(msg);
       getToolTip().addStyleName("x-form-invalid-tip");
+      getToolTip().enable();
     } else {
       Element elem = DOM.getElementById(messageTarget);
       if (elem != null) {
@@ -586,7 +600,7 @@ public abstract class Field<D> extends BoxComponent {
 
   /**
    * The standard separator to display after the text of each form label
-   * (defaults to the value of {@link FormLayout#setLabelSeperator(String)},
+   * (defaults to the value of {@link FormLayout#setLabelSeparator(String)},
    * which is a colon ':' by default).
    * 
    * @param labelSeparator the label separator or "" for none
@@ -642,6 +656,17 @@ public abstract class Field<D> extends BoxComponent {
     if (rendered) {
       getInputEl().dom.setAttribute("name", name);
     }
+  }
+
+  /**
+   * Updates the original value of the field. The originalValue is the value of
+   * the field when it is rendered. This method is useful when a form / field is
+   * being reused and the originaValue needs to be reset.
+   * 
+   * @param originalValue
+   */
+  public void setOriginalValue(D originalValue) {
+    this.originalValue = originalValue;
   }
 
   /**
@@ -724,6 +749,16 @@ public abstract class Field<D> extends BoxComponent {
       setRawValue(v);
       validate();
     }
+  }
+
+  /**
+   * Updates the original value of the field. This method is useful when a form
+   * / field is being reused and the originaValue needs to be reset.
+   * 
+   * @param value the new original value
+   */
+  public void updateOriginalValue(D value) {
+    originalValue = value;
   }
 
   /**
@@ -813,7 +848,7 @@ public abstract class Field<D> extends BoxComponent {
 
   protected void onBlur(ComponentEvent be) {
     if (!GXT.isOpera && focusStyle != null) {
-      getFocusEl().removeStyleName(focusStyle);
+      getInputEl().removeStyleName(focusStyle);
     }
     hasFocus = false;
     if (validateOnBlur) {
@@ -862,9 +897,9 @@ public abstract class Field<D> extends BoxComponent {
       lbl.setVisible(false);
     }
   }
-  
+
   protected void onKeyDown(FieldEvent fe) {
-     fireEvent(Events.KeyDown, new FieldEvent(this, fe.event));
+    fireEvent(Events.KeyDown, new FieldEvent(this, fe.event));
   }
 
   protected void onKeyPress(FieldEvent fe) {
@@ -911,6 +946,14 @@ public abstract class Field<D> extends BoxComponent {
         Event.ONCLICK | Event.MOUSEEVENTS | Event.FOCUSEVENTS | Event.KEYEVENTS);
 
     initValue();
+  }
+
+  @Override
+  protected void onResize(int width, int height) {
+    super.onResize(width, height);
+    if (errorIcon != null && errorIcon.isAttached()) {
+      alignErrorIcon();
+    }
   }
 
   @Override

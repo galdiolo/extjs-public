@@ -111,7 +111,7 @@ public class FlowLayout extends Layout {
       c.setStyleAttribute("position", "static");
     }
     if (getLayoutData(c) != null && getLayoutData(c) instanceof FlowData) {
-      FlowData data = (FlowData)getLayoutData(c);
+      FlowData data = (FlowData) getLayoutData(c);
       applyMargins(c.el(), data.getMargins());
     }
   }

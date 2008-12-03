@@ -10,8 +10,8 @@ package com.extjs.gxt.ui.client.widget.button;
 import com.extjs.gxt.ui.client.widget.StatusBar;
 
 /**
- * A <code>ButtonBar</code> with a <code>StatusBar</code> that aligns its
- * button to the right.
+ * A <code>ButtonBar</code> with a <code>StatusBar</code> that aligns its button
+ * to the right.
  */
 public class StatusButtonBar extends ButtonBar {
 

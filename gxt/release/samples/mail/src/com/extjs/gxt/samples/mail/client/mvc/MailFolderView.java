@@ -48,7 +48,7 @@ public class MailFolderView extends View {
   }
 
   protected void initUI() {
-    ContentPanel west = (ContentPanel) Registry.get("west");
+    ContentPanel west = (ContentPanel) Registry.get(AppView.WEST_PANEL);
     west.setLayout(new AccordionLayout());
 
     ContentPanel mail = new ContentPanel();

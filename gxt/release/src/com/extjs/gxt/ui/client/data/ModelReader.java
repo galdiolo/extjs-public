@@ -11,8 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A <code>DataReader</code> implementation for <code>Model</code>
- * instances.
+ * A <code>DataReader</code> implementation for <code>Model</code> instances.
  */
 public class ModelReader<C> implements DataReader<C, ListLoadResult<ModelData>> {
 
@@ -20,14 +19,24 @@ public class ModelReader<C> implements DataReader<C, ListLoadResult<ModelData>> 
     if (data instanceof ModelData) {
       List list = new ArrayList();
       list.add(data);
-      return new BaseListLoadResult(list);
+      return newLoadResult(loadConfig, list);
     } else if (data instanceof List) {
-      return new BaseListLoadResult((List) data);
+      return newLoadResult(loadConfig, (List) data);
     } else if (data instanceof ListLoadResult) {
-      return (ListLoadResult)data;
+      return (ListLoadResult) data;
     } else {
       throw new RuntimeException("Error converting data");
     }
+  }
+
+  /**
+   * Template method that provides load result.
+   * 
+   * @param models the models
+   * @return the load result
+   */
+  protected ListLoadResult newLoadResult(C loadConfig, List<ModelData> models) {
+    return new BaseListLoadResult(models);
   }
 
 }

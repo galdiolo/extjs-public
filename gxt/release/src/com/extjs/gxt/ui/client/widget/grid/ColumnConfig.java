@@ -14,6 +14,10 @@ import com.google.gwt.i18n.client.NumberFormat;
 
 /**
  * A column config for a column in a column model.
+ * 
+ * <p /> The column config is a configuration object that should only be used
+ * when creating a column model. After the column model is created, any changes
+ * should be made to the column model, not the column config.
  */
 public class ColumnConfig extends BaseObservable {
 
@@ -326,6 +330,19 @@ public class ColumnConfig extends BaseObservable {
    */
   public void setSortable(boolean sortable) {
     this.sortable = sortable;
+  }
+
+  /**
+   * Sets one to many styles.
+   * 
+   * <pre><code>
+   * setStyle("color:red;font-weight: bold");
+   * </code></pre>
+   * 
+   * @param style the style
+   */
+  public void setStyle(String style) {
+    this.style = style;
   }
 
   /**

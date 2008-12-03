@@ -14,5 +14,5 @@ public class ContactPanel extends ContentPanel {
   public ContactPanel() {
     setHeading("Contacts");
   }
-  
+
 }

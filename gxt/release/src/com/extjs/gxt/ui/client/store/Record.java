@@ -214,7 +214,7 @@ public class Record {
    * @param value the value of the field to set
    */
   public void set(String name, Object value) {
-    if (model.get(name) != null && model.<Object>get(name).equals(value)) {
+    if (model.get(name) != null && model.<Object> get(name).equals(value)) {
       return;
     }
     dirty = true;

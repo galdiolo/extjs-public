@@ -13,9 +13,19 @@ import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.util.Util;
 
 /**
- * Selection event type.
+ * <code>BaseEvent</code> used to signal a <code>SelectionProviders</code>
+ * selection has changed.
  * 
- * @param <M> the data type
+ * <pre>
+    TableBinder<Stock> binder = new TableBinder&lt;Stock>(tbl, store);
+    binder.addSelectionChangedListener(new SelectionChangedListener&lt;Stock>() {
+      public void selectionChanged(SelectionChangedEvent&lt;Stock> se) {
+        List&lt;Stock> sel = se.getSelection();
+      }
+    });
+ * </pre>
+ * 
+ * @param <M> the model type being selected
  */
 public class SelectionChangedEvent<M extends ModelData> extends BaseEvent {
 

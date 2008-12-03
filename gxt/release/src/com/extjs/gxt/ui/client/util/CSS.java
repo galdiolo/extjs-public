@@ -78,16 +78,16 @@ public class CSS {
    * @param cssStr the rules string
    */
   native public static void setRules(Element style, String cssStr) /*-{
-   style.setAttribute("type", "text/css");
-   if(style.styleSheet){// IE
-   style.styleSheet.cssText = cssStr;
-   } else {// w3c
-   while (style.firstChild) {
-   style.removeChild(style.firstChild);
-   }
-   var cssText = $doc.createTextNode(cssStr);
-   style.appendChild(cssText);
-   }
-   }-*/;
+    style.setAttribute("type", "text/css");
+    if(style.styleSheet){// IE
+    style.styleSheet.cssText = cssStr;
+    } else {// w3c
+    while (style.firstChild) {
+    style.removeChild(style.firstChild);
+    }
+    var cssText = $doc.createTextNode(cssStr);
+    style.appendChild(cssText);
+    }
+    }-*/;
 
 }

@@ -23,6 +23,9 @@ import com.google.gwt.user.client.Element;
  */
 public class ThemeSelector extends ComboBox<Theme> {
 
+  /**
+   * Creates a new theme selector.
+   */
   public ThemeSelector() {
     setEditable(false);
     setDisplayField("name");
@@ -32,17 +35,19 @@ public class ThemeSelector extends ComboBox<Theme> {
   @Override
   protected void beforeRender() {
     super.beforeRender();
-    ListStore store = new ListStore();
+    ListStore<Theme> store = new ListStore();
     store.add(ThemeManager.getThemes());
     setStore(store);
 
     String theme = GXT.getThemeId();
     if (theme == null) {
       setValue(Theme.BLUE);
-    }
-    Theme r = findModel("id", theme);
-    if (r != null) {
-      setValue(r);
+    } else {
+      for (Theme t : store.getModels()) {
+        if (theme.equals(t.getId().toLowerCase())) {
+          setValue(t);
+        }
+      }
     }
   }
 
@@ -51,7 +56,7 @@ public class ThemeSelector extends ComboBox<Theme> {
     super.onRender(parent, index);
     addListener(Events.Change, new Listener<FieldEvent>() {
       public void handleEvent(FieldEvent be) {
-        Theme t = (Theme)be.value;
+        Theme t = (Theme) be.value;
         GXT.switchTheme(t);
       }
     });

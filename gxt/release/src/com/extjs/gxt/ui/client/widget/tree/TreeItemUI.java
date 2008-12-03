@@ -259,6 +259,15 @@ public class TreeItemUI {
     }
   }
 
+  public void refresh() {
+    onIconStyleChange(null);
+    updateJointStyle();
+  }
+
+  public void update() {
+    fly(indentEl).setWidth(getIndent());
+  }
+
   public void render(Element target, int index) {
     if (item.root) return;
 
@@ -282,7 +291,7 @@ public class TreeItemUI {
     textSpanEl = textEl.getFirstChildElement().cast();
     containerEl = el.getChild(1);
     containerEl.makePositionable();
-    
+
     if (item.getItemStyleName() != null) {
       item.el().firstChild().addStyleName(item.getItemStyleName());
     }
@@ -307,6 +316,7 @@ public class TreeItemUI {
     }
 
     updateJointStyle();
+    onIconStyleChange(item.getIconStyle());
     item.disableTextSelection(true);
   }
 
@@ -314,7 +324,7 @@ public class TreeItemUI {
     if (item.root) {
       return;
     }
-    
+
     TreeStyle style = item.tree.getStyle();
 
     if (!item.isLeaf()) {
@@ -325,19 +335,20 @@ public class TreeItemUI {
         boolean children = false;
         boolean binder = item.tree != null ? item.tree.getData("binder") != null : false;
         boolean loaded = item.getData("loaded") != null;
-        if ((binder && !loaded) || (binder && item.hasChildren())) {
+        if ((!binder && !item.isLeaf()) || (binder && !loaded) || (binder && item.hasChildren())) {
           children = true;
         }
         if (!binder && item.hasChildren()) {
           children = true;
         }
-        s = children ? (style.getJointCloseIconStyle() != null ? style.getJointCloseIconStyle() :classTreeClose) : "";
+        s = children ? (style.getJointCloseIconStyle() != null ? style.getJointCloseIconStyle()
+            : classTreeClose) : "";
       }
       String cls = s;
       jointDivEl.setClassName(cls);
-      jointDivEl.getStyle().setProperty("display", "");
+      jointDivEl.getStyle().setProperty("vibility", "visible");
     } else {
-      jointDivEl.getStyle().setProperty("display", "none");
+      jointDivEl.getStyle().setProperty("vibility", "hidden");
     }
 
     if (item.tree.getCheckable()) {

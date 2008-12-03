@@ -26,5 +26,4 @@ public class FlowData extends MarginData {
     super(margins);
   }
 
-
 }

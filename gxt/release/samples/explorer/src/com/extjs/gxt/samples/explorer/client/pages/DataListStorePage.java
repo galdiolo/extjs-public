@@ -28,7 +28,7 @@ public class DataListStorePage extends LayoutContainer implements EntryPoint {
   public void onModuleLoad() {
     RootPanel.get().add(this);
   }
-  
+
   public DataListStorePage() {
     setLayout(new FlowLayout(10));
 

@@ -200,7 +200,7 @@ public class Editor extends BoxComponent {
   /**
    * Called after the editor completes an edit.
    * 
-   * @param value the value
+   * @param value the value from the editor
    * @return the updated value
    */
   public Object postProcessValue(Object value) {
@@ -210,7 +210,7 @@ public class Editor extends BoxComponent {
   /**
    * Called before the editor sets the value on the wrapped field.
    * 
-   * @param value
+   * @param value the editor value
    * @return the updated value
    */
   public Object preProcessValue(Object value) {
@@ -375,10 +375,13 @@ public class Editor extends BoxComponent {
       hide();
       return;
     }
+
+    field.clearInvalid();
+
     EditorEvent e = new EditorEvent(this);
     e.value = postProcessValue(v);
     e.startValue = startValue;
-    
+
     if (fireEvent(Events.BeforeComplete, e)) {
       editing = false;
       if (updateEl && boundEl != null) {
@@ -482,11 +485,10 @@ public class Editor extends BoxComponent {
 
   protected void onSpecialKey(FieldEvent fe) {
 
-    
     if (completeOnEnter && fe.getKeyCode() == KeyboardListener.KEY_ENTER) {
       // ugly
       if (field instanceof ComboBox) {
-        ComboBox box = (ComboBox)field;
+        ComboBox box = (ComboBox) field;
         if (box.isExpanded()) {
           return;
         }

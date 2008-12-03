@@ -26,7 +26,7 @@ public class LoadListener implements Listener<LoadEvent> {
       case Loader.LoadException:
         loaderLoadException(le);
         break;
-    }    
+    }
   }
 
   /**
@@ -35,8 +35,8 @@ public class LoadListener implements Listener<LoadEvent> {
    * 
    * @param le the load event
    */
-  public void loaderBeforeLoad(LoadEvent le){
-    
+  public void loaderBeforeLoad(LoadEvent le) {
+
   }
 
   /**
@@ -44,8 +44,8 @@ public class LoadListener implements Listener<LoadEvent> {
    * 
    * @param le the load event
    */
-  public void loaderLoadException(LoadEvent le){
-    
+  public void loaderLoadException(LoadEvent le) {
+
   }
 
   /**
@@ -53,7 +53,7 @@ public class LoadListener implements Listener<LoadEvent> {
    * 
    * @param le the load event
    */
-  public void loaderLoad(LoadEvent le){
-    
+  public void loaderLoad(LoadEvent le) {
+
   }
 }

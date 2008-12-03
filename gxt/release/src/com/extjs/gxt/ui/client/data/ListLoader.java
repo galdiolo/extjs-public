@@ -11,7 +11,7 @@ import com.extjs.gxt.ui.client.Style.SortDir;
 
 /**
  * Inteface for list based loaders.
- *
+ * 
  * @param <C> the list load config type
  */
 public interface ListLoader<C extends ListLoadConfig> extends Loader<C> {

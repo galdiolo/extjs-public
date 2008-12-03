@@ -36,39 +36,45 @@ import com.google.gwt.user.client.Event;
  * <dl>
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>CellClick</b> : TreeTableEvent(treeTable, item, index)<br>
+ * <dd><b>CellClick</b> : TreeTableEvent(treeTable, item, rowIndex, cellIndex)<br>
  * <div>Fires after a cell has been clicked.</div>
  * <ul>
  * <li>treeTable : tree table</li>
  * <li>item : item represented by the cell</li>
- * <li>index : cell column index</li>
+ * <li>rowIndex : the item's depth</li>
+ * <li>cellIndex : the cell index</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>CellDoubleClick</b> : TreeTableEvent(treeTable, item, index)<br>
+ * <dd><b>CellDoubleClick</b> : TreeTableEvent(treeTable, item, rowIndex,
+ * cellIndex)<br>
  * <div>Fires after a cell has been double clicked.</div>
  * <ul>
  * <li>treeTable : tree table</li>
  * <li>item : item represented by the cell</li>
- * <li>index : cell column index</li>
+ * <li>rowIndex : the item's depth</li>
+ * <li>cellIndex : the cell index</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>RowClick</b> : TreeTableEvent(treeTable, item, index)<br>
+ * <dd><b>RowClick</b> : TreeTableEvent(treeTable, item, rowIndex, cellIndex)<br>
  * <div>Fires after a cell has been clicked.</div>
  * <ul>
  * <li>treeTable : tree table</li>
  * <li>item : item that represents the row</li>
- * <li>index : cell column index</li>
+ * <li>rowIndex : the item's depth</li>
+ * <li>cellIndex : the cell index</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>RowDoubleClick</b> : TreeTableEvent(treeTable, item, index)<br>
+ * <dd><b>RowDoubleClick</b> : TreeTableEvent(treeTable, item, rowIndex,
+ * cellIndex)<br>
  * <div>Fires after a cell has been double clicked.</div>
  * <ul>
  * <li>treeTable : tree table</li>
  * <li>item : item that represents the row</li>
- * <li>index : cell column index</li>
+ * <li>rowIndex : the item's depth</li>
+ * <li>cellIndex : the cell index</li>
  * </ul>
  * </dd>
  * </dl>
@@ -100,30 +106,22 @@ public class TreeTable extends Tree implements BaseTable {
   }
 
   /**
-   * Sets whether the table header context menu is displayed (defaults to true).
-   * 
-   * @param columnContextMenu the column context menu sate
-   */
-  public void setColumnContextMenu(boolean columnContextMenu) {
-    this.columnContextMenu = columnContextMenu;
-  }
-
-  /**
-   * Returns the column context menu enabed state.
-   * 
-   * @return <code>true</code> if enabled, <code>false</code> otherwise.
-   */
-  public boolean getColumnContextMenu() {
-    return !columnContextMenu;
-  }
-
-  /**
    * Creates a new tree table with the given column model.
    * 
    * @param cm the tree table column model
    */
   public TreeTable(TreeTableColumnModel cm) {
     this.cm = cm;
+  }
+
+  @Override
+  public boolean fireEvent(int type, ComponentEvent ce) {
+    // handle case where events are disabled why animating expand / collapse
+    boolean d = isDisabledEvents();
+    disableEvents(false);
+    boolean result = super.fireEvent(type, ce);
+    disableEvents(d);
+    return result;
   }
 
   /**
@@ -144,6 +142,15 @@ public class TreeTable extends Tree implements BaseTable {
    */
   public TableColumn getColumn(String id) {
     return cm.getColumn(id);
+  }
+
+  /**
+   * Returns the column context menu enabed state.
+   * 
+   * @return <code>true</code> if enabled, <code>false</code> otherwise.
+   */
+  public boolean getColumnContextMenu() {
+    return !columnContextMenu;
   }
 
   /**
@@ -215,6 +222,15 @@ public class TreeTable extends Tree implements BaseTable {
   }
 
   /**
+   * Sets whether the table header context menu is displayed (defaults to true).
+   * 
+   * @param columnContextMenu the column context menu sate
+   */
+  public void setColumnContextMenu(boolean columnContextMenu) {
+    this.columnContextMenu = columnContextMenu;
+  }
+
+  /**
    * True to display a horizonatal scroll bar when needed (defaults to true).
    * 
    * @param horizontalScroll the horizontal scroll state
@@ -258,11 +274,18 @@ public class TreeTable extends Tree implements BaseTable {
 
   @Override
   protected ComponentEvent createComponentEvent(Event event) {
-    TreeTableEvent e = new TreeTableEvent(this);
+    Element target = null;
+    TreeItem item = null;
     if (event != null) {
-      e.item = findItem(DOM.eventGetTarget(event));
+      target = event.getTarget().cast();
+      item = (TreeItem) findItem(target);
     }
-    return e;
+    TreeTableEvent te = new TreeTableEvent(this, item);
+    if (view != null && event != null && item != null) {
+      te.cellIndex = view.findCellIndex(target);
+      te.rowIndex = item.getDepth();
+    }
+    return te;
   }
 
   @Override
@@ -295,14 +318,6 @@ public class TreeTable extends Tree implements BaseTable {
     }
   }
 
-  /**
-   * Returns <code>true</code> if vertical lines are enabled.
-   * 
-   * @return the vertical line state
-   */
-  // public boolean getVeritcalLines() {
-  // return verticalLines;
-  // }
   /**
    * Returns the tree table's view.
    * 

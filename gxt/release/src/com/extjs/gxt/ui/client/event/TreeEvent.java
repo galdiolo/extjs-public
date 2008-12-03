@@ -13,10 +13,6 @@ import com.extjs.gxt.ui.client.widget.tree.TreeItem;
 /**
  * Tree event type.
  * 
- * <p/>Note: For a given event, only the fields which are appropriate will be
- * filled in. The appropriate fields for each event are documented by the event
- * source.
- * 
  * @see Tree
  */
 public class TreeEvent extends ContainerEvent<Tree, TreeItem> {

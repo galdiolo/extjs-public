@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.ui.client.widget.layout;
 
-
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.core.El;
@@ -42,8 +41,8 @@ public class CenterLayout extends TableLayout {
   @Override
   protected void renderAll(Container container, El target) {
     Component c = container.getItem(0);
-    c.setStyleAttribute("textAlign", "left");
     if (c != null && !isValidParent(c.getElement(), target.dom)) {
+      c.setStyleAttribute("textAlign", "left");
       renderComponent(c, 0, target);
     }
   }

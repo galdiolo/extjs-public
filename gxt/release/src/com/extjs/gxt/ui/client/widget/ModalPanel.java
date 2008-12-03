@@ -7,6 +7,8 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
+import java.util.Stack;
+
 import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.FxEvent;
@@ -25,6 +27,43 @@ import com.google.gwt.user.client.ui.RootPanel;
  */
 public class ModalPanel extends BoxComponent {
 
+  private static Stack modalStack = new Stack();
+  private static ModalPanel last;
+
+  /**
+   * Returns a ModalPanel from the stack.
+   * 
+   * @return the panel
+   */
+  public static ModalPanel pop() {
+    ModalPanel panel = modalStack.size() > 0 ? (ModalPanel) modalStack.pop() : null;
+    if (panel == null) {
+      panel = new ModalPanel();
+    }
+    last = panel;
+    return panel;
+  }
+
+  /**
+   * Pushes the last popped panel onto the stack.
+   */
+  public static void push() {
+    if (last != null) {
+      push(last);
+    }
+  }
+
+  /**
+   * Pushes a panel back onto the stack.
+   * 
+   * @param panel the panel
+   */
+  public static void push(ModalPanel panel) {
+    panel.hide();
+    last = null;
+    modalStack.push(panel);
+  }
+
   private boolean blink;
   private Component component;
   private boolean blinking;
@@ -39,6 +78,11 @@ public class ModalPanel extends BoxComponent {
     setShadow(false);
   }
 
+  /**
+   * Returns the panel's event preview.
+   * 
+   * @return the event preview
+   */
   public BaseEventPreview getEventPreview() {
     return eventPreview;
   }
@@ -49,7 +93,13 @@ public class ModalPanel extends BoxComponent {
   public void hide() {
     super.hide();
     el().setZIndex(-1);
+    component = null;
+    eventPreview.getIgnoreList().removeAll();
     eventPreview.remove();
+    if (layer != null) {
+      layer.disableShadow();
+      layer.hideShim();
+    }
     RootPanel.get().remove(this);
   }
 
@@ -115,8 +165,7 @@ public class ModalPanel extends BoxComponent {
   @Override
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
-    setElement(DOM.createDiv());
-    el().insertInto(target, index);
+    setElement(DOM.createDiv(), target, index);
 
     El body = XDOM.getBodyEl();
     int width = body.dom.getScrollWidth();
@@ -134,11 +183,6 @@ public class ModalPanel extends BoxComponent {
     el().setSize(w, h);
 
     eventPreview = new BaseEventPreview() {
-
-      @Override
-      public boolean onPreview(PreviewEvent pe) {
-        return super.onPreview(pe);
-      }
 
       @Override
       protected boolean onAutoHide(PreviewEvent pe) {

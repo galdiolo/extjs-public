@@ -16,8 +16,8 @@ import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * A <code>Container</code> that scrolls its contents. The container is
- * created with scrolling disabled.
+ * A <code>Container</code> that scrolls its contents. The container is created
+ * with scrolling disabled.
  * 
  * <dl>
  * <dt>Events:</dt>
@@ -50,7 +50,11 @@ public class ScrollContainer<T extends Component> extends Container<T> {
    * @return the horizontal scroll position
    */
   public int getHScrollPosition() {
-    return rendered ? el().getScrollLeft() : 0;
+    if (rendered) {
+      return getLayoutTarget().getScrollLeft();
+    } else {
+      return scrollLeft != Style.DEFAULT ? scrollLeft : 0;
+    }
   }
 
   /**
@@ -68,7 +72,11 @@ public class ScrollContainer<T extends Component> extends Container<T> {
    * @return the vertical scroll position
    */
   public int getVScrollPosition() {
-    return rendered ? getLayoutTarget().getScrollTop() : 0;
+    if (rendered) {
+      return getLayoutTarget().getScrollTop();
+    } else {
+      return scrollTop != Style.DEFAULT ? scrollTop : 0;
+    }
   }
 
   public void onComponentEvent(ComponentEvent ce) {
@@ -131,7 +139,7 @@ public class ScrollContainer<T extends Component> extends Container<T> {
           getLayoutTarget().setStyleAttribute("overflowX", "hidden");
           break;
       }
-      
+
     }
   }
 
@@ -152,7 +160,7 @@ public class ScrollContainer<T extends Component> extends Container<T> {
       setHScrollPosition(scrollLeft);
     }
     if (scrollTop != Style.DEFAULT) {
-      setVScrollPosition(scrollLeft);
+      setVScrollPosition(scrollTop);
     }
     if (scrollMode != Scroll.NONE) {
       setScrollMode(scrollMode);

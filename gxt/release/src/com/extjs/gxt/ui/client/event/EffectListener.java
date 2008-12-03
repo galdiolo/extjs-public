@@ -9,7 +9,6 @@ package com.extjs.gxt.ui.client.event;
 
 import com.extjs.gxt.ui.client.Events;
 
-
 /**
  * Event interface for effect events.
  */
@@ -35,7 +34,7 @@ public class EffectListener implements Listener<BaseEvent> {
    * @param be an event containing information about the event
    */
   public void effectStart(BaseEvent be) {
-    
+
   }
 
   /**
@@ -44,7 +43,7 @@ public class EffectListener implements Listener<BaseEvent> {
    * @param be an event containing information about the event
    */
   public void effectCancel(BaseEvent be) {
-    
+
   }
 
   /**
@@ -52,8 +51,8 @@ public class EffectListener implements Listener<BaseEvent> {
    * 
    * @param be an event containing information about the event
    */
-  public void effectComplete(BaseEvent be){
-    
+  public void effectComplete(BaseEvent be) {
+
   }
 
 }

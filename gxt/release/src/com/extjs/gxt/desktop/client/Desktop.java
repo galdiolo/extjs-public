@@ -10,18 +10,14 @@ package com.extjs.gxt.desktop.client;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.core.El;
-import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.WindowEvent;
 import com.extjs.gxt.ui.client.event.WindowListener;
-import com.extjs.gxt.ui.client.event.WindowManagerEvent;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.Viewport;
 import com.extjs.gxt.ui.client.widget.Window;
-import com.extjs.gxt.ui.client.widget.WindowManager;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.google.gwt.user.client.DOM;
@@ -30,37 +26,40 @@ import com.google.gwt.user.client.ui.RootPanel;
 
 /**
  * A desktop represents a desktop like application which contains a task bar,
- * start menu, and shortcuts. 
+ * start menu, and shortcuts.
  * 
- * <p/> Rather than adding content directly to the
- * root panel, content should be wrapped in windows. Windows can be opened via
- * shortcuts and the start menu.
+ * <p/> Rather than adding content directly to the root panel, content should be
+ * wrapped in windows. Windows can be opened via shortcuts and the start menu.
  */
 public class Desktop {
 
-  private TaskBar taskBar = new TaskBar();
-  private WindowListener listener;
-  private Listener<WindowManagerEvent> managerListener;
-  private Viewport viewport;
-  private Window activeWindow;
-  private List<Shortcut> shortcuts = new ArrayList<Shortcut>();
-  private El shortcutEl;
-  
+  protected TaskBar taskBar = new TaskBar();
+  protected WindowListener listener;
+  protected Viewport viewport;
+  protected LayoutContainer desktop;
+  protected Window activeWindow;
+  protected List<Shortcut> shortcuts;
+  protected List<Window> windows;
+  protected El shortcutEl;
+
   public Desktop() {
+    shortcuts = new ArrayList<Shortcut>();
+    windows = new ArrayList<Window>();
+
     initListeners();
 
     viewport = new Viewport();
     viewport.setLayout(new RowLayout());
 
-    LayoutContainer lc = new LayoutContainer() {
+    desktop = new LayoutContainer() {
       @Override
       protected void onRender(Element parent, int index) {
         super.onRender(parent, index);
-        el().appendChild(XDOM.getElementById("x-desktop"));
+        getElement().appendChild(XDOM.getElementById("x-desktop"));
       }
     };
 
-    viewport.add(lc, new RowData(1, 1));
+    viewport.add(desktop, new RowData(1, 1));
     viewport.add(taskBar, new RowData(1, 30));
 
     Element el = XDOM.getElementById("x-shortcuts");
@@ -70,33 +69,107 @@ public class Desktop {
       XDOM.getBody().appendChild(el);
     }
     shortcutEl = new El(el);
-
     RootPanel.get().add(viewport);
   }
 
+  /**
+   * Adds a shortcut to the desktop.
+   * 
+   * @param shortcut the shortcut to add
+   */
   public void addShortcut(Shortcut shortcut) {
-    shortcuts.add(shortcut);
-    shortcut.render(shortcutEl.dom);
-    ComponentHelper.doAttach(shortcut);
+    if (shortcutEl != null) {
+      shortcuts.add(shortcut);
+      shortcut.render(shortcutEl.dom);
+      ComponentHelper.doAttach(shortcut);
+    }
   }
 
-  public void removeShortcut(Shortcut shortcut) {
-    shortcuts.remove(shortcut);
-    shortcutEl.dom.removeChild(shortcut.getElement());
-    ComponentHelper.doDetach(shortcut);
+  /**
+   * Adds a window to the desktop.
+   * 
+   * @param window the window to add
+   */
+  public void addWindow(Window window) {
+    if (windows.add(window)) {
+      window.setContainer(desktop.getElement());
+      window.addWindowListener(listener);
+    }
   }
 
+  /**
+   * Returns the container of the "desktop", which is the viewport minus the
+   * task bar.
+   * 
+   * @return the desktop layout container
+   */
+  public LayoutContainer getDesktop() {
+    return desktop;
+  }
+
+  /**
+   * Returns the start menu.
+   * 
+   * @return the start menu
+   */
   public StartMenu getStartMenu() {
     return taskBar.getStartMenu();
   }
 
+  /**
+   * Returns the desktop's task bar.
+   * 
+   * @return the task bar
+   */
   public TaskBar getTaskBar() {
     return taskBar;
   }
 
+  /**
+   * Returns a list of the desktop's windows.
+   * 
+   * @return the windows
+   */
+  public List<Window> getWindows() {
+    return windows;
+  }
+
+  /**
+   * Minimizes the window.
+   * 
+   * @param window the window to minimize
+   */
   public void minimizeWindow(Window window) {
     window.setData("minimize", true);
     window.hide();
+  }
+
+  /**
+   * Removes a shortcut from the desktop.
+   * 
+   * @param shortcut the shortcut to remove
+   */
+  public void removeShortcut(Shortcut shortcut) {
+    if (shortcutEl != null) {
+      shortcuts.remove(shortcut);
+      shortcutEl.dom.removeChild(shortcut.getElement());
+      ComponentHelper.doDetach(shortcut);
+    }
+  }
+
+  /**
+   * Removes a window from the desktop.
+   * 
+   * @param window the window to remove
+   */
+  public void removeWindow(Window window) {
+    if (windows.remove(window)) {
+      window.removeWindowListener(listener);
+      if (activeWindow == window) {
+        activeWindow = null;
+      }
+      taskBar.removeTaskButton((TaskButton) window.getData("taskButton"));
+    }
   }
 
   protected void initListeners() {
@@ -107,8 +180,18 @@ public class Desktop {
       }
 
       @Override
+      public void windowClose(WindowEvent we) {
+        onClose(we.window);
+      }
+
+      @Override
       public void windowDeactivate(WindowEvent we) {
         markInactive(we.window);
+      }
+
+      @Override
+      public void windowHide(WindowEvent we) {
+        onHide(we.window);
       }
 
       @Override
@@ -116,33 +199,23 @@ public class Desktop {
         minimizeWindow(we.window);
       }
 
-    };
-
-    managerListener = new Listener<WindowManagerEvent>() {
-
-      public void handleEvent(WindowManagerEvent be) {
-        switch (be.type) {
-          case Events.Register:
-            onRegister(be.window);
-            break;
-          case Events.Unregister:
-            onUnregister(be.window);
-            break;
-        }
+      @Override
+      public void windowShow(WindowEvent we) {
+        onShow(we.window);
       }
 
     };
 
-    WindowManager.get().addListener(Events.Register, managerListener);
-    WindowManager.get().addListener(Events.Unregister, managerListener);
   }
 
-  private void onRegister(Window window) {
-    taskBar.addTaskButton(window);
-    window.addWindowListener(listener);
+  protected void onClose(Window window) {
+    removeWindow(window);
   }
 
-  private void onUnregister(Window window) {
+  protected void onHide(Window window) {
+    if (window.getData("minimize") != null) {
+      return;
+    }
     if (activeWindow == window) {
       activeWindow = null;
     }
@@ -166,6 +239,14 @@ public class Desktop {
       TaskButton btn = window.getData("taskButton");
       btn.removeStyleName("active-win");
     }
+  }
+
+  private void onShow(Window window) {
+    TaskButton btn = window.getData("taskButton");
+    if (btn != null && taskBar.getButtons().contains(btn)) {
+      return;
+    }
+    taskBar.addTaskButton(window);
   }
 
 }

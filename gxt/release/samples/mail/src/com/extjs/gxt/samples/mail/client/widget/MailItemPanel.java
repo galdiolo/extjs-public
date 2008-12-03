@@ -49,7 +49,7 @@ public class MailItemPanel extends ContentPanel {
 
       content.removeAll();
       content.addText("<div style='padding: 12px;font-size: 12px'>" + item.getBody() + "</div>");
-      
+
       layout();
 
     } else {

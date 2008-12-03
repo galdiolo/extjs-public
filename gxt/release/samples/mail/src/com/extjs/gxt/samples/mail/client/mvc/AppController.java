@@ -8,6 +8,7 @@
 package com.extjs.gxt.samples.mail.client.mvc;
 
 import com.extjs.gxt.samples.mail.client.AppEvents;
+import com.extjs.gxt.samples.mail.client.Mail;
 import com.extjs.gxt.samples.mail.client.MailServiceAsync;
 import com.extjs.gxt.samples.resources.client.model.Folder;
 import com.extjs.gxt.ui.client.Registry;
@@ -51,7 +52,7 @@ public class AppController extends Controller {
 
   private void onInit(AppEvent event) {
     forwardToView(appView, event);
-    service = (MailServiceAsync) Registry.get("service");
+    service = (MailServiceAsync) Registry.get(Mail.SERVICE);
     service.getMailFolders("darrell", new AsyncCallback<Folder>() {
       public void onFailure(Throwable caught) {
         Dispatcher.forwardEvent(AppEvents.Error, caught);

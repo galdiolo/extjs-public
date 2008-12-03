@@ -8,6 +8,7 @@
 package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.BaseObservable;
@@ -20,6 +21,7 @@ import com.extjs.gxt.ui.client.widget.layout.LayoutData;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -56,20 +58,6 @@ public abstract class Layout extends BaseObservable {
     }
   });
 
-  protected void onResize(ComponentEvent ce) {
-    if (resizeDelay != -1) {
-      task.delay(resizeDelay);
-    } else {
-      layout();
-    }
-  }
-
-  public void layout() {
-    El target = container.getLayoutTarget();
-    onLayout(container, target);
-    fireEvent(Events.AfterLayout, new LayoutEvent(container, this));
-  }
-
   /**
    * Returns the extra style name.
    * 
@@ -95,6 +83,12 @@ public abstract class Layout extends BaseObservable {
    */
   public boolean isRenderHidden() {
     return renderHidden;
+  }
+
+  public void layout() {
+    El target = container.getLayoutTarget();
+    onLayout(container, target);
+    fireEvent(Events.AfterLayout, new LayoutEvent(container, this));
   }
 
   /**
@@ -145,12 +139,60 @@ public abstract class Layout extends BaseObservable {
     this.resizeDelay = resizeDelay;
   }
 
+  protected void applyMargins(El target, Margins margins) {
+    if (margins == null) return;
+    target.setStyleAttribute("marginLeft", margins.left);
+    target.setStyleAttribute("marginTop", margins.top);
+    target.setStyleAttribute("marginRight", margins.right);
+    target.setStyleAttribute("marginBottom", margins.bottom);
+  }
+
+  protected void applyPadding(El target, Margins margins) {
+    target.setStyleAttribute("paddingLeft", margins.left);
+    target.setStyleAttribute("paddingTop", margins.top);
+    target.setStyleAttribute("paddingRight", margins.right);
+    target.setStyleAttribute("paddingBottom", margins.bottom);
+  }
+
+  protected El fly(com.google.gwt.dom.client.Element elem) {
+    return El.fly(elem);
+  }
+
   protected El fly(Element elem) {
     return El.fly(elem);
   }
-  
-  protected El fly(com.google.gwt.dom.client.Element elem) {
-    return El.fly(elem);
+
+  protected LayoutData getLayoutData(Component c) {
+    return ComponentHelper.getLayoutData(c);
+  }
+
+  protected int getSideMargins(Component c) {
+    if (GXT.isSafari) {
+      try {
+        Object data = getLayoutData(c);
+        if (data != null && data instanceof MarginData) {
+          MarginData m = (MarginData)data;
+          Margins margins = m.getMargins();
+          if (margins == null) {
+            return 0;
+          }
+          int tot = 0;
+          if (margins.left != -1) {
+            tot += margins.left;
+          }
+          if (margins.right != -1) {
+            tot += margins.right;
+          }
+          return tot;
+        }
+      } catch (Exception e) {
+        Window.alert("" + e.getMessage());
+      }
+
+    } else {
+      return c.el().getMargins("lr");
+    }
+    return 0;
   }
 
   protected boolean isValidParent(Element elem, Element parent) {
@@ -160,9 +202,21 @@ public abstract class Layout extends BaseObservable {
     return false;
   }
 
+  protected void layoutContainer() {
+    container.layout();
+  }
+  
   protected void onLayout(Container container, El target) {
     this.target = target;
     renderAll(container, target);
+  }
+
+  protected void onResize(ComponentEvent ce) {
+    if (resizeDelay != -1) {
+      task.delay(resizeDelay);
+    } else {
+      layout();
+    }
   }
 
   protected void renderAll(Container container, El target) {
@@ -189,7 +243,7 @@ public abstract class Layout extends BaseObservable {
     }
     LayoutData data = component.getLayoutData();
     if (data != null && data instanceof MarginData) {
-      MarginData ld = (MarginData)data;
+      MarginData ld = (MarginData) data;
       applyMargins(component.el(), ld.getMargins());
     }
   }
@@ -202,39 +256,16 @@ public abstract class Layout extends BaseObservable {
     }
   }
 
+  protected void setLayoutData(Component c, LayoutData data) {
+    ComponentHelper.setLayoutData(c, data);
+  }
+
   protected void setSize(Component c, int width, int height) {
     if (c instanceof BoxComponent) {
       ((BoxComponent) c).setSize(width, height);
     } else if (c.isRendered()) {
       fly(c.getElement()).setSize(width, height, true);
     }
-  }
-  
-  protected void layoutContainer() {
-    container.layout();
-  }
-  
-  protected void setLayoutData(Component c, LayoutData data) {
-    ComponentHelper.setLayoutData(c, data);
-  }
-  
-  protected LayoutData getLayoutData(Component c) {
-    return ComponentHelper.getLayoutData(c);
-  }
-  
-  protected void applyPadding(El target, Margins margins) {
-    target.setStyleAttribute("paddingLeft", margins.left);
-    target.setStyleAttribute("paddingTop", margins.top);
-    target.setStyleAttribute("paddingRight", margins.right);
-    target.setStyleAttribute("paddingBottom", margins.bottom);
-  }
-  
-  protected void applyMargins(El target, Margins margins) {
-    if (margins == null) return;
-    target.setStyleAttribute("marginLeft", margins.left);
-    target.setStyleAttribute("marginTop", margins.top);
-    target.setStyleAttribute("marginRight", margins.right);
-    target.setStyleAttribute("marginBottom", margins.bottom);
   }
 
 }

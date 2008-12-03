@@ -24,6 +24,6 @@ public interface ExampleServiceAsync {
       AsyncCallback<PagingLoadResult<BeanPost>> callback);
 
   public void getCustomers(AsyncCallback<List<Customer>> callback);
-  
+
   public void getPhotos(AsyncCallback<List<Photo>> callback);
 }

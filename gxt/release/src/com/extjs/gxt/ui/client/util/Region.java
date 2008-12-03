@@ -18,7 +18,7 @@ public class Region {
   public int left;
 
   /**
-   * The top value. 
+   * The top value.
    */
   public int top;
 

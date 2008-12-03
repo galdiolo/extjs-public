@@ -133,8 +133,8 @@ import com.google.gwt.user.client.ui.Widget;
  * <div>Fires on any browser event the component receives. Listners will be
  * called prior to any event processing and before
  * {@link #onComponentEvent(ComponentEvent)} is called. Listeners can set the
- * <code>doit</code> field to <code>false</code> to cancel the processing of
- * the event.</div>
+ * <code>doit</code> field to <code>false</code> to cancel the processing of the
+ * event.</div>
  * <ul>
  * <li>component : this</li>
  * <li>event : event</li>
@@ -248,6 +248,7 @@ public abstract class Component extends Widget implements Observable {
   private Map overElements;
   private Element dummy;
   private boolean disableEvents;
+  private boolean disableBrowserEvents;
   private boolean hasBrowserListener;
   private boolean enableState = true;
   private boolean focused;
@@ -422,7 +423,16 @@ public abstract class Component extends Widget implements Observable {
     if (disableEvents) return true;
     return observable.fireEvent(type, previewEvent(type, ce));
   }
-  
+
+  /**
+   * Returns true if events are disabled.
+   * 
+   * @return true if events disabled
+   */
+  public boolean isDisabledEvents() {
+    return disableEvents;
+  }
+
   /**
    * Returns the global flyweight instance.
    * 
@@ -556,9 +566,8 @@ public abstract class Component extends Widget implements Observable {
   }
 
   /**
-   * Hide this component. Fires the <i>BeforeHide</i> event before the
-   * component is hidden, the fires the <i>Hide</i> event after the component
-   * is hidden.
+   * Hide this component. Fires the <i>BeforeHide</i> event before the component
+   * is hidden, the fires the <i>Hide</i> event after the component is hidden.
    */
   public void hide() {
     if (fireEvent(Events.BeforeHide)) {
@@ -611,7 +620,7 @@ public abstract class Component extends Widget implements Observable {
    * @param event the dom event
    */
   public void onBrowserEvent(Event event) {
-    if (disabled || disableEvents) {
+    if (disabled || disableEvents || disableBrowserEvents) {
       return;
     }
 
@@ -635,9 +644,8 @@ public abstract class Component extends Widget implements Observable {
 
     // dom event type
     ce.type = type;
-
-    int tt = GXT.isSafari ? Event.ONMOUSEDOWN : Event.ONMOUSEUP;
-    if (ce.type == tt && ce.isRightClick()) {
+    if (ce.type == (GXT.isSafari && GXT.isMac ? Event.ONMOUSEDOWN : Event.ONMOUSEUP)
+        && ce.isRightClick()) {
       onRightClick(ce);
     }
 
@@ -1068,9 +1076,9 @@ public abstract class Component extends Widget implements Observable {
   }
 
   /**
-   * Show this component. Fires the <i>BeforeShow</i> event before the
-   * component is made visible, then fires the <i>Show</i> event after the
-   * component is visible.
+   * Show this component. Fires the <i>BeforeShow</i> event before the component
+   * is made visible, then fires the <i>Show</i> event after the component is
+   * visible.
    */
   public void show() {
     if (fireEvent(Events.BeforeShow)) {
@@ -1233,6 +1241,9 @@ public abstract class Component extends Widget implements Observable {
   @Override
   protected void onDetach() {
     super.onDetach();
+
+    hideToolTip();
+
     if (disableTextSelection > 0) {
       el.disableTextSelection(false);
     }
@@ -1250,12 +1261,18 @@ public abstract class Component extends Widget implements Observable {
     removeStyleName(disabledStyle);
   }
 
+  @Override
+  protected void onEnsureDebugId(String baseID) {
+    setId(DEBUG_ID_PREFIX + baseID);
+  }
+
   protected void onHide() {
     el.setVisible(false);
+    hideToolTip();
   }
 
   protected void onHideContextMenu() {
-    disableEvents = false;
+    disableBrowserEvents = false;
   }
 
   @Override
@@ -1295,14 +1312,16 @@ public abstract class Component extends Widget implements Observable {
   }
 
   protected void onShowContextMenu(int x, int y) {
-    contextMenu.addListener(Events.Hide, new Listener<ComponentEvent>() {
-      public void handleEvent(ComponentEvent ce) {
-        contextMenu.removeListener(Events.Hide, this);
-        onHideContextMenu();
-      }
-    });
     contextMenu.showAt(x + 5, y + 5);
-    disableEvents = true;
+    if (contextMenu.isVisible()) {
+      contextMenu.addListener(Events.Hide, new Listener<ComponentEvent>() {
+        public void handleEvent(ComponentEvent ce) {
+          contextMenu.removeListener(Events.Hide, this);
+          onHideContextMenu();
+        }
+      });
+      disableBrowserEvents = true;
+    }
   }
 
   protected ComponentEvent previewEvent(int type, ComponentEvent ce) {
@@ -1350,15 +1369,15 @@ public abstract class Component extends Widget implements Observable {
   }
 
   private native Element createHiddenInput() /*-{
-   var input = $doc.createElement('input');
-   input.type = 'text';
-   input.className = '_focus';
-   input.style.opacity = 0;
-   input.style.zIndex = -1;
-   input.style.height = '1px';
-   input.style.width = '1px';
-   input.style.overflow = 'hidden';
-   input.style.position = 'absolute';
-   return input;
-   }-*/;
+    var input = $doc.createElement('input');
+    input.type = 'text';
+    input.className = '_focus';
+    input.style.opacity = 0;
+    input.style.zIndex = -1;
+    input.style.height = '1px';
+    input.style.width = '1px';
+    input.style.overflow = 'hidden';
+    input.style.position = 'absolute';
+    return input;
+    }-*/;
 }

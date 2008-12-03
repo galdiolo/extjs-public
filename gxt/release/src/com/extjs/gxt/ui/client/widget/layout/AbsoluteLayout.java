@@ -14,8 +14,8 @@ import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.Container;
 
 /**
- * Inherits the anchoring of {@link AnchorLayout} and adds the ability for left /
- * top positioning using the <code>AbsoluteData</code> left and top
+ * Inherits the anchoring of {@link AnchorLayout} and adds the ability for left
+ * / top positioning using the <code>AbsoluteData</code> left and top
  * properties.
  * 
  * @see AbsoluteData
@@ -41,7 +41,7 @@ public class AbsoluteLayout extends AnchorLayout {
     }
     ad.setLeft(left);
     ad.setTop(top);
-    
+
     if (container.isRendered() && c.isRendered()) {
       if (c instanceof BoxComponent) {
         BoxComponent box = (BoxComponent) c;
@@ -63,7 +63,7 @@ public class AbsoluteLayout extends AnchorLayout {
     super.onLayout(container, target);
     target.makePositionable();
     for (int i = 0; i < container.getItemCount(); i++) {
-      Component c = container.getItem(0);
+      Component c = container.getItem(i);
       LayoutData data = ComponentHelper.getLayoutData(c);
       if (data != null && data instanceof AbsoluteData) {
         AbsoluteData ad = (AbsoluteData) data;

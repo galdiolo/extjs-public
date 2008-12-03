@@ -8,7 +8,6 @@
 package com.extjs.gxt.ui.client.widget.treetable;
 
 import com.extjs.gxt.ui.client.GXT;
-import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
@@ -44,6 +43,7 @@ public class TreeTableView {
   protected String cellOverflowStyle = baseStyle + "-" + "overflow";
   protected String textStyle = cellStyle + "-text";
   protected String widgetStyle = cellStyle + "-widget";
+  protected String cellSelector = ".my-treetbl-cell";
 
   protected TableColumnModel cm;
   protected Element treeDiv;
@@ -51,84 +51,51 @@ public class TreeTableView {
   protected TreeTable treeTable;
   protected int scrollBarWidth;
 
-  public void applyCellStyles(TreeTableItem item) {
-    if (item.cellStyles != null) {
-      for (int i = 0; i < item.cellStyles.length; i++) {
-        setCellStyle(item, i, item.cellStyles[i]);
-      }
+  private int cellSelectorDepth = 10;
+
+  /**
+   * Returns the cell.
+   * 
+   * @param elem the cell element or any child element
+   * @return the cell or null if not match
+   */
+  public Element findCell(Element elem) {
+    if (elem == null) {
+      return null;
     }
+    return El.fly(elem).findParentElement(cellSelector, cellSelectorDepth);
   }
 
-  public int getCellIndex(Element target) {
-    String index = target.getAttribute("index");
-    if (index != null && index.length() == 0) {
-      target = DOM.getParent(target);
-      while (target != null && target != null) {
-        index = target.getAttribute("index");
-        if (index != null && index.length() == 0) {
-          target = DOM.getParent(target);
-        } else {
-          break;
-        }
-      }
+  /**
+   * Returns the elements cell index.
+   * 
+   * @param elem the row element
+   * @return the cell index or -1 if not match
+   */
+  public int findCellIndex(Element elem) {
+    Element cell = findCell(elem);
+    if (cell != null) {
+      return getCellIndex(cell);
     }
-    return index == null ? Style.DEFAULT : Integer.parseInt(index);
+    return -1;
   }
 
+  /**
+   * Returns the data element.
+   * 
+   * @return the data elemnt
+   */
+  public El getDataEl() {
+    return dataEl;
+  }
+
+  /**
+   * Returns the scroll element.
+   * 
+   * @return the scroll element
+   */
   public El getScrollEl() {
     return scrollEl;
-  }
-
-  public Element getTextCellElement(TreeTableItem item, int cell) {
-    return ((TreeTableItemUI) item.getUI()).getTextCellElement(cell);
-  }
-
-  public void init(TreeTable treeTable) {
-    this.treeTable = treeTable;
-    this.cm = treeTable.getColumnModel();
-  }
-
-  public void removeItem(TableItem item) {
-    dataEl.dom.removeChild(item.el().dom);
-  }
-
-  public void render() {
-    scrollBarWidth = XDOM.getScrollBarWidth();
-
-    Element div = DOM.createDiv();
-    DOM.setInnerHTML(div, bodyHTML.toString());
-    scrollEl = new El(El.fly(div).getSubChild(2));
-    dataEl = new El(DOM.getFirstChild(scrollEl.dom));
-    treeDiv = dataEl.firstChild().dom;
-    DOM.appendChild(treeDiv, treeTable.getRootItem().getElement());
-    DOM.appendChild(treeTable.getElement(), DOM.getFirstChild(div));
-
-    if (!GXT.isIE) {
-      DOM.setElementPropertyInt(treeTable.getElement(), "tabIndex", 0);
-    }
-
-    treeTable.disableTextSelection(true);
-
-    DOM.sinkEvents(scrollEl.dom, Event.ONSCROLL);
-  }
-
-  public void renderItemValue(TreeTableItem item, int index, Object value) {
-    Element textElem = getTextCellElement(item, index);
-    if (textElem != null) {
-      DOM.setInnerHTML(textElem, "");
-      if (value instanceof Widget) {
-        Widget widget = (Widget) value;
-        XDOM.setStyleName(textElem, widgetStyle);
-        DOM.appendChild(textElem, widget.getElement());
-        if (treeTable.isAttached()) {
-          ComponentHelper.doAttach(widget);
-        }
-      } else {
-        String s = treeTable.getRenderedValue(item, index, value);
-        textElem.setInnerHTML(s);
-      }
-    }
-    applyCellStyles(item);
   }
 
   public void resize() {
@@ -167,7 +134,102 @@ public class TreeTableView {
     scrollEl.setSize(bodyWidth, bodyHeight);
   }
 
-  public void resizeCells(int columnIndex) {
+  /**
+   * The number of levels to search for cells in event delegation (defaults to
+   * 10).
+   * 
+   * @param cellSelectorDepth the cell selector depth
+   */
+  public void setCellSelectorDepth(int cellSelectorDepth) {
+    this.cellSelectorDepth = cellSelectorDepth;
+  }
+
+  /**
+   * Returns the cell selector depth.
+   * 
+   * @return the cell selector depth
+   */
+  public int getCellSelectorDepth() {
+    return cellSelectorDepth;
+  }
+
+  protected void applyCellStyles(TreeTableItem item) {
+    if (item.cellStyles != null) {
+      for (int i = 0; i < item.cellStyles.length; i++) {
+        setCellStyle(item, i, item.cellStyles[i]);
+      }
+    }
+  }
+
+  protected Element getCell(TableItem item, int cell) {
+    return item.el().select("td.my-treetbl-cell")[cell];
+  }
+
+  protected int getCellIndex(Element elem) {
+    if (elem != null) {
+      String index = elem.getAttribute("index");
+      if (index != null && index.length() != 0) {
+        return Integer.parseInt(index);
+      }
+    }
+    return -1;
+  }
+
+  protected Element getTextCellElement(TreeTableItem item, int cell) {
+    return ((TreeTableItemUI) item.getUI()).getTextCellElement(cell);
+  }
+
+  protected void init(TreeTable treeTable) {
+    this.treeTable = treeTable;
+    this.cm = treeTable.getColumnModel();
+  }
+
+  protected void processRows() {
+    for (int i = 0; i < treeTable.getItems().size(); i++) {
+      treeTable.getItem(i).getElement().setPropertyInt("rowIndex", i);
+    }
+  }
+
+  protected void render() {
+    scrollBarWidth = XDOM.getScrollBarWidth();
+
+    Element div = DOM.createDiv();
+    DOM.setInnerHTML(div, bodyHTML.toString());
+    scrollEl = new El(El.fly(div).getSubChild(2));
+    dataEl = new El(DOM.getFirstChild(scrollEl.dom));
+    treeDiv = dataEl.firstChild().dom;
+    DOM.appendChild(treeDiv, treeTable.getRootItem().getElement());
+    DOM.appendChild(treeTable.getElement(), DOM.getFirstChild(div));
+
+    if (!GXT.isIE) {
+      DOM.setElementPropertyInt(treeTable.getElement(), "tabIndex", 0);
+    }
+
+    treeTable.disableTextSelection(true);
+
+    DOM.sinkEvents(scrollEl.dom, Event.ONSCROLL);
+  }
+
+  protected void renderItemValue(TreeTableItem item, int index, Object value) {
+    Element textElem = getTextCellElement(item, index);
+    if (textElem != null) {
+      DOM.setInnerHTML(textElem, "");
+      if (value instanceof Widget) {
+        Widget widget = (Widget) value;
+        XDOM.setStyleName(textElem, widgetStyle);
+        DOM.appendChild(textElem, widget.getElement());
+        if (treeTable.isAttached()) {
+          ComponentHelper.doAttach(widget);
+        }
+      } else {
+        String s = treeTable.getRenderedValue(item, index, value);
+        textElem.setInnerHTML(s);
+      }
+    }
+    applyCellStyles(item);
+  }
+
+  protected void resizeCells(int columnIndex) {
     TreeTableColumn c = (TreeTableColumn) cm.getColumn(columnIndex);
     int w = ((TreeTableColumnModel) cm).getWidthInPixels(c.getIndex());
     String sel = "." + treeTable.getId() + "-col-" + columnIndex;
@@ -176,14 +238,14 @@ public class TreeTableView {
     treeTable.styleTemplate.apply();
   }
 
-  public void setCellStyle(TreeTableItem item, int index, String style) {
+  protected void setCellStyle(TreeTableItem item, int index, String style) {
     if (item.cellsRendered) {
       Element cell = getTextCellElement(item, index);
       XDOM.setStyleName(cell, textStyle + " " + style);
     }
   }
 
-  public void showColumn(int columnIndex, boolean show) {
+  protected void showColumn(int columnIndex, boolean show) {
     TreeTableColumn c = (TreeTableColumn) cm.getColumn(columnIndex);
     int w = ((TreeTableColumnModel) cm).getWidthInPixels(c.getIndex());
     String sel = "." + treeTable.getId() + "-col-" + columnIndex;
@@ -191,4 +253,5 @@ public class TreeTableView {
     treeTable.styleTemplate.set(sel, rule);
     treeTable.styleTemplate.apply();
   }
+
 }

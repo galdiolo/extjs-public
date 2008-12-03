@@ -12,7 +12,7 @@ import com.extjs.gxt.ui.client.Events;
 /**
  * Check changed listener.
  */
-public class CheckChangedListener implements Listener<CheckChangedEvent>{
+public class CheckChangedListener implements Listener<CheckChangedEvent> {
 
   public void handleEvent(CheckChangedEvent ce) {
     switch (ce.type) {
@@ -28,7 +28,7 @@ public class CheckChangedListener implements Listener<CheckChangedEvent>{
    * @param event the check changed event
    */
   public void checkChanged(CheckChangedEvent event) {
-    
+
   }
 
 }

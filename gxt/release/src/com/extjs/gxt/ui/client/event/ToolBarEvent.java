@@ -17,12 +17,12 @@ import com.extjs.gxt.ui.client.widget.toolbar.ToolItem;
  */
 public class ToolBarEvent extends ContainerEvent<ToolBar, ToolItem> {
 
-  public ToolBarEvent(ToolBar container, ToolItem component) {
-    super(container, component);
+  public ToolBarEvent(ToolBar toolBar, ToolItem item) {
+    super(toolBar, item);
   }
 
-  public ToolBarEvent(ToolBar container) {
-    super(container);
+  public ToolBarEvent(ToolBar toolBar) {
+    super(toolBar);
   }
 
 }

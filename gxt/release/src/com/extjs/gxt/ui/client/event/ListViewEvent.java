@@ -21,11 +21,11 @@ public class ListViewEvent extends BoxComponentEvent {
    * The source list view.
    */
   public ListView listView;
-  
+
   public int index;
 
   public ModelData model;
-  
+
   public Element element;
 
   public ListViewEvent(ListView listView, Event event) {

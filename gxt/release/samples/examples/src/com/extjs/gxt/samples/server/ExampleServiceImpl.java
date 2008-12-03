@@ -142,11 +142,12 @@ public class ExampleServiceImpl extends RemoteServiceServlet implements ExampleS
       return "";
     }
   }
-  
+
   private void loadPhotos() {
     photos = new ArrayList<Photo>();
-    
-    URL url = getClass().getClassLoader().getResource("com/extjs/gxt/samples/public/view/images/thumbs/");
+
+    URL url = getClass().getClassLoader().getResource(
+        "com/extjs/gxt/samples/public/view/images/thumbs/");
     File folder = new File(url.getFile());
     File[] pics = folder.listFiles();
     Arrays.sort(pics, new Comparator<File>() {
@@ -154,7 +155,7 @@ public class ExampleServiceImpl extends RemoteServiceServlet implements ExampleS
         return o1.getName().compareTo(o2.getName());
       }
     });
-    
+
     for (File pic : pics) {
       Photo photo = new Photo();
       photo.setName(pic.getName());
@@ -208,4 +209,3 @@ public class ExampleServiceImpl extends RemoteServiceServlet implements ExampleS
   }
 
 }
-

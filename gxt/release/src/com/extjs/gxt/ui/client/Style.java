@@ -55,7 +55,7 @@ public class Style {
         return c;
       }
     },
-    
+
     ASC {
       @Override
       public <X> Comparator<X> comparator(final Comparator<X> c) {
@@ -77,8 +77,6 @@ public class Style {
         };
       }
     };
-
-
 
     public static SortDir toggle(SortDir sortDir) {
       return (sortDir == ASC) ? DESC : ASC;

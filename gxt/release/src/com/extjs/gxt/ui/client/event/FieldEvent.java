@@ -41,7 +41,7 @@ public class FieldEvent extends BoxComponentEvent {
     super(field);
     this.field = field;
   }
-  
+
   public FieldEvent(Field field, Event event) {
     this(field);
     this.event = event;

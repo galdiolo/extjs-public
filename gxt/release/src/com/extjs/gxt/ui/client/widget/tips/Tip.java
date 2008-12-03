@@ -137,7 +137,7 @@ public class Tip extends ContentPanel {
         bw = Math.max(bw, head.el().child("span").getTextWidth());
       }
       bw += getFrameWidth() + (closable ? 20 : 0) + fly(body).getPadding("lr");
-      
+
       setWidth(Util.constrain(bw, minWidth, maxWidth));
     }
     Point p = new Point(x, y);

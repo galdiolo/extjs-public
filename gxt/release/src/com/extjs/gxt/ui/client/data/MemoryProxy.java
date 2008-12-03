@@ -10,8 +10,8 @@ package com.extjs.gxt.ui.client.data;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
- * A <code>DataProxy</code> implementation that simply passes the data
- * specified in the constructor to the reader when its load method is called.
+ * A <code>DataProxy</code> implementation that simply passes the data specified
+ * in the constructor to the reader when its load method is called.
  * 
  * @param <D> the data type
  */

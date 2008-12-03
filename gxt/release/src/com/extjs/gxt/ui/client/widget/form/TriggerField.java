@@ -40,8 +40,8 @@ public class TriggerField<Data> extends TextField<Data> {
   protected El trigger;
   protected El input;
   protected EventListener triggerListener;
+  protected String triggerStyle = "x-form-trigger-arrow";
 
-  private String triggerStyle;
   private boolean hideTrigger;
 
   /**

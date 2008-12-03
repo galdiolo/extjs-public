@@ -34,8 +34,7 @@ import com.google.gwt.user.client.Element;
  * <li>item : this</li>
  * <li>menu : the parent menu</li>
  * </ul>
- * </dd>
- * </dt>
+ * </dd> </dt>
  */
 public class CheckMenuItem extends MenuItem {
 

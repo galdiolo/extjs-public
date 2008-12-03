@@ -11,9 +11,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TemplatesCache {
-  
+
   public static Cache INSTANCE = new Cache();
-  
+
   public static class Cache {
 
     private Map<Key, Object> cacheMap = new HashMap<Key, Object>();

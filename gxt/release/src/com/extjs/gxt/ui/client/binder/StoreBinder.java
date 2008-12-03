@@ -28,10 +28,11 @@ import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
 
 /**
- * Base class for all binders.
+ * Abstract base class for all Store Binders. Binders provide model support to
+ * data widgets by binding a <code>Store</code> to a component.
  * 
  * @param <S> the store type
- * @param <C> the component
+ * @param <C> the component being bound
  * @param <M> the model type
  */
 public abstract class StoreBinder<S extends Store<M>, C extends Component, M extends ModelData>
@@ -73,7 +74,7 @@ public abstract class StoreBinder<S extends Store<M>, C extends Component, M ext
       onUpdate(se);
     }
 
-  };;
+  };
   protected ModelStringProvider stringProvider;
   protected ModelStringProvider iconProvider;
   protected ModelStringProvider styleProvider;
@@ -87,7 +88,7 @@ public abstract class StoreBinder<S extends Store<M>, C extends Component, M ext
       }
     }
   };
-  
+
   private boolean mask = false;
   private boolean autoSelect;
 
@@ -118,6 +119,15 @@ public abstract class StoreBinder<S extends Store<M>, C extends Component, M ext
 
   public List<M> getSelection() {
     return getSelectionFromComponent();
+  }
+
+  /**
+   * Returns the binder's store.
+   * 
+   * @return the store
+   */
+  public Store getStore() {
+    return store;
   }
 
   /**
@@ -240,8 +250,9 @@ public abstract class StoreBinder<S extends Store<M>, C extends Component, M ext
     this.store = store;
     if (store != null) {
       store.addStoreListener(listener);
-    } else {
-      store.removeAll();
+      if (component.isRendered()) {
+        createAll();
+      }
     }
   }
 
@@ -303,10 +314,6 @@ public abstract class StoreBinder<S extends Store<M>, C extends Component, M ext
       component.el().unmask();
     }
   }
-  
-  protected void setModel(Component c, ModelData model) {
-    ComponentHelper.setModel(c, model);
-  }
 
   protected void onFilter(StoreEvent se) {
 
@@ -321,6 +328,10 @@ public abstract class StoreBinder<S extends Store<M>, C extends Component, M ext
   protected abstract void onUpdate(StoreEvent se);
 
   protected abstract void removeAll();
+
+  protected void setModel(Component c, ModelData model) {
+    ComponentHelper.setModel(c, model);
+  }
 
   protected abstract void setSelectionFromProvider(List<M> selection);
 

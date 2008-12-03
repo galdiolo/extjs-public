@@ -11,11 +11,11 @@ import com.extjs.gxt.ui.client.data.BaseModelData;
 
 /**
  * A <code>ModelData</code> instance used in a <code>SimpleComboBox</code>.
- *
+ * 
  * @param <T> the data type
  */
 public class SimpleComboValue<T> extends BaseModelData {
-  
+
   protected SimpleComboValue(T value) {
     setValue(value);
   }
@@ -26,7 +26,7 @@ public class SimpleComboValue<T> extends BaseModelData {
    * @return the value
    */
   public T getValue() {
-    return (T)get("value");
+    return (T) get("value");
   }
 
   /**

@@ -10,9 +10,9 @@ package com.extjs.gxt.ui.client.widget.treetable;
 import com.extjs.gxt.ui.client.widget.table.TableColumn;
 
 /**
- * A column in a <code>TreeTable</code>. Column sizes can be specified as
- * either pixels or percentanges. Width values less than or equal to 1 are
- * treated as percentages.
+ * A column in a <code>TreeTable</code>. Column sizes can be specified as either
+ * pixels or percentanges. Width values less than or equal to 1 are treated as
+ * percentages.
  * 
  * <p>
  * Note: Public members should not be modified after the column is added to a
@@ -26,7 +26,7 @@ public class TreeTableColumn extends TableColumn {
    * 
    * @param id the column id
    * @param width the column width, widths that are 1 or less are treated as
-   *            percentages.
+   *          percentages.
    */
   public TreeTableColumn(String id, float width) {
     super(id, width);

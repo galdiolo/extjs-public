@@ -30,7 +30,7 @@ public class ContactFolderView extends View {
   protected void initialize() {
 
   }
-  
+
   protected void initUI() {
     contacts = new ContentPanel();
     contacts.setHeading("Contacts");
@@ -40,7 +40,7 @@ public class ContactFolderView extends View {
       }
     });
 
-    ContentPanel west = (ContentPanel) Registry.get("west");
+    ContentPanel west = (ContentPanel) Registry.get(AppView.WEST_PANEL);
     west.add(contacts);
   }
 

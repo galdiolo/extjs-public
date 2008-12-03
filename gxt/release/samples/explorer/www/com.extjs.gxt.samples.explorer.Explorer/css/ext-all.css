@@ -923,13 +923,41 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
 .x-slider-vert .x-slider-thumb-over{background-position:-15px -14px;}
 .x-slider-vert .x-slider-thumb-drag{background-position:-30px -28px;}
 
-* {
+.x-btn-focus .x-btn-left{
+	background-position:0 -147px;
+}
+.x-btn-focus .x-btn-right{
+	background-position:0 -168px;
+}
+.x-btn-focus .x-btn-center{
+	background-position:0 -189px;
+}
+
+.x-btn-over .x-btn-left{
+	background-position:0 -63px;
+}
+.x-btn-over .x-btn-right{
+	background-position:0 -84px;
+}
+.x-btn-over .x-btn-center{
+	background-position:0 -105px;
+}
+
+.x-btn-click .x-btn-center{
+	background-position:0 -126px;
+}
+.x-btn-click  .x-btn-right{
+	background-position:0 -84px;
+}
+.x-btn-click .x-btn-left{
+	background-position:0 -63px;
+}* {
   margin: 0px;
   padding: 0px;
 }
 
 .x-portlet {
-    margin-bottom:10px;
+  margin-bottom: 10px;
 }
 
 .ext-el-mask {
@@ -970,7 +998,7 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
   position: absolute;
   z-index: 10;
   background-color: black;
-  filter: alpha(opacity =                   10);
+  filter: alpha(opacity =                     10);
   opacity: .1;
   left: 0px;
   top: 0px;
@@ -1057,7 +1085,7 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
 .x-drag-proxy {
   border: 1px dashed #3b5a82;
   background-color: #EDEDED;
-  filter: alpha(opacity =                       50);
+  filter: alpha(opacity =                         50);
   opacity: .5;
   background-color: #c3daf9;
   z-index: 20000;
@@ -1154,7 +1182,7 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
   position: absolute;
   z-index: 10;
   background-color: black;
-  filter: alpha(opacity =                   10);
+  filter: alpha(opacity =                     10);
   opacity: .1;
   left: 0px;
   top: 0px;
@@ -1219,7 +1247,7 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
 }
 
 .x-splitbar-shim {
-  filter: alpha(opacity =                           1);
+  filter: alpha(opacity =                             1);
   opacity: 0;
   position: absolute;
   width: 100%;
@@ -1236,7 +1264,7 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
 .x-drag-proxy {
   border: 1px dashed #3b5a82;
   background-color: #EDEDED;
-  filter: alpha(opacity =                       50);
+  filter: alpha(opacity =                         50);
   opacity: .5;
   background-color: #c3daf9;
   z-index: 20000;
@@ -1329,17 +1357,51 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
   font-weight: bold;
   line-height: normal;
   overflow: hidden;
-}.x-form-check{background:none;}
-.x-form-radio{background:none;}
+}.x-dd-cursor {
+  cursor: default !important; 
+}
+
+.x-insert-bar {
+  position: absolute;
+
+  z-index: 99999;
+}
+
+.x-insert-bar td {
+  line-height: 1px;
+  font-size: 1px;
+}
+
+.x-insert-left {
+  background: url(../images/gxt/dd/insert-bg.gif) no-repeat;
+}
+
+.x-insert-mid {
+  background: url(../images/gxt/dd/insert-bg.gif) repeat-x 0 -12px;
+}
+
+.x-insert-right {
+  background: url(../images/gxt/dd/insert-bg.gif) no-repeat 0px -6px;
+}.ext-gecko .x-form-file {
+  height: inherit !important;
+}
+
+.x-form-check {
+  background: none !important
+}
+
+.x-form-radio {
+  background: none !important
+}
 
 .x-form-label {
-  padding: 2 3 3 0px;
+  padding: 2px 3px 3px 0px;
   font-size: 12px;
 }
 
 .x-form-label-top .x-form-item {
   padding-bottom: 0px;
-  margin-bottom:2px;
+  margin-bottom: 2px;
 }
 
 .ext-safari .x-form-text {
@@ -1381,7 +1443,30 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
 .x-form-group-label,.x-form-cb-label {
   font: normal 12px tahoma, arial, helvetica, sans-serif;
   padding-right: 10px;
-}.x-info {
+}
+
+.x-form-list {
+  background: #FFFFFF url(../images/default/form/text-bg.gif) repeat-x scroll 0 0;
+  border: 1px solid #B5B8C8;
+}.arrow-top {
+  background: url(../images/gxt/icons/top2.gif) no-repeat center left !important;
+}
+.arrow-bottom {
+  background: url(../images/gxt/icons/bottom2.gif) no-repeat center left !important;
+}
+.arrow-up {
+  background: url(../images/gxt/icons/up2.gif) no-repeat center left !important;
+}
+.arrow-down {
+  background: url(../images/gxt/icons/down2.gif) no-repeat center left !important;
+}
+.arrow-left {
+  background: url(../images/gxt/icons/left2.gif) no-repeat center left !important;
+}
+.arrow-right {
+  background: url(../images/gxt/icons/right2.gif) no-repeat center left !important;
+}
+.x-info {
   border-style: solid;
   border-color: #99bbe8;
   border-width: 0;
@@ -1537,7 +1622,13 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
   font-style: normal;
   font-variant: normal;
   font-weight: normal;
-}.my-list {
+}.x-combo-over {
+  border: 1px dotted #B5B4B4 !important;
+  background: #F1F1F1;
+  cursor: pointer;
+}
+
+.my-list {
   border: 1px solid #99BBE8;
   -moz-outline: none;
   -moz-user-focus: normal;
@@ -1916,21 +2007,23 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
 }
 
 .my-tbl-item-sel {
-  background-image: none;
-  background-color: #D9E1ED;
-  border-top: 1px dotted #9EB8ED;
-  border-bottom: 1px dotted #9EB8ED;
+  background-image: none !important;
+  background-color: #D9E1ED !important;
+  border-top: 1px dotted #9EB8ED !important;
+  border-bottom: 1px dotted #9EB8ED !important;
 }
 
 .ext-ie .my-tbl TD .x-form-text {
   POSITION: static;
   TOP: 0px;
+}ul.x-tab-strip li {
+  position: relative;
 }.tree-folder {
-  background: url(../images/gxt/icons/folder-closed.gif) no-repeat -1px -1px;
+  background: url(../images/gxt/icons/folder-closed.gif) no-repeat center left !important;
 }
 
 .tree-folder-open {
-  background: url(../images/gxt/icons/folder.gif) no-repeat -1px -1px;
+  background: url(../images/gxt/icons/folder.gif) no-repeat center left !important;
 }
 
 .my-tree {
@@ -1976,24 +2069,15 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
 
 .my-tree-check div {
   width: 17px;
-  height: 19px;
+  height: 17px;
   line-height: 1px;
   font-size: 1px;
 }
 
 .my-tree-icon div {
   width: 16px;
-  height: 16px;
-  margin-top: 1px;
+  height: 17px;
   cursor: pointer;
-}
-
-.ext-ie .my-tree-icon {
-  padding-top: 2px;
-}
-
-.ext-ie .my-tree-icon div {
-  position: static;
 }
 
 .my-tree-item-text span {
@@ -2031,6 +2115,18 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
   background: url(../images/gxt/shared/select-19-bg.gif) left -38px;
 }
 
+.my-tree-drop .my-tree-left {
+  background: url(../images/gxt/shared/select-19-bg.gif) no-repeat left -115px;
+}
+
+.my-tree-drop .my-tree-right {
+  background: url(../images/gxt/shared/select-19-bg.gif) no-repeat right -133px;
+}
+
+.my-tree-drop .my-tree-check,.my-tree-drop .my-tree-icon,.my-tree-drop .my-tree-item-text {
+  background: url(../images/gxt/shared/select-19-bg.gif) left -152px;
+}
+
 .my-tree-close {
   background: url(../images/gxt/tree/vnode.gif) no-repeat 0px 1px;
 }
@@ -2056,7 +2152,7 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
 }
 
 .my-tree-loading .tree-folder {
-  background: url(../images/gxt/icons/wait.gif) no-repeat 0px -1px;
+  background: url(../images/gxt/icons/wait.gif) no-repeat 0px -1px !important;
 }
 
 .my-tree-loading .my-tree-item-text span {

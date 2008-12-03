@@ -11,13 +11,22 @@ import com.google.gwt.user.client.Event;
 
 /**
  * Defines the GXT event types.
+ * 
+ * <p /> The maximum value of all GXT defined events is 2000, see
+ * {@value #GXT_MAX_EVENT}. All user defined event constants should be
+ * greater than 2000.
  */
 public class Events {
 
   protected Events() {
-    
+
   }
-  
+
+  /**
+   * The maximum value for all GXT defined event constants.
+   */
+  public static final int GXT_MAX_EVENT = 2000;
+
   /**
    * DOM ONCLICK event type.
    */
@@ -112,12 +121,12 @@ public class Events {
    * BeforeCollapse event type (value is 70).
    */
   public static final int BeforeCollapse = 70;
-  
+
   /**
    * BeforeComplete event type (value is 71).
    */
   public static final int BeforeComplete = 71;
-  
+
   /**
    * BeforeEdit event type (value is 72).
    */
@@ -279,6 +288,16 @@ public class Events {
   public static final int DragEnd = 300;
 
   /**
+   * DragEnter event type (value is 302).
+   */
+  public static final int DragEnter = 302;
+
+  /**
+   * DragLeave event type (value is 304).
+   */
+  public static final int DragLeave = 304;
+
+  /**
    * DragMove event type (value is 310).
    */
   public static final int DragMove = 310;
@@ -287,7 +306,7 @@ public class Events {
    * DragStart event type (value is 320).
    */
   public static final int DragStart = 320;
-  
+
   /**
    * Drop event type (value is 322).
    */
@@ -407,7 +426,7 @@ public class Events {
    * Open event type (value is 540).
    */
   public static final int Open = 540;
-  
+
   /**
    * Refresh event type (value is 548).
    */
@@ -517,7 +536,7 @@ public class Events {
    * StateRestore event type (value is 684).
    */
   public static final int StateRestore = 684;
-  
+
   /**
    * Submit event type (value is 686).
    */
@@ -552,7 +571,7 @@ public class Events {
    * Valid event type (value is 710).
    */
   public static final int Valid = 710;
-  
+
   /**
    * Validate drop event type (value is 715).
    */

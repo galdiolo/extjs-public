@@ -13,14 +13,14 @@ import com.extjs.gxt.ui.client.util.Margins;
  * Base layout data with margin support.
  */
 public class MarginData extends LayoutData {
-  
+
   private Margins margins;
-  
+
   /**
    * Creates a new layout data.
    */
   public MarginData() {
-    
+
   }
 
   /**
@@ -31,7 +31,6 @@ public class MarginData extends LayoutData {
   public MarginData(int margin) {
     this.margins = new Margins(margin);
   }
-
 
   /**
    * Creates a new layout data.

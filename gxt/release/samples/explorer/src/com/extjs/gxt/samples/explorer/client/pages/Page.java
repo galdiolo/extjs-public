@@ -30,18 +30,22 @@ public class Page extends TabPanel {
     setBodyBorder(false);
 
     TabItem demo = new TabItem();
+    demo.setScrollMode(Scroll.AUTO);
     if (entry.isFill()) {
       demo.setLayout(new FitLayout());
+      demo.setScrollMode(Scroll.NONE);
     }
-    demo.setScrollMode(Scroll.AUTO);
+
     demo.setText("Demo");
     demo.add(entry.getExample());
     add(demo);
 
-    TabItem source = new TabItem();
-    source.setText("Source");
-    source.setUrl(entry.getSourceUrl());
-    add(source);
+    if (entry.isClosable()) {
+      TabItem source = new TabItem();
+      source.setText("Source");
+      source.setUrl(entry.getSourceUrl());
+      add(source);
+    }
   }
 
 }

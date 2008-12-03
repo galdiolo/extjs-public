@@ -32,14 +32,14 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
  * <dl>
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>Filter</b> : StoreEvent(store)<br>
+ * <dd><b>Store.Filter</b> : StoreEvent(store)<br>
  * <div>Fires when filters are applied and removed from the store.</div>
  * <ul>
  * <li>store : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Update</b> : StoreEvent(store, model, record)<br>
+ * <dd><b>Store.Update</b> : StoreEvent(store, model, record)<br>
  * <div>Fires when a model has been updated via its record.</div>
  * <ul>
  * <li>store : this</li>
@@ -49,7 +49,7 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
  * </ul>
  * </dd>
  * 
- * <dd><b>Clear</b> : StoreEvent(store)<br>
+ * <dd><b>Store.Clear</b> : StoreEvent(store)<br>
  * <div>Fires when the data cache has been cleared.</div>
  * <ul>
  * <li>store : this</li>
@@ -174,7 +174,7 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
       }
     }
     all = filtered;
-    
+
     if (storeSorter != null) {
       applySort(false);
     }
@@ -195,8 +195,8 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
 
   /**
    * Commit all items with outstanding changes. To handle updates for changes,
-   * subscribe to the Store's <i>Update</i> event, and perform updating when
-   * the operation parameter is {@link RecordUpdate#COMMIT}.
+   * subscribe to the Store's <i>Update</i> event, and perform updating when the
+   * operation parameter is {@link RecordUpdate#COMMIT}.
    */
   public void commitChanges() {
     List<Record> mod = new ArrayList(modified);
@@ -226,7 +226,7 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
     filterBeginsWidth = null;
     applyFilters(property);
   }
-  
+
   /**
    * Filters the store using the given property.
    * 
@@ -282,9 +282,10 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
     }
     return null;
   }
-  
+
   /**
-   * Returns a list of all matching models whose property matches the given value.
+   * Returns a list of all matching models whose property matches the given
+   * value.
    * 
    * @param property the property name
    * @param value the value to match
@@ -482,8 +483,8 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
   }
 
   /**
-   * Notifies the store that the model has been updated and fires the <i>Update</i>
-   * event.
+   * Notifies the store that the model has been updated and fires the
+   * <i>Update</i> event.
    * 
    * @param model the updated model
    */

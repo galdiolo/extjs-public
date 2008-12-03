@@ -22,10 +22,19 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.TableSectionElement;
 
+/**
+ * A <code>GroupingView</code> with support for a summary row.
+ */
 public class GroupSummaryView extends GroupingView {
 
   protected Template rowTpl, cellTpl;
 
+  /**
+   * Returns the summary node element.
+   * 
+   * @param g the group element
+   * @return the summary node
+   */
   public El getSummaryNode(Element g) {
     if (g != null) {
       return fly(g).down(".x-grid3-summary-row");
@@ -33,10 +42,20 @@ public class GroupSummaryView extends GroupingView {
     return null;
   }
 
+  /**
+   * Returns true if summaries are visible.
+   * 
+   * @return true for visible
+   */
   public boolean isSummaryVisible() {
     return !grid.el().hasStyleName("x-grid-hide-summary");
   }
 
+  /**
+   * Toggles the summary information visibility.
+   * 
+   * @param visible true for visible, false to hide
+   */
   public void toggleSummaries(boolean visible) {
     El el = grid.el();
     if (el != null) {
@@ -69,6 +88,7 @@ public class GroupSummaryView extends GroupingView {
     for (int i = 0, len = gs.getLength(); i < len; i++) {
       Element s = gs.getItem(i).getChildNodes().getItem(2).cast();
       s.getStyle().setProperty("width", tw);
+      if (s.getFirstChild() == null) return;
       s.getFirstChildElement().getStyle().setProperty("width", tw);
       TableSectionElement tse = s.getFirstChildElement().cast();
       NodeList<Element> cells = (NodeList) tse.getRows().getItem(0).getChildNodes();
@@ -87,6 +107,7 @@ public class GroupSummaryView extends GroupingView {
   }
 
   protected void doWidth(int col, String w, String tw) {
+    if (!enableGrouping) return;
     NodeList gs = getGroups();
     for (int i = 0, len = gs.getLength(); i < len; i++) {
       Element s = gs.getItem(i).getChildNodes().getItem(2).cast();
@@ -189,6 +210,7 @@ public class GroupSummaryView extends GroupingView {
 
   @Override
   protected void templateOnColumnHiddenUpdated(int col, boolean hidden, String tw) {
+    if (!enableGrouping) return;
     NodeList gs = getGroups();
     String display = hidden ? "none" : "";
     for (int i = 0, len = gs.getLength(); i < len; i++) {

@@ -30,9 +30,9 @@ public class BeanModelReader<C> implements DataReader<C, ListLoadResult<ModelDat
         if (factory == null) {
           throw new RuntimeException("No BeanModelFactory found for " + beans.get(0).getClass());
         }
-        return new BaseListLoadResult(factory.createModel(beans));
+        return newLoadResult(loadConfig, (List) factory.createModel(beans));
       }
-      return new BaseListLoadResult(beans);
+      return newLoadResult(loadConfig, (List) beans);
 
     } else if (data instanceof ListLoadResult) {
       ListLoadResult result = (ListLoadResult) data;
@@ -50,6 +50,16 @@ public class BeanModelReader<C> implements DataReader<C, ListLoadResult<ModelDat
     } else {
       throw new RuntimeException("Error converting data");
     }
+  }
+
+  /**
+   * Template method that provides load result.
+   * 
+   * @param models the models
+   * @return the load result
+   */
+  protected ListLoadResult newLoadResult(C loadConfig, List<ModelData> models) {
+    return new BaseListLoadResult(models);
   }
 
 }

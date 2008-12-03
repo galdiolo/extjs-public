@@ -43,7 +43,7 @@ import com.extjs.gxt.ui.client.util.Util;
  * 
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>BeforeDataChanged</b> : TreeStoreEvent(store)<br>
+ * <dd><b>Store.BeforeDataChanged</b> : TreeStoreEvent(store)<br>
  * <div>Fires before the store's data is changed. Apply applies when a store is
  * bound to a loader.</div>
  * <ul>
@@ -51,7 +51,7 @@ import com.extjs.gxt.ui.client.util.Util;
  * </ul>
  * </dd>
  * 
- * <dd><b>DataChange</b> : TreeStoreEvent(store)<br>
+ * <dd><b>Store.DataChange</b> : TreeStoreEvent(store)<br>
  * <div>Fires when the data cache has changed, and a widget which is using this
  * Store as a Model cache should refresh its view.</div>
  * <ul>
@@ -59,14 +59,14 @@ import com.extjs.gxt.ui.client.util.Util;
  * </ul>
  * </dd>
  * 
- * <dd><b>Filter</b> : TreeStoreEvent(store)<br>
+ * <dd><b>Store.Filter</b> : TreeStoreEvent(store)<br>
  * <div>Fires when filters are applied and removed from the store.</div>
  * <ul>
  * <li>store : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Add</b> : TreeStoreEvent(store, parent, child)<br>
+ * <dd><b>Store.Add</b> : TreeStoreEvent(store, parent, child)<br>
  * <div>Fires when models have been added to the store.</div>
  * <ul>
  * <li>store : this</li>
@@ -76,7 +76,7 @@ import com.extjs.gxt.ui.client.util.Util;
  * </ul>
  * </dd>
  * 
- * <dd><b>Remove</b> : TreeStoreEvent(store, parent, child)<br>
+ * <dd><b>Store.Remove</b> : TreeStoreEvent(store, parent, child)<br>
  * <div>Fires when a model has been removed from the store.</div>
  * <ul>
  * <li>store : this</li>
@@ -86,7 +86,7 @@ import com.extjs.gxt.ui.client.util.Util;
  * </ul>
  * </dd>
  * 
- * <dd><b>Update</b> : TreeStoreEvent(store, model, record)<br>
+ * <dd><b>Store.Update</b> : TreeStoreEvent(store, model, record)<br>
  * <div>Fires when a model has been updated via its record.</div>
  * <ul>
  * <li>store : this</li>
@@ -96,14 +96,14 @@ import com.extjs.gxt.ui.client.util.Util;
  * </ul>
  * </dd>
  * 
- * <dd><b>Clear</b> : TreeStoreEvent(store)<br>
+ * <dd><b>Store.Clear</b> : TreeStoreEvent(store)<br>
  * <div>Fires when the data cache has been cleared.</div>
  * <ul>
  * <li>store : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Sort</b> : TreeStoreEvent(store)<br>
+ * <dd><b>Store.Sort</b> : TreeStoreEvent(store)<br>
  * <div>Fires after a sorter is applied to the store.</div>
  * <ul>
  * <li>store : this</li>
@@ -495,15 +495,20 @@ public class TreeStore<M extends ModelData> extends Store<M> {
     super.onModelChange(ce);
     switch (ce.type) {
       case ChangeEventSource.Add: {
-        M parent = (M) ce.source;
-        M child = (M) ce.item;
-        add(parent, child, false);
+        if (ce.source == ce.parent) {
+          M parent = (M) ce.parent;
+          M child = (M) ce.item;
+          add(parent, child, false);
+        }
         break;
       }
       case ChangeEventSource.Remove: {
-        M parent = (M) ce.source;
-        M child = (M) ce.item;
-        remove(parent, child);
+        if (ce.source == ce.parent) {
+          M parent = (M) ce.parent;
+          M child = (M) ce.item;
+          remove(parent, child);
+        }
+
         break;
       }
     }
@@ -576,12 +581,13 @@ public class TreeStore<M extends ModelData> extends Store<M> {
               insert.add(wrap(m));
             }
             doInsert(sub, insert, getChildCount(model), true, false);
+            update(model);
           }
         }
       }
     }
   }
-  
+
   private void findChildren(M parent, List<M> children) {
     for (M child : getChildren(parent)) {
       children.add(child);

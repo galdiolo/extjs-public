@@ -9,11 +9,15 @@ package com.extjs.gxt.ui.client.widget.form;
 
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Allows any widget to be used in a <code>Formlayout</code>.
+ * 
+ * <p/> By default, the wrapped widget will not be resized when the field is
+ * resized. This can be changed by calling {@link #setResizeWidget(boolean)}.
  */
 public class AdapterField extends Field {
 
@@ -21,6 +25,8 @@ public class AdapterField extends Field {
    * The wrapped widget.
    */
   protected Widget widget;
+
+  private boolean resizeWidget;
 
   /**
    * Creates a new adapter field.
@@ -38,6 +44,30 @@ public class AdapterField extends Field {
    */
   public Widget getWidget() {
     return widget;
+  }
+
+  /**
+   * Returns true if the wrapped widget is being resized.
+   * 
+   * @return true is resizing is enabled
+   */
+  public boolean isResizeWidget() {
+    return resizeWidget;
+  }
+
+  @Override
+  public boolean isValid() {
+    return validateValue(null);
+  }
+
+  /**
+   * True to resize the wrapped widget when the field is resized (defaults to
+   * false).
+   * 
+   * @param resizeWidget true to resize the wrapped widget
+   */
+  public void setResizeWidget(boolean resizeWidget) {
+    this.resizeWidget = resizeWidget;
   }
 
   @Override
@@ -59,8 +89,24 @@ public class AdapterField extends Field {
       if (!c.isRendered()) {
         c.render(target, index);
       }
+      if (c instanceof LayoutContainer) {
+        ((LayoutContainer)c).layout();
+      }
     }
     setElement(widget.getElement(), target, index);
+  }
+
+  @Override
+  protected void onResize(int width, int height) {
+    super.onResize(width, height);
+    if (resizeWidget) {
+      if (width != -1) {
+        widget.setWidth(width + "px");
+      }
+      if (height != -1) {
+        widget.setHeight(height + "px");
+      }
+    }
   }
 
   @Override

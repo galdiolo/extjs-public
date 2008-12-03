@@ -11,19 +11,21 @@ public class QueryLoadConfig {
 
   private String query;
   private boolean forceAll;
-  
+
   public boolean isForceAll() {
     return forceAll;
   }
+
   public void setForceAll(boolean forceAll) {
     this.forceAll = forceAll;
   }
+
   public String getQuery() {
     return query;
   }
+
   public void setQuery(String query) {
     this.query = query;
   }
-  
-  
+
 }

@@ -1,7 +1,9 @@
 com.extjs.gxt.ui.client
 com.extjs.gxt.ui.client.binder
+com.extjs.gxt.ui.client.binding
 com.extjs.gxt.ui.client.core
 com.extjs.gxt.ui.client.data
+com.extjs.gxt.ui.client.dnd
 com.extjs.gxt.ui.client.event
 com.extjs.gxt.ui.client.fx
 com.extjs.gxt.ui.client.js

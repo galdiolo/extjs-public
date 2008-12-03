@@ -8,7 +8,19 @@
 package com.extjs.gxt.ui.client.data;
 
 /**
- * <p/>Primary interface for GXT model objects with event support.
+ * Primary interface for GXT model objects with event support.
+ * 
+ * <dl>
+ * <dt><b>Events:</b></dt>
+ * 
+ * <dd><b>Update</b> : ChangeEvent(source)<br>
+ * <div>Fires after the the model is updated.</div>
+ * <ul>
+ * <li>source : this</li>
+ * </ul>
+ * </dd>
+ * 
+ * </dl>
  * 
  * <p/>For a default implementation see {@link BaseModel} or
  * {@link BaseTreeModel}.

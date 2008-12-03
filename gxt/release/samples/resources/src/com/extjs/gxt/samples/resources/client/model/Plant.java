@@ -15,11 +15,11 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 public class Plant extends BaseModelData {
 
   private DateTimeFormat df = DateTimeFormat.getFormat("MM/dd/y");
-  
+
   public Plant() {
-    
+
   }
-  
+
   public Plant(String name, String light, double price, String available, boolean indoor) {
     setName(name);
     setLight(light);
@@ -27,7 +27,7 @@ public class Plant extends BaseModelData {
     setAvailable(df.parse(available));
     setIndoor(indoor);
   }
-  
+
   public Date getAvailable() {
     return get("available");
   }
@@ -37,7 +37,7 @@ public class Plant extends BaseModelData {
   }
 
   public boolean isIndoor() {
-    return (Boolean)get("indoor");
+    return (Boolean) get("indoor");
   }
 
   public void setIndoor(boolean indoor) {
@@ -61,7 +61,7 @@ public class Plant extends BaseModelData {
   }
 
   public double getPrice() {
-    return (Double)get("price");
+    return (Double) get("price");
   }
 
   public void setPrice(double price) {

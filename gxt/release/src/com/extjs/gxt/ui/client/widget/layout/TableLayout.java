@@ -244,7 +244,7 @@ public class TableLayout extends Layout {
   }
 
   protected Element getNextCell(Component widget) {
-    TableData data = (TableData)getLayoutData(widget);
+    TableData data = (TableData) getLayoutData(widget);
     if (data == null) {
       data = new TableData();
       setLayoutData(widget, data);

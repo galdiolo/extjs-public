@@ -27,6 +27,10 @@ import com.google.gwt.user.client.ui.RootPanel;
 
 public class AppView extends View {
 
+  public static final String CENTER_PANEL = "centerPanel";
+  public static final String WEST_PANEL = "westPanel";
+  public static final String NORTH_PANEL = "northPanel";
+  
   private Viewport viewport;
   private ContentPanel centerPanel;
   private HtmlContainer northPanel;
@@ -61,7 +65,7 @@ public class AppView extends View {
     BorderLayoutData data = new BorderLayoutData(LayoutRegion.CENTER);
     data.setMargins(new Margins(5, 5, 5, 0));
     viewport.add(centerPanel, data);
-    Registry.register("centerPanel", centerPanel);
+    Registry.register(CENTER_PANEL, centerPanel);
   }
 
   private void createWest() {
@@ -74,7 +78,7 @@ public class AppView extends View {
     westPanel.setTopComponent(toolBar);
 
     viewport.add(westPanel, data);
-    Registry.register("westPanel", westPanel);
+    Registry.register(WEST_PANEL, westPanel);
   }
 
   private void createNorth() {
@@ -83,7 +87,7 @@ public class AppView extends View {
 
     northPanel = new HtmlContainer(sb.toString());
     northPanel.setEnableState(false);
-    
+
     ThemeManager.register(Slate.SLATE);
     ThemeSelector selector = new ThemeSelector();
     selector.setWidth(125);
@@ -92,7 +96,7 @@ public class AppView extends View {
     BorderLayoutData data = new BorderLayoutData(LayoutRegion.NORTH, 33);
     data.setMargins(new Margins());
     viewport.add(northPanel, data);
-    Registry.register("northPanel", northPanel);
+    Registry.register(NORTH_PANEL, northPanel);
   }
 
 }

@@ -28,7 +28,7 @@ public class TreeTableItemUI extends TreeItemUI {
   private Element rowTableEl;
   private Element rowTrEl;
   private Element[] cells;
-  
+
   public TreeTableItemUI(TreeTableItem item) {
     super(item);
     styleTreeOver = "my-treetbl-over";
@@ -39,6 +39,7 @@ public class TreeTableItemUI extends TreeItemUI {
     classTreeOpen = "my-treetbl-open";
     classTreeClose = "my-treetbl-close";
   }
+
   public TreeTableItem getTreeTableItem() {
     return (TreeTableItem) item;
   }
@@ -67,10 +68,6 @@ public class TreeTableItemUI extends TreeItemUI {
   }
 
   public void onMouseOut(BaseEvent be) {
-    // ToolTip tooltip = getTreeTableItem().getCellToolTip();
-    // if (tooltip != null && tooltip.isShowing()) {
-    // tooltip.hide();
-    // }
     if (!item.isRoot()) {
       El.fly(tableItemEl).removeStyleName("my-treetbl-item-over");
     }
@@ -150,8 +147,7 @@ public class TreeTableItemUI extends TreeItemUI {
     boolean checkable = getTreeTableItem().getTreeTable().getCheckable();
     El.fly(checkEl).setVisible(checkable);
 
-    onValuesChanged(getTreeTableItem().getTreeTable(),
-        getTreeTableItem().getRenderedValues());
+    onValuesChanged(getTreeTableItem().getTreeTable(), getTreeTableItem().getRenderedValues());
 
     onIconStyleChange(item.getIconStyle());
 
@@ -164,8 +160,6 @@ public class TreeTableItemUI extends TreeItemUI {
     if (!GXT.isIE) {
       DOM.setElementPropertyInt(item.getElement(), "tabIndex", 0);
     }
-
-    getTreeTableItem().initCellToolTips();
 
     updateJointStyle();
     item.disableTextSelection(true);
@@ -201,7 +195,7 @@ public class TreeTableItemUI extends TreeItemUI {
   }
 
   protected void onValuesChanged(TreeTable table, String[] values) {
-    onTextChange(item.getText());
+    onTextChange(values[0] != null ? values[0] : item.getText());
     for (int i = 1; i < cells.length; i++) {
       updateText(i, values[i]);
     }

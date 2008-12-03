@@ -18,6 +18,7 @@ import com.extjs.gxt.samples.resources.client.model.Plant;
 import com.extjs.gxt.samples.resources.client.model.State;
 import com.extjs.gxt.samples.resources.client.model.Stock;
 import com.extjs.gxt.samples.resources.client.model.Task;
+import com.google.gwt.i18n.client.DateTimeFormat;
 
 public class TestData {
 
@@ -65,7 +66,7 @@ public class TestData {
       + "scelerisque dolor. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Phasellus semper, odio id "
       + "rutrum volutpat, mauris ante tempus metus, bibendum porta dolor ligula pretium tortor.</div>";
 
-//  private static DateTimeFormat df = DateTimeFormat.getFormat("MM/dd/y");
+  // private static DateTimeFormat df = DateTimeFormat.getFormat("MM/dd/y");
 
   private static final int NUM_ITEMS = 37;
 
@@ -256,7 +257,7 @@ public class TestData {
     }
     return list;
   }
-  
+
   public static List<Task> getTasks() {
     List<Task> tasks = new ArrayList<Task>();
     tasks.add(new Task(100, "Ext Forms: Field Anchoring", 112,
@@ -351,7 +352,7 @@ public class TestData {
     states.add(new State("WY", "Wyoming", "Like No Place on Earth"));
     return states;
   }
-  
+
   public static List<Country> getCountries() {
     List<Country> countries = new ArrayList<Country>();
     countries.add(new Country("ad", "Andora"));
@@ -363,7 +364,7 @@ public class TestData {
     countries.add(new Country("an", "Neth. Antilles"));
     countries.add(new Country("ao", "Angola"));
     countries.add(new Country("ar", "Argentina"));
-   
+
     return countries;
   }
 
@@ -408,45 +409,75 @@ public class TestData {
   }
 
   public static List<Stock> getCompanies() {
+    DateTimeFormat f = DateTimeFormat.getFormat("M/d h:mma");
     List<Stock> stocks = new ArrayList<Stock>();
-    stocks.add(new Stock("3m Co", 71.72, 0.02, 0.03, "4/2 12:00am", "Manufacturing"));
-    stocks.add(new Stock("Alcoa Inc", 29.01, 0.42, 1.47, "4/1 12:00am", "Manufacturing"));
-    stocks.add(new Stock("Altria Group Inc", 83.81, 0.28, 0.34, "4/3 12:00am", "Manufacturing"));
-    stocks.add(new Stock("American Express Company", 52.55, 0.01, 0.02, "4/8 12:00am", "Finance"));
-    stocks.add(new Stock("American International Group, Inc.", 64.13, 0.31, 0.49, "4/1 12:00am",
-        "Services"));
-    stocks.add(new Stock("AT&T Inc.", 31.61, -0.48, -1.54, "4/8 12:00am", "Services"));
-    stocks.add(new Stock("Boeing Co.", 75.43, 0.53, 0.71, "4/8 12:00am", "Manufacturing"));
-    stocks.add(new Stock("Caterpillar Inc.", 67.27, 0.92, 1.39, "4/1 12:00am", "Services"));
-    stocks.add(new Stock("Citigroup, Inc.", 49.37, 0.02, 0.04, "4/4 12:00am", "Finance"));
-    stocks.add(new Stock("E.I. du Pont de Nemours and Company", 40.48, 0.51, 1.28, "4/1 12:00am",
+    stocks.add(new Stock("3m Co", 71.72, 0.02, 0.03, f.parse("4/2 12:00am"), "Manufacturing"));
+    stocks.add(new Stock("Alcoa Inc", 29.01, 0.42, 1.47, f.parse("4/1 12:00am"), "Manufacturing"));
+    stocks.add(new Stock("Altria Group Inc", 83.81, 0.28, 0.34, f.parse("4/3 12:00am"),
         "Manufacturing"));
-    stocks.add(new Stock("Exxon Mobil Corp", 68.1, -0.43, -0.64, "4/3 12:00am", "Manufacturing"));
-    stocks.add(new Stock("General Electric Company", 34.14, -0.08, -0.23, "4/3 12:00am",
+    stocks.add(new Stock("American Express Company", 52.55, 0.01, 0.02, f.parse("4/8 12:00am"),
+        "Finance"));
+    stocks.add(new Stock("American International Group, Inc.", 64.13, 0.31, 0.49,
+        f.parse("4/1 12:00am"), "Services"));
+    stocks.add(new Stock("AT&T Inc.", 31.61, -0.48, -1.54, f.parse("4/8 12:00am"), "Services"));
+    stocks.add(new Stock("Boeing Co.", 75.43, 0.53, 0.71, f.parse("4/8 12:00am"), "Manufacturing"));
+    stocks.add(new Stock("Caterpillar Inc.", 67.27, 0.92, 1.39, f.parse("4/1 12:00am"), "Services"));
+    stocks.add(new Stock("Citigroup, Inc.", 49.37, 0.02, 0.04, f.parse("4/4 12:00am"), "Finance"));
+    stocks.add(new Stock("E.I. du Pont de Nemours and Company", 40.48, 0.51, 1.28,
+        f.parse("4/1 12:00am"), "Manufacturing"));
+    stocks.add(new Stock("Exxon Mobil Corp", 68.1, -0.43, -0.64, f.parse("4/3 12:00am"),
         "Manufacturing"));
-    stocks.add(new Stock("General Motors Corporation", 30.27, 1.09, 3.74, "4/3 12:00am",
+    stocks.add(new Stock("General Electric Company", 34.14, -0.08, -0.23, f.parse("4/3 12:00am"),
+        "Manufacturing"));
+    stocks.add(new Stock("General Motors Corporation", 30.27, 1.09, 3.74, f.parse("4/3 12:00am"),
         "Automotive"));
-    stocks.add(new Stock("Hewlett-Packard Co.", 36.53, -0.03, -0.08, "4/3 12:00am", "Computer"));
-    stocks.add(new Stock("Honeywell Intl Inc", 38.77, 0.05, 0.13, "4/3 12:00am", "Manufacturing"));
-    stocks.add(new Stock("Intel Corporation", 19.88, 0.31, 1.58, "4/2 12:00am", "Computer"));
-    stocks.add(new Stock("International Business Machines", 81.41, 0.44, 0.54, "4/1 12:00am",
+    stocks.add(new Stock("Hewlett-Packard Co.", 36.53, -0.03, -0.08, f.parse("4/3 12:00am"),
         "Computer"));
-    stocks.add(new Stock("Johnson & Johnson", 64.72, 0.06, 0.09, "4/2 12:00am", "Medical"));
-    stocks.add(new Stock("JP Morgan & Chase & Co", 45.73, 0.07, 0.15, "4/2 12:00am", "Finance"));
-    stocks.add(new Stock("McDonald\"s Corporation", 36.76, 0.86, 2.40, "4/2 12:00am", "Food"));
-    stocks.add(new Stock("Merck & Co., Inc.", 40.96, 0.41, 1.01, "4/2 12:00am", "Medical"));
-    stocks.add(new Stock("Microsoft Corporation", 25.84, 0.14, 0.54, "4/2 12:00am", "Computer"));
-    stocks.add(new Stock("Pfizer Inc", 27.96, 0.4, 1.45, "4/8 12:00am", "Services"));
-    stocks.add(new Stock("The Coca-Cola Company", 45.07, 0.26, 0.58, "4/1 12:00am", "Food"));
-    stocks.add(new Stock("The Home Depot, Inc.", 34.64, 0.35, 1.02, "4/8 12:00am", "Retail"));
-    stocks.add(new Stock("The Procter & Gamble Company", 61.91, 0.01, 0.02, "4/1 12:00am",
+    stocks.add(new Stock("Honeywell Intl Inc", 38.77, 0.05, 0.13, f.parse("4/3 12:00am"),
         "Manufacturing"));
-    stocks.add(new Stock("United Technologies Corporation", 63.26, 0.55, 0.88, "4/1 12:00am",
+    stocks.add(new Stock("Intel Corporation", 19.88, 0.31, 1.58, f.parse("4/2 12:00am"), "Computer"));
+    stocks.add(new Stock("International Business Machines", 81.41, 0.44, 0.54,
+        f.parse("4/1 12:00am"), "Computer"));
+    stocks.add(new Stock("Johnson & Johnson", 64.72, 0.06, 0.09, f.parse("4/2 12:00am"), "Medical"));
+    stocks.add(new Stock("JP Morgan & Chase & Co", 45.73, 0.07, 0.15, f.parse("4/2 12:00am"),
+        "Finance"));
+    stocks.add(new Stock("McDonald\"s Corporation", 36.76, 0.86, 2.40, f.parse("4/2 12:00am"),
+        "Food"));
+    stocks.add(new Stock("Merck & Co., Inc.", 40.96, 0.41, 1.01, f.parse("4/2 12:00am"), "Medical"));
+    stocks.add(new Stock("Microsoft Corporation", 25.84, 0.14, 0.54, f.parse("4/2 12:00am"),
         "Computer"));
-    stocks.add(new Stock("Verizon Communications", 35.57, 0.39, 1.11, "4/3 12:00am", "Services"));
-    stocks.add(new Stock("Wal-Mart Stores, Inc.", 45.45, 0.73, 1.63, "4/3 12:00am", "Retail"));
+    stocks.add(new Stock("Pfizer Inc", 27.96, 0.4, 1.45, f.parse("4/8 12:00am"), "Services"));
+    stocks.add(new Stock("The Coca-Cola Company", 45.07, 0.26, 0.58, f.parse("4/1 12:00am"), "Food"));
+    stocks.add(new Stock("The Home Depot, Inc.", 34.64, 0.35, 1.02, f.parse("4/8 12:00am"),
+        "Retail"));
+    stocks.add(new Stock("The Procter & Gamble Company", 61.91, 0.01, 0.02, f.parse("4/1 12:00am"),
+        "Manufacturing"));
+    stocks.add(new Stock("United Technologies Corporation", 63.26, 0.55, 0.88,
+        f.parse("4/1 12:00am"), "Computer"));
+    stocks.add(new Stock("Verizon Communications", 35.57, 0.39, 1.11, f.parse("4/3 12:00am"),
+        "Services"));
+    stocks.add(new Stock("Wal-Mart Stores, Inc.", 45.45, 0.73, 1.63, f.parse("4/3 12:00am"),
+        "Retail"));
     stocks.add(new Stock("Walt Disney Company (The) (Holding Company)", 29.89, 0.24, 0.81,
-        "4/1 12:00am", "Services"));
+        f.parse("4/1 12:00am"), "Services"));
+    return stocks;
+  }
+  
+  public static List<Stock> getShortStocks() {
+    List<Stock> stocks = new ArrayList<Stock>();
+
+    stocks.add(new Stock("Apple", "AAPL", 125.64, 123.43));
+    stocks.add(new Stock("Cisco Systems", "CSCO", 25.84, 26.3));
+    stocks.add(new Stock("Google Inc.", "GOOG", 516.2, 512.6));
+    stocks.add(new Stock("Intel", "INTC", 21.36, 21.53));
+    stocks.add(new Stock("Microsoft", "MSFT", 29.56, 29.72));
+    stocks.add(new Stock("Nokia (ADR)", "NOK", 27.83, 27.93));
+    stocks.add(new Stock("Oracle", "ORCL", 18.73, 18.98));
+    stocks.add(new Stock("Starbucks", "SBUX", 27.33, 27.36));
+    stocks.add(new Stock("Yahoo! Inc.", "YHOO", 26.97, 27.29));
+    stocks.add(new Stock("Comcast", "CMCSA", 25.9, 26.4));
+    stocks.add(new Stock("Sirius Satellite", "SIRI", 2.77, 2.74));
+    
     return stocks;
   }
 

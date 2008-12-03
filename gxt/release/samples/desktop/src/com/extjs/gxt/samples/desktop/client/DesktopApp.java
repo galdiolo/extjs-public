@@ -62,8 +62,13 @@ public class DesktopApp implements EntryPoint {
         } else {
           w = ce.component.getData("window");
         }
-        if (w != null) {
+        if (!desktop.getWindows().contains(w)) {
+          desktop.addWindow(w);
+        }
+        if (w != null && !w.isVisible()) {
           w.show();
+        } else {
+          w.toFront();
         }
       }
     };

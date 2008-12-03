@@ -17,7 +17,6 @@ public class Entry extends BaseTreeModel {
   private boolean fill;
   private boolean closable = true;
 
-
   public Entry(String name, LayoutContainer example) {
     this.name = name;
     set("name", name);
@@ -29,21 +28,21 @@ public class Entry extends BaseTreeModel {
     this(name, example);
     this.fill = fill;
   }
-  
+
   public Entry(String name, LayoutContainer example, boolean fill, boolean closable) {
     this(name, example);
     this.fill = fill;
     this.closable = closable;
   }
-  
+
   protected Entry() {
 
   }
-  
+
   public LayoutContainer getExample() {
     return (LayoutContainer) get("example");
   }
-  
+
   public String getId() {
     if (name.equals("% Columns")) {
       return "percentcolumns";
@@ -56,11 +55,11 @@ public class Entry extends BaseTreeModel {
   }
 
   public String getSourceUrl() {
-    Object o = (Object)get("example");
+    Object o = (Object) get("example");
     String name = o.getClass().getName();
-    
+
     name = name.substring(name.lastIndexOf("examples.") + 9);
-    name =  "code/" + name + ".html";
+    name = "code/" + name + ".html";
     name = name.replaceFirst("\\.", "/");
     name = GWT.getModuleBaseURL() + name;
     return name;

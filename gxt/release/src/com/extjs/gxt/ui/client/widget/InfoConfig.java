@@ -14,17 +14,17 @@ import com.extjs.gxt.ui.client.util.Params;
  * Configuation settings for {@link Info}.
  */
 public class InfoConfig {
-  
+
   /**
    * The info title (defaults to null).
    */
   public String title;
-  
+
   /**
    * The info text (defaults to null).
    */
   public String text;
-  
+
   /**
    * The index or key based substitution values.
    */
@@ -49,12 +49,12 @@ public class InfoConfig {
    * Listener to be notified when the info is displayed (defaults to null).
    */
   public Listener listener;
-  
+
   public InfoConfig(String title, String text) {
     this.title = title;
     this.text = text;
   }
-  
+
   public InfoConfig(String title, String text, Params params) {
     this.title = title;
     this.text = text;

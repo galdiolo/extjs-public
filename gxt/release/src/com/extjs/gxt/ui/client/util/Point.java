@@ -13,11 +13,11 @@ package com.extjs.gxt.ui.client.util;
  * @see Rectangle
  */
 public class Point {
-  
+
   public static Point newInstance(double x, double y) {
-    return new Point((int)x, (int)y);
+    return new Point((int) x, (int) y);
   }
-  
+
   public static Point newInstance(int x, int y) {
     return new Point(x, y);
   }
@@ -42,7 +42,7 @@ public class Point {
     this.x = x;
     this.y = y;
   }
-  
+
   public String toString() {
     return ("x: " + x + ", y: " + y);
   }

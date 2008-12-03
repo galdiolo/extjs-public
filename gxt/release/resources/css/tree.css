@@ -1,9 +1,9 @@
 .tree-folder {
-  background: url(../images/gxt/icons/folder-closed.gif) no-repeat -1px -1px;
+  background: url(../images/gxt/icons/folder-closed.gif) no-repeat center left !important;
 }
 
 .tree-folder-open {
-  background: url(../images/gxt/icons/folder.gif) no-repeat -1px -1px;
+  background: url(../images/gxt/icons/folder.gif) no-repeat center left !important;
 }
 
 .my-tree {
@@ -49,24 +49,15 @@
 
 .my-tree-check div {
   width: 17px;
-  height: 19px;
+  height: 17px;
   line-height: 1px;
   font-size: 1px;
 }
 
 .my-tree-icon div {
   width: 16px;
-  height: 16px;
-  margin-top: 1px;
+  height: 17px;
   cursor: pointer;
-}
-
-.ext-ie .my-tree-icon {
-  padding-top: 2px;
-}
-
-.ext-ie .my-tree-icon div {
-  position: static;
 }
 
 .my-tree-item-text span {
@@ -104,6 +95,18 @@
   background: url(../images/gxt/shared/select-19-bg.gif) left -38px;
 }
 
+.my-tree-drop .my-tree-left {
+  background: url(../images/gxt/shared/select-19-bg.gif) no-repeat left -115px;
+}
+
+.my-tree-drop .my-tree-right {
+  background: url(../images/gxt/shared/select-19-bg.gif) no-repeat right -133px;
+}
+
+.my-tree-drop .my-tree-check,.my-tree-drop .my-tree-icon,.my-tree-drop .my-tree-item-text {
+  background: url(../images/gxt/shared/select-19-bg.gif) left -152px;
+}
+
 .my-tree-close {
   background: url(../images/gxt/tree/vnode.gif) no-repeat 0px 1px;
 }
@@ -129,7 +132,7 @@
 }
 
 .my-tree-loading .tree-folder {
-  background: url(../images/gxt/icons/wait.gif) no-repeat 0px -1px;
+  background: url(../images/gxt/icons/wait.gif) no-repeat 0px -1px !important;
 }
 
 .my-tree-loading .my-tree-item-text span {

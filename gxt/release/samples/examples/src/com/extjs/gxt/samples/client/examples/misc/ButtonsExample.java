@@ -39,11 +39,11 @@ public class ButtonsExample extends LayoutContainer {
     Button disabled = new Button("Disabled", listener);
     disabled.disable();
     buttonBar.add(disabled);
-    
+
     ToggleButton toggle = new ToggleButton("Toggle");
     toggle.toggle(true);
     buttonBar.add(toggle);
-    
+
     Menu menu = new Menu();
     menu.add(new MenuItem("Item 1"));
     menu.add(new MenuItem("Item 2"));
@@ -58,5 +58,5 @@ public class ButtonsExample extends LayoutContainer {
     setLayout(new FlowLayout(4));
     add(buttonBar);
   }
-  
+
 }

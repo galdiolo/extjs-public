@@ -26,7 +26,7 @@ public interface GridCellRenderer<M extends ModelData> {
    * @param store the data store
    * @return the cell HTML
    */
-  public String render(M model, String property, ColumnData config, int rowIndex,
-      int colIndex, ListStore<M> store);
+  public String render(M model, String property, ColumnData config, int rowIndex, int colIndex,
+      ListStore<M> store);
 
 }

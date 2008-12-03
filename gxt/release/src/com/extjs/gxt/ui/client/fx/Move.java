@@ -32,5 +32,4 @@ public class Move extends BaseEffect {
     el.setXY(x, y);
   }
 
-
 }

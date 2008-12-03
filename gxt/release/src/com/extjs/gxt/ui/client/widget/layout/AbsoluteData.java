@@ -16,11 +16,11 @@ public class AbsoluteData extends AnchorData {
 
   private int left = Style.DEFAULT;
   private int top = Style.DEFAULT;
-  
+
   public AbsoluteData() {
-    
+
   }
-  
+
   public AbsoluteData(int left, int top) {
     this.left = left;
     this.top = top;

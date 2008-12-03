@@ -26,21 +26,26 @@ import com.extjs.gxt.ui.client.widget.layout.ColumnLayout;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
+import com.google.gwt.user.client.Element;
 
 public class AdvancedFormsExample extends LayoutContainer {
 
   private VerticalPanel vp;
-  
+
   public AdvancedFormsExample() {
     vp = new VerticalPanel();
     vp.setSpacing(10);
-    
+  }
+
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
     createColumnForm();
     createTabForm();
-    
+
     add(vp);
   }
-  
+
   private void createTabForm() {
     FormPanel panel = new FormPanel();
     panel.setFrame(false);
@@ -103,10 +108,10 @@ public class AdvancedFormsExample extends LayoutContainer {
     panel.addButton(new Button("Submit"));
 
     panel.setSize(340, 180);
-    
+
     vp.add(panel);
   }
-  
+
   private void createColumnForm() {
     FormPanel panel = new FormPanel();
     panel.setFrame(true);
@@ -181,7 +186,7 @@ public class AdvancedFormsExample extends LayoutContainer {
 
     TextArea a = new TextArea();
     a.setFieldLabel("Comment");
-    
+
     String adj = GXT.isIE ? "100%" : "-20"; // looking into
     a.setData("anchorSpec", adj);
     area.add(a);
@@ -193,5 +198,5 @@ public class AdvancedFormsExample extends LayoutContainer {
 
     vp.add(panel);
   }
-  
+
 }

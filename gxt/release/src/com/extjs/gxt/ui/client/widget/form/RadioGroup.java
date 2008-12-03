@@ -12,6 +12,17 @@ import com.google.gwt.user.client.Element;
 
 /**
  * A group of Radio's.
+ * 
+ * <dl>
+ * <dt>Events:</dt>
+ * 
+ * <dd><b>Change</b> : FieldEvent(field, value, oldValue)<br>
+ * <div>Fires after a child radio is selected.</div>
+ * <ul>
+ * <li>field : this the group, not the radio</li>
+ * </ul>
+ * </dd>
+ * </dl>
  */
 public class RadioGroup extends MultiField<Radio> {
 
@@ -124,7 +135,7 @@ public class RadioGroup extends MultiField<Radio> {
     for (Radio r : fields) {
       if (r == radio) {
         r.setValue(true);
-      } else if (r.getValue()) {
+      } else {
         r.setValue(false);
       }
     }

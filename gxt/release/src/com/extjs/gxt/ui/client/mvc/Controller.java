@@ -31,7 +31,7 @@ public abstract class Controller {
     }
     view.handleEvent(event);
   }
-  
+
   /**
    * Forward an event to a view. Ensures the view is initialized before
    * forwarding the event.
@@ -48,7 +48,7 @@ public abstract class Controller {
   protected Controller parent;
   protected List<Controller> children;
   protected boolean initialized;
-  
+
   private Set<Integer> supportedEvents;
 
   /**

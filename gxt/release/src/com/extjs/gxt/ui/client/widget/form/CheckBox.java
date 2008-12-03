@@ -57,6 +57,9 @@ public class CheckBox extends Field<Boolean> {
 
   @Override
   public String getRawValue() {
+    if (!rendered) {
+      return value.toString();
+    }
     String propName = isAttached() ? "checked" : "defaultChecked";
     return input.dom.getPropertyString(propName);
   }
@@ -73,6 +76,9 @@ public class CheckBox extends Field<Boolean> {
    */
   public void setBoxLabel(String boxLabel) {
     this.boxLabel = boxLabel;
+    if (rendered) {
+      getInputEl().dom.setAttribute("value", getBoxLabel());
+    }
   }
 
   @Override
@@ -101,7 +107,7 @@ public class CheckBox extends Field<Boolean> {
   protected El getStyleEl() {
     return input;
   }
-  
+
   @Override
   protected void initValue() {
     if (value != null) {
@@ -117,8 +123,6 @@ public class CheckBox extends Field<Boolean> {
     hasFocus = false;
     fireEvent(Events.Blur, new FieldEvent(this));
   }
-  
-  
 
   @Override
   protected void onClick(ComponentEvent ce) {
@@ -153,6 +157,7 @@ public class CheckBox extends Field<Boolean> {
       div.setClassName("x-form-cb-label");
       div.setInnerHTML(boxLabel);
       wrap.dom.appendChild(div);
+      setBoxLabel(boxLabel);
     }
 
     super.onRender(target, index);
@@ -161,7 +166,7 @@ public class CheckBox extends Field<Boolean> {
   }
 
   private native void setValueInternal(Boolean b) /*-{
-   this.@com.extjs.gxt.ui.client.widget.form.Field::value = b;
-   }-*/;
+    this.@com.extjs.gxt.ui.client.widget.form.Field::value = b;
+    }-*/;
 
 }

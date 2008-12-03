@@ -23,6 +23,7 @@ public class StyleTemplate {
 
   /**
    * Creates a new template.
+   * 
    * @param styleElem the HTML style element
    */
   public StyleTemplate(Element styleElem) {
@@ -31,6 +32,7 @@ public class StyleTemplate {
 
   /**
    * Sets a new rule.
+   * 
    * @param selector the CSS selector
    * @param rule the rule
    */

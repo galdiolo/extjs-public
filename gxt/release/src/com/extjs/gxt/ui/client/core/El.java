@@ -66,6 +66,14 @@ public class El {
     return addUnitsInternal(value, "px");
   }
 
+  /**
+   * Gets the globally shared flyweight El, with the passed node as the active
+   * element. Do not store a reference to this element - the dom node can be
+   * overwritten by other code.
+   * 
+   * @param element the element
+   * @return the el instance
+   */
   public static El fly(com.google.gwt.dom.client.Element element) {
     global.dom = (Element) element;
     return global;
@@ -85,57 +93,57 @@ public class El {
   }
 
   private static native String addUnitsInternal(String v, String defaultUnit) /*-{
-      if(v === "" || v == "auto"){
-      return v;
-      }
-      if(v === undefined){
-      return '';
-      }
-      if(typeof v == "number" || !/\d+(px|em|%|en|ex|pt|in|cm|mm|pc)$/i.test(v)){
-      return v + (defaultUnit || 'px');
-      }
-      return v;
-      }-*/;
+     if(v === "" || v == "auto"){
+       return v;
+     }
+     if(v === undefined){
+       return '';
+     }
+     if(typeof v == "number" || !/\d+(px|em|%|en|ex|pt|in|cm|mm|pc)$/i.test(v)){
+       return v + (defaultUnit || 'px');
+     }
+     return v;
+   }-*/;
 
   private native static void disableContextMenuInternal(Element elem, boolean disable) /*-{
-      if (disable) {
-      elem.oncontextmenu = function() {  return false};
-      } else {
-      elem.oncontextmenu = null;
-      }
-      }-*/;
+     if (disable) {
+       elem.oncontextmenu = function() {  return false};
+     } else {
+       elem.oncontextmenu = null;
+     }
+   }-*/;
 
   private native static void disableTextSelectInternal(Element e, boolean disable)/*-{
-         if (disable) {
-           e.ondrag = function (evt) {
-            var targ;
-            if (!e) var e = $wnd.event;
-            if (e.target) targ = e.target;
-            else if (e.srcElement) targ = e.srcElement;
-            if (targ.nodeType == 3) // defeat Safari bug
-            targ = targ.parentNode;
-            if (targ.tagName == 'INPUT') {
-              return true;
-            }
-            return false; 
-           };
-           e.onselectstart = function (e) { 
-            var targ;
-            if (!e) var e = $wnd.event;
-            if (e.target) targ = e.target;
-            else if (e.srcElement) targ = e.srcElement;
-            if (targ.nodeType == 3) // defeat Safari bug
-            targ = targ.parentNode;
-            if (targ.tagName == 'INPUT') {
-              return true;
-            }
-            return false; 
-           };
-         } else {
-           e.ondrag = null;
-           e.onselectstart = null;
-         }
-         }-*/;
+     if (disable) {
+       e.ondrag = function (evt) {
+        var targ;
+        if (!e) var e = $wnd.event;
+        if (e.target) targ = e.target;
+        else if (e.srcElement) targ = e.srcElement;
+        if (targ.nodeType == 3) // defeat Safari bug
+        targ = targ.parentNode;
+        if (targ.tagName == 'INPUT') {
+          return true;
+        }
+        return false; 
+       };
+       e.onselectstart = function (e) { 
+        var targ;
+        if (!e) var e = $wnd.event;
+        if (e.target) targ = e.target;
+        else if (e.srcElement) targ = e.srcElement;
+        if (targ.nodeType == 3) // defeat Safari bug
+        targ = targ.parentNode;
+        if (targ.tagName == 'INPUT') {
+          return true;
+        }
+        return false; 
+       };
+     } else {
+       e.ondrag = null;
+       e.onselectstart = null;
+     }
+     }-*/;
 
   /**
    * The wrapped dom element.
@@ -259,13 +267,14 @@ public class El {
 
   /**
    * More flexible version of {@link #setStyleAttribute} for setting style
-   * properties.
+   * properties. Style attribute names must be in lower camel case, e.g.
+   * "backgroundColor:white"
    * 
-   * @param styles a style specification string, e.g. "width:100px"
+   * @param styles a style specification string
    * @return this
    */
   public El applyStyles(String styles) {
-    Ext.call(dom, "applyStyles", styles);
+    XElement.fly(dom).applyStyles(styles);
     return this;
   }
 
@@ -409,17 +418,17 @@ public class El {
    * @return this
    */
   public native El click() /*-{
-      var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-      if (dom.click) {
-      dom.click();
-      }
-      else {
-      var event = $doc.createEvent("MouseEvents");
-      event.initEvent('click', true, true, $wnd, 0, 0, 0, 0, 0, false, false, false, false, 1, dom);
-      dom.dispatchEvent(event);    
-      }
-      return this;
-      }-*/;
+     var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+     if (dom.click) {
+       dom.click();
+     }
+     else {
+       var event = $doc.createEvent("MouseEvents");
+       event.initEvent('click', true, true, $wnd, 0, 0, 0, 0, 0, false, false, false, false, 1, dom);
+       dom.dispatchEvent(event);    
+     }
+     return this;
+   }-*/;
 
   /**
    * Clips overflow on the element.
@@ -447,9 +456,9 @@ public class El {
    * @return the new element
    */
   public native Element cloneNode(boolean deep) /*-{
-      var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-      return dom.cloneNode(deep);
-      }-*/;
+     var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+     return dom.cloneNode(deep);
+   }-*/;
 
   /**
    * Creates and adds a child using the HTML fragment.
@@ -481,10 +490,10 @@ public class El {
    * @return this
    */
   public native El disable() /*-{
-      var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-      dom.disabled = true;
-      return this;
-      }-*/;
+     var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+     dom.disabled = true;
+     return this;
+   }-*/;
 
   /**
    * Enables and disables the browsers default context menu for the specified
@@ -535,10 +544,10 @@ public class El {
    * @return this
    */
   public native El enable()/*-{
-         var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-         dom.disabled = false;
-         return this;
-         }-*/;
+       var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+       dom.disabled = false;
+       return this;
+     }-*/;
 
   /**
    * Convenience method for setVisibilityMode(VisibilityMode.DISPLAY).
@@ -599,7 +608,7 @@ public class El {
    * @return the matching element
    */
   public El findParent(String selector, int maxDepth) {
-    Element elem = Ext.findParent(dom, selector, maxDepth);
+    Element elem = XElement.fly(dom).findParentElement(selector, maxDepth);
     if (elem == null) {
       return null;
     }
@@ -615,7 +624,7 @@ public class El {
    * @return the matching element
    */
   public Element findParentElement(String selector, int maxDepth) {
-    return Ext.findParent(dom, selector, maxDepth);
+    return XElement.fly(dom).findParentElement(selector, maxDepth);
   }
 
   /**
@@ -688,7 +697,7 @@ public class El {
    * @return the width of the sides passed added together
    */
   public int getBorderWidth(String sides) {
-    return Ext.callInt(dom, "getBorderWidth", sides);
+    return XElement.fly(dom).getBorderWidth(sides);
   }
 
   /**
@@ -812,7 +821,7 @@ public class El {
    * @return the width
    */
   public int getFrameWidth(String sides) {
-    return Ext.callInt(dom, "getFrameWidth", sides);
+    return XElement.fly(dom).getFrameWidth(sides);
   }
 
   /**
@@ -821,7 +830,7 @@ public class El {
    * @return the height
    */
   public int getHeight() {
-    return getHeight(false);
+    return dom.getOffsetHeight();
   }
 
   /**
@@ -898,7 +907,7 @@ public class El {
    * @return the left value
    */
   public int getLeft(boolean local) {
-    return Ext.callInt(dom, "getLeft", local ? "true" : "false");
+    return XElement.fly(dom).getLeft(local);
   }
 
   /**
@@ -910,10 +919,7 @@ public class El {
    * @return the margins
    */
   public int getMargins(String sides) {
-    if (getStyleAttribute("margin").equals("")) {
-      return 0;
-    }
-    return Ext.callInt(dom, "getMargins", sides);
+    return XElement.fly(dom).getMargins(sides);
   }
 
   /**
@@ -946,7 +952,7 @@ public class El {
    * @return the width of the sides passed added together
    */
   public int getPadding(String sides) {
-    return Ext.callInt(dom, "getPadding", sides);
+    return XElement.fly(dom).getPadding(sides);
   }
 
   /**
@@ -1034,7 +1040,7 @@ public class El {
    * @return the current value of the style attribute for this element.
    */
   public String getStyleAttribute(String attr) {
-    return Ext.callString(dom, "getStyle", attr);
+    return XElement.fly(dom).getStyleAttribute(attr);
   }
 
   /**
@@ -1043,7 +1049,7 @@ public class El {
    * @return the style width
    */
   public int getStyleHeight() {
-    String h = getStyleAttribute("height");
+    String h = dom.getStyle().getProperty("height");
     if (h == null || h.equals("")) return 0;
     if (h.matches("(auto|em|%|en|ex|pt|in|cm|mm|pc)")) {
       return 0;
@@ -1080,7 +1086,7 @@ public class El {
    * @return the style width
    */
   public int getStyleWidth() {
-    String w = getStyleAttribute("width");
+    String w = dom.getStyle().getProperty("width");
     if (w == null || w.equals("")) return 0;
     if (w.matches("(auto|em|%|en|ex|pt|in|cm|mm|pc)")) {
       return 0;
@@ -1134,7 +1140,7 @@ public class El {
    * @return the top value
    */
   public int getTop(boolean local) {
-    return Ext.callInt(dom, "getTop", local ? "true" : "false");
+    return XElement.fly(dom).getTop(local);
   }
 
   /**
@@ -1152,7 +1158,7 @@ public class El {
    * @return the width
    */
   public int getWidth() {
-    return DOM.getElementPropertyInt(dom, "offsetWidth");
+    return dom.getOffsetWidth();
   }
 
   /**
@@ -1185,13 +1191,9 @@ public class El {
    * 
    * @return the location
    */
-  public native Point getXY() /*-{
-      var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-      $wnd.dom = dom;
-      var xy = $wnd.GXT._el.fly(dom).getXY();
-      var p = @com.extjs.gxt.ui.client.util.Point::newInstance(II)(xy[0],xy[1]);
-      return p;
-      }-*/;
+  public Point getXY() {
+    return XElement.fly(dom).getXY();
+  }
 
   /**
    * Gets the current Y position of the element based on page coordinates.
@@ -1199,7 +1201,7 @@ public class El {
    * @return the y position of the element
    */
   public int getY() {
-    return DOM.getAbsoluteTop(dom);
+    return dom.getAbsoluteTop();
   }
 
   /**
@@ -1275,6 +1277,13 @@ public class El {
     return this;
   }
 
+  /**
+   * Inserts the children at the specified index.
+   * 
+   * @param children the children to add
+   * @param index the insert location
+   * @return this
+   */
   public El insertChild(Element[] children, int index) {
     for (int i = children.length - 1; i >= 0; i--) {
       DOM.insertChild(dom, children[i], index);
@@ -1293,6 +1302,12 @@ public class El {
     return this;
   }
 
+  /**
+   * Inserts the children.
+   * 
+   * @param elems the child elements
+   * @return this
+   */
   public El insertFirst(Element[] elems) {
     for (int i = 0; i < elems.length; i++) {
       DOM.appendChild(dom, elems[i]);
@@ -1442,12 +1457,11 @@ public class El {
    * @return true if visible
    */
   public boolean isVisible(boolean blockOnly) {
-    String v = getStyleAttribute("visibility");
-    String d = getStyleAttribute("display");
+    String d = dom.getStyle().getProperty("display");
     if (blockOnly) {
       return d != null && d.equals("block");
     }
-
+    String v = dom.getStyle().getProperty("visibility");
     if (v != null && v.equals("hidden")) {
       return false;
     } else if (d != null && d.equals("none")) {
@@ -1548,8 +1562,8 @@ public class El {
 
     appendChild(_maskMsg.dom);
 
-    if (GXT.isIE && !(GXT.isIE && GXT.isStrict)) {
-      _mask.setWidth(getClientWidth());
+    if (GXT.isIE && !(GXT.isIE && GXT.isStrict) && "auto".equals(getStyleAttribute("height"))) {
+      _mask.setSize(getClientWidth(), getHeight());
     }
 
     _maskMsg.center(dom);
@@ -1574,8 +1588,8 @@ public class El {
    * @return the xy page offsets
    */
   public Point offsetsTo(Element to) {
-    Point o = El.fly(dom).getXY();
-    Point e = El.fly(to).getXY();
+    Point o = XElement.fly(dom).getXY();
+    Point e = XElement.fly(to).getXY();
     return new Point(o.x - e.x, o.y - e.y);
   }
 
@@ -1637,7 +1651,7 @@ public class El {
    * @return this
    */
   public El removeStyleName(String style) {
-    Ext.call(dom, "removeClass", style);
+    XElement.fly(dom).removeStyleName(style);
     return this;
   }
 
@@ -1662,38 +1676,38 @@ public class El {
    * @param hscroll <code>false</code> to disable horizontal scrolling.
    */
   public native void scrollIntoView(Element container, boolean hscroll) /*-{
-      var elem = this.@com.extjs.gxt.ui.client.core.El::dom;
-      var c = container || $doc.body;
-      var o = this.@com.extjs.gxt.ui.client.core.El::offsetsTo(Lcom/google/gwt/user/client/Element;)(container);
-      var l = o.@com.extjs.gxt.ui.client.util.Point::x;
-      var t = o.@com.extjs.gxt.ui.client.util.Point::y;
-      l = l + c.scrollLeft;
-      t = t + c.scrollTop;
-      var b = t + elem.offsetHeight;
-      var r = l + elem.offsetWidth;
-      
-      var ch = c.clientHeight;
-      var ct = parseInt(c.scrollTop, 10);
-      var cl = parseInt(c.scrollLeft, 10);
-      var cb = ct + ch;
-      var cr = cl + c.clientWidth;
-      
-      if (t < ct){
-      c.scrollTop = t;
-      }else if(b > cb){
-      c.scrollTop = b-ch;
-      }
-      c.scrollTop = c.scrollTop; 
-      
-      if(hscroll !== false){
-      if(l < cl){
-      c.scrollLeft = l;
-      } else if(r > cr){
-      c.scrollLeft = r-c.clientWidth;
-      }
-      c.scrollLeft = c.scrollLeft;
-      }
-      }-*/;
+     var elem = this.@com.extjs.gxt.ui.client.core.El::dom;
+     var c = container || $doc.body;
+     var o = this.@com.extjs.gxt.ui.client.core.El::offsetsTo(Lcom/google/gwt/user/client/Element;)(container);
+     var l = o.@com.extjs.gxt.ui.client.util.Point::x;
+     var t = o.@com.extjs.gxt.ui.client.util.Point::y;
+     l = l + c.scrollLeft;
+     t = t + c.scrollTop;
+     var b = t + elem.offsetHeight;
+     var r = l + elem.offsetWidth;
+     
+     var ch = c.clientHeight;
+     var ct = parseInt(c.scrollTop, 10);
+     var cl = parseInt(c.scrollLeft, 10);
+     var cb = ct + ch;
+     var cr = cl + c.clientWidth;
+     
+     if (t < ct){
+       c.scrollTop = t;
+     }else if(b > cb){
+       c.scrollTop = b-ch;
+     }
+     c.scrollTop = c.scrollTop; 
+     
+     if(hscroll !== false){
+       if(l < cl){
+         c.scrollLeft = l;
+       } else if(r > cr){
+         c.scrollLeft = r-c.clientWidth;
+       }
+       c.scrollLeft = c.scrollLeft;
+     }
+   }-*/;
 
   /**
    * Scrolls this element the specified scroll point.
@@ -1884,18 +1898,18 @@ public class El {
    * @param focus the new focus state
    */
   public native El setFocus(boolean focus) /*-{
-      var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-      try {
-      if (focus) {
-      dom.focus();
-      } else {
-      dom.blur();
-      }
-      } 
-      catch(err) {
-      }
-      return this;
-      }-*/;
+     var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+     try {
+       if (focus) {
+         dom.focus();
+       } else {
+         dom.blur();
+       }
+     } 
+     catch(err) {
+     }
+     return this;
+   }-*/;
 
   /**
    * Sets the elements height.
@@ -1922,7 +1936,7 @@ public class El {
     if (adjust && !XDOM.isVisibleBox) {
       height -= getFrameWidth("tb");
     }
-    setStyleAttribute("height", height + "px");
+    dom.getStyle().setPropertyPx("height", height);
     return this;
   }
 
@@ -1946,7 +1960,7 @@ public class El {
     if (Util.isImagePath(style)) {
       setStyleAttribute("backgroundImage", "url(" + style + ")");
     } else {
-      setStyleName(style);
+      dom.setClassName(style);
     }
   }
 
@@ -1957,7 +1971,7 @@ public class El {
    * @return this
    */
   public El setId(String id) {
-    DOM.setElementProperty(dom, "id", id);
+    dom.setId(id);
     return this;
   }
 
@@ -2147,7 +2161,7 @@ public class El {
    * @return this
    */
   public El setStyleName(String style) {
-    DOM.setElementProperty(dom, "className", style);
+    dom.setClassName(style);
     return this;
   }
 
@@ -2198,7 +2212,7 @@ public class El {
    * @return this
    */
   public El setTitle(String title) {
-    DOM.setElementProperty(dom, "title", title);
+    dom.setTitle(title);
     return this;
   }
 
@@ -2210,7 +2224,7 @@ public class El {
    * @return this
    */
   public El setTop(int top) {
-    DOM.setStyleAttribute(dom, "top", top + "px");
+    dom.getStyle().setPropertyPx("top", top);
     return this;
   }
 
@@ -2367,11 +2381,10 @@ public class El {
    * @param y the y coordinate
    * @return this
    */
-  public native El setY(int y) /*-{
-      var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-      $wnd.GXT._el.fly(dom).setY(y);
-      return this;
-      }-*/;
+  public El setY(int y) {
+    XElement.fly(dom).setY(y);
+    return this;
+  }
 
   /**
    * Sets the element's z-index.

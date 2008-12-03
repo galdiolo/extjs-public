@@ -24,68 +24,68 @@ public class GridEvent extends BoxComponentEvent {
   /**
    * The column index.
    */
-  public int colIndex;
-  
+  public int colIndex = -1;
+
   /**
    * The row index.
    */
-  public int rowIndex;
-  
+  public int rowIndex = -1;
+
   /**
    * The source grid.
    */
   public Grid grid;
-  
+
   /**
    * The scroll left value.
    */
   public int scrollLeft;
-  
+
   /**
    * The scroll top value.
    */
   public int scrollTop;
-  
+
   /**
    * SortInfo value.
    */
   public SortInfo sortInfo;
-  
+
   /**
    * The width.
    */
   public int width;
-  
+
   /**
    * The model.
    */
   public ModelData model;
-  
+
   /**
    * The property name.
    */
   public String property;
-  
+
   /**
    * The context menu.
    */
   public Menu menu;
-  
+
   /**
    * The record.
    */
   public Record record;
-  
+
   /**
    * The value.
    */
   public Object value;
-  
+
   /**
-   * The start value. 
+   * The start value.
    */
   public Object startValue;
-  
+
   public GridEvent(Grid grid) {
     super(grid);
     this.grid = grid;

@@ -34,11 +34,11 @@ public class DateWrapper {
       this.jsCode = jsCode;
     }
   }
-  
+
   static {
     GXT.init();
   }
-  
+
   protected static String format(float date, String format) {
     long d = new Float(date).longValue();
     return DateTimeFormat.getFormat(format).format(new Date(d));
@@ -49,16 +49,16 @@ public class DateWrapper {
    * means that long can't be used over jsni.. must use double
    */
   private static native JavaScriptObject createDate(double time) /*-{
-      return new Date(time);
-    }-*/;
+       return new Date(time);
+     }-*/;
 
   /**
    * GWT introduced long emulation to support true 64 bit longs, however this
    * means that long can't be used over jsni.. must use double
    */
   private static native JavaScriptObject createDate(int year, int month, int day) /*-{
-    return new Date(year, month, day);
-  }-*/;
+     return new Date(year, month, day);
+   }-*/;
 
   // the wrapped javascript Date instance
   final JavaScriptObject jsDate;
@@ -208,7 +208,6 @@ public class DateWrapper {
     return dateWrapper == null || getTime() < dateWrapper.getTime();
   }
 
-
   /**
    * Returns a new instance with the time portion
    * (hours/minutes/seconds/milliseconds) cleared.
@@ -340,7 +339,7 @@ public class DateWrapper {
   public int getSeconds() {
     return (int) call("getSeconds");
   }
-  
+
   /**
    * Returns the time in milliseconds.
    * 
@@ -360,17 +359,17 @@ public class DateWrapper {
    * means that long can't be used over jsni.. must use double
    */
   private native JavaScriptObject addInternal(String interval, double value) /*-{
-    return this.@com.extjs.gxt.ui.client.util.DateWrapper::jsDate.add(interval, value);
-  }-*/;
+     return this.@com.extjs.gxt.ui.client.util.DateWrapper::jsDate.add(interval, value);
+   }-*/;
 
   /**
    * GWT introduced long emulation to support true 64 bit longs, however this
    * means that long can't be used over jsni.. must use double
    */
   private native double call(String method) /*-{
-    var d = this.@com.extjs.gxt.ui.client.util.DateWrapper::jsDate;
-    return d[method]();
-  }-*/;
+     var d = this.@com.extjs.gxt.ui.client.util.DateWrapper::jsDate;
+     return d[method]();
+   }-*/;
 
   private DateWrapper callAndWrap(String method) {
     return new DateWrapper((long) callGetTime(method));
@@ -381,16 +380,16 @@ public class DateWrapper {
    * means that long can't be used over jsni.. must use double
    */
   private native double callGetTime(String method) /*-{
-    var d = this.@com.extjs.gxt.ui.client.util.DateWrapper::jsDate;
-    return d[method]().getTime();
-  }-*/;
+     var d = this.@com.extjs.gxt.ui.client.util.DateWrapper::jsDate;
+     return d[method]().getTime();
+   }-*/;
 
   /**
    * GWT introduced long emulation to support true 64 bit longs, however this
    * means that long can't be used over jsni.. must use double
    */
   private native JavaScriptObject clearTimeInternal() /*-{
-    return this.@com.extjs.gxt.ui.client.util.DateWrapper::jsDate.clearTime(true);
-  }-*/;
+     return this.@com.extjs.gxt.ui.client.util.DateWrapper::jsDate.clearTime(true);
+   }-*/;
 
 }

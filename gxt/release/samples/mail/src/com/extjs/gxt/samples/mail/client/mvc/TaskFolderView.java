@@ -34,7 +34,7 @@ public class TaskFolderView extends View {
         break;
     }
   }
-  
+
   @Override
   protected void initialize() {
 
@@ -49,7 +49,7 @@ public class TaskFolderView extends View {
       }
     });
 
-    ContentPanel west = (ContentPanel) Registry.get("west");
+    ContentPanel west = (ContentPanel) Registry.get(AppView.WEST_PANEL);
     west.add(tasks);
   }
 }

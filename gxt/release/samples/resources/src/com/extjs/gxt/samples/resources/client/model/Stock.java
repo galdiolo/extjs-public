@@ -10,15 +10,12 @@ package com.extjs.gxt.samples.resources.client.model;
 import java.util.Date;
 
 import com.extjs.gxt.ui.client.data.BaseModel;
-import com.google.gwt.i18n.client.DateTimeFormat;
 
 public class Stock extends BaseModel {
-  
-  private static DateTimeFormat format = DateTimeFormat.getFormat("M/d h:mma");
 
   public Stock() {
   }
-  
+
   public Stock(String name, String symbol, double open, double last) {
     set("name", name);
     set("symbol", symbol);
@@ -28,12 +25,12 @@ public class Stock extends BaseModel {
     set("change", last - open);
   }
 
-  public Stock(String name, double open, double change, double pctChange, String date, String industry) {
+  public Stock(String name, double open, double change, double pctChange, Date date, String industry) {
     set("name", name);
     set("open", open);
     set("change", change);
     set("percentChange", pctChange);
-    set("date", format.parse(date));
+    set("date", date);
     set("industry", industry);
   }
 

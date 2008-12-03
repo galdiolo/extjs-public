@@ -7,10 +7,18 @@
  */
 package com.extjs.gxt.ui.client.event;
 
-
-
 /**
  * Abstract base class for objects that register listeners and fire events.
+ * 
+ * <pre>
+    Observable observable = new BaseObservable();
+    observable.addListener(Events.Select, new Listener&lt;BaseEvent>() {
+      public void handleEvent(BaseEvent be) {
+
+      }
+    });
+    observable.fireEvent(Events.Select, new BaseEvent()); 
+ * </pre>
  * 
  * @see Listener
  * @see BaseEvent

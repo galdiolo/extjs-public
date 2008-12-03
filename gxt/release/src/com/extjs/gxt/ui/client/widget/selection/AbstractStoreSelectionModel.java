@@ -15,13 +15,15 @@ import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseObservable;
+import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.event.SelectionEvent;
+import com.extjs.gxt.ui.client.event.SelectionProvider;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.store.StoreEvent;
 import com.extjs.gxt.ui.client.store.StoreListener;
 
 /**
- * Abstract store selection model.
+ * Abstract base class for store based selection models.
  * 
  * <dl>
  * <dt><b>Events:</b></dt>
@@ -35,7 +37,8 @@ import com.extjs.gxt.ui.client.store.StoreListener;
  * </dd>
  * 
  * <dd><b>BeforeSelect</b> : SelectionEvent(source, model)<br>
- * <div>Fires before a row is selected.</div>
+ * <div>Fires before a row is selected. Listeners can set the <code>doit</code>
+ * field to <code>false</code> to cancel the operation.</div>
  * <ul>
  * <li>source : this</li>
  * <li>model : the selected item</li>
@@ -43,10 +46,10 @@ import com.extjs.gxt.ui.client.store.StoreListener;
  * </ul>
  * </dd>
  * 
- * @param <M> the model type
+ * @param <M> the model type contained within the store
  */
 public abstract class AbstractStoreSelectionModel<M extends ModelData> extends BaseObservable
-    implements StoreSelectionModel<M> {
+    implements StoreSelectionModel<M>, SelectionProvider<M> {
 
   protected ListStore<M> store;
   protected SelectionMode selectionMode = SelectionMode.MULTI;
@@ -56,9 +59,13 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
 
   protected StoreListener<M> storeListener = new StoreListener<M>() {
     @Override
+    public void storeAdd(StoreEvent<M> se) {
+      onAdd(se.models);
+    }
+
+    @Override
     public void storeClear(StoreEvent<M> se) {
-      selected.clear();
-      lastSelected = null;
+      onClear(se);
     }
 
     @Override
@@ -67,6 +74,10 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     }
 
   };
+
+  public void addSelectionChangedListener(SelectionChangedListener listener) {
+    addListener(Events.SelectionChange, listener);
+  }
 
   public void bind(ListStore store) {
     if (this.store != null) {
@@ -120,6 +131,10 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     return new ArrayList(selected);
   }
 
+  public List<M> getSelection() {
+    return getSelectedItems();
+  }
+
   public SelectionMode getSelectionMode() {
     return selectionMode;
   }
@@ -160,14 +175,24 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     }
   }
 
+  public void removeSelectionListener(SelectionChangedListener listener) {
+    removeListener(Events.SelectionChange, listener);
+  }
+
   public void select(int index) {
     select(index, index);
   }
 
   public void select(int start, int end) {
     List<M> sel = new ArrayList<M>();
-    for (int i = start; i <= end; i++) {
-      sel.add(store.getAt(i));
+    if (start <= end) {
+      for (int i = start; i <= end; i++) {
+        sel.add(store.getAt(i));
+      }
+    } else {
+      for (int i = start; i >= end; i--) {
+        sel.add(store.getAt(i));
+      }
     }
     doSelect(sel, false, false);
   }
@@ -196,6 +221,10 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
    */
   public void setLocked(boolean locked) {
     this.locked = locked;
+  }
+
+  public void setSelection(List<M> selection) {
+    select(selection);
   }
 
   public void setSelectionMode(SelectionMode selectionMode) {
@@ -228,6 +257,11 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
       doDeselect(new ArrayList<M>(selected), true);
     }
     for (M m : models) {
+      SelectionEvent e = new SelectionEvent(this, m);
+      e.index = store.indexOf(m);
+      if (!fireEvent(Events.BeforeSelect, e)) {
+        continue;
+      }
       change = true;
       onSelectChange(m, true);
       lastSelected = m;
@@ -258,7 +292,7 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     if (!fireEvent(Events.BeforeSelect, e)) {
       return;
     }
-    
+
     if (isSelected(model)) {
       return;
     }
@@ -277,6 +311,15 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     if (change && !supressEvent) {
       fireSelectionChange();
     }
+  }
+
+  protected void onAdd(List<M> models) {
+
+  }
+
+  protected void onClear(StoreEvent<M> se) {
+    selected.clear();
+    lastSelected = null;
   }
 
   protected void onRemove(M model) {

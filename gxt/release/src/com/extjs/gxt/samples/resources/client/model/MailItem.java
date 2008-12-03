@@ -41,7 +41,7 @@ public class MailItem extends BaseModel {
   public String getEmail() {
     return (String) get("email");
   }
-  
+
   public String getBody() {
     return (String) get("body");
   }

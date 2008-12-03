@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.samples.client.ExampleServiceAsync;
+import com.extjs.gxt.samples.client.Examples;
 import com.extjs.gxt.samples.client.examples.model.Post;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -35,8 +36,8 @@ public class PagingGridExample extends LayoutContainer {
   @Override
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
-    
-    final ExampleServiceAsync service = (ExampleServiceAsync) Registry.get("service");
+
+    final ExampleServiceAsync service = (ExampleServiceAsync) Registry.get(Examples.SERVICE);
 
     FlowLayout layout = new FlowLayout(10);
     setLayout(layout);

@@ -35,7 +35,7 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
  * <dl>
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>BeforeDataChanged</b> : StoreEvent(store)<br>
+ * <dd><b>Store.BeforeDataChanged</b> : StoreEvent(store)<br>
  * <div>Fires before the store's data is changed. Apply applies when a store is
  * bound to a loader.</div>
  * <ul>
@@ -43,29 +43,29 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
  * </ul>
  * </dd>
  * 
- * <dd><b>DataChange</b> : StoreEvent(store)<br>
+ * <dd><b>Store.DataChange</b> : StoreEvent(store)<br>
  * <div>Fires when the data cache has changed, and a widget which is using this
- * Store as a Record cache should refresh its view.</div>
+ * Store as a ModelData cache should refresh its view.</div>
  * <ul>
  * <li>store : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Filter</b> : StoreEvent(store)<br>
+ * <dd><b>Store.Filter</b> : StoreEvent(store)<br>
  * <div>Fires when filters are applied and removed from the store.</div>
  * <ul>
  * <li>store : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Sort</b> : StoreEvent(store)<br>
+ * <dd><b>Store.Sort</b> : StoreEvent(store)<br>
  * <div>Fires after the store's data has been changed due to sorting.</div>
  * <ul>
  * <li>store : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Add</b> : StoreEvent(store, models, index)<br>
+ * <dd><b>Store.Add</b> : StoreEvent(store, models, index)<br>
  * <div>Fires when models have been added to the store.</div>
  * <ul>
  * <li>store : this</li>
@@ -74,7 +74,7 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
  * </ul>
  * </dd>
  * 
- * <dd><b>Remove</b> : StoreEvent(store, model)<br>
+ * <dd><b>Store.Remove</b> : StoreEvent(store, model)<br>
  * <div>Fires when a model has been removed from the store.</div>
  * <ul>
  * <li>store : this</li>
@@ -83,7 +83,7 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
  * </ul>
  * </dd>
  * 
- * <dd><b>Update</b> : StoreEvent(store, model, record)<br>
+ * <dd><b>Store.Update</b> : StoreEvent(store, model, record)<br>
  * <div>Fires when a model has been updated via its record.</div>
  * <ul>
  * <li>store : this</li>
@@ -93,7 +93,7 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
  * </ul>
  * </dd>
  * 
- * <dd><b>Clear</b> : StoreEvent(store)<br>
+ * <dd><b>Store.Clear</b> : StoreEvent(store)<br>
  * <div>Fires when the data cache has been cleared.</div>
  * <ul>
  * <li>store : this</li>
@@ -138,52 +138,6 @@ public class ListStore<M extends ModelData> extends Store<M> {
     });
   }
 
-  protected void onBeforeLoad(LoadEvent le) {
-    fireEvent(BeforeDataChanged, createStoreEvent());
-  }
-
-  protected void onLoad(LoadEvent le) {
-    this.config = (ListLoadConfig)le.config;
-    
-    Object data = le.data;
-    
-    removeAll();
-    
-    if (data instanceof List) {
-      List<M> list = (List) le.data;
-      all = list;
-
-    } else if (data instanceof ListLoadResult) {
-      all = ((ListLoadResult) data).getData();
-    }
-    
-    for (M m : all) {
-      registerModel(m);
-    }
-
-    if (le.config instanceof ListLoadConfig) {
-      ListLoadConfig config = (ListLoadConfig) le.config;
-      if (config.getSortInfo().getSortField() != null) {
-        sortInfo = config.getSortInfo();
-      } else {
-        sortInfo = new SortInfo();
-      }
-    }
-
-    if (filtersEnabled) {
-      filtersEnabled = false;
-      applyFilters(filterProperty);
-    }
-    if (storeSorter != null) {
-      applySort(true);
-    }
-    fireEvent(DataChanged, createStoreEvent());
-  }
-
-  protected void onLoadException(LoadEvent le) {
-    throw new RuntimeException(le.exception);
-  }
-
   /**
    * Adds the models to the store and fires the <i>Add</i> event.
    * 
@@ -211,7 +165,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
   public M getAt(int index) {
     return index < all.size() ? all.get(index) : null;
   }
-
+  
   /**
    * Gets the number of cached records.
    * 
@@ -219,6 +173,15 @@ public class ListStore<M extends ModelData> extends Store<M> {
    */
   public int getCount() {
     return all.size();
+  }
+
+  /**
+   * Returns the store's last processed load config if available.
+   * 
+   * @return the load config
+   */
+  public ListLoadConfig getLoadConfig() {
+    return config;
   }
 
   /**
@@ -369,7 +332,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
    */
   public void sort(String field, SortDir sortDir) {
     SortInfo prev = new SortInfo(sortInfo.getSortField(), sortInfo.getSortDir());
-    
+
     if (sortDir == null) {
       if (sortInfo.getSortField() != null && !sortInfo.getSortField().equals(field)) {
         sortInfo.setSortDir(SortDir.NONE);
@@ -383,7 +346,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
           sortDir = SortDir.ASC;
           break;
       }
-      
+
     }
 
     sortInfo.setSortField(field);
@@ -427,19 +390,6 @@ public class ListStore<M extends ModelData> extends Store<M> {
       }
     }
   }
-  
-  protected void sortData(final String field, SortDir direction) {
-    direction = direction == null ? SortDir.ASC : direction;
-    storeSorter = storeSorter == null ? new StoreSorter() : storeSorter;
-    Collections.sort(all, new Comparator<M>() {
-      public int compare(M m1, M m2) {
-        return storeSorter.compare(ListStore.this, m1, m2, field);
-      }
-    });
-    if (direction == SortDir.DESC) {
-      Collections.reverse(all);
-    }
-  }
 
   protected void insert(List<M> items, int index, boolean supressEvent) {
     if (storeSorter != null) {
@@ -468,6 +418,65 @@ public class ListStore<M extends ModelData> extends Store<M> {
       }
     }
 
+  }
+
+  protected void onBeforeLoad(LoadEvent le) {
+    fireEvent(BeforeDataChanged, createStoreEvent());
+  }
+
+  protected void onLoad(LoadEvent le) {
+    this.config = (ListLoadConfig) le.config;
+
+    Object data = le.data;
+
+    removeAll();
+
+    if (data instanceof List) {
+      List<M> list = (List) le.data;
+      all = list;
+
+    } else if (data instanceof ListLoadResult) {
+      all = ((ListLoadResult) data).getData();
+    }
+
+    for (M m : all) {
+      registerModel(m);
+    }
+
+    if (le.config instanceof ListLoadConfig) {
+      ListLoadConfig config = (ListLoadConfig) le.config;
+      if (config.getSortInfo().getSortField() != null) {
+        sortInfo = config.getSortInfo();
+      } else {
+        sortInfo = new SortInfo();
+      }
+    }
+
+    if (filtersEnabled) {
+      filtersEnabled = false;
+      applyFilters(filterProperty);
+    }
+    if (storeSorter != null) {
+      applySort(true);
+    }
+    fireEvent(DataChanged, createStoreEvent());
+  }
+
+  protected void onLoadException(LoadEvent le) {
+    throw new RuntimeException(le.exception);
+  }
+
+  protected void sortData(final String field, SortDir direction) {
+    direction = direction == null ? SortDir.ASC : direction;
+    storeSorter = storeSorter == null ? new StoreSorter() : storeSorter;
+    Collections.sort(all, new Comparator<M>() {
+      public int compare(M m1, M m2) {
+        return storeSorter.compare(ListStore.this, m1, m2, field);
+      }
+    });
+    if (direction == SortDir.DESC) {
+      Collections.reverse(all);
+    }
   }
 
 }

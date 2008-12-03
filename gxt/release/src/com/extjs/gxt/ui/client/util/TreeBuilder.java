@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.ui.client.util;
 
-
 import com.extjs.gxt.ui.client.data.TreeModel;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.tree.Tree;
@@ -21,7 +20,7 @@ import com.google.gwt.user.client.Element;
  * @see Tree
  */
 public class TreeBuilder {
-  
+
   /**
    * Populates a tree from existing dom elements. The tree item text is taken
    * from the 'title' attribute of the element.

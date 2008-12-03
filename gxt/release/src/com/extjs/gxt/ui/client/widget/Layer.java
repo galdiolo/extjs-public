@@ -14,7 +14,6 @@ import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.util.Size;
-import com.extjs.gxt.ui.client.widget.Shadow.ShadowPosition;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -27,7 +26,7 @@ public class Layer extends El {
 
   private static Stack<El> shims = new Stack<El>();
 
-  private Shadow shadow = new Shadow(ShadowPosition.DROP);
+  private Shadow shadow;
   private El shim;
   private boolean shimEnabled;
   private boolean shadowEnabled;
@@ -72,8 +71,12 @@ public class Layer extends El {
     if (GXT.isIE && GXT.isSecure) {
       el.dom.setPropertyString("src", GXT.SSL_SECURE_URL);
     }
-    getParent().insertBefore(el.dom, dom);
+    XDOM.getBody().appendChild(el.dom);
     return el;
+  }
+
+  public void destroy() {
+    hideUnders(true);
   }
 
   /**
@@ -93,13 +96,14 @@ public class Layer extends El {
    */
   public void enableShadow(boolean show) {
     shadowEnabled = show;
+
     if (shadow != null) {
       if (show) {
         sync(true);
       } else {
         hideShadow();
       }
-    } else {
+    } else if (show) {
       shadow = Shadow.pop();
     }
   }
@@ -125,20 +129,13 @@ public class Layer extends El {
     }
     El pn = getParent();
     El p = shim.getParent();
-    if (pn.dom != p.dom) {
+    if (p.dom == XDOM.getBody()) {
+      pn.insertChild(shim.dom, 0);
+    } else if (pn.dom != p.dom) {
       pn.insertBefore(shim.dom, dom);
     }
     shim.setStyleAttribute("zIndex", Math.max(0, getZIndex() - 1));
     return shim;
-  }
-
-  @Override
-  public El updateZIndex(int adj) {
-    super.updateZIndex(adj);
-    if (shim != null) {
-      shim.setZIndex(Math.max(0, XDOM.getTopZIndex() - 2));
-    }
-    return this;
   }
 
   /**
@@ -156,7 +153,7 @@ public class Layer extends El {
   public void hideShim() {
     if (shim != null) {
       shim.setVisible(false);
-      shim.removeFromParent();
+//      shim.removeFromParent();
       shims.push(shim);
       shim = null;
     }
@@ -207,6 +204,13 @@ public class Layer extends El {
   @Override
   public El setSize(Size size) {
     super.setSize(size);
+    sync(false);
+    return this;
+  }
+
+  @Override
+  public El setTop(int top) {
+    super.setTop(top);
     sync(false);
     return this;
   }
@@ -298,7 +302,8 @@ public class Layer extends El {
             shim = getShim();
           }
           shim.setVisible(true);
-          Rectangle a = shadow.adjusts;
+
+          Rectangle a = shadow == null ? null : shadow.adjusts;
           if (a == null) a = new Rectangle(0, 0, 0, 0);
 
           try {
@@ -316,8 +321,13 @@ public class Layer extends El {
     }
   }
 
-  public void destroy() {
-    hideUnders(true);
+  @Override
+  public El updateZIndex(int adj) {
+    super.updateZIndex(adj);
+    if (shim != null) {
+      shim.setZIndex(Math.max(0, XDOM.getTopZIndex() - 2));
+    }
+    return this;
   }
 
   private void hideUnders(boolean hide) {

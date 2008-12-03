@@ -20,7 +20,7 @@ public class FxConfig {
   private Listener<FxEvent> effectStartListener;
   private Listener<FxEvent> effectCompleteListener;
   private int duration;
-  
+
   public FxConfig() {
 
   }

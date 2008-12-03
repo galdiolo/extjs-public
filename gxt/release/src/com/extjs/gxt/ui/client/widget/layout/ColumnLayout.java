@@ -54,7 +54,7 @@ public class ColumnLayout extends Layout {
   public void setAdjustForScroll(boolean adjustForScroll) {
     this.adjustForScroll = adjustForScroll;
   }
-  
+
   @Override
   protected void onLayout(Container container, El target) {
     if (innerCt == null) {
@@ -88,7 +88,7 @@ public class ColumnLayout extends Layout {
     for (int i = 0; i < count; i++) {
       Component c = container.getItem(i);
       ColumnData data = (ColumnData) getLayoutData(c);
-      if (data.getWidth() < 1) {
+      if (data.getWidth() <= 1) {
         setSize(c, (int) (data.getWidth() * pw), -1);
       } else {
         setSize(c, (int) data.getWidth(), -1);

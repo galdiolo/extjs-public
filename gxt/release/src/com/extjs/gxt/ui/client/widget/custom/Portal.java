@@ -36,9 +36,10 @@ import com.google.gwt.user.client.Element;
  * <dl>
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>ValidateDrop</b> : PortalEvent(portal, startColumn, startRow,
- * column, row)<br>
- * <div>Fires before a dragged portlet can be inserted into a new location.</div>
+ * <dd><b>ValidateDrop</b> : PortalEvent(portal, startColumn, startRow, column,
+ * row)<br>
+ * <div>Fires before a dragged portlet can be inserted into a new
+ * location.</div>
  * <ul>
  * <li>portal : this</li>
  * <li>portlet : the portlet being dragged</li>
@@ -131,12 +132,30 @@ public class Portal extends Container<LayoutContainer> {
    * @param column the column to insert into
    */
   public void add(Portlet portlet, int column) {
-    Draggable d = new Draggable(portlet, portlet.getHeader());
+    insert(portlet, columns.get(column).getItemCount(), column);
+  }
+
+  /**
+   * Inserts a portlet.
+   * 
+   * @param portlet the portlet to add
+   * @param index the insert index
+   * @param column the column to insert into
+   */
+  public void insert(Portlet portlet, int index, int column) {
+    Draggable d = portlet.getData("gxt.draggable");
+    if (d == null) {
+      d = new Draggable(portlet, portlet.getHeader());
+      portlet.setData("gxt.draggable", d);
+    }
     d.setUseProxy(true);
+    d.removeDragListener(listener);
     d.addDragListener(listener);
     d.setMoveAfterProxyDrag(false);
     d.setSizeProxyToSource(true);
-    columns.get(column).add(portlet, new RowData(1, -1));
+    d.setEnabled(!portlet.isPinned());
+    columns.get(column).insert(portlet, index, new RowData(1, -1));
+    columns.get(column).layout();
   }
 
   /**
@@ -146,6 +165,7 @@ public class Portal extends Container<LayoutContainer> {
    * @param column the column
    */
   public void remove(Portlet portlet, int column) {
+    portlet.setData("gxt.draggable", null);
     columns.get(column).remove(portlet);
   }
 
@@ -202,10 +222,10 @@ public class Portal extends Container<LayoutContainer> {
 
   protected void onDragMove(DragEvent de) {
     active.setVisible(false);
-    
+
     int col = getColumn(de.getClientX());
     int row = getRowPosition(col, de.getClientY());
-    
+
     if (col != insertCol || row != insertRow) {
       PortalEvent pe = new PortalEvent(this, active, startCol, startRow, col, row);
       if (fireEvent(Events.ValidateDrop, pe)) {
@@ -291,9 +311,10 @@ public class Portal extends Container<LayoutContainer> {
 
   private void onDragStart(DragEvent de) {
     active = (Portlet) de.component;
-    
+
     if (dummy == null) {
-      dummy = new El(XDOM.create("<div class='x-portal-insert' style='margin-bottom: 10px'><div></div></div>"));
+      dummy = new El(
+          XDOM.create("<div class='x-portal-insert' style='margin-bottom: 10px'><div></div></div>"));
       dummy.setStyleName("x-portal-insert");
     }
 
@@ -310,7 +331,6 @@ public class Portal extends Container<LayoutContainer> {
     }
     startCol = getColumn(de.getClientX());
     startRow = getRow(startCol, de.getClientY());
-    
-    
+
   }
 }

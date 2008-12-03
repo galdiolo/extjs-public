@@ -16,6 +16,7 @@ import com.extjs.gxt.ui.client.widget.tree.Tree;
 import com.extjs.gxt.ui.client.widget.tree.TreeItem;
 import com.extjs.gxt.ui.client.widget.tree.TreeItemUI;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Event;
 
 /**
  * A item in a <code>TreeTable</code>. All events are bubbled to the item's
@@ -218,18 +219,14 @@ public class TreeTableItem extends TreeItem {
       getUI().handleEvent((TreeTableEvent) ce);
     }
 
-    // if (cellToolTip != null) {
-    // cellToolTip.handleEvent(be);
-    // }
-
     switch (ce.type) {
-      case Events.OnClick:
+      case Event.ONCLICK:
         onClick(ce);
         break;
-      case Events.OnDoubleClick:
+      case Event.ONDBLCLICK:
         onDoubleClick(ce);
         break;
-      case Events.OnMouseOver:
+      case Event.ONMOUSEOVER:
         onMouseOver(ce);
         break;
     }
@@ -272,7 +269,6 @@ public class TreeTableItem extends TreeItem {
   public void setCellToolTip(int index, String text) {
     if (toolTips == null) toolTips = new String[values.length];
     toolTips[index] = text;
-    initCellToolTips();
   }
 
   /**
@@ -282,7 +278,6 @@ public class TreeTableItem extends TreeItem {
    */
   public void setCellToolTips(String[] toolTips) {
     this.toolTips = toolTips;
-    initCellToolTips();
   }
 
   /**
@@ -344,13 +339,6 @@ public class TreeTableItem extends TreeItem {
     this.treeTable = treeTable;
   }
 
-  protected void initCellToolTips() {
-    // if (cellToolTip == null && isRendered()) {
-    // cellToolTip = new ToolTip(this);
-    // cellToolTip.setTrackMouse(true);
-    // }
-  }
-
   public void setElement(Element elem) {
     super.setElement(elem);
   }
@@ -366,51 +354,16 @@ public class TreeTableItem extends TreeItem {
     if (index == Style.DEFAULT) {
       return;
     }
-
-    // if (cellToolTip != null) {
-    // if (toolTips != null && toolTips[index] != null &&
-    // toolTips[index].length() > 0) {
-    // cellToolTip.setText(null, toolTips[index]);
-    // cellToolTip.setVisible(true);
-    // } else {
-    // cellToolTip.setVisible(false);
-    // }
-    // }
   }
 
   protected void onClick(ComponentEvent ce) {
-    Element target = ce.getTarget();
-
-    int index = treeTable.getView().getCellIndex(target);
-    if (index == Style.DEFAULT) {
-      return;
-    }
-
-    TreeTableEvent evt = new TreeTableEvent(treeTable);
-    evt.item = this;
-    evt.rowIndex = treeTable.indexOf(this);
-    evt.cellIndex = index;
-    evt.event = ce.event;
-    
-    treeTable.fireEvent(Events.CellClick, evt);
-    treeTable.fireEvent(Events.RowClick, evt);
+    treeTable.fireEvent(Events.CellClick, ce);
+    treeTable.fireEvent(Events.RowClick, ce);
   }
 
   protected void onDoubleClick(ComponentEvent ce) {
-    Element target = ce.getTarget();
-
-    int index = treeTable.getView().getCellIndex(target);
-    if (index == Style.DEFAULT) {
-      return;
-    }
-    TreeTableEvent evt = new TreeTableEvent(treeTable);
-    evt.item = this;
-    evt.event = ce.event;
-    evt.cellIndex = index;
-    evt.rowIndex = treeTable.indexOf(this);
-
-    treeTable.fireEvent(Events.CellDoubleClick, evt);
-    treeTable.fireEvent(Events.RowDoubleClick, evt);
+    treeTable.fireEvent(Events.CellDoubleClick, ce);
+    treeTable.fireEvent(Events.RowDoubleClick, ce);
   }
 
   protected void setTree(Tree tree) {

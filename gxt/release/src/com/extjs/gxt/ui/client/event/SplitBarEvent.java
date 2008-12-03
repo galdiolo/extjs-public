@@ -24,7 +24,7 @@ public class SplitBarEvent extends ComponentEvent {
    * The source split bar.
    */
   public SplitBar splitBar;
-  
+
   /**
    * The drag event.
    */

@@ -31,7 +31,7 @@ public class TaskView extends View {
   @Override
   protected void handleEvent(AppEvent event) {
     if (event.type == AppEvents.NavTasks) {
-      LayoutContainer wrapper = (LayoutContainer) Registry.get("center");
+      LayoutContainer wrapper = (LayoutContainer) Registry.get(AppView.CENTER_PANEL);
       wrapper.removeAll();
       wrapper.add(panel);
       wrapper.layout();

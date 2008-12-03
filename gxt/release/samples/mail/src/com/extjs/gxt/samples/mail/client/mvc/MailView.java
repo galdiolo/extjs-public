@@ -37,14 +37,14 @@ public class MailView extends View {
 
   protected void handleEvent(AppEvent event) {
     if (event.type == AppEvents.NavMail) {
-      LayoutContainer wrapper = (LayoutContainer) Registry.get("center");
+      LayoutContainer wrapper = (LayoutContainer) Registry.get(AppView.CENTER_PANEL);
       wrapper.removeAll();
       wrapper.add(container);
       wrapper.layout();
     }
 
     if (event.type == AppEvents.ViewMailItems) {
-      LayoutContainer wrapper = (LayoutContainer) Registry.get("center");
+      LayoutContainer wrapper = (LayoutContainer) Registry.get(AppView.CENTER_PANEL);
 
       Folder f = (Folder) event.getData("folder");
       mailListPanel.setHeading(f.getName());

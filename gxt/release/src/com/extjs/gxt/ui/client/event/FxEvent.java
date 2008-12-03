@@ -21,7 +21,7 @@ public class FxEvent extends BaseEvent {
    * The source fx.
    */
   public Fx fx;
-  
+
   /**
    * The current effect.
    */

@@ -35,8 +35,8 @@ public class DateField extends TriggerField<Date> {
    */
   public class DateFieldMessages extends TextFieldMessages {
 
-    private String minText = "The date in this field must be equal to or after {0}";
-    private String maxText = "The date in this field must be equal to or before {0}";
+    private String minText;
+    private String maxText;
     private String invalidText;
 
     /**
@@ -79,7 +79,8 @@ public class DateField extends TriggerField<Date> {
 
     /**
      * Sets the error text to display when the date in the cell is after
-     * maxValue (defaults to 'The date in this field must be before {{@link #setMaxValue}').
+     * maxValue (defaults to 'The date in this field must be before {
+     * {@link #setMaxValue}').
      * 
      * @param maxText the max error text
      */
@@ -89,7 +90,8 @@ public class DateField extends TriggerField<Date> {
 
     /**
      * The error text to display when the date in the cell is before minValue
-     * (defaults to 'The date in this field must be after {@link #setMinValue}').
+     * (defaults to 'The date in this field must be after {@link #setMinValue} 
+     * ').
      * 
      * @param minText the min text
      */
@@ -103,6 +105,7 @@ public class DateField extends TriggerField<Date> {
   private Date maxValue;
   private DateMenu menu;
   private BaseEventPreview focusPreview;
+  private boolean formatValue;
 
   /**
    * Creates a new date field.
@@ -114,28 +117,6 @@ public class DateField extends TriggerField<Date> {
     setTriggerStyle("x-form-date-trigger");
   }
 
-  @Override
-  protected void onRender(Element target, int index) {
-    super.onRender(target, index);
-    focusPreview = new BaseEventPreview();
-    
-    new KeyNav(this) {
-      public void onDown(ComponentEvent ce) {
-        if (menu == null || !menu.isAttached()) {
-          expand();
-        }
-      }
-    };
-  }
-
-  private void doBlur(ComponentEvent ce) {
-    if (menu != null && menu.isVisible()) {
-      menu.hide();
-    }
-    super.onBlur(ce);
-    focusPreview.remove();
-  }
-
   /**
    * Returns the field's date picker.
    * 
@@ -144,12 +125,11 @@ public class DateField extends TriggerField<Date> {
   public DatePicker getDatePicker() {
     if (menu == null) {
       menu = new DateMenu();
- 
+
       menu.addListener(Events.Select, new Listener<ComponentEvent>() {
         public void handleEvent(ComponentEvent ce) {
           focusValue = getValue();
           setValue(menu.getDate());
-          fireChangeEvent(focusValue, getValue());
           menu.hide();
           el().blur();
         }
@@ -191,63 +171,24 @@ public class DateField extends TriggerField<Date> {
     return (DateTimePropertyEditor) propertyEditor;
   }
 
-  @Override
-  protected void onBlur(final ComponentEvent ce) {
-    Rectangle rec = trigger.getBounds();
-    if (rec.contains(BaseEventPreview.getLastClientX(), BaseEventPreview.getLastClientY())) {
-      ce.stopEvent();
-      return;
-    }
-    if (menu != null && menu.isVisible()) {
-      return;
-    }
-    hasFocus = false;
-    doBlur(ce);
-  }
-  
-  @Override
-  protected void onFocus(ComponentEvent ce) {
-    super.onFocus(ce);
-    focusPreview.add();
+  /**
+   * Returns true if formatting is enabled.
+   * 
+   * @return the format value state
+   */
+  public boolean isFormatValue() {
+    return formatValue;
   }
 
-  @Override
-  protected void onKeyPress(FieldEvent fe) {
-    super.onKeyPress(fe);
-    int code = fe.event.getKeyCode();
-    if (code == 8 || code == 9) {
-      if (menu != null && menu.isAttached()) {
-        menu.hide();
-      }
-    }
-  }
-  
-  protected void expand() {
-    DatePicker picker = getDatePicker();
-
-    Object v = getValue();
-    Date d = null;
-    if (v instanceof Date) {
-      d = (Date) v;
-    } else {
-      d = new Date();
-    }
-    picker.setValue(d, true);
-    picker.setMinDate(minValue);
-    picker.setMaxDate(maxValue);
-
-    menu.show(wrap.dom, "tl-bl?");
-    menu.focus();
-  }
-
-  @Override
-  protected void onTriggerClick(ComponentEvent ce) {
-    super.onTriggerClick(ce);
-    if (disabled || isReadOnly()) {
-      return;
-    }
-
-    expand();
+  /**
+   * True to format the user entered value using the field's property editor
+   * after passing validation (defaults to false). Format value should not be
+   * enabled when auto validating.
+   * 
+   * @param formatValue true to format the user value
+   */
+  public void setFormatValue(boolean formatValue) {
+    this.formatValue = formatValue;
   }
 
   /**
@@ -277,6 +218,86 @@ public class DateField extends TriggerField<Date> {
   @Override
   public void setRawValue(String value) {
     super.setRawValue(value);
+  }
+
+  protected void expand() {
+    DatePicker picker = getDatePicker();
+
+    Object v = getValue();
+    Date d = null;
+    if (v instanceof Date) {
+      d = (Date) v;
+    } else {
+      d = new Date();
+    }
+    picker.setValue(d, true);
+    picker.setMinDate(minValue);
+    picker.setMaxDate(maxValue);
+
+    menu.show(wrap.dom, "tl-bl?");
+    menu.focus();
+  }
+
+  @Override
+  protected void onBlur(final ComponentEvent ce) {
+    Rectangle rec = trigger.getBounds();
+    if (rec.contains(BaseEventPreview.getLastClientX(), BaseEventPreview.getLastClientY())) {
+      ce.stopEvent();
+      return;
+    }
+    if (menu != null && menu.isVisible()) {
+      return;
+    }
+    hasFocus = false;
+    doBlur(ce);
+  }
+
+  protected void onDown(FieldEvent fe) {
+    fe.cancelBubble();
+    if (menu == null || !menu.isAttached()) {
+      expand();
+    }
+  }
+
+  @Override
+  protected void onFocus(ComponentEvent ce) {
+    super.onFocus(ce);
+    focusPreview.add();
+  }
+
+  @Override
+  protected void onKeyPress(FieldEvent fe) {
+    super.onKeyPress(fe);
+    int code = fe.event.getKeyCode();
+    if (code == 8 || code == 9) {
+      if (menu != null && menu.isAttached()) {
+        menu.hide();
+      }
+    }
+  }
+
+  @Override
+  protected void onRender(Element target, int index) {
+    super.onRender(target, index);
+    focusPreview = new BaseEventPreview();
+
+    new KeyNav<FieldEvent>(this) {
+      public void onDown(FieldEvent fe) {
+        DateField.this.onDown(fe);
+      }
+    };
+  }
+
+  @Override
+  protected void onTriggerClick(ComponentEvent ce) {
+    super.onTriggerClick(ce);
+    if (disabled || isReadOnly()) {
+      return;
+    }
+
+    expand();
+    
+    getInputEl().focus();
   }
 
   @Override
@@ -326,13 +347,25 @@ public class DateField extends TriggerField<Date> {
       if (getMessages().getMaxText() != null) {
         error = Format.substitute(getMessages().getMaxText(), format.format(maxValue));
       } else {
-        error = GXT.MESSAGES.dateField_minText(format.format(maxValue));
+        error = GXT.MESSAGES.dateField_maxText(format.format(maxValue));
       }
       markInvalid(error);
       return false;
     }
 
+    if (formatValue && getPropertyEditor().getFormat() != null) {
+      setRawValue(getPropertyEditor().getFormat().format(date));
+    }
+
     return true;
+  }
+
+  private void doBlur(ComponentEvent ce) {
+    if (menu != null && menu.isVisible()) {
+      menu.hide();
+    }
+    super.onBlur(ce);
+    focusPreview.remove();
   }
 
 }

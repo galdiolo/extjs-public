@@ -9,7 +9,6 @@ package com.extjs.gxt.ui.client.widget.toolbar;
 
 import com.extjs.gxt.ui.client.widget.Component;
 
-
 /**
  * Base class for items contained in a tool bar.
  * 

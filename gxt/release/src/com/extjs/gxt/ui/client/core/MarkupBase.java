@@ -1,3 +1,10 @@
+/*
+ * Ext GWT - Ext for GWT
+ * Copyright(c) 2007, 2008, Ext JS, LLC.
+ * licensing@extjs.com
+ * 
+ * http://extjs.com/license
+ */
 package com.extjs.gxt.ui.client.core;
 
 import com.extjs.gxt.ui.client.GXT;
@@ -9,7 +16,7 @@ public class MarkupBase implements Markup {
   static {
     GXT.init();
   }
-  
+
   private Element rootElement;
 
   public String getHtml() {
@@ -34,14 +41,14 @@ public class MarkupBase implements Markup {
   public Element getRootElement() {
     return rootElement;
   }
-  
+
   public static Element createRootElement(String html) {
     Element rootElement = DOM.createDiv();
     rootElement.setInnerHTML(html);
     if (rootElement.getFirstChild() != null) {
-        rootElement = rootElement.getFirstChildElement().cast();
+      rootElement = rootElement.getFirstChildElement().cast();
     }
     return rootElement;
   }
-  
+
 }

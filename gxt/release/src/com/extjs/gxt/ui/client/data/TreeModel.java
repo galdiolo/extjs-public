@@ -10,8 +10,40 @@ package com.extjs.gxt.ui.client.data;
 import java.util.List;
 
 /**
- * A Model that supports parent and children.
- *
+ * A Model that supports parent and children. Change events bubble to parent
+ * elements.
+ * 
+ * <dl>
+ * <dt><b>Events:</b></dt>
+ * 
+ * <dd><b>Update</b> : ChangeEvent(source)<br>
+ * <div>Fires after the the model is updated.</div>
+ * <ul>
+ * <li>source : this</li>
+ * </ul>
+ * </dd>
+ * 
+ * <dd><b>Add</b> : ChangeEvent(source, parent, item, index)<br>
+ * <div>Fires after a child model is added.</div>
+ * <ul>
+ * <li>source : this (events bubble)</li>
+ * <li>parent : the parent model</li>
+ * <li>item : the item that was added</li>
+ * <li>index : the insert location</li>
+ * </ul>
+ * </dd>
+ * 
+ * <dd><b>Remove</b> : ChangeEvent(source, parent, item)<br>
+ * <div>Fires after a child model is added.</div>
+ * <ul>
+ * <li>source : this (events bubble)</li>
+ * <li>parent : the parent model</li>
+ * <li>item : the item that was removed</li>
+ * </ul>
+ * </dd>
+ * 
+ * </dl>
+ * 
  * @param <T> the tree model type
  */
 public interface TreeModel<T extends TreeModel> extends Model {

@@ -27,11 +27,11 @@ import com.extjs.gxt.ui.client.widget.Layout;
  * </p>
  * <p>
  * The items added to an AnchorLayout can also supply an anchoring-specific
- * layout property (see {@link AnchorData#setAnchorSpec(String)}) which is a string
- * containing two values: the horizontal anchor value and the vertical anchor
- * value (for example, '100% 50%'). This value is what tells the layout how the
- * item should be anchored to the container. The following types of anchor
- * values are supported:
+ * layout property (see {@link AnchorData#setAnchorSpec(String)}) which is a
+ * string containing two values: the horizontal anchor value and the vertical
+ * anchor value (for example, '100% 50%'). This value is what tells the layout
+ * how the item should be anchored to the container. The following types of
+ * anchor values are supported:
  * <ul>
  * <li><b>Percentage</b>:<br>
  * Any value between 1 and 100, expressed as a percentage. The first anchor is
@@ -57,15 +57,15 @@ import com.extjs.gxt.ui.client.widget.Layout;
 public class AnchorLayout extends Layout {
 
   private Size anchorSize;
-  
+
   public AnchorLayout() {
     monitorResize = true;
   }
-  
+
   protected int adjustWidthAnchor(int width, Component comp) {
     return width;
   }
-  
+
   @Override
   protected void onLayout(Container container, El target) {
     super.onLayout(container, target);
@@ -74,7 +74,7 @@ public class AnchorLayout extends Layout {
     Rectangle rect = target.getBounds(true);
     rect.width = size.width;
     rect.height = size.height;
-    
+
     int w = rect.width, h = rect.height;
 
     if (w < 20 || h < 20) {
@@ -82,7 +82,7 @@ public class AnchorLayout extends Layout {
     }
 
     int aw, ah;
-    
+
     if (anchorSize != null) {
       aw = anchorSize.width;
       ah = anchorSize.height;
@@ -110,12 +110,12 @@ public class AnchorLayout extends Layout {
           if (vs.length > 1) {
             ch = parseAnchor(vs[1], h, ah, ah);
           }
-          
+
           cw -= comp.el().getMargins("lr");
           ch -= comp.el().getMargins("tb");
-          
+
           cw = adjustWidthAnchor(cw, comp);
-          
+
           setSize(comp, cw, ch);
         }
       }
@@ -143,12 +143,12 @@ public class AnchorLayout extends Layout {
   }
 
   private native boolean standard(String a) /*-{
-    if(/^(r|right|b|bottom)$/i.test(a)){ 
-      return true;
-    } else {
-      return false;
-    }
-  }-*/;
+     if(/^(r|right|b|bottom)$/i.test(a)){ 
+       return true;
+     } else {
+       return false;
+     }
+   }-*/;
 
   /**
    * Sets a virtual container for the layout to use.

@@ -40,7 +40,7 @@ public class PercentageTablePage extends LayoutContainer implements EntryPoint {
 
   public void onModuleLoad() {
     setStyleAttribute("margin", "8px");
-    
+
     Viewport v = new Viewport();
     v.setLayout(new FillLayout());
     v.add(this);
@@ -133,7 +133,7 @@ public class PercentageTablePage extends LayoutContainer implements EntryPoint {
     // add buttons
     panel.addButton(new Button("Save"));
     panel.addButton(new Button("Cancel"));
-    
+
     add(panel);
 
   }

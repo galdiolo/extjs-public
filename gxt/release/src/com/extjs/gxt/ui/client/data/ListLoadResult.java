@@ -23,5 +23,4 @@ public interface ListLoadResult<Data> {
    */
   public List<Data> getData();
 
-
 }

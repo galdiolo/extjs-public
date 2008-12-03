@@ -10,6 +10,7 @@ package com.extjs.gxt.samples.client.examples.tree;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.extjs.gxt.samples.client.Examples;
 import com.extjs.gxt.samples.client.FileServiceAsync;
 import com.extjs.gxt.samples.client.examples.model.FileModel;
 import com.extjs.gxt.samples.client.examples.model.FolderModel;
@@ -43,7 +44,7 @@ public class TreeTableExample extends LayoutContainer {
 
     setLayout(new FlowLayout(10));
 
-    final FileServiceAsync service = (FileServiceAsync) Registry.get("fileservice");
+    final FileServiceAsync service = (FileServiceAsync) Registry.get(Examples.FILE_SERVICE);
 
     List<TreeTableColumn> columns = new ArrayList<TreeTableColumn>();
 

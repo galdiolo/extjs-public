@@ -16,6 +16,8 @@ import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.store.Record;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 
@@ -82,6 +84,7 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
   private Record activeRecord;
   private Listener<DomEvent> editorListener;
   private Listener<GridEvent> gridListener;
+  private boolean ignoreScroll;
 
   /**
    * Creates a new editor grid.
@@ -128,47 +131,61 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
    * @param row the row index
    * @param col the column index
    */
-  public void startEditing(int row, int col) {
+  public void startEditing(final int row, final int col) {
     stopEditing();
     if (cm.isCellEditble(col)) {
       getView().ensureVisible(row, col, false);
-      M m = store.getAt(row);
+      if (sm instanceof CellSelectionModel) {
+        ((CellSelectionModel) sm).selectCell(row, col);
+      }
+
+      final M m = store.getAt(row);
       activeRecord = store.getRecord(m);
 
-      String field = cm.getDataIndex(col);
+      final String field = cm.getDataIndex(col);
       GridEvent e = new GridEvent(this);
       e.model = m;
       e.property = field;
       e.rowIndex = row;
       e.colIndex = col;
       if (fireEvent(Events.BeforeEdit, e)) {
-        editing = true;
-        CellEditor ed = cm.getEditor(col);
-        ed.row = row;
-        ed.col = col;
+        DeferredCommand.addCommand(new Command() {
         
-        if (!ed.isRendered()) {
-          ed.render((Element)view.getEditorParent());
-        }
+          public void execute() {
+            editing = true;
+            CellEditor ed = cm.getEditor(col);
+            ed.row = row;
+            ed.col = col;
 
-        if (editorListener == null) {
-          editorListener = new Listener<DomEvent>() {
-            public void handleEvent(DomEvent e) {
-              if (e.type == Events.Complete) {
-                EditorEvent ee = (EditorEvent) e;
-                onEditComplete((CellEditor) ee.editor, ee.value, ee.startValue);
-              } else if (e.type == Events.SpecialKey) {
-                ((CellSelectionModel) sm).onEditorKey(e);
-              }
+            if (!ed.isRendered()) {
+              ed.render((Element) view.getEditorParent());
             }
-          };
-        }
 
-        ed.addListener(Events.Complete, editorListener);
-        ed.addListener(Events.SpecialKey, editorListener);
+            if (editorListener == null) {
+              editorListener = new Listener<DomEvent>() {
+                public void handleEvent(DomEvent e) {
+                  if (e.type == Events.Complete) {
+                    EditorEvent ee = (EditorEvent) e;
+                    onEditComplete((CellEditor) ee.editor, ee.value, ee.startValue);
+                  } else if (e.type == Events.SpecialKey) {
+                    ((CellSelectionModel) sm).onEditorKey(e);
+                  }
+                }
+              };
+            }
 
-        activeEditor = ed;
-        ed.startEdit((Element) view.getCell(row, col), m.get(field));
+            ed.addListener(Events.Complete, editorListener);
+            ed.addListener(Events.SpecialKey, editorListener);
+
+            activeEditor = ed;
+            // when inserting the editor into the last row, the body is scrolling
+            // in ie, and edit is being cancelled
+            ignoreScroll = true;
+            ed.startEdit((Element) view.getCell(row, col), m.get(field));
+            ignoreScroll = false;
+          }
+        });
+        
       }
     }
   }
@@ -222,8 +239,8 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
         fireEvent(Events.AfterEdit, ge);
       }
     }
-    
-    getView().focusCell(ed.row, ed.col, true);
+
+    getView().focusCell(ed.row, ed.col, false);
   }
 
   @Override
@@ -234,7 +251,9 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
       public void handleEvent(GridEvent ge) {
         switch (ge.type) {
           case Events.BodyScroll:
-            stopEditing();
+            if (!ignoreScroll) {
+              stopEditing();
+            }
             break;
           case Events.CellClick:
           case Events.CellDoubleClick:

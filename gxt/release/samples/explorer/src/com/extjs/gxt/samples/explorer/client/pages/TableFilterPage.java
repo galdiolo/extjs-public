@@ -93,7 +93,7 @@ public class TableFilterPage extends LayoutContainer implements EntryPoint {
 
     ListStore<Stock> store = new ListStore<Stock>();
     store.add(TestData.getStocks());
-    
+
     TableBinder<Stock> binder = new TableBinder<Stock>(tbl, store);
     binder.init();
 
@@ -111,7 +111,8 @@ public class TableFilterPage extends LayoutContainer implements EntryPoint {
     StoreFilterField<Stock> filterField = new StoreFilterField<Stock>() {
 
       @Override
-      protected boolean doSelect(Store store, Stock parent, Stock record, String property, String filter) {
+      protected boolean doSelect(Store store, Stock parent, Stock record, String property,
+          String filter) {
         String name = record.getName().toString().toLowerCase();
         if (name.startsWith(filter.toLowerCase())) {
           return true;

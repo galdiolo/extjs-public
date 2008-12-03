@@ -52,7 +52,7 @@ public class ButtonAdapter extends Button {
     super.doDetachChildren();
     ComponentHelper.doDetach(widget);
   }
-  
+
   @Override
   protected El getFocusEl() {
     return el();
@@ -62,12 +62,12 @@ public class ButtonAdapter extends Button {
   protected void onDisable() {
 
   }
-  
+
   @Override
   protected void onEnable() {
 
   }
-  
+
   @Override
   protected void onRender(Element target, int index) {
     if (widget instanceof Component) {

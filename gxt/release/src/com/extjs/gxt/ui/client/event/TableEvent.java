@@ -27,23 +27,23 @@ public class TableEvent extends ContainerEvent<Table, TableItem> {
   /**
    * The column index.
    */
-  public int columnIndex;
+  public int columnIndex = -1;
 
   /**
    * The row index.
    */
-  public int rowIndex;
+  public int rowIndex = -1;
 
   /**
    * The cell index.
    */
-  public int cellIndex;
+  public int cellIndex = -1;
 
   /**
    * The sort direction.
    */
   public SortDir sortDir = SortDir.NONE;
-  
+
   /**
    * The context menu.
    */
@@ -57,7 +57,7 @@ public class TableEvent extends ContainerEvent<Table, TableItem> {
   public TableEvent(Table table) {
     super(table);
   }
-  
+
   public TableEvent(Table table, TableItem item) {
     super(table, item);
   }

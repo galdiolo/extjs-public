@@ -1,3 +1,10 @@
+/*
+ * Ext GWT - Ext for GWT
+ * Copyright(c) 2007, 2008, Ext JS, LLC.
+ * licensing@extjs.com
+ * 
+ * http://extjs.com/license
+ */
 package com.extjs.gxt.samples.client.examples.forms;
 
 import java.util.Date;
@@ -29,7 +36,6 @@ public class AdvancedComboBoxExample extends LayoutContainer {
     ModelType type = new ModelType();
     type.root = "topics";
     type.totalName = "totalCount";
-    type.id = "post_id";
     type.addField("title", "topic_title");
     type.addField("topicId", "topic_id");
     type.addField("author", "author");
@@ -42,10 +48,9 @@ public class AdvancedComboBoxExample extends LayoutContainer {
 
     JsonReader<PagingLoadConfig> reader = new JsonReader<PagingLoadConfig>(type) {
       @Override
-      protected ListLoadResult newLoadResult(PagingLoadConfig loadConfig,
-          List<ModelData> models) {
-        PagingLoadResult result = new BasePagingLoadResult(models,
-            loadConfig.getOffset(), loadConfig.getLimit());
+      protected ListLoadResult newLoadResult(PagingLoadConfig loadConfig, List<ModelData> models) {
+        PagingLoadResult result = new BasePagingLoadResult(models, loadConfig.getOffset(),
+            loadConfig.getLimit());
         return result;
       }
     };
@@ -65,19 +70,19 @@ public class AdvancedComboBoxExample extends LayoutContainer {
 
     VerticalPanel vp = new VerticalPanel();
     vp.setSpacing(10);
-    
+
     vp.addText("<span class='text'><b>Combo with Templates and Ajax</b><br>This is a more advanced example that shows how you can combine paging, XTemplate and a remote data store to create a 'live search' feature.</span>");
     vp.add(combo);
-    
+
     add(vp);
   }
-  
+
   private native String getTemplate() /*-{
-  return [
-    '<tpl for="."><div class="search-item">',
-    '<h3><span>{lastPost:date("MM/dd/y")}<br />by {author}</span>{title}</h3>',
-    '{excerpt}',
-    '</div></tpl>'
-  ].join("");
-  }-*/;
+   return [
+     '<tpl for="."><div class="search-item">',
+     '<h3><span>{lastPost:date("MM/dd/y")}<br />by {author}</span>{title}</h3>',
+     '{excerpt}',
+     '</div></tpl>'
+   ].join("");
+   }-*/;
 }

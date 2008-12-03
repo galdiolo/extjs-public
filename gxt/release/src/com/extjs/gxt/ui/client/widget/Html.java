@@ -12,7 +12,20 @@ import com.google.gwt.user.client.Element;
 
 /**
  * A component that contains arbitrary HTML text. The wrapping HTML tag can be
- * configured using {@link #tagName}.
+ * configured using {@link #setTagName(String)}. </p>
+ * 
+ * Code snippet:
+ * 
+ * <pre>{@code
+   Html h = new Html(
+     "<div class=text style='padding:5px'>"
+     + "<h1>Heading1</h1>"
+     + "<i>Some text</i></br>"
+     + "Some more text</br>"
+     + "  <UL> <LI>item 1 <LI>item 2 </UL></br>"
+     + "<u>Final text</u></div>");
+   RootPanel.get().add(h);
+ * }</pre>
  */
 public class Html extends BoxComponent {
 

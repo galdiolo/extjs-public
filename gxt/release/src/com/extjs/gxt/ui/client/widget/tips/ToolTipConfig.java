@@ -240,10 +240,9 @@ public class ToolTipConfig {
    * 
    * @param target the target element
    */
-  public void setTarget(Element target) {
-    this.target = target;
-  }
-
+  // public void setTarget(Element target) {
+  // this.target = target;
+  // }
   /**
    * A optional template to be used to render the tool tip. The {@link #params}
    * will be applied to the template. If specified, {@link #title} and
@@ -283,5 +282,5 @@ public class ToolTipConfig {
   public void setTrackMouse(boolean trackMouse) {
     this.trackMouse = trackMouse;
   }
-  
+
 }

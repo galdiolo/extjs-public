@@ -28,47 +28,47 @@ import com.google.gwt.user.client.Element;
  * 
  * <dl>
  * <dt><b>Events:</b></dt>
- * <dd><b>Select</b> : ButtonBarEvent(buttonBar, button)<br>
+ * <dd><b>Select</b> : ButtonBarEvent(container, item)<br>
  * <div>Fires when a button is selected.</div>
  * <ul>
- * <li>buttonBar : the button bar</li>
- * <li>button : the button that was clicked</li>
+ * <li>container : the button bar</li>
+ * <li>item : the button that was clicked</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>BeforeAdd</b> : ButtonEvent(buttonBar, item, index)<br>
+ * <dd><b>BeforeAdd</b> : ButtonEvent(container, item, index)<br>
  * <div>Fires before a widget is added or inserted. Listeners can set the
  * <code>doit</code> field to <code>false</code> to cancel the action.</div>
  * <ul>
- * <li>buttonBar : this</li>
+ * <li>container : this</li>
  * <li>item : the widget being added</li>
  * <li>index : the index at which the widget will be added</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>BeforeRemove</b> : ButtonEvent(buttonBar, button)<br>
+ * <dd><b>BeforeRemove</b> : ButtonEvent(container, item)<br>
  * <div>Fires before a widget is removed. Listeners can set the
  * <code>doit</code> field to <code>false</code> to cancel the action.</div>
  * <ul>
- * <li>buttonBar : this</li>
- * <li>button : the button being removed</li>
+ * <li>container : this</li>
+ * <li>item : the button being removed</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Add</b> : ButtonEvent(buttonBar, button, index)<br>
+ * <dd><b>Add</b> : ButtonEvent(container, item, index)<br>
  * <div>Fires after a widget has been added or inserted.</div>
  * <ul>
- * <li>buttonBar : this</li>
- * <li>button : the button that was added</li>
+ * <li>container : this</li>
+ * <li>items : the button that was added</li>
  * <li>index : the index at which the button was added</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Remove</b> : ButtonEvent(buttonBar, button)<br>
+ * <dd><b>Remove</b> : ButtonEvent(container, item)<br>
  * <div>Fires after a widget has been removed.</div>
  * <ul>
- * <li>buttonBar : this</li>
- * <li>button : the button that was removed</li>
+ * <li>container : this</li>
+ * <li>item : the button that was removed</li>
  * </ul>
  * </dd>
  * 
@@ -279,12 +279,13 @@ public class ButtonBar extends Container<Button> {
 
     StringBuffer sb = new StringBuffer();
     sb.append("<div class=x-panel-btn-ct>");
-    sb.append("<table width=100% cellpadding=100 cellspacing=0><tr><td class=inner-cell align=" + align + "></td></tr></table>");
+    sb.append("<table width=100% cellpadding=100 cellspacing=0><tr><td class=inner-cell align="
+        + align + "></td></tr></table>");
 
     setElement(XDOM.create(sb.toString()), target, index);
 
     inner = el().selectNode(".inner-cell");
-    
+
     TableElement tbl = el().selectNode("table").dom.cast();
     if (cellSpacing != -1) {
       tbl.setCellSpacing(cellSpacing);

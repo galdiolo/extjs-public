@@ -116,7 +116,6 @@ public class Dispatcher extends BaseObservable {
   private Map<String, AppEvent> history;
 
   private List<Controller> controllers;
-  private boolean ignoreNext;
 
   private Dispatcher() {
     instance = this;
@@ -124,10 +123,6 @@ public class Dispatcher extends BaseObservable {
     history = new HashMap<String, AppEvent>();
     History.addHistoryListener(new HistoryListener() {
       public void onHistoryChanged(String historyToken) {
-        if (ignoreNext) {
-          ignoreNext = false;
-          return;
-        }
         if (history.containsKey(historyToken)) {
           dispatch(history.get(historyToken), false);
         }
@@ -220,8 +215,8 @@ public class Dispatcher extends BaseObservable {
    * @param listener the listener to be removed
    */
   public void removeDispatcherListener(DispatcherListener listener) {
-      removeListener(BeforeDispatch, listener);
-      removeListener(AfterDispatch, listener);
+    removeListener(BeforeDispatch, listener);
+    removeListener(AfterDispatch, listener);
   }
 
   private void dispatch(AppEvent event, boolean createhistory) {
@@ -246,8 +241,7 @@ public class Dispatcher extends BaseObservable {
         token = "" + new Date().getTime();
       }
       history.put(token, event);
-      ignoreNext = true;
-      History.newItem(token);
+      History.newItem(token, false);
     }
   }
 

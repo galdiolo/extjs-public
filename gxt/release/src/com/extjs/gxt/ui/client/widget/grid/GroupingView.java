@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.data.ModelData;
@@ -28,14 +29,16 @@ import com.extjs.gxt.ui.client.widget.menu.CheckMenuItem;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.menu.SeparatorMenuItem;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NodeList;
 
 public class GroupingView extends GridView {
 
+  protected boolean enableGrouping;
+
   private GroupingStore groupingStore;
   private boolean showGroupedColumn = true;
-  private boolean enableGrouping;
   private boolean enableGroupingMenu = true;
   private boolean isUpdating;
   private boolean showGroupName;
@@ -121,9 +124,10 @@ public class GroupingView extends GridView {
   }
 
   /**
-   * True to allow the user to turn off grouping (defaults to true).
+   * True to allow the user to turn off grouping by adding a check item to the
+   * header context menu (defaults to true).
    * 
-   * @param enableNoGroups true to enable turning off groupin
+   * @param enableNoGroups true to enable turning off grouping
    */
   public void setEnableNoGroups(boolean enableNoGroups) {
     this.enableNoGroups = enableNoGroups;
@@ -173,7 +177,7 @@ public class GroupingView extends GridView {
     Menu menu = super.createContextMenu(colIndex);
 
     if (menu != null && enableGroupingMenu && cm.isGroupable(colIndex)) {
-      MenuItem groupBy = new MenuItem("Group By");
+      MenuItem groupBy = new MenuItem(GXT.MESSAGES.groupingView_groupByText());
       groupBy.setIconStyle("x-group-by-icon");
       groupBy.addSelectionListener(new SelectionListener<MenuEvent>() {
 
@@ -187,12 +191,13 @@ public class GroupingView extends GridView {
       menu.add(groupBy);
     }
 
-    if (menu != null && enableGroupingMenu && enableGrouping) {
-      final CheckMenuItem showInGroups = new CheckMenuItem("Show in Groups");
+    if (menu != null && enableGroupingMenu && enableGrouping && enableNoGroups) {
+      final CheckMenuItem showInGroups = new CheckMenuItem(
+          GXT.MESSAGES.groupingView_showGroupsText());
       showInGroups.setEnabled(cm.isGroupable(colIndex));
       showInGroups.setChecked(true);
       showInGroups.addSelectionListener(new SelectionListener<MenuEvent>() {
-      
+
         @Override
         public void componentSelected(MenuEvent ce) {
           onShowGroupsClick(ce, showInGroups.isChecked());
@@ -205,14 +210,6 @@ public class GroupingView extends GridView {
 
   protected void doGroupEnd(StringBuilder buf, GroupColumnData g, List<ColumnData> cs, int colCount) {
     buf.append(templates.endGroup());
-  }
-
-  protected void onShowGroupsClick(MenuEvent be, boolean checked) {
-    if (checked) {
-      onGroupByClick(be, activeHdIndex);
-    } else {
-      groupingStore.clearGrouping();
-    }
   }
 
   protected void doGroupStart(StringBuilder buf, GroupColumnData g, List<ColumnData> cs,
@@ -286,6 +283,10 @@ public class GroupingView extends GridView {
 
     for (GroupColumnData group : groups) {
       if (groupRenderer != null) {
+        String g = groupRenderer.render(group);
+        if (g == null || g.equals("")) {
+          g = "&nbsp;";
+        }
         group.group = groupRenderer.render(group);
       }
     }
@@ -325,6 +326,13 @@ public class GroupingView extends GridView {
       }
     }
     return rows.toArray(new Element[0]);
+  }
+
+  protected JavaScriptObject getRowsNative(Element body) {
+    if (!enableGrouping) {
+      return super.getRowsNative(mainBody.dom);
+    }
+    return getRowsFromGroups(mainBody.dom);
   }
 
   @Override
@@ -375,6 +383,14 @@ public class GroupingView extends GridView {
       fly(g).removeFromParent();
     }
     // appply empty text
+  }
+
+  protected void onShowGroupsClick(MenuEvent be, boolean checked) {
+    if (checked) {
+      onGroupByClick(be, activeHdIndex);
+    } else {
+      groupingStore.clearGrouping();
+    }
   }
 
   @Override
@@ -434,6 +450,18 @@ public class GroupingView extends GridView {
   private String getGroupField() {
     return groupingStore.getGroupState();
   }
+
+  private native JavaScriptObject getRowsFromGroups(Element body) /*-{
+      var r = [];
+      var g, gs = body.childNodes;
+      for(var i = 0, len = gs.length; i < len; i++){
+          g = gs[i].childNodes[1].childNodes;
+          for(var j = 0, jlen = g.length; j < jlen; j++){
+              r[r.length] = g[j];
+          }
+      }
+      return r;
+    }-*/;
 
   private boolean isGroupExpanded(Element g) {
     return fly(g).hasStyleName("x-grid-group-collapsed");

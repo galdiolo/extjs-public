@@ -25,45 +25,43 @@ import com.google.gwt.user.client.Event;
  * 
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>BeforeAdd</b> : ToolBarEvent(toolBar, item, index)<br>
+ * <dd><b>BeforeAdd</b> : ToolBarEvent(container, item, index)<br>
  * <div>Fires before a item is added or inserted. Listeners can set the
  * <code>doit</code> field to <code>false</code> to cancel the action.</div>
  * <ul>
- * <li>toolBar : this</li>
+ * <li>container : this</li>
  * <li>item : the item being added</li>
  * <li>index : the index at which the item will be added</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>BeforeRemove</b> : ToolBarEvent(toolBar, item)<br>
+ * <dd><b>BeforeRemove</b> : ToolBarEvent(container, item)<br>
  * <div>Fires before a item is removed. Listeners can set the <code>doit</code>
  * field to <code>false</code> to cancel the action.</div>
  * <ul>
- * <li>toolBar : this</li>
+ * <li>container : this</li>
  * <li>item : the item being removed</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Add</b> : ToolBarEvent(toolBar, item, index)<br>
+ * <dd><b>Add</b> : ToolBarEvent(container, item, index)<br>
  * <div>Fires after a item has been added or inserted.</div>
  * <ul>
- * <li>toolBar : this</li>
+ * <li>container : this</li>
  * <li>item : the item that was added</li>
  * <li>index : the index at which the item will be added</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Remove</b> : ToolBarEvent(toolBar, item)<br>
+ * <dd><b>Remove</b> : ToolBarEvent(container, item)<br>
  * <div>Fires after a item has been removed.</div>
  * <ul>
- * <li>toolBar : this</li>
+ * <li>container : this</li>
  * <li>item : the item being removed</li>
  * </ul>
  * </dd>
  * 
- * <dt><b>CSS:</b></dt>
- * <dd>x-toolbar (the tool bar)</dd>
- * </dl>
+ * <dt><b>CSS:</b></dt> <dd>x-toolbar (the tool bar)</dd> </dl>
  * 
  * @see ToolItem
  * @see ToggleToolItem
@@ -111,6 +109,7 @@ public class ToolBar extends Container<ToolItem> {
   public boolean insert(ToolItem item, int index) {
     boolean added = super.insert(item, index);
     if (added) {
+      item.toolBar = this;
       TableData data = new TableData();
       data.setVerticalAlign(VerticalAlignment.MIDDLE);
       ComponentHelper.setLayoutData(item, data);
@@ -155,7 +154,7 @@ public class ToolBar extends Container<ToolItem> {
 
     addStyleName(baseStyle + " x-small-editor");
     setStyleAttribute("paddingRight", "8px");
-    
+
     TableRowLayout layout = new TableRowLayout();
     layout.setCellSpacing(0);
     setLayout(layout);

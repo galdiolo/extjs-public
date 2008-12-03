@@ -22,11 +22,11 @@ import com.extjs.gxt.ui.client.event.StateEvent;
 public abstract class Provider extends BaseObservable {
 
   protected StateManager manager;
-  
+
   protected void bind(StateManager manager) {
     this.manager = manager;
   }
-  
+
   /**
    * Clears a value.
    * 

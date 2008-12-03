@@ -16,12 +16,28 @@ import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.google.gwt.user.client.Element;
 
 /**
- * A <code>Window</code> with specialized support for buttons.
+ * A <code>Window</code> with specialized support for buttons. Defaults to a
+ * dialog with an 'ok' button.</p>
+ * 
+ * Code snippet:
+ * 
+ * <pre>
+   Dialog d = new Dialog();
+   d.setHeading("Exit Warning!");
+   d.addText("Do you wish to save before exiting?");
+   d.setBodyStyle("fontWeight:bold;padding:13px;");
+   d.setSize(300, 100);
+   d.setHideOnButtonClick(true);
+   d.setButtons(Dialog.YESNOCANCEL);
+   d.show();
+ * </pre>
+ * 
  * <p>
  * The internal buttons can be retrieved from the button bar using their
- * respective ids ('ok', 'cancel', 'yes', 'no', 'cancel') or by index. Any call
- * to {@link #getButtonBar()} before the dialog is rendered will cause the
- * buttons to be created based on the {@link #buttons} value..
+ * respective ids ('ok', 'cancel', 'yes', 'no', 'cancel') or by index. The
+ * method {@link #getButtonBar()} creates the buttons, so any call before the
+ * dialog is rendered will cause the buttons to be created based on the
+ * {@link #setButtons(String)} value.
  * </p>
  */
 public class Dialog extends Window {
@@ -139,7 +155,7 @@ public class Dialog extends Window {
   }
 
   /**
-   * Sets the buttons to display (defaults to OK).
+   * Sets the buttons to display (defaults to OK). Must be one of:
    * 
    * <pre>
    * Dialog.OK
@@ -162,6 +178,9 @@ public class Dialog extends Window {
     this.hideOnButtonClick = hideOnButtonClick;
   }
 
+  /**
+   * Creates the buttons based on button creation constant
+   */
   protected void createButtons() {
     if (!buttonsInitialized) {
 
@@ -201,18 +220,19 @@ public class Dialog extends Window {
   }
 
   /**
-   * Called after a button in the button bar is selected. Default implementation
-   * closes are hides the dialog if the close button was pressed, determined by
-   * {@link #closeAction}.
+   * Called after a button in the button bar is selected. If
+   * {@link #setHideOnButtonClick(boolean)} is true, closes or hides the dialog
+   * when any button is pressed, determined by {@link #closeAction}.
    * 
    * @param button the button
    */
   protected void onButtonPressed(Button button) {
-    if (button == closeBtn) {
-      hide(button);
-    }
-    if (hideOnButtonClick) {
-      hide(button);
+    if (button == closeBtn || hideOnButtonClick) {
+      if (closeAction == CloseAction.HIDE) {
+        hide(button);
+      } else {
+        close(button);
+      }
     }
   }
 

@@ -11,8 +11,7 @@ import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.store.ListStore;
 
 /**
- * A <code>ColumnConfig</code> that provides an automatic row numbering
- * column.
+ * A <code>ColumnConfig</code> that provides an automatic row numbering column.
  * 
  * <p>
  * Note: The row numbers will not be updated when models are added and removed

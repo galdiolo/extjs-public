@@ -92,6 +92,7 @@ public class SplitButton extends Button {
   @Override
   protected void onClick(ComponentEvent ce) {
     ce.preventDefault();
+    hideToolTip();
     if (!disabled) {
       ButtonEvent be = new ButtonEvent(this);
       be.event = ce.event;

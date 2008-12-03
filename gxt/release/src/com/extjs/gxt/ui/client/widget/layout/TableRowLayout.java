@@ -24,14 +24,14 @@ public class TableRowLayout extends TableLayout {
 
   @Override
   protected Element getNextCell(Component component) {
-    TableData data = (TableData)getLayoutData(component);
+    TableData data = (TableData) getLayoutData(component);
     if (data == null) {
       data = new TableData();
       setLayoutData(component, data);
     }
-    
+
     if (component.getData("width") != null) {
-      data.setWidth((String)component.getData("width"));
+      data.setWidth((String) component.getData("width"));
     }
 
     El td = new El(DOM.createTD());
@@ -53,7 +53,7 @@ public class TableRowLayout extends TableLayout {
     } else if (cellPadding > 0) {
       td.dom.getStyle().setPropertyPx("padding", cellPadding);
     }
-    
+
     if (data.getStyleName() != null) {
       td.dom.setClassName(data.getStyleName());
     }
@@ -64,7 +64,7 @@ public class TableRowLayout extends TableLayout {
     if (data.getWidth() != null) {
       td.dom.setPropertyString("width", data.getWidth());
     }
-    
+
     if (data.getStyle() != null) {
       td.applyStyles(data.getStyle());
     }
@@ -81,7 +81,7 @@ public class TableRowLayout extends TableLayout {
     target.removeChildren();
 
     table = DOM.createTable().cast();
-    
+
     if (getTableStyle() != null) {
       fly(table).applyStyles(getTableStyle());
     }

@@ -22,7 +22,7 @@ public final class XTemplate extends JavaScriptObject {
   static {
     GXT.init();
   }
-  
+
   /**
    * Specifies the maxiumum number of nested models to search when preparing the
    * templates data (defaults to 4).
@@ -30,8 +30,8 @@ public final class XTemplate extends JavaScriptObject {
    * @param maxDepth the maximum number of nested childen
    */
   public final native void setMaxDepth(int maxDepth) /*-{
-    this.maxDepth = maxDepth;
-  }-*/;
+     this.maxDepth = maxDepth;
+   }-*/;
 
   /**
    * Returns the maximum number of nested children to process when preparing the
@@ -40,11 +40,11 @@ public final class XTemplate extends JavaScriptObject {
    * @return the max depth
    */
   public final native int getMaxDepth() /*-{
-    if (!this.maxDepth) {
-      this.maxDepth = 4;
-    }
-    return this.maxDepth;
-  }-*/;
+     if (!this.maxDepth) {
+       this.maxDepth = 4;
+     }
+     return this.maxDepth;
+   }-*/;
 
   /**
    * Returns a new template instance using the given html.
@@ -53,17 +53,17 @@ public final class XTemplate extends JavaScriptObject {
    * @return a new template instance
    */
   public static native XTemplate create(String html) /*-{
-   return new $wnd.GXT.Ext.XTemplate(html);
-   }-*/;
+    return new $wnd.GXT.Ext.XTemplate(html);
+    }-*/;
 
   protected XTemplate() {
 
   }
 
   public final native Element append(Element elem, JavaScriptObject values) /*-{
-   return this.append(elem, values);
-   }-*/;
-  
+    return this.append(elem, values);
+    }-*/;
+
   /**
    * Returns an HTML fragment of this template with the specified values
    * applied.
@@ -72,16 +72,16 @@ public final class XTemplate extends JavaScriptObject {
    * @return the html fragment
    */
   public final native String applyTemplate(JavaScriptObject values) /*-{
-   return this.applyTemplate(values);
-   }-*/;
+    return this.applyTemplate(values);
+    }-*/;
 
   /**
    * Compiles the template into an internal function, eliminating the regex
    * overhead.
    */
   public final native void compile() /*-{
-   this.compile();
-   }-*/;
+    this.compile();
+    }-*/;
 
   /**
    * Applies the supplied values to the template and inserts the new node(s)
@@ -91,8 +91,8 @@ public final class XTemplate extends JavaScriptObject {
    * @param values the substitution values
    */
   public final native void insertAfter(Element elem, JavaScriptObject values) /*-{
-   this.insertAfter(elem, values);
-   }-*/;
+    this.insertAfter(elem, values);
+    }-*/;
 
   /**
    * Applies the supplied values to the template and inserts the new node(s)
@@ -102,8 +102,8 @@ public final class XTemplate extends JavaScriptObject {
    * @param values the substitution values
    */
   public final native void insertBefore(Element elem, JavaScriptObject values) /*-{
-   this.insertBefore(elem, values);
-   }-*/;
+    this.insertBefore(elem, values);
+    }-*/;
 
   /**
    * Applies the supplied values to the template and overwrites the content of
@@ -113,7 +113,7 @@ public final class XTemplate extends JavaScriptObject {
    * @param values the substitution values
    */
   public final native void overwrite(Element elem, JavaScriptObject values) /*-{
-   this.overwrite(elem, values);
-   }-*/;
+    this.overwrite(elem, values);
+    }-*/;
 
 }

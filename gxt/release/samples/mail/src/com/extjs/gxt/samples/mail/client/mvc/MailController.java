@@ -10,6 +10,7 @@ package com.extjs.gxt.samples.mail.client.mvc;
 import java.util.List;
 
 import com.extjs.gxt.samples.mail.client.AppEvents;
+import com.extjs.gxt.samples.mail.client.Mail;
 import com.extjs.gxt.samples.mail.client.MailServiceAsync;
 import com.extjs.gxt.samples.resources.client.model.Folder;
 import com.extjs.gxt.samples.resources.client.model.MailItem;
@@ -24,7 +25,6 @@ public class MailController extends Controller {
   private MailServiceAsync service;
   private MailFolderView folderView;
   private MailView mailView;
-
 
   public MailController() {
     registerEventTypes(AppEvents.Init);
@@ -73,7 +73,7 @@ public class MailController extends Controller {
   }
 
   public void initialize() {
-    service = (MailServiceAsync) Registry.get("service");
+    service = (MailServiceAsync) Registry.get(Mail.SERVICE);
 
     folderView = new MailFolderView(this);
     mailView = new MailView(this);

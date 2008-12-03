@@ -77,6 +77,11 @@ public class LabelField extends Field {
   }
 
   @Override
+  public boolean validate() {
+    return true;
+  }
+
+  @Override
   protected void onRender(Element parent, int index) {
     setElement(DOM.createDiv(), parent, index);
     if (text != null) {

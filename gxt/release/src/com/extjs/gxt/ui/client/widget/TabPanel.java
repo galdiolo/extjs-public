@@ -28,80 +28,78 @@ import com.google.gwt.user.client.Event;
 /**
  * A basic tab container.
  * 
+ * <pre>
+   TabPanel panel = new TabPanel();
+   panel.setResizeTabs(true);
+   panel.setEnableTabScroll(true);
+   panel.setAnimScroll(true);
+  
+   TabItem item = new TabItem();
+   item.setClosable(true);
+   item.setText("Tab Item");
+  
+   item.setLayout(new FitLayout());
+   item.add(new Label("Test Content"));
+  
+   panel.add(item);
+ * </pre>
+ * 
  * <dl>
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>BeforeSelect</b> : TabPanelEvent(tabPanel, item)<br>
+ * <dd><b>BeforeSelect</b> : TabPanelEvent(container, item)<br>
  * <div>Fires after an item is selected. Listeners can set the <code>doit</code>
  * field to <code>false</code> to cancel the action.</div>
  * <ul>
- * <li>tabPanel : this</li>
+ * <li>container : this</li>
  * <li>item : the item about to be selected.</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Select</b> : TabPanelEvent(tabPanel, item)<br>
+ * <dd><b>Select</b> : TabPanelEvent(container, item)<br>
  * <div>Fires after a item is selected.</div>
  * <ul>
- * <li>tabPanel : this</li>
+ * <li>container : this</li>
  * <li>item : the item that was selected</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>BeforeAdd</b> : TabPanelEvent(tabPanel, item, index)<br>
+ * <dd><b>BeforeAdd</b> : TabPanelEvent(container, item, index)<br>
  * <div>Fires before a item is added or inserted. Listeners can set the
  * <code>doit</code> field to <code>false</code> to cancel the action.</div>
  * <ul>
- * <li>tabPanel : this</li>
+ * <li>container : this</li>
  * <li>item : the item being added</li>
  * <li>index : the index at which the item will be added</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>BeforeRemove</b> : TabPanelEvent(tabPanel, item)<br>
+ * <dd><b>BeforeRemove</b> : TabPanelEvent(container, item)<br>
  * <div>Fires before a item is removed. Listeners can set the <code>doit</code>
  * field to <code>false</code> to cancel the action.</div>
  * <ul>
- * <li>tabPanel : this</li>
+ * <li>container : this</li>
  * <li>item : the item being removed</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Add</b> : TabPanelEvent(tabPanel, item, index)<br>
+ * <dd><b>Add</b> : TabPanelEvent(container, item, index)<br>
  * <div>Fires after a item has been added or inserted.</div>
  * <ul>
- * <li>tabPanel : this</li>
+ * <li>container : this</li>
  * <li>item : the item that was added</li>
  * <li>index : the index at which the item will be added</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Remove</b> : TabPanelEvent(tabPanel, item)<br>
+ * <dd><b>Remove</b> : TabPanelEvent(container, item)<br>
  * <div>Fires after a item has been removed.</div>
  * <ul>
- * <li>tabPanel : this</li>
+ * <li>container : this</li>
  * <li>item : the item being removed</li>
  * </ul>
  * </dd>
  * </dl>
- * 
- * <pre><code>
- TabPanel panel = new TabPanel();
- panel.resizeTabs = true;
- panel.enableTabScroll = true;
- panel.animScroll = true;
-
- TabItem item = new TabItem();
- item.closable = true;
- item.setText("Tab Item");
-
- item.setLayout(new FitLayout());
- item.add(new Label("Test Content"));
-
- panel.add(item);
- * </code></pre>
- * 
- * </p>
  */
 public class TabPanel extends Container<TabItem> {
 
@@ -394,6 +392,7 @@ public class TabPanel extends Container<TabItem> {
           }
         }
       }
+      delegateUpdates();
     }
 
     return removed;
@@ -557,6 +556,7 @@ public class TabPanel extends Container<TabItem> {
       stack.add(activeItem);
       cardLayout.setActiveItem(item);
 
+      if (isAttached()) ComponentHelper.doAttach(item);
       item.layout();
 
       if (scrolling) {
@@ -715,6 +715,8 @@ public class TabPanel extends Container<TabItem> {
 
   @Override
   protected void onResize(int width, int height) {
+    stripWrap.setScrollLeft(0);
+
     int hh = getFrameHeight();
     width -= el().getFrameWidth("lr");
     if (height != Style.DEFAULT) {
@@ -816,7 +818,7 @@ public class TabPanel extends Container<TabItem> {
       }
       scrolling = true;
       if (pos > (l - tw)) {
-        stripWrap.setLeft(l - tw);
+        stripWrap.setScrollLeft(l - tw);
       } else {
         scrollToTab(activeItem, false);
       }
@@ -871,7 +873,7 @@ public class TabPanel extends Container<TabItem> {
   }
 
   private int getScrollArea() {
-    return Math.max(0, stripWrap.getWidth());
+    return Math.max(0, stripWrap.getClientWidth());
   }
 
   private int getScrollIncrement() {
@@ -931,7 +933,7 @@ public class TabPanel extends Container<TabItem> {
   private void updateScrollButtons() {
     int pos = getScollPos();
     scrollLeft.setStyleName("x-tab-scroller-left-disabled", pos == 0);
-    scrollRight.setStyleName("x-tab-scroller-right-disabled",
-        pos >= (getScrollWidth() - getScrollArea()));
+    scrollRight.setStyleName("x-tab-scroller-right-disabled", pos >= (getScrollWidth()
+        - getScrollArea() - 2));
   }
 }

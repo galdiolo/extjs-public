@@ -7,7 +7,9 @@
  */
 package com.extjs.gxt.ui.client.widget.form;
 
+import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.FieldEvent;
 
 /**
  * Single radio field. Same as Checkbox, but provided as a convenience for
@@ -32,6 +34,14 @@ public class Radio extends CheckBox {
   protected RadioGroup group;
 
   /**
+   * The browser automatically deselects checked radio items when another radio
+   * is clicked. This is an issue with firing change events as the radio's
+   * checked state is being changed by the browser. setvalue keeps track of the
+   * last value that was changed via the Radio component itself.
+   */
+  private boolean setvalue;
+
+  /**
    * Returns the radios container group.
    * 
    * @return the group
@@ -42,15 +52,31 @@ public class Radio extends CheckBox {
 
   @Override
   public void setValue(Boolean value) {
-    boolean old = getValue();
     if (value == null) {
       value = new Boolean(false);
     }
     super.setValue(value);
     // fire change event when value is changed, not on blur
-    fireChangeEvent(old, value);
+    fireChangeEvent(setvalue, value);
     if (value && group != null) {
       group.onRadioSelected(this);
+    }
+    setvalue = value;
+  }
+
+  @Override
+  protected void fireChangeEvent(Object oldValue, Object value) {
+    if (oldValue != value) {
+      FieldEvent e = new FieldEvent(this);
+      e.oldValue = oldValue;
+      e.value = value;
+      fireEvent(Events.Change, e);
+      if ((Boolean) value && group != null) {
+        e = new FieldEvent(group);
+        e.oldValue = oldValue;
+        e.value = value;
+        group.fireEvent(Events.Change, e);
+      }
     }
   }
 

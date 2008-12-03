@@ -74,7 +74,7 @@ public class GridExample extends LayoutContainer {
     GridCellRenderer<Stock> change = new GridCellRenderer<Stock>() {
       public String render(Stock model, String property, ColumnData config, int rowIndex,
           int colIndex, ListStore<Stock> store) {
-        double val = (Double)model.get(property);
+        double val = (Double) model.get(property);
         String style = val < 0 ? "red" : "green";
         return "<span style='color:" + style + "'>" + number.format(val) + "</span>";
       }

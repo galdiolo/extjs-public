@@ -19,6 +19,7 @@ import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.Items;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Event;
 
 /**
  * Concrete selection model. 3 selection models are supported:
@@ -68,7 +69,7 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
       createKeyNav(container);
     }
     if (this.container != null) {
-      this.container.removeListener(Events.OnClick, this);
+      this.container.removeListener(Event.ONMOUSEDOWN, this);
       this.container.removeListener(Events.OnDoubleClick, this);
       this.container.removeListener(Events.Remove, this);
       this.container.removeListener(Events.ContextMenu, this);
@@ -76,7 +77,7 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
     }
     this.container = container;
     if (container != null) {
-      container.addListener(Events.OnClick, this);
+      container.addListener(Event.ONMOUSEDOWN, this);
       container.addListener(Events.OnDoubleClick, this);
       container.addListener(Events.Remove, this);
       container.addListener(Events.ContextMenu, this);
@@ -143,8 +144,8 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
 
   public void handleEvent(ContainerEvent ce) {
     switch (ce.type) {
-      case Events.OnClick:
-        onClick(ce);
+      case Event.ONMOUSEDOWN:
+        onMouseDown(ce);
         break;
       case Events.OnDoubleClick:
         onDoubleClick(ce);
@@ -222,7 +223,7 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
     if (singleSelect) {
       doSelect(new Items(0), false, false);
     } else {
-      doSelect(new Items(0, container.getItemCount()), false, false);
+      doSelect(new Items(0, container.getItemCount() - 1), false, false);
     }
   }
 
@@ -236,8 +237,8 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
   }
 
   protected native ContainerEvent createContainerEvent(Container container) /*-{
-   return container.@com.extjs.gxt.ui.client.widget.Container::createContainerEvent(Lcom/extjs/gxt/ui/client/widget/Component;)(null);
-   }-*/;
+    return container.@com.extjs.gxt.ui.client.widget.Container::createContainerEvent(Lcom/extjs/gxt/ui/client/widget/Component;)(null);
+    }-*/;
 
   protected void createKeyNav(Container tree) {
     keyNav = new KeyNav<ContainerEvent>() {
@@ -300,9 +301,7 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
     int index = container.indexOf(item);
     if (ce.isShiftKey() && selectedItem != null) {
       int last = container.indexOf(selectedItem);
-      int a = (last > index) ? index : last;
-      int b = (last < index) ? index : last;
-      doSelect(new Items(a, b + 1), ce.isControlKey(), false);
+      doSelect(new Items(last, index), false, false);
       selectedItem = container.getItem(last);
     } else {
       if (ce.isControlKey() && isSelected(item)) {
@@ -328,14 +327,14 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
         fireSelectionChanged();
       }
     } else {
-      if (!keepExisting) {
-        deselectAll(true);
-      }
       T item = items.getItem(container);
       if (item != null) {
         ContainerEvent ce = createContainerEvent(container);
         ce.item = item;
         if (container.fireEvent(Events.BeforeSelect, ce)) {
+          if (!keepExisting) {
+            deselectAll(true);
+          }
           onSelectChange(item, true);
           selected.add(item);
           selectedItem = item;
@@ -404,7 +403,7 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
     return null;
   }
 
-  protected void onClick(ContainerEvent ce) {
+  protected void onMouseDown(ContainerEvent ce) {
     if (locked) return;
     T item = (T) ce.item;
     if (item != null) {

@@ -179,8 +179,6 @@ public class SplitBar extends BoxComponent {
     draggable.addListener(Events.DragEnd, dragListener);
     draggable.addListener(Events.DragCancel, dragListener);
 
-   
-
     if (resizeWidget.isAttached()) {
       BaseEvent be = createComponentEvent(null);
       be.type = Events.Attach;
@@ -192,7 +190,7 @@ public class SplitBar extends BoxComponent {
         sync();
       }
     });
-    
+
     setElement(DOM.createDiv());
     el().makePositionable(true);
     sinkEvents(Event.MOUSEEVENTS);

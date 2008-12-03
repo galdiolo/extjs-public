@@ -34,6 +34,11 @@ public class ChangeEvent {
   public Model item;
 
   /**
+   * The parent model.
+   */
+  public Model parent;
+
+  /**
    * The location for inserts.
    */
   public int index;

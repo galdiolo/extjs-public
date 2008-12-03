@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.FormEvent;
@@ -42,8 +43,8 @@ import com.google.gwt.user.client.ui.impl.FormPanelImplHost;
  * 
  * <dd><b>BeforeSubmit</b> : FormEvent(this)<br>
  * <div>Fires before the form is submitted. Only applies when using HTML
- * submits. Listeners can set the <code>doit</code> field to
- * <code>false</code> to cancel the action.</div>
+ * submits. Listeners can set the <code>doit</code> field to <code>false</code>
+ * to cancel the action.</div>
  * <ul>
  * <li>formPanel : this</li>
  * </ul>
@@ -97,6 +98,9 @@ public class FormPanel extends ContentPanel implements FormPanelImplHost {
   private LabelAlign labelAlign = LabelAlign.LEFT;
   private int labelWidth = 75;
   private int fieldWidth = 210;
+  private String labelSeparator = ":";
+  private boolean hideLabels;
+  private int padding = 10;
   private El form;
   private Method method = Method.GET;
   private Encoding encoding;
@@ -110,6 +114,24 @@ public class FormPanel extends ContentPanel implements FormPanelImplHost {
   public FormPanel() {
     frameName = "gxt.formpanel-" + (++formId);
     setTarget(frameName);
+  }
+
+  /**
+   * Clears all values from all fields.
+   */
+  public void clear() {
+    for (Field f : getFields()) {
+      f.setValue(null);
+    }
+  }
+  
+  /**
+   * Resets all field values.
+   */
+  public void reset() {
+    for (Field f : getFields()) {
+      f.reset();
+    }
   }
 
   /**
@@ -152,12 +174,30 @@ public class FormPanel extends ContentPanel implements FormPanelImplHost {
   }
 
   /**
+   * Returns true if labels are being hidden.
+   * 
+   * @return the hide label state
+   */
+  public boolean getHideLabels() {
+    return hideLabels;
+  }
+
+  /**
    * Returns the label alignment.
    * 
    * @return the label alignment
    */
   public LabelAlign getLabelAlign() {
     return labelAlign;
+  }
+
+  /**
+   * Returns the label separator.
+   * 
+   * @return the label separaotr
+   */
+  public String getLabelSeparator() {
+    return labelSeparator;
   }
 
   /**
@@ -182,6 +222,15 @@ public class FormPanel extends ContentPanel implements FormPanelImplHost {
    */
   public Method getMethod() {
     return method;
+  }
+
+  /**
+   * Returns the panel's padding.
+   * 
+   * @return the padding
+   */
+  public int getPadding() {
+    return padding;
   }
 
   /**
@@ -274,12 +323,30 @@ public class FormPanel extends ContentPanel implements FormPanelImplHost {
   }
 
   /**
+   * True to hide field labels by default (defaults to false).
+   * 
+   * @param hideLabels true to hide labels
+   */
+  public void setHideLabels(boolean hideLabels) {
+    this.hideLabels = hideLabels;
+  }
+
+  /**
    * Sets the label alignment.
    * 
    * @param align the alignment
    */
   public void setLabelAlign(LabelAlign align) {
     this.labelAlign = align;
+  }
+
+  /**
+   * Sets the label separator (defaults to ':').
+   * 
+   * @param labelSeparator the label separator
+   */
+  public void setLabelSeparator(String labelSeparator) {
+    this.labelSeparator = labelSeparator;
   }
 
   /**
@@ -305,6 +372,15 @@ public class FormPanel extends ContentPanel implements FormPanelImplHost {
   }
 
   /**
+   * Sets the padding to be applied to the forms children (defaults to 10).
+   * 
+   * @param padding the padding
+   */
+  public void setPadding(int padding) {
+    this.padding = padding;
+  }
+
+  /**
    * Sets all of the panel's fields read only state.
    * 
    * @param readOnly true for read only
@@ -323,7 +399,7 @@ public class FormPanel extends ContentPanel implements FormPanelImplHost {
       impl.submit(form.dom, iframe);
     }
   }
-
+  
   @Override
   protected void onAttach() {
     super.onAttach();
@@ -375,10 +451,33 @@ public class FormPanel extends ContentPanel implements FormPanelImplHost {
       layout.setDefaultWidth(fieldWidth);
       layout.setLabelWidth(labelWidth);
       layout.setLabelAlign(labelAlign);
+      layout.setLabelSeparator(labelSeparator);
+      layout.setPadding(padding);
+      layout.setHideLabels(hideLabels);
       setLayout(layout);
     }
 
     form.addEventsSunk(Event.ONLOAD);
+  }
+
+  @Override
+  protected void onResize(int width, int height) {
+    if (isAutoWidth()) {
+      getLayoutTarget().setWidth("auto");
+    } else if (width != -1) {
+      int w = width - getFrameWidth();
+      if (!frame && GXT.isIE) {
+        w -= 2;
+      }
+      getLayoutTarget().setWidth(w, true);
+    }
+    if (isExpanded()) {
+      if (isAutoHeight()) {
+        getLayoutTarget().setHeight("auto");
+      } else if (height != -1) {
+        getLayoutTarget().setHeight(height - getFrameHeight(), true);
+      }
+    }
   }
 
   private void createFrame() {

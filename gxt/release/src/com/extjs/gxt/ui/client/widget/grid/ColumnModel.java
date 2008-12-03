@@ -133,7 +133,7 @@ public class ColumnModel extends BaseObservable {
     }
     return config.size();
   }
-  
+
   public boolean isGroupable(int colIndex) {
     return config.get(colIndex).isGroupable();
   }

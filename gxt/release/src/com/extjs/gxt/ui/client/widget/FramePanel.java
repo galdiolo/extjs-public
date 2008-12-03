@@ -65,9 +65,9 @@ public class FramePanel extends Component {
    * @param element the parent element
    */
   public native void onHide(Element element) /*-{
-    var frame = this.@com.google.gwt.user.client.ui.UIObject::element;
-    frame.parentNode.removeChild(frame);
-   }-*/;
+     var frame = this.@com.google.gwt.user.client.ui.UIObject::element;
+     frame.parentNode.removeChild(frame);
+    }-*/;
 
   /**
    * Displays the panel behind the given element.
@@ -116,50 +116,50 @@ public class FramePanel extends Component {
   }
 
   private native void bindIE(Element parent, Element frame) /*-{
-      frame.scrolling = 'no';
-      frame.frameBorder = 0;
-      frame.style.position = 'absolute';
-      frame.className = 'my-frame-panel';
-      parent.__frame = frame;
-      frame.__parent = parent;
-      frame.style.setExpression('left', parent.offsetLeft);
-      frame.style.setExpression('top', parent.offsetTop);
-      frame.style.setExpression('width', parent.offsetWidth);
-      frame.style.setExpression('height', parent.offsetHeight);
-      parent.parentElement.insertBefore(frame, parent);
-    }-*/;
+       frame.scrolling = 'no';
+       frame.frameBorder = 0;
+       frame.style.position = 'absolute';
+       frame.className = 'my-frame-panel';
+       parent.__frame = frame;
+       frame.__parent = parent;
+       frame.style.setExpression('left', parent.offsetLeft);
+       frame.style.setExpression('top', parent.offsetTop);
+       frame.style.setExpression('width', parent.offsetWidth);
+       frame.style.setExpression('height', parent.offsetHeight);
+       parent.parentElement.insertBefore(frame, parent);
+     }-*/;
 
   private native void bindOther(Element parent, Element frame) /*-{
-      frame.scrolling = 'no';
-      frame.frameBorder = 0;
-      frame.style.position = 'absolute';
-      frame.className = 'my-frame-panel';
-      parent.__frame = frame;
-      frame.__parent = parent;
-      frame.style.left = parent.offsetLeft + 'px';
-      frame.style.top = parent.offsetTop + 'px';
-      frame.style.width = parent.offsetWidth + 'px';
-      frame.style.height = parent.offsetHeight + 'px'; 
-      parent.parentNode.insertBefore(frame, parent);
-    }-*/;
+       frame.scrolling = 'no';
+       frame.frameBorder = 0;
+       frame.style.position = 'absolute';
+       frame.className = 'my-frame-panel';
+       parent.__frame = frame;
+       frame.__parent = parent;
+       frame.style.left = parent.offsetLeft + 'px';
+       frame.style.top = parent.offsetTop + 'px';
+       frame.style.width = parent.offsetWidth + 'px';
+       frame.style.height = parent.offsetHeight + 'px'; 
+       parent.parentNode.insertBefore(frame, parent);
+     }-*/;
 
   private native void setZIndexIE(int index) /*-{
-      var frame = this.@com.google.gwt.user.client.ui.UIObject::element;
-      frame.style.setExpression('zIndex', index);
-    }-*/;
+       var frame = this.@com.google.gwt.user.client.ui.UIObject::element;
+       frame.style.setExpression('zIndex', index);
+     }-*/;
 
   private native void syncIE(Element parent, Element frame) /*-{
-      frame.style.setExpression('left', parent.offsetLeft);
-      frame.style.setExpression('top', parent.offsetTop);
-      frame.style.setExpression('width', parent.offsetWidth);
-      frame.style.setExpression('height', parent.offsetHeight);
-   }-*/;
+       frame.style.setExpression('left', parent.offsetLeft);
+       frame.style.setExpression('top', parent.offsetTop);
+       frame.style.setExpression('width', parent.offsetWidth);
+       frame.style.setExpression('height', parent.offsetHeight);
+    }-*/;
 
   private native void syncOther(Element parent, Element frame) /*-{
-      frame.style.left = parent.offsetLeft + 'px';
-      frame.style.top = parent.offsetTop + 'px';
-      frame.style.width = parent.offsetWidth + 'px';
-      frame.style.height = parent.offsetHeight + 'px'; 
-   }-*/;
+       frame.style.left = parent.offsetLeft + 'px';
+       frame.style.top = parent.offsetTop + 'px';
+       frame.style.width = parent.offsetWidth + 'px';
+       frame.style.height = parent.offsetHeight + 'px'; 
+    }-*/;
 
 }

@@ -69,7 +69,7 @@ public class TableHeader extends BoxComponent {
     this.table = table;
     this.columnModel = this.table.getColumnModel();
   }
-  
+
   public void clearSort() {
     if (sortColumn != null) {
       sortColumn.onSortChange(SortDir.NONE);
@@ -123,7 +123,7 @@ public class TableHeader extends BoxComponent {
   public void init(BaseTable table) {
     this.table = table;
     this.columnModel = this.table.getColumnModel();
-    
+
     columns = new ArrayList<TableColumnUI>();
     int cols = columnModel.getColumnCount();
     for (int i = 0; i < cols; i++) {
@@ -169,9 +169,6 @@ public class TableHeader extends BoxComponent {
   protected void onRender(Element target, int index) {
     setElement(XDOM.create(html), target, index);
     headerRow = el().selectNode(".my-tbl-header-row").dom;
-
-
-
     disableContextMenu(true);
   }
 
@@ -269,12 +266,12 @@ public class TableHeader extends BoxComponent {
 
     columns.setSubMenu(columnMenu);
     menu.add(columns);
-    
+
     if (table instanceof Table) {
-      TableEvent e = new TableEvent((Table)table);
+      TableEvent e = new TableEvent((Table) table);
       e.columnIndex = column.getIndex();
       e.menu = menu;
-      ((Table)table).fireEvent(Events.HeaderContextMenu, e);
+      ((Table) table).fireEvent(Events.HeaderContextMenu, e);
     }
 
     return menu;

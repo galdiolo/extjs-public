@@ -14,7 +14,6 @@ import com.google.gwt.core.client.JavaScriptObject;
  */
 public class JsObject implements JsWrapper {
 
-
   /**
    * The native javascript object.
    */
@@ -43,9 +42,9 @@ public class JsObject implements JsWrapper {
    * @return the value
    */
   public native Object get(String name) /*-{
-   var js = this.@com.extjs.gxt.ui.client.js.JsObject::jsObject;
-   return js[name];
-  }-*/;
+    var js = this.@com.extjs.gxt.ui.client.js.JsObject::jsObject;
+    return js[name];
+   }-*/;
 
   public JavaScriptObject getJsObject() {
     return jsObject;
@@ -58,9 +57,9 @@ public class JsObject implements JsWrapper {
    * @return the value
    */
   public native int getNumber(String name) /*-{
-    var js = this.@com.extjs.gxt.ui.client.js.JsObject::jsObject;
-    return js[name];
-  }-*/;
+     var js = this.@com.extjs.gxt.ui.client.js.JsObject::jsObject;
+     return js[name];
+   }-*/;
 
   /**
    * Returns a property value.
@@ -69,25 +68,25 @@ public class JsObject implements JsWrapper {
    * @return the value
    */
   public native String getString(String name) /*-{
-    var js = this.@com.extjs.gxt.ui.client.js.JsObject::jsObject;
-    return js[name];
-   }-*/;
+     var js = this.@com.extjs.gxt.ui.client.js.JsObject::jsObject;
+     return js[name];
+    }-*/;
 
   public native void set(String name, boolean value) /*-{
-    var js = this.@com.extjs.gxt.ui.client.js.JsObject::jsObject;
-    js[name] = value;
-   }-*/;
-
-  public native void set(String name, int value) /*-{
-    var js = this.@com.extjs.gxt.ui.client.js.JsObject::jsObject;
-    js[name] = value;
-   }-*/;
-
-  public native void set(String name, JavaScriptObject value) /*-{
      var js = this.@com.extjs.gxt.ui.client.js.JsObject::jsObject;
      js[name] = value;
+    }-*/;
 
-     }-*/;
+  public native void set(String name, int value) /*-{
+     var js = this.@com.extjs.gxt.ui.client.js.JsObject::jsObject;
+     js[name] = value;
+    }-*/;
+
+  public native void set(String name, JavaScriptObject value) /*-{
+      var js = this.@com.extjs.gxt.ui.client.js.JsObject::jsObject;
+      js[name] = value;
+
+      }-*/;
 
   /**
    * Sets a property.
@@ -100,18 +99,17 @@ public class JsObject implements JsWrapper {
   }
 
   public native void set(String name, Object value) /*-{
-    var js = this.@com.extjs.gxt.ui.client.js.JsObject::jsObject;
-    js[name] = value;
-   }-*/;
-
-  public native void set(String name, String value) /*-{
      var js = this.@com.extjs.gxt.ui.client.js.JsObject::jsObject;
      js[name] = value;
     }-*/;
 
-  protected native JavaScriptObject create() /*-{
-     return {};
+  public native void set(String name, String value) /*-{
+      var js = this.@com.extjs.gxt.ui.client.js.JsObject::jsObject;
+      js[name] = value;
      }-*/;
 
-}
+  protected native JavaScriptObject create() /*-{
+      return {};
+      }-*/;
 
+}

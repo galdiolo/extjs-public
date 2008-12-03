@@ -8,22 +8,25 @@
 package com.extjs.gxt.ui.client.widget;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.CompositeElement;
 import com.extjs.gxt.ui.client.core.DomQuery;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XTemplate;
 import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.data.ModelProcessor;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.ListViewEvent;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.store.StoreEvent;
 import com.extjs.gxt.ui.client.store.StoreListener;
 import com.extjs.gxt.ui.client.util.Util;
-import com.extjs.gxt.ui.client.widget.tips.ToolTip;
-import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
+import com.extjs.gxt.ui.client.widget.tips.QuickTip;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -33,7 +36,8 @@ import com.google.gwt.user.client.Event;
  * an {@link XTemplate} as its internal templating mechanism.
  * <p>
  * <b>In order to use these features, an {@link #setItemSelector(String)} must
- * be provided for the ListView to determine what nodes it will be working with.</b>
+ * be provided for the ListView to determine what nodes it will be working
+ * with.</b>
  * </p>
  * 
  * <dt><b>Events:</b></dt>
@@ -71,20 +75,21 @@ import com.google.gwt.user.client.Event;
  */
 public class ListView<M extends ModelData> extends BoxComponent {
 
-  private ToolTip toolTip;
-  private String selectStyle = "x-view-selected";
-  private String overStyle = "";
+  protected ListStore<M> store;
+
+  private String selectStyle = "x-view-item-sel";
+  private String overStyle = "x-view-item-over";
   private String itemSelector = ".x-view-item";
   private boolean selectOnHover;
   private CompositeElement all;
-  private ListStore<M> store;
   private ListViewSelectionModel<M> sm;
   private XTemplate template;
   private boolean initial;
   private StoreListener storeListener;
   private String displayProperty = "text";
-  private boolean enableTips = false;
   private String loadingText;
+  private Element overElement;
+  private ModelProcessor<M> modelProcessor;
 
   /**
    * Creates a new view.
@@ -94,6 +99,8 @@ public class ListView<M extends ModelData> extends BoxComponent {
     setSelectionModel(new ListViewSelectionModel<M>());
     all = new CompositeElement();
     baseStyle = "x-view";
+    focusable = true;
+    new QuickTip(this);
   }
 
   /**
@@ -112,6 +119,30 @@ public class ListView<M extends ModelData> extends BoxComponent {
   public ListView(ListStore<M> store, XTemplate template) {
     this(store);
     this.template = template;
+  }
+
+  /**
+   * Returns the matching element.
+   * 
+   * @param element the element or any child element
+   * @return the parent element
+   */
+  public Element findElement(Element element) {
+    return fly(element).findParentElement(itemSelector, 5);
+  }
+
+  /**
+   * Returns the element's index.
+   * 
+   * @param element the element or any child element
+   * @return the element index or -1 if no match
+   */
+  public int findElementIndex(Element element) {
+    Element elem = findElement(element);
+    if (elem != null) {
+      return indexOf(elem);
+    }
+    return -1;
   }
 
   /**
@@ -162,6 +193,15 @@ public class ListView<M extends ModelData> extends BoxComponent {
 
   public String getLoadingText() {
     return loadingText;
+  }
+
+  /**
+   * Returns the model processor.
+   * 
+   * @return the model processor
+   */
+  public ModelProcessor<M> getModelProcessor() {
+    return modelProcessor;
   }
 
   /**
@@ -231,32 +271,62 @@ public class ListView<M extends ModelData> extends BoxComponent {
     return all.indexOf(element);
   }
 
+  /**
+   * Moves the current selections down one level.
+   */
+  public void moveSelectedDown() {
+    List<M> sel = getSelectionModel().getSelectedItems();
+
+    Collections.sort(sel, new Comparator<M>() {
+      public int compare(M o1, M o2) {
+        return store.indexOf(o1) < store.indexOf(o2) ? 1 : 0;
+      }
+    });
+
+    for (M m : sel) {
+      int idx = store.indexOf(m);
+      if (idx < (store.getCount() - 1)) {
+        store.remove(m);
+        store.insert(m, idx + 1);
+      }
+    }
+    getSelectionModel().select(sel);
+  }
+
+  /**
+   * Moves the current selections up one level.
+   */
+  public void moveSelectedUp() {
+    List<M> sel = getSelectionModel().getSelectedItems();
+
+    Collections.sort(sel, new Comparator<M>() {
+      public int compare(M o1, M o2) {
+        return store.indexOf(o1) > store.indexOf(o2) ? 1 : 0;
+      }
+    });
+
+    for (M m : sel) {
+      int idx = store.indexOf(m);
+      if (idx > 0) {
+        store.remove(m);
+        store.insert(m, idx - 1);
+      }
+    }
+    getSelectionModel().select(sel);
+  }
+
   public void onComponentEvent(ComponentEvent ce) {
     super.onComponentEvent(ce);
     ListViewEvent le = (ListViewEvent) ce;
     switch (ce.type) {
       case Event.ONMOUSEOVER:
-        if (le.index != -1) {
-          Element item = all.getElement(le.index);
-          Element from = DOM.eventGetFromElement(ce.event);
-          if (from != null && !DOM.isOrHasChild(item, from)) {
-            onMouseOver(le);
-            onMouseAction(le);
-          }
-        }
+        onMouseOver(le);
         break;
       case Event.ONMOUSEOUT:
-        if (le.index != -1) {
-          Element item = all.getElement(le.index);
-          Element to = DOM.eventGetToElement(ce.event);
-          if (to != null && !DOM.isOrHasChild(item, to)) {
-            onMouseOut(le);
-            onMouseAction(le);
-          }
-        }
+        onMouseOut(le);
         break;
-      case Event.ONCLICK:
-        onClick(ce);
+      case Event.ONMOUSEDOWN:
+        onMouseDown(ce);
         break;
     }
   }
@@ -312,13 +382,28 @@ public class ListView<M extends ModelData> extends BoxComponent {
     this.itemSelector = itemSelector;
   }
 
+  /**
+   * Sets the text loading text to be displayed during a load request.
+   * 
+   * @param loadingText the loading text
+   */
   public void setLoadingText(String loadingText) {
     this.loadingText = loadingText;
   }
 
   /**
-   * Sets the style name to apply on mouse over (defaults to
-   * 'x-view-item-over').
+   * Sets the view's model processor. The model processor can be used to provide
+   * "formatted" properties to the XTemplate used to render the view.
+   * 
+   * @see ModelProcessor
+   * @param modelProcessor
+   */
+  public void setModelProcessor(ModelProcessor<M> modelProcessor) {
+    this.modelProcessor = modelProcessor;
+  }
+
+  /**
+   * Sets the style name to apply on mouse over.
    * 
    * @param overStyle the over style
    */
@@ -358,6 +443,21 @@ public class ListView<M extends ModelData> extends BoxComponent {
    */
   public void setSelectStyle(String selectStyle) {
     this.selectStyle = selectStyle;
+  }
+
+  /**
+   * Sets the template fragment to be used for the text of each listview item.
+   * 
+   * <pre><code>
+   * listview.setSimpleTemplate("{abbr} {name}");
+   * </code></pre>
+   * 
+   * @param html the html used only for the text of each item in the list
+   */
+  public void setSimpleTemplate(String html) {
+    assertPreRender();
+    html = "<tpl for=\".\"><div class=x-view-item>" + html + "</div></tpl>";
+    template = XTemplate.create(html);
   }
 
   /**
@@ -429,6 +529,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
     if (elem != null) {
       fly(elem).scrollIntoView(getElement(), false);
     }
+    focus();
   }
 
   protected void initComponent() {
@@ -478,8 +579,11 @@ public class ListView<M extends ModelData> extends BoxComponent {
 
   protected void onAdd(List<M> models, int index) {
     Element[] nodes = bufferRender(models);
-    el().insertChild(nodes, index);
     all.insert(nodes, index);
+    if (rendered) {
+      el().insertChild(nodes, index);
+      updateIndexes(index, -1);
+    }
   }
 
   protected void onBeforeLoad() {
@@ -491,48 +595,19 @@ public class ListView<M extends ModelData> extends BoxComponent {
     }
   }
 
-  protected void onClick(ComponentEvent be) {
+  protected void onMouseDown(ComponentEvent be) {
     El el = be.getTarget(itemSelector, 10);
     if (el != null) {
       fireEvent(Events.Select, be);
     }
   }
 
-  protected void onMouseAction(ListViewEvent le) {
-    if (le.index != -1) {
-      Element item = all.getElement(le.index);
-      String tip = item.getAttribute("qtip");
-      if (tip != null && (tip.equals("null") || tip.equals(""))) {
-        tip = null;
-      }
-      
-      if (tip != null) {
-        enableTips = true;
-      }
-      
-      if (!enableTips) {
-        return;
-      }
-   
-      if (toolTip == null) {
-        toolTip = getToolTip();
-        if (toolTip == null) {
-          toolTip = new ToolTip(this);
-        }
-      }
-      ToolTipConfig config = toolTip.getConfig();
-      config.setTarget(item);
-      config.setText(item.getAttribute("qtip"));
-      config.setTitle(item.getAttribute("qtitle"));
-      config.setEnabled(tip != null);
-      toolTip.update(config);
-    }
-
-  }
-
   protected void onMouseOut(ListViewEvent ce) {
-    if (ce.index != -1) {
-        fly(all.getElement(ce.index)).removeStyleName(overStyle);
+    if (overElement != null) {
+      if (!ce.within(overElement, true)) {
+        fly(overElement).removeStyleName(overStyle);
+        overElement = null;
+      }
     }
   }
 
@@ -541,14 +616,30 @@ public class ListView<M extends ModelData> extends BoxComponent {
       if (selectOnHover) {
         sm.select(ce.index);
       } else {
-        fly(all.getElement(ce.index)).addStyleName(overStyle);
+        Element e = all.getElement(ce.index);
+        if (e != null && e != overElement) {
+          fly(e).addStyleName(overStyle);
+          overElement = e;
+        }
       }
     }
   }
 
   protected void onRemove(ModelData data, int index) {
     if (all != null) {
-      all.remove(index);
+      Element e = getElement(index);
+      if (e != null) {
+        fly(e).removeStyleName(overStyle);
+        if (overElement == e) {
+          overElement = null;
+        }
+
+        getSelectionModel().deselect(index);
+
+        fly(e).removeFromParent();
+        all.remove(index);
+        updateIndexes(index, -1);
+      }
     }
   }
 
@@ -557,11 +648,20 @@ public class ListView<M extends ModelData> extends BoxComponent {
     setElement(DOM.createDiv(), target, index);
     el().setStyleAttribute("overflow", "auto");
     el().setStyleAttribute("padding", "0px");
+    if (!GXT.isIE) {
+      el().setTabIndex(0);
+    }
+
+    if (template == null) {
+      template = XTemplate.create("<tpl for=\".\"><div class='x-view-item'>{" + displayProperty
+          + "}</div></tpl>");
+    }
 
     if (store != null && store.getCount() > 0) {
       refresh();
     }
 
+    disableTextSelection(true);
     sinkEvents(Event.ONCLICK | Event.ONDBLCLICK | Event.MOUSEEVENTS);
   }
 
@@ -574,6 +674,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
         } else {
           fly(all.getElement(index)).removeStyleName(selectStyle);
         }
+        fly(all.getElement(index)).removeStyleName(overStyle);
       }
     }
   }
@@ -586,6 +687,9 @@ public class ListView<M extends ModelData> extends BoxComponent {
   }
 
   protected M prepareData(M model) {
+    if (modelProcessor != null) {
+      return modelProcessor.prepareData(model);
+    }
     return model;
   }
 

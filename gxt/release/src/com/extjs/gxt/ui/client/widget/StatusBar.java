@@ -76,9 +76,16 @@ public class StatusBar extends Component {
   }
 
   /**
-   * Sets the icon style.
+   * Sets the bar's icon style. The style name should match a CSS style that
+   * specifies a background image using the following format:
    * 
-   * @param iconStyle
+   * <pre><code>
+   * .my-icon {
+   *    background: url(images/icons/my-icon.png) no-repeat center left !important;
+   * }
+   * </code></pre>
+   * 
+   * @param iconStyle the icon style
    */
   public void setIconStyle(String iconStyle) {
     waitBtn.setVisible(true);

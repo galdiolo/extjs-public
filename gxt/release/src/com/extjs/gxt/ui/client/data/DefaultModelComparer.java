@@ -9,11 +9,11 @@ package com.extjs.gxt.ui.client.data;
 
 /**
  * Default <code>ModelComparer</code>
- *
+ * 
  * @param <M> the model type
  */
 public class DefaultModelComparer<M extends ModelData> implements ModelComparer<M> {
-  
+
   /**
    * Global instance.
    */

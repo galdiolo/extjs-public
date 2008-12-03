@@ -97,10 +97,10 @@ public class ScriptTagProxy<C, D> implements DataProxy<C, D> {
   }
 
   private native void createCallback(ScriptTagProxy proxy, String transId) /*-{
-   cb = function( j ){
-   proxy.@com.extjs.gxt.ui.client.data.ScriptTagProxy::onReceivedData(Ljava/lang/String;Lcom/google/gwt/core/client/JavaScriptObject;)(transId, j);
-   };
-   $wnd[transId]=cb;
-   }-*/;
+    cb = function( j ){
+    proxy.@com.extjs.gxt.ui.client.data.ScriptTagProxy::onReceivedData(Ljava/lang/String;Lcom/google/gwt/core/client/JavaScriptObject;)(transId, j);
+    };
+    $wnd[transId]=cb;
+    }-*/;
 
 }

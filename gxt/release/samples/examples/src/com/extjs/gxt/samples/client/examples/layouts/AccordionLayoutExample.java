@@ -20,11 +20,11 @@ public class AccordionLayoutExample extends LayoutContainer {
 
   public AccordionLayoutExample() {
     setLayout(new FlowLayout(10));
-    
+
     ContentPanel panel = new ContentPanel();
     panel.setHeading("AccordionLayout");
     panel.setBodyBorder(false);
-    
+
     panel.setLayout(new AccordionLayout());
     panel.setIconStyle("icon-accordion");
 
@@ -41,7 +41,7 @@ public class AccordionLayoutExample extends LayoutContainer {
     family.add(newItem("Lia", "user-kid"));
     family.add(newItem("Alec", "user-kid"));
     family.setExpanded(true);
-    
+
     TreeItem friends = new TreeItem("Friends");
     tree.getRootItem().add(friends);
     friends.add(newItem("Bob", "user"));
@@ -57,27 +57,27 @@ public class AccordionLayoutExample extends LayoutContainer {
     cp.setHeading("Settings");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     panel.add(cp);
-    
+
     cp = new ContentPanel();
     cp.setBodyStyleName("pad-text");
     cp.setHeading("Stuff");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     panel.add(cp);
-    
+
     cp = new ContentPanel();
     cp.setBodyStyleName("pad-text");
     cp.setHeading("More Stuff");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     panel.add(cp);
     panel.setSize(200, 325);
-    
+
     add(panel);
   }
-  
+
   private TreeItem newItem(String text, String iconStyle) {
     TreeItem item = new TreeItem(text);
     item.setIconStyle(iconStyle);
     return item;
   }
-  
+
 }

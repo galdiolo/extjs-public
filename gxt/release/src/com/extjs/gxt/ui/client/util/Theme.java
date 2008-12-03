@@ -44,9 +44,9 @@ public class Theme extends BaseModelData {
     BLUE = new Theme("blue", GXT.MESSAGES.themeSelector_blueTheme(), "ext-all.css");
     GRAY = new Theme("gray", GXT.MESSAGES.themeSelector_grayTheme(), "xtheme-gray.css");
   }
-  
+
   protected Theme() {
-    
+
   }
 
   public Theme(String id, String name, String file) {
@@ -56,15 +56,15 @@ public class Theme extends BaseModelData {
   }
 
   public String getId() {
-    return this.<String>get("id");
+    return this.<String> get("id");
   }
 
   public String getName() {
-    return this.<String>get("name");
+    return this.<String> get("name");
   }
 
   public String getFile() {
-    return this.<String>get("file");
+    return this.<String> get("file");
   }
 
   public Map asMap() {

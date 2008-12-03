@@ -21,13 +21,25 @@ import com.google.gwt.user.client.ui.Widget;
  * internal element structure, inserting its child components at any location.
  * For example, a TableLayout lays out its children using HTML tables.
  * 
- * <p/>Many layouts support layout data which are configurable objects that
+ * <p/> Many layouts support layout data which are configurable objects that
  * provide additional information to the layout. These objects can be passed
  * when adding and inserting child components into the container. Each layout
- * will document if and what layout data it supports.
+ * will document if and what layout data it supports. </p>
  * 
- * <p/>{@link FlowLayout} is the the default layout and will be used if not a
- * layout is not specified.
+ * Code snippet:
+ * 
+ * <pre>
+   LayoutContainer container = new LayoutContainer();
+   container.add(new Button("Click Me"));
+   container.setSize(300,300);
+   container.setBorders(true);
+   RootPanel.get().add(container);
+ * </pre>
+ * 
+ * {@link FlowLayout} is the the default layout and will be used if not a layout
+ * is not specified. You must size/position containers unless they are in an
+ * existing container that lays out its children.</p>
+ * 
  * <dl>
  * <dt><b>Events:</b></dt>
  * 
@@ -99,8 +111,7 @@ public class LayoutContainer extends ScrollContainer<Component> {
 
   /**
    * Adds a widget to this Container. Fires the <i>BeforeAdd</i> event before
-   * adding, then fires the <i>Add</i> event after the component has been
-   * added.
+   * adding, then fires the <i>Add</i> event after the component has been added.
    * 
    * @param widget the widget to add. If the widget is not a Component instance
    *          it will be wrapped in a WidgetComponent
@@ -111,8 +122,7 @@ public class LayoutContainer extends ScrollContainer<Component> {
 
   /**
    * Adds a widget to this Container. Fires the <i>BeforeAdd</i> event before
-   * adding, then fires the <i>Add</i> event after the component has been
-   * added.
+   * adding, then fires the <i>Add</i> event after the component has been added.
    * 
    * @param widget the widget to add. If the widget is not a Component instance
    *          it will be wrapped in a WidgetComponent
@@ -124,8 +134,8 @@ public class LayoutContainer extends ScrollContainer<Component> {
 
   /**
    * Creates a new HTML instance and adds it to the container. Fires the
-   * <i>BeforeAdd</i> event before adding, then fires the <i>Add</i> event
-   * after the component has been added.
+   * <i>BeforeAdd</i> event before adding, then fires the <i>Add</i> event after
+   * the component has been added.
    * 
    * @param text the html text
    * @return the new HTML instance
@@ -271,7 +281,7 @@ public class LayoutContainer extends ScrollContainer<Component> {
   public void setLayout(Layout layout) {
     super.setLayout(layout);
   }
-  
+
   /**
    * Sets the component's layout data.
    * 

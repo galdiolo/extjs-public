@@ -233,7 +233,7 @@ public class Resizable extends BaseObservable {
       DOM.removeChild(resize.getElement(), handle.getElement());
     }
   }
-  
+
   /**
    * Removes a resize listener.
    * 
@@ -243,7 +243,7 @@ public class Resizable extends BaseObservable {
     removeListener(Events.ResizeStart, listener);
     removeListener(Events.ResizeEnd, listener);
   }
-  
+
   /**
    * Enables or disables the drag handles.
    * 

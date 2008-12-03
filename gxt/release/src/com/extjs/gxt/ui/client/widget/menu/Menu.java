@@ -16,6 +16,8 @@ import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.PreviewEvent;
 import com.extjs.gxt.ui.client.util.BaseEventPreview;
 import com.extjs.gxt.ui.client.util.KeyNav;
+import com.extjs.gxt.ui.client.util.Point;
+import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.Shadow.ShadowPosition;
 import com.google.gwt.user.client.DOM;
@@ -30,68 +32,68 @@ import com.google.gwt.user.client.ui.Widget;
  * <dl>
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>BeforeShow</b> : MenuEvent(menu)<br>
+ * <dd><b>BeforeShow</b> : MenuEvent(container)<br>
  * <div>Fires before this menu is displayed. Listener can set the doit field to
  * <code>false</code> to cancel the menu being displayed.</div>
  * <ul>
- * <li>menu : this</li>
+ * <li>container : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Show</b> : MenuEvent(menu)<br>
+ * <dd><b>Show</b> : MenuEvent(container)<br>
  * <div>Fires after this menu is displayed.</div>
  * <ul>
- * <li>menu : this</li>
+ * <li>container : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>BeforeHide</b> : MenuEvent(menu)<br>
+ * <dd><b>BeforeHide</b> : MenuEvent(container)<br>
  * <div>Fired before the menu is hidden. Listener can set the doit field to
  * <code>false</code> to cancel the menu being hidden.</div>
  * <ul>
- * <li>menu : this</li>
+ * <li>container : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Hide</b> : MenuEvent(menu)<br>
+ * <dd><b>Hide</b> : MenuEvent(container)<br>
  * <div>Fires after this menu is hidden.</div>
  * <ul>
- * <li>menu : this</li>
+ * <li>container : this</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>BeforeAdd</b> : MenuEvent(menu, item, index)<br>
+ * <dd><b>BeforeAdd</b> : MenuEvent(container, item, index)<br>
  * <div>Fires before a item is added or inserted. Listeners can set the
  * <code>doit</code> field to <code>false</code> to cancel the action.</div>
  * <ul>
- * <li>menu : this</li>
+ * <li>container : this</li>
  * <li>item : the item being added</li>
  * <li>index : the index at which the item will be added</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>BeforeRemove</b> : MenuEvent(menu, item)<br>
+ * <dd><b>BeforeRemove</b> : MenuEvent(container, item)<br>
  * <div>Fires before a item is removed. Listeners can set the <code>doit</code>
  * field to <code>false</code> to cancel the action.</div>
  * <ul>
- * <li>menu : this</li>
+ * <li>container : this</li>
  * <li>item : the item being removed</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Add</b> : MenuEvent(menu, item, index)<br>
+ * <dd><b>Add</b> : MenuEvent(container, item, index)<br>
  * <div>Fires after a item has been added or inserted.</div>
  * <ul>
- * <li>menu : this</li>
+ * <li>container : this</li>
  * <li>item : the item that was added</li>
  * <li>index : the index at which the item will be added</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Remove</b> : MenuEvent(menu, item)<br>
+ * <dd><b>Remove</b> : MenuEvent(container, item)<br>
  * <div>Fires after a item has been removed.</div>
  * <ul>
- * <li>menu : this</li>
+ * <li>container : this</li>
  * <li>item : the item being removed</li>
  * </ul>
  * </dd>
@@ -104,7 +106,7 @@ public class Menu extends Container<Item> {
   protected Item parentItem;
   protected BaseEventPreview eventPreview;
 
-  private String subMenuAlign = "tl-tr-?";
+  private String subMenuAlign = "tl-tr?";
   private String defaultAlign = "tl-bl?";
   private ShadowPosition shadowPosition = ShadowPosition.SIDES;
   private int minWidth = 120;
@@ -128,14 +130,11 @@ public class Menu extends Container<Item> {
     eventPreview = new BaseEventPreview() {
       @Override
       protected boolean onAutoHide(PreviewEvent pe) {
-        hide(true);
-        return true;
+        return Menu.this.onAutoHide(pe);
       }
     };
     eventPreview.setAutoHideCancelEvent(false);
   }
-  
-
 
   /**
    * Adds a item to the menu.
@@ -346,10 +345,10 @@ public class Menu extends Container<Item> {
       RootPanel.get().add(this);
       showing = true;
       el().makePositionable(true);
-      
+
       onShow();
       el().alignTo(elem, pos, new int[] {0, 0});
-     
+
       eventPreview.add();
       focus();
       fireEvent(Events.Show, me);
@@ -376,10 +375,10 @@ public class Menu extends Container<Item> {
     if (fireEvent(Events.BeforeShow, me)) {
       RootPanel.get().add(this);
       el().makePositionable(true);
-      
+
       // add menu to ignore list
       eventPreview.getIgnoreList().add(getElement());
-      
+
       onShow();
       setPagePosition(x, y);
 
@@ -417,6 +416,37 @@ public class Menu extends Container<Item> {
   protected void createStyles(String baseStyle) {
     menuList = baseStyle + "-list";
     menuListItem = baseStyle + "-list-item";
+  }
+
+  @Override
+  protected void doAttachChildren() {
+    super.doAttachChildren();
+    for (Item item : getItems()) {
+      if (item instanceof AdapterMenuItem) {
+        ComponentHelper.doAttach(((AdapterMenuItem) item).widget);
+      }
+    }
+  }
+
+  @Override
+  protected void doDetachChildren() {
+    super.doDetachChildren();
+    for (Item item : getItems()) {
+      if (item instanceof AdapterMenuItem) {
+        ComponentHelper.doDetach(((AdapterMenuItem) item).widget);
+      }
+    }
+  }
+
+  protected boolean onAutoHide(PreviewEvent pe) {
+    // in some cases the double click target element is body
+    // which causes the menu to be hidden, so check xy
+    Point p = BaseEventPreview.getLastXY();
+    if (getBounds(false).contains(p)) {
+      return false;
+    }
+    hide(true);
+    return true;
   }
 
   @Override

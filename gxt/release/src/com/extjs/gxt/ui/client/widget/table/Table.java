@@ -7,9 +7,7 @@
  */
 package com.extjs.gxt.ui.client.widget.table;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Style.SelectionMode;
@@ -34,42 +32,50 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * The table is used to display two-dimensional table of cells.
  * 
+ * <p /> When using custom cell renderers or nested widgets within cells it may
+ * be nesseccary to increase the cell selector depth to account for the new
+ * nested elements within each cell. For example, if nesting a table structure
+ * in a cell, the selector depth should be increased to at least a value of 10 (@see
+ * {@link TableView#setCellSelectorDepth(int)}.
+ * 
  * <dl>
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>BeforeAdd</b> : TableEvent(table, item)<br>
+ * <dd><b>BeforeAdd</b> : TableEvent(table, item, rowIndex)<br>
  * <div>Fires before a item is added or inserted. Listeners can set the
  * <code>doit</code> field to <code>false</code> to cancel the action.</div>
  * <ul>
  * <li>table : this</li>
  * <li>item : the item being added</li>
- * <li>index : the index at which the item will be added</li>
+ * <li>rowIndex : the index at which the item will be added</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>BeforeRemove</b> : TableEvent(table, item)<br>
+ * <dd><b>BeforeRemove</b> : TableEvent(table, item, rowIndex)<br>
  * <div>Fires before a item is removed. Listeners can set the <code>doit</code>
  * field to <code>false</code> to cancel the action.</div>
  * <ul>
  * <li>table : this</li>
  * <li>item : the item being removed</li>
+ * <li>rowIndex : the index of the removed item</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Add</b> : TableEvent(table, item)<br>
+ * <dd><b>Add</b> : TableEvent(table, item, rowIndex)<br>
  * <div>Fires after a item has been added or inserted.</div>
  * <ul>
  * <li>table : this</li>
  * <li>item : the item that was added</li>
- * <li>index : the index at which the item will be added</li>
+ * <li>rowIndex : the index at which the item will be added</li>
  * </ul>
  * </dd>
  * 
- * <dd><b>Remove</b> : TableEvent(table this, item)<br>
+ * <dd><b>Remove</b> : TableEvent(table, item, rowIndex)<br>
  * <div>Fires after a item has been removed.</div>
  * <ul>
  * <li>table : this</li>
- * <li>item : the item being removed</li>
+ * <li>item : the item that was removed</li>
+ * <li>rowIndex : the index of the item that was remvoed</li>
  * </ul>
  * </dd>
  * 
@@ -214,17 +220,17 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
   private boolean columnContextMenu = true;
   private boolean verticalLines;
   private boolean horizontalScroll = true;
-  private Map nodes = new HashMap();
   private TableView view;
   private Size lastSize;
   private int lastLeft;
+  private boolean stripeRows;
 
   private DelayedTask scrollTask = new DelayedTask(new Listener<ComponentEvent>() {
     public void handleEvent(ComponentEvent ce) {
       header.updateSplitBars();
     }
   });
-  
+
   private DelayedTask recaluateTask = new DelayedTask(new Listener<ComponentEvent>() {
     public void handleEvent(ComponentEvent ce) {
       recalculate();
@@ -270,6 +276,16 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
     addListener(Events.CellDoubleClick, listener);
     addListener(Events.RowClick, listener);
     addListener(Events.RowDoubleClick, listener);
+  }
+
+  @Override
+  public TableItem findItem(Element elem) {
+    if (rendered && view != null) {
+      int idx = view.findRowIndex(elem);
+      TableItem item = idx != -1 ? getItem(idx) : super.findItem(elem);
+      return item;
+    }
+    return super.findItem(elem);
   }
 
   /**
@@ -408,7 +424,6 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
   public boolean insert(TableItem item, int index) {
     boolean added = super.insert(item, index);
     if (added) {
-      register(item);
       if (rendered) {
         view.renderItem(item, index);
       }
@@ -417,6 +432,21 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
       }
     }
     return added;
+  }
+
+  /**
+   * Returns true if row striping is enabled.
+   * 
+   * @return the strip row state
+   */
+  public boolean isStripeRows() {
+    return stripeRows;
+  }
+
+  @Override
+  public void onAttach() {
+    super.onAttach();
+    header.resizeColumns(false, true);
   }
 
   public void onBrowserEvent(Event event) {
@@ -455,14 +485,7 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
 
   @Override
   public boolean remove(TableItem item) {
-    boolean removed = super.remove(item);
-    if (removed) {
-      unregister(item);
-      if (rendered) {
-        view.removeItem(item);
-      }
-    }
-    return removed;
+    return super.remove(item);
   }
 
   /**
@@ -568,6 +591,15 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
   }
 
   /**
+   * True to stripe the rows (defaults to false).
+   * 
+   * @param stripeRows true to strip rows
+   */
+  public void setStripeRows(boolean stripeRows) {
+    this.stripeRows = stripeRows;
+  }
+
+  /**
    * Sets the table's header. Should only be called when providing a custom
    * table header. Has no effect if called after the table has been rendered.
    * 
@@ -621,22 +653,17 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
   }
 
   @Override
-  public TableItem findItem(Element elem) {
-    if (rendered && view != null) {
-      int idx = view.findRowIndex(elem);
-      TableItem item = idx != -1 ? getItem(idx) : super.findItem(elem);
-      return item;
-    }
-    return super.findItem(elem);
-  }
-
-  @Override
   protected ComponentEvent createComponentEvent(Event event) {
-    TableEvent te = new TableEvent(this, (event == null) ? null : findItem(DOM.eventGetTarget(event)));
+    TableEvent te = new TableEvent(this);
+    te.event = event;
     if (view != null && event != null) {
-      te.cellIndex = view.findCellIndex((Element)event.getTarget());
+      Element target = event.getTarget().cast();
+      int idx = view.findRowIndex(target);
+      if (idx != -1) {
+        te.item = idx != -1 ? getItem(idx) : null;
+        te.cellIndex = view.findCellIndex(target);
+      }
     }
-   
     return te;
   }
 
@@ -692,7 +719,7 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
       if (value != null) {
         return value.toString();
       }
-      return null;
+      return "&nbsp;";
     }
   }
 
@@ -722,7 +749,7 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
 
     for (TableColumn col : getColumnModel().getColumns()) {
       if (col.sortDir != SortDir.NONE) {
-        header.getColumnUI(col.index).onSortChange(col.sortDir);
+        header.onSortChange(col, col.sortDir);
       }
     }
 
@@ -730,12 +757,6 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
     view.init(this);
     view.render();
     view.renderItems();
-  }
-
-  @Override
-  public void onAttach() {
-    super.onAttach();
-    header.resizeColumns(false, true);
   }
 
   protected void onResize(int width, int height) {
@@ -756,12 +777,15 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
     getView().clearHoverStyles();
   }
 
-  private void register(TableItem item) {
-    nodes.put(item.getId(), item);
-  }
-
-  private void unregister(TableItem item) {
-    nodes.remove(item.getId());
+  @Override
+  protected ComponentEvent previewEvent(int type, ComponentEvent ce) {
+    switch (type) {
+      case Events.Remove:
+      case Events.Add:
+        TableEvent te = (TableEvent) ce;
+        te.rowIndex = te.index;
+    }
+    return super.previewEvent(type, ce);
   }
 
 }

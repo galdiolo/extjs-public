@@ -142,7 +142,7 @@ public class TextField<D> extends Field<D> {
   public boolean getAllowBlank() {
     return allowBlank;
   }
-  
+
   /**
    * Returns the cursor position.
    * 
@@ -160,7 +160,7 @@ public class TextField<D> extends Field<D> {
   public int getMaxLength() {
     return maxLength;
   }
-  
+
   @Override
   public TextFieldMessages getMessages() {
     return (TextFieldMessages) messages;
@@ -267,7 +267,7 @@ public class TextField<D> extends Field<D> {
   public void setCursorPos(int pos) {
     setSelectionRange(pos, 0);
   }
-  
+
   /**
    * Sets the maximum input field length.
    * 
@@ -308,7 +308,7 @@ public class TextField<D> extends Field<D> {
   public void setRegex(String regex) {
     this.regex = regex;
   }
-  
+
   /**
    * Selects the range.
    * 
@@ -318,7 +318,7 @@ public class TextField<D> extends Field<D> {
   public void setSelectionRange(int pos, int length) {
     impl.setSelectionRange(getInputEl().dom, pos, length);
   }
-  
+
   /**
    * True to automatically select any existing field text when the field
    * receives input focus (defaults to false).
@@ -332,9 +332,9 @@ public class TextField<D> extends Field<D> {
   /**
    * Sets the validator instance to be called during field validation. It will
    * be called only after the basic validators all return true, and will be
-   * passed the current field value and expected to return <code>null</code>
-   * if the value is valid or a string error message if invalid. Default value
-   * is <code>null</code>.
+   * passed the current field value and expected to return <code>null</code> if
+   * the value is valid or a string error message if invalid. Default value is
+   * <code>null</code>.
    * 
    * @param validator the validator
    */

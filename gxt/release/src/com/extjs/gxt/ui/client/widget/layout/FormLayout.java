@@ -7,14 +7,18 @@
  */
 package com.extjs.gxt.ui.client.widget.layout;
 
+import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.Template;
+import com.extjs.gxt.ui.client.event.ContainerEvent;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.Params;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.form.AdapterField;
 import com.extjs.gxt.ui.client.widget.form.Field;
+import com.extjs.gxt.ui.client.widget.form.HiddenField;
 import com.extjs.gxt.ui.client.widget.form.LabelField;
 import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
 import com.google.gwt.user.client.Element;
@@ -30,7 +34,7 @@ public class FormLayout extends AnchorLayout {
 
   private LabelAlign labelAlign = LabelAlign.LEFT;
   private boolean hideLabels;
-  private String labelSeperator = ":";
+  private String labelSeparator = ":";
   private int labelWidth = 100;
   private int defaultWidth = 200;
   private Template fieldTemplate;
@@ -39,31 +43,13 @@ public class FormLayout extends AnchorLayout {
   private int labelPad = 10;
   private int padding = 10;
   private int labelAdjust;
+  private Listener<ContainerEvent> listener;
 
   /**
    * Creates a new form layout.
    */
   public FormLayout() {
 
-  }
-
-  /**
-   * Returns the label pad.
-   * 
-   * @return the label pad
-   */
-  public int getLabelPad() {
-    return labelPad;
-  }
-
-  /**
-   * The default padding in pixels for field labels (defaults to 10). labelPad
-   * only applies if labelWidth is also specified, otherwise it will be ignored.
-   * 
-   * @param labelPad the label pad
-   */
-  public void setLabelPad(int labelPad) {
-    this.labelPad = labelPad;
   }
 
   public FormLayout(LabelAlign labelAlign) {
@@ -98,12 +84,21 @@ public class FormLayout extends AnchorLayout {
   }
 
   /**
-   * Returns the label seperator.
+   * Returns the label pad.
    * 
-   * @return the label seperaotr
+   * @return the label pad
    */
-  public String getLabelSeperator() {
-    return labelSeperator;
+  public int getLabelPad() {
+    return labelPad;
+  }
+
+  /**
+   * Returns the label separator.
+   * 
+   * @return the label separaotr
+   */
+  public String getLabelSeparator() {
+    return labelSeparator;
   }
 
   /**
@@ -126,7 +121,23 @@ public class FormLayout extends AnchorLayout {
 
   @Override
   public void setContainer(Container ct) {
+    if (listener == null) {
+      listener = new Listener<ContainerEvent>() {
+        public void handleEvent(ContainerEvent be) {
+          if (be.item instanceof Field) {
+            onRemove((Field) be.item);
+          }
+        }
+      };
+    }
+
+    if (this.container != null) {
+      this.container.removeListener(Events.BeforeRemove, listener);
+    }
+
     super.setContainer(ct);
+
+    this.container.addListener(Events.BeforeRemove, listener);
 
     if (labelAlign != null) {
       ct.addStyleName("x-form-label-" + labelAlign.name().toLowerCase());
@@ -188,12 +199,22 @@ public class FormLayout extends AnchorLayout {
   }
 
   /**
-   * Sets the label seperator (defaults to ':').
+   * The default padding in pixels for field labels (defaults to 10). labelPad
+   * only applies if labelWidth is also specified, otherwise it will be ignored.
    * 
-   * @param labelSeperator the label seperator
+   * @param labelPad the label pad
    */
-  public void setLabelSeperator(String labelSeperator) {
-    this.labelSeperator = labelSeperator;
+  public void setLabelPad(int labelPad) {
+    this.labelPad = labelPad;
+  }
+
+  /**
+   * Sets the label separator (defaults to ':').
+   * 
+   * @param labelSeparator the label separator
+   */
+  public void setLabelSeparator(String labelSeparator) {
+    this.labelSeparator = labelSeparator;
   }
 
   /**
@@ -215,6 +236,16 @@ public class FormLayout extends AnchorLayout {
   }
 
   @Override
+  protected int adjustWidthAnchor(int width, Component comp) {
+    if (comp instanceof Field) {
+      Field f = (Field) comp;
+      int adj = XDOM.isVisibleBox ? padding : (padding / 2);
+      return width - (f.isHideLabel() ? 0 : (labelAdjust + adj));
+    }
+    return super.adjustWidthAnchor(width, comp);
+  }
+
+  @Override
   protected boolean isValidParent(Element elem, Element parent) {
     return true;
   }
@@ -227,9 +258,18 @@ public class FormLayout extends AnchorLayout {
     }
   }
 
+  protected void onRemove(Field field) {
+    if (field.isRendered()) {
+      El elem = field.el().findParent(".x-form-item", 5);
+      if (elem != null) {
+        elem.removeFromParent();
+      }
+    }
+  }
+
   @Override
   protected void renderComponent(Component component, int index, El target) {
-    if (component instanceof Field) {
+    if (component instanceof Field && !(component instanceof HiddenField)) {
       Field f = (Field) component;
       renderField((Field) component, index, target);
       FormData formData = (FormData) getLayoutData(f);
@@ -246,22 +286,14 @@ public class FormLayout extends AnchorLayout {
           f.setHeight(formData.getHeight());
         }
       }
+    } else {
+      super.renderComponent(component, index, target);
     }
-  }
-
-  @Override
-  protected int adjustWidthAnchor(int width, Component comp) {
-    if (comp instanceof Field) {
-      Field f = (Field) comp;
-      int adj = XDOM.isVisibleBox ? padding : (padding / 2);
-      return width - (f.isHideLabel() ? 0 : (labelAdjust + adj));
-    }
-    return super.adjustWidthAnchor(width, comp);
   }
 
   private void renderField(Field field, int index, El target) {
     if (field != null && !field.isRendered()) {
-      String ls = field.getLabelSeparator() != null ? field.getLabelSeparator() : labelSeperator;
+      String ls = field.getLabelSeparator() != null ? field.getLabelSeparator() : labelSeparator;
       field.setLabelSeparator(ls);
 
       Params p = new Params();

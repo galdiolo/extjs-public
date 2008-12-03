@@ -17,7 +17,7 @@ import com.extjs.gxt.ui.client.widget.treetable.TreeTable;
 import com.extjs.gxt.ui.client.widget.treetable.TreeTableItem;
 
 /**
- * Binds a tree table and store.
+ * A <code>StoreBinder</code> implementation for TreeTable.
  * 
  * @param <M> the model type
  */
@@ -93,7 +93,7 @@ public class TreeTableBinder<M extends ModelData> extends TreeBinder<M> {
     if (loader != null) {
       item.setLeaf(!loader.hasChildren(model));
     } else {
-      item.setLeaf(store.getChildCount(model) == 0);
+      item.setLeaf(hasChildren(model));
     }
 
     return item;
@@ -101,6 +101,10 @@ public class TreeTableBinder<M extends ModelData> extends TreeBinder<M> {
 
   protected String getColumnId(int column) {
     return treeTable.getColumn(column).getId();
+  }
+
+  protected boolean hasChildren(M parent) {
+    return store.getChildCount(parent) != 0;
   }
 
   @Override

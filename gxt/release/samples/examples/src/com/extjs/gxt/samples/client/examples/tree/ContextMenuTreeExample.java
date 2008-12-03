@@ -42,7 +42,7 @@ public class ContextMenuTreeExample extends LayoutContainer {
     insert.setIconStyle("icon-add");
     insert.addSelectionListener(new SelectionListener<MenuEvent>() {
       public void componentSelected(MenuEvent ce) {
-        TreeItem item = (TreeItem)tree.getSelectionModel().getSelectedItem();
+        TreeItem item = (TreeItem) tree.getSelectionModel().getSelectedItem();
         if (item != null) {
           TreeItem newItem = new TreeItem();
           newItem.setText("Add Child " + count++);
@@ -58,7 +58,7 @@ public class ContextMenuTreeExample extends LayoutContainer {
     remove.setIconStyle("icon-delete");
     remove.addSelectionListener(new SelectionListener<MenuEvent>() {
       public void componentSelected(MenuEvent ce) {
-        TreeItem item = (TreeItem)tree.getSelectionModel().getSelectedItem();
+        TreeItem item = (TreeItem) tree.getSelectionModel().getSelectedItem();
         if (item != null) {
           item.getParentItem().remove(item);
         }

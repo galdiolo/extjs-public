@@ -247,8 +247,8 @@ public class PagingToolBar extends Component implements Listener {
   }
 
   /**
-   * Adds an item to the end of the tool bar (pre-render). Can be used to add custom
-   * components to the tool bar. Use {@link AdapterToolItem} to adapt and
+   * Adds an item to the end of the tool bar (pre-render). Can be used to add
+   * custom components to the tool bar. Use {@link AdapterToolItem} to adapt and
    * component to be used in the tool bar.
    * 
    * @param item the item to add
@@ -628,11 +628,11 @@ public class PagingToolBar extends Component implements Listener {
     toolBar.add(last);
     toolBar.add(new SeparatorToolItem());
     toolBar.add(refresh);
-    
+
     for (ToolItem item : items) {
       toolBar.add(item);
     }
-    
+
     toolBar.add(new FillToolItem());
     toolBar.add(new AdapterToolItem(displayText));
 

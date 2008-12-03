@@ -28,6 +28,5 @@ public class MenuEvent extends ContainerEvent<Menu, Item> {
   public MenuEvent(Menu container, Item component) {
     super(container, component);
   }
-  
 
 }

@@ -12,5 +12,5 @@ import java.util.Map;
 public interface SummaryRenderer {
 
   public String render(Double value, Map<String, Double> data);
-  
+
 }

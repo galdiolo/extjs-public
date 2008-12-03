@@ -17,40 +17,40 @@ public class ComponentHelper {
   public static void doAttach(Widget widget) {
     if (widget != null && !widget.isAttached()) {
       if (widget instanceof Component) {
-        ((Component)widget).onAttach();
+        ((Component) widget).onAttach();
       } else {
         doAttachNative(widget);
       }
     }
   }
-  
+
   public static void doDetach(Widget widget) {
     if (widget != null && widget.isAttached()) {
       if (widget instanceof Component) {
-        ((Component)widget).onDetach();
+        ((Component) widget).onDetach();
       } else {
         doDetachNative(widget);
       }
     }
   }
-  
+
   public static LayoutData getLayoutData(Component c) {
     return c.getLayoutData();
   }
-  
+
   public static void setLayoutData(Component c, LayoutData data) {
     c.setLayoutData(data);
   }
-  
+
   public static void setModel(Component c, ModelData model) {
     c.setModel(model);
   }
-  
+
   static native void doAttachNative(Widget widget) /*-{
-    widget.@com.google.gwt.user.client.ui.Widget::onAttach()();
-  }-*/;
+     widget.@com.google.gwt.user.client.ui.Widget::onAttach()();
+   }-*/;
 
   static native void doDetachNative(Widget widget) /*-{
-   widget.@com.google.gwt.user.client.ui.Widget::onDetach()();
-  }-*/;
+    widget.@com.google.gwt.user.client.ui.Widget::onDetach()();
+   }-*/;
 }

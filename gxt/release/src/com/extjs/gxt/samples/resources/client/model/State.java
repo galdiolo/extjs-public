@@ -20,11 +20,11 @@ public class State extends BaseModelData {
     setName(name);
     setSlogan(slogan);
   }
-  
+
   public String getSlogan() {
     return get("slogan");
   }
-  
+
   public void setSlogan(String slogan) {
     set("slogan", slogan);
   }

@@ -51,9 +51,8 @@ public class FillLayout extends RowLayout {
     int count = container.getItemCount();
     for (int i = 0; i < count; i++) {
       Component c = container.getItem(i);
-      int width = (w / count) - c.el().getMargins("lr") ;
+      int width = (w / count) - getSideMargins(c);
       int height = h - c.el().getMargins("tb");
-
       setSize(c, width, height);
     }
   }
@@ -68,9 +67,8 @@ public class FillLayout extends RowLayout {
     int count = container.getItemCount();
     for (int i = 0; i < count; i++) {
       Component c = container.getItem(i);
-      int width = w - c.el().getMargins("lr");
+      int width = w - getSideMargins(c);
       int height = (h / count) - c.el().getMargins("tb");
-
       setSize(c, width, height);
     }
   }

@@ -120,7 +120,7 @@ public interface SelectionModel<C extends Container, T extends Component> {
    * @param items the items
    */
   public void select(T... items);
-  
+
   /**
    * Selects the item.
    * 

@@ -25,8 +25,8 @@ import com.extjs.gxt.ui.client.widget.DataList;
 import com.extjs.gxt.ui.client.widget.DataListItem;
 
 /**
- * Binds a data list and a store.
- *
+ * A <code>StoreBinder</code> implementation for DataList.
+ * 
  * @param <M> the model type
  */
 public class DataListBinder<M extends ModelData> extends StoreBinder<ListStore<M>, DataList, M>
@@ -40,7 +40,7 @@ public class DataListBinder<M extends ModelData> extends StoreBinder<ListStore<M
 
   /**
    * Creates a new data list store binder.
-   *
+   * 
    * @param list the data list
    * @param store the list store
    */
@@ -79,7 +79,7 @@ public class DataListBinder<M extends ModelData> extends StoreBinder<ListStore<M
 
   /**
    * Returns the display property.
-   *
+   * 
    * @return the display property
    */
   public String getDisplayProperty() {
@@ -97,7 +97,7 @@ public class DataListBinder<M extends ModelData> extends StoreBinder<ListStore<M
 
   /**
    * Returns the list store.
-   *
+   * 
    * @return the store
    */
   public ListStore<M> getStore() {

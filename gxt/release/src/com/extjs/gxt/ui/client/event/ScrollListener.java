@@ -29,7 +29,7 @@ public class ScrollListener implements Listener<ComponentEvent> {
    * @param ce the component event
    */
   public void widgetScrolled(ComponentEvent ce) {
-    
+
   }
 
 }

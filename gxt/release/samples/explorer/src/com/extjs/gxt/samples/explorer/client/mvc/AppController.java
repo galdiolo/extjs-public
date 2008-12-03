@@ -14,10 +14,10 @@ import com.extjs.gxt.ui.client.mvc.Controller;
 public class AppController extends Controller {
 
   private AppView appView;
-  
+
   public AppController() {
     appView = new AppView(this);
-    
+
     registerEventTypes(AppEvents.Init);
   }
 

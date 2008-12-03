@@ -17,7 +17,7 @@ import java.util.List;
 public abstract class BeanModelFactory {
 
   protected abstract BeanModel newInstance();
-  
+
   /**
    * Creates a new bean model instance.
    * 
@@ -43,6 +43,5 @@ public abstract class BeanModelFactory {
     }
     return models;
   }
-
 
 }

@@ -8,9 +8,9 @@ import com.extjs.gxt.ui.client.data.BaseTreeModel;
 public class Post extends BaseTreeModel<Post> implements Serializable {
 
   protected Date dummy;
-  
+
   public Post() {
-    
+
   }
 
   public String getUsername() {
@@ -46,4 +46,3 @@ public class Post extends BaseTreeModel<Post> implements Serializable {
   }
 
 }
-

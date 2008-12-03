@@ -11,11 +11,11 @@ package com.extjs.gxt.ui.client.util;
  * Instances of this class represent a rectangle's size.
  */
 public class Size {
-  
+
   public static Size newInstance(int x, int y) {
     return new Size(x, y);
   }
-  
+
   /**
    * The width.
    */
@@ -42,7 +42,7 @@ public class Size {
   }
 
   public boolean equals(Object obj) {
-    Size s = (Size)obj;
+    Size s = (Size) obj;
     if (width == s.width && height == s.height) {
       return true;
     }

@@ -125,9 +125,16 @@ public class DataListItem extends Component {
       list.onCheckChange(this, checked);
     }
   }
-  
+
   /**
-   * Sets the item's icon style.
+   * Sets the item's icon style. The style name should match a CSS style that
+   * specifies a background image using the following format:
+   * 
+   * <pre><code>
+   * .my-icon {
+   *    background: url(images/icons/my-icon.png) no-repeat center left !important;
+   * }
+   * </code></pre>
    * 
    * @param iconStyle the icon style
    */

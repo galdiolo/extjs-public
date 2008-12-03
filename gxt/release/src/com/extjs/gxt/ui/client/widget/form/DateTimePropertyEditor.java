@@ -14,15 +14,15 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 public class DateTimePropertyEditor implements PropertyEditor<Date> {
 
   protected DateTimeFormat format = DateTimeFormat.getShortDateFormat();
-  
+
   public DateTimePropertyEditor() {
-    
+
   }
-  
+
   public DateTimePropertyEditor(DateTimeFormat format) {
     this.format = format;
   }
-  
+
   public DateTimePropertyEditor(String pattern) {
     this.format = DateTimeFormat.getFormat(pattern);
   }

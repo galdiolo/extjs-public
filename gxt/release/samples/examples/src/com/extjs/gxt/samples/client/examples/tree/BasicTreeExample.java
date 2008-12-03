@@ -20,7 +20,7 @@ import com.extjs.gxt.ui.client.widget.tree.Tree;
 import com.google.gwt.user.client.Element;
 
 public class BasicTreeExample extends LayoutContainer {
-  
+
   @Override
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
@@ -30,7 +30,7 @@ public class BasicTreeExample extends LayoutContainer {
 
     // quick way to build tree from Model instances.
     TreeBuilder.buildTree(tree, TestData.getTreeModel());
-    
+
     ButtonBar buttonBar = new ButtonBar();
 
     buttonBar.add(new Button("Expand All", new SelectionListener<ComponentEvent>() {

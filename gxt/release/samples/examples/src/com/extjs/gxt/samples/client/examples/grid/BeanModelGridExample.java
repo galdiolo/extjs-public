@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.samples.client.ExampleServiceAsync;
+import com.extjs.gxt.samples.client.Examples;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.data.BaseListLoader;
 import com.extjs.gxt.ui.client.data.BeanModel;
@@ -33,7 +34,7 @@ public class BeanModelGridExample extends LayoutContainer {
     setStyleAttribute("padding", "20px");
 
     // gwt service
-    final ExampleServiceAsync service = (ExampleServiceAsync) Registry.get("service");
+    final ExampleServiceAsync service = (ExampleServiceAsync) Registry.get(Examples.SERVICE);
 
     // proxy and reader
     RpcProxy proxy = new RpcProxy() {

@@ -14,11 +14,22 @@ import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.Layout;
 
 /**
- * <p/>This is a base class for layouts that contain a single item that
+ * This is a base class for layouts that contain a single item that
  * automatically expands to fill the layout's container.
  * 
- * <p/>FitLayout does not have any associated layout data. If the container has
- * multiple children, only the first one will be displayed.
+ * <p /> In the following code, the child panel will be sized to 400 by 400 when
+ * the parent container is sized:
+ * 
+ * <pre><code>
+ * LayoutContainer container = new LayoutContainer();
+ * container.setLayout(new FitLayout());
+ * 
+ * ContentPanel panel = new ContentPanel();
+ * container.add(panel);
+ * 
+ * container.setSize(400, 400);
+ * 
+ * </code></pre>
  */
 public class FitLayout extends Layout {
 
@@ -38,10 +49,10 @@ public class FitLayout extends Layout {
 
   protected void setItemSize(Component item, Size size) {
     if (item != null && item.isRendered() && size.height > 10) {
-      size.width -= item.el().getMargins("lr");
+      size.width -= getSideMargins(item);
       size.height -= item.el().getMargins("tb");
       setSize(item, size.width, size.height);
-    } 
+    }
   }
 
 }

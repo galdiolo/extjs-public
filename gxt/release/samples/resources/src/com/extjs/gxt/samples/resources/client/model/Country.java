@@ -12,9 +12,9 @@ import com.extjs.gxt.ui.client.data.BaseModelData;
 public class Country extends BaseModelData {
 
   public Country() {
-    
+
   }
-  
+
   public Country(String abbr, String name) {
     setAbbr(abbr);
     setName(name);

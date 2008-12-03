@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import com.extjs.gxt.ui.client.js.JsObject;
 import com.extjs.gxt.ui.client.js.JsUtil;
 import com.google.gwt.core.client.JavaScriptObject;

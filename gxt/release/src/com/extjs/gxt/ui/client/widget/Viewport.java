@@ -16,12 +16,20 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.WindowResizeListener;
 
 /**
- * A LayoutContainer that fills the viewport and monitors window resizing.
+ * A LayoutContainer that fills the browser window and monitors window resizing.
  * Viewports are best used for applications that will fill the browser without
- * window scrolling. Children of the viewport can allow scrolling.
+ * window scrolling. Children of the viewport can allow scrolling.</p>
+ * 
+ * Code snippet:
+ * 
+ * <pre>
+   Viewport viewport = new Viewport();        
+   viewport.add(new ContentPanel(), new MarginData(10));            
+   RootPanel.get().add(viewport);
+ * </pre>
  * 
  * <p/> The viewport is not added to the root panel automatically. Is is not
- * neccesary to call {@link #layout()} after adding the viewport to the
+ * necessary to call {@link #layout()} after adding the viewport to the
  * RootPanel. Layout will be called in a deferred command after being added to
  * the root panel.
  */
@@ -37,9 +45,10 @@ public class Viewport extends LayoutContainer {
       layout();
     }
   });
-  
+
   public Viewport() {
     baseStyle = "x-viewport";
+    layoutOnAttach = true;
   }
 
   /**

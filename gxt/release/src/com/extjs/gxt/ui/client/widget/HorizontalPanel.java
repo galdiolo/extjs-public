@@ -16,14 +16,18 @@ import com.google.gwt.user.client.Element;
 /**
  * A {@link LayoutContainer} that lays out its children in a single row using a
  * {@link TableRowLayout}. Each child widget can control its cell's properties
- * using an associated {@link TableData} instance.
+ * using an associated {@link TableData} instance.</p>Code snippet:
  * 
- * <pre><code>
- * HoriztonalPanel hp = new HorizontalPanel();
- * 
- * hp.add(new Label("Aligned Center"));
- * hp.add(new Label("Aligned Right"), new TableData("right", "middle");
- * </pre></code>
+ * <pre>
+   HorizontalPanel hp = new HorizontalPanel();
+   hp.setWidth(300);
+   hp.setTableWidth("100%");
+   hp.add(new Label("Aligned Center"));
+   TableData td = new TableData();
+   td.setHorizontalAlign(HorizontalAlignment.RIGHT);
+   hp.add(new Label("Aligned Right"), td); 
+   RootPanel.get().add(hp);
+ * </pre>
  */
 public class HorizontalPanel extends LayoutContainer {
 
@@ -131,6 +135,7 @@ public class HorizontalPanel extends LayoutContainer {
     layout.setWidth(tableWidth);
     layout.setHeight(tableHeight);
     setLayout(layout);
+    // monitor resize is off
     layout();
   }
 

@@ -37,7 +37,6 @@ public class LoginDialog extends Dialog {
     setHeading("GXT Mail Demo Login");
     setModal(true);
     setBodyBorder(true);
-    setInsetBorder(true);
     setBodyStyle("padding: 8px;background: none");
     setWidth(300);
     setResizable(false);

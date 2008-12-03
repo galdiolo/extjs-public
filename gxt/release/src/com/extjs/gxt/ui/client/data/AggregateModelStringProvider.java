@@ -68,7 +68,7 @@ public class AggregateModelStringProvider implements ModelStringProvider {
     }
 
     if (classProviders != null && model.get(property) != null) {
-      Class clz = model.<Object>get(property).getClass();
+      Class clz = model.<Object> get(property).getClass();
       if (classProviders.containsKey(clz)) {
         return classProviders.get(clz).getStringValue(model, property);
       }

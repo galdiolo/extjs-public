@@ -16,15 +16,23 @@ import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Frame;
 
 /**
- * A tab in a <code>TabPanel</code>.
+ * TabItems are added to a {@link TabPanel}. TabItems can be closable, disabled
+ * and support icons.</p>Code snippet:
+ * 
+ * <pre>
+   TabItem ti = new TabItem("Tab One");
+   ti.setClosable(true);
+   ti.setEnabled(false);
+   tabPanel.add(ti);
+ * </pre>
  * 
  * <dl>
  * <dt><b>Events:</b></dt>
  * 
  * <dd><b>BeforeClose</b> : TabPanelEvent(tabPanel, item)<br>
  * <div>Fires before an item is closed by the user clicking the close icon.
- * Listeners can set the <code>doit</code> field to <code>false</code> to
- * cancel the action.</div>
+ * Listeners can set the <code>doit</code> field to <code>false</code> to cancel
+ * the action.</div>
  * <ul>
  * <li>tabPanel : this</li>
  * <li>item : the item that was closed.</li>
@@ -81,7 +89,15 @@ public class TabItem extends LayoutContainer {
     }
 
     /**
-     * Sets the header's icon style (pre-render).
+     * Sets the item's icon style. The style name should match a CSS style that
+     * specifies a background image using the following format:
+     * 
+     * <pre>
+     * 
+     * <code> .my-icon { background: url(images/icons/my-icon.png) no-repeat
+     * center left !important; } </code>
+     * 
+     * </pre>
      * 
      * @param iconStyle the icon style
      */
@@ -239,7 +255,12 @@ public class TabItem extends LayoutContainer {
   }
 
   /**
-   * Sets the item's icon style.
+   * Sets the item's icon style. The style name should match a CSS style that
+   * specifies a background image using the following format:
+   * 
+   * <pre>
+     .my-icon { background: url(images/icons/my-icon.png) no-repeat center left !important; } 
+   * </pre>
    * 
    * @param iconStyle the icon style
    */

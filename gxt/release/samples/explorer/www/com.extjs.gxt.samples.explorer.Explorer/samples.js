@@ -59,7 +59,7 @@ Ext.EventManager.on(window, 'load', function(){
             desc: 'A mail application with a preview pane that retrieves data using the Ext GWT data loading API.'
         },{
             text: 'Web Desktop',
-            url: 'http://extjs.com/webdesktop',
+            url: 'http://extjs.com/deploy/gxt-1.1/samples/desktop/www/com.extjs.gxt.samples.desktop.DesktopApp/',
             icon: 'desktop.gif',
             desc: 'Demonstrates how one could build a desktop in the browser using Ext components including a module plugin system.'
         }]
@@ -115,9 +115,37 @@ Ext.EventManager.on(window, 'load', function(){
             desc: 'Advanced tab features including tab scrolling, adding tabs programmatically.'
         }]
     },{
+        title: 'Drag and Drop',
+        samples: [{
+            text: 'List to List',
+            url: 'dnd/listtolist.html',
+            icon: 'listtolist.gif',
+            desc: 'Drag and drop between two lists.'
+        },{
+            text: 'Grid to Grid',
+            url: 'dnd/gridtogrid.html',
+            icon: 'gridtogrid.gif',
+            desc: 'Drag and drop between two grids supporting both appends and inserts.'
+        },{
+	        text: 'Tree to Tree',
+	        url: 'dnd/treetotree.html',
+	        icon: 'treetotree.gif',
+	        desc: 'Drag and drop between two sorted trees.'
+        },{
+	        text: 'Reordering Tree',
+	        url: 'dnd/reorderingtree.html',
+	        icon: 'reorderingtree.gif',
+	        desc: 'A single tree where nodes and leafs can be reordered.'
+        },{
+	        text: 'Image Organizer',
+	        url: 'dnd/imageorganizer.html',
+	        icon: 'imageorganizer.gif',
+	        desc: 'The image organizer shows an example of dragging a picture from a list to a folder in a tree.'
+        }]
+    },{
         title: 'Windows',
         samples: [{
-            text: 'Hello World',
+            text: 'Tree to Tree',
             url: 'window/hello.html',
             icon: 'helloworld.gif',
             desc: 'Simple "Hello World" window that contains a basic TabPanel.'
@@ -228,6 +256,34 @@ Ext.EventManager.on(window, 'load', function(){
             url: 'forms/advanced.html',
             icon: 'advancedforms.gif',
             desc: 'Advanced form layouts with nested column layout and tab panels.'
+        },{
+            text: 'DualListField',
+            url: 'forms/duallistfield.html',
+            icon: 'duallistfield.gif',
+            desc: 'A field that displays two list fields and allows selections to be dragged between lists.'
+        },{
+            text: 'File Upload',
+            url: 'forms/fileupload.html',
+            icon: 'fileupload.gif',
+            desc: 'A field that allows a user to upload a file via a standard HTML submit.'
+        }]
+    },{
+        title: 'Data Binding',
+        samples: [{
+            text: 'Basic Binding',
+            url: 'binding/basicbinding.html',
+            icon: 'basicbinding.gif',
+            desc: 'Basic binding between model and a form.'
+        },{
+            text: 'Grid Binding',
+            url: 'binding/gridbinding.html',
+            icon: 'gridbinding.gif',
+            desc: 'Demonstrates an example of binding a model to a form based on the selection of a grid.'
+        },{
+            text: 'Grid Store Binding',
+            url: 'binding/gridstorebinding.html',
+            icon: 'gridstorebinding.gif',
+            desc: 'Edits are made to the grid are done via the store via records. Edits are cached and can be committed or rejected.'
         }]
     },{
         title: 'Toolbars and Menus',
@@ -289,7 +345,7 @@ Ext.EventManager.on(window, 'load', function(){
             desc: 'Examples of making any element resizable with various configuration options.'
 		},{
             text: 'Fx',
-            url: 'msic/fx.html',
+            url: 'misc/fx.html',
             icon: 'fx.gif',
             desc: 'Examples of different effects including sliding and moving.'
         }]

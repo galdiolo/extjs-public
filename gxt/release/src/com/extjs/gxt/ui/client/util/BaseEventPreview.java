@@ -46,8 +46,7 @@ import com.google.gwt.user.client.EventPreview;
  * <li>target : the target element</li>
  * <li>event : event</li>
  * </ul>
- * </dd>
- * </dt>
+ * </dd> </dt>
  */
 public class BaseEventPreview extends BaseObservable implements EventPreview {
 
@@ -84,9 +83,9 @@ public class BaseEventPreview extends BaseObservable implements EventPreview {
   }
 
   private static native List getPreviewStack() /*-{
-      var stack = @com.google.gwt.user.client.DOM::sEventPreviewStack;
-      return stack;
-     }-*/;
+       var stack = @com.google.gwt.user.client.DOM::sEventPreviewStack;
+       return stack;
+      }-*/;
 
   private CompositeElement ignoreList = new CompositeElement();
   private boolean autoHide = true;

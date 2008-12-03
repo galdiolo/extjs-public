@@ -179,7 +179,7 @@ public class StartMenu extends Menu {
       toolsUl.dom.appendChild(li);
       item.render(li);
       item.addSelectionListener(new SelectionListener<ComponentEvent>() {
-      
+
         @Override
         public void componentSelected(ComponentEvent ce) {
           hide();

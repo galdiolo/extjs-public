@@ -20,11 +20,11 @@ import com.google.gwt.user.client.rpc.RemoteService;
 public interface ExampleService extends RemoteService {
 
   public PagingLoadResult<Post> getPosts(PagingLoadConfig config);
-  
+
   public PagingLoadResult<BeanPost> getBeanPosts(PagingLoadConfig config);
-  
+
   public List<Customer> getCustomers();
-  
+
   public List<Photo> getPhotos();
-  
+
 }

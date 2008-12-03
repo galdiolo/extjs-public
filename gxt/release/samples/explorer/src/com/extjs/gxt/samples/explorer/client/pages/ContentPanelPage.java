@@ -27,7 +27,7 @@ public class ContentPanelPage extends LayoutContainer implements EntryPoint {
   public void onModuleLoad() {
     RootPanel.get().add(this);
   }
-  
+
   public ContentPanelPage() {
     // next line is only used to pass layout to containing container
     // this will have NO effect outside of the explorer demo

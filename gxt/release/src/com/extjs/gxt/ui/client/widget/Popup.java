@@ -84,15 +84,12 @@ public class Popup extends LayoutContainer {
   private BaseEventPreview preview = new BaseEventPreview() {
     @Override
     protected boolean onAutoHide(PreviewEvent ce) {
-      if (ce.getTarget() == XDOM.getBody()) {
-        return false;
-      }
       if (Popup.this.onAutoHide(ce.event)) {
         hide();
       }
       return true;
     }
-  
+
   };
 
   /**
@@ -210,6 +207,7 @@ public class Popup extends LayoutContainer {
    * Returns true if event preview is enabled.
    * 
    * @return the event preview state
+   * @deprecated event preview is enabled based on the auto hide config
    */
   public boolean isEventPreview() {
     return eventPreview;
@@ -266,15 +264,18 @@ public class Popup extends LayoutContainer {
    * True to enable event preview (defaults to true).
    * 
    * @param eventPreview true to enable event preview
+   * @deprecated event preview is enabled based on the auto hide config
    */
   public void setEventPreview(boolean eventPreview) {
     this.eventPreview = eventPreview;
   }
 
   /**
-   * Sets the popup's content.
+   * Removes all children adds the item to the container.
    * 
    * @param item the content item
+   * @deprecated popup is a container (@link {@link LayoutContainer}, children
+   *             can be added and removed via the container methods
    */
   public void setItem(Component item) {
     removeAll();
@@ -304,8 +305,7 @@ public class Popup extends LayoutContainer {
    */
   public void show() {
     if (!fireEvent(Events.BeforeShow, new ComponentEvent(this))) return;
-    Point p = new Point((int) Window.getClientWidth() / 2,
-        (int) Window.getClientHeight() / 2);
+    Point p = new Point((int) Window.getClientWidth() / 2, (int) Window.getClientHeight() / 2);
     showAt(p.x, p.y);
   }
 
@@ -319,7 +319,6 @@ public class Popup extends LayoutContainer {
     if (!fireEvent(Events.BeforeShow, new ComponentEvent(this))) {
       return;
     }
-    setItem(widget);
     alignElem = widget.getElement();
     onShowPopup();
   }
@@ -380,7 +379,7 @@ public class Popup extends LayoutContainer {
 
   protected void afterShow() {
     el().setVisible(true);
-    
+
     if (layer != null) {
       layer.sync(true);
     }
@@ -418,7 +417,7 @@ public class Popup extends LayoutContainer {
     super.onRender(target, index);
     setStyleAttribute("zIndex", "100");
     el().makePositionable(true);
-    
+
     preview.getIgnoreList().add(getElement());
   }
 
@@ -427,7 +426,7 @@ public class Popup extends LayoutContainer {
 
     hidden = false;
     Point p = null;
- 
+
     if (alignElem != null) {
       alignPos = alignPos != null ? alignPos : getDefaultAlign();
       alignOffsets = alignOffsets != null ? alignOffsets : new int[] {0, 2};
@@ -467,7 +466,7 @@ public class Popup extends LayoutContainer {
 
     el().setVisibility(true);
 
-    if (eventPreview) {
+    if (eventPreview && autoHide) {
       preview.add();
     }
 

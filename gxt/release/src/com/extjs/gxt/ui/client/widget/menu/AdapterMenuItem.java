@@ -30,7 +30,7 @@ public class AdapterMenuItem extends Item {
   public AdapterMenuItem(Widget widget) {
     this.widget = widget;
   }
-  
+
   /**
    * Returns the wrapped widget.
    * 

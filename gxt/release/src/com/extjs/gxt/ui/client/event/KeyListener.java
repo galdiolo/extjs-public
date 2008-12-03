@@ -20,16 +20,16 @@ public class KeyListener implements Listener<ComponentEvent> {
    * @param event the component event
    */
   public void componentKeyDown(ComponentEvent event) {
-    
+
   }
-  
+
   /**
    * Fires on key press.
    * 
    * @param event the component event
    */
   public void componentKeyPress(ComponentEvent event) {
-    
+
   }
 
   /**
@@ -38,7 +38,7 @@ public class KeyListener implements Listener<ComponentEvent> {
    * @param event the component event
    */
   public void componentKeyUp(ComponentEvent event) {
-    
+
   }
 
   public void handleEvent(ComponentEvent ce) {

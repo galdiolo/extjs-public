@@ -55,9 +55,9 @@ public class BasicTabExample extends LayoutContainer {
     ajax1.addStyleName("pad-text");
     ajax1.setAutoLoad(new RequestBuilder(RequestBuilder.GET, "ajax1.html"));
     panel.add(ajax1);
-    
+
     TabItem eventTab = new TabItem("Event Tab");
-    eventTab.addListener(Events.Select, new Listener<ComponentEvent>( ){
+    eventTab.addListener(Events.Select, new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent be) {
         Window.alert("Event Tab Was Selected");
       }
@@ -65,7 +65,7 @@ public class BasicTabExample extends LayoutContainer {
     eventTab.addStyleName("pad-text");
     eventTab.addText("I am tab 4's content. I also have an event listener attached.");
     panel.add(eventTab);
-    
+
     TabItem disabled = new TabItem("Disabled");
     disabled.setEnabled(false);
     panel.add(disabled);

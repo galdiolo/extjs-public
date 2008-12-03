@@ -14,10 +14,11 @@ import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.util.TextMetrics;
 import com.extjs.gxt.ui.client.widget.Component;
+import com.extjs.gxt.ui.client.widget.Document;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
@@ -88,6 +89,8 @@ public class Button extends Component {
   private String menuAlign = "tl-bl?";
   private boolean handleMouseEvents = true;
   private String iconStyle;
+  private boolean monitoringMouseOver;
+  private Listener<ComponentEvent> listener;
 
   /**
    * Creates a new button.
@@ -127,15 +130,6 @@ public class Button extends Component {
   }
 
   /**
-   * Retutns true if mouse over effect is disabled.
-   * 
-   * @return the handleMouseEvents the handle mouse event state
-   */
-  public boolean getMouseEvents() {
-    return handleMouseEvents;
-  }
-
-  /**
    * Returns the button's icon style.
    * 
    * @return the icon style
@@ -170,6 +164,15 @@ public class Button extends Component {
   }
 
   /**
+   * Retutns true if mouse over effect is disabled.
+   * 
+   * @return the handleMouseEvents the handle mouse event state
+   */
+  public boolean getMouseEvents() {
+    return handleMouseEvents;
+  }
+
+  /**
    * Returns the button's text.
    * 
    * @return the button text
@@ -194,15 +197,6 @@ public class Button extends Component {
       ButtonEvent be = new ButtonEvent(this);
       be.menu = menu;
       fireEvent(Events.MenuHide, be);
-    }
-  }
-
-  @Override
-  public void onAttach() {
-    super.onAttach();
-    El focusEl = getFocusEl();
-    if (focusEl != null) {
-      DOM.setEventListener(getFocusEl().dom, this);
     }
   }
 
@@ -257,19 +251,17 @@ public class Button extends Component {
   }
 
   /**
-   * False to disable visual cues on mouseover, mouseout and mousedown (defaults
-   * to true).
+   * Sets the button's icon style. The style name should match a CSS style that
+   * specifies a background image using the following format:
    * 
-   * @param handleMouseEvents false to disable mouse over cahnges
-   */
-  public void setMouseEvents(boolean handleMouseEvents) {
-    this.handleMouseEvents = handleMouseEvents;
-  }
-
-  /**
-   * A CSS style which sets a background image to be used as the icon.
+   * <pre>
    * 
-   * @param iconStyle the CSS class name
+   * <code> .my-icon { background: url(images/icons/my-icon.png) no-repeat
+   * center left !important; } </code>
+   * 
+   * </pre>
+   * 
+   * @param iconStyle the icon style
    */
   public void setIconStyle(String iconStyle) {
     if (rendered) {
@@ -309,6 +301,16 @@ public class Button extends Component {
   }
 
   /**
+   * False to disable visual cues on mouseover, mouseout and mousedown (defaults
+   * to true).
+   * 
+   * @param handleMouseEvents false to disable mouse over cahnges
+   */
+  public void setMouseEvents(boolean handleMouseEvents) {
+    this.handleMouseEvents = handleMouseEvents;
+  }
+
+  /**
    * Sets the button's tab index.
    * 
    * @param index the tab index
@@ -328,6 +330,9 @@ public class Button extends Component {
   public void setText(String text) {
     this.text = text;
     if (rendered) {
+      if (text != null && text.equals("")) {
+        text = "&nbsp;";
+      }
       el().child("td.x-btn-center " + buttonSelector).update(text);
       autoWidth();
     }
@@ -384,7 +389,7 @@ public class Button extends Component {
     if (rendered) {
       el().setWidth("auto");
       if (GXT.isIE) {
-        if (buttonEl != null && buttonEl.getWidth() > 20) {
+        if (buttonEl != null && buttonEl.getStyleWidth() > 20) {
           buttonEl.clip();
           TextMetrics.get().bind(buttonEl.dom);
           int adj = iconStyle != null ? 8 : 0;
@@ -424,12 +429,34 @@ public class Button extends Component {
     return buttonEl;
   }
 
+  protected void monitorMouseOver(Event event) {
+    if (monitoringMouseOver) {
+      if (event.getTarget() != getElement()
+          && !DOM.isOrHasChild(getElement(), (Element) event.getTarget())) {
+        Document.get().removeListener(Event.ONMOUSEOVER, listener);
+        monitoringMouseOver = false;
+        onMouseLeave(new ComponentEvent(this, event));
+      }
+    }
+  }
+
+  @Override
+  protected void onAttach() {
+    super.onAttach();
+    El focusEl = getFocusEl();
+    if (focusEl != null) {
+      DOM.setEventListener(getFocusEl().dom, this);
+    }
+  }
+
   protected void onBlur(ButtonEvent e) {
     removeStyleName(baseStyle + "-focus");
   }
 
   protected void onClick(ComponentEvent ce) {
     ce.preventDefault();
+    focus();
+    hideToolTip();
     if (!disabled) {
       ButtonEvent be = new ButtonEvent(this);
       if (!fireEvent(Events.BeforeSelect, be)) {
@@ -488,6 +515,10 @@ public class Button extends Component {
     if (!disabled && getMouseEvents()) {
       addStyleName(baseStyle + "-over");
     }
+    if (!monitoringMouseOver) {
+      Document.get().addListener(Event.ONMOUSEOVER, listener);
+      monitoringMouseOver = true;
+    }
   }
 
   protected void onMouseLeave(ComponentEvent ce) {
@@ -513,14 +544,15 @@ public class Button extends Component {
       if (buttonTemplate == null) {
         StringBuffer sb = new StringBuffer();
         sb.append("<table border=0 cellpadding=0 cellspacing=0 class='{2}-wrap'><tbody><tr>");
-        sb.append("<td class={2}-left><i>&#160;</i></td><td class='x-btn-center'><em unselectable=on><button class={2}-text type={1}>{0}</button></em></td><td class={2}-right><i>&#160;</i></td>");
+        sb.append("<td class={2}-left><i>&#160;</i></td><td class='{2}-center'><em unselectable=on><button class={2}-text type={1}>{0}</button></em></td><td class={2}-right><i>&#160;</i></td>");
         sb.append("</tr></tbody></table>");
         buttonTemplate = new Template(sb.toString());
       }
       template = buttonTemplate;
     }
 
-    setElement(template.create(text != null ? text : "", getType(), baseStyle), target, index);
+    setElement(template.create((text != null && !text.equals("")) ? text : "&nbsp;", getType(),
+        baseStyle), target, index);
 
     buttonEl = el().selectNode(buttonSelector);
 
@@ -532,13 +564,12 @@ public class Button extends Component {
       getFocusEl().addEventsSunk(Event.FOCUSEVENTS);
     }
 
-    KeyNav nav = new KeyNav<ButtonEvent>(this) {
-      @Override
-      public void onEnter(ButtonEvent ce) {
-        // onClick(ce);
+    listener = new Listener<ComponentEvent>() {
+
+      public void handleEvent(ComponentEvent be) {
+        monitorMouseOver(be.event);
       }
     };
-    nav.setCancelBubble(false);
 
     el().addEventsSunk(Event.ONCLICK | Event.MOUSEEVENTS);
   }

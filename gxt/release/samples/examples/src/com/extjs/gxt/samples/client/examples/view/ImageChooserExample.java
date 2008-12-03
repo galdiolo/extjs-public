@@ -8,6 +8,7 @@
 package com.extjs.gxt.samples.client.examples.view;
 
 import com.extjs.gxt.samples.client.ExampleServiceAsync;
+import com.extjs.gxt.samples.client.Examples;
 import com.extjs.gxt.samples.client.examples.model.Photo;
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Registry;
@@ -52,7 +53,7 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Image;
 
-public class ImageChooserExample extends LayoutContainer  {
+public class ImageChooserExample extends LayoutContainer {
 
   private ListStore<BeanModel> store;
   private SimpleComboBox<String> sort;
@@ -68,7 +69,7 @@ public class ImageChooserExample extends LayoutContainer  {
 
     detailTp = XTemplate.create(getDetailTemplate());
 
-    final ExampleServiceAsync service = (ExampleServiceAsync) Registry.get("service");
+    final ExampleServiceAsync service = (ExampleServiceAsync) Registry.get(Examples.SERVICE);
 
     RpcProxy proxy = new RpcProxy() {
       @Override
@@ -114,8 +115,8 @@ public class ImageChooserExample extends LayoutContainer  {
 
     StoreFilterField<BeanModel> field = new StoreFilterField<BeanModel>() {
       @Override
-      protected boolean doSelect(Store<BeanModel> store, BeanModel parent,
-        BeanModel record, String property, String filter) {
+      protected boolean doSelect(Store<BeanModel> store, BeanModel parent, BeanModel record,
+          String property, String filter) {
         Photo photo = record.getBean();
         String name = photo.getName().toLowerCase();
         if (name.indexOf(filter.toLowerCase()) != -1) {
@@ -164,8 +165,7 @@ public class ImageChooserExample extends LayoutContainer  {
         long size = photo.getSize() / 1000;
         model.set("shortName", Util.ellipse(photo.getName(), 15));
         model.set("sizeString", NumberFormat.getFormat("#0").format(size) + "k");
-        model.set("dateString", DateTimeFormat.getMediumDateTimeFormat().format(
-            photo.getDate()));
+        model.set("dateString", DateTimeFormat.getMediumDateTimeFormat().format(photo.getDate()));
         return model;
       }
     };
@@ -174,7 +174,6 @@ public class ImageChooserExample extends LayoutContainer  {
     view.setBorders(false);
     view.setStore(store);
     view.setItemSelector("div.thumb-wrap");
-    view.setOverStyle("x-view-over");
     view.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     view.getSelectionModel().addListener(Events.SelectionChange,
         new Listener<SelectionEvent<BeanModel>>() {
@@ -205,7 +204,7 @@ public class ImageChooserExample extends LayoutContainer  {
         view.getSelectionModel().select(0);
       }
     }));
-    
+
     image = new Image();
     image.getElement().getStyle().setProperty("marginTop", "10px");
     image.setVisible(false);
@@ -234,24 +233,26 @@ public class ImageChooserExample extends LayoutContainer  {
   }
 
   private native String getTemplate() /*-{
-   return ['<tpl for=".">',
-   '<div class="thumb-wrap" id="{name}">',
-   '<div class="thumb"><img src="{path}" title="{name}"></div>',
-   '<span>{shortName}</span></div>',
-   '</tpl>'].join("");
-   }-*/;
+    return ['<tpl for=".">',
+    '<div class="thumb-wrap" id="{name}" style="border: 1px solid white">',
+    '<div class="thumb"><img src="{path}" title="{name}"></div>',
+    '<span class="x-editable">{shortName}</span></div>',
+    '</tpl>',
+    '<div class="x-clear"></div>'].join("");
+    
+    }-*/;
 
   public native String getDetailTemplate() /*-{
-   return ['<div class="details">',
-   '<tpl for=".">',
-   '<img src="{path}"><div class="details-info">',
-   '<b>Image Name:</b>',
-   '<span>{name}</span>',
-   '<b>Size:</b>',
-   '<span>{sizeString}</span>',
-   '<b>Last Modified:</b>',
-   '<span>{dateString}</span></div>',
-   '</tpl>',
-   '</div>'].join("");
-   }-*/;
+    return ['<div class="details">',
+    '<tpl for=".">',
+    '<img src="{path}"><div class="details-info">',
+    '<b>Image Name:</b>',
+    '<span>{name}</span>',
+    '<b>Size:</b>',
+    '<span>{sizeString}</span>',
+    '<b>Last Modified:</b>',
+    '<span>{dateString}</span></div>',
+    '</tpl>',
+    '</div>'].join("");
+    }-*/;
 }

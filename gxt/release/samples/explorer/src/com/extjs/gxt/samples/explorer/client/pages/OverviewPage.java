@@ -31,7 +31,7 @@ public class OverviewPage extends LayoutContainer {
 
     setScrollMode(Scroll.AUTO);
 
-    ExamplesModel model = (ExamplesModel) Registry.get("model");
+    ExamplesModel model = (ExamplesModel) Registry.get(Explorer.MODEL);
     ListStore store = new ListStore();
     store.add(model.getEntries());
 

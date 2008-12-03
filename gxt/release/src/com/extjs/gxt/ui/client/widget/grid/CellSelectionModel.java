@@ -7,13 +7,14 @@
  */
 package com.extjs.gxt.ui.client.widget.grid;
 
+import java.util.List;
+
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.DomEvent;
 import com.extjs.gxt.ui.client.event.GridEvent;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
+import com.extjs.gxt.ui.client.store.StoreEvent;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.KeyboardListener;
 
@@ -37,6 +38,7 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
   }
 
   private CellSelection selection;
+
   private Callback callback = new Callback(this);
   private EditorGrid editGrid;
 
@@ -53,7 +55,7 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
       grid.setTrackMouseOver(false);
       grid.addListener(Events.CellMouseDown, this);
       grid.getView().addListener(Events.Refresh, this);
-      editGrid = grid instanceof EditorGrid ? ((EditorGrid)grid) : null;
+      editGrid = grid instanceof EditorGrid ? ((EditorGrid) grid) : null;
       keyNav.bind(grid);
       bind(grid.getStore());
     }
@@ -64,6 +66,7 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
   public void deselectAll() {
     if (selection != null) {
       grid.getView().onCellDeselect(selection.row, selection.cell);
+      selection = null;
     }
   }
 
@@ -99,7 +102,7 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
     M m = store.getAt(row);
     selection = new CellSelection(m, row, cell);
     grid.getView().onCellSelect(row, cell);
-    grid.getView().focusCell(row, cell, false);
+    grid.getView().focusCell(row, cell, true);
   }
 
   @Override
@@ -108,6 +111,17 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
       return;
     }
     selectCell(e.rowIndex, e.colIndex);
+  }
+
+  @Override
+  protected void onAdd(List<M> models) {
+    deselectAll();
+  }
+
+  @Override
+  protected void onClear(StoreEvent<M> se) {
+    super.onClear(se);
+    selection = null;
   }
 
   protected void onEditorKey(DomEvent e) {
@@ -133,13 +147,9 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
 
     if (newCell != null) {
       final int rr = newCell.row;
-      final  int cc = newCell.cell;
+      final int cc = newCell.cell;
       selectCell(newCell.row, newCell.cell);
-      DeferredCommand.addCommand(new Command() {
-        public void execute() {
-          ((EditorGrid) grid).startEditing(rr, cc);
-        }
-      });
+      ((EditorGrid) grid).startEditing(rr, cc);
     }
   }
 
@@ -202,6 +212,14 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
     if (newCell != null) {
       selectCell(newCell.row, newCell.cell);
       e.stopEvent();
+    }
+  }
+
+  @Override
+  protected void onRemove(M model) {
+    super.onRemove(model);
+    if (selection != null && selection.model == model) {
+      selection = null;
     }
   }
 

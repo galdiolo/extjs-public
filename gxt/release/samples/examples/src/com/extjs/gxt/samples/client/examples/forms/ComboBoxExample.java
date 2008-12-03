@@ -34,7 +34,7 @@ public class ComboBoxExample extends LayoutContainer {
     combo.setTypeAhead(true);
     combo.setTriggerAction(TriggerAction.ALL);
     vp.add(combo);
-    
+
     states = new ListStore<State>();
     states.add(TestData.getStates());
     combo = new ComboBox<State>();
@@ -46,7 +46,7 @@ public class ComboBoxExample extends LayoutContainer {
     combo.setTypeAhead(true);
     combo.setTriggerAction(TriggerAction.ALL);
     vp.add(combo);
-    
+
     ListStore<Country> countries = new ListStore<Country>();
     countries.add(TestData.getCountries());
 
@@ -56,23 +56,26 @@ public class ComboBoxExample extends LayoutContainer {
     combo2.setTemplate(getFlagTemplate(GWT.getModuleBaseURL()));
     combo2.setDisplayField("name");
     combo2.setTypeAhead(true);
+    combo2.setTriggerAction(TriggerAction.ALL);
 
     vp.add(combo2);
     add(vp);
   }
+
   private native String getTemplate() /*-{
-  return  [
-  '<tpl for=".">',
-  '<div class="x-combo-list-item" qtip="{slogan}" qtitle="State Slogan">{name}</div>',
-  '</tpl>'
-  ].join("");
-  }-*/;
-  private native String getFlagTemplate(String base) /*-{
    return  [
    '<tpl for=".">',
-   '<div class="x-combo-list-item"><img src="' + base + '/images/icons/fam/flags/{[values.abbr]}.png">&nbsp;{[values.name]}</div>',
+   '<div class="x-combo-list-item" qtip="{slogan}" qtitle="State Slogan">{name}</div>',
    '</tpl>'
    ].join("");
    }-*/;
+
+  private native String getFlagTemplate(String base) /*-{
+    return  [
+    '<tpl for=".">',
+    '<div class="x-combo-list-item"><img src="' + base + '/images/icons/fam/flags/{[values.abbr]}.png">&nbsp;{[values.name]}</div>',
+    '</tpl>'
+    ].join("");
+    }-*/;
 
 }

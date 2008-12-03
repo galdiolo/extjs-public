@@ -1,4 +1,4 @@
-Reachable types computed on: Thu Sep 18 00:16:09 EDT 2008
+Reachable types computed on: Mon Dec 01 16:35:21 EST 2008
 com.extjs.gxt.samples.mail.client.model.MailModel
    Serialization status
       Instantiable
@@ -40,8 +40,8 @@ com.extjs.gxt.samples.resources.client.model.MailItem
       Instantiable
    Path
       'com.extjs.gxt.samples.resources.client.model.MailItem' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.MailItem'
-      'com.extjs.gxt.samples.resources.client.model.MailItem' is reachable from type argument 0 of type 'java.util.Stack<E>'
-      'java.util.Stack<com.extjs.gxt.samples.resources.client.model.MailItem>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.resources.client.model.MailItem>'
+      'com.extjs.gxt.samples.resources.client.model.MailItem' is reachable from type argument 0 of type 'java.util.Vector<E>'
+      'java.util.Vector<com.extjs.gxt.samples.resources.client.model.MailItem>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.resources.client.model.MailItem>'
       Started from 'java.util.List<com.extjs.gxt.samples.resources.client.model.MailItem>'
 
 com.extjs.gxt.samples.resources.client.model.MailItem[]
@@ -76,9 +76,8 @@ com.extjs.gxt.ui.client.data.BaseModel
    Serialization status
       Field serializable
    Path
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -90,19 +89,7 @@ com.extjs.gxt.ui.client.data.BaseModelData
       Field serializable
    Path
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
-      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
-      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
-
-com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>
-   Serialization status
-      Instantiable
-   Path
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
@@ -116,6 +103,17 @@ com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeMode
    Path
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
       'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
+      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
+
+com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>
+   Serialization status
+      Instantiable
+   Path
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -138,9 +136,8 @@ com.extjs.gxt.ui.client.data.RpcMap
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -165,9 +162,8 @@ com.google.gwt.i18n.client.impl.ConstantMap
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -183,9 +179,8 @@ com.google.gwt.i18n.client.impl.DateRecord
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -200,9 +195,8 @@ com.google.gwt.i18n.client.impl.DateRecord[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -222,8 +216,7 @@ com.google.gwt.user.client.ui.ChangeListenerCollection
    Path
       'com.google.gwt.user.client.ui.ChangeListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
       'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -236,8 +229,7 @@ com.google.gwt.user.client.ui.ClickListenerCollection
    Path
       'com.google.gwt.user.client.ui.ClickListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
       'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -250,8 +242,7 @@ com.google.gwt.user.client.ui.FocusListenerCollection
    Path
       'com.google.gwt.user.client.ui.FocusListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
       'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -264,8 +255,7 @@ com.google.gwt.user.client.ui.FormHandlerCollection
    Path
       'com.google.gwt.user.client.ui.FormHandlerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
       'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -278,8 +268,7 @@ com.google.gwt.user.client.ui.KeyboardListenerCollection
    Path
       'com.google.gwt.user.client.ui.KeyboardListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
       'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -292,8 +281,7 @@ com.google.gwt.user.client.ui.LoadListenerCollection
    Path
       'com.google.gwt.user.client.ui.LoadListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
       'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -306,8 +294,7 @@ com.google.gwt.user.client.ui.MouseListenerCollection
    Path
       'com.google.gwt.user.client.ui.MouseListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
       'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -320,8 +307,7 @@ com.google.gwt.user.client.ui.MouseWheelListenerCollection
    Path
       'com.google.gwt.user.client.ui.MouseWheelListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
       'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -334,8 +320,7 @@ com.google.gwt.user.client.ui.PopupListenerCollection
    Path
       'com.google.gwt.user.client.ui.PopupListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
       'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -348,8 +333,7 @@ com.google.gwt.user.client.ui.ScrollListenerCollection
    Path
       'com.google.gwt.user.client.ui.ScrollListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
       'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -362,8 +346,7 @@ com.google.gwt.user.client.ui.TabListenerCollection
    Path
       'com.google.gwt.user.client.ui.TabListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
       'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -376,8 +359,7 @@ com.google.gwt.user.client.ui.TableListenerCollection
    Path
       'com.google.gwt.user.client.ui.TableListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
       'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -390,8 +372,7 @@ com.google.gwt.user.client.ui.TreeListenerCollection
    Path
       'com.google.gwt.user.client.ui.TreeListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
       'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -407,9 +388,8 @@ java.lang.Boolean
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -424,9 +404,8 @@ java.lang.Boolean[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -442,9 +421,8 @@ java.lang.Byte
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -459,9 +437,8 @@ java.lang.Byte[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -477,9 +454,8 @@ java.lang.Double
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -494,9 +470,8 @@ java.lang.Double[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -521,9 +496,8 @@ java.lang.Float
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -538,9 +512,8 @@ java.lang.Float[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -556,9 +529,8 @@ java.lang.Integer
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -573,9 +545,8 @@ java.lang.Integer[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -591,9 +562,8 @@ java.lang.Long
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -608,9 +578,8 @@ java.lang.Long[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -627,9 +596,8 @@ java.lang.Number
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -653,9 +621,8 @@ java.lang.Short
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -670,9 +637,8 @@ java.lang.Short[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -696,9 +662,8 @@ java.lang.String[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -724,9 +689,8 @@ java.sql.Date
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -741,9 +705,8 @@ java.sql.Date[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -759,9 +722,8 @@ java.sql.Time
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -776,9 +738,8 @@ java.sql.Time[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -794,9 +755,8 @@ java.sql.Timestamp
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -811,9 +771,8 @@ java.sql.Timestamp[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -827,111 +786,6 @@ java.util.ArrayList<com.extjs.gxt.samples.resources.client.model.MailItem>
       'java.util.ArrayList<com.extjs.gxt.samples.resources.client.model.MailItem>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.resources.client.model.MailItem>'
       Started from 'java.util.List<com.extjs.gxt.samples.resources.client.model.MailItem>'
 
-java.util.ArrayList<com.google.gwt.user.client.ui.MouseListener>
-   Serialization status
-      Field serializable
-   Path
-      'java.util.ArrayList<com.google.gwt.user.client.ui.MouseListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.MouseListenerCollection'
-      'com.google.gwt.user.client.ui.MouseListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
-      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
-      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
-      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
-
-java.util.ArrayList<com.google.gwt.user.client.ui.KeyboardListener>
-   Serialization status
-      Field serializable
-   Path
-      'java.util.ArrayList<com.google.gwt.user.client.ui.KeyboardListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.KeyboardListenerCollection'
-      'com.google.gwt.user.client.ui.KeyboardListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
-      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
-      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
-      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
-
-java.util.ArrayList<com.google.gwt.user.client.ui.ClickListener>
-   Serialization status
-      Field serializable
-   Path
-      'java.util.ArrayList<com.google.gwt.user.client.ui.ClickListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.ClickListenerCollection'
-      'com.google.gwt.user.client.ui.ClickListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
-      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
-      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
-      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
-
-java.util.ArrayList<com.google.gwt.user.client.ui.MouseWheelListener>
-   Serialization status
-      Field serializable
-   Path
-      'java.util.ArrayList<com.google.gwt.user.client.ui.MouseWheelListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.MouseWheelListenerCollection'
-      'com.google.gwt.user.client.ui.MouseWheelListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
-      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
-      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
-      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
-
-java.util.ArrayList<com.google.gwt.user.client.ui.LoadListener>
-   Serialization status
-      Field serializable
-   Path
-      'java.util.ArrayList<com.google.gwt.user.client.ui.LoadListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.LoadListenerCollection'
-      'com.google.gwt.user.client.ui.LoadListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
-      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
-      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
-      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
-
-java.util.ArrayList<com.google.gwt.user.client.ui.ScrollListener>
-   Serialization status
-      Field serializable
-   Path
-      'java.util.ArrayList<com.google.gwt.user.client.ui.ScrollListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.ScrollListenerCollection'
-      'com.google.gwt.user.client.ui.ScrollListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
-      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
-      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
-      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
-
-java.util.ArrayList<com.google.gwt.user.client.ui.TabListener>
-   Serialization status
-      Field serializable
-   Path
-      'java.util.ArrayList<com.google.gwt.user.client.ui.TabListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.TabListenerCollection'
-      'com.google.gwt.user.client.ui.TabListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
-      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
-      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
-      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
-
 java.util.ArrayList<com.google.gwt.user.client.ui.TableListener>
    Serialization status
       Field serializable
@@ -939,82 +793,7 @@ java.util.ArrayList<com.google.gwt.user.client.ui.TableListener>
       'java.util.ArrayList<com.google.gwt.user.client.ui.TableListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.TableListenerCollection'
       'com.google.gwt.user.client.ui.TableListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
       'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
-      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
-      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
-
-java.util.ArrayList<com.google.gwt.user.client.ui.FormHandler>
-   Serialization status
-      Field serializable
-   Path
-      'java.util.ArrayList<com.google.gwt.user.client.ui.FormHandler>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.FormHandlerCollection'
-      'com.google.gwt.user.client.ui.FormHandlerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
-      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
-      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
-      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
-
-java.util.ArrayList<T>
-   Serialization status
-      Instantiable
-   Path
-      'java.util.ArrayList<T>' is reachable as a subtype of type 'interface java.util.List<T>'
-      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
-      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
-      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
-
-java.util.ArrayList<com.google.gwt.user.client.ui.ChangeListener>
-   Serialization status
-      Field serializable
-   Path
-      'java.util.ArrayList<com.google.gwt.user.client.ui.ChangeListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.ChangeListenerCollection'
-      'com.google.gwt.user.client.ui.ChangeListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
-      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
-      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
-      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
-
-java.util.ArrayList<com.google.gwt.user.client.ui.PopupListener>
-   Serialization status
-      Field serializable
-   Path
-      'java.util.ArrayList<com.google.gwt.user.client.ui.PopupListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.PopupListenerCollection'
-      'com.google.gwt.user.client.ui.PopupListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
-      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
-      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
-      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
-      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
-
-java.util.ArrayList<com.google.gwt.user.client.ui.FocusListener>
-   Serialization status
-      Field serializable
-   Path
-      'java.util.ArrayList<com.google.gwt.user.client.ui.FocusListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.FocusListenerCollection'
-      'com.google.gwt.user.client.ui.FocusListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
-      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -1028,8 +807,174 @@ java.util.ArrayList<com.google.gwt.user.client.ui.TreeListener>
       'java.util.ArrayList<com.google.gwt.user.client.ui.TreeListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.TreeListenerCollection'
       'com.google.gwt.user.client.ui.TreeListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
       'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
+      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
+
+java.util.ArrayList<T>
+   Serialization status
+      Instantiable
+   Path
+      'java.util.ArrayList<T>' is reachable as a subtype of type 'interface java.util.List<T>'
+      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
+      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
+
+java.util.ArrayList<com.google.gwt.user.client.ui.KeyboardListener>
+   Serialization status
+      Field serializable
+   Path
+      'java.util.ArrayList<com.google.gwt.user.client.ui.KeyboardListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.KeyboardListenerCollection'
+      'com.google.gwt.user.client.ui.KeyboardListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
+      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
+      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
+
+java.util.ArrayList<com.google.gwt.user.client.ui.ScrollListener>
+   Serialization status
+      Field serializable
+   Path
+      'java.util.ArrayList<com.google.gwt.user.client.ui.ScrollListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.ScrollListenerCollection'
+      'com.google.gwt.user.client.ui.ScrollListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
+      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
+      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
+
+java.util.ArrayList<com.google.gwt.user.client.ui.ChangeListener>
+   Serialization status
+      Field serializable
+   Path
+      'java.util.ArrayList<com.google.gwt.user.client.ui.ChangeListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.ChangeListenerCollection'
+      'com.google.gwt.user.client.ui.ChangeListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
+      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
+      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
+
+java.util.ArrayList<com.google.gwt.user.client.ui.ClickListener>
+   Serialization status
+      Field serializable
+   Path
+      'java.util.ArrayList<com.google.gwt.user.client.ui.ClickListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.ClickListenerCollection'
+      'com.google.gwt.user.client.ui.ClickListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
+      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
+      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
+
+java.util.ArrayList<com.google.gwt.user.client.ui.MouseWheelListener>
+   Serialization status
+      Field serializable
+   Path
+      'java.util.ArrayList<com.google.gwt.user.client.ui.MouseWheelListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.MouseWheelListenerCollection'
+      'com.google.gwt.user.client.ui.MouseWheelListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
+      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
+      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
+
+java.util.ArrayList<com.google.gwt.user.client.ui.MouseListener>
+   Serialization status
+      Field serializable
+   Path
+      'java.util.ArrayList<com.google.gwt.user.client.ui.MouseListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.MouseListenerCollection'
+      'com.google.gwt.user.client.ui.MouseListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
+      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
+      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
+
+java.util.ArrayList<com.google.gwt.user.client.ui.FormHandler>
+   Serialization status
+      Field serializable
+   Path
+      'java.util.ArrayList<com.google.gwt.user.client.ui.FormHandler>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.FormHandlerCollection'
+      'com.google.gwt.user.client.ui.FormHandlerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
+      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
+      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
+
+java.util.ArrayList<com.google.gwt.user.client.ui.LoadListener>
+   Serialization status
+      Field serializable
+   Path
+      'java.util.ArrayList<com.google.gwt.user.client.ui.LoadListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.LoadListenerCollection'
+      'com.google.gwt.user.client.ui.LoadListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
+      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
+      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
+
+java.util.ArrayList<com.google.gwt.user.client.ui.PopupListener>
+   Serialization status
+      Field serializable
+   Path
+      'java.util.ArrayList<com.google.gwt.user.client.ui.PopupListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.PopupListenerCollection'
+      'com.google.gwt.user.client.ui.PopupListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
+      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
+      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
+
+java.util.ArrayList<com.google.gwt.user.client.ui.FocusListener>
+   Serialization status
+      Field serializable
+   Path
+      'java.util.ArrayList<com.google.gwt.user.client.ui.FocusListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.FocusListenerCollection'
+      'com.google.gwt.user.client.ui.FocusListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
+      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
+      'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      'com.extjs.gxt.samples.resources.client.model.Folder' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
+      Started from 'com.extjs.gxt.samples.resources.client.model.Folder'
+
+java.util.ArrayList<com.google.gwt.user.client.ui.TabListener>
+   Serialization status
+      Field serializable
+   Path
+      'java.util.ArrayList<com.google.gwt.user.client.ui.TabListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.TabListenerCollection'
+      'com.google.gwt.user.client.ui.TabListenerCollection' is reachable as a subtype of type 'interface java.util.List<T>'
+      'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -1045,9 +990,8 @@ java.util.ArrayList<java.lang.String>
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -1067,8 +1011,7 @@ java.util.Arrays.ArrayList<T>
    Path
       'java.util.Arrays.ArrayList<T>' is reachable as a subtype of type 'interface java.util.List<T>'
       'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -1084,9 +1027,8 @@ java.util.Arrays.ArrayList<java.lang.String>
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -1102,9 +1044,8 @@ java.util.Date
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -1119,9 +1060,8 @@ java.util.Date[]
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -1138,9 +1078,8 @@ java.util.HashMap<java.lang.String, java.lang.String>
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -1157,9 +1096,8 @@ java.util.HashSet<java.lang.String>
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -1175,9 +1113,8 @@ java.util.IdentityHashMap<java.lang.String, java.lang.String>
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -1193,9 +1130,8 @@ java.util.LinkedHashMap<java.lang.String, java.lang.String>
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -1211,9 +1147,8 @@ java.util.LinkedHashSet<java.lang.String>
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -1233,8 +1168,7 @@ java.util.LinkedList<T>
    Path
       'java.util.LinkedList<T>' is reachable as a subtype of type 'interface java.util.List<T>'
       'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -1250,9 +1184,8 @@ java.util.LinkedList<java.lang.String>
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -1272,8 +1205,7 @@ java.util.Stack<T>
    Path
       'java.util.Stack<T>' is reachable as a subtype of type 'interface java.util.List<T>'
       'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -1289,9 +1221,8 @@ java.util.Stack<java.lang.String>
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -1302,19 +1233,16 @@ java.util.Vector<com.extjs.gxt.samples.resources.client.model.MailItem>
    Serialization status
       Instantiable
    Path
-      'java.util.Vector<com.extjs.gxt.samples.resources.client.model.MailItem>' is reachable as a supertype of type 'class java.util.Stack<com.extjs.gxt.samples.resources.client.model.MailItem>'
-      'java.util.Stack<com.extjs.gxt.samples.resources.client.model.MailItem>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.resources.client.model.MailItem>'
+      'java.util.Vector<com.extjs.gxt.samples.resources.client.model.MailItem>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.resources.client.model.MailItem>'
       Started from 'java.util.List<com.extjs.gxt.samples.resources.client.model.MailItem>'
 
 java.util.Vector<T>
    Serialization status
       Instantiable
    Path
-      'java.util.Vector<T>' is reachable as a supertype of type 'class java.util.Stack<T>'
-      'java.util.Stack<T>' is reachable as a subtype of type 'interface java.util.List<T>'
+      'java.util.Vector<T>' is reachable as a subtype of type 'interface java.util.List<T>'
       'java.util.List<T>' is reachable from field 'children' of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'
@@ -1325,15 +1253,13 @@ java.util.Vector<java.lang.String>
    Serialization status
       Instantiable
    Path
-      'java.util.Vector<java.lang.String>' is reachable as a supertype of type 'class java.util.Stack<java.lang.String>'
-      'java.util.Stack<java.lang.String>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
+      'java.util.Vector<java.lang.String>' is reachable as a subtype of type 'interface java.util.List<java.lang.String>'
       'java.util.List<java.lang.String>' is reachable from field '_list' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'
       'com.extjs.gxt.ui.client.data.BaseModelData' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseModel'
-      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>'
-      'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Music'
-      'com.extjs.gxt.samples.resources.client.model.Music' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
+      'com.extjs.gxt.ui.client.data.BaseModel' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>'
+      'com.extjs.gxt.ui.client.data.BaseTreeModel<? extends com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.TreeModel'
       Type 'com.extjs.gxt.ui.client.data.TreeModel' is reachable from array type 'com.extjs.gxt.ui.client.data.TreeModel[]'
       'com.extjs.gxt.ui.client.data.TreeModel' is reachable from type argument 0 of type 'com.extjs.gxt.ui.client.data.BaseTreeModel<T>'
       'com.extjs.gxt.ui.client.data.BaseTreeModel<com.extjs.gxt.ui.client.data.TreeModel>' is reachable as a supertype of type 'class com.extjs.gxt.samples.resources.client.model.Folder'

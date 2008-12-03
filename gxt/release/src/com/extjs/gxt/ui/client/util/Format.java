@@ -34,16 +34,15 @@ public class Format {
    * @param params the parameters
    * @return the new text
    */
-  public static String substitute(String text, Map<String,String> params) {
+  public static String substitute(String text, Map<String, Object> params) {
     Iterator<String> it = params.keySet().iterator();
     while (it.hasNext()) {
       String key = it.next();
-      text = text.replaceAll("\\{" + key + "}",
-          safeRegexReplacement(params.get(key)));
+      text = text.replaceAll("\\{" + key + "}", safeRegexReplacement(params.get(key).toString()));
     }
     return text;
   }
-  
+
   public static String substitute(String text, Params params) {
     if (params.isMap) {
       return substitute(text, params.getMap());
@@ -51,7 +50,7 @@ public class Format {
       return substitute(text, params.getList().toArray());
     }
     return text;
-    
+
   }
 
   /**

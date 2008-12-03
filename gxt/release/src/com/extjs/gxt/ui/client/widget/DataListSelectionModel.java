@@ -13,7 +13,7 @@ import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.widget.selection.AbstractSelectionModel;
 
 /**
- * DataList selection model.
+ * A <code>AbstractSelectionModel</code> implementation for DataList.
  */
 public class DataListSelectionModel extends AbstractSelectionModel<DataList, DataListItem> {
 
@@ -43,7 +43,7 @@ public class DataListSelectionModel extends AbstractSelectionModel<DataList, Dat
   }
 
   @Override
-  protected void onClick(ContainerEvent ce) {
+  protected void onMouseDown(ContainerEvent ce) {
     if (locked) return;
     if (!selectOnCheck) {
       DataListItem item = (DataListItem) ce.item;
@@ -56,7 +56,7 @@ public class DataListSelectionModel extends AbstractSelectionModel<DataList, Dat
         }
       }
     }
-    super.onClick(ce);
+    super.onMouseDown(ce);
   }
 
 }

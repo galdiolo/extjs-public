@@ -120,7 +120,14 @@ public class Header extends Component {
   }
 
   /**
-   * Sets the header's icon style.
+   * Sets the header's icon style. The style name should match a CSS style that
+   * specifies a background image using the following format:
+   * 
+   * <pre><code>
+   * .my-icon {
+   *    background: url(images/icons/my-icon.png) no-repeat center left !important;
+   * }
+   * </code></pre>
    * 
    * @param iconStyle the icon style
    */
@@ -128,7 +135,6 @@ public class Header extends Component {
     this.iconStyle = iconStyle;
     if (rendered) {
       textEl.addStyleName("x-panel-icon");
-      iconBtn.el().setLeft(1);
       iconBtn.setVisible(true);
       iconBtn.changeStyle(iconStyle);
     }

@@ -17,9 +17,9 @@ public abstract class SummaryType {
     @Override
     public double render(Object v, ModelData m, String field, Map<String, Object> data) {
       if (v == null) {
-         v= 0d;
+        v = 0d;
       }
-      return ((Double) v) + ((Number)m.get(field)).doubleValue();
+      return ((Double) v) + ((Number) m.get(field)).doubleValue();
     }
   };
 
@@ -36,9 +36,9 @@ public abstract class SummaryType {
 
       Double total = (Double) data.get(field + "total");
       if (total == null) total = 0d;
-      total += ((Number)m.get(field)).doubleValue();
+      total += ((Number) m.get(field)).doubleValue();
       data.put(field + "total", total);
-      
+
       return total == 0 ? 0 : total / i;
     }
   };

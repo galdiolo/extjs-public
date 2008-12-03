@@ -52,7 +52,7 @@ public class DragEvent extends DomEvent {
    * The current y-coordinate value.
    */
   public int y;
-  
+
   /**
    * Returns the event target.
    * 
@@ -61,9 +61,9 @@ public class DragEvent extends DomEvent {
   public Element getTarget() {
     return DOM.eventGetTarget(event);
   }
-  
+
   public DragEvent(Draggable draggable) {
     this.draggable = draggable;
   }
-  
+
 }

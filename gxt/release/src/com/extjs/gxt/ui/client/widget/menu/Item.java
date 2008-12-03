@@ -37,7 +37,7 @@ public abstract class Item extends Component {
   protected Menu parentMenu;
 
   private String activeStyle = "x-menu-item-active";
-  
+
   public Item() {
     disabledStyle = "x-item-disabled";
   }

@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 import com.extjs.gxt.ui.client.util.Elements;
 import com.extjs.gxt.ui.client.util.Util;
 import com.google.gwt.user.client.DOM;
@@ -259,7 +258,7 @@ public class CompositeElement {
       elem.setInnerHTML(html);
     }
   }
-  
+
   public void removeStyleName(String style) {
     for (Element elem : items) {
       El.fly(elem).removeStyleName(style);

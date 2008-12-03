@@ -16,8 +16,7 @@ public class PropertyChangeEvent extends ChangeEvent {
   private Object oldValue;
   private Object newValue;
 
-  public PropertyChangeEvent(int type, Model source, String name, Object oldValue,
-      Object newValue) {
+  public PropertyChangeEvent(int type, Model source, String name, Object oldValue, Object newValue) {
     super(type, source);
     this.name = name;
     this.oldValue = oldValue;

@@ -285,6 +285,7 @@ public class DataView extends ScrollContainer<DataViewItem> implements Selectabl
 
   /**
    * Sets the container's tag name (defaults to 'div', pre-render).
+   * 
    * @param containerTagName
    */
   public void setContainerTagName(String containerTagName) {
@@ -447,7 +448,7 @@ public class DataView extends ScrollContainer<DataViewItem> implements Selectabl
       item.setElement(elems[i]);
     }
   }
-  
+
   protected void renderItem(DataViewItem item, int index) {
     item.setElement(XDOM.create(template.applyTemplate(new Params(item.getValues()))));
     el().insertChild(item.getElement(), index);

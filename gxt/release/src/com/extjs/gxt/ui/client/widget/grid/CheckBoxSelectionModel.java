@@ -33,7 +33,7 @@ public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionMo
 
   public CheckBoxSelectionModel() {
     super();
-    config = new ColumnConfig();
+    config = newColumnConfig();
     config.setHeader("<div class='x-grid3-hd-checker'>&#160;</div>");
     config.setId("checker");
     config.setWidth(20);
@@ -86,6 +86,10 @@ public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionMo
     } else {
       super.handleMouseDown(e);
     }
+  }
+
+  protected ColumnConfig newColumnConfig() {
+    return new ColumnConfig();
   }
 
   protected void onHeaderClick(GridEvent e) {

@@ -34,7 +34,7 @@ public class StoreEvent<M extends ModelData> extends BaseEvent {
    * The operation
    */
   public RecordUpdate operation;
-  
+
   /**
    * The record.
    */

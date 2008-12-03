@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XTemplate;
@@ -22,6 +23,7 @@ import com.extjs.gxt.ui.client.data.PagingLoadConfig;
 import com.extjs.gxt.ui.client.data.PagingLoader;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.DomEvent;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.PreviewEvent;
@@ -40,6 +42,8 @@ import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.ListView;
 import com.extjs.gxt.ui.client.widget.PagingToolBar;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -48,8 +52,43 @@ import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.RootPanel;
 
 /**
- * A combobox control.
+ * A combobox component.
  * 
+ * <p>
+ * When not forcing a selection ({@link #setForceSelection(boolean)})
+ * {@link #getValue()} can return null event if the user has typed text into the
+ * field if that text cannot be tied to a model from from the combo's store. In
+ * this case, you can use {@link #getRawValue()} to get the fields string value.
+ * </p>
+ * 
+ * <p>
+ * Combo uses a <code>XTemplate</code> to render it's drop down list. A custom
+ * template can be specified to customize the display of the drop down list. See
+ * {@link #setTemplate(XTemplate)}.
+ * </p>
+ * 
+ * <p>
+ * A custom <code>PropertyEditor</code> can be used to "format" the value that
+ * is displayed in the combo's text field. For example:
+ * 
+ * <pre>
+ *  combo.setPropertyEditor(new ListModelPropertyEditor&lt;State>(){
+      public String getStringValue(State value) {
+        return value.getAbbr() + " " + value.getName();
+      }
+    });
+ * </pre>
+ * A <code>ModelProcessor</code> can be used to "format" the values in the drop
+ * down list:
+ * 
+ * <pre>
+    combo.getView().setModelProcessor(new ModelProcessor<State>() {
+      public State prepareData(State model) {
+        model.set("test", model.getAbbr() + " " + model.getName());
+        return model;
+      }
+    });
+ * </pre>
  * <dl>
  * <dt><b>Events:</b></dt>
  * 
@@ -123,6 +162,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
   }
 
   protected ListStore<D> store;
+  protected boolean autoComplete = false;
 
   private String listStyle = "x-combo-list";
   private String selectedStyle = "x-combo-selected";
@@ -154,8 +194,9 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
   private int assetHeight;
   private El footer;
   private PagingToolBar pageTb;
-  private boolean lazyRender;
-  private boolean initialized;
+  private boolean lazyRender, initialized;
+  private String valueField;
+  private InputElement hiddenInput;
 
   /**
    * Creates a combo box.
@@ -163,6 +204,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
   public ComboBox() {
     messages = new ComboBoxMessages();
     modelStringProvider = new BaseModelStringProvider();
+    listView = new ListView();
     setPropertyEditor(new ListModelPropertyEditor<D>());
     initComponent();
   }
@@ -220,9 +262,6 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     if (q == null) {
       q = "";
     }
-    if (q.equals("")) {
-      forceAll = true;
-    }
 
     if (forceAll || q.length() >= minChars) {
       if (lastQuery == null || !lastQuery.equals(q)) {
@@ -256,9 +295,13 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     }
     expanded = true;
 
-    RootPanel.get().add(list);
+    if (!initialized) {
+      createList(false);
+    } else {
+      RootPanel.get().add(list);
+    }
+
     list.layout();
-    initialized = true;
 
     list.el().setVisibility(false);
     list.el().updateZIndex(0);
@@ -379,9 +422,19 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
    * Returns the model string provider.
    * 
    * @return the model string provider
+   * @deprecated see {@link #setModelStringProvider(ModelStringProvider)}
    */
   public ModelStringProvider<D> getModelStringProvider() {
     return modelStringProvider;
+  }
+  
+  /**
+   * Returns the combo's list view.
+   * 
+   * @return the view
+   */
+  public ListView getView() {
+    return listView;
   }
 
   /**
@@ -391,6 +444,15 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
    */
   public int getPageSize() {
     return pageSize;
+  }
+
+  /**
+   * Returns the combo's paging tool bar.
+   * 
+   * @return the tool bar
+   */
+  public PagingToolBar getPagingToolBar() {
+    return pageTb;
   }
 
   @Override
@@ -463,13 +525,30 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
 
   @Override
   public D getValue() {
-    if (lazyRender && !initialized && store != null && store.getCount() == 0) {
+    if (!initialized) {
       return value;
     }
     if (store != null) {
       getPropertyEditor().setList(store.getModels());
     }
+    D v = super.getValue();
+    // a value was set directly and there is not a
+    // matching value in the drop down list
+    String rv = getRawValue();
+    boolean empty = rv == null || rv.equals("");
+    if (!rendered && !empty && v == null && value != null && !forceSelection) {
+      return value;
+    }
     return super.getValue();
+  }
+
+  /**
+   * Returns the value field name.
+   * 
+   * @return the value field name
+   */
+  public String getValueField() {
+    return valueField;
   }
 
   /**
@@ -674,6 +753,8 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
    * .
    * 
    * @param modelStringProvider the string provider
+   * @deprecated the preferred way to provide "formatted" values is to use a
+   *             <code>ModelProcessor</code> with the comobo's view.
    */
   public void setModelStringProvider(ModelStringProvider<D> modelStringProvider) {
     this.modelStringProvider = modelStringProvider;
@@ -812,10 +893,6 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
   public void setTypeAheadDelay(int typeAheadDelay) {
     this.typeAheadDelay = typeAheadDelay;
   }
-  
-  public void setView(ListView view) {
-    this.listView = view;
-  }
 
   @Override
   public void setValue(D value) {
@@ -824,7 +901,27 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     SelectionChangedEvent se = new SelectionChangedEvent(this, getSelection());
     fireEvent(Events.SelectionChange, se);
   }
-  
+
+  /**
+   * Sets the model field used to retieve the "value" from the model. If
+   * specified, a hidden form field will contain the value. The hidden form
+   * field name will be the combo's field name plus "-hidden".
+   * 
+   * @param valueField the value field name
+   */
+  public void setValueField(String valueField) {
+    this.valueField = valueField;
+  }
+
+  /**
+   * Sets the combo's view.
+   * 
+   * @param view the view
+   */
+  public void setView(ListView view) {
+    this.listView = view;
+  }
+
   @Override
   protected void doAttachChildren() {
     super.doAttachChildren();
@@ -845,6 +942,10 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
   }
 
   protected void doForce() {
+    String rv = getRawValue();
+    if (getAllowBlank() && (rv == null || rv.equals(""))) {
+      return;
+    }
     if (getValue() == null) {
       setRawValue(lastSelectionText != null ? lastSelectionText : "");
     }
@@ -853,7 +954,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
   protected D findModel(String property, String value) {
     if (value == null) return null;
     for (D model : store.getModels()) {
-      if (value.equals(getStringValue(model, property))) {
+      if (value.equals(getPropertyEditor().getStringValue(model))) {
         return model;
       }
     }
@@ -873,8 +974,17 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     return config;
   }
 
+  /**
+   * The string value of the model.
+   * 
+   * @param model the model
+   * @param propertyName the property name
+   * @return the string value
+   * @deprecated the property editor is used to obtain the string value of the
+   *             model
+   */
   protected String getStringValue(D model, String propertyName) {
-    return getModelStringProvider().getStringValue(model, propertyName);
+    return getPropertyEditor().getStringValue(model);
   }
 
   protected boolean hasFocus() {
@@ -909,7 +1019,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
       protected void onClick(PreviewEvent pe) {
         Element target = DOM.eventGetTarget(pe.event);
         if (DOM.isOrHasChild(listView.getElement(), target)) {
-          onViewClick(true);
+          onViewClick(pe, true);
         }
       }
     };
@@ -928,7 +1038,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
       public void onEnter(ComponentEvent ce) {
         if (expanded) {
           ce.cancelBubble();
-          onViewClick(false);
+          onViewClick(ce, false);
         }
       }
 
@@ -942,7 +1052,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
       @Override
       public void onTab(ComponentEvent ce) {
         if (expanded) {
-          onViewClick(false);
+          onViewClick(ce, false);
         }
       }
 
@@ -961,9 +1071,10 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     if (listView == null) {
       listView = new ListView();
     }
-    
+
     String style = listStyle;
     listView.setStyleAttribute("overflow", "auto");
+    listView.setStyleAttribute("overflowX", "hidden");
     listView.setStyleName(style + "-inner");
     listView.setStyleAttribute("padding", "0px");
     listView.setItemSelector(itemSelector != null ? itemSelector : "." + style + "-item");
@@ -976,7 +1087,6 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
             selectedItem = listView.getSelectionModel().getSelectedItem();
           }
         });
-    // }
 
     if (template == null) {
       String html = "<tpl for=\".\"><div class=\"" + style + "-item\">{" + getDisplayField()
@@ -1003,26 +1113,18 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
 
     list.add(listView);
 
-    if (!lazyRender) {
-      RootPanel.get().add(list);
-      RootPanel.get().remove(list);
-      initialized = true;
-    }
-
     if (pageSize > 0) {
-      footer = list.el().createChild("<div class='" + style + "'></div>");
       pageTb = new PagingToolBar(pageSize);
       pageTb.bind((PagingLoader) store.getLoader());
-      pageTb.setBorders(false);
-      pageTb.render(footer.dom);
-      assetHeight += footer.getHeight();
-      ComponentHelper.doAttach(pageTb);
+    }
+
+    if (!lazyRender) {
+      createList(true);
     }
 
     listView.setStyleAttribute("backgroundColor", "white");
     listView.setTemplate(template);
     listView.setSelectStyle(selectedStyle);
-    // }
 
     bindStore(store, true);
   }
@@ -1077,7 +1179,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
   protected void onKeyDown(FieldEvent fe) {
     if (fe.getKeyCode() == KeyboardListener.KEY_TAB) {
       if (expanded) {
-        collapse();
+        onViewClick(fe, false);
       }
     }
     super.onKeyDown(fe);
@@ -1122,6 +1224,10 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     el().addEventsSunk(Event.KEYEVENTS);
     initList();
 
+    if (!autoComplete) {
+      getInputEl().dom.setAttribute("autocomplete", "off");
+    }
+
     if (!this.editable) {
       this.editable = true;
       this.setEditable(false);
@@ -1140,6 +1246,12 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
         initQuery();
       }
     });
+
+    if (valueField != null) {
+      hiddenInput = Document.get().createHiddenInputElement().cast();
+      hiddenInput.setName(getName() + "-hidden");
+      parent.appendChild(hiddenInput);
+    }
 
     if (typeAhead) {
       taTask = new DelayedTask(new Listener<BaseEvent>() {
@@ -1201,11 +1313,22 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     }
   }
 
-  protected void onViewClick(boolean focus) {
-    D sel = listView.getSelectionModel().getSelectedItem();
-    if (sel != null) {
-      int index = store.indexOf(sel);
-      onSelect(sel, index);
+  protected void onViewClick(DomEvent de, boolean focus) {
+    int idx = -1;
+    // when testing in selenium the items will not be selected as the mouse
+    // is not moved during the test
+    Element elem = listView.findElement(de.getTarget());
+    if (elem != null) {
+      idx = listView.indexOf(elem);
+    } else {
+      D sel = listView.getSelectionModel().getSelectedItem();
+      if (sel != null) {
+        idx = store.indexOf(sel);
+      }
+    }
+    if (idx != -1) {
+      D sel = store.getAt(idx);
+      onSelect(sel, idx);
     }
     if (focus) {
       focus();
@@ -1234,11 +1357,41 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     }
   }
 
+  private void createList(boolean remove) {
+    RootPanel.get().add(list);
+    if (remove) {
+      RootPanel.get().remove(list);
+    }
+
+    initialized = true;
+
+    if (pageTb != null) {
+      footer = list.el().createChild("<div class='" + listStyle + "'></div>");
+      pageTb.setBorders(false);
+      pageTb.render(footer.dom);
+      assetHeight += footer.getHeight();
+      ComponentHelper.doAttach(pageTb);
+    }
+  }
+
   private void doBlur(ComponentEvent ce) {
     super.onBlur(ce);
     if (forceSelection) {
       doForce();
+      if (getValidateOnBlur()) {
+        validate();
+      }
     }
+
+    if (hiddenInput != null) {
+      String v = "";
+      D val = getValue();
+      if (val != null && val.get(valueField) != null) {
+        v = ((Object)val.get(valueField)).toString();
+      }
+      hiddenInput.setValue(v);
+    }
+
     focusPreview.remove();
   }
 
@@ -1251,19 +1404,22 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     list.setHeight("");
     int w = Math.max(getWidth(), minListWidth);
     list.setWidth(w);
+    listView.setWidth(w - 2);
 
-    int fw = list.el().getFrameWidth("tb");
+    int fh = footer != null ? footer.getHeight() : 0;
+    int fw = list.el().getFrameWidth("tb") + fh;
+    
     int h = listView.el().getHeight() + fw;
 
     h = Math.min(h, maxHeight - fw);
     list.setHeight(h);
     list.el().makePositionable(true);
-    list.el().alignTo(getElement(), listAlign, new int[] {0, -1});
+    list.el().alignTo(getElement(), listAlign, new int[] {0, GXT.isIE ? -2 : 0});
 
     if (footer != null) {
-      h -= (footer.getHeight() + 2);
+      h -=  fh;
     }
-    listView.setHeight(h);
+    listView.setHeight(h - 2);
 
     int y = list.el().getY();
     int b = y + h;

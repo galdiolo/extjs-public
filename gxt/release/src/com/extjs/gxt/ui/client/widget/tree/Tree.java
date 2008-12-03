@@ -95,7 +95,7 @@ import com.google.gwt.user.client.Event;
  * </dd>
  * 
  * <dd><b>SelectionChange</b> : TreeEvent(tree, selected)<br>
- * <div>Fires after a item has been removed.</div>
+ * <div>Fires after the tree selection changes.</div>
  * <ul>
  * <li>tree : this</li>
  * <li>selected : the selected items</li>
@@ -137,10 +137,8 @@ import com.google.gwt.user.client.Event;
  * </ul>
  * </dd>
  * 
- * <dt><b>CSS:</b></dt>
- * <dd>.my-tree (the tree itself)</dd>
- * <dd>.my-tree-item-text span (the tree item text)</dd>
- * </dl>
+ * <dt><b>CSS:</b></dt> <dd>.my-tree (the tree itself)</dd> <dd>
+ * .my-tree-item-text span (the tree item text)</dd> </dl>
  */
 public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
 
@@ -161,7 +159,7 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
   protected TreeItem root;
   protected TreeSelectionModel sm;
   protected boolean isViewer;
-  
+
   private CheckCascade checkStyle = CheckCascade.PARENTS;
   private CheckNodes checkNodes = CheckNodes.BOTH;
   private boolean animate = true;
@@ -182,7 +180,7 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
     nodeHash = new HashMap<String, TreeItem>();
     setSelectionModel(new TreeSelectionModel());
   }
-  
+
   /**
    * Returns the tree's style.
    * 
@@ -276,6 +274,16 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
     temp.add(root);
     temp.addAll(nodeHash.values());
     return temp;
+  }
+
+  /**
+   * Returns the total number of items contained in the tree excluding the root
+   * item.
+   * 
+   * @return the total item count
+   */
+  public int getAllItemCount() {
+    return nodeHash.size();
   }
 
   /**

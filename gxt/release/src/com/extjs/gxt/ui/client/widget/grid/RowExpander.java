@@ -26,7 +26,7 @@ import com.google.gwt.user.client.Element;
  */
 public class RowExpander extends ColumnConfig implements ComponentPlugin {
 
-  private Grid grid;
+  protected Grid grid;
   private XTemplate template;
 
   /**
@@ -67,10 +67,16 @@ public class RowExpander extends ColumnConfig implements ComponentPlugin {
 
     GridView view = grid.getView();
 
+    final GridViewConfig config = view.getViewConfig();
     view.viewConfig = new GridViewConfig() {
       @Override
       public String getRowStyle(ModelData model, int rowIndex, ListStore ds) {
-        return "x-grid3-row-collapsed";
+        String s = "x-grid3-row-collapsed";
+        if (config != null) {
+          return s + " " + config.getRowStyle(model, rowIndex, ds);
+        } else {
+          return s;
+        }
       }
     };
 

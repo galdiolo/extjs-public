@@ -136,6 +136,7 @@ public class VerticalPanel extends LayoutContainer {
     layout.setWidth(tableWidth);
     layout.setHeight(tableHeight);
     setLayout(layout);
+    // monitor resize is off
     layout();
   }
 }

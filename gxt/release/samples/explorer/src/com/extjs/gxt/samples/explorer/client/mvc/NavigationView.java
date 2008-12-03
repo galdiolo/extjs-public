@@ -65,7 +65,7 @@ public class NavigationView extends View {
   }
 
   protected void initialize() {
-    model = (ExplorerModel) Registry.get("model");
+    model = (ExplorerModel) Registry.get(Explorer.MODEL);
     SelectionService.get().addListener(new SelectionChangedListener<ModelData>() {
       public void selectionChanged(SelectionChangedEvent event) {
         List<TreeModel> sel = event.getSelection();
@@ -97,7 +97,7 @@ public class NavigationView extends View {
 
     };
 
-    westPanel = (ContentPanel) Registry.get("westPanel");
+    westPanel = (ContentPanel) Registry.get(AppView.WEST_PANEL);
     westPanel.setHeading("Navigation");
     westPanel.setLayout(new FitLayout());
     westPanel.add(createTabPanel());

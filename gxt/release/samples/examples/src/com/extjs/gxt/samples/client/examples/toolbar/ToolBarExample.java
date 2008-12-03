@@ -34,7 +34,7 @@ public class ToolBarExample extends LayoutContainer {
 
     TextToolItem item1 = new TextToolItem("Button w/ Menu");
     item1.setIconStyle("icon-menu-show");
-    
+
     Menu menu = new Menu();
     CheckMenuItem menuItem = new CheckMenuItem("I Like Cats");
     menuItem.setChecked(true);
@@ -43,12 +43,12 @@ public class ToolBarExample extends LayoutContainer {
     menuItem = new CheckMenuItem("I Like Dogs");
     menu.add(menuItem);
     item1.setMenu(menu);
-    
+
     menu.add(new SeparatorMenuItem());
-    
+
     MenuItem radios = new MenuItem("Radio Options");
     menu.add(radios);
-    
+
     Menu radioMenu = new Menu();
     CheckMenuItem r = new CheckMenuItem("Blue Theme");
     r.setGroup("radios");
@@ -58,15 +58,15 @@ public class ToolBarExample extends LayoutContainer {
     r.setGroup("radios");
     radioMenu.add(r);
     radios.setSubMenu(radioMenu);
-    
+
     MenuItem date = new MenuItem("Choose a Date");
     date.setIconStyle("icon-calendar");
     menu.add(date);
 
     date.setSubMenu(new DateMenu());
-    
+
     toolBar.add(item1);
-    
+
     toolBar.add(new SeparatorToolItem());
 
     SplitToolItem splitItem = new SplitToolItem("Split Button");
@@ -84,11 +84,11 @@ public class ToolBarExample extends LayoutContainer {
 
     ToggleToolItem toggle = new ToggleToolItem("Toggle");
     toolBar.add(toggle);
-    
+
     toolBar.add(new SeparatorToolItem());
     toolBar.add(new FillToolItem());
     toolBar.add(new AdapterToolItem(new ThemeSelector()));
-    
+
     ContentPanel panel = new ContentPanel();
     panel.setCollapsible(true);
     panel.setFrame(true);
@@ -96,7 +96,7 @@ public class ToolBarExample extends LayoutContainer {
     panel.setLayout(new FitLayout());
     panel.setSize(450, 300);
     panel.setTopComponent(toolBar);
-    
+
     LayoutContainer c = new LayoutContainer();
     c.setStyleAttribute("backgroundColor", "white");
     c.setBorders(true);
@@ -104,5 +104,5 @@ public class ToolBarExample extends LayoutContainer {
 
     add(panel);
   }
-  
+
 }

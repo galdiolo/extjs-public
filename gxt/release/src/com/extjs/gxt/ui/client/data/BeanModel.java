@@ -16,10 +16,13 @@ import java.util.Map;
 /**
  * A <code>ModelData</code> instance that wraps a bean.
  * 
- * <p/> Nested beans are supported when creating BeanModel instances with limited
- * support for nested lists of beans. Any child lists must be defined with
- * java.util.List and must be paramertized with a BeanModelTag class or
+ * <p/> Nested beans are supported when creating BeanModel instances with
+ * limited support for nested lists of beans. Any child lists must be defined
+ * with java.util.List and must be paramertized with a BeanModelTag class or
  * subclass.
+ * 
+ * <p/> When working with bean models, avoid settting beans as values, rather,
+ * set the wrapping bean model instance.
  * 
  * <pre><code>
  * private List<NumberTag> numbers;
@@ -55,7 +58,7 @@ public class BeanModel extends BaseModelData {
 
   @Override
   public String toString() {
-    return "BeanModel[" + (getBean() == null ? "null" : ((Object) getBean()).toString()) + "]";
+    return ((Object) getBean()).toString();
   }
 
   protected Object processValue(Object value) {

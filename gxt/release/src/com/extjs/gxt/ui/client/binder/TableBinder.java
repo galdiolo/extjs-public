@@ -25,7 +25,7 @@ import com.extjs.gxt.ui.client.widget.table.TableColumn;
 import com.extjs.gxt.ui.client.widget.table.TableItem;
 
 /**
- * A store binder for tables.
+ * A <code>StoreBinder</code> implementation for Tables.
  * 
  * @param <M> the model type
  */
@@ -38,8 +38,8 @@ public class TableBinder<M extends ModelData> extends StoreBinder<ListStore<M>, 
    * Creates a new table binder. {@link #init()} must be called after
    * configuring the binder.
    * 
-   * @param table
-   * @param store
+   * @param table the table
+   * @param store the list store
    */
   public TableBinder(final Table table, ListStore<M> store) {
     super(store, table);
@@ -196,11 +196,11 @@ public class TableBinder<M extends ModelData> extends StoreBinder<ListStore<M>, 
   protected void onSort(StoreEvent se) {
     String id = store.getSortField();
     table.getTableHeader().onSortChange(table.getColumn(id), store.getSortDir());
-    
+
     Collections.sort(table.getItems(), new Comparator<TableItem>() {
       public int compare(TableItem o1, TableItem o2) {
-        int idx1 = store.indexOf((M)o1.getModel());
-        int idx2 = store.indexOf((M)o2.getModel());
+        int idx1 = store.indexOf((M) o1.getModel());
+        int idx2 = store.indexOf((M) o2.getModel());
         return idx1 < idx2 ? -1 : 1;
       }
     });

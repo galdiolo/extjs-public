@@ -68,16 +68,16 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
   public void handleEvent(BaseEvent e) {
     switch (e.type) {
       case Events.RowMouseDown:
-        handleMouseDown((GridEvent)e);
+        handleMouseDown((GridEvent) e);
         break;
       case Events.RowUpdated:
-        onRowUpdated((GridEvent)e);
+        onRowUpdated((GridEvent) e);
         break;
       case Events.Refresh:
         refresh();
         break;
       case Events.ContextMenu:
-        onContextMenu((GridEvent)e);
+        onContextMenu((GridEvent) e);
         break;
     }
   }
@@ -119,6 +119,10 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
     GridView view = grid.getView();
     M sel = store.getAt(e.rowIndex);
 
+    if (isSelected(sel) && !e.isControlKey()) {
+      return;
+    }
+
     if (selectionMode == SelectionMode.SINGLE) {
       if (isSelected(sel) && e.isControlKey()) {
         deselect(sel);
@@ -133,14 +137,19 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
         int b = (last < index) ? index : last;
         select(a, b);
         lastSelected = store.getAt(last);
-        view.focusRow(index);
+        view.focusCell(index, e.colIndex, true);
       } else if (isSelected(sel) && e.isControlKey()) {
         doDeselect(Arrays.asList(sel), false);
       } else {
         doSelect(Arrays.asList(sel), e.isControlKey(), false);
-        view.focusRow(e.rowIndex);
+        view.focusCell(e.rowIndex, e.colIndex, true);
       }
     }
+  }
+
+  protected void doFocus(int row, int cell) {
+    GridView view = grid.getView();
+    view.focusRow(row);
   }
 
   protected boolean hasNext() {
@@ -161,7 +170,7 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
   protected void onKeyPress(GridEvent e) {
 
   }
-  
+
   protected void onContextMenu(GridEvent e) {
     if (locked) return;
     if (e.rowIndex != -1) {
@@ -187,6 +196,10 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
 
   @Override
   protected void onSelectChange(M model, boolean select) {
+    int idx = store.indexOf(model);
+    if (idx == -1) {
+      return;
+    }
     if (select) {
       grid.getView().onRowSelect(store.indexOf(model));
     } else {

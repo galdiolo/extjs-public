@@ -13,7 +13,9 @@ import java.util.List;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.util.Format;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.i18n.client.constants.NumberConstants;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.KeyboardListener;
 
@@ -106,9 +108,10 @@ public class NumberField extends TextField<Number> {
   private boolean allowNegative = true;
   private boolean allowDecimals = true;
   private List<Character> allowed;
-  private double minValue = Double.NEGATIVE_INFINITY;
-  private double maxValue = Double.MAX_VALUE;
+  private Number minValue = Double.NEGATIVE_INFINITY;
+  private Number maxValue = Double.MAX_VALUE;
   private int lastKeyCode;
+  private NumberConstants constants = (NumberConstants) GWT.create(NumberConstants.class);
 
   /**
    * Creates a new number field.
@@ -116,6 +119,7 @@ public class NumberField extends TextField<Number> {
   public NumberField() {
     messages = new NumberFieldMessages();
     propertyEditor = new NumberPropertyEditor();
+    decimalSeparator = constants.decimalSeparator();
   }
 
   /**
@@ -146,9 +150,9 @@ public class NumberField extends TextField<Number> {
   }
 
   /**
-   * Returns the field's decimal seperator.
+   * Returns the field's decimal separator.
    * 
-   * @return the seperator
+   * @return the separator
    */
   public String getDecimalSeparator() {
     return decimalSeparator;
@@ -168,7 +172,7 @@ public class NumberField extends TextField<Number> {
    * 
    * @return the max value
    */
-  public double getMaxValue() {
+  public Number getMaxValue() {
     return maxValue;
   }
 
@@ -182,7 +186,7 @@ public class NumberField extends TextField<Number> {
    * 
    * @return the min value
    */
-  public double getMinValue() {
+  public Number getMinValue() {
     return minValue;
   }
 
@@ -253,8 +257,8 @@ public class NumberField extends TextField<Number> {
    * 
    * @param maxValue the max value
    */
-  public void setMaxValue(double maxValue) {
-    this.maxValue = maxValue;
+  public void setMaxValue(Number maxValue) {
+    this.maxValue = maxValue.doubleValue();
   }
 
   /**
@@ -262,8 +266,8 @@ public class NumberField extends TextField<Number> {
    * 
    * @param minValue the min value
    */
-  public void setMinValue(double minValue) {
-    this.minValue = minValue;
+  public void setMinValue(Number minValue) {
+    this.minValue = minValue.doubleValue();
   }
 
   /**
@@ -287,8 +291,8 @@ public class NumberField extends TextField<Number> {
   protected void onKeyPress(FieldEvent fe) {
     super.onKeyPress(fe);
     char key = (char) fe.getKeyCode();
-
-    if ((fe.isSpecialKey(lastKeyCode) || lastKeyCode == KeyboardListener.KEY_BACKSPACE || lastKeyCode == KeyboardListener.KEY_DELETE)) {
+    
+    if (fe.isSpecialKey(lastKeyCode) || lastKeyCode == KeyboardListener.KEY_BACKSPACE || lastKeyCode == KeyboardListener.KEY_DELETE || fe.isControlKey()) {
       return;
     }
 
@@ -331,11 +335,11 @@ public class NumberField extends TextField<Number> {
       return true;
     }
 
-    String v = value.replace(decimalSeparator, ".");
+    String v = value;
 
     Number d = null;
     try {
-      d = getPropertyEditor().convertStringValue(value);
+      d = getPropertyEditor().convertStringValue(v);
     } catch (Exception e) {
       System.out.println(e);
       String error = "";
@@ -347,10 +351,10 @@ public class NumberField extends TextField<Number> {
       markInvalid(error);
       return false;
     }
-    if (d.doubleValue() < minValue) {
+    if (d.doubleValue() < minValue.doubleValue()) {
       String error = "";
       if (getMessages().getMinText() == null) {
-        error = GXT.MESSAGES.numberField_minText(minValue);
+        error = GXT.MESSAGES.numberField_minText(minValue.doubleValue());
       } else {
         error = Format.substitute(getMessages().getMinText(), minValue);
       }
@@ -358,10 +362,10 @@ public class NumberField extends TextField<Number> {
       return false;
     }
 
-    if (d.doubleValue() > maxValue) {
+    if (d.doubleValue() > maxValue.doubleValue()) {
       String error = "";
       if (getMessages().getMaxText() == null) {
-        error = GXT.MESSAGES.numberField_maxText(maxValue);
+        error = GXT.MESSAGES.numberField_maxText(maxValue.doubleValue());
       } else {
         error = Format.substitute(getMessages().getMaxText(), maxValue);
       }

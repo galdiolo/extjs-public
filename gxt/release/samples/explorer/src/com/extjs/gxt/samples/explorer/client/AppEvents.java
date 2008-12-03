@@ -10,9 +10,9 @@ package com.extjs.gxt.samples.explorer.client;
 public class AppEvents {
 
   public static final int Init = 0;
-  
+
   public static final int ShowPage = 1;
-  
+
   public static final int HidePage = 2;
-  
+
 }

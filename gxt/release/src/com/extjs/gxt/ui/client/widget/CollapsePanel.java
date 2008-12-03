@@ -71,7 +71,7 @@ public class CollapsePanel extends ContentPanel {
         break;
       case Event.ONMOUSEOUT:
         removeStyleName("x-layout-collapsed-over");
-      break;
+        break;
     }
   }
 
@@ -142,17 +142,17 @@ public class CollapsePanel extends ContentPanel {
         "<div class=x-panel-header><span class=x-pnael-header-text>" + txt + "</span></div>");
 
     String icon = null;
-    adj = new int[]{0,0};
+    adj = new int[] {0, 0};
     switch (parentData.getRegion()) {
       case WEST:
         icon = "right";
         align = "tl-tr";
-        adj = new int[]{0, 24};
+        adj = new int[] {0, 24};
         break;
       case EAST:
         icon = "left";
         align = "tr-tl";
-        adj = new int[]{0, 24};
+        adj = new int[] {0, 24};
         break;
       case NORTH:
         icon = "down";
@@ -163,11 +163,11 @@ public class CollapsePanel extends ContentPanel {
         align = "bl-tl";
         break;
     }
-    
+
     if (r == LayoutRegion.NORTH || region == LayoutRegion.SOUTH) {
       headerEl.setStyleAttribute("background", "none");
     }
- 
+
     headerEl.setStyleAttribute("cursor", "default");
 
     setStyleName("x-layout-collapsed");
@@ -187,7 +187,7 @@ public class CollapsePanel extends ContentPanel {
       el().addEventsSunk(Event.MOUSEEVENTS | Event.ONCLICK);
     }
     el().setVisibility(true);
-    
+
     sinkEvents(Event.MOUSEEVENTS);
   }
 
@@ -206,7 +206,7 @@ public class CollapsePanel extends ContentPanel {
         return false;
       }
     };
-   
+
     popup.getIgnoreList().add(collapseBtn.getElement());
     popup.getIgnoreList().add(getElement());
     popup.getIgnoreList().add(panel.getElement());
@@ -215,9 +215,9 @@ public class CollapsePanel extends ContentPanel {
     popup.setShadow(true);
 
     int hh = fly(el().firstChild().dom).getHeight();
-    
+
     panel.el().setLeftTop(0, 0);
-    panel.setStyleAttribute("margin", "4px");
+    panel.setBorders(false);
     panel.getHeader().hide();
     panel.body.addStyleName("x-panel-popup-body");
 
@@ -225,7 +225,7 @@ public class CollapsePanel extends ContentPanel {
 
     int w = 0;
     int h = 0;
-    
+
     switch (region) {
       case WEST:
       case EAST:
@@ -235,13 +235,13 @@ public class CollapsePanel extends ContentPanel {
       case NORTH:
       case SOUTH:
         w = box.width;
-        h = (int)parentData.getSize();
+        h = (int) parentData.getSize();
     }
 
     popup.setSize(w, h);
     popup.show(getElement(), align, adj);
     popup.layout();
-    
+
     afterShowPanel(panel);
   }
 }

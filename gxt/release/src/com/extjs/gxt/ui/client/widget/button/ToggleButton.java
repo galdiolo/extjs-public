@@ -96,6 +96,7 @@ public class ToggleButton extends Button {
   @Override
   protected void onClick(ComponentEvent ce) {
     ce.stopEvent();
+    hideToolTip();
     if (!disabled) {
       toggle();
       if (menu != null && !menu.isVisible()) {

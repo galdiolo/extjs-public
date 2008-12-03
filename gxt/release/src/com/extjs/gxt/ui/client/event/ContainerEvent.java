@@ -33,7 +33,7 @@ public class ContainerEvent<C extends Container, I extends Component> extends Bo
    * The child item.
    */
   public I item;
-  
+
   /**
    * The selected items.
    */

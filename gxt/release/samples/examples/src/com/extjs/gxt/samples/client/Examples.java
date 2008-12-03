@@ -38,20 +38,28 @@ import com.google.gwt.user.client.ui.RootPanel;
 
 public class Examples implements EntryPoint {
 
-  private Viewport viewport;
+  public static final String SERVICE = "service";
+  public static final String FILE_SERVICE = "fileservice";
+  public static final String MODEL = "model";
   
+  private Viewport viewport;
+
   public void onModuleLoad() {
+    String name = GWT.getModuleName();
+    if (!"com.extjs.gxt.samples.Examples".equals(name)) {
+      return;
+    }
     ExampleServiceAsync service = (ExampleServiceAsync) GWT.create(ExampleService.class);
     ServiceDefTarget endpoint = (ServiceDefTarget) service;
     String moduleRelativeURL = GWT.getModuleBaseURL() + "service";
     endpoint.setServiceEntryPoint(moduleRelativeURL);
-    Registry.register("service", service);
+    Registry.register(SERVICE, service);
 
     FileServiceAsync fileservice = (FileServiceAsync) GWT.create(FileService.class);
     endpoint = (ServiceDefTarget) fileservice;
     moduleRelativeURL = GWT.getModuleBaseURL() + "fileservice";
     endpoint.setServiceEntryPoint(moduleRelativeURL);
-    Registry.register("fileservice", fileservice);
+    Registry.register(FILE_SERVICE, fileservice);
 
     Map<String, Entry> examples = new HashMap<String, Entry>();
 
@@ -63,6 +71,8 @@ public class Examples implements EntryPoint {
         examples.put(entry.getId(), entry);
       }
     }
+    
+    Registry.register(MODEL, model);
 
     String id = Window.Location.getParameter("id");
     if (id == null) {
@@ -77,9 +87,8 @@ public class Examples implements EntryPoint {
 
     viewport = new Viewport();
     viewport.setLayout(new BorderLayout());
-    
+
     createNorth();
-    
 
     TabPanel panel = new TabPanel();
     panel.setResizeTabs(true);
@@ -87,6 +96,7 @@ public class Examples implements EntryPoint {
     example.setScrollMode(Scroll.AUTO);
     if (entry.isFill()) {
       example.setLayout(new FitLayout());
+      example.setScrollMode(Scroll.NONE);
     }
 
     TabItem source = new TabItem("View Source");
@@ -107,14 +117,14 @@ public class Examples implements EntryPoint {
 
     RootPanel.get().add(viewport);
   }
-  
+
   private void createNorth() {
     StringBuffer sb = new StringBuffer();
     sb.append("<div id='demo-header' class='x-small-editor'><div id='demo-theme'></div><div id=demo-title>Ext GWT Examples</div></div>");
 
     HtmlContainer northPanel = new HtmlContainer(sb.toString());
     northPanel.setEnableState(false);
-    
+
     ThemeManager.register(Slate.SLATE);
     ThemeSelector selector = new ThemeSelector();
     selector.setWidth(125);
@@ -123,6 +133,5 @@ public class Examples implements EntryPoint {
     BorderLayoutData data = new BorderLayoutData(LayoutRegion.NORTH, 33);
     data.setMargins(new Margins());
     viewport.add(northPanel, data);
-    Registry.register("northPanel", northPanel);
   }
 }

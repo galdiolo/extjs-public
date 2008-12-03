@@ -25,11 +25,11 @@ public class CookieProvider extends Provider {
    * Creates a new cookie provider
    * 
    * @param path The path for which the cookie is active (defaults to root '/'
-   *            which makes it active for all pages in the site)
+   *          which makes it active for all pages in the site)
    * @param expires the cookie expiration date (defaults to 7 days from now)
    * @param domain The domain to save the cookie for. Note that you cannot
-   *            specify a different domain than your page is on, but you can
-   *            specify a sub-domain.
+   *          specify a different domain than your page is on, but you can
+   *          specify a sub-domain.
    * @param secure <code>true</code> if the site is using SSL
    */
   public CookieProvider(String path, Date expires, String domain, boolean secure) {
@@ -37,7 +37,8 @@ public class CookieProvider extends Provider {
     this.secure = secure;
     this.domain = domain;
     if (expires == null) {
-      expires = new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 7)); // 7-days
+      expires = new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 7)); //7-
+                                                                            // days
     }
     this.expires = expires;
   }

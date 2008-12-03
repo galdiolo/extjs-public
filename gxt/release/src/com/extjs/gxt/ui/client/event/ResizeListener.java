@@ -12,7 +12,7 @@ import com.extjs.gxt.ui.client.Events;
 /**
  * Resize listener.
  */
-public class ResizeListener implements Listener<ResizeEvent>{
+public class ResizeListener implements Listener<ResizeEvent> {
 
   public void handleEvent(ResizeEvent be) {
     switch (be.type) {
@@ -24,13 +24,13 @@ public class ResizeListener implements Listener<ResizeEvent>{
         break;
     }
   }
-  
+
   public void resizeStart(ResizeEvent re) {
-    
+
   }
-  
+
   public void resizeEnd(ResizeEvent re) {
-    
+
   }
 
 }

@@ -28,11 +28,10 @@ public class MailModel extends BaseTreeModel {
 
     List items = TestData.getMailItems();
     int count = items.size();
-    
+
     List<MailItem> inlist = new ArrayList<MailItem>();
     List<MailItem> sentlist = new ArrayList<MailItem>();
-    
-    
+
     for (int i = 0; i < count; i++) {
       MailItem item = (MailItem) items.get(i);
       if (i < (count / 2)) {
@@ -41,7 +40,7 @@ public class MailModel extends BaseTreeModel {
         sentlist.add(item);
       }
     }
-    
+
     inbox.set("children", inlist);
     sent.set("children", sentlist);
     trash.set("children", new ArrayList());

@@ -104,11 +104,11 @@ public class AccordionLayout extends FitLayout {
     }
     activeItem = item;
     markExpanded((ContentPanel) activeItem);
-    
+
     if (activeOnTop) {
       target.insertChild(item.getElement(), 0);
     }
-    
+
     layout();
     DeferredCommand.addCommand(new Command() {
       public void execute() {
@@ -180,17 +180,20 @@ public class AccordionLayout extends FitLayout {
   @Override
   protected void renderComponent(Component component, int index, El target) {
     ContentPanel cp = (ContentPanel) component;
-    cp.setCollapsible(true);
-    cp.setAnimCollapse(false);
+
+    if (!cp.isRendered()) {
+      cp.setCollapsible(true);
+      cp.setAnimCollapse(false);
+      if (titleCollapse) {
+        cp.setTitleCollapse(true);
+      }
+      if (hideCollapseTool) {
+        cp.setHideCollapseTool(true);
+      }
+    }
 
     if (autoWidth) {
       cp.setAutoWidth(autoWidth);
-    }
-    if (titleCollapse) {
-      cp.setTitleCollapse(true);
-    }
-    if (hideCollapseTool) {
-      cp.setHideCollapseTool(true);
     }
 
     super.renderComponent(component, index, target);
@@ -224,7 +227,7 @@ public class AccordionLayout extends FitLayout {
         }
       }
       size.height -= hh;
-      ContentPanel cp = (ContentPanel)item;
+      ContentPanel cp = (ContentPanel) item;
       if (cp.isExpanded()) {
         setSize(item, size.width, size.height);
       } else {
@@ -259,7 +262,7 @@ public class AccordionLayout extends FitLayout {
   }
 
   private native void markExpanded(ContentPanel panel) /*-{
-     panel.@com.extjs.gxt.ui.client.widget.ContentPanel::collapsed = false;
-   }-*/;
+        panel.@com.extjs.gxt.ui.client.widget.ContentPanel::collapsed = false;
+      }-*/;
 
 }

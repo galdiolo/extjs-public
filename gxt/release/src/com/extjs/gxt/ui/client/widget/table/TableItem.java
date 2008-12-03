@@ -67,7 +67,6 @@ public class TableItem extends Component {
   }
 
   public void onComponentEvent(ComponentEvent ce) {
-    table.getView().onItemEvent((TableEvent)ce);
     switch (ce.type) {
       case Event.ONDBLCLICK:
         onDoubleClick(ce);
@@ -126,7 +125,7 @@ public class TableItem extends Component {
   public void setCellToolTips(String[] toolTips) {
     this.toolTips = toolTips;
   }
-  
+
   /**
    * Returns the cell tool tips.
    * 

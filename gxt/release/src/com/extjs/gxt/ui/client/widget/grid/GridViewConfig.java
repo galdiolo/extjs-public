@@ -15,5 +15,5 @@ public class GridViewConfig {
   public String getRowStyle(ModelData model, int rowIndex, ListStore ds) {
     return "";
   }
-  
+
 }
