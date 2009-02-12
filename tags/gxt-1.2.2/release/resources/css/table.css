@@ -1,0 +1,148 @@
+.my-tbl {
+  border: 1px solid #99BBE8;
+  cursor: default;
+  background-color: white;
+  overflow: hidden;
+  -moz-outline: none;
+  -moz-user-focus: normal;
+  font-family: arial, tahoma, helvetica, sans-serif;
+  font-size: 11px;
+  table-layout: fixed;
+}
+
+.my-tbl-col-overflow {
+  overflow: hidden;
+}
+
+.ext-ie .my-tbl-col-overflow {
+  
+}
+
+.my-tbl-col-text {
+  color: black;
+  padding: 5 4 0 4px;
+  display: block;
+  white-space: nowrap;
+  font-family: arial, tahoma, helvetica, sans-serif;
+  font-size: 11px;
+}
+
+.my-tbl-col {
+  border-right: 1px solid #D5D5D5;
+  background: url(../images/gxt/table/vs-column-bg.gif) repeat-x;
+}
+
+.my-tbl-col-splitter {
+  position: absolute;
+  top: 0;
+  width: 6px;
+  z-index: 100;
+  height: 100%;
+  right: 0px;
+}
+
+.my-tbl-col-over {
+  background: url(../images/gxt/table/vs-column-bg.gif) repeat-x 0px -24px;
+}
+
+.my-tbl-col-sort {
+  background-position: 0px -48px;
+}
+
+.my-icon-asc {
+  background-image: url(../images/gxt/icons/hmenu-asc.gif) !important;
+}
+
+.my-icon-desc {
+  background-image: url(../images/gxt/icons/hmenu-desc.gif) !important;
+}
+
+.my-tbl-col-asc {
+  background: url(../images/gxt/table/vsort-asc.gif) no-repeat 50% top;
+}
+
+.my-tbl-col-desc {
+  background: url(../images/gxt/table/vsort-desc.gif) no-repeat 50% top;
+}
+
+.my-tbl-col-splitter {
+  background: none;
+}
+
+.my-tbl-data {
+  background-color: white;
+  overflow: hidden;
+  -moz-outline: none;
+  -moz-user-focus: normal;
+}
+
+.my-tbl-item {
+  border-top: 1px solid white;
+  border-bottom: 1px solid white;
+  border-bottom: 1px solid #EDEDED;
+  cursor: default;
+  -moz-outline: none;
+  -moz-user-focus: normal;
+}
+
+.my-tbl-item table {
+  -moz-outline: none;
+  -moz-user-focus: normal;
+  table-layout: fixed;
+}
+
+.my-tbl-data .my-tbl-item-cell {
+  -moz-outline: none;
+  -moz-user-focus: normal;
+}
+
+.my-tbl-item td {
+  -moz-user-select: none;
+  -moz-outline: none;
+  -moz-user-focus: normal;
+}
+
+.my-tbl-vlines .my-tbl-data .my-tbl-item-cell-overflow {
+  border-right: 1px solid #EDEDED;
+}
+
+.my-tbl-data .my-tbl-item-cell-overflow {
+  white-space: nowrap;
+  overflow: hidden;
+  -moz-outline: none;
+  -moz-user-focus: normal;
+}
+
+.my-tbl-data .my-tbl-item-cell-text {
+  padding: 3 4 3 4px;
+  font-family: arial, tahoma, helvetica, sans-serif;
+  font-size: 11px;
+  -moz-outline: none;
+  -moz-user-focus: normal;
+}
+
+.my-tbl-data .my-tbl-item-cell-widget {
+  padding: 1 4 1 4px;
+}
+
+.my-tbl-data tr {
+  overflow: hidden;
+}
+
+.my-tbl-item-over {
+  border-top: 1px solid #dddddd;
+  border-bottom: 1px solid #dddddd;
+  background: #efefef url(../images/default/grid/row-over.gif) repeat-x left top;
+}
+
+.my-tbl-item-sel {
+  background-image: none !important;
+  background-color: #D9E1ED !important;
+  border-top: 1px dotted #9EB8ED !important;
+  border-bottom: 1px dotted #9EB8ED !important;
+}
+
+.ext-ie .my-tbl TD .x-form-text {
+  POSITION: static;
+  TOP: 0px;
+}
