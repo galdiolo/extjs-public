@@ -6,6 +6,11 @@
   background: #1E4176 url(images/bg/slate-hd-bg.gif) repeat-x scroll 0pt;
 }
 
+.drag-ok {
+  border: 1px solid green !important;
+  background-color: #e6eae7;
+}
+
 /* chooser */
 #img-chooser-dlg .details {
   padding: 10px;

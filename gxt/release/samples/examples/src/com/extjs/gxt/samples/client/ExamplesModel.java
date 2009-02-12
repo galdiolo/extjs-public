@@ -14,6 +14,7 @@ import com.extjs.gxt.samples.client.examples.binding.BasicBindingExample;
 import com.extjs.gxt.samples.client.examples.binding.GridBindingExample;
 import com.extjs.gxt.samples.client.examples.binding.GridStoreBindingExample;
 import com.extjs.gxt.samples.client.examples.core.TemplateExample;
+import com.extjs.gxt.samples.client.examples.dnd.BasicDNDExample;
 import com.extjs.gxt.samples.client.examples.dnd.DualListFieldExample;
 import com.extjs.gxt.samples.client.examples.dnd.GridToGridExample;
 import com.extjs.gxt.samples.client.examples.dnd.ListViewDNDExample;
@@ -36,6 +37,7 @@ import com.extjs.gxt.samples.client.examples.grid.XmlGridExample;
 import com.extjs.gxt.samples.client.examples.layouts.AccordionLayoutExample;
 import com.extjs.gxt.samples.client.examples.layouts.AnchorLayoutExample;
 import com.extjs.gxt.samples.client.examples.layouts.BorderLayoutExample;
+import com.extjs.gxt.samples.client.examples.layouts.CardLayoutExample;
 import com.extjs.gxt.samples.client.examples.layouts.CenterLayoutExample;
 import com.extjs.gxt.samples.client.examples.layouts.RowLayoutExample;
 import com.extjs.gxt.samples.client.examples.list.DataListExample;
@@ -90,8 +92,8 @@ public class ExamplesModel extends BaseTreeModel {
     add(tabs);
 
     Category dnd = new Category("Drag and Drop");
+    dnd.addEntry("Basic", new BasicDNDExample());
     dnd.addEntry("List to List", new ListViewDNDExample());
-    
     dnd.addEntry("Grid to Grid", new GridToGridExample());
     dnd.addEntry("Tree to Tree", new TreeToTreeExample());
     dnd.addEntry("Reordering Tree", new ReordingTreeDNDExample());
@@ -115,12 +117,13 @@ public class ExamplesModel extends BaseTreeModel {
     add(trees);
 
     Category layouts = new Category("Layouts");
-    layouts.addEntry("BorderLayout", new BorderLayoutExample(), true);
     layouts.addEntry("AccordionLayout", new AccordionLayoutExample());
     layouts.addEntry("AnchorLayout", new AnchorLayoutExample());
+    layouts.addEntry("BorderLayout", new BorderLayoutExample(), true);
+    layouts.addEntry("CardLayout", new CardLayoutExample());
+    layouts.addEntry("CenterLayout", new CenterLayoutExample(), true);
     layouts.addEntry("RowLayout", new RowLayoutExample(), true);
     layouts.addEntry("Portal", new PortalExample(), true);
-    layouts.addEntry("CenterLayout", new CenterLayoutExample(), true);
     add(layouts);
 
     Category combos = new Category("Combos");

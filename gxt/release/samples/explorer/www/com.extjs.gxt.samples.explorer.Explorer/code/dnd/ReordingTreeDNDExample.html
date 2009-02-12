@@ -101,7 +101,7 @@ public class ReordingTreeDNDExample extends LayoutContainer {
       @Override
       public void dragStart(DNDEvent e) {
         TreeItem item = tree.findItem(e.getTarget());
-        if (item != null && item == tree.getRootItem().getItem(0)) {
+        if (item != null && item == tree.getRootItem().getItem(0) && tree.getRootItem().getItemCount() == 1) {
           e.doit = false;
           e.status.setStatus(false);
           return;

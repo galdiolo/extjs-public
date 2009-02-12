@@ -68,6 +68,7 @@ public class AccordionWindowExample extends LayoutContainer {
     family.add(newItem("Maro", "user-girl"));
     family.add(newItem("Lia", "user-kid"));
     family.add(newItem("Alec", "user-kid"));
+    family.add(newItem("Andrew", "user-kid"));
     family.setExpanded(true);
 
     TreeItem friends = new TreeItem("Friends");

@@ -51,10 +51,11 @@ public class ContentView extends View {
     tabPanel.addListener(Events.Select, new Listener<TabPanelEvent>() {
       public void handleEvent(TabPanelEvent be) {
         String token = History.getToken();
-        Entry entry = (Entry)be.item.getData("entry");
+        Entry entry = (Entry) be.item.getData("entry");
         if (token != null && (!token.equals(entry.getId()))) {
           History.newItem(entry.getId(), false);
         }
+        Dispatcher.forwardEvent(AppEvents.TabChange, entry);
       }
     });
     ContentPanel center = (ContentPanel) Registry.get(AppView.CENTER_PANEL);

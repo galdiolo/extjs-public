@@ -75,7 +75,13 @@ public class TotalsGridExample extends LayoutContainer {
     rate.setNumberFormat(NumberFormat.getCurrencyFormat());
     rate.setSummaryFormat(NumberFormat.getCurrencyFormat());
     rate.setSummaryType(SummaryType.AVG);
-    rate.setEditor(new CellEditor(new NumberField()));
+    
+    NumberField nf = new NumberField();
+    nf.setAutoValidate(true);
+    CellEditor ce = new CellEditor(nf);
+    ce.setRevertInvalid(true);
+    ce.setCancelOnEsc(true);
+    rate.setEditor(ce);
 
     SummaryColumnConfig cost = new SummaryColumnConfig("cost", "Cost", 20);
     cost.setSummaryFormat(NumberFormat.getCurrencyFormat());
@@ -123,7 +129,6 @@ public class TotalsGridExample extends LayoutContainer {
     panel.setSize(700, 450);
     panel.setLayout(new FitLayout());
     panel.add(grid);
-
     add(panel);
   }
 

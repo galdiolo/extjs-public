@@ -59,7 +59,7 @@ Ext.EventManager.on(window, 'load', function(){
             desc: 'A mail application with a preview pane that retrieves data using the Ext GWT data loading API.'
         },{
             text: 'Web Desktop',
-            url: 'http://extjs.com/deploy/gxt-1.1/samples/desktop/www/com.extjs.gxt.samples.desktop.DesktopApp/',
+            url: 'http://extjs.com/deploy/gxt-1.2.2/samples/desktop/www/com.extjs.gxt.samples.desktop.DesktopApp/',
             icon: 'desktop.gif',
             desc: 'Demonstrates how one could build a desktop in the browser using Ext components including a module plugin system.'
         }]
@@ -117,6 +117,11 @@ Ext.EventManager.on(window, 'load', function(){
     },{
         title: 'Drag and Drop',
         samples: [{
+            text: 'Basic DND',
+            url: 'dnd/basicdnd.html',
+            icon: 'basicdnd.gif',
+            desc: 'A basic DND example not using any specialized drag sources or drop targets.'
+        },{
             text: 'List to List',
             url: 'dnd/listtolist.html',
             icon: 'listtolist.gif',

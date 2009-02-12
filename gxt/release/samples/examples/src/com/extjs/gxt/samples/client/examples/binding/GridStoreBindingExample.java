@@ -1,3 +1,10 @@
+/*
+ * Ext GWT - Ext for GWT
+ * Copyright(c) 2007, 2008, Ext JS, LLC.
+ * licensing@extjs.com
+ * 
+ * http://extjs.com/license
+ */
 package com.extjs.gxt.samples.client.examples.binding;
 
 import java.util.ArrayList;
@@ -7,19 +14,13 @@ import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Stock;
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.Style.Orientation; /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007, 2008, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
+import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.binding.FormBinding;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.SelectionEvent;
+import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
@@ -59,10 +60,10 @@ public class GridStoreBindingExample extends LayoutContainer {
 
     final Grid grid = createGrid();
     grid.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-    grid.getSelectionModel().addListener(Events.SelectionChange, new Listener<SelectionEvent>() {
-      public void handleEvent(SelectionEvent be) {
-        if (be.selection.size() > 0) {
-          formBindings.bind((ModelData) be.selection.get(0));
+    grid.getSelectionModel().addListener(Events.SelectionChange, new Listener<SelectionChangedEvent>() {
+      public void handleEvent(SelectionChangedEvent be) {
+        if (be.getSelection().size() > 0) {
+          formBindings.bind((ModelData) be.getSelection().get(0));
         } else {
           formBindings.unbind();
         }

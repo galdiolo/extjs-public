@@ -63,6 +63,7 @@ import com.extjs.gxt.ui.client.widget.form.RadioGroup;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.form.TimeField;
+import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.google.gwt.user.client.Element;
@@ -112,6 +113,7 @@ public class FormsExample extends LayoutContainer {
     ComboBox<Stock> combo = new ComboBox<Stock>();
     combo.setFieldLabel("Company");
     combo.setDisplayField("name");
+    combo.setTriggerAction(TriggerAction.ALL);
     combo.setStore(store);
     simple.add(combo);
 

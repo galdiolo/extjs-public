@@ -24,7 +24,7 @@ import com.extjs.gxt.ui.client.data.RpcProxy;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.SelectionEvent;
+import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.event.WindowEvent;
 import com.extjs.gxt.ui.client.store.ListStore;
@@ -176,8 +176,8 @@ public class ImageChooserExample extends LayoutContainer {
     view.setItemSelector("div.thumb-wrap");
     view.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     view.getSelectionModel().addListener(Events.SelectionChange,
-        new Listener<SelectionEvent<BeanModel>>() {
-          public void handleEvent(SelectionEvent<BeanModel> be) {
+        new Listener<SelectionChangedEvent<BeanModel>>() {
+          public void handleEvent(SelectionChangedEvent<BeanModel> be) {
             onSelectionChange(be);
           }
         });
@@ -222,9 +222,9 @@ public class ImageChooserExample extends LayoutContainer {
     }
   }
 
-  private void onSelectionChange(SelectionEvent<BeanModel> se) {
-    if (se.selection.size() > 0) {
-      detailTp.overwrite(details.getElement(), Util.getJsObject(se.selection.get(0)));
+  private void onSelectionChange(SelectionChangedEvent<BeanModel> se) {
+    if (se.getSelection().size() > 0) {
+      detailTp.overwrite(details.getElement(), Util.getJsObject(se.getSelection().get(0)));
       chooser.getButtonById("ok").enable();
     } else {
       chooser.getButtonById("ok").disable();

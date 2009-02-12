@@ -16,6 +16,7 @@ package com.extjs.gxt.samples.server;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,7 +34,13 @@ public class FileServiceImpl extends RemoteServiceServlet implements FileService
 
   public FileServiceImpl() {
     URL rootUrl = getClass().getClassLoader().getResource("com/extjs");
-    root = new File(rootUrl.getFile());
+    try {
+      // %20 will be converted to a space
+      root = new File(rootUrl.toURI());
+    } catch (URISyntaxException e) {
+      // fallback
+      root = new File(rootUrl.getFile());
+    }
     filter = new FilenameFilter() {
       public boolean accept(File dir, String name) {
         return !name.startsWith(".");

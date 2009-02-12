@@ -53,7 +53,7 @@ import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.binding.FormBinding;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.SelectionEvent;
+import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -92,10 +92,10 @@ public class GridBindingExample extends LayoutContainer {
     Grid grid = createGrid();
     grid.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     grid.getSelectionModel().addListener(Events.SelectionChange,
-        new Listener<SelectionEvent>() {
-          public void handleEvent(SelectionEvent be) {
-            if (be.selection.size() > 0) {
-              formBindings.bind((ModelData) be.selection.get(0));
+        new Listener<SelectionChangedEvent>() {
+          public void handleEvent(SelectionChangedEvent be) {
+            if (be.getSelection().size() > 0) {
+              formBindings.bind((ModelData) be.getSelection().get(0));
             } else {
               formBindings.unbind();
             }

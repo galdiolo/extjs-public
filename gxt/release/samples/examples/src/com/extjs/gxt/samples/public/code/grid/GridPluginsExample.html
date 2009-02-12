@@ -48,6 +48,8 @@ import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Stock;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.core.XTemplate;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -311,10 +313,11 @@ public class GridPluginsExample extends LayoutContainer {
 
   private void createNumberer() {
     List<Stock> stocks = TestData.getStocks();
-
+    
+    RowNumberer r = new RowNumberer();
+    
     List<ColumnConfig> configs = new ArrayList<ColumnConfig>();
-
-    configs.add(new RowNumberer());
+    configs.add(r);
 
     ColumnConfig column = new ColumnConfig();
     column.setId("name");
@@ -346,16 +349,29 @@ public class GridPluginsExample extends LayoutContainer {
 
     ColumnModel cm = new ColumnModel(configs);
 
+    final Grid<Stock> grid = new Grid<Stock>(store, cm);
+    grid.addPlugin(r);
+    grid.getView().setForceFit(true);
+    
+    Button btn = new Button("Remove a Row", new SelectionListener<ComponentEvent>() {
+      @Override
+      public void componentSelected(ComponentEvent ce) {
+        grid.getStore().remove(grid.getStore().getAt(0));
+        if (grid.getStore().getCount() == 0) {
+          ce.component.disable();
+        }
+      }
+
+    });
+    btn.setIconStyle("icon-delete");
+
     ContentPanel cp = new ContentPanel();
     cp.setHeading("Grid with Numbered Rows and Force Fit");
     cp.setIconStyle("icon-table");
     cp.setLayout(new FitLayout());
     cp.setSize(600, 300);
-
-    final Grid<Stock> grid = new Grid<Stock>(store, cm);
-    grid.getView().setForceFit(true);
-
     cp.add(grid);
+    cp.addButton(btn);
     panel.add(cp);
   }
 

@@ -51,6 +51,12 @@ public class FileUploadExample extends LayoutContainer {
     file.setAllowBlank(false);
     file.setFieldLabel("File");
     panel.add(file);
+    
+    FileUploadField file2 = new FileUploadField();
+    file2.setAllowBlank(false);
+    file2.setFieldLabel("Print file");
+    file2.setButtonIconStyle("icon-printer");
+    panel.add(file2);
 
     List<Stock> list = TestData.getStocks();
     final ListStore<Stock> store = new ListStore<Stock>();

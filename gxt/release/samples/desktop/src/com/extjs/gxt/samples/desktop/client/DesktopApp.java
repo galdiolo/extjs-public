@@ -307,7 +307,7 @@ public class DesktopApp implements EntryPoint {
 
   private Window createBogusWindow(int index) {
     Window w = new Window();
-    w.setCloseAction(CloseAction.CLOSE);
+    w.setCloseAction(CloseAction.HIDE);
     w.setIconStyle("bogus");
     w.setMinimizable(true);
     w.setMaximizable(true);

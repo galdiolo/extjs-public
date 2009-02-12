@@ -15,4 +15,6 @@ public class AppEvents {
 
   public static final int HidePage = 2;
 
+  public static final int TabChange = 3;
+
 }

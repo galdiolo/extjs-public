@@ -81,8 +81,8 @@ public class NavigationView extends View {
     filter = new StoreFilterField<ModelData>() {
 
       @Override
-      protected boolean doSelect(Store store, ModelData parent, ModelData child, String property,
-          String filter) {
+      protected boolean doSelect(Store store, ModelData parent, ModelData child,
+          String property, String filter) {
         if (child instanceof Folder) {
           return false;
         }
@@ -190,6 +190,9 @@ public class NavigationView extends View {
     switch (event.type) {
       case AppEvents.HidePage:
         binder.setSelection(new ArrayList());
+        break;
+      case AppEvents.TabChange:
+        binder.setSelection((Entry) event.data);
         break;
     }
   }

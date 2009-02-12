@@ -27,6 +27,7 @@ import com.extjs.gxt.ui.client.widget.form.DateField;
 import com.extjs.gxt.ui.client.widget.form.NumberField;
 import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
 import com.extjs.gxt.ui.client.widget.form.TextField;
+import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.grid.CellEditor;
 import com.extjs.gxt.ui.client.widget.grid.CheckColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
@@ -66,6 +67,7 @@ public class EditableGridExample extends LayoutContainer {
     configs.add(column);
 
     final SimpleComboBox<String> combo = new SimpleComboBox<String>();
+    combo.setTriggerAction(TriggerAction.ALL);
     combo.add("Shade");
     combo.add("Mostly Shady");
     combo.add("Sun or Shade");
