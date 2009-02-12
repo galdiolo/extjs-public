@@ -28,29 +28,14 @@ import java.util.Map;
  * 
  * <dl>
  * <dt><b>Events:</b></dt>
- * 
- * <dd><b>Model.Add</b> : (source, item)<br>
- * <div>Fires after the button is selected.</div>
+ *  
+ * <dd><b>ChangeEventSource.Update</b> : (source, name, oldvalue, newvalue)<br>
+ * <div>Fires after the item is updated.</div>
  * <ul>
  * <li>source : this</li>
- * <li>item : add item</li>
- * </ul>
- * </dd>
- * 
- * <dd><b>Model.Insert</b> : (source, item)<br>
- * <div>Fires after the button is selected.</div>
- * <ul>
- * <li>source : this</li>
- * <li>item : insert item</li>
- * <li>index : insert index</li>
- * </ul>
- * </dd>
- * 
- * <dd><b>Model.Update</b> : (source, item)<br>
- * <div>Fires after the button is selected.</div>
- * <ul>
- * <li>source : this</li>
- * <li>item : this</li>
+ * <li>name : property name </li>
+ * <li>oldvalue : old value</li>
+ * <li>newvalue : new value</li>
  * </ul>
  * </dd>
  * </dl>

@@ -23,7 +23,16 @@ import com.extjs.gxt.ui.client.widget.Layout;
  * width (if pixels) or columnWidth (if percent) of each panel during layout to
  * determine how to size each panel. If width or columnWidth is not specified
  * for a given panel, its width will default to the panel's width (or auto).
- * </p>
+ * <p>
+ * Code snippet:
+ * 
+ * <code><pre>
+   LayoutContainer container = new LayoutContainer();
+   container.setLayout(new ColumnLayout());
+   container.add(new Button("100px"), new ColumnData(100));
+   container.add(new Button("30%"), new ColumnData(.3));
+   container.add(new Button("50px"), new ColumnData(50));
+ * </pre></code>
  * 
  * @see ColumnData
  */
@@ -37,7 +46,7 @@ public class ColumnLayout extends Layout {
   }
 
   /**
-   * Returns true if ajust for scroll is enabled.
+   * Returns true if adjust for scroll is enabled.
    * 
    * @return the adjust for scroll state
    */
@@ -46,7 +55,7 @@ public class ColumnLayout extends Layout {
   }
 
   /**
-   * True to ajust the container width calculations to account for the scroll
+   * True to adjust the container width calculations to account for the scroll
    * bar (defaults to false).
    * 
    * @param adjustForScroll the adjust for scroll state

@@ -10,11 +10,19 @@ package com.extjs.gxt.ui.client.widget.grid;
 import com.extjs.gxt.ui.client.widget.Editor;
 import com.extjs.gxt.ui.client.widget.form.Field;
 
+/**
+ * Cell based <code>Editor</code> for Grid.
+ */
 public class CellEditor extends Editor {
 
   protected int row;
   protected int col;
 
+  /**
+   * Creates a new cell editor.
+   * 
+   * @param field the editor's field
+   */
   public CellEditor(Field field) {
     super(field);
     setAlignment("tl-tl");

@@ -117,6 +117,15 @@ public class Layer extends El {
   }
 
   /**
+   * Returns the layer's shadow.
+   * 
+   * @return the shadow or null
+   */
+  public Shadow getShadow() {
+    return shadow;
+  }
+  
+  /**
    * Returns the layer's shim.
    * 
    * @return the shim

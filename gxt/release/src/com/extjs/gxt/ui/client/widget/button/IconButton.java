@@ -9,6 +9,7 @@ package com.extjs.gxt.ui.client.widget.button;
 
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.IconButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.google.gwt.user.client.DOM;
@@ -18,20 +19,41 @@ import com.google.gwt.user.client.Event;
 /**
  * A simple css styled button with 3 states: normal, over, and disabled.
  * 
- * <p>
+ * <p />
  * Note: To change the icon style after construction use
  * {@link #changeStyle(String)}.
- * </p>
+ * 
  * <dl>
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>Select</b> : (widget, event)<br>
+ * <dd><b>Select</b> : ToolButtonEvent(widget, event)<br>
  * <div>Fires after the item is selected.</div>
  * <ul>
  * <li>widget : this</li>
  * <li>event : the dom event</li>
  * </ul>
  * </dd>
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
  */
 public class IconButton extends BoxComponent {
 
@@ -111,6 +133,11 @@ public class IconButton extends BoxComponent {
     removeListener(Events.Select, listener);
   }
 
+  @Override
+  protected ComponentEvent createComponentEvent(Event event) {
+    return new IconButtonEvent(this, event);
+  }
+
   protected void onClick(ComponentEvent ce) {
     if (cancelBubble) {
       ce.cancelBubble();
@@ -122,7 +149,7 @@ public class IconButton extends BoxComponent {
   protected void onDisable() {
     addStyleName(style + "-disabled");
   }
-
+  
   protected void onEnable() {
     removeStyleName(style + "-disabled");
   }

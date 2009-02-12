@@ -22,21 +22,42 @@ import com.google.gwt.user.client.Timer;
 /**
  * An updateable progress bar component. The progress bar supports two different
  * modes: manual and automatic.
- * <p>
+ * 
+ * <p />
  * In manual mode, you are responsible for showing, updating (via
  * {@link #updateProgress}) and clearing the progress bar as needed from your
  * own code. This method is most appropriate when you want to show progress
  * throughout an operation that has predictable points of interest at which you
  * can update the control.
- * </p>
- * <p>
+ * 
+ * <p />
  * In automatic mode, you simply call {@link #auto} and let the progress bar run
  * indefinitely, only clearing it once the operation is complete. You can
  * optionally have the progress bar wait for a specific amount of time and then
  * clear itself. Automatic mode is most appropriate for timed operations or
- * asymchronous operations in which you have no need for indicating intermediate
+ * asynchronous operations in which you have no need for indicating intermediate
  * progress.
- * </p>
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
  */
 public class ProgressBar extends BoxComponent {
 

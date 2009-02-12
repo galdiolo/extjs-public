@@ -30,6 +30,14 @@ import com.google.gwt.user.client.ui.RootPanel;
  * 
  * <p/> Rather than adding content directly to the root panel, content should be
  * wrapped in windows. Windows can be opened via shortcuts and the start menu.
+ * 
+ * <p /> Desktop requires a 'x-desktop' element in your host page.
+ * 
+ * <pre>
+    &lt;div id="x-desktop">
+        &lt;dl id="x-shortcuts">&lt;/dl>
+    &lt;/div>
+ * </pre>
  */
 public class Desktop {
 

@@ -74,13 +74,16 @@ class DNDManager {
     }
 
     if (target != currentTarget) {
-      if (!source.getGroup().equals(target.getGroup()))  {
+      if (!source.getGroup().equals(target.getGroup())) {
         return;
       }
-      
-        
+
       if (currentTarget != null) {
         currentTarget.handleDragLeave(event);
+        currentTarget = null;
+      }
+      if (!target.isEnabled() || !target.component.isEnabled()) {
+        return;
       }
       currentTarget = target;
     }
@@ -94,7 +97,7 @@ class DNDManager {
     // entering
     event.doit = false;
     event.target = currentTarget;
-    currentTarget.onDragEnter(event);
+    currentTarget.handleDragEnter(event);
     currentTarget.fireEvent(Events.DragEnter, event);
   }
 
@@ -118,9 +121,8 @@ class DNDManager {
 
       currentTarget.handleDrop(event);
       currentTarget.fireEvent(Events.Drop, event);
-
-      Insert.get().hide();
     }
+    Insert.get().hide();
     currentTarget = null;
   }
 

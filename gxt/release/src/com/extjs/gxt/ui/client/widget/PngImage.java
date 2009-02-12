@@ -12,7 +12,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Image;
 
 /**
- * Image widget that overcomes PNG browser incompatabilities.
+ * Image widget that overcomes PNG browser incompatibilities.
  * 
  * <p>
  * Implementation adapted from GWT Widget Library

@@ -29,7 +29,8 @@ import com.google.gwt.user.client.ui.Widget;
  * is a non-visual class that simply provides the base logic required to
  * function as a layout. This class is intended to be extended.
  * 
- * <p/> Layout instances should not be shared with multiple containers.
+ * <p/>
+ * Layout instances should not be shared with multiple containers.
  * 
  * @see LayoutContainer
  */
@@ -171,7 +172,7 @@ public abstract class Layout extends BaseObservable {
       try {
         Object data = getLayoutData(c);
         if (data != null && data instanceof MarginData) {
-          MarginData m = (MarginData)data;
+          MarginData m = (MarginData) data;
           Margins margins = m.getMargins();
           if (margins == null) {
             return 0;
@@ -205,7 +206,7 @@ public abstract class Layout extends BaseObservable {
   protected void layoutContainer() {
     container.layout();
   }
-  
+
   protected void onLayout(Container container, El target) {
     this.target = target;
     renderAll(container, target);

@@ -148,9 +148,10 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
       e.property = field;
       e.rowIndex = row;
       e.colIndex = col;
+      e.value = m.get(field);
       if (fireEvent(Events.BeforeEdit, e)) {
         DeferredCommand.addCommand(new Command() {
-        
+
           public void execute() {
             editing = true;
             CellEditor ed = cm.getEditor(col);
@@ -178,14 +179,15 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
             ed.addListener(Events.SpecialKey, editorListener);
 
             activeEditor = ed;
-            // when inserting the editor into the last row, the body is scrolling
+            // when inserting the editor into the last row, the body is
+            // scrolling
             // in ie, and edit is being cancelled
             ignoreScroll = true;
             ed.startEdit((Element) view.getCell(row, col), m.get(field));
             ignoreScroll = false;
           }
         });
-        
+
       }
     }
   }
@@ -197,6 +199,11 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
     stopEditing(false);
   }
 
+  /**
+   * Stops any active editing.
+   * 
+   * @param cancel true to cancel, false to complete
+   */
   public void stopEditing(boolean cancel) {
     if (activeEditor != null) {
       if (cancel) {
@@ -236,6 +243,7 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
 
       if (fireEvent(Events.ValidateEdit, ge)) {
         r.set(ge.property, ge.value);
+        r.setValid(ge.property, ed.getField().isValid());
         fireEvent(Events.AfterEdit, ge);
       }
     }

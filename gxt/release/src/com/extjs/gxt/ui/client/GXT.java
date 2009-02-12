@@ -9,6 +9,7 @@ package com.extjs.gxt.ui.client;
 
 import java.util.Map;
 
+import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.messages.MyMessages;
 import com.extjs.gxt.ui.client.state.CookieProvider;
 import com.extjs.gxt.ui.client.state.StateManager;
@@ -33,7 +34,22 @@ public class GXT {
    * <code>true</code> if the browser is safari.
    */
   public static boolean isSafari;
+  
+  /**
+   * <code>true</code> if the browser is safari2.
+   */
+  public static boolean isSafari2;
+  
+  /**
+   * <code>true</code> if the browser is safari3.
+   */
+  public static boolean isSafari3;
 
+  /**
+   * <code>true</code> if the browser is chrome.
+   */
+  public static boolean isChrome;
+  
   /**
    * <code>true</code> if the browser is opera.
    */
@@ -53,11 +69,26 @@ public class GXT {
    * <code>true</code> if the browser is ie7.
    */
   public static boolean isIE7;
+  
+  /**
+   * <code>true</code> if the browser is ie8.
+   */
+  public static boolean isIE8;
 
   /**
    * <code>true</code> if the browser is gecko.
    */
   public static boolean isGecko;
+
+  /**
+   * <code>true</code> if the browser is gecko2.
+   */
+  public static boolean isGecko2;
+  
+  /**
+   * <code>true</code> if the browser is gecko3.
+   */
+  public static boolean isGecko3;
 
   /**
    * <code>true</code> if the browser is in strict mode.
@@ -78,6 +109,21 @@ public class GXT {
    * <code>true</code> if linux os.
    */
   public static boolean isLinux;
+  
+  /**
+   * <code>true</code> if windows os.
+   */
+  public static boolean isWindows;
+  
+  /**
+   * <code>true</code> if is air.
+   */
+  public static boolean isAir;
+  
+  /**
+   * <code>true</code> if is borderbox.
+   */
+  public static boolean isBorderBox;
 
   /**
    * URL to a blank file used by GXT when in secure mode for iframe src to
@@ -89,7 +135,8 @@ public class GXT {
    * URL to a 1x1 transparent gif image used by GXT to create inline icons with
    * CSS background images. Default value is 'images/default/shared/clear.gif';
    */
-  public static String BLANK_IMAGE_URL = GWT.getModuleBaseURL() + "images/default/shared/clear.gif";
+  public static String BLANK_IMAGE_URL = GWT.getModuleBaseURL()
+      + "images/default/shared/clear.gif";
 
   private static boolean initialized;
   private static Theme defaultTheme;
@@ -116,7 +163,7 @@ public class GXT {
    */
   public native static String getUserAgent() /*-{
      return $wnd.navigator.userAgent.toLowerCase();
-     }-*/;
+   }-*/;
 
   /**
    * Returns the version information.
@@ -149,7 +196,8 @@ public class GXT {
   }
 
   /**
-   * Initializes GXT.
+   * Initializes GXT. Statically called by
+   * {@link com.extjs.gxt.ui.client.widget.Component} when instantiated
    */
   public static void init() {
     if (initialized) {
@@ -157,16 +205,25 @@ public class GXT {
     }
     initialized = true;
 
-    String ua = getUserAgent();
-
-    isSafari = ua.indexOf("webkit") != -1;
-    isOpera = ua.indexOf("opera") != -1;
-    isIE = ua.indexOf("msie") != -1;
-    isIE7 = ua.indexOf("msie 7") != -1;
-    isIE6 = isIE && !isIE7;
-    isGecko = ua.indexOf("gecko") != -1 && ua.indexOf("like gecko") == -1;
-    isMac = ua.indexOf("macintosh") != -1 || ua.indexOf("mac os x") != -1;
-    isLinux = ua.indexOf("linux") != -1;
+    String ua = getUserAgent();   
+    
+    isOpera = ua.indexOf("opera") > -1;
+    isChrome = ua.indexOf("chrome") > -1;
+    isSafari = !isChrome && (ua.indexOf("webkit") > -1 || ua.indexOf("khtml") > -1);
+    isSafari3 = isSafari && ua.indexOf("webkit/5") != -1;
+    isSafari2 = isSafari && !isSafari3;
+    isIE = !isOpera && ua.indexOf("msie") > -1;
+    isIE7 = !isOpera && ua.indexOf("msie 7") > -1;
+    isIE8 = !isOpera && ua.indexOf("msie 8") > -1;
+    isIE6 = isIE && !isIE7 && !isIE8;
+    isGecko = !isSafari && !isChrome && ua.indexOf("gecko") > -1;
+    isGecko3 = isGecko && ua.indexOf("rv:1.9") > -1;
+    isGecko2 = isGecko && !isGecko3;
+    isBorderBox = isIE && !isStrict;
+    isWindows = (ua.indexOf("windows") != -1 || ua.indexOf("win32") != -1);
+    isMac = (ua.indexOf("macintosh") != -1 || ua.indexOf("mac os x") != -1);
+    isAir = (ua.indexOf("adobeair") != -1);
+    isLinux = (ua.indexOf("linux") != -1);
 
     String mode = DOM.getElementProperty(XDOM.getDocument(), "compatMode");
     isStrict = mode != null ? mode.equals("CSS1Compat") : false;
@@ -176,8 +233,10 @@ public class GXT {
     String cls = "";
     if (isIE) {
       cls = "ext-ie";
+      cls += " "+ (isIE6 ? "ext-ie6" : (isIE7 ? "ext-ie7" : "ext-ie8"));
     } else if (isGecko) {
       cls = "ext-gecko";
+      cls +=" "+ (isGecko2 ? "ext-gecko2" : "ext-gecko3");
     } else if (isOpera) {
       cls = "ext-opera";
     } else if (isSafari) {
@@ -191,6 +250,9 @@ public class GXT {
     if (isLinux) {
       cls += " ext-linux";
     }
+   
+    if(isBorderBox)
+      cls +=" ext-border-box";
 
     CookieProvider provider = new CookieProvider("/", null, null, false);
     StateManager.get().setProvider(provider);
@@ -212,11 +274,22 @@ public class GXT {
     XDOM.getBody().setClassName(cls);
 
     initInternal();
+    
+    if(isStrict){ // add to the parent to allow for selectors like ".ext-strict .ext-ie"
+      Element p = (Element) XDOM.getBody().getParentElement();
+      if(p != null){
+          El.fly(p).addStyleName("ext-strict");
+      }
+    }
   }
 
   /**
    * Sets the default theme which will be used if the user does not have a theme
    * selected with the state provider.
+   * <p/>
+   * Note : {@link com.extjs.gxt.ui.client.widget.Component} statically calls
+   * {@link#init()} when instantiated, so ensure default theme is set before GXT
+   * widgets are constructed.
    * 
    * @param theme the default theme
    * @param force true to force the theme, ignoring the the theme saved with the
@@ -244,10 +317,10 @@ public class GXT {
      $wnd.GXT = {};
      $wnd.GXT.Ext = {};
      @com.extjs.gxt.ui.client.core.Ext::load()();
-     }-*/;
+   }-*/;
 
   private static native boolean isSecure() /*-{
      return $wnd.location.href.toLowerCase().indexOf("https") === 0;
-     }-*/;
+   }-*/;
 
 }

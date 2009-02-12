@@ -233,8 +233,22 @@ public class CompositeElement {
     items.clear();
   }
 
-  public void replaceElement(Element elem, Element replace) {
-
+  /**
+   * Replaces an element.
+   * 
+   * @param elem the element to remove
+   * @param replace the element to replace
+   * @return true if the item was replaced
+   */
+  public boolean replaceElement(Element elem, Element replace) {
+    int i = items.indexOf(elem);
+    if (i != -1) {
+      remove(elem);
+      items.add(i, replace);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**

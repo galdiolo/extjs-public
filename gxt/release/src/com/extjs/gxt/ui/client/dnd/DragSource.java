@@ -1,5 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
+ * Ext GWT - Ext for GWT 
+ * 
  * Copyright(c) 2007, 2008, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -8,6 +9,7 @@
 package com.extjs.gxt.ui.client.dnd;
 
 import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.extjs.gxt.ui.client.event.DNDEvent;
 import com.extjs.gxt.ui.client.event.DNDListener;
@@ -17,24 +19,18 @@ import com.extjs.gxt.ui.client.fx.Draggable;
 import com.extjs.gxt.ui.client.widget.Component;
 
 /**
- * Identifies a component that drag and drops can be initiated from.
+ * Identifies a component that drag and drops can be initiated from. <p /> Drag
+ * sources must set the data that will be dragged during a drag operation. The
+ * data can be specified either by using {@link #setData(Object)} or, setting
+ * the data via the DND event when a drag begins.
  * 
- * <p>
- * Drag sources must set the data that will be dragged during a drag operation.
- * The data can be specified either by using {@link #setData(Object)} or,
- * setting the data via the DND event when a drag begins.
- * </p>
- * 
- * <p>
- * Drag sources are responsible for removing the dragged data from the source
- * component after a valid drop. Use {@link DropTarget#getOperation()} to
+ * <p /> Drag sources are responsible for removing the dragged data from the
+ * source component after a valid drop. Use {@link DropTarget#getOperation()} to
  * determine if the data was copied or moved. The target is accessible via the
  * DNDEvent passed to {@link #onDragDrop(DNDEvent)} and listeners.
- * </p>
  * 
  * <dl>
  * <dt><b>Events:</b></dt>
- * 
  * <dd><b>DragStart</b> : DNDEvent(source, component, event, dragEvent, status)<br>
  * <div>Fires after the user begins a drag and drop operation.</div>
  * <ul>
@@ -44,8 +40,8 @@ import com.extjs.gxt.ui.client.widget.Component;
  * <li>dragEvent : the drag event (draggable)</li>
  * <li>status : the status object</li>
  * </ul>
- * </dd>
  * 
+ * </dd>
  * <dd><b>DragCancel</b> : DNDEvent(source, component, event, dragEvent)<br>
  * <div>Fires after a drag is cancelled.</div>
  * <ul>
@@ -68,7 +64,6 @@ import com.extjs.gxt.ui.client.widget.Component;
  * <li>status : the status object</li>
  * </ul>
  * </dd>
- * 
  * </dl>
  */
 public class DragSource extends BaseObservable {
@@ -81,6 +76,7 @@ public class DragSource extends BaseObservable {
 
   private String statusText;
   private String group = "";
+  private boolean enabled = true;
 
   /**
    * @param component
@@ -130,6 +126,20 @@ public class DragSource extends BaseObservable {
   }
 
   /**
+   * Disables the drag source.
+   */
+  public void disable() {
+    enabled = false;
+  }
+
+  /**
+   * Enables the drag source.
+   */
+  public void enable() {
+    enabled = true;
+  }
+
+  /**
    * Returns the source component.
    * 
    * @return the component
@@ -175,6 +185,15 @@ public class DragSource extends BaseObservable {
   }
 
   /**
+   * Returns true if the drag source is enabled.
+   * 
+   * @return true for enabled
+   */
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  /**
    * Removes the drag and drop listener.
    * 
    * @param listener the listener to remove
@@ -213,6 +232,15 @@ public class DragSource extends BaseObservable {
     this.statusText = statusText;
   }
 
+  /**
+   * Called when a drag operation has been cancelled.
+   * 
+   * @param event the dnd event
+   */
+  protected void onDragCancelled(DNDEvent event) {
+
+  }
+
   protected void onDragDrop(DNDEvent event) {
 
   }
@@ -225,15 +253,6 @@ public class DragSource extends BaseObservable {
    * @param event the dnd event
    */
   protected void onDragStart(DNDEvent event) {
-
-  }
-
-  /**
-   * Called when a drag operation has been cancelled.
-   * 
-   * @param event the dnd event
-   */
-  protected void onDragCancelled(DNDEvent event) {
 
   }
 
@@ -260,8 +279,8 @@ public class DragSource extends BaseObservable {
   }
 
   private void onDraggableDragMove(DragEvent de) {
-    de.x = de.getClientX() + 12;
-    de.y = de.getClientY() + 12;
+    de.x = de.getClientX() + 12 + XDOM.getBodyScrollLeft();
+    de.y = de.getClientY() + 12 + XDOM.getBodyScrollTop();
 
     DNDEvent e = new DNDEvent(this);
     e.event = de.event;
@@ -274,6 +293,9 @@ public class DragSource extends BaseObservable {
   }
 
   private void onDraggableDragStart(DragEvent de) {
+    if (!isEnabled() || !component.isEnabled()) {
+      return;
+    }
     DNDEvent e = new DNDEvent(this);
     e.data = data;
     e.event = de.event;

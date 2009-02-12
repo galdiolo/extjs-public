@@ -20,13 +20,37 @@ import com.google.gwt.user.client.EventListener;
 
 /**
  * A 2-trigger TriggerField.
+ * 
+ * <dl>
+ * <dt><b>Events:</b></dt>
+ * 
+ * <dd><b>TwinTriggerClick</b> : FieldEvent(field, event)<br>
+ * <div>Fires after the twin trigger is clicked.</div>
+ * <ul>
+ * <li>field : this</li>
+ * <li>event : event</li>
+ * </ul>
+ * </dd>
+ * </dl>
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>Field Focus</dd>
+ * <dd>Field Blur</dd>
+ * <dd>Field Change</dd>
+ * <dd>Field Invalid</dd>
+ * <dd>Field Valid</dd>
+ * <dd>Field KeyPress</dd>
+ * <dd>Field SpecialKey</dd>
+ * <dd>TriggerField TriggerClick</dd>
+ * </dl>
  */
 public class TwinTriggerField extends TriggerField {
 
-  protected Element twinTrigger;
+  protected El twinTrigger;
 
   private String twinTriggerStyle;
-  private Element span;
+  private El span;
 
   /**
    * Returns the twin trigger style.
@@ -49,13 +73,13 @@ public class TwinTriggerField extends TriggerField {
   @Override
   protected void doAttachChildren() {
     super.doAttachChildren();
-    DOM.setEventListener(twinTrigger, triggerListener);
+    DOM.setEventListener(twinTrigger.dom, triggerListener);
   }
 
   @Override
   protected void doDetachChildren() {
     super.doDetachChildren();
-    DOM.setEventListener(twinTrigger, null);
+    DOM.setEventListener(twinTrigger.dom, null);
   }
 
   @Override
@@ -68,20 +92,24 @@ public class TwinTriggerField extends TriggerField {
     trigger.dom.setClassName("x-form-trigger " + triggerStyle);
     trigger.dom.setPropertyString("src", GXT.BLANK_IMAGE_URL);
 
-    twinTrigger = DOM.createImg();
-    twinTrigger.setClassName("x-form-trigger " + twinTriggerStyle);
-    twinTrigger.setPropertyString("src", GXT.BLANK_IMAGE_URL);
+    twinTrigger = new El(DOM.createImg());
+    twinTrigger.dom.setClassName("x-form-trigger " + twinTriggerStyle);
+    twinTrigger.dom.setPropertyString("src", GXT.BLANK_IMAGE_URL);
 
-    span = DOM.createSpan();
-    span.setClassName("x-form-twin-triggers");
-    DOM.appendChild(span, twinTrigger);
-    DOM.appendChild(span, trigger.dom);
+    span = new El(DOM.createSpan());
+    span.dom.setClassName("x-form-twin-triggers");
+    DOM.appendChild(span.dom, twinTrigger.dom);
+    DOM.appendChild(span.dom, trigger.dom);
 
     DOM.appendChild(wrap.dom, input.dom);
-    DOM.appendChild(wrap.dom, span);
+    DOM.appendChild(wrap.dom, span.dom);
 
     setElement(wrap.dom, target, index);
 
+    if (isHideTrigger()) {
+      span.setVisible(false);
+    }
+    
     super.onRender(target, index);
 
     triggerListener = new EventListener() {
@@ -95,21 +123,29 @@ public class TwinTriggerField extends TriggerField {
     };
     DOM.sinkEvents(wrap.dom, Event.FOCUSEVENTS);
     DOM.sinkEvents(trigger.dom, Event.ONCLICK | Event.MOUSEEVENTS);
-    DOM.sinkEvents(twinTrigger, Event.ONCLICK | Event.MOUSEEVENTS);
+    DOM.sinkEvents(twinTrigger.dom, Event.ONCLICK | Event.MOUSEEVENTS);
+    
+    if (width == null) {
+      setWidth(150);
+    }
   }
 
   @Override
   protected void onResize(int width, int height) {
     if (width != Style.DEFAULT) {
-      int tw = fly(span).getWidth();
-      input.setWidth(adjustWidth("input", width - tw), true);
+      int tw = span.getWidth();
+      if (!this.isHideTrigger() && tw == 0) { // need to look into why 0 is returned
+        tw = 34;
+      }
+      getInputEl().setWidth(this.adjustWidth("input", width - tw));
+      wrap.setWidth(width, true);
     }
   }
 
   @Override
   protected void onTriggerEvent(ComponentEvent ce) {
     El target = ce.getTargetEl();
-    if (target.dom == twinTrigger) {
+    if (target.dom == twinTrigger.dom) {
       onTwinTriggerEvent(ce);
     } else {
       super.onTriggerEvent(ce);
@@ -124,10 +160,10 @@ public class TwinTriggerField extends TriggerField {
     int type = ce.getEventType();
     switch (type) {
       case Event.ONMOUSEOVER:
-        fly(twinTrigger).addStyleName("x-form-trigger-over");
+       twinTrigger.addStyleName("x-form-trigger-over");
         break;
       case Event.ONMOUSEOUT:
-        fly(twinTrigger).removeStyleName("x-form-trigger-over");
+        twinTrigger.removeStyleName("x-form-trigger-over");
         break;
       case Event.ONCLICK:
         onTwinTriggerClick(ce);

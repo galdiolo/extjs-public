@@ -85,12 +85,16 @@ public interface MyMessages extends Messages {
   String textField_regexText();
 
   String textField_emptyText();
+  
+  String uploadField_browseText();
 
   String numberField_minText(double min);
 
   String numberField_maxText(double max);
 
   String numberField_nanText(String num);
+  
+  String numberField_negativeText();
 
   String dateField_disabledDaysText();
 
@@ -102,11 +106,19 @@ public interface MyMessages extends Messages {
 
   String dateField_invalidText(String date, String format);
 
-  String dateField_format();
-
-  String dateField_altFormats();
-
   String comboBox_loading();
+
+  String listField_moveSelectedUp();
+
+  String listField_moveSelectedDown();
+
+  String listField_addAll();
+
+  String listField_addSelected();
+
+  String listField_removeAll();
+
+  String listField_removeSelected();
 
   String gridView_sortAscText();
 

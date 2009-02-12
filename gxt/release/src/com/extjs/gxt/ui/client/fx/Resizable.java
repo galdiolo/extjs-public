@@ -23,6 +23,7 @@ import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
+import com.extjs.gxt.ui.client.widget.Shim;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -136,18 +137,18 @@ public class Resizable extends BaseObservable {
    * True to resize the widget directly instead of using a proxy (defaults to
    * false).
    */
-  public boolean dynamic;
   private BoxComponent resize;
   private List<ResizeHandle> handleList;
   private boolean enabled = true;
-  private boolean dragging;
-  private El proxyEl, dragEl;
+  private boolean resizing;
+  private El proxyEl;
   private Dir dir;
   private EventPreview preview;
   private Listener listener;
   private String handles;
   private Rectangle startBox;
   private Point startPoint;
+  private Shim shim = new Shim();
 
   /**
    * Creates a new resizable instance with 8-way resizing.
@@ -214,7 +215,7 @@ public class Resizable extends BaseObservable {
    * @return the resize state
    */
   public boolean isResizing() {
-    return dragging;
+    return resizing;
   }
 
   /**
@@ -349,6 +350,8 @@ public class Resizable extends BaseObservable {
       return;
     }
 
+    shim.cover(false);
+
     dir = handle.dir;
 
     startBox = resize.getBounds(false);
@@ -356,30 +359,27 @@ public class Resizable extends BaseObservable {
     int y = DOM.eventGetClientY(event);
     startPoint = new Point(x, y);
 
-    dragging = true;
+    resizing = true;
 
-    if (!dynamic) {
-      if (proxyEl == null) {
-        proxyEl = new El(DOM.createDiv());
-        proxyEl.setStyleName(proxyStyle, true);
-        proxyEl.disableTextSelection(true);
-        Element body = RootPanel.getBodyElement();
-        DOM.appendChild(body, proxyEl.dom);
-      }
-
-      proxyEl.makePositionable(true);
-      proxyEl.setLeft(startBox.x).setTop(startBox.y);
-      proxyEl.setSize(startBox.width, startBox.height);
-      proxyEl.setVisible(true);
-      dragEl = proxyEl;
-    } else {
-      dragEl = new El(resize.getElement());
+    if (proxyEl == null) {
+      proxyEl = new El(DOM.createDiv());
+      proxyEl.setStyleName(proxyStyle, true);
+      proxyEl.disableTextSelection(true);
+      Element body = RootPanel.getBodyElement();
+      DOM.appendChild(body, proxyEl.dom);
     }
+
+    proxyEl.makePositionable(true);
+    proxyEl.setLeft(startBox.x).setTop(startBox.y);
+    proxyEl.setSize(startBox.width, startBox.height);
+    proxyEl.setVisible(true);
+    proxyEl.updateZIndex(0);
+
     DOM.addEventPreview(preview);
   }
 
   private void handleMouseMove(int xin, int yin) {
-    if (dragging) {
+    if (resizing) {
       int x = startBox.x;
       int y = startBox.y;
       float w = startBox.width;
@@ -499,14 +499,15 @@ public class Resizable extends BaseObservable {
           }
         }
       }
-      dragEl.setBounds(x, y, (int) w, (int) h);
+      proxyEl.setBounds(x, y, (int) w, (int) h);
     }
   }
 
   private void handleMouseUp(Event event) {
-    dragging = false;
+    resizing = false;
     DOM.removeEventPreview(preview);
-    Rectangle rect = dragEl.getBounds();
+    shim.uncover();
+    Rectangle rect = proxyEl.getBounds();
 
     rect.width = Math.min(rect.width, maxWidth);
     rect.height = Math.min(rect.height, maxHeight);
@@ -517,7 +518,6 @@ public class Resizable extends BaseObservable {
 
     resize.setBounds(rect);
 
-    dragEl.setVisible(false);
     proxyEl.setVisible(false);
 
     ResizeEvent ce = new ResizeEvent(this);

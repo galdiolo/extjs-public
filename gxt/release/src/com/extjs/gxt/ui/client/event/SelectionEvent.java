@@ -7,21 +7,18 @@
  */
 package com.extjs.gxt.ui.client.event;
 
-import java.util.List;
-
 import com.extjs.gxt.ui.client.data.ModelData;
 
 /**
- * Selection event type.
+ * Selection event type. A selection event is fired when the selection state of
+ * a individual model changes. A <code>SelectionChangedEvent</code> is fired
+ * when the overall selection state of a component changes.
  * 
  * @param <M> the model data type
+ * 
+ * @see SelectionChangedEvent
  */
 public class SelectionEvent<M extends ModelData> extends BaseEvent {
-
-  /**
-   * The selection.
-   */
-  public List<M> selection;
 
   /**
    * The model.
@@ -32,11 +29,6 @@ public class SelectionEvent<M extends ModelData> extends BaseEvent {
    * The index.
    */
   public int index;
-
-  public SelectionEvent(Object source, List<M> selection) {
-    super(source);
-    this.selection = selection;
-  }
 
   public SelectionEvent(Object source, M model) {
     super(source);

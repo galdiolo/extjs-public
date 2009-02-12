@@ -10,7 +10,7 @@ package com.extjs.gxt.ui.client.widget.layout;
 import com.extjs.gxt.ui.client.util.Margins;
 
 /**
- * Layout data for <code>AnchorLayout</code>.
+ * Layout data for {@link AnchorLayout}.
  */
 public class AnchorData extends MarginData {
 

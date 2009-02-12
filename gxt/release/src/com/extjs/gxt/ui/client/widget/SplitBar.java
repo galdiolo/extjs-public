@@ -63,20 +63,11 @@ public class SplitBar extends BoxComponent {
   /**
    * Transparent shim that allows drags over iframes.
    */
-  private static Html shim;
+  private Shim shim = new Shim();
   private static List<SplitBar> attachedBars;
   private static DelayedTask delayedTask;
 
   static {
-    shim = new Html();
-    shim.shim = true;
-    shim.setSize("2000", "2000");
-    shim.setStyleAttribute("position", "absolute");
-    RootPanel.get().add(shim);
-    shim.el().setLeftTop(0, 0);
-    shim.setStyleAttribute("backgroundColor", "red");
-    shim.el().setStyleAttribute("opacity", 0);
-    shim.setVisible(false);
     attachedBars = new ArrayList<SplitBar>();
 
     delayedTask = new DelayedTask(new Listener<ComponentEvent>() {
@@ -244,7 +235,7 @@ public class SplitBar extends BoxComponent {
   }
 
   /**
-   * Returns the maxiumum size.
+   * Returns the maximum size.
    * 
    * @return the max size
    */
@@ -391,11 +382,11 @@ public class SplitBar extends BoxComponent {
         el().setBounds(x + getYOffset(), y + h + getXOffset(), w, getHandleWidth(), false);
         break;
       case WEST:
-        el().setBounds(x - getBarWidth() + getYOffset(), y + getXOffset(), getHandleWidth(), h,
+        el().setBounds(x - getHandleWidth() + getYOffset(), y + getXOffset(), getHandleWidth(), h,
             false);
         break;
       case NORTH:
-        el().setBounds(x + getYOffset(), y - getBarWidth() + getXOffset(), w, getHandleWidth(),
+        el().setBounds(x + getYOffset(), y - getHandleWidth() + getXOffset(), w, getHandleWidth(),
             false);
         break;
       case EAST:
@@ -406,16 +397,16 @@ public class SplitBar extends BoxComponent {
   }
 
   private void onCancelDrag(BaseEvent be) {
-    shim.setVisible(false);
+    shim.uncover();
     resizeWidget.enableEvents(true);
     sync();
   }
 
-  private void onEndDrag(DragEvent bee) {
-    shim.setVisible(false);
+  private void onEndDrag(DragEvent de) {
+    shim.uncover();
 
-    int x = bee.x;
-    int y = bee.y;
+    int x = de.x;
+    int y = de.y;
     int width = resizeWidget.getOffsetWidth();
     int height = resizeWidget.getOffsetHeight();
 
@@ -477,11 +468,7 @@ public class SplitBar extends BoxComponent {
     se.dragEvent = de;
     fireEvent(Events.DragStart, se);
 
-    el().updateZIndex(0);
-
-    shim.setVisible(true);
-    shim.show();
-    shim.el().setZIndex(-1);
+    shim.cover(false);
 
     resizeWidget.enableEvents(false);
 

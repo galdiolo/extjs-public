@@ -13,11 +13,19 @@ import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.Component;
 
 /**
- * <code>FillLayout</code> places its components in a single row or column,
- * forcing them to be the same size.
+ * Extending {@link RowLayout}, this layout places its components in a single
+ * row or column, forcing them to be of equal size, filling the container.
  * 
- * <p/> Each components margins can be specifed by using a FillData instance for
- * each child. Only 1 component should specify a margin on adjacent sides.
+ * <p /> Child Widgets are:
+ * <ul>
+ * <li><b>Sized</b> : Yes - expands to fill parent container</li>
+ * <li><b>Positioned</b> : Yes - widgets are placed in a row/column</li>
+ * </ul>
+ * 
+ * <p /> Component margins can be specified by using a FillData instance for each
+ * child. Only 1 component should specify a margin on adjacent sides.
+ * 
+ * @see FillData
  */
 public class FillLayout extends RowLayout {
 

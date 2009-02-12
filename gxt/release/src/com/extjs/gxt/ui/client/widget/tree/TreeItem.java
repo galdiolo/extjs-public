@@ -215,7 +215,10 @@ public class TreeItem extends Component {
    * @return the first child or <code>null</code>
    */
   public TreeItem firstChild() {
-    return getItem(0);
+    for (TreeItem child : getItems()) {
+      if (child.isVisible()) return child;
+    }
+    return null;
   }
 
   /**
@@ -278,6 +281,16 @@ public class TreeItem extends Component {
    */
   public List<TreeItem> getItems() {
     return new ArrayList<TreeItem>(children);
+  }
+
+  public List<TreeItem> getItems(boolean deep) {
+    if (deep) {
+      List list = new ArrayList();
+      getAllChildren(list, this);
+      return list;
+    } else {
+      return getItems();
+    }
   }
 
   /**
@@ -401,6 +414,19 @@ public class TreeItem extends Component {
   }
 
   /**
+   * Returns the item's last child.
+   * 
+   * @return the last child
+   */
+  public TreeItem lastChild() {
+    for (int i = getItemCount() - 1; i >= 0; i--) {
+      TreeItem child = getItem(i);
+      if (child.isVisible()) return child;
+    }
+    return null;
+  }
+
+  /**
    * Returns the item next sibling.
    * 
    * @return the next sibling
@@ -408,7 +434,10 @@ public class TreeItem extends Component {
   public TreeItem nextSibling() {
     if (parentItem == null) return null;
     int index = parentItem.indexOf(this);
-    return parentItem.getItem(index + 1);
+    for (int i = index + 1; i < parentItem.getItemCount(); i++) {
+      if (parentItem.getItem(i).isVisible()) return parentItem.getItem(i);
+    }
+    return null;
   }
 
   public void onComponentEvent(ComponentEvent ce) {
@@ -426,7 +455,10 @@ public class TreeItem extends Component {
   public TreeItem previousSibling() {
     if (parentItem == null) return null;
     int index = parentItem.indexOf(this);
-    return parentItem.getItem(index - 1);
+    for (int i = index - 1; i >= 0; i--) {
+      if (parentItem.getItem(i).isVisible()) return parentItem.getItem(i);
+    }
+    return null;
   }
 
   /**
@@ -729,10 +761,6 @@ public class TreeItem extends Component {
     return this == parentItem.getItem(parentItem.getItemCount() - 1);
   }
 
-  TreeItem lastChild() {
-    return getItem(getItemCount() - 1);
-  }
-
   private void clearCheckChildren(TreeItem parent) {
     for (int i = 0; i < parent.getItemCount(); i++) {
       TreeItem sub = parent.getItem(i);
@@ -745,16 +773,6 @@ public class TreeItem extends Component {
     for (int i = 0; i < getItemCount(); i++) {
       TreeItem item = getItem(i);
       item.setExpanded(true, deep);
-    }
-  }
-
-  public List<TreeItem> getItems(boolean deep) {
-    if (deep) {
-      List list = new ArrayList();
-      getAllChildren(list, this);
-      return list;
-    } else {
-      return getItems();
     }
   }
 

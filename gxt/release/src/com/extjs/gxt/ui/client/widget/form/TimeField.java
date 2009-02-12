@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.extjs.gxt.ui.client.data.BaseModelData;
-import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.DateWrapper;
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -20,6 +18,31 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 /**
  * Provides a time input field with a time dropdown and automatic time
  * validation.
+ * 
+ * <p /> The model used by TimeField is @link {@link Time}. An instance of Time
+ * is used with {@link #setValue(Time)} and {@link #getValue()}. Use
+ * {@link #setDateValue(Date)} and {@link #getDateValue()} to work with Dates.
+ * When using dates, the Time instance will match exact matches of hours and
+ * Minutes and will match times between to entries.
+ * 
+ * Code Snippet.
+ * 
+ * <pre>
+    TimeField field = new TimeField();
+    
+    DateWrapper wrap = new DateWrapper();
+    wrap = wrap.clearTime();
+    wrap.addHours(4);
+    
+    field.setMinValue(wrap.asDate());
+    field.setDateValue(new Date());
+    
+    Time time = field.getValue();
+    Date d = time.getDate();
+    
+    Time match = field.findModel(new Date());
+    field.setValue(match);
+ * </pre>
  * 
  * <dl>
  * <dt><b>Events:</b></dt>
@@ -52,8 +75,22 @@ import com.google.gwt.i18n.client.DateTimeFormat;
  * </ul>
  * </dd>
  * </dl>
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>Field Focus</dd>
+ * <dd>Field Blur</dd>
+ * <dd>Field Change</dd>
+ * <dd>Field Invalid</dd>
+ * <dd>Field Valid</dd>
+ * <dd>Field KeyPress</dd>
+ * <dd>Field SpecialKey</dd>
+ * <dd>TriggerField TriggerClick</dd>
+ * </dl>
+ * 
+ * @see Time
  */
-public class TimeField extends ComboBox<ModelData> {
+public class TimeField extends ComboBox<Time> {
 
   /**
    * TimeField error messages.
@@ -128,9 +165,68 @@ public class TimeField extends ComboBox<ModelData> {
 
   private Date minValue;
   private Date maxValue;
+  private boolean initialized;
 
+  /**
+   * Creates a new time field.
+   */
   public TimeField() {
     setMessages(new TimeFieldMessages());
+  }
+
+  /**
+   * Returns the matching Time for the given date.
+   * 
+   * @param date the date
+   * @return the matching model or null if no match
+   */
+  public Time findModel(Date date) {
+    if (!initialized) initList();
+    DateWrapper w = new DateWrapper();
+    DateWrapper w2 = new DateWrapper(date);
+
+    w = w.clearTime();
+    w = w.addHours(w2.getHours());
+    w = w.addMinutes(w2.getMinutes());
+
+    long l = w.getTime();
+
+    List<Time> times = store.getModels();
+    for (int i = 0; i < times.size(); i++) {
+      Time t1 = store.getAt(i);
+      Time t2 = store.getAt(i + 1);
+
+      if (t2 == null) {
+        DateWrapper temp = new DateWrapper();
+        temp = temp.clearTime();
+        temp = temp.addMinutes(t1.getMinutes() + increment);
+        temp = temp.addHours(t1.getHour());
+        t2 = new Time(temp.asDate());
+      }
+
+      long l1 = t1.getDate().getTime();
+      long l2 = t2.getDate().getTime();
+
+      if (l >= l1 && l < l2) {
+        return t1;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Return the matching Time for the given time.
+   * 
+   * @param hours the hours
+   * @param minutes the minutes
+   * @return the matching model or null if no match
+   */
+  public Time findModel(int hours, int minutes) {
+    DateWrapper w = new DateWrapper();
+    w = w.clearTime();
+    w = w.addHours(hours);
+    w = w.addMinutes(minutes);
+    return findModel(w.asDate());
   }
 
   /**
@@ -139,9 +235,10 @@ public class TimeField extends ComboBox<ModelData> {
    * @return the value
    */
   public Date getDateValue() {
-    ModelData value = getValue();
+    if (!initialized) initList();
+    Time value = getValue();
     if (value != null) {
-      return format.parse((String) value.get("text"));
+      return value.getDate();
     }
     return null;
   }
@@ -188,6 +285,19 @@ public class TimeField extends ComboBox<ModelData> {
   }
 
   /**
+   * Sets the field's value from a date.
+   * 
+   * @param date the date
+   */
+  public void setDateValue(Date date) {
+    if (!initialized) initList();
+    Time t = findModel(date);
+    if (t != null) {
+      setValue(t);
+    }
+  }
+
+  /**
    * Sets the date time format used to format each entry (defaults to
    * {@link DateTimeFormat#getShortDateFormat()}.
    * 
@@ -227,6 +337,7 @@ public class TimeField extends ComboBox<ModelData> {
 
   @Override
   protected void initList() {
+    initialized = true;
     DateWrapper min = minValue != null ? new DateWrapper(minValue) : new DateWrapper();
     if (minValue == null) {
       min = min.clearTime();
@@ -239,7 +350,7 @@ public class TimeField extends ComboBox<ModelData> {
 
     List times = new ArrayList();
     while (min.before(max)) {
-      BaseModelData r = new BaseModelData();
+      Time r = new Time(min.asDate());
       r.set("text", getFormat().format(min.asDate()));
       times.add(r);
       min = min.addMinutes(increment);

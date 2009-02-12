@@ -23,7 +23,28 @@ import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.RootPanel;
 
 /**
- * A panel that grays out the view port and displays a widget above it.
+ * A panel that grays out the view port and displays a widget above it. Used by {@link Window}.
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
  */
 public class ModalPanel extends BoxComponent {
 
@@ -94,8 +115,10 @@ public class ModalPanel extends BoxComponent {
     super.hide();
     el().setZIndex(-1);
     component = null;
-    eventPreview.getIgnoreList().removeAll();
-    eventPreview.remove();
+    if (eventPreview != null) {
+      eventPreview.getIgnoreList().removeAll();
+      eventPreview.remove();
+    }
     if (layer != null) {
       layer.disableShadow();
       layer.hideShim();
@@ -113,7 +136,7 @@ public class ModalPanel extends BoxComponent {
   }
 
   /**
-   * Fowards a event to the underlying event preview instance.
+   * Forwards an event to the underlying event preview instance.
    * 
    * @param event the event
    */
@@ -144,10 +167,11 @@ public class ModalPanel extends BoxComponent {
 
     super.show();
 
-    eventPreview.getIgnoreList().removeAll();
-    eventPreview.getIgnoreList().add(component.getElement());
-
-    eventPreview.add();
+    if (blink) {
+      eventPreview.getIgnoreList().removeAll();
+      eventPreview.getIgnoreList().add(component.getElement());
+      eventPreview.add();
+    }
   }
 
   @Override

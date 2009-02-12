@@ -194,7 +194,6 @@ public class GroupingView extends GridView {
     if (menu != null && enableGroupingMenu && enableGrouping && enableNoGroups) {
       final CheckMenuItem showInGroups = new CheckMenuItem(
           GXT.MESSAGES.groupingView_showGroupsText());
-      showInGroups.setEnabled(cm.isGroupable(colIndex));
       showInGroups.setChecked(true);
       showInGroups.addSelectionListener(new SelectionListener<MenuEvent>() {
 
@@ -287,7 +286,7 @@ public class GroupingView extends GridView {
         if (g == null || g.equals("")) {
           g = "&nbsp;";
         }
-        group.group = groupRenderer.render(group);
+        group.group = g;
       }
     }
 
@@ -453,6 +452,10 @@ public class GroupingView extends GridView {
 
   private native JavaScriptObject getRowsFromGroups(Element body) /*-{
       var r = [];
+      var fc = body.firstChild;
+      if (fc && fc.className == 'x-grid-empty') {
+        return [];
+      }
       var g, gs = body.childNodes;
       for(var i = 0, len = gs.length; i < len; i++){
           g = gs[i].childNodes[1].childNodes;

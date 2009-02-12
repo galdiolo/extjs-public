@@ -325,17 +325,21 @@ public class El {
   /**
    * Centers the element.
    * 
-   * @param constrainViewport true to contstrain the element position to the
+   * @param constrainViewport true to constrain the element position to the
    *          viewport.
    * @return this
    */
   public El center(boolean constrainViewport) {
+    makePositionable(true);
+    
     Element container = null;
     int width = container == null ? Window.getClientWidth() : container.getOffsetWidth();
     int height = container == null ? Window.getClientHeight() : container.getOffsetHeight();
 
     if (container == null) {
       container = XDOM.getBody();
+    } else {
+      fly(container).makePositionable();
     }
 
     int w = getWidth();
@@ -361,11 +365,14 @@ public class El {
    * @return this
    */
   public El center(Element container) {
+    makePositionable(true);
     int width = container == null ? Window.getClientWidth() : container.getOffsetWidth();
     int height = container == null ? Window.getClientHeight() : container.getOffsetHeight();
 
     if (container == null) {
       container = XDOM.getBody();
+    } else {
+      fly(container).makePositionable();
     }
 
     int w = getWidth();
@@ -1477,7 +1484,7 @@ public class El {
    * @return the last child
    */
   public El lastChild() {
-    return El.fly(DOM.getChild(dom, DOM.getChildCount(dom) - 1));
+    return new El(DOM.getChild(dom, DOM.getChildCount(dom) - 1));
   }
 
   /**
@@ -2581,9 +2588,6 @@ public class El {
       vw = fly(elem).getWidth();
       vh = fly(elem).getHeight();
     }
-
-    vx = getLeft();
-    vy = getTop();
 
     Point xy = proposedXY;
     int x = xy.x;

@@ -20,6 +20,12 @@ import com.extjs.gxt.ui.client.widget.selection.AbstractStoreSelectionModel;
 
 /**
  * ListView selection model.
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>AbstractStoreSelectionModel BeforeSelect</dd>
+ * <dd>AbstractStoreSelectionModel SelectionChange</dd>
+ * </dl>
  */
 public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSelectionModel<M>
     implements Listener<ListViewEvent> {
@@ -44,6 +50,11 @@ public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSe
 
   };
 
+  /**
+   * Binds the list view to the selection model.
+   * 
+   * @param listView the list view
+   */
   public void bindList(ListView listView) {
     if (this.listView != null) {
       this.listView.removeListener(Events.Select, this);

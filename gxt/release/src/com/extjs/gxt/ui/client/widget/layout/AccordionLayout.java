@@ -21,6 +21,12 @@ import com.google.gwt.user.client.DeferredCommand;
 /**
  * This is a layout that contains multiple content panels in an expandable
  * accordion style such that only one panel can be open at any given time.
+ * 
+ * <p /> Child Widgets are:
+ * <ul>
+ * <li><b>Sized</b> : Yes - default expands to fill parent container.</li>
+ * <li><b>Positioned</b> : No - widgets are located at 0,0.</li>
+ * </ul>
  * <p>
  * <b>Note:</b> All children added to the container must be
  * <code>ContentPanel</code> instances.

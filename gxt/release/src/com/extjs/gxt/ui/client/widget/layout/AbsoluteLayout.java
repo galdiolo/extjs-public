@@ -18,6 +18,12 @@ import com.extjs.gxt.ui.client.widget.Container;
  * / top positioning using the <code>AbsoluteData</code> left and top
  * properties.
  * 
+ * <p /> Child Widgets are:
+ * <ul>
+ * <li><b>Sized</b> : Yes - but only if you use anchor spec, otherwise not sized</li>
+ * <li><b>Positioned</b> : Yes - using left and top.</li>
+ * </ul>
+ * 
  * @see AbsoluteData
  */
 public class AbsoluteLayout extends AnchorLayout {

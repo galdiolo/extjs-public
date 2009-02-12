@@ -14,11 +14,19 @@ import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.Layout;
 
 /**
- * <code>Layout</code> that simply renders each child component into its
- * container. The size and position of children are not altered by this layout.
+ * A layout that simply renders each child component into its container. The
+ * size and position of children are not altered by this layout.
  * 
- * <p/> Margins can be applied directly to child components to control the
+ * <p /> Child Widgets are:
+ * <ul>
+ * <li><b>Sized</b> : No</li>
+ * <li><b>Positioned</b> : No</li>
+ * </ul>
+ * 
+ * <p /> Margins can be applied directly to child components to control the
  * spacing between components.
+ * 
+ * @see FlowData
  */
 public class FlowLayout extends Layout {
 

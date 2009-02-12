@@ -10,7 +10,6 @@ package com.extjs.gxt.ui.client.widget.form;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -23,7 +22,35 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 
 /**
- * A field that displays multiple fields in a single row.
+ * A field that displays multiple fields in a single row or column.
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>Field Focus</dd>
+ * <dd>Field Blur</dd>
+ * <dd>Field Change</dd>
+ * <dd>Field Invalid</dd>
+ * <dd>Field Valid</dd>
+ * <dd>Field KeyPress</dd>
+ * <dd>Field SpecialKey</dd>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
  */
 public class MultiField<F extends Field> extends Field<F> {
 
@@ -32,6 +59,7 @@ public class MultiField<F extends Field> extends Field<F> {
   protected Validator validator;
   protected Orientation orientation = Orientation.HORIZONTAL;
   protected int spacing;
+  private boolean resizeFields;
 
   /**
    * Creates a new checkbox group.
@@ -128,6 +156,15 @@ public class MultiField<F extends Field> extends Field<F> {
     return validator;
   }
 
+  /**
+   * Returns true if child fields are being resized.
+   * 
+   * @return the resize field state
+   */
+  public boolean isResizeFields() {
+    return resizeFields;
+  }
+
   @Override
   public boolean isValid() {
     boolean ret = super.isValid();
@@ -170,6 +207,15 @@ public class MultiField<F extends Field> extends Field<F> {
     for (Field field : fields) {
       field.setReadOnly(readOnly);
     }
+  }
+
+  /**
+   * True to resize the child fields to fit available space (defaults to false).
+   * 
+   * @param resizeFields true to resize children
+   */
+  public void setResizeFields(boolean resizeFields) {
+    this.resizeFields = resizeFields;
   }
 
   /**
@@ -218,7 +264,6 @@ public class MultiField<F extends Field> extends Field<F> {
     } else {
       lc = new HorizontalPanel();
     }
-    if (GXT.isIE) lc.setStyleAttribute("position", "relative");
 
     for (int i = 0, len = fields.size(); i < len; i++) {
       Field f = fields.get(i);
@@ -244,7 +289,24 @@ public class MultiField<F extends Field> extends Field<F> {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
+  protected void onResize(int width, int height) {
+    super.onResize(width, height);
+    if (resizeFields) {
+      if (orientation == Orientation.HORIZONTAL) {
+        int w = width / fields.size();
+        w -= (fields.size() * spacing);
+        for (Field f : fields) {
+          f.setWidth(w);
+        }
+      } else {
+        for (Field f : fields) {
+          f.setWidth(width);
+        }
+      }
+    }
+  }
+
+  @Override
   protected boolean validateValue(String value) {
     // validate multi field
     if (validator != null) {

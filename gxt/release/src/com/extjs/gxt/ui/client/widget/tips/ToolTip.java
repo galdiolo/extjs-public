@@ -340,12 +340,16 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
 
   private void delayHide() {
     if (!hidden && hideTimer == null) {
+      if(hideDelay == 0) {
+        hide();
+        return;
+      }
       hideTimer = new Timer() {
         public void run() {
           hide();
         }
       };
-      hideTimer.schedule(getHideDelay());
+      hideTimer.schedule(hideDelay);
     }
   }
 

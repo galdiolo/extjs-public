@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.dnd;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.core.El;
@@ -27,6 +28,8 @@ public class ListViewDropTarget extends DropTarget {
   protected ListView listView;
   protected int insertIndex;
 
+  private boolean autoSelect;
+
   /**
    * Creates a new list view drop target instance.
    * 
@@ -46,23 +49,35 @@ public class ListViewDropTarget extends DropTarget {
     return listView;
   }
 
+  /**
+   * Returns true if auto select is enabled.
+   * 
+   * @return the auto select state
+   */
+  public boolean isAutoSelect() {
+    return autoSelect;
+  }
+
   @Override
   protected void onDragDrop(DNDEvent e) {
     super.onDragDrop(e);
     final Object data = e.data;
     DeferredCommand.addCommand(new Command() {
       public void execute() {
-        if (feedback == Feedback.APPEND) {
-          if (data instanceof ModelData) {
-            listView.getStore().add((ModelData) data);
-          } else if (data instanceof List) {
-            listView.getStore().add((List) data);
+        List temp = new ArrayList();
+        if (data instanceof ModelData) {
+          temp.add((ModelData) data);
+        } else if (data instanceof List) {
+          temp = (List)data;
+        }
+        if (temp.size() > 0) {
+          if (feedback == Feedback.APPEND) {
+            listView.getStore().add(temp);
+          } else {
+            listView.getStore().insert(temp, insertIndex);
           }
-        } else {
-          if (data instanceof ModelData) {
-            listView.getStore().insert((ModelData) data, insertIndex);
-          } else if (data instanceof List) {
-            listView.getStore().insert((List) data, insertIndex);
+          if (autoSelect) {
+            listView.getSelectionModel().select(temp);
           }
         }
       }
@@ -90,6 +105,16 @@ public class ListViewDropTarget extends DropTarget {
     } else {
       event.doit = true;
     }
+  }
+
+  /**
+   * True to automatically select and new items created after a drop (defaults
+   * to false).
+   * 
+   * @param autoSelect true to auto select
+   */
+  public void setAutoSelect(boolean autoSelect) {
+    this.autoSelect = autoSelect;
   }
 
   @Override

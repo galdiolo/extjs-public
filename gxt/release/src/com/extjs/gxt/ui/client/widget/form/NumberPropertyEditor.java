@@ -21,6 +21,8 @@ import com.google.gwt.i18n.client.constants.NumberConstants;
  * <pre><code>
  * NumberPropertyEditor editor = new NumberPropertyEditor(Integer.class);
  * </code></pre>
+ * 
+ * @see NumberFormat
  */
 public class NumberPropertyEditor implements PropertyEditor<Number> {
 
@@ -29,7 +31,6 @@ public class NumberPropertyEditor implements PropertyEditor<Number> {
   protected String alpahRegex = "[a-zA-Z]";
   protected String currencySymbolRegex = "\\$";
   protected String groupSeparator = numbers.groupingSeparator();
-
   protected Class type;
 
   private boolean stripCurrencySymbol;
@@ -112,8 +113,6 @@ public class NumberPropertyEditor implements PropertyEditor<Number> {
       Double d = NumberFormat.getDecimalFormat().parse(value);
       return returnTypedValue(d);
     }
-
-    // return new Double(value);
   }
 
   /**

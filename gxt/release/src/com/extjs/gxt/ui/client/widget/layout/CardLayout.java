@@ -8,22 +8,33 @@
 package com.extjs.gxt.ui.client.widget.layout;
 
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.widget.CardPanel;
 import com.extjs.gxt.ui.client.widget.Component;
 
 /**
  * This layout contains multiple widgets, each fit to the container, where only
  * a single widget can be visible at any given time. This layout style is most
  * commonly used for wizards, tab implementations, etc.
- * <p>
- * The CardLayout's focal method is setActiveItem. Since only one panel is
- * displayed at a time, the only way to move from one panel to the next is by
- * calling setActiveItem the next panel to display. The layout itself does not
- * provide a mechanism for handling this navigation, so that functionality must
- * be provided by the developer.
- * </p>
+ * 
+ * <p /> Child Widgets are:
+ * <ul>
+ * <li><b>Sized</b> : Yes - expands to fill parent container.</li>
+ * <li><b>Positioned</b> : No - widgets are located at 0,0.</li>
+ * </ul>
+ * 
+ * <p /> The CardLayout's focal method is {@link #setActiveItem(Component)}.
+ * Since only one panel is displayed at a time, the only way to move from one
+ * panel to the next is by calling setActiveItem the next panel to display. The
+ * layout itself does not provide a mechanism for handling this navigation, so
+ * that functionality must be provided by the developer.
+ * 
+ * @see CardPanel
  */
 public class CardLayout extends FitLayout {
 
+  /**
+   * Creates a new card layout instance.
+   */
   public CardLayout() {
     monitorResize = true;
     renderHidden = true;
@@ -41,7 +52,7 @@ public class CardLayout extends FitLayout {
   /**
    * Sets the active (visible) item in the layout.
    * 
-   * @param component the active widget
+   * @param component the active component
    */
   public void setActiveItem(Component component) {
     if (activeItem != component) {
@@ -51,9 +62,7 @@ public class CardLayout extends FitLayout {
       activeItem = component;
       if (activeItem != null) {
         activeItem.setVisible(true);
-        if (container.isRendered()) {
-          layout();
-        }
+        layoutContainer();
       }
     }
   }

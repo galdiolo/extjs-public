@@ -26,8 +26,8 @@ import com.google.gwt.user.client.ui.Widget;
  * A specialized container whose contents can be specified as an existing
  * element, an html fragment, or a remote url. When adding children a css
  * selector is used to identify the element the child will be inserted into.
- * </p>
  * 
+ * <p />
  * Code snippet:
  * 
  * <pre>{@code
@@ -43,6 +43,31 @@ import com.google.gwt.user.client.ui.Widget;
    hc.setPosition(10, 10);
    RootPanel.get().add(hc);
  * }</pre>
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>Container BeforeAdd</dd>
+ * <dd>Container Add</dd>
+ * <dd>Container BeforeRemove</dd>
+ * <dd>Container Remove</dd>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
  */
 public class HtmlContainer extends Container<Component> {
 

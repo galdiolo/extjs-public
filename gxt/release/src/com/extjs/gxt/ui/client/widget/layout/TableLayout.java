@@ -21,13 +21,13 @@ import com.google.gwt.user.client.Element;
 /**
  * <code>TableLayout</code> allows you to easily render content into an HTML
  * table. The total number of columns can be specified.
- * <p>
+ * 
+ * <p />
  * Rather than explicitly creating and nesting rows and columns as you would in
  * HTML, you simply specify the total column count and start adding widgets in
  * their natural order from left to right, top to bottom. The layout will
  * automatically figure out, based on the column count how to position each
  * panel within the table.
- * </p>
  */
 public class TableLayout extends Layout {
 
@@ -187,7 +187,7 @@ public class TableLayout extends Layout {
   }
 
   /**
-   * Sets the cell's vertical alignment. If specifed, the value will be applied
+   * Sets the cell's vertical alignment. If specified, the value will be applied
    * to all cell's without a horizontal alignment specified.
    * 
    * @param cellVerticalAlign the vertical alignment

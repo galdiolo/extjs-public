@@ -26,11 +26,17 @@ import com.google.gwt.user.client.Element;
 /**
  * Utility class for generating different styles of message boxes.
  * 
- * <p>
+ * <p/>
+ * Code snippet:
+ * 
+ * <pre>
+ * MessageBox.confirm(&quot;Close?&quot;, &quot;Are you sure?&quot;, null);
+ * </pre>
+ * 
+ * <p/>
  * Note that the MessageBox is asynchronous. Unlike a regular JavaScript
  * <code>alert</code> (which will halt browser execution), showing a MessageBox
  * will not cause the code to stop.
- * </p>
  */
 public class MessageBox {
 
@@ -105,7 +111,7 @@ public class MessageBox {
     box.show();
     return box;
   }
-  
+
   /**
    * Displays a confirmation message box with Yes and No buttons (comparable to
    * JavaScript's confirm).
@@ -115,7 +121,8 @@ public class MessageBox {
    * @param callback the listener invoked after the message box is closed
    * @return the new message box instance
    */
-  public static MessageBox confirm(String title, String msg, Listener<WindowEvent> callback) {
+  public static MessageBox confirm(String title, String msg,
+      Listener<WindowEvent> callback) {
     MessageBox box = new MessageBox();
     box.setTitle(title);
     box.setMessage(msg);
@@ -179,7 +186,7 @@ public class MessageBox {
   public static MessageBox prompt(String title, String msg) {
     return prompt(title, msg, false, null);
   }
-  
+
   /**
    * Displays a message box with OK and Cancel buttons prompting the user to
    * enter some text (comparable to JavaScript's prompt).
@@ -202,7 +209,8 @@ public class MessageBox {
    * @param multiline true for a multi-line text aread
    * @return the new message box
    */
-  public static MessageBox prompt(String title, String msg, boolean multiline, Listener<WindowEvent> callback) {
+  public static MessageBox prompt(String title, String msg, boolean multiline,
+      Listener<WindowEvent> callback) {
     MessageBox box = new MessageBox();
     box.setTitle(title);
     box.setMessage(msg);
@@ -215,7 +223,7 @@ public class MessageBox {
     box.show();
     return box;
   }
-  
+
   /**
    * Displays a message box with OK and Cancel buttons prompting the user to
    * enter some text (comparable to JavaScript's prompt).
@@ -351,6 +359,7 @@ public class MessageBox {
 
           iconEl = body.firstChild().dom;
           Element contentEl = body.dom.getChildNodes().getItem(1).cast();
+          fly(contentEl).makePositionable();
           msgEl = contentEl.getFirstChild().cast();
           msgEl.setInnerHTML(message);
 
@@ -395,7 +404,8 @@ public class MessageBox {
         protected ComponentEvent previewEvent(int type, ComponentEvent ce) {
           if (ce instanceof WindowEvent) {
             WindowEvent we = (WindowEvent) ce;
-            MessageBoxEvent e = new MessageBoxEvent(MessageBox.this, this, we.buttonClicked);
+            MessageBoxEvent e = new MessageBoxEvent(MessageBox.this, this,
+                we.buttonClicked);
             if (type == Events.Close || type == Events.BeforeClose) {
               if (textBox != null) {
                 e.value = textBox.getValue();

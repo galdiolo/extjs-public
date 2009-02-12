@@ -11,6 +11,7 @@ import java.util.List;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.dnd.DND.Operation;
 import com.extjs.gxt.ui.client.event.DNDEvent;
 import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
@@ -47,13 +48,15 @@ public class GridDragSource extends DragSource {
 
   @Override
   protected void onDragDrop(DNDEvent e) {
-    Object data = e.data;
-    if (data instanceof ModelData) {
-      grid.getStore().remove((ModelData) data);
-    } else if (data instanceof List) {
-      List<ModelData> sel = (List) data;
-      for (ModelData m : sel) {
-        grid.getStore().remove(m);
+    if (e.operation == Operation.MOVE) {
+      Object data = e.data;
+      if (data instanceof ModelData) {
+        grid.getStore().remove((ModelData) data);
+      } else if (data instanceof List) {
+        List<ModelData> sel = (List) data;
+        for (ModelData m : sel) {
+          grid.getStore().remove(m);
+        }
       }
     }
   }

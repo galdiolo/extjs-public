@@ -97,11 +97,11 @@ public class StartMenu extends Menu {
     el().updateZIndex(0);
     int tPanelWidth = 100;
     Rectangle box = menuBWrap.getBounds();
-    menuPanel.setWidth(box.width - tPanelWidth);
-    menuPanel.setHeight(box.height);
-    toolsPanel.setWidth(tPanelWidth);
-    toolsPanel.setX(box.x + box.width - tPanelWidth);
-    toolsPanel.setHeight(box.height);
+    menuPanel.setWidth(box.width - tPanelWidth,true);
+    menuPanel.setHeight(box.height,true);
+    toolsPanel.setWidth(tPanelWidth,true);
+    toolsPanel.setHeight(box.height,true);
+    toolsPanel.alignTo(menuPanel.dom, "tl-tr", null);
   }
 
   @Override

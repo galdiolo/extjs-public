@@ -16,15 +16,44 @@ import com.extjs.gxt.ui.client.store.Record;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentPlugin;
 
+/**
+ * A <code>ColumnConfig</code> implementation that renders a checkbox in each
+ * cell.
+ * 
+ * <p />
+ * CheckColumnConfig is a <code>ComponentPlugin</code> and must be added to the
+ * Grid's list of plugins (see @link {@link Grid#addPlugin(ComponentPlugin)}).
+ * 
+ * <p /> Disabled support code snippet:
+ * 
+ * <pre>
+    CheckColumnConfig checkColumn = new CheckColumnConfig("indoor", "Indoor?", 55) {
+      protected String getCheckState(ModelData model, String property, int rowIndex,
+          int colIndex) {
+        return "-disabled";
+      }
+    };
+ * </pre>
+ */
 public class CheckColumnConfig extends ColumnConfig implements ComponentPlugin {
 
   protected Grid grid;
 
+  /**
+   * Creates a new check column config.
+   */
   public CheckColumnConfig() {
     super();
     init();
   }
 
+  /**
+   * Creates a new check column config.
+   * 
+   * @param id the column id
+   * @param name the column name
+   * @param width the column width
+   */
   public CheckColumnConfig(String id, String name, int width) {
     super(id, name, width);
     init();
@@ -39,9 +68,41 @@ public class CheckColumnConfig extends ColumnConfig implements ComponentPlugin {
     });
   }
 
+  /**
+   * Returns the css style name which contains a background image representing
+   * the checkbox. This implementation returns "-on" or "" based on a boolean
+   * model property. "-disabled" can be returned to render a disabled checkbox.
+   * 
+   * @param model the model
+   * @param property the model property
+   * @param rowIndex the row index
+   * @param colIndex the cell index
+   * @return the css style name
+   */
+  protected String getCheckState(ModelData model, String property, int rowIndex,
+      int colIndex) {
+    Boolean v = model.get(property);
+    String on = v ? "-on" : "";
+    return on;
+  }
+
+  protected void init() {
+    setRenderer(new GridCellRenderer() {
+      public String render(ModelData model, String property, ColumnData config,
+          int rowIndex, int colIndex, ListStore store) {
+        return onRender(model, property, config, rowIndex, colIndex, store);
+      }
+    });
+  }
+
+  /**
+   * Called when the cell is clicked.
+   * 
+   * @param ge the grid event
+   */
   protected void onMouseDown(GridEvent ge) {
     String cls = ge.getTarget().getClassName();
-    if (cls != null && cls.indexOf("x-grid3-cc-" + getId()) != -1) {
+    if (cls != null && cls.indexOf("x-grid3-cc-" + getId()) != -1 && cls.indexOf("disabled") == -1) {
       ge.stopEvent();
       int index = grid.getView().findRowIndex(ge.getTarget());
       ModelData m = grid.getStore().getAt(index);
@@ -51,16 +112,23 @@ public class CheckColumnConfig extends ColumnConfig implements ComponentPlugin {
     }
   }
 
-  protected void init() {
-    setRenderer(new GridCellRenderer() {
-      public String render(ModelData model, String property, ColumnData config, int rowIndex,
-          int colIndex, ListStore store) {
-        Boolean v = model.get(property);
-        String on = v ? "-on" : "";
-        config.css = "x-grid3-check-col-td";
-        return "<div class='x-grid3-check-col" + on + " x-grid3-cc-" + getId() + "'>&#160;</div>";
-      }
-    });
+  /**
+   * Called to render each check cell.
+   * 
+   * @param model the model
+   * @param property the model property
+   * @param config the config object
+   * @param rowIndex the row index
+   * @param colIndex the column index
+   * @param store the list store
+   * @return the rendered HTML
+   */
+  protected String onRender(ModelData model, String property, ColumnData config,
+      int rowIndex, int colIndex, ListStore store) {
+    config.css = "x-grid3-check-col-td";
+    return "<div class='x-grid3-check-col"
+        + " x-grid3-check-col" + getCheckState(model, property, rowIndex, colIndex) + " x-grid3-cc-" + getId()
+        + "'>&#160;</div>";
   }
 
 }

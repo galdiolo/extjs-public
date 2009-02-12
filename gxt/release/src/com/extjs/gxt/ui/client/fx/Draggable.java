@@ -18,9 +18,8 @@ import com.extjs.gxt.ui.client.event.DragListener;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.widget.Component;
-import com.google.gwt.user.client.Command;
+import com.extjs.gxt.ui.client.widget.Shim;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.EventPreview;
@@ -102,6 +101,7 @@ public class Draggable extends BaseObservable {
   private EventPreview preview;
   private DragEvent dragEvent;
   private int startDragDistance = 2;
+  private Shim shim = new Shim();
 
   /**
    * Creates a new draggable instance.
@@ -130,7 +130,6 @@ public class Draggable extends BaseObservable {
 
     preview = new EventPreview() {
       public boolean onEventPreview(Event event) {
-        DOM.eventCancelBubble(event, true);
         DOM.eventPreventDefault(event);
         switch (DOM.eventGetType(event)) {
           case Event.ONKEYDOWN:
@@ -185,7 +184,6 @@ public class Draggable extends BaseObservable {
         proxyEl.disableTextSelection(false);
         Element body = XDOM.getBody();
         DOM.removeChild(body, proxyEl.dom);
-        proxyEl = null;
       }
       if (!isUseProxy()) {
         dragWidget.el().setPagePosition(startBounds.x, startBounds.y);
@@ -463,12 +461,9 @@ public class Draggable extends BaseObservable {
   }
 
   protected void afterDrag() {
-    El.fly(XDOM.getBody()).removeStyleName("x-unselectable");
-    DeferredCommand.addCommand(new Command() {
-      public void execute() {
-        dragWidget.enableEvents(true);
-      }
-    });
+    XDOM.getBodyEl().removeStyleName("x-unselectable");
+    XDOM.getBodyEl().removeStyleName("x-dd-cursor");
+    shim.uncover();
   }
 
   protected El createProxy() {
@@ -480,7 +475,7 @@ public class Draggable extends BaseObservable {
   }
 
   protected void onMouseDown(ComponentEvent ce) {
-    if (!enabled) {
+    if (!enabled || ce.event.getButton() != Event.BUTTON_LEFT) {
       return;
     }
     Element target = ce.getTarget();
@@ -495,8 +490,6 @@ public class Draggable extends BaseObservable {
 
     dragStartX = ce.getClientX();
     dragStartY = ce.getClientY();
-
-    dragWidget.enableEvents(false);
 
     DOM.addEventPreview(preview);
 
@@ -521,7 +514,7 @@ public class Draggable extends BaseObservable {
 
   protected void onMouseMove(Event event) {
     String cls = event.getTarget().getClassName();
-    if (cls.contains("x-insert")) {
+    if (cls!=null && cls.contains("x-insert")) {
       return;
     }
 
@@ -623,6 +616,8 @@ public class Draggable extends BaseObservable {
     XDOM.getBodyEl().addStyleName("x-unselectable");
     XDOM.getBodyEl().addStyleName("x-dd-cursor");
     dragWidget.el().makePositionable();
+    
+    shim.cover(true);
 
     if (updateZIndex) {
       dragWidget.el().updateZIndex(0);
@@ -675,9 +670,6 @@ public class Draggable extends BaseObservable {
   }
 
   protected void stopDrag(Event event) {
-    XDOM.getBodyEl().removeStyleName("x-unselectable");
-    XDOM.getBodyEl().removeStyleName("x-dd-cursor");
-    dragWidget.enableEvents(true);
     DOM.removeEventPreview(preview);
 
     if (dragging) {
@@ -690,7 +682,6 @@ public class Draggable extends BaseObservable {
         proxyEl.disableTextSelection(false);
         Element body = XDOM.getBody();
         DOM.removeChild(body, proxyEl.dom);
-        proxyEl = null;
       }
       DragEvent de = new DragEvent(this);
       de.component = dragWidget;

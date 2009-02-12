@@ -16,8 +16,9 @@ import com.google.gwt.user.client.Event;
 /**
  * A specialized tooltip class for tooltips that can be specified in markup.
  * 
- * <p /> Quicktips can be configured via tag attributes directly in markup.
- * Below is the summary of the configuration properties which can be used.
+ * <p />
+ * Quicktips can be configured via tag attributes directly in markup. Below is
+ * the summary of the configuration properties which can be used.
  * 
  * <ul>
  * <li>text (required)</li>
@@ -25,12 +26,12 @@ import com.google.gwt.user.client.Event;
  * <li>width</li>
  * </ul>
  * 
- * <p>
+ * <p />
  * To register a quick tip in markup, you simply add one or more of the valid
  * QuickTip attributes prefixed with the <b>ext:</b> namespace. The HTML element
  * itself is automatically set as the quick tip target. Here is the summary of
  * supported attributes (optional unless otherwise noted):
- * </p>
+ * 
  * <ul>
  * <li><b>qtip (required)</b>: The quick tip text (equivalent to the 'text'
  * target element config).</li>
@@ -42,9 +43,9 @@ import com.google.gwt.user.client.Event;
  */
 public class QuickTip extends ToolTip {
 
-  private Element targetElem;
-  private boolean interceptTitles;
   private boolean initialized;
+  private boolean interceptTitles;
+  private Element targetElem;
 
   /**
    * Creates a new quick tip instance.
@@ -92,42 +93,46 @@ public class QuickTip extends ToolTip {
     this.interceptTitles = intercepTitiles;
   }
 
+  protected void onTargetOut(ComponentEvent ce) {
+    if (targetElem == null) super.onTargetOut(ce);
+  }
+
   @Override
   protected void onTargetOver(ComponentEvent ce) {
     if (disabled) {
       return;
     }
 
-    Element target = ce.getTarget();
-    String tip = target.getAttribute("qtip");
-    String title = target.getAttribute("title");
-    boolean hasTip = hasAttributeValue(tip) || (interceptTitles && hasAttributeValue(title));
+    Element t = ce.getTarget();
+    while (t != null && t != target.getElement()) {
+      if (hasTip(t)) {
+        break;
+      }
+      t = (Element) t.getParentElement();
+    }
+
+    boolean hasTip = t != null && hasTip(t);
 
     if (!initialized && !hasTip) {
       return;
     }
-
     initialized = true;
 
-    if ((targetElem == null && hasTip)) {
-      hide();
-      updateTargetElement(target);
-    } else if (targetElem != null && !ce.within(targetElem)) {
-      if (!ce.within(targetElem)) {
-        if (hasTip) {
-          updateTargetElement(target);
-        } else {
-          clearTimers();
-          hide();
-          targetElem = null;
-          text = null;
-          title = null;
-          return;
-        }
+    if (targetElem == null && hasTip) {
+      updateTargetElement(t);
+    } else {
+      if (hasTip && targetElem != t) {
+        updateTargetElement(t);
+      } else if (targetElem != null && ce.within(targetElem)) {
+        return;
+      } else {
+        clearTimers();
+        hide();
+        targetElem = null;
+        text = null;
+        title = null;
+        return;
       }
-
-    } else if (targetElem != null && !ce.within(targetElem)) {
-      return;
     }
 
     clearTimer("hide");
@@ -138,16 +143,22 @@ public class QuickTip extends ToolTip {
   private String getAttributeValue(Element target, String attr) {
     String v = target.getAttribute(attr);
     return v != null && v.equals("") ? null : v;
-
   }
 
   private boolean hasAttributeValue(String v) {
     return v != null && !v.equals("");
   }
 
+  private boolean hasTip(Element target) {
+    String tip = target.getAttribute("qtip");
+    String title = target.getAttribute("title");
+    return hasAttributeValue(tip) || (interceptTitles && hasAttributeValue(title));
+  }
+
   private void updateTargetElement(Element target) {
     targetElem = target;
-    text = interceptTitles ? getAttributeValue(target, "title") : getAttributeValue(target, "qtip");
+    text = interceptTitles ? getAttributeValue(target, "title") : getAttributeValue(
+        target, "qtip");
     title = getAttributeValue(target, "qtitle");
 
     String width = getAttributeValue(target, "qwidth");

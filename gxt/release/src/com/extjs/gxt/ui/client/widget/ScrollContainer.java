@@ -16,7 +16,7 @@ import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * A <code>Container</code> that scrolls its contents. The container is created
+ * A {@link Container} that scrolls its contents. The container is created
  * with scrolling disabled.
  * 
  * <dl>
@@ -27,6 +27,31 @@ import com.google.gwt.user.client.ui.Widget;
  * <li>component : this</li>
  * </ul>
  * </dd>
+ * </dl>
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>Container BeforeAdd</dd>
+ * <dd>Container Add</dd>
+ * <dd>Container BeforeRemove</dd>
+ * <dd>Container Remove</dd>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
  * </dl>
  */
 public class ScrollContainer<T extends Component> extends Container<T> {

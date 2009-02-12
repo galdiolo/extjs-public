@@ -51,7 +51,7 @@ public class FormBinding extends Bindings {
     for (Field f : panel.getFields()) {
       if (!bindings.containsKey(f)) {
         String name = f.getName();
-        if (name != null) {
+        if (name != null && name.length() > 0) {
           FieldBinding b = new FieldBinding(f, f.getName());
           bindings.put(f, b);
         }

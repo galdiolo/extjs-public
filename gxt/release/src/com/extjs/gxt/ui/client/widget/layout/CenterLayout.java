@@ -7,49 +7,35 @@
  */
 package com.extjs.gxt.ui.client.widget.layout;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
-import com.google.gwt.user.client.Element;
+import com.extjs.gxt.ui.client.widget.Layout;
 
 /**
- * <code>CenterLayout</code> centers a single widget within its container.
+ * This layout centers a single widget within its container.
+ * 
+ * <p /> Child Widgets are:
+ * <ul>
+ * <li><b>Sized</b> : No</li>
+ * <li><b>Positioned</b> : Yes</li>
+ * </ul>
+ *  
+ * @see El#center(Element container)
  */
-public class CenterLayout extends TableLayout {
+public class CenterLayout extends Layout {
 
-  private TableData data;
-
-  /**
-   * Creates a new center layout.
-   */
-  public CenterLayout() {
-    setWidth("100%");
-    setHeight("100%");
-
-    data = new TableData();
-    data.setHorizontalAlign(HorizontalAlignment.CENTER);
-    data.setVerticalAlign(VerticalAlignment.MIDDLE);
+  @Override
+  protected void renderComponent(Component component, int index, El target) {
+    super.renderComponent(component, index, target);
   }
 
   @Override
   protected void onLayout(Container container, El target) {
     super.onLayout(container, target);
-  }
-
-  @Override
-  protected void renderAll(Container container, El target) {
     Component c = container.getItem(0);
-    if (c != null && !isValidParent(c.getElement(), target.dom)) {
-      c.setStyleAttribute("textAlign", "left");
-      renderComponent(c, 0, target);
+    if (c != null) {
+      c.el().center(container.el().dom);
     }
   }
-
-  protected Element getNextCell(Component c) {
-    setLayoutData(c, data);
-    return super.getNextCell(c);
-  }
-
 }

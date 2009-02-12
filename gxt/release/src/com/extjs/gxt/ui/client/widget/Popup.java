@@ -47,7 +47,7 @@ import com.google.gwt.user.client.ui.RootPanel;
  * </ul>
  * </dd>
  * 
- * <dd><b>BeforeShow</b> : ComponentEvent(component)<br>
+ * <dd><b>BeforeHide</b> : ComponentEvent(component)<br>
  * <div>Fires before the popup is hidden. Listeners can set the
  * <code>doit</code> field to <code>false</code> to cancel the action.</div>
  * <ul>
@@ -61,7 +61,36 @@ import com.google.gwt.user.client.ui.RootPanel;
  * <li>component : this</li>
  * </ul>
  * </dd>
+ * </dl>
  * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>LayoutContainer AfterLayout</dd>
+ * <dd>ScrollContainer Scroll</dd>
+ * <dd>Container BeforeAdd</dd>
+ * <dd>Container Add</dd>
+ * <dd>Container BeforeRemove</dd>
+ * <dd>Container Remove</dd>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
+ * 
+ * <dl>
  * <dt><b>CSS:</b></dt>
  * <dd>.x-popup (the popup itself)</dd>
  * </dl>
@@ -382,6 +411,9 @@ public class Popup extends LayoutContainer {
 
     if (layer != null) {
       layer.sync(true);
+      if (layer.getShadow() != null) {
+        layer.getShadow().el().updateZIndex(-2);
+      }
     }
     if (isAutoFocus()) {
       focus();

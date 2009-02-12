@@ -12,6 +12,10 @@ import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.layout.LayoutData;
 import com.google.gwt.user.client.ui.Widget;
 
+/**
+ * A convenience class to assist with Component tasks.
+ * 
+ */
 public class ComponentHelper {
 
   public static void doAttach(Widget widget) {
@@ -47,10 +51,10 @@ public class ComponentHelper {
   }
 
   static native void doAttachNative(Widget widget) /*-{
-     widget.@com.google.gwt.user.client.ui.Widget::onAttach()();
-   }-*/;
+        widget.@com.google.gwt.user.client.ui.Widget::onAttach()();
+      }-*/;
 
   static native void doDetachNative(Widget widget) /*-{
-    widget.@com.google.gwt.user.client.ui.Widget::onDetach()();
-   }-*/;
+       widget.@com.google.gwt.user.client.ui.Widget::onDetach()();
+      }-*/;
 }

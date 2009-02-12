@@ -15,7 +15,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public interface DataProxy<C, D> {
 
   /**
-   * Data should be retrived using the specified load config.
+   * Data should be retrieved using the specified load config.
    * 
    * @param reader the reader instance
    * @param loadConfig the config

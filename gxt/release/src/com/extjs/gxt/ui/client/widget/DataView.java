@@ -28,11 +28,12 @@ import com.google.gwt.user.client.Event;
 /**
  * A mechanism for displaying data using custom layout templates. DataView uses
  * an {@link Template} as its internal templating mechanism.
- * <p>
+ * 
+ * <p />
  * A {@link #itemSelector} MUST be provided for the DataView to determine what
  * nodes it will be working with.
- * </p>
  * 
+ * <dl>
  * <dt><b>Events:</b></dt>
  * 
  * <dd><b>BeforeAdd</b> : DataViewEvent(view, item, index)<br>
@@ -87,15 +88,38 @@ import com.google.gwt.user.client.Event;
  * <li>menu : menu</li>
  * </ul>
  * </dd>
+ * </dl>
  * 
- * </dt>
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>ScrollContainer Scroll</dd>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
  */
-public class DataView extends ScrollContainer<DataViewItem> implements Selectable<DataViewItem> {
+public class DataView extends ScrollContainer<DataViewItem> implements
+    Selectable<DataViewItem> {
 
   /**
    * Data view selection model.
    */
-  public class DataViewSelectionModel extends AbstractSelectionModel<DataView, DataViewItem> {
+  public class DataViewSelectionModel extends
+      AbstractSelectionModel<DataView, DataViewItem> {
 
     public DataViewSelectionModel() {
       super();
@@ -399,7 +423,8 @@ public class DataView extends ScrollContainer<DataViewItem> implements Selectabl
 
   @Override
   protected ComponentEvent createComponentEvent(Event event) {
-    return new DataViewEvent(this, (event == null) ? null : findItem(DOM.eventGetTarget(event)));
+    return new DataViewEvent(this, (event == null) ? null
+        : findItem(DOM.eventGetTarget(event)));
   }
 
   @Override
@@ -427,7 +452,8 @@ public class DataView extends ScrollContainer<DataViewItem> implements Selectabl
 
     renderAll();
 
-    el().addEventsSunk(Event.ONCLICK | Event.ONDBLCLICK | Event.MOUSEEVENTS | Event.KEYEVENTS);
+    el().addEventsSunk(
+        Event.ONCLICK | Event.ONDBLCLICK | Event.MOUSEEVENTS | Event.KEYEVENTS);
   }
 
   protected void renderAll() {

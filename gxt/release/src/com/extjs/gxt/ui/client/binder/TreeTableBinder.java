@@ -93,7 +93,7 @@ public class TreeTableBinder<M extends ModelData> extends TreeBinder<M> {
     if (loader != null) {
       item.setLeaf(!loader.hasChildren(model));
     } else {
-      item.setLeaf(hasChildren(model));
+      item.setLeaf(!hasChildren(model));
     }
 
     return item;
@@ -114,7 +114,13 @@ public class TreeTableBinder<M extends ModelData> extends TreeBinder<M> {
       setModel(item, model);
       updateItemValues(item);
       updateItemStyles(item);
-      super.update(item, model);
+
+      String icon = getIconValue(model, displayProperty);
+      String style = (styleProvider == null) ? null : styleProvider.getStringValue(model,
+          displayProperty);
+
+      item.setTextStyle(style);
+      item.setIconStyle(icon);
     }
   }
 

@@ -15,6 +15,7 @@ import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseObservable;
+import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.event.SelectionEvent;
 import com.extjs.gxt.ui.client.event.SelectionProvider;
@@ -28,7 +29,7 @@ import com.extjs.gxt.ui.client.store.StoreListener;
  * <dl>
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>SelectionChange</b> : SelectionEvent(source, selection)<br>
+ * <dd><b>SelectionChange</b> : SelectionChangedEvent(source, selection)<br>
  * <div>Fires after the selection changes.</div>
  * <ul>
  * <li>source : this</li>
@@ -318,19 +319,27 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
   }
 
   protected void onClear(StoreEvent<M> se) {
+    int oldSize = selected.size();
     selected.clear();
     lastSelected = null;
+    if (oldSize > 0) fireSelectionChange();
   }
 
   protected void onRemove(M model) {
     if (locked) return;
-    selected.remove(model);
+    if (isSelected(model)) {
+      selected.remove(model);
+      if (lastSelected == model) {
+        lastSelected = null;
+      }
+      fireSelectionChange();
+    }
   }
 
   protected abstract void onSelectChange(M model, boolean select);
 
   private void fireSelectionChange() {
-    fireEvent(Events.SelectionChange, new SelectionEvent(this, new ArrayList(selected)));
+    fireEvent(Events.SelectionChange, new SelectionChangedEvent(this, new ArrayList(selected)));
   }
 
 }

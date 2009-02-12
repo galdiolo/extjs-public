@@ -165,7 +165,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
   public M getAt(int index) {
     return index < all.size() ? all.get(index) : null;
   }
-  
+
   /**
    * Gets the number of cached records.
    * 
@@ -289,6 +289,9 @@ public class ListStore<M extends ModelData> extends Store<M> {
       se.index = index;
       fireEvent(Remove, se);
     }
+    modified.remove(model);
+    if(isFiltered())
+      snapshot.remove(model);
   }
 
   /**
@@ -323,7 +326,8 @@ public class ListStore<M extends ModelData> extends Store<M> {
   /**
    * Sort the store.
    * 
-   * <p/>If remote sorting is used, the sort is performed on the server, and the
+   * <p/>
+   * If remote sorting is used, the sort is performed on the server, and the
    * cache is reloaded. If local sorting is used, the cache is sorted
    * internally.
    * 
@@ -392,36 +396,49 @@ public class ListStore<M extends ModelData> extends Store<M> {
   }
 
   protected void insert(List<M> items, int index, boolean supressEvent) {
-    if (storeSorter != null) {
-      for (M m : items) {
-        all.add(m);
-        applySort(true);
-        int idx = indexOf(m);
-        registerModel(m);
+    if(items.size() > 0) {
+      if (storeSorter != null) {
+        for (M m : items) {
+          if (isFiltered()) {
+            snapshot.add(m);
+          } else {
+            all.add(m);
+          }
+          if (isFiltered() && !isFiltered(m, filterProperty)) all.add(m);
+          applySort(true);
+          int idx = indexOf(m);
+          registerModel(m);
+          if (!supressEvent) {
+            StoreEvent evt = createStoreEvent();
+            evt.models = Util.createList(m);
+            evt.index = idx;
+            fireEvent(Add, evt);
+          }
+        }
+      } else {
+        if (!isFiltered()) {
+          all.addAll(index, items);
+        } else {
+          snapshot.addAll(index, items);
+        }
+        for (M m : items) {
+          registerModel(m);
+          if (isFiltered() && !isFiltered(m, filterProperty)) all.add(m);
+        }
         if (!supressEvent) {
           StoreEvent evt = createStoreEvent();
-          evt.models = Util.createList(m);
-          evt.index = idx;
+          evt.models = items;
+          evt.index = index;
           fireEvent(Add, evt);
         }
       }
-    } else {
-      all.addAll(index, items);
-      for (M m : items) {
-        registerModel(m);
-      }
-      if (!supressEvent) {
-        StoreEvent evt = createStoreEvent();
-        evt.models = items;
-        evt.index = index;
-        fireEvent(Add, evt);
-      }
     }
-
   }
 
   protected void onBeforeLoad(LoadEvent le) {
-    fireEvent(BeforeDataChanged, createStoreEvent());
+    if(!fireEvent(BeforeDataChanged, createStoreEvent())){
+      le.doit=false;
+    }
   }
 
   protected void onLoad(LoadEvent le) {

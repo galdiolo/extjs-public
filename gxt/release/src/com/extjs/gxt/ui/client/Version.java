@@ -8,14 +8,15 @@
 package com.extjs.gxt.ui.client;
 
 /**
- * Contains the current codes release information.
+ * Contains the current codes release information. Use {@link GXT#getVersion()} to get
+ * an instance of this class.
  */
 public final class Version {
 
-  private static final String release = "1.2";
+  private static final String release = "1.2.2";
   private static final int major = 1;
   private static final int minor = 2;
-  private static final int revision = 0;
+  private static final int revision = 2;
 
   Version() {
 

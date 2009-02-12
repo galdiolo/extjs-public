@@ -71,6 +71,28 @@ import com.google.gwt.user.client.Element;
  * <li>item : the button that was removed</li>
  * </ul>
  * </dd>
+ * </dl>
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
  * 
  * <dt><b>CSS:</b></dt>
  * <dd>.my-btn-bar (the button bar itself)</dd>

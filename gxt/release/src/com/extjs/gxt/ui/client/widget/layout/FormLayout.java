@@ -52,6 +52,11 @@ public class FormLayout extends AnchorLayout {
 
   }
 
+  /**
+   * Creates a new form layout.
+   * 
+   * @param labelAlign the label alignment
+   */
   public FormLayout(LabelAlign labelAlign) {
     this.labelAlign = labelAlign;
   }
@@ -95,7 +100,7 @@ public class FormLayout extends AnchorLayout {
   /**
    * Returns the label separator.
    * 
-   * @return the label separaotr
+   * @return the label separator
    */
   public String getLabelSeparator() {
     return labelSeparator;
@@ -239,7 +244,7 @@ public class FormLayout extends AnchorLayout {
   protected int adjustWidthAnchor(int width, Component comp) {
     if (comp instanceof Field) {
       Field f = (Field) comp;
-      int adj = XDOM.isVisibleBox ? padding : (padding / 2);
+      int adj = XDOM.isVisibleBox ? padding : (padding * 2);
       return width - (f.isHideLabel() ? 0 : (labelAdjust + adj));
     }
     return super.adjustWidthAnchor(width, comp);

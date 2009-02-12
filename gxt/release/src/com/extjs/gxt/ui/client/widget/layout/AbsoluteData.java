@@ -10,7 +10,7 @@ package com.extjs.gxt.ui.client.widget.layout;
 import com.extjs.gxt.ui.client.Style;
 
 /**
- * Layout data for <code>AbsoluteLayout</code>.
+ * Layout data for {@link AbsoluteLayout}.
  */
 public class AbsoluteData extends AnchorData {
 

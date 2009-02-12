@@ -29,10 +29,21 @@ import com.google.gwt.user.client.ui.KeyboardListener;
  * {@link #setPropertyEditor(PropertyEditor)} should be called with the
  * appropriate number type.
  * 
- * <pre><code>
- * NumberField<Integer> field = new NumberField<Integer>;
+ * <code><pre>
+ * NumberField&lt;Integer&gt; field = new NumberField&lt;Integer&gt;;
  * field.setPropertyEdtiorType(Integer.class);
- * </code></pre>
+ * </pre></code>
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>Field Focus</dd>
+ * <dd>Field Blur</dd>
+ * <dd>Field Change</dd>
+ * <dd>Field Invalid</dd>
+ * <dd>Field Valid</dd>
+ * <dd>Field KeyPress</dd>
+ * <dd>Field SpecialKey</dd>
+ * </dl>
  */
 public class NumberField extends TextField<Number> {
 
@@ -43,6 +54,7 @@ public class NumberField extends TextField<Number> {
     private String minText;
     private String maxText;
     private String nanText;
+    private String negativeText = GXT.MESSAGES.numberField_negativeText();
 
     /**
      * Returns the max error text.
@@ -69,6 +81,15 @@ public class NumberField extends TextField<Number> {
      */
     public String getNanText() {
       return nanText;
+    }
+
+    /**
+     * Returns the negative error text.
+     * 
+     * @return the error text
+     */
+    public String getNegativeText() {
+      return negativeText;
     }
 
     /**
@@ -100,6 +121,16 @@ public class NumberField extends TextField<Number> {
      */
     public void setNanText(String nanText) {
       this.nanText = nanText;
+    }
+
+    /**
+     * Sets the negative error text (defaults to 'The value must be greater or
+     * equal to 0').
+     * 
+     * @param negativeText the error text
+     */
+    public void setNegativeText(String negativeText) {
+      this.negativeText = negativeText;
     }
   }
 
@@ -291,8 +322,9 @@ public class NumberField extends TextField<Number> {
   protected void onKeyPress(FieldEvent fe) {
     super.onKeyPress(fe);
     char key = (char) fe.getKeyCode();
-    
-    if (fe.isSpecialKey(lastKeyCode) || lastKeyCode == KeyboardListener.KEY_BACKSPACE || lastKeyCode == KeyboardListener.KEY_DELETE || fe.isControlKey()) {
+
+    if (fe.isSpecialKey(lastKeyCode) || lastKeyCode == KeyboardListener.KEY_BACKSPACE
+        || lastKeyCode == KeyboardListener.KEY_DELETE || fe.isControlKey()) {
       return;
     }
 
@@ -320,7 +352,6 @@ public class NumberField extends TextField<Number> {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   protected boolean validateValue(String value) {
     // validator should run after super rules
     Validator tv = validator;
@@ -370,6 +401,11 @@ public class NumberField extends TextField<Number> {
         error = Format.substitute(getMessages().getMaxText(), maxValue);
       }
       markInvalid(error);
+      return false;
+    }
+
+    if (!allowNegative && d.doubleValue() < 0) {
+      markInvalid(getMessages().getNegativeText());
       return false;
     }
 

@@ -33,25 +33,25 @@ import com.google.gwt.user.client.ui.Frame;
  * toolbars, along with separate header, footer and body sections. It also
  * provides built-in expandable and collapsible behavior, along with a variety
  * of pre-built tool buttons that can be wired up to provide other customized
- * behavior.</p>
+ * behavior.
  * 
  * Code snippet:
  * 
  * <pre>
- ContentPanel cp = new ContentPanel();
- cp.setHeading("Folder Contents");
- cp.setSize(250,140);
- cp.setPosition(10, 10);
- cp.setCollapsible(true);
- cp.setFrame(true);
- cp.setBodyStyle("backgroundColor: white;");
- cp.getHeader().addTool(new ToolButton("x-tool-gear"));
- cp.getHeader().addTool(new ToolButton("x-tool-close"));
- cp.addText(getBogusText());
- cp.addButton(new Button("Ok"));
- cp.setIconStyle("tree-folder-open");
- RootPanel.get().add(cp);
- cp.layout();
+ * ContentPanel cp = new ContentPanel();
+ * cp.setHeading(&quot;Folder Contents&quot;);
+ * cp.setSize(250, 140);
+ * cp.setPosition(10, 10);
+ * cp.setCollapsible(true);
+ * cp.setFrame(true);
+ * cp.setBodyStyle(&quot;backgroundColor: white;&quot;);
+ * cp.getHeader().addTool(new ToolButton(&quot;x-tool-gear&quot;));
+ * cp.getHeader().addTool(new ToolButton(&quot;x-tool-close&quot;));
+ * cp.addText(getBogusText());
+ * cp.addButton(new Button(&quot;Ok&quot;));
+ * cp.setIconStyle(&quot;tree-folder-open&quot;);
+ * RootPanel.get().add(cp);
+ * cp.layout();
  * </pre>
  * 
  * <dl>
@@ -73,7 +73,7 @@ import com.google.gwt.user.client.ui.Frame;
  * </dd>
  * 
  * <dd><b>BeforeCollapse</b> : ComponentEvent(component)<br>
- * <div>Fires before the panel is collpased. Listeners can set the
+ * <div>Fires before the panel is collapsed. Listeners can set the
  * <code>doit</code> field <code>false</code> to cancel the collapse.</div>
  * <ul>
  * <li>component : this</li>
@@ -101,6 +101,33 @@ import com.google.gwt.user.client.ui.Frame;
  * <li>component : this</li>
  * </ul>
  * </dd>
+ * </dl>
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>LayoutContainer AfterLayout</dt>
+ * <dd>ScrollContainer Scroll</dd>
+ * <dd>Container BeforeAdd</dd>
+ * <dd>Container Add</dd>
+ * <dd>Container BeforeRemove</dd>
+ * <dd>Container Remove</dd>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
  * </dl>
  */
 public class ContentPanel extends LayoutContainer {
@@ -631,8 +658,11 @@ public class ContentPanel extends LayoutContainer {
    * Sets the item's icon style. The style name should match a CSS style that
    * specifies a background image using the following format:
    * 
-   * <pre><code> .my-icon { background: url(images/icons/my-icon.png) no-repeat
-   * center left !important; } </code></pre>
+   * <pre>
+   * .my-icon {
+   *    background: url(images/icons/my-icon.png) no-repeat center left !important;
+   * }
+   * </pre>
    * 
    * @param iconStyle the icon style
    */
@@ -757,7 +787,7 @@ public class ContentPanel extends LayoutContainer {
   }
 
   protected void onClick(ComponentEvent ce) {
-    if (head != null && ce.within(head.getElement()) && collapsible) {
+    if (head != null && ce.within(head.getElement()) && collapsible && titleCollapse) {
       setExpanded(!isExpanded());
     }
   }

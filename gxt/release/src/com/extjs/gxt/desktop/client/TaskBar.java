@@ -10,14 +10,10 @@ package com.extjs.gxt.desktop.client;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
-import com.extjs.gxt.ui.client.event.FxEvent;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -200,9 +196,9 @@ class TaskButton extends Button {
 
 class TasksButtonsPanel extends BoxComponent {
 
-  private TaskButton activeButton;
+//  private TaskButton activeButton;
   private El stripWrap, strip, edge;
-  private El scrollLeft, scrollRight;
+//  private El scrollLeft, scrollRight;
   private List<TaskButton> items;
   private boolean buttonWidthSet = false;
   private int lastButtonWidth;
@@ -211,7 +207,7 @@ class TasksButtonsPanel extends BoxComponent {
   private int buttonWidth = 168;
   private int minButtonWidth = 118;
   private int buttonMargin = 2;
-  private boolean scrolling;
+//  private boolean scrolling;
   private int scrollIncrement = -1;
 
   TasksButtonsPanel() {
@@ -248,7 +244,7 @@ class TasksButtonsPanel extends BoxComponent {
   }
 
   public void setActiveButton(TaskButton btn) {
-    this.activeButton = btn;
+//    this.activeButton = btn;
     delegateUpdates();
   }
 
@@ -281,50 +277,6 @@ class TasksButtonsPanel extends BoxComponent {
     if (true) {
       return;
     }
-    int count = items.size();
-    int tw = el().getStyleWidth();
-
-    El wrap = stripWrap;
-    int cw = wrap.getWidth();
-    int pos = getScrollPos();
-    int l = edge.getOffsetsTo(stripWrap.dom).x + pos;
-
-    if (!enableScroll || count < 1 || cw < 20) {
-      return;
-    }
-
-    wrap.setWidth(tw);
-
-    if (l <= tw) {
-      wrap.dom.setScrollLeft(0);
-      if (scrolling) {
-        scrolling = false;
-        el().removeStyleName("x-taskbuttons-scrolling");
-        scrollLeft.setVisible(false);
-        scrollRight.setVisible(false);
-      }
-    } else {
-      if (!scrolling) {
-        el().addStyleName("x-taskbuttons-scrolling");
-      }
-      tw -= wrap.getMargins("lr");
-      wrap.setWidth(tw > 20 ? tw : 20);
-      if (!scrolling) {
-        if (scrollLeft == null) {
-          createScrollers();
-        } else {
-          scrollLeft.setVisible(true);
-          scrollRight.setVisible(true);
-        }
-      }
-      scrolling = true;
-      if (pos > (l - tw)) {
-        wrap.dom.setScrollLeft(l - tw);
-      } else {
-        scrollToBtn(activeButton, true);
-      }
-      updateScrollButtons();
-    }
   }
 
   private void autoSize() {
@@ -351,17 +303,17 @@ class TasksButtonsPanel extends BoxComponent {
     }
   }
 
-  private void createScrollers() {
-    int h = el().getHeight();
-
-    El sl = el().insertFirst(XDOM.create("<div class='ux-taskbuttons-scroller-left'></div>"));
-    sl.setHeight(h);
-    scrollLeft = sl;
-
-    El sr = el().insertFirst(XDOM.create("<div class='ux-taskbuttons-scroller-right'></div>"));
-    sr.setHeight(h);
-    scrollRight = sr;
-  }
+//  private void createScrollers() {
+//    int h = el().getHeight();
+//
+//    El sl = el().insertFirst(XDOM.create("<div class='ux-taskbuttons-scroller-left'></div>"));
+//    sl.setHeight(h);
+//    scrollLeft = sl;
+//
+//    El sr = el().insertFirst(XDOM.create("<div class='ux-taskbuttons-scroller-right'></div>"));
+//    sr.setHeight(h);
+//    scrollRight = sr;
+//  }
 
   private void delegateUpdates() {
     if (resizeButtons && rendered) {
@@ -389,52 +341,52 @@ class TasksButtonsPanel extends BoxComponent {
   // }
   // }
 
-  private int getScrollArea() {
-    return stripWrap.getClientWidth();
-  }
+//  private int getScrollArea() {
+//    return stripWrap.getClientWidth();
+//  }
 
-  private int getScrollPos() {
-    return stripWrap.dom.getScrollLeft();
-  }
+//  private int getScrollPos() {
+//    return stripWrap.dom.getScrollLeft();
+//  }
 
-  private int getScrollWidth() {
-    return edge.getOffsetsTo(stripWrap.dom).x + getScrollPos();
-  }
+//  private int getScrollWidth() {
+//    return edge.getOffsetsTo(stripWrap.dom).x + getScrollPos();
+//  }
 
-  private void scrollTo(int pos, boolean animate) {
-    if (animate) {
-      stripWrap.scrollTo("left", pos, new FxConfig(new Listener<FxEvent>() {
-        public void handleEvent(FxEvent fe) {
-          updateScrollButtons();
-        }
-      }));
-    } else {
-      stripWrap.scrollTo("left", pos);
-      updateScrollButtons();
-    }
-  }
+//  private void scrollTo(int pos, boolean animate) {
+//    if (animate) {
+//      stripWrap.scrollTo("left", pos, new FxConfig(new Listener<FxEvent>() {
+//        public void handleEvent(FxEvent fe) {
+//          updateScrollButtons();
+//        }
+//      }));
+//    } else {
+//      stripWrap.scrollTo("left", pos);
+//      updateScrollButtons();
+//    }
+//  }
 
-  private void scrollToBtn(TaskButton btn, boolean animate) {
-    com.google.gwt.dom.client.Element item = btn.getElement().getParentElement();
-    if (item == null) {
-      return;
-    }
-    int pos = getScrollPos();
-    int area = getScrollArea();
-    int left = fly((Element) item).getOffsetsTo(stripWrap.dom).x + pos;
-    int right = left + getWidth();
-    if (left > pos) {
-      scrollTo(left, animate);
-    } else if (right > (pos + area)) {
-      scrollTo(right - area, animate);
-    }
-  }
+//  private void scrollToBtn(TaskButton btn, boolean animate) {
+//    com.google.gwt.dom.client.Element item = btn.getElement().getParentElement();
+//    if (item == null) {
+//      return;
+//    }
+//    int pos = getScrollPos();
+//    int area = getScrollArea();
+//    int left = fly((Element) item).getOffsetsTo(stripWrap.dom).x + pos;
+//    int right = left + getWidth();
+//    if (left > pos) {
+//      scrollTo(left, animate);
+//    } else if (right > (pos + area)) {
+//      scrollTo(right - area, animate);
+//    }
+//  }
 
-  private void updateScrollButtons() {
-    int pos = getScrollPos();
-    scrollLeft.setStyleName("ux-taskbuttons-scroller-left-disabled", pos == 0);
-    scrollRight.setStyleName("ux-taskbuttons-scroller-right-disabled",
-        pos >= (getScrollWidth() - getScrollArea()));
-  }
+//  private void updateScrollButtons() {
+//    int pos = getScrollPos();
+//    scrollLeft.setStyleName("ux-taskbuttons-scroller-left-disabled", pos == 0);
+//    scrollRight.setStyleName("ux-taskbuttons-scroller-right-disabled",
+//        pos >= (getScrollWidth() - getScrollArea()));
+//  }
 
 }

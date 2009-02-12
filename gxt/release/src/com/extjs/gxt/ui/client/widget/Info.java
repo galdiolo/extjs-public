@@ -21,6 +21,45 @@ import com.google.gwt.user.client.ui.RootPanel;
 /**
  * Displays a message in the bottom right region of the browser for a specified
  * amount of time.
+ * <p />
+ * Code snippet:
+ * 
+ * <pre>
+ * Info.display(&quot;Test Message&quot;, &quot;You name is {0}&quot;, &quot;darrell&quot;);
+ * </pre>
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>ContentPanel BeforeExpand</dd>
+ * <dd>ContentPanel Expand</dd>
+ * <dd>ContentPanel BeforeCollapse</dd>
+ * <dd>ContentPanel Collapse</dd>
+ * <dd>ContentPanel BeforeClose</dd>
+ * <dd>ContentPanel Close</dd>
+ * <dd>LayoutContainer AfterLayout</dd>
+ * <dd>ScrollContainer Scroll</dd>
+ * <dd>Container BeforeAdd</dd>
+ * <dd>Container Add</dd>
+ * <dd>Container BeforeRemove</dd>
+ * <dd>Container Remove</dd>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
  */
 public class Info extends ContentPanel {
 

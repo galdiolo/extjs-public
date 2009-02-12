@@ -28,7 +28,8 @@ import com.google.gwt.user.client.Event;
  * A standard hierarchical tree widget. The tree contains a hierarchy of
  * <code>TreeItems</code> that the user can open, close, and select.
  * 
- * <p/>The root item cannot be displayed.
+ * <p/>
+ * The root item cannot be displayed.
  * 
  * <dt><b>Events:</b></dt>
  * 
@@ -110,7 +111,7 @@ import com.google.gwt.user.client.Event;
  * </dd>
  * 
  * <dd><b>Collapse</b> : TreeEvent(tree, item)<br>
- * <div>Fires ater a item is collapsed.</div>
+ * <div>Fires after a item is collapsed.</div>
  * <ul>
  * <li>item : this</li>
  * </ul>
@@ -136,9 +137,34 @@ import com.google.gwt.user.client.Event;
  * <li>event : dom event</li>
  * </ul>
  * </dd>
+ * </dl>
  * 
- * <dt><b>CSS:</b></dt> <dd>.my-tree (the tree itself)</dd> <dd>
- * .my-tree-item-text span (the tree item text)</dd> </dl>
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
+ * 
+ * <dl>
+ * <dt><b>CSS:</b></dt>
+ * <dd>.my-tree (the tree itself)</dd>
+ * <dd>.my-tree-item-text span (the tree item text)</dd>
+ * </dl>
  */
 public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
 
@@ -616,7 +642,8 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
     }
 
     disableTextSelection(true);
-    el().addEventsSunk(Event.ONCLICK | Event.ONDBLCLICK | Event.KEYEVENTS | Event.MOUSEEVENTS);
+    el().addEventsSunk(
+        Event.ONCLICK | Event.ONDBLCLICK | Event.KEYEVENTS | Event.MOUSEEVENTS);
   }
 
   void registerItem(TreeItem item) {

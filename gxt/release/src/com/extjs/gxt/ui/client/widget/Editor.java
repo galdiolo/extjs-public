@@ -72,6 +72,27 @@ import com.google.gwt.user.client.ui.RootPanel;
  * </ul>
  * </dd>
  * </dl>
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
  */
 public class Editor extends BoxComponent {
 
@@ -116,7 +137,7 @@ public class Editor extends BoxComponent {
   }
 
   /**
-   * Returns the editor's alignemnt.
+   * Returns the editor's alignment.
    * 
    * @return the alignment
    */
@@ -176,6 +197,15 @@ public class Editor extends BoxComponent {
    */
   public boolean isConstrain() {
     return constrain;
+  }
+  
+  /**
+   * Returns true of the editor reverts the value to the start value on invalid.
+   * 
+   * @return the revertInvalid state
+   */
+  public boolean isRevertInvalid() {
+    return revertInvalid;
   }
 
   /**
@@ -267,10 +297,19 @@ public class Editor extends BoxComponent {
   /**
    * True to constrain the editor to the viewport.
    * 
-   * @param constrain true to constrian
+   * @param constrain true to constrain
    */
   public void setConstrain(boolean constrain) {
     this.constrain = constrain;
+  }
+
+  /**
+   * True to revert to start value on invalid value (defaults to false).
+   * 
+   * @param revertInvalid true to revert
+   */
+  public void setRevertInvalid(boolean revertInvalid) {
+    this.revertInvalid = revertInvalid;
   }
 
   @Override
@@ -335,6 +374,11 @@ public class Editor extends BoxComponent {
       return;
     }
 
+    // since field may be reused, store may be filtered
+    if (field instanceof ComboBox) {
+      ((ComboBox) field).getStore().clearFilters();
+    }
+
     startValue = value;
     field.setValue(preProcessValue(value));
 
@@ -347,6 +391,7 @@ public class Editor extends BoxComponent {
     el().alignTo(boundEl.dom, alignment, new int[] {-1, -1});
 
     show();
+
     field.focus();
   }
 
@@ -365,10 +410,13 @@ public class Editor extends BoxComponent {
     }
 
     Object v = getValue();
-    if (revertInvalid && field.isValid()) {
+    if (revertInvalid && !field.isValid()) {
       v = startValue;
       cancelEdit(true);
+    } else if(!field.isValid()) {
+      return;
     }
+    
     if (v == startValue) {
       // ignore no change
       editing = false;
@@ -482,24 +530,36 @@ public class Editor extends BoxComponent {
     e.value = startValue;
     fireEvent(Events.StartEdit, e);
   }
-
+  
   protected void onSpecialKey(FieldEvent fe) {
-
     if (completeOnEnter && fe.getKeyCode() == KeyboardListener.KEY_ENTER) {
-      // ugly
-      if (field instanceof ComboBox) {
-        ComboBox box = (ComboBox) field;
-        if (box.isExpanded()) {
-          return;
-        }
-      }
+      beforeComplete(fe);
       fe.stopEvent();
       completeEdit();
     } else if (cancelOnEsc && fe.getKeyCode() == KeyboardListener.KEY_ESCAPE) {
       cancelEdit();
+    } else if (fe.getKeyCode() == KeyboardListener.KEY_TAB) {
+      beforeComplete(fe);
+      fireEvent(Events.SpecialKey, fe);
     } else {
       fireEvent(Events.SpecialKey, fe);
     }
   }
+
+  private void beforeComplete(FieldEvent fe) {
+    if (field instanceof ComboBox) {
+      ComboBox box = (ComboBox) field;
+      if (box.isExpanded()) {
+        return;
+      }
+      if (box.getForceSelection()) {
+        doBlur(box);
+      }
+    }
+  }
+
+  private native void doBlur(ComboBox box) /*-{
+      box.@com.extjs.gxt.ui.client.widget.form.ComboBox::doBlur(Lcom/extjs/gxt/ui/client/event/ComponentEvent;)(null);
+    }-*/;
 
 }

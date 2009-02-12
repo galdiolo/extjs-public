@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.widget.toolbar;
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.ToolBarEvent;
 import com.extjs.gxt.ui.client.widget.button.SplitButton;
 
 /**
@@ -17,11 +18,11 @@ import com.extjs.gxt.ui.client.widget.button.SplitButton;
  * 
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>ArrowClick</b> : ToolBarEvent(toolBar, item, event)<br>
+ * <dd><b>ArrowClick</b> : ToolBarEvent(container, item, event)<br>
  * <div>Fires when this button's arrow is clicked.</div>
  * <ul>
- * <li>component : this</li>
- * <li>item : the menu</li>
+ * <li>container : the parent toolbar</li>
+ * <li>item : this</li>
  * <li>event : the dom event</li>
  * </ul>
  * </dd> </dt>
@@ -58,8 +59,9 @@ public class SplitToolItem extends TextToolItem {
   }
 
   protected void onArrowClick(ComponentEvent ce) {
-    ce.component = this;
-    fireEvent(Events.ArrowClick, ce);
+    ToolBarEvent evt = new ToolBarEvent(toolBar, this);
+    evt.event = ce.event;
+    fireEvent(Events.ArrowClick, evt);
   }
 
 }

@@ -28,7 +28,7 @@ import com.google.gwt.user.client.ui.Widget;
  * This class encapsulates the user interface of a {@link Table}.
  * 
  * <p /> When using custom cell renderers or nested widgets within cells it may
- * be nesseccary to increase the cell selector depth to account for the new
+ * be necessary to increase the cell selector depth to account for the new
  * nested elements within each cell. For example, if nesting a table structure
  * in a cell, the selector depth should be increased to at least a value of 10 (@see
  * {@link TableView#setCellSelectorDepth(int)}.

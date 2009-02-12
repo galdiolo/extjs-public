@@ -9,6 +9,7 @@ package com.extjs.gxt.ui.client.widget.form;
 
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.FieldEvent;
@@ -20,25 +21,36 @@ import com.google.gwt.user.client.Element;
  * the radios state is changed, not on blur.
  * 
  * <dl>
- * <dt>Events:</dt>
- * 
- * <dd><b>Change</b> : FieldEvent(field, value, oldValue)<br>
- * <div>Fires when the field value has changed.</div>
- * <ul>
- * <li>field : this</li>
- * <li>value : the new value</li>
- * <li>oldValue : the old value</li>
- * </ul>
- * </dd>
+ * <dt>Inherited Events:</dt>
+ * <dd>Field Focus</dd>
+ * <dd>Field Blur</dd>
+ * <dd>Field Change</dd>
+ * <dd>Field Invalid</dd>
+ * <dd>Field Valid</dd>
+ * <dd>Field KeyPress</dd>
+ * <dd>Field SpecialKey</dd>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
  * </dl>
  */
 public class CheckBox extends Field<Boolean> {
 
-  protected El wrap, input;
-
-  /**
-   * The text that appears beside the checkbox (defaults to null).
-   */
+  protected El wrap, input, boxLabelEl;
   private String boxLabel;
 
   public CheckBox() {
@@ -70,14 +82,14 @@ public class CheckBox extends Field<Boolean> {
   }
 
   /**
-   * The text that appears beside the checkbox.
+   * The text that appears beside the checkbox (defaults to null).
    * 
    * @param boxLabel the box label
    */
   public void setBoxLabel(String boxLabel) {
     this.boxLabel = boxLabel;
     if (rendered) {
-      getInputEl().dom.setAttribute("value", getBoxLabel());
+      boxLabelEl.update(getBoxLabel());
     }
   }
 
@@ -145,7 +157,8 @@ public class CheckBox extends Field<Boolean> {
     }
 
     input.setStyleAttribute("marginTop", "3px");
-
+    input.setId(XDOM.getUniqueId());
+    
     wrap = new El(DOM.createDiv());
     wrap.dom.setPropertyString("hideFocus", "hideFocus");
     wrap.dom.setClassName("x-form-check-wrap");
@@ -153,10 +166,12 @@ public class CheckBox extends Field<Boolean> {
     setElement(wrap.dom, target, index);
 
     if (boxLabel != null) {
-      Element div = DOM.createDiv();
-      div.setClassName("x-form-cb-label");
-      div.setInnerHTML(boxLabel);
-      wrap.dom.appendChild(div);
+      boxLabelEl = new El(DOM.createLabel());
+      boxLabelEl.setStyleAttribute("position", "static");
+      boxLabelEl.setElementAttribute("for", input.getId());
+      boxLabelEl.setElementAttribute("htmlFor", input.getId());
+      boxLabelEl.dom.setClassName("x-form-cb-label");
+      wrap.dom.appendChild(boxLabelEl.dom);
       setBoxLabel(boxLabel);
     }
 

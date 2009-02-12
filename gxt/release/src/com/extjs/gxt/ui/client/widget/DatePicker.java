@@ -40,8 +40,24 @@ import com.google.gwt.user.client.ui.SourcesTableEvents;
 import com.google.gwt.user.client.ui.TableListener;
 
 /**
- * Simple date picker.
+ * Simple date picker calendar.
+ * <p/>
  * 
+ * Code snippet:
+ * 
+ * <pre>
+ * final DatePicker picker = new DatePicker();
+ * picker.addListener(Events.Select, new Listener&lt;ComponentEvent&gt;() {
+ * 
+ *   public void handleEvent(ComponentEvent be) {
+ *     String d = DateTimeFormat.getShortDateFormat().format(picker.getValue());
+ *     Info.display(&quot;Date Selected&quot;, &quot;You selected {0}.&quot;, new Params(d));
+ *   }
+ * 
+ * });
+ * </pre>
+ * 
+ * <dl>
  * <dt><b>Events:</b></dt>
  * 
  * <dd><b>Select</b> : DatePickerEvent(datePicker, date)<br>
@@ -50,7 +66,29 @@ import com.google.gwt.user.client.ui.TableListener;
  * <li>datePicker : this</li>
  * <li>date : the selected date</li>
  * </ul>
- * </dd> </dt>
+ * </dd>
+ * </dl>
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
  */
 public class DatePicker extends BoxComponent {
 
@@ -279,19 +317,21 @@ public class DatePicker extends BoxComponent {
       monthBtn.render(el().selectNode(".x-date-middle").dom);
       monthBtn.el().child("tr").addStyleName("x-btn-with-menu");
 
-      prevBtn = new IconButton("x-date-left-icon", new SelectionListener<ComponentEvent>() {
-        public void componentSelected(ComponentEvent ce) {
-          showPrevMonth();
-        }
-      });
+      prevBtn = new IconButton("x-date-left-icon",
+          new SelectionListener<ComponentEvent>() {
+            public void componentSelected(ComponentEvent ce) {
+              showPrevMonth();
+            }
+          });
       prevBtn.setToolTip(pt);
       prevBtn.render(el().selectNode(".x-date-left").dom);
 
-      nextBtn = new IconButton("x-date-right-icon", new SelectionListener<ComponentEvent>() {
-        public void componentSelected(ComponentEvent ce) {
-          showNextMonth();
-        }
-      });
+      nextBtn = new IconButton("x-date-right-icon",
+          new SelectionListener<ComponentEvent>() {
+            public void componentSelected(ComponentEvent ce) {
+              showNextMonth();
+            }
+          });
       nextBtn.setToolTip(nt);
       nextBtn.render(el().selectNode(".x-date-right").dom);
     }
@@ -389,6 +429,13 @@ public class DatePicker extends BoxComponent {
       case Event.ONCLICK:
         onClick(ce);
         return;
+      case Event.ONMOUSEOVER:
+        onMouseOver(ce);
+        break;
+      case Event.ONMOUSEOUT:
+        onMouseOut(ce);
+        break;
+
     }
   }
 
@@ -554,7 +601,8 @@ public class DatePicker extends BoxComponent {
     days.setBorderWidth(0);
 
     String[] dn = constants.narrowWeekdays();
-    firstDOW = startDay != 0 ? startDay : Integer.parseInt(constants.firstDayOfTheWeek()) - 1;
+    firstDOW = startDay != 0 ? startDay
+        : Integer.parseInt(constants.firstDayOfTheWeek()) - 1;
 
     days.setHTML(0, 0, "<span>" + dn[(0 + firstDOW) % 7] + "</span>");
     days.setHTML(0, 1, "<span>" + dn[(1 + firstDOW) % 7]);
@@ -592,12 +640,14 @@ public class DatePicker extends BoxComponent {
       footer.setWidth(175);
     }
 
-    todayBtn = new Button(messages.getTodayText(), new SelectionListener<ComponentEvent>() {
-      public void componentSelected(ComponentEvent ce) {
-        selectToday();
-      }
-    });
-    footer.add(todayBtn, new TableData(HorizontalAlignment.CENTER, VerticalAlignment.MIDDLE));
+    todayBtn = new Button(messages.getTodayText(),
+        new SelectionListener<ComponentEvent>() {
+          public void componentSelected(ComponentEvent ce) {
+            selectToday();
+          }
+        });
+    footer.add(todayBtn, new TableData(HorizontalAlignment.CENTER,
+        VerticalAlignment.MIDDLE));
 
     monthPicker = new El(DOM.createDiv());
     monthPicker.dom.setClassName("x-date-mp");
@@ -616,7 +666,7 @@ public class DatePicker extends BoxComponent {
     activeDate = value != null ? value : new DateWrapper();
     update(activeDate);
 
-    el().addEventsSunk(Event.ONCLICK);
+    el().addEventsSunk(Event.ONCLICK | Event.MOUSEEVENTS);
     el().makePositionable();
 
   }
@@ -632,8 +682,8 @@ public class DatePicker extends BoxComponent {
     String[] monthNames = constants.shortMonths();
     for (int i = 0; i < 6; i++) {
       buf.append("<tr><td class=x-date-mp-month><a href=#>" + monthNames[i] + "</a></td>");
-      buf.append("<td class='x-date-mp-month x-date-mp-sep'><a href=#>" + monthNames[i + 6]
-          + "</a></td>");
+      buf.append("<td class='x-date-mp-month x-date-mp-sep'><a href=#>"
+          + monthNames[i + 6] + "</a></td>");
       if (i == 0) {
         buf.append("<td class=x-date-mp-ybtn align=center><a class=x-date-mp-prev href=#></a></td><td class='x-date-mp-ybtn' align=center><a class='x-date-mp-next'></a></td></tr>");
       } else {
@@ -667,7 +717,11 @@ public class DatePicker extends BoxComponent {
   }
 
   private void handleDateClick(El target, String dt) {
-    Date d = new Date(Long.valueOf(dt));
+    String[] tokens = dt.split(",");
+    int year = Integer.parseInt(tokens[0]);
+    int month = Integer.parseInt(tokens[1]);
+    int day = Integer.parseInt(tokens[2]);
+    Date d = new DateWrapper(year, month, day).asDate();
     if (d != null && !target.getParent().hasStyleName("x-date-disabled")) {
       setValue(d);
     }
@@ -681,14 +735,62 @@ public class DatePicker extends BoxComponent {
     }));
   }
 
+  private void onMouseOut(ComponentEvent ce) {
+    El target = ce.getTarget("td.x-date-active", 3);
+    if (target == null) {
+      target = ce.getTarget("td.x-date-nextday", 3);
+    }
+    if (target == null) {
+      target = ce.getTarget("td.x-date-prevday", 3);
+    }
+    if (target == null) {
+      target = ce.getTarget("td.x-date-mp-month", 3);
+    }
+    if (target == null) {
+      target = ce.getTarget("td.x-date-mp-year", 3);
+    }
+    if (target != null) {
+      target.removeStyleName("x-date-active-hover");
+    }
+
+  }
+
+  private void onMouseOver(ComponentEvent ce) {
+    El target = ce.getTarget("td.x-date-active", 3);
+    if (target == null) {
+      target = ce.getTarget("td.x-date-nextday", 3);
+    }
+    if (target == null) {
+      target = ce.getTarget("td.x-date-prevday", 3);
+    }
+    if (target == null) {
+      target = ce.getTarget("td.x-date-mp-month", 3);
+    }
+    if (target == null) {
+      target = ce.getTarget("td.x-date-mp-year", 3);
+    }
+    if (target != null) {
+      target.addStyleName("x-date-active-hover");
+    }
+
+  }
+
   private void selectToday() {
     setValue(new DateWrapper().asDate());
   }
 
   private void setCellStyle(Element cell, Date d, long sel, long min, long max) {
     long t = d.getTime();
+
+    DateWrapper w = new DateWrapper(d);
+    int year = w.getFullYear();
+    int month = w.getMonth();
+    int day = w.getDate();
+
+    String dd = year + "," + month + "," + day;
+
     El cellEl = new El(cell);
-    cellEl.firstChild().dom.setPropertyString("dateValue", "" + t);
+    cellEl.firstChild().dom.setPropertyString("dateValue", dd);
     if (t == today) {
       cellEl.addStyleName("x-date-today");
       cellEl.setTitle(messages.getTodayText());
@@ -707,7 +809,6 @@ public class DatePicker extends BoxComponent {
   }
 
   private void showMonthPicker() {
-
     createMonthPicker();
 
     Size s = el().getSize(true);
@@ -740,7 +841,8 @@ public class DatePicker extends BoxComponent {
     DateWrapper vd = activeDate;
     activeDate = date;
     if (vd != null && el() != null) {
-      if (vd.getMonth() == activeDate.getMonth() && vd.getFullYear() == activeDate.getFullYear()) {
+      if (vd.getMonth() == activeDate.getMonth()
+          && vd.getFullYear() == activeDate.getFullYear()) {
 
       }
       int days = date.getDaysInMonth();
@@ -785,7 +887,8 @@ public class DatePicker extends BoxComponent {
       }
 
       int month = activeDate.getMonth();
-      monthBtn.setText(constants.standaloneMonths()[month] + " " + activeDate.getFullYear());
+      monthBtn.setText(constants.standaloneMonths()[month] + " "
+          + activeDate.getFullYear());
     }
   }
 

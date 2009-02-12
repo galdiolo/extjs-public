@@ -32,13 +32,51 @@ import com.google.gwt.user.client.Element;
    d.show();
  * </pre>
  * 
- * <p>
+ * <p />
  * The internal buttons can be retrieved from the button bar using their
  * respective ids ('ok', 'cancel', 'yes', 'no', 'cancel') or by index. The
  * method {@link #getButtonBar()} creates the buttons, so any call before the
  * dialog is rendered will cause the buttons to be created based on the
  * {@link #setButtons(String)} value.
- * </p>
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>Window Activate</dd>
+ * <dd>Window Deactivate</dd>
+ * <dd>Window Minimize</dd>
+ * <dd>Window Maximize</dd>
+ * <dd>Window Restore</dd>
+ * <dd>Window Resize</dd>
+ * <dd>ContentPanel BeforeExpand</dd>
+ * <dd>ContentPanel Expand</dd>
+ * <dd>ContentPanel BeforeCollapse</dd>
+ * <dd>ContentPanel Collapse</dd>
+ * <dd>ContentPanel BeforeClose</dd>
+ * <dd>ContentPanel Close</dd>
+ * <dd>LayoutContainer AfterLayout</dd>
+ * <dd>ScrollContainer Scroll</dd>
+ * <dd>Container BeforeAdd</dd>
+ * <dd>Container Add</dd>
+ * <dd>Container BeforeRemove</dd>
+ * <dd>Container Remove</dd>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
  */
 public class Dialog extends Window {
 

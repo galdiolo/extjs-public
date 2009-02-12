@@ -25,6 +25,6 @@ public interface StoreFilter<T extends ModelData> {
    * @param property the active property
    * @return true to select, false to filter
    */
-  public boolean select(Store store, T parent, T item, String property);
+  public boolean select(Store<T> store, T parent, T item, String property);
 
 }

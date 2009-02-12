@@ -17,16 +17,14 @@ import com.extjs.gxt.ui.client.event.FieldEvent;
  * by the browser if you give each radio in a group the same name.
  * 
  * <dl>
- * <dt>Events:</dt>
- * 
- * <dd><b>Change</b> : FieldEvent(field)<br>
- * <div>Fires when the radio's value changes.</div>
- * <ul>
- * <li>field : this</li>
- * <li>oldValue : the old value</li>
- * <li>value : the new value</li>
- * </ul>
- * </dd>
+ * <dt>Inherited Events:</dt>
+ * <dd>Field Focus</dd>
+ * <dd>Field Blur</dd>
+ * <dd>Field Change</dd>
+ * <dd>Field Invalid</dd>
+ * <dd>Field Valid</dd>
+ * <dd>Field KeyPress</dd>
+ * <dd>Field SpecialKey</dd>
  * </dl>
  */
 public class Radio extends CheckBox {

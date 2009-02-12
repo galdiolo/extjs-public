@@ -31,7 +31,9 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 
 /**
- * A Portal container of Portlets.
+ * A Portal container of Portlets. It is required that
+ * {@link #setColumnWidth(int, double)} be called for each column prior to
+ * rendering.
  * 
  * <dl>
  * <dt><b>Events:</b></dt>
@@ -62,6 +64,31 @@ import com.google.gwt.user.client.Element;
  * </ul>
  * </dd>
  * </dl>
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>Container BeforeAdd</dd>
+ * <dd>Container Add</dd>
+ * <dd>Container BeforeRemove</dd>
+ * <dd>Container Remove</dd>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
  */
 public class Portal extends Container<LayoutContainer> {
 
@@ -74,6 +101,7 @@ public class Portal extends Container<LayoutContainer> {
   private Portlet active;
   private El dummy;
   private ColumnLayout cl;
+  private int spacing = 10;
 
   /**
    * Creates a new portal container.
@@ -93,7 +121,7 @@ public class Portal extends Container<LayoutContainer> {
       LayoutContainer l = new LayoutContainer();
       l.addStyleName("x-portal x-portal-column");
       l.setStyleAttribute("minHeight", "20px");
-      l.setStyleAttribute("padding", "10px 0px 0px 10px");
+      l.setStyleAttribute("padding", "" + spacing + " 0 0 " + spacing);
       l.setLayout(new RowLayout());
       l.setLayoutOnChange(true);
       add(l);
@@ -133,6 +161,43 @@ public class Portal extends Container<LayoutContainer> {
    */
   public void add(Portlet portlet, int column) {
     insert(portlet, columns.get(column).getItemCount(), column);
+  }
+
+  /**
+   * Returns the column of the given porlet.
+   * 
+   * @param portlet the portlet
+   * @return the column or -1 if not found
+   */
+  public int getPortletColumn(Portlet portlet) {
+    LayoutContainer c = (LayoutContainer) portlet.getParent();
+    if (c != null) {
+      return columns.indexOf(c);
+    }
+    return -1;
+  }
+
+  /**
+   * Returns the index of the column for the given portlet.
+   * 
+   * @param portlet the portlet
+   * @return the index or -1 if not found
+   */
+  public int getPortletIndex(Portlet portlet) {
+    LayoutContainer c = (LayoutContainer) portlet.getParent();
+    if (c != null) {
+      return c.indexOf(portlet);
+    }
+    return -1;
+  }
+
+  /**
+   * Returns the spacing between portlets.
+   * 
+   * @return the spacing the spacing in pixels
+   */
+  public int getSpacing() {
+    return spacing;
   }
 
   /**
@@ -188,6 +253,15 @@ public class Portal extends Container<LayoutContainer> {
     ComponentHelper.setLayoutData(columns.get(colIndex), new ColumnData(width));
   }
 
+  /**
+   * Sets the spacing between portlets (defaults to 10).
+   * 
+   * @param spacing the spacing in pixels
+   */
+  public void setSpacing(int spacing) {
+    this.spacing = spacing;
+  }
+
   @Override
   protected void onAttach() {
     super.onAttach();
@@ -198,7 +272,7 @@ public class Portal extends Container<LayoutContainer> {
       }
     });
   }
-
+  
   protected void onDragEnd(DragEvent de) {
     dummy.removeFromParent();
 
@@ -221,9 +295,8 @@ public class Portal extends Container<LayoutContainer> {
   }
 
   protected void onDragMove(DragEvent de) {
-    active.setVisible(false);
-
     int col = getColumn(de.getClientX());
+
     int row = getRowPosition(col, de.getClientY());
 
     if (col != insertCol || row != insertRow) {
@@ -243,14 +316,19 @@ public class Portal extends Container<LayoutContainer> {
   }
 
   private void addInsert(int col, int row) {
+    if (insertCol == col && insertRow < row) {
+      row++;
+    }
     insertCol = col;
     insertRow = row;
-    dummy.removeFromParent();
+
     LayoutContainer lc = columns.get(insertCol);
-    lc.el().insertChild(dummy.dom, row);
+   
+    dummy.insertInto(lc.el().dom, row);
   }
 
   private int getColumn(int x) {
+    x += XDOM.getBodyScrollLeft();
     for (int i = startColumns.size() - 1; i >= 0; i--) {
       if (x > startColumns.get(i)) {
         return i;
@@ -260,6 +338,7 @@ public class Portal extends Container<LayoutContainer> {
   }
 
   private int getRow(int col, int y) {
+    y += XDOM.getBodyScrollTop();
     LayoutContainer con = columns.get(col);
     int count = con.getItemCount();
 
@@ -277,6 +356,7 @@ public class Portal extends Container<LayoutContainer> {
   }
 
   private int getRowPosition(int col, int y) {
+    y += XDOM.getBodyScrollTop();
     LayoutContainer con = columns.get(col);
     List<Component> list = new ArrayList<Component>(con.getItems());
     list.remove(dummy);
@@ -331,6 +411,7 @@ public class Portal extends Container<LayoutContainer> {
     }
     startCol = getColumn(de.getClientX());
     startRow = getRow(startCol, de.getClientY());
-
+    active.setVisible(false);
+    addInsert(startCol, startRow);
   }
 }

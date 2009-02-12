@@ -19,7 +19,7 @@ import com.google.gwt.user.client.EventPreview;
 
 /**
  * Specialized <code>EventPreview</code>. Provides auto hide support and the
- * ability to add elements which should be ignored when auto hide is enabed.
+ * ability to add elements which should be ignored when auto hide is enabled.
  * 
  * <dt><b>Events:</b></dt>
  * 
@@ -33,7 +33,7 @@ import com.google.gwt.user.client.EventPreview;
  * </dd>
  * 
  * <dd><b>Remove</b> : PreviewEvent(preview)<br>
- * <div>Fires after event preview has been remevoed.</div>
+ * <div>Fires after event preview has been removed.</div>
  * <ul>
  * <li>preview : this</li>
  * </ul>
@@ -83,9 +83,9 @@ public class BaseEventPreview extends BaseObservable implements EventPreview {
   }
 
   private static native List getPreviewStack() /*-{
-       var stack = @com.google.gwt.user.client.DOM::sEventPreviewStack;
-       return stack;
-      }-*/;
+   var stack = @com.google.gwt.user.client.DOM::sEventPreviewStack;
+   return stack;
+  }-*/;
 
   private CompositeElement ignoreList = new CompositeElement();
   private boolean autoHide = true;

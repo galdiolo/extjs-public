@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.widget.form;
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
+import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.FieldEvent;
@@ -27,24 +28,20 @@ import com.google.gwt.user.client.Event;
 /**
  * Base class for form fields that provides default event handling, value
  * handling and other functionality.
- * 
  * <dl>
  * <dt>Events:</dt>
- * 
  * <dd><b>Focus</b> : FieldEvent(field)<br>
  * <div>Fires when this field receives input focus.</div>
  * <ul>
  * <li>field : this</li>
  * </ul>
  * </dd>
- * 
  * <dd><b>Blur</b> : FieldEvent(field)<br>
  * <div>Fires when this field loses input focus.</div>
  * <ul>
  * <li>field : this</li>
  * </ul>
  * </dd>
- * 
  * <dd><b>Change</b> : FieldEvent(field, value, oldValue)<br>
  * <div>Fires after the field's value is changed.</div>
  * <ul>
@@ -53,7 +50,6 @@ import com.google.gwt.user.client.Event;
  * <li>oldValue : the old value</li>
  * </ul>
  * </dd>
- * 
  * <dd><b>Invalid</b> : FieldEvent(field, message)<br>
  * <div>Fires after the field has been marked as invalid.</div>
  * <ul>
@@ -61,21 +57,18 @@ import com.google.gwt.user.client.Event;
  * <li>message : the validation message</li>
  * </ul>
  * </dd>
- * 
  * <dd><b>Valid</b> : FieldEvent(field)<br>
  * <div>Fires after the field has been validated with no errors.</div>
  * <ul>
  * <li>field : this</li>
  * </ul>
  * </dd>
- * 
  * <dd><b>KeyPress</b> : FieldEvent(field)<br>
  * <div>Fires after a key is pressed.</div>
  * <ul>
  * <li>field : this</li>
  * </ul>
  * </dd>
- * 
  * <dd><b>SpecialKey</b> : FieldEvent(field)<br>
  * <div>Fires when any key related to navigation (arrows, tab, enter, esc, etc.)
  * is pressed.</div>
@@ -83,9 +76,28 @@ import com.google.gwt.user.client.Event;
  * <li>field : this</li>
  * </ul>
  * </dd>
- * 
  * </dl>
  * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
  * 
  * @param <D> the data type of the field
  */
@@ -134,7 +146,7 @@ public abstract class Field<D> extends BoxComponent {
   protected boolean hasFocus;
   protected Object focusValue;
   protected D originalValue;
-
+ 
   private String labelStyle = "";
   private String name;
   private String fieldLabel = "";
@@ -229,7 +241,6 @@ public abstract class Field<D> extends BoxComponent {
    * 
    * @param msg the error text
    */
-  @SuppressWarnings("deprecation")
   public void forceInvalid(String msg) {
     forceInvalidText = msg;
     markInvalid(msg);
@@ -304,21 +315,27 @@ public abstract class Field<D> extends BoxComponent {
    * @return the field name
    */
   public String getName() {
-    return rendered ? getInputEl().dom.getAttribute("name") : name;
+    if (rendered) {
+      String n = getInputEl().dom.getAttribute("name");
+      if (!n.equals("")) {
+        return n;
+      }
+    }
+    return name;
   }
 
   /**
    * Returns the original value of the field, which is the value of the field
    * when it is first rendered.
    * 
-   * @return the orignal value
+   * @return the original value
    */
   public D getOriginalValue() {
     return originalValue;
   }
 
   /**
-   * Retuns the field's property editor.
+   * Returns the field's property editor.
    * 
    * @return the property editor
    */
@@ -432,19 +449,19 @@ public abstract class Field<D> extends BoxComponent {
   }
 
   /**
-   * Mark this field as invalid.
+   * Marks this field as invalid. Validation will still run if called again, and
+   * the error message will be changed or cleared based on validation. To set a
+   * error message that will not be cleared until manually cleared see
+   * {@link #forceInvalid(String)}
    * 
    * @param msg the validation message
-   * @deprecated to directly set an error message see
-   *             {@link #forceInvalid(String)}. Visibility of markInvalid will
-   *             be changed to protected in a future release.
    */
   public void markInvalid(String msg) {
     if (!rendered) {
       return;
     }
     getInputEl().addStyleName(invalidStyle);
-    msg = msg == null ? getMessages().getInvalidText() : msg;
+    msg = XDOM.escapeHtml(msg == null ? getMessages().getInvalidText() : msg);
 
     if (messageTarget.equals("side")) {
       if (errorIcon == null) {
@@ -494,6 +511,9 @@ public abstract class Field<D> extends BoxComponent {
         onBlur(ce);
         break;
       case Event.ONCLICK:
+        // in some cases, focus event is not fired when event preview was
+        // active when the click is fired
+        if (!hasFocus) focus();
         onClick(ce);
         break;
       case Event.ONKEYUP:
@@ -799,7 +819,7 @@ public abstract class Field<D> extends BoxComponent {
   protected void alignErrorIcon() {
     DeferredCommand.addCommand(new Command() {
       public void execute() {
-        errorIcon.el().alignTo(getElement(), "tl-tr", new int[] {2, 1});
+        errorIcon.el().alignTo(getElement(), "tl-tr", new int[] {2, 3});
       }
     });
   }
@@ -971,7 +991,6 @@ public abstract class Field<D> extends BoxComponent {
    * @param value the value to validate
    * @return <code>true</code> for valid
    */
-  @SuppressWarnings("deprecation")
   protected boolean validateValue(String value) {
     if (forceInvalidText != null) {
       markInvalid(forceInvalidText);

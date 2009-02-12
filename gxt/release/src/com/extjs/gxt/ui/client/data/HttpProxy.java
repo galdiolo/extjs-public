@@ -55,7 +55,8 @@ public class HttpProxy<C, D> implements DataProxy<C, D> {
 
         public void onResponseReceived(Request request, Response response) {
           if (response.getStatusCode() != Response.SC_OK) {
-            callback.onFailure(new RuntimeException("HttpProxy: Invalid status code " + response.getStatusCode()));
+            callback.onFailure(new RuntimeException("HttpProxy: Invalid status code "
+                + response.getStatusCode()));
             return;
           }
           String text = response.getText();
@@ -92,6 +93,14 @@ public class HttpProxy<C, D> implements DataProxy<C, D> {
       sb.append("&start=" + cfg.getOffset());
       sb.append("&limit=" + cfg.getLimit());
     }
+
+    if (loadConfig instanceof BaseListLoadConfig) {
+      BaseListLoadConfig cfg = (BaseListLoadConfig) loadConfig;
+      for (String s : cfg.getParams().keySet()) {
+        sb.append("&" + s + "=" + cfg.getParams().get(s));
+      }
+    }
+
     if (sb.length() > 0) {
       return sb.substring(1, sb.length());
     }
@@ -99,6 +108,6 @@ public class HttpProxy<C, D> implements DataProxy<C, D> {
   }
 
   private native void setUrl(RequestBuilder rb, String url) /*-{
-      rb.@com.google.gwt.http.client.RequestBuilder::url = url;
-    }-*/;
+       rb.@com.google.gwt.http.client.RequestBuilder::url = url;
+     }-*/;
 }

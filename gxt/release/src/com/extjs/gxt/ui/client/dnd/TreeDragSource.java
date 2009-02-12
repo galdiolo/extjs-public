@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.extjs.gxt.ui.client.binder.TreeBinder;
 import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.dnd.DND.Operation;
 import com.extjs.gxt.ui.client.dnd.DND.TreeSource;
 import com.extjs.gxt.ui.client.event.DNDEvent;
 import com.extjs.gxt.ui.client.util.Format;
@@ -70,20 +71,24 @@ public class TreeDragSource extends DragSource {
 
   @Override
   protected void onDragDrop(DNDEvent event) {
-    if (binder != null) {
-      List<ModelData> sel = (List) event.data;
-      for (ModelData m : sel) {
-        ModelData p = binder.getTreeStore().getParent(m);
-        if (p != null) {
-          binder.getTreeStore().remove(p, m);
+    if (event.operation == Operation.MOVE) {
+      if (binder != null) {
+        List<ModelData> sel = (List) event.data;
+        for (ModelData m : sel) {
+          ModelData p = binder.getTreeStore().getParent(m);
+          if (p != null) {
+            binder.getTreeStore().remove(p, m);
+          } else {
+            binder.getTreeStore().remove(m);
+          }
         }
-      }
-    } else {
-      List<TreeItem> sel = (List) event.data;
-      for (TreeItem item : sel) {
-        TreeItem p = item.getParentItem();
-        if (p != null) {
-          p.remove(item);
+      } else {
+        List<TreeItem> sel = (List) event.data;
+        for (TreeItem item : sel) {
+          TreeItem p = item.getParentItem();
+          if (p != null) {
+            p.remove(item);
+          }
         }
       }
     }
@@ -92,7 +97,7 @@ public class TreeDragSource extends DragSource {
   @Override
   protected void onDragStart(DNDEvent e) {
     TreeItem item = tree.findItem(e.getTarget());
-    if (item == null) {
+    if (item == null || e.getTarget(".my-tree-joint", 3) != null) {
       e.doit = false;
       return;
     }

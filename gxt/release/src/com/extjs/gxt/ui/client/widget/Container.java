@@ -26,16 +26,79 @@ import com.google.gwt.user.client.WindowResizeListener;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * <p/> Class for any {@link BoxComponent} that can contain other components.
+ * Class for any {@link BoxComponent} that can contain other components.
  * Containers handle the basic behavior of containing components, namely
  * managing, attaching, and detaching the child widgets.
  * 
- * <p/> When children are added to a container they are not physically added to
- * the DOM of the container. Subclasses are responsible for connecting the child
+ * <p/>
+ * When children are added to a container they are not physically added to the
+ * DOM of the container. Subclasses are responsible for connecting the child
  * components.
  * 
- * <p/> Container does not define a root element. setElement must be called by
- * any subclass to ensure the container has an element.
+ * <p/>
+ * Container does not define a root element. setElement must be called by any
+ * subclass to ensure the container has an element.
+ * 
+ * <dl>
+ * <dt><b>Events:</b></dt>
+ * 
+ * <dd><b>BeforeAdd</b> : ContainerEvent(container, item, index)<br>
+ * <div>Fires before a item is added or inserted. Listeners can set the
+ * <code>doit</code> field to <code>false</code> to cancel the action.</div>
+ * <ul>
+ * <li>container : this</li>
+ * <li>item : the component being added</li>
+ * <li>index : the index at which the component will be added</li>
+ * </ul>
+ * </dd>
+ * 
+ * <dd><b>BeforeRemove</b> : ContainerEvent(container, item)<br>
+ * <div>Fires before a item is removed. Listeners can set the <code>doit</code>
+ * field to <code>false</code> to cancel the action.</div>
+ * <ul>
+ * <li>container : this</li>
+ * <li>item : the component being removed</li>
+ * </ul>
+ * </dd>
+ * 
+ * <dd><b>Add</b> : ContainerEvent(container, item, index)<br>
+ * <div>Fires after a item has been added or inserted.</div>
+ * <ul>
+ * <li>container : this</li>
+ * <li>item : the item that was added</li>
+ * <li>index : the index at which the item will be added</li>
+ * </ul>
+ * </dd>
+ * 
+ * <dd><b>Remove</b> : ContainerEvent(container, item)<br>
+ * <div>Fires after a item has been removed.</div>
+ * <ul>
+ * <li>container : this</li>
+ * <li>item : the item being removed</li>
+ * </ul>
+ * </dd>
+ * </dl>
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
  * 
  * @param <T> the child component type
  */
@@ -288,6 +351,11 @@ public abstract class Container<T extends Component> extends BoxComponent {
       if (attachChildren && c.isRendered() && !c.isAttached()) {
         ComponentHelper.doAttach(c);
       }
+
+      if (c instanceof Composite) {
+        c = ((Composite) c).getComponent();
+      }
+
       if (c instanceof LayoutContainer) {
         ((LayoutContainer) c).layout();
       } else if (c instanceof Container) {
@@ -300,8 +368,8 @@ public abstract class Container<T extends Component> extends BoxComponent {
       }
     }
 
-    ContainerEvent ce = new ContainerEvent(this);
-    fireEvent(Events.AfterLayout, ce);
+    onAfterLayout();
+    fireEvent(Events.AfterLayout, createContainerEvent(null));
     return true;
   }
 
@@ -312,9 +380,9 @@ public abstract class Container<T extends Component> extends BoxComponent {
   protected El getLayoutTarget() {
     return el();
   }
-  
+
   /**
-   * Addss a item into the container. Fires the <i>BeforeAdd</i> event before
+   * Adds a item into the container. Fires the <i>BeforeAdd</i> event before
    * inserting, then fires the <i>Add</i> event after the widget has been
    * inserted.
    * 
@@ -375,6 +443,10 @@ public abstract class Container<T extends Component> extends BoxComponent {
     return doLayout();
   }
 
+  protected void onAfterLayout() {
+
+  }
+
   @Override
   protected void onAttach() {
     super.onAttach();
@@ -416,7 +488,8 @@ public abstract class Container<T extends Component> extends BoxComponent {
     assert (child.getParent() == this);
     if (child.isAttached()) {
       ComponentHelper.doDetach(child);
-      assert !child.isAttached() : "Failure of " + getClass() + " to call super.onDetach()";
+      assert !child.isAttached() : "Failure of " + getClass()
+          + " to call super.onDetach()";
     }
     setParent(null, child);
   }
@@ -513,7 +586,8 @@ public abstract class Container<T extends Component> extends BoxComponent {
    * Helper Method for the subclasses that wish to support automatic wrapping of
    * Widget instances in WidgetComponents
    * 
-   * <p/> If the widget is a component, no wrapping is performed
+   * <p/>
+   * If the widget is a component, no wrapping is performed
    * 
    * @param widget the widget to be wrapped
    * @return the new component
@@ -527,7 +601,7 @@ public abstract class Container<T extends Component> extends BoxComponent {
   }
 
   private native void setParent(Widget parent, Widget child) /*-{
-     child.@com.google.gwt.user.client.ui.Widget::parent = parent;
-   }-*/;
+      child.@com.google.gwt.user.client.ui.Widget::parent = parent;
+    }-*/;
 
 }

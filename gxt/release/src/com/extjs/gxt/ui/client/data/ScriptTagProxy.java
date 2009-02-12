@@ -13,6 +13,20 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+/**
+ * A <code>DataProxy</code> that reads a data from a URL which may be in a
+ * domain other than the originating domain of the running page.
+ * 
+ * <p />
+ * Note that if you are retrieving data from a page that is in a domain that is
+ * NOT the same as the originating domain of the running page, you must use this
+ * class, rather than HttpProxy.
+ * 
+ * @param <C> the config object type
+ * @param <D> the remote data type
+ * 
+ * @see HttpProxy
+ */
 public class ScriptTagProxy<C, D> implements DataProxy<C, D> {
 
   private static int ID = 0;
@@ -72,8 +86,8 @@ public class ScriptTagProxy<C, D> implements DataProxy<C, D> {
       sb.append("&limit=" + cfg.getLimit());
     }
 
-    if (loadConfig instanceof BasePagingLoadConfig) {
-      BasePagingLoadConfig cfg = (BasePagingLoadConfig) loadConfig;
+    if (loadConfig instanceof BaseListLoadConfig) {
+      BaseListLoadConfig cfg = (BaseListLoadConfig) loadConfig;
       for (String s : cfg.getParams().keySet()) {
         sb.append("&" + s + "=" + cfg.getParams().get(s));
       }

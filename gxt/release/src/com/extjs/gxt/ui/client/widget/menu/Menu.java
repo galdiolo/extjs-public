@@ -97,7 +97,27 @@ import com.google.gwt.user.client.ui.Widget;
  * <li>item : the item being removed</li>
  * </ul>
  * </dd>
+ * </dl>
  * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
  * </dl>
  */
 public class Menu extends Container<Item> {
@@ -380,21 +400,12 @@ public class Menu extends Container<Item> {
       eventPreview.getIgnoreList().add(getElement());
 
       onShow();
-      setPagePosition(x, y);
-
       if (constrainViewport) {
-        int ch = XDOM.getViewportSize().height;
-        int cw = XDOM.getViewportSize().width;
-        int bottom = el().getBottom(false);
-        int right = el().getRight(false);
-        if (bottom > ch) {
-          y -= (bottom - ch) - 3;
-        }
-        if (right > cw) {
-          x -= (right - cw) - 3;
-        }
-        setPagePosition(x, y);
+        Point p = el().adjustForConstraints(new Point(x, y));
+        x = p.x;
+        y = p.y;
       }
+      setPagePosition(x + XDOM.getBodyScrollLeft(), y + XDOM.getBodyScrollTop());
 
       eventPreview.add();
       showing = true;
@@ -443,6 +454,9 @@ public class Menu extends Container<Item> {
     // which causes the menu to be hidden, so check xy
     Point p = BaseEventPreview.getLastXY();
     if (getBounds(false).contains(p)) {
+      return false;
+    }
+    if (parentItem != null && pe.within(parentItem.getElement())) {
       return false;
     }
     hide(true);

@@ -12,8 +12,9 @@ import com.google.gwt.user.client.Element;
 
 /**
  * A component that contains arbitrary HTML text. The wrapping HTML tag can be
- * configured using {@link #setTagName(String)}. </p>
+ * configured using {@link #setTagName(String)}.
  * 
+ * <p />
  * Code snippet:
  * 
  * <pre>{@code
@@ -26,6 +27,27 @@ import com.google.gwt.user.client.Element;
      + "<u>Final text</u></div>");
    RootPanel.get().add(h);
  * }</pre>
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
  */
 public class Html extends BoxComponent {
 

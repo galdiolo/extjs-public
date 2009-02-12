@@ -112,7 +112,7 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
   protected String filterBeginsWidth;
 
   protected boolean filtersEnabled;
-  private List<M> snapshot;
+  protected List<M> snapshot;
   private List<StoreFilter> filters;
   private ModelComparer<M> comparer = DefaultModelComparer.DFFAULT;
   private ChangeListener changeListener;
@@ -155,9 +155,11 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
     if (filters != null && filters.size() == 0) {
       return;
     }
+    filterProperty = property;
     if (!filtersEnabled) {
       snapshot = all;
     }
+    
     filtersEnabled = true;
     filtered = new ArrayList<M>();
     for (M items : snapshot) {
@@ -496,6 +498,7 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
       }
       StoreEvent<M> evt = createStoreEvent();
       evt.model = model;
+      evt.index = all.indexOf(m);
       fireEvent(Update, evt);
     }
   }
@@ -574,6 +577,13 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
       all.add(index, newModel);
       unregisterModel(oldModel);
       registerModel(newModel);
+    }
+    if(isFiltered()) {
+      index=snapshot.indexOf(oldModel);
+      if(index!=-1) {
+        snapshot.remove(oldModel);
+        snapshot.add(index,newModel);
+      }
     }
   }
 

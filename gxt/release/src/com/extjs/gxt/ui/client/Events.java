@@ -306,6 +306,11 @@ public class Events {
    * DragStart event type (value is 320).
    */
   public static final int DragStart = 320;
+  
+  /**
+   * DoubleClick event type (value is 324).
+   */
+  public static final int DoubleClick = 324;
 
   /**
    * Drop event type (value is 322).

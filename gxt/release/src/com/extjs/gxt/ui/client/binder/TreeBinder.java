@@ -405,13 +405,14 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
   @Override
   protected void onFilter(StoreEvent se) {
     filterItems(tree.getRootItem());
+    boolean animated = tree.getAnimate();
+    tree.setAnimate(false);
     if (store.isFiltered() && expandOnFilter) {
-      tree.setAnimate(false);
       tree.expandAll();
     } else if (!store.isFiltered() && expandOnFilter) {
       tree.collapseAll();
-      tree.setAnimate(true);
     }
+    tree.setAnimate(animated);
   }
 
   @Override
@@ -541,7 +542,7 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
   }
 
   private native void markChildrenRendered(TreeItem item, boolean rendered) /*-{
-      item.@com.extjs.gxt.ui.client.widget.tree.TreeItem::childrenRendered = rendered;
-      }-*/;
+       item.@com.extjs.gxt.ui.client.widget.tree.TreeItem::childrenRendered = rendered;
+       }-*/;
 
 }

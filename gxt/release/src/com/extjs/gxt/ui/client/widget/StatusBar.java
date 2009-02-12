@@ -12,7 +12,7 @@ import com.extjs.gxt.ui.client.widget.button.IconButton;
 import com.google.gwt.user.client.Element;
 
 /**
- * Basic status bar.
+ * Basic status bar that supports text and a busy icon, aligned horizontally. 
  */
 public class StatusBar extends Component {
 

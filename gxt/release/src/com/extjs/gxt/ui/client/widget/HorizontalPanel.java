@@ -16,18 +16,48 @@ import com.google.gwt.user.client.Element;
 /**
  * A {@link LayoutContainer} that lays out its children in a single row using a
  * {@link TableRowLayout}. Each child widget can control its cell's properties
- * using an associated {@link TableData} instance.</p>Code snippet:
+ * using an associated {@link TableData} instance.
+ * 
+ * <p />
+ * Code snippet:
  * 
  * <pre>
    HorizontalPanel hp = new HorizontalPanel();
    hp.setWidth(300);
-   hp.setTableWidth("100%");
-   hp.add(new Label("Aligned Center"));
+   hp.setTableWidth(&quot;100%&quot;);
+   hp.add(new Label(&quot;Aligned Center&quot;));
    TableData td = new TableData();
    td.setHorizontalAlign(HorizontalAlignment.RIGHT);
-   hp.add(new Label("Aligned Right"), td); 
+   hp.add(new Label(&quot;Aligned Right&quot;), td);
    RootPanel.get().add(hp);
  * </pre>
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>LayoutContainer AfterLayout</dd>
+ * <dd>ScrollContainer Scroll</dd>
+ * <dd>Container BeforeAdd</dd>
+ * <dd>Container Add</dd>
+ * <dd>Container BeforeRemove</dd>
+ * <dd>Container Remove</dd>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
  */
 public class HorizontalPanel extends LayoutContainer {
 

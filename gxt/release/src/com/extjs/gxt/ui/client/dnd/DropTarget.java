@@ -18,13 +18,11 @@ import com.extjs.gxt.ui.client.widget.Component;
 /**
  * Identifies components that can receive data from a drag and drop operations.
  * 
- * <p>
- * While the cursor is over a target, the target is responsible for determining
- * if the drop is valid and showing any visual indicators for the drop. The @link
- * {@link StatusProxy} object should be used to specifiy if the drop is valid,
- * and can also be used to change the values of the proxy object displayed by
- * the cursor. The status proxy is accesible via the DNDEvent.
- * </p>
+ * <p /> While the cursor is over a target, the target is responsible for
+ * determining if the drop is valid and showing any visual indicators for the
+ * drop. The @link {@link StatusProxy} object should be used to specify if the
+ * drop is valid, and can also be used to change the values of the proxy object
+ * displayed by the cursor. The status proxy is accessible via the DNDEvent.
  * 
  * <dl>
  * <dt><b>Events:</b></dt>
@@ -94,7 +92,6 @@ import com.extjs.gxt.ui.client.widget.Component;
  * <li>status : the status object</li>
  * </ul>
  * </dd>
- * 
  * </dl>
  */
 public class DropTarget extends BaseObservable {
@@ -106,6 +103,7 @@ public class DropTarget extends BaseObservable {
 
   private boolean allowSelfAsSource;
   private String group = "";
+  private boolean enabled = true;
 
   /**
    * Creates a new drop target.
@@ -130,6 +128,20 @@ public class DropTarget extends BaseObservable {
     addListener(Events.DragCancel, listener);
     addListener(Events.Drop, listener);
     addListener(Events.Move, listener);
+  }
+
+  /**
+   * Disables the drag source.
+   */
+  public void disable() {
+    enabled = false;
+  }
+
+  /**
+   * Enables the drag source.
+   */
+  public void enable() {
+    enabled = true;
   }
 
   /**
@@ -187,6 +199,15 @@ public class DropTarget extends BaseObservable {
   }
 
   /**
+   * Returns true if the drag source is enabled.
+   * 
+   * @return true for enabled
+   */
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  /**
    * Unregisters the target as a drop target.
    */
   public void release() {
@@ -227,8 +248,8 @@ public class DropTarget extends BaseObservable {
   }
 
   /**
-   * Sets the drag srop group. If specified, only drag srouces with the same
-   * group value are allowed.
+   * Sets the drag group. If specified, only drag sources with the same group
+   * value are allowed.
    * 
    * @param group the group name
    */
@@ -264,7 +285,6 @@ public class DropTarget extends BaseObservable {
    * @param event the dd event
    */
   protected void onDragCancelled(DNDEvent event) {
-    component.enableEvents(true);
     Insert.get().hide();
   }
 
@@ -274,8 +294,7 @@ public class DropTarget extends BaseObservable {
    * @param event the dd event
    */
   protected void onDragDrop(DNDEvent event) {
-    component.enableEvents(true);
-    Insert.get().hide();
+
   }
 
   /**
@@ -286,7 +305,7 @@ public class DropTarget extends BaseObservable {
    * @param event the dd event
    */
   protected void onDragEnter(DNDEvent event) {
-    component.enableEvents(false);
+
   }
 
   /**
@@ -295,8 +314,7 @@ public class DropTarget extends BaseObservable {
    * @param event the dd event
    */
   protected void onDragLeave(DNDEvent event) {
-    component.enableEvents(true);
-    Insert.get().hide();
+
   }
 
   /**
@@ -322,7 +340,8 @@ public class DropTarget extends BaseObservable {
   }
 
   boolean handleDragEnter(DNDEvent event) {
-    event.doit = false;
+    event.doit = true;
+    event.status.setStatus(true);
     onDragEnter(event);
     if (!fireEvent(Events.DragEnter, event)) {
       event.status.setStatus(false);
@@ -330,7 +349,6 @@ public class DropTarget extends BaseObservable {
     }
 
     event.status.setStatus(true);
-
     if (overStyle != null) {
       component.addStyleName(overStyle);
     }
@@ -338,10 +356,11 @@ public class DropTarget extends BaseObservable {
   }
 
   void handleDragLeave(DNDEvent event) {
-    event.status.setStatus(false);
     if (overStyle != null) {
       component.removeStyleName(overStyle);
     }
+    event.status.setStatus(false);
+    Insert.get().hide();
     onDragLeave(event);
   }
 
@@ -351,6 +370,10 @@ public class DropTarget extends BaseObservable {
   }
 
   void handleDrop(DNDEvent event) {
+    Insert.get().hide();
+    if (overStyle != null) {
+      component.removeStyleName(overStyle);
+    }
     onDragDrop(event);
   }
 

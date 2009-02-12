@@ -30,13 +30,14 @@ import com.google.gwt.user.client.ui.impl.FormPanelImpl;
 import com.google.gwt.user.client.ui.impl.FormPanelImplHost;
 
 /**
- * A panel for displaying form wigets. By default, FormPanel uses a FormLayout,
+ * A panel for displaying form widgets. By default, FormPanel uses a FormLayout,
  * but this may be overridden when using nested layouts. See {@link FormLayout}
  * for more documentation.
  * 
- * <p/>FormPanel supports nested layout containers. Fields should only be added
- * to layout containers with a form layout. The form panel settings only apply
- * to the panel's direct children.
+ * <p/>
+ * FormPanel supports nested layout containers. Fields should only be added to
+ * layout containers with a form layout. The form panel settings only apply to
+ * the panel's direct children.
  * 
  * <dl>
  * <dt><b>Events:</b></dt>
@@ -58,7 +59,39 @@ import com.google.gwt.user.client.ui.impl.FormPanelImplHost;
  * <li>resultHtml : the response html</li>
  * </ul>
  * </dd>
+ * </dl>
  * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>ContentPanel BeforeExpand</dd>
+ * <dd>ContentPanel Expand</dd>
+ * <dd>ContentPanel BeforeCollapse</dd>
+ * <dd>ContentPanel Collapse</dd>
+ * <dd>ContentPanel BeforeClose</dd>
+ * <dd>ContentPanel Close</dd>
+ * <dd>LayoutContainer AfterLayout</dd>
+ * <dd>ScrollContainer Scroll</dd>
+ * <dd>Container BeforeAdd</dd>
+ * <dd>Container Add</dd>
+ * <dd>Container BeforeRemove</dd>
+ * <dd>Container Remove</dd>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
  * </dl>
  */
 public class FormPanel extends ContentPanel implements FormPanelImplHost {
@@ -124,7 +157,7 @@ public class FormPanel extends ContentPanel implements FormPanelImplHost {
       f.setValue(null);
     }
   }
-  
+
   /**
    * Resets all field values.
    */
@@ -399,7 +432,7 @@ public class FormPanel extends ContentPanel implements FormPanelImplHost {
       impl.submit(form.dom, iframe);
     }
   }
-  
+
   @Override
   protected void onAttach() {
     super.onAttach();

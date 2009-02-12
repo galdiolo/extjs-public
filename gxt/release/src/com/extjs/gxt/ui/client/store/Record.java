@@ -20,6 +20,26 @@ import com.extjs.gxt.ui.client.data.RpcMap;
 /**
  * Records wrap model instances and provide specialized editing features,
  * including modification tracking and editing capabilities.
+ * 
+ * <p /> Rather than editing a model from a store directly, record can be used
+ * to "buffer" any changes to the model. Changes can be "committed" or
+ * "rejected" at both the record and store level.
+ * 
+ * <p /> Record instances can be retrieved from the container store by calling @link
+ * {@link Store#getRecord(ModelData)}. To get a list of modified records call @link
+ * {@link Store#getModifiedRecords()}.
+ * 
+ * Code snippet:
+ * 
+ * <pre>
+    Record record = store.getRecord(store.getAt(0));
+    record.set("foo", "bar");
+    List<Record> modified = store.getModifiedRecords();
+    for (Record r : modified) {
+      
+    }
+    store.commitChanges(); 
+ * </pre>
  */
 public class Record {
 
@@ -45,9 +65,10 @@ public class Record {
   private transient Store store;
   private boolean editing;
   private String error;
+  private Map<String, Boolean> validMap;
 
   /**
-   * Creates a new record.
+   * Creates a new record, wrapping a new model data instance.
    * 
    * @param properties the initial values
    */
@@ -63,6 +84,38 @@ public class Record {
   public Record(ModelData wrappedModel) {
     if (wrappedModel == null) throw new RuntimeException("Record cannot wrap a null model");
     this.model = wrappedModel;
+  }
+
+  /**
+   * Returns true if the record is valid.
+   * 
+   * @param property the property name
+   * @return true if the record is valid
+   */
+  public boolean isValid(String property) {
+    if (validMap == null) {
+      return true;
+    }
+    if (validMap.containsKey(property)) {
+      return validMap.get(property);
+    }
+    return true;
+  }
+
+  /**
+   * Sets whether the record is valid (defualts to true). The valid state of a
+   * record is not modified or changed by the record itself. Both EditorGrid and
+   * FieldBinding will set the valid state of the record to match the field's
+   * valid state after an edit completes.
+   * 
+   * @param property the property name
+   * @param valid true if valid, false otherwise
+   */
+  public void setValid(String property, boolean valid) {
+    if (validMap == null) {
+      validMap = new HashMap<String, Boolean>();
+    }
+    validMap.put(property, valid);
   }
 
   /**
@@ -93,6 +146,7 @@ public class Record {
     dirty = false;
     modified = null;
     editing = false;
+    validMap = null;
     if (store != null && !silent) {
       store.afterCommit(this);
     }
@@ -202,6 +256,7 @@ public class Record {
     dirty = false;
     modified = null;
     editing = false;
+    validMap = null;
     if (store != null && !silent) {
       store.afterReject(this);
     }

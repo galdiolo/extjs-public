@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.widget.layout;
 
+import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.util.Margins;
@@ -14,20 +15,28 @@ import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.Layout;
+import com.extjs.gxt.ui.client.widget.ScrollContainer;
 
 /**
- * This layout positions the container's children in a single horiztontal or
+ * This layout positions the container's children in a single horizontal or
  * vertical row. Each component may specify its height and width in pixels or as
  * percentage.
  * 
- * <p/> Each components margin may also be specified using a RowData instance.
- * Only 1 component should specify a margin on adjacent sides.
+ * <p /> Child Widgets are:
+ * <ul>
+ * <li><b>Sized</b> : Yes - but only if you use a RowData, otherwise not sized</li>
+ * <li><b>Positioned</b> : Yes - widgets are placed in a row/column</li>
+ * </ul>
+ * <p>
+ * Each components margin may also be specified using a RowData instance. Only 1
+ * component should specify a margin on adjacent sides.
  * 
  * @see RowData
  */
 public class RowLayout extends Layout {
 
   private Orientation orientation = Orientation.VERTICAL;
+  private boolean adjustForScroll = false;
 
   /**
    * Creates a new vertical row layout.
@@ -44,6 +53,25 @@ public class RowLayout extends Layout {
   public RowLayout(Orientation orientation) {
     this.orientation = orientation;
     monitorResize = true;
+  }
+
+  /**
+   * Returns true if ajust for scroll is enabled.
+   * 
+   * @return the adjust for scroll state
+   */
+  public boolean isAdjustForScroll() {
+    return adjustForScroll;
+  }
+
+  /**
+   * True to ajust the container width calculations to account for the scroll
+   * bar (defaults to false).
+   * 
+   * @param adjustForScroll the adjust for scroll state
+   */
+  public void setAdjustForScroll(boolean adjustForScroll) {
+    this.adjustForScroll = adjustForScroll;
   }
 
   /**
@@ -67,7 +95,7 @@ public class RowLayout extends Layout {
   protected void layoutHorizontal(El target) {
     Size size = target.getStyleSize();
 
-    int w = size.width;
+    int w = size.width - (adjustForScroll ? XDOM.getScrollBarWidth() : 0);
     int h = size.height;
     int pw = w;
 
@@ -142,7 +170,7 @@ public class RowLayout extends Layout {
   protected void layoutVertical(El target) {
     Size size = target.getStyleSize();
 
-    int w = size.width;
+    int w = size.width - (adjustForScroll ? XDOM.getScrollBarWidth() : 0);
     int h = size.height;
     int ph = h;
 
@@ -194,8 +222,14 @@ public class RowLayout extends Layout {
   @Override
   protected void onLayout(Container container, El target) {
     super.onLayout(container, target);
-    target.setStyleAttribute("overflow", "hidden");
     target.makePositionable();
+
+    if (container instanceof ScrollContainer) {
+      ScrollContainer sc = (ScrollContainer) container;
+      sc.setScrollMode(sc.getScrollMode());
+    } else {
+      target.setStyleAttribute("overflow", "hidden");
+    }
 
     if (orientation == Orientation.VERTICAL) {
       layoutVertical(target);

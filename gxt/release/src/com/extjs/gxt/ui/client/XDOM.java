@@ -31,6 +31,7 @@ public final class XDOM {
   public static boolean isVisibleBox;
 
   private static El bodyEl = new El(getBody());
+  private static Element escapeElement = DOM.createDiv();
   private static int scrollBarHeight = Style.DEFAULT;
   private static int autoId = 0;
   private static int zIndexId = 1000;
@@ -52,6 +53,18 @@ public final class XDOM {
     Element firstChild = DOM.getFirstChild(div);
     // support text node creation
     return (firstChild != null) ? firstChild : div;
+  }
+  
+  /**
+   * Escapes HTML string and returns valid text that will be shown rather than
+   * rendered.
+   * 
+   * @param html the HTML
+   * @return the escaped HTML string
+   */
+  public static String escapeHtml(String html) {
+    escapeElement.setInnerHTML(html);
+    return escapeElement.getInnerHTML();
   }
 
   /**

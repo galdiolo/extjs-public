@@ -26,7 +26,7 @@ public class Document extends Component {
 
   @Override
   public void onBrowserEvent(Event event) {
-    // do not unnessecarily create component events
+    // do not unnecessarily create component events
     if (hasListeners) {
       super.onBrowserEvent(event);
     }

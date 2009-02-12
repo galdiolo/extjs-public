@@ -22,9 +22,9 @@ public class StoreSorter<M extends ModelData> {
   /**
    * The default comparator instance.
    */
-  public static DefaultComparator DEFAULT_COMPARATOR = new DefaultComparator();
+  public static DefaultComparator<Object> DEFAULT_COMPARATOR = new DefaultComparator<Object>();
 
-  protected Comparator comparator;
+  protected Comparator<Object> comparator;
 
   /**
    * Creates a new store sorter.
@@ -38,7 +38,7 @@ public class StoreSorter<M extends ModelData> {
    * 
    * @param comparator the comparator
    */
-  public StoreSorter(Comparator<M> comparator) {
+  public StoreSorter(Comparator<Object> comparator) {
     this.comparator = comparator;
   }
 

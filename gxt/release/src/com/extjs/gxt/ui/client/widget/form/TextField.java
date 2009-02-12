@@ -20,9 +20,46 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.impl.TextBoxImpl;
 
 /**
- * Basic text field.
+ * Basic text field. <b>Code snippet</b>:
+ * 
+ * <pre>
+ * TextField&lt;String&gt; text = new TextField&amp;ltString&gt;();
+ *     text.setFieldLabel(&quot;Name&quot;);
+ *     text.setEmptyText(&quot;Enter your full name&quot;);
+ *     text.setAllowBlank(false);
+ *     text.setMinLength(4);
+ * </pre>
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>Field Focus</dd>
+ * <dd>Field Blur</dd>
+ * <dd>Field Change</dd>
+ * <dd>Field Invalid</dd>
+ * <dd>Field Valid</dd>
+ * <dd>Field KeyPress</dd>
+ * <dd>Field SpecialKey</dd>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
  * 
  * @param <D> the data type
+ * @see NumberField
  */
 public class TextField<D> extends Field<D> {
 
@@ -251,7 +288,7 @@ public class TextField<D> extends Field<D> {
   }
 
   /**
-   * Sets whether a field is value when its value length = 0 (default to true).
+   * Sets whether a field is valid when its value length = 0 (default to true).
    * 
    * @param allowBlank true to allow blanks, false otherwise
    */
@@ -266,6 +303,13 @@ public class TextField<D> extends Field<D> {
    */
   public void setCursorPos(int pos) {
     setSelectionRange(pos, 0);
+  }
+
+  @Override
+  public void setEmptyText(String emptyText) {
+    removeEmptyText();
+    super.setEmptyText(emptyText);
+    applyEmptyText();
   }
 
   /**
@@ -344,9 +388,7 @@ public class TextField<D> extends Field<D> {
 
   @Override
   public void setValue(D value) {
-    if (rendered && emptyText != null && !emptyText.equals("")) {
-      getInputEl().removeStyleName(emptyStyle);
-    }
+    removeEmptyText();
     super.setValue(value);
     applyEmptyText();
   }
@@ -355,6 +397,17 @@ public class TextField<D> extends Field<D> {
     if (rendered && !password && emptyText != null && getRawValue().length() < 1) {
       setRawValue(emptyText);
       getInputEl().addStyleName(emptyStyle);
+    }
+  }
+
+  @Override
+  protected void onAttach() {
+    super.onAttach();
+    if (GXT.isIE && (!(this instanceof TriggerField)) && !(this instanceof FileUploadField)) {
+      int y;
+      if (el().getY() != (y = el().getParent().getY())) {
+        el().setY(y);
+      }
     }
   }
 
@@ -373,7 +426,7 @@ public class TextField<D> extends Field<D> {
         setRawValue("");
         select(0, 0);
       }
-      getInputEl().removeStyleName(emptyStyle);
+      removeEmptyText();
     }
     if (selectOnFocus) {
       selectAll();
@@ -399,16 +452,12 @@ public class TextField<D> extends Field<D> {
     if (el() == null) {
       if (password) {
         setElement(DOM.createInputPassword());
-
       } else {
         setElement(DOM.createInputText());
       }
-
       el().insertInto(target, index);
     }
-
     super.onRender(target, index);
-
     if (autoValidate) {
       validationTask = new DelayedTask(new Listener() {
         public void handleEvent(BaseEvent be) {
@@ -416,14 +465,20 @@ public class TextField<D> extends Field<D> {
         }
       });
     }
-
     getInputEl().addStyleName("x-form-text");
-
     applyEmptyText();
   }
 
+  protected void removeEmptyText() {
+    if (rendered) {
+      getInputEl().removeStyleName(emptyStyle);
+      if (getRawValue() == "") {
+        setRawValue("");
+      }
+    }
+  }
+
   @Override
-  @SuppressWarnings("deprecation")
   protected boolean validateValue(String value) {
     boolean result = super.validateValue(value);
     if (!result) {

@@ -215,7 +215,11 @@ public class TreeDropTarget extends DropTarget {
       idx = status == 0 ? idx : idx + 1;
       if (sel.get(0) instanceof ModelData) {
         ModelData p = item.getParentItem().getModel();
-        binder.getTreeStore().insert(p, (List) sel, idx, true);
+        if (p == null) {
+          binder.getTreeStore().insert((List) sel, idx, true);
+        } else {
+          binder.getTreeStore().insert(p, (List) sel, idx, true);
+        }
       } else {
         for (int i = 0; i < sel.size(); i++) {
           TreeItem ti = (TreeItem) sel.get(i);

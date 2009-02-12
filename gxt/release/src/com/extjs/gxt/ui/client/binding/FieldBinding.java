@@ -159,30 +159,39 @@ public class FieldBinding {
    * Updates the field's value with the model value.
    */
   public void updateField() {
-    Object val = model.get(property);
-    if (convertor != null) {
-      val = convertor.convertModelValue(val);
-    }
+    Object val = onConvertModelValue(model.get(property));
     field.setValue(val);
   }
-
+  
   /**
    * Updates the model's value with the field value.
    */
   public void updateModel() {
-    Object val = field.getValue();
-    if (convertor != null) {
-      val = convertor.convertFieldValue(val);
-    }
+    Object val = onConvertFieldValue(field.getValue());
     if (store != null) {
       Record r = store.getRecord(model);
       if (r != null) {
+        r.setValid(property, field.isValid());
         r.set(property, val);
       }
     } else {
       model.set(property, val);
     }
 
+  }
+  
+  protected Object onConvertFieldValue(Object value) {
+    if (convertor != null) {
+      return convertor.convertFieldValue(value);
+    }
+    return value;
+  }
+
+  protected Object onConvertModelValue(Object value) {
+    if (convertor != null) {
+      return convertor.convertModelValue(value);
+    }
+    return value;
   }
 
   protected void onFieldChange(FieldEvent e) {

@@ -47,11 +47,14 @@ import com.google.gwt.user.client.ui.Widget;
  * layout should subclass Component (or {@link BoxComponent} if managed box
  * model handling is required).
  * 
- * <p>
+ * <p />
  * The following 4 methods inherited from UIObject (setSize, setWidth,
  * setHeight, setPixelSize) have been overridden and do nothing. Any component
  * whose size can change should subclass {@link BoxComponent}.
- * </p>
+ * 
+ * <p />
+ * All components are registered and unregistred with the @link
+ * {@link ComponentManager} when the are attached and detached.
  * 
  * <dl>
  * <dt>Events:</dt>
@@ -158,7 +161,7 @@ import com.google.gwt.user.client.ui.Widget;
  * </ul>
  * </dd>
  * 
- * <dd><b>StateRestore</b> : ComponentEvent(component, state)<br>
+ * <dd><b>BeforeStateSave</b> : ComponentEvent(component, state)<br>
  * <div>Fires before the state of the component is saved to the configured state
  * provider.</div>
  * <ul>
@@ -177,6 +180,8 @@ import com.google.gwt.user.client.ui.Widget;
  * </dd>
  * 
  * </dl>
+ * 
+ * @see ComponentManager
  */
 public abstract class Component extends Widget implements Observable {
 
@@ -334,6 +339,16 @@ public abstract class Component extends Widget implements Observable {
   }
 
   /**
+   * Clears the component's state.
+   */
+  public void clearState() {
+    if (state != null) {
+      state.clear();
+      saveState();
+    }
+  }
+
+  /**
    * Disable this component. Fires the <i>Disable</i> event.
    */
   public void disable() {
@@ -371,6 +386,7 @@ public abstract class Component extends Widget implements Observable {
    * @return the el instance
    */
   public El el() {
+    assertAfterRender();
     return el;
   }
 
@@ -391,7 +407,7 @@ public abstract class Component extends Widget implements Observable {
    * @param enable the enable state
    */
   public void enableEvents(boolean enable) {
-    disabled = !enable;
+    disableEvents = !enable;
   }
 
   /**
@@ -422,15 +438,6 @@ public abstract class Component extends Widget implements Observable {
   public boolean fireEvent(int type, ComponentEvent ce) {
     if (disableEvents) return true;
     return observable.fireEvent(type, previewEvent(type, ce));
-  }
-
-  /**
-   * Returns true if events are disabled.
-   * 
-   * @return true if events disabled
-   */
-  public boolean isDisabledEvents() {
-    return disableEvents;
   }
 
   /**
@@ -589,6 +596,15 @@ public abstract class Component extends Widget implements Observable {
   }
 
   /**
+   * Returns true if events are disabled.
+   * 
+   * @return true if events disabled
+   */
+  public boolean isDisabledEvents() {
+    return disableEvents;
+  }
+
+  /**
    * Returns <code>true</code> if the component is enabled.
    * 
    * @return the enabled state
@@ -610,7 +626,11 @@ public abstract class Component extends Widget implements Observable {
    * Returns <code>true</code> if the component is visible.
    */
   public boolean isVisible() {
-    return rendered && el.isVisible();
+    if(getParent() != null) {
+      return rendered && el.isVisible() && getParent().isVisible();
+    } else {
+      return rendered && el.isVisible();
+    }
   }
 
   /**
@@ -793,7 +813,8 @@ public abstract class Component extends Widget implements Observable {
     }
 
     if (el == null)
-      throw new RuntimeException(getClass().getName() + " must call setElement in onRender");
+      throw new RuntimeException(getClass().getName()
+          + " must call setElement in onRender");
 
     if (events != 0) {
       el().addEventsSunk(events);
@@ -1144,11 +1165,16 @@ public abstract class Component extends Widget implements Observable {
   protected void assertPreRender() {
     assert !afterRender : "Method must be called before the component is rendered";
   }
+  
+  protected void assertAfterRender() {
+    assert rendered : "Method must be called after the component is rendered";
+  }
 
   /**
    * Called before the component has been rendered.
    * 
-   * <p/> This method can be used to lazily alter this component pre-render
+   * <p/>
+   * This method can be used to lazily alter this component pre-render
    */
   protected void beforeRender() {
   }
@@ -1236,6 +1262,7 @@ public abstract class Component extends Widget implements Observable {
       el.disableContextMenu(disableContextMenu == 1);
     }
     super.onAttach();
+
   }
 
   @Override
@@ -1251,6 +1278,7 @@ public abstract class Component extends Widget implements Observable {
       el.disableContextMenu(false);
     }
     fireEvent(Events.Detach);
+    ComponentManager.get().unregister(this);
   }
 
   protected void onDisable() {
@@ -1279,6 +1307,7 @@ public abstract class Component extends Widget implements Observable {
   protected void onLoad() {
     super.onLoad();
     fireEvent(Events.Attach);
+    ComponentManager.get().register(this);
   }
 
   /**
@@ -1312,7 +1341,7 @@ public abstract class Component extends Widget implements Observable {
   }
 
   protected void onShowContextMenu(int x, int y) {
-    contextMenu.showAt(x + 5, y + 5);
+    contextMenu.showAt(x, y);
     if (contextMenu.isVisible()) {
       contextMenu.addListener(Events.Hide, new Listener<ComponentEvent>() {
         public void handleEvent(ComponentEvent ce) {
@@ -1342,9 +1371,7 @@ public abstract class Component extends Widget implements Observable {
   protected void setContextMenu(Menu menu) {
     contextMenu = menu;
     disableContextMenu(true);
-    if (isAttached()) {
-      el.disableContextMenu(true);
-    }
+    sinkEvents(GXT.isSafari && GXT.isMac ? Event.ONMOUSEDOWN : Event.ONMOUSEUP);
   }
 
   protected void setEl(El el) {
@@ -1369,15 +1396,15 @@ public abstract class Component extends Widget implements Observable {
   }
 
   private native Element createHiddenInput() /*-{
-    var input = $doc.createElement('input');
-    input.type = 'text';
-    input.className = '_focus';
-    input.style.opacity = 0;
-    input.style.zIndex = -1;
-    input.style.height = '1px';
-    input.style.width = '1px';
-    input.style.overflow = 'hidden';
-    input.style.position = 'absolute';
-    return input;
-    }-*/;
+        var input = $doc.createElement('input');
+        input.type = 'text';
+        input.className = '_focus';
+        input.style.opacity = 0;
+        input.style.zIndex = -1;
+        input.style.height = '1px';
+        input.style.width = '1px';
+        input.style.overflow = 'hidden';
+        input.style.position = 'absolute';
+        return input;
+        }-*/;
 }

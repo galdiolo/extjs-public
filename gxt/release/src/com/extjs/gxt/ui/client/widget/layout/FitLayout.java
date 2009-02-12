@@ -17,22 +17,32 @@ import com.extjs.gxt.ui.client.widget.Layout;
  * This is a base class for layouts that contain a single item that
  * automatically expands to fill the layout's container.
  * 
+ * <p /> Child Widgets are:
+ * <ul>
+ * <li><b>Sized</b> : Yes - expands to fill parent container</li>
+ * <li><b>Positioned</b> : No</li>
+ * </ul>
+ * 
  * <p /> In the following code, the child panel will be sized to 400 by 400 when
  * the parent container is sized:
  * 
- * <pre><code>
- * LayoutContainer container = new LayoutContainer();
- * container.setLayout(new FitLayout());
+ * <code><pre>
+   LayoutContainer container = new LayoutContainer();
+   container.setLayout(new FitLayout());
+  
+   ContentPanel panel = new ContentPanel();
+   container.add(panel);
+  
+   container.setSize(400, 400);
+ * </pre></code>
  * 
- * ContentPanel panel = new ContentPanel();
- * container.add(panel);
- * 
- * container.setSize(400, 400);
- * 
- * </code></pre>
+ * @see FitData
  */
 public class FitLayout extends Layout {
 
+  /**
+   * Creates a new fit layout instance.
+   */
   public FitLayout() {
     monitorResize = true;
   }

@@ -32,14 +32,29 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 
 /**
- * A mechanism for displaying data using custom layout templates. ListView uses
- * an {@link XTemplate} as its internal templating mechanism.
- * <p>
- * <b>In order to use these features, an {@link #setItemSelector(String)} must
- * be provided for the ListView to determine what nodes it will be working
- * with.</b>
- * </p>
+ * A mechanism for displaying data using custom layout templates and a
+ * store/model. ListView uses an {@link XTemplate} as its internal templating
+ * mechanism.
  * 
+ * <p/>
+ * Code snippet:
+ * 
+ * <pre>
+ * ListStore&lt;CarModel&gt; store = new ListStore&lt;CarModel&gt;();
+ * store.add(new CarModel(&quot;SAAB&quot;, &quot;9000&quot;, 1994));
+ * store.add(new CarModel(&quot;BMW&quot;, &quot;318i&quot;, 1999));
+ * store.add(new CarModel(&quot;VW&quot;, &quot;GOLF&quot;, 2001));
+ * store.add(new CarModel(&quot;Peugeot&quot;, &quot;307&quot;, 2002));
+ * ListView&lt;CarModel&gt; lv = new ListView&lt;CarModel&gt;();
+ * lv.setStore(store);
+ * lv.setSimpleTemplate(&quot;&lt;b&gt;{car_make}&lt;/b&gt; {car_model} &lt;i&gt;({car_year})&lt;/i&gt;&quot;);
+ * lv.setPosition(10, 10);
+ * lv.setSize(160, 60);
+ * RootPanel.get().add(lv);
+ * </pre>
+ * 
+ * 
+ * <dl>
  * <dt><b>Events:</b></dt>
  * 
  * <dd><b>Select</b> : ListViewEvent(listView, event)<br>
@@ -56,7 +71,7 @@ import com.google.gwt.user.client.Event;
  * <ul>
  * <li>listView : this</li>
  * <li>index : the index of the target node</li>
- * <li>element : the target nodet</li>
+ * <li>element : the target node</li>
  * <li>event : the dom event</li>
  * </ul>
  * </dd>
@@ -70,8 +85,28 @@ import com.google.gwt.user.client.Event;
  * <li>event : the dom event</li>
  * </ul>
  * </dd>
+ * </dl>
  * 
- * </dt>
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
  */
 public class ListView<M extends ModelData> extends BoxComponent {
 
@@ -191,6 +226,11 @@ public class ListView<M extends ModelData> extends BoxComponent {
     return itemSelector;
   }
 
+  /**
+   * Returns the view's loading text.
+   * 
+   * @return the loading text
+   */
   public String getLoadingText() {
     return loadingText;
   }
@@ -241,7 +281,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
   }
 
   /**
-   * Returns the combo's stote.
+   * Returns the combo's store.
    * 
    * @return the store
    */
@@ -259,7 +299,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
   }
 
   /**
-   * Reuturns the index of the element.
+   * Returns the index of the element.
    * 
    * @param element the element
    * @return the index
@@ -326,8 +366,17 @@ public class ListView<M extends ModelData> extends BoxComponent {
         onMouseOut(le);
         break;
       case Event.ONMOUSEDOWN:
-        onMouseDown(ce);
+        onMouseDown(le);
         break;
+      case Event.ONDBLCLICK:
+        if (le.index != -1) {
+          onDoubleClick(le);
+        }
+        break;
+      case Event.ONCLICK:
+        if (le.index != -1) {
+          onClick(le);
+        }
     }
   }
 
@@ -373,7 +422,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
 
   /**
    * This is a required setting. A simple CSS selector (e.g. div.some-class or
-   * span:first-child) that will be used to determine what nodes this DataView
+   * span:first-child) that will be used to determine what nodes this ListView
    * will be working with (defaults to 'x-view-item').
    * 
    * @param itemSelector the item selector
@@ -448,9 +497,11 @@ public class ListView<M extends ModelData> extends BoxComponent {
   /**
    * Sets the template fragment to be used for the text of each listview item.
    * 
-   * <pre><code>
-   * listview.setSimpleTemplate("{abbr} {name}");
-   * </code></pre>
+   * <pre>
+   * &lt;code&gt;
+   * listview.setSimpleTemplate(&quot;{abbr} {name}&quot;);
+   * &lt;/code&gt;
+   * </pre>
    * 
    * @param html the html used only for the text of each item in the list
    */
@@ -595,10 +646,17 @@ public class ListView<M extends ModelData> extends BoxComponent {
     }
   }
 
-  protected void onMouseDown(ComponentEvent be) {
-    El el = be.getTarget(itemSelector, 10);
-    if (el != null) {
-      fireEvent(Events.Select, be);
+  protected void onClick(ListViewEvent e) {
+
+  }
+
+  protected void onDoubleClick(ListViewEvent e) {
+    fireEvent(Events.DoubleClick, e);
+  }
+
+  protected void onMouseDown(ListViewEvent e) {
+    if (e.index != -1) {
+      fireEvent(Events.Select, e);
     }
   }
 
@@ -653,8 +711,8 @@ public class ListView<M extends ModelData> extends BoxComponent {
     }
 
     if (template == null) {
-      template = XTemplate.create("<tpl for=\".\"><div class='x-view-item'>{" + displayProperty
-          + "}</div></tpl>");
+      template = XTemplate.create("<tpl for=\".\"><div class='x-view-item'>{"
+          + displayProperty + "}</div></tpl>");
     }
 
     if (store != null && store.getCount() > 0) {
@@ -684,6 +742,8 @@ public class ListView<M extends ModelData> extends BoxComponent {
     List list = Util.createList(model);
     Element node = bufferRender(list)[0];
     all.replaceElement(original, node);
+    el().insertChild(node, index);
+    el().removeChild(original);
   }
 
   protected M prepareData(M model) {
@@ -695,8 +755,8 @@ public class ListView<M extends ModelData> extends BoxComponent {
 
   private Element[] bufferRender(List<M> models) {
     Element div = DOM.createDiv();
-    template.overwrite(div,
-        Util.getJsObjects(collectData((List) models, 0), template.getMaxDepth()));
+    template.overwrite(div, Util.getJsObjects(collectData((List) models, 0),
+        template.getMaxDepth()));
     return DomQuery.select(itemSelector, div);
   }
 

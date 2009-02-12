@@ -11,6 +11,7 @@ import java.util.Date;
 
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
@@ -27,6 +28,18 @@ import com.google.gwt.user.client.Element;
 /**
  * Provides a date input field with a {@link DatePicker} dropdown and automatic
  * date validation.
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>Field Focus</dd>
+ * <dd>Field Blur</dd>
+ * <dd>Field Change</dd>
+ * <dd>Field Invalid</dd>
+ * <dd>Field Valid</dd>
+ * <dd>Field KeyPress</dd>
+ * <dd>Field SpecialKey</dd>
+ * <dd>TriggerField TriggerClick</dd>
+ * </dl>
  */
 public class DateField extends TriggerField<Date> {
 
@@ -106,6 +119,7 @@ public class DateField extends TriggerField<Date> {
   private DateMenu menu;
   private BaseEventPreview focusPreview;
   private boolean formatValue;
+  private boolean editable = true;
 
   /**
    * Creates a new date field.
@@ -165,10 +179,19 @@ public class DateField extends TriggerField<Date> {
   public Date getMinValue() {
     return minValue;
   }
-
+  
   @Override
   public DateTimePropertyEditor getPropertyEditor() {
     return (DateTimePropertyEditor) propertyEditor;
+  }
+
+  /**
+   * Returns true if the combo is editable.
+   * 
+   * @return true if editable
+   */
+  public boolean isEditable() {
+    return editable;
   }
 
   /**
@@ -178,6 +201,30 @@ public class DateField extends TriggerField<Date> {
    */
   public boolean isFormatValue() {
     return formatValue;
+  }
+
+  /**
+   * Allow or prevent the user from directly editing the field text. If false is
+   * passed, the user will only be able to select from the items defined in the
+   * dropdown list.
+   * 
+   * @param value true to allow the user to directly edit the field text
+   */
+  public void setEditable(boolean value) {
+    if (value == this.editable) {
+      return;
+    }
+    this.editable = value;
+    if (rendered) {
+      El fromEl = getInputEl();
+      if (!value) {
+        fromEl.dom.setPropertyBoolean("readOnly", true);
+        fromEl.addStyleName("x-combo-noedit");
+      } else {
+        fromEl.dom.setPropertyBoolean("readOnly", false);
+        fromEl.removeStyleName("x-combo-noedit");
+      }
+    }
   }
 
   /**
@@ -214,7 +261,7 @@ public class DateField extends TriggerField<Date> {
     }
     this.minValue = minValue;
   }
-
+  
   @Override
   public void setRawValue(String value) {
     super.setRawValue(value);
@@ -252,6 +299,15 @@ public class DateField extends TriggerField<Date> {
     doBlur(ce);
   }
 
+  @Override
+  protected void onClick(ComponentEvent ce) {
+    if (!editable && ce.getTarget() == getInputEl().dom) {
+      onTriggerClick(ce);
+      return;
+    }
+    super.onClick(ce);
+  }
+
   protected void onDown(FieldEvent fe) {
     fe.cancelBubble();
     if (menu == null || !menu.isAttached()) {
@@ -280,6 +336,12 @@ public class DateField extends TriggerField<Date> {
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
     focusPreview = new BaseEventPreview();
+    
+    if (!this.editable) {
+      this.editable = true;
+      this.setEditable(false);
+    }
+
 
     new KeyNav<FieldEvent>(this) {
       public void onDown(FieldEvent fe) {
@@ -301,7 +363,6 @@ public class DateField extends TriggerField<Date> {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   protected boolean validateValue(String value) {
     if (!super.validateValue(value)) {
       return false;

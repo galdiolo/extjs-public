@@ -39,7 +39,7 @@ public abstract class StoreFilterField<M extends ModelData> extends TriggerField
     setTriggerStyle("x-form-clear-trigger");
     setWidth(150);
     filter = new StoreFilter<M>() {
-      public boolean select(Store store, M parent, M model, String property) {
+      public boolean select(Store<M> store, M parent, M model, String property) {
         String v = getRawValue();
         return doSelect(store, parent, model, property, v);
       }
@@ -51,7 +51,7 @@ public abstract class StoreFilterField<M extends ModelData> extends TriggerField
    * 
    * @param store the store to add
    */
-  public void bind(Store store) {
+  public void bind(Store<M> store) {
     store.addFilter(filter);
     stores.add(store);
   }

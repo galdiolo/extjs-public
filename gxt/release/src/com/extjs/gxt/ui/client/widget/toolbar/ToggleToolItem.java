@@ -20,10 +20,10 @@ import com.google.gwt.user.client.Element;
  * <dl>
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>Toggle</b> : ToolBarEvent(toolBar, item, event)<br>
+ * <dd><b>Toggle</b> : ToolBarEvent(container, item, event)<br>
  * <div>Fires when the "pressed" state changes.</div>
  * <ul>
- * <li>toolBar : the parent tolbar</li>
+ * <li>container : the parent toolbar</li>
  * <li>item : this</li>
  * <li>event : the dom event</li>
  * </ul>
@@ -31,11 +31,6 @@ import com.google.gwt.user.client.Element;
  * </dl>
  */
 public class ToggleToolItem extends TextToolItem {
-
-  /**
-   * True to start pressed.
-   */
-  public boolean pressed;
 
   /**
    * The wrapped toggle button.
@@ -91,7 +86,6 @@ public class ToggleToolItem extends TextToolItem {
 
   @Override
   protected void onRender(Element target, int index) {
-    toggleButton.toggle(pressed);
     toggleButton.addListener(Events.Toggle, new Listener<ButtonEvent>() {
       public void handleEvent(ButtonEvent be) {
         onButtonToggle(be);

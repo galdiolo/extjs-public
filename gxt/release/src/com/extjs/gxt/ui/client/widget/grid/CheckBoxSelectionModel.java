@@ -45,6 +45,7 @@ public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionMo
     config.setRenderer(new GridCellRenderer() {
       public String render(ModelData model, String property, ColumnData config, int rowIndex,
           int colIndex, ListStore store) {
+        config.cellAttr = "rowspan='2'";
         return "<div class='x-grid3-row-checker'>&#160;</div>";
       }
     });

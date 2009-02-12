@@ -24,18 +24,8 @@ public class DefaultComparator<X extends Object> implements Comparator<X> {
       } else {
         return (o1 == null) ? -1 : 1;
       }
-    } else if (o1 instanceof Date) {
-      return compareDates((Date) o1, (Date) o2);
-    } else if (o1 instanceof Float) {
-      return ((Float) o1).compareTo(((Float) o2));
-    } else if (o1 instanceof Double) {
-      return ((Double) o1).compareTo(((Double) o2));
-    } else if (o1 instanceof Short) {
-      return ((Short) o1).compareTo(((Short) o2));
-    } else if (o1 instanceof Integer) {
-      return ((Integer) o1).compareTo(((Integer) o2));
-    } else if (o1 instanceof Long) {
-      return ((Long) o1).compareTo(((Long) o2));
+    } else if (o1 instanceof Comparable<?> && o2 instanceof Comparable<?>) {
+      return ((Comparable) o1).compareTo(o2);
     } else {
       return compareStrings(o1.toString(), o2.toString());
     }

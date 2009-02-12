@@ -15,8 +15,8 @@ import com.extjs.gxt.ui.client.core.XTemplate;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
-import com.extjs.gxt.ui.client.event.SelectionEvent;
 import com.extjs.gxt.ui.client.event.SelectionProvider;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
@@ -27,6 +27,34 @@ import com.google.gwt.user.client.Event;
 
 /**
  * A multi-select list field.
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>Field Focus</dd>
+ * <dd>Field Blur</dd>
+ * <dd>Field Change</dd>
+ * <dd>Field Invalid</dd>
+ * <dd>Field Valid</dd>
+ * <dd>Field KeyPress</dd>
+ * <dd>Field SpecialKey</dd>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
  * 
  * @param <D> the model type
  */
@@ -51,6 +79,18 @@ public class ListField<D extends ModelData> extends Field<D> implements Selectio
 
   public void addSelectionChangedListener(SelectionChangedListener listener) {
     addListener(Events.SelectionChange, listener);
+  }
+
+  @Override
+  public void disable() {
+    super.disable();
+    listView.disable();
+  }
+
+  @Override
+  public void enable() {
+    super.enable();
+    listView.enable();
   }
 
   /**
@@ -214,7 +254,7 @@ public class ListField<D extends ModelData> extends Field<D> implements Selectio
 
   @Override
   protected El getInputEl() {
-    return el();
+    return input;
   }
 
   @Override
@@ -258,9 +298,9 @@ public class ListField<D extends ModelData> extends Field<D> implements Selectio
     listView.setOverStyle("x-combo-over");
 
     listView.getSelectionModel().addListener(Events.SelectionChange,
-        new Listener<SelectionEvent>() {
-          public void handleEvent(SelectionEvent se) {
-            onSelectionChange(se.selection);
+        new Listener<SelectionChangedEvent>() {
+          public void handleEvent(SelectionChangedEvent se) {
+            onSelectionChange(se.getSelection());
           }
         });
 
@@ -274,6 +314,8 @@ public class ListField<D extends ModelData> extends Field<D> implements Selectio
     disableTextSelection(true);
     DOM.sinkEvents(input.dom, Event.FOCUSEVENTS);
     sinkEvents(Event.ONCLICK);
+    
+    super.onRender(parent, index);
   }
 
   @Override

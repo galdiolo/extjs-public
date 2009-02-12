@@ -303,8 +303,10 @@ public class BeanModelGenerator extends Generator {
       }
 
       sw.println("if (s.equals(\"" + p + "\")) {");
+      sw.println("Object old = get(s);");
       sw.println("((" + typeName + ")bean)." + s + "((" + type + ")obj);");
-      sw.println("return val;");
+      sw.println("notifyPropertyChanged(s, val, old);");
+      sw.println("return (X)old;");
       sw.println("}");
     }
     sw.println("return super.set(s, val);");

@@ -90,7 +90,6 @@ public class RadioGroup extends MultiField<Radio> {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public boolean isValid() {
     if (selectionRequired) {
       boolean sel = false;

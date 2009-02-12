@@ -28,7 +28,7 @@ import java.util.Map;
  * private List<NumberTag> numbers;
  * </code></pre>
  */
-public class BeanModel extends BaseModelData {
+public class BeanModel extends BaseModel {
 
   protected Object bean;
   protected Map<String, BeanModel> nestedModels = new HashMap<String, BeanModel>();

@@ -62,6 +62,7 @@ import com.google.gwt.user.client.Event;
  * <ul>
  * <li>grid : this</li>
  * <li>rowIndex : the row index</li>
+ * <li>cellIndex : cell index</li>
  * <li>index : the cell index</li>
  * <li>event : the dom event</li>
  * </ul>
@@ -142,7 +143,6 @@ import com.google.gwt.user.client.Event;
  * <li>scrollTop : scrollTop</li>
  * </ul>
  * </dd>
- * </dl>
  * 
  * <dd><b>ColumnResize</b> : GridEvent(grid, colIndex, width)<br>
  * <div>Fires when the user resizes a column.</div>
@@ -168,7 +168,29 @@ import com.google.gwt.user.client.Event;
  * <li>grid : this</li>
  * <li>sortInfo : the sort field and direction</li>
  * </ul>
- * </dd> </dl>
+ * </dd>
+ * </dl>
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
  * 
  * @param <M> the model type
  */
@@ -592,7 +614,8 @@ public class Grid<M extends ModelData> extends BoxComponent {
     }
   }
 
-  protected Cell walkCells(int row, int col, int step, Callback callback, boolean acceptNavs) {
+  protected Cell walkCells(int row, int col, int step, Callback callback,
+      boolean acceptNavs) {
     boolean first = true;
     int clen = cm.getColumnCount();
     int rlen = store.getCount();

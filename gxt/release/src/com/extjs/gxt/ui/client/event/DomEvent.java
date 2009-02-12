@@ -130,7 +130,7 @@ public class DomEvent extends BaseEvent {
    * Returns the matching parent using the specified selector.
    * 
    * @param selector the CSS selector
-   * @param maxDepth the maxiumum number of parents to search
+   * @param maxDepth the maximum number of parents to search
    * @return the matching element or null
    */
   public El getTarget(String selector, int maxDepth) {
@@ -155,7 +155,7 @@ public class DomEvent extends BaseEvent {
   /**
    * Returns the mouse location.
    * 
-   * @return the mouse locaiton
+   * @return the mouse location
    */
   public Point getXY() {
     if (event != null) {

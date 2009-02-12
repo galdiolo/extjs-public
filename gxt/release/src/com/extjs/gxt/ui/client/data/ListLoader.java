@@ -10,7 +10,7 @@ package com.extjs.gxt.ui.client.data;
 import com.extjs.gxt.ui.client.Style.SortDir;
 
 /**
- * Inteface for list based loaders.
+ * Interface for list based loaders.
  * 
  * @param <C> the list load config type
  */

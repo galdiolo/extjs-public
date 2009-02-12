@@ -101,7 +101,7 @@ public class CheckMenuItem extends MenuItem {
    * Set the checked state of this item.
    * 
    * @param state the new checked state
-   * @param supressEvent true to prevent the checkchange event from firing
+   * @param supressEvent true to prevent the CheckChange event from firing
    */
   public void setChecked(boolean state, boolean supressEvent) {
     if (!rendered) {

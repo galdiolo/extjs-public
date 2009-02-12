@@ -24,6 +24,8 @@ import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.button.IconButton;
 import com.extjs.gxt.ui.client.widget.layout.TableData;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 
 /**
@@ -33,6 +35,127 @@ import com.google.gwt.user.client.Element;
  * @param <D> the model type
  */
 public class DualListField<D extends ModelData> extends MultiField<Field> {
+
+  /**
+   * The dual list field messages.
+   */
+  public class DualListFieldMessages extends FieldMessages {
+
+    private String moveUp;
+    private String moveDown;
+    private String addAll;
+    private String addSelected;
+    private String removeSelected;
+    private String removeAll;
+
+    /**
+     * Returns the add all tooltip.
+     * 
+     * @return the add all tooltip
+     */
+    public String getAddAll() {
+      return addAll;
+    }
+
+    /**
+     * Returns the add selected tooltip.
+     * 
+     * @return the add selected tooltip
+     */
+    public String getAddSelected() {
+      return addSelected;
+    }
+
+    /**
+     * Returns the move down tooltip.
+     * 
+     * @return the move down tooltip
+     */
+    public String getMoveDown() {
+      return moveDown;
+    }
+
+    /**
+     * Sets the move up tooltip.
+     * 
+     * @return the move up tooltip
+     */
+    public String getMoveUp() {
+      return moveUp;
+    }
+
+    /**
+     * Returns the remove all tooltip.
+     * 
+     * @return the remove all tooltip
+     */
+    public String getRemoveAll() {
+      return removeAll;
+    }
+
+    /**
+     * Returns the remove selected tooltip.
+     * 
+     * @return the remove selected tooltip
+     */
+    public String getRemoveSelected() {
+      return removeSelected;
+    }
+
+    /**
+     * Sets the add all tooltip (defaults to 'Add all').
+     * 
+     * @param addAll the add all tooltip
+     */
+    public void setAddAll(String addAll) {
+      this.addAll = addAll;
+    }
+
+    /**
+     * Sets the add selected tooltip (defaults to 'Add selected').
+     * 
+     * @param addSelected the add selected tooltip
+     */
+    public void setAddSelected(String addSelected) {
+      this.addSelected = addSelected;
+    }
+
+    /**
+     * Sets the move selected down tooltip (defaults to 'Move selected down').
+     * 
+     * @param moveDown the move down tootip
+     */
+    public void setMoveDown(String moveDown) {
+      this.moveDown = moveDown;
+    }
+
+    /**
+     * Sets the move selected up tooltip (defaults to 'Move selected up').
+     * @param moveUp
+     */
+    public void setMoveUp(String moveUp) {
+      this.moveUp = moveUp;
+    }
+
+    /**
+     * Sets the remove all tooltip (defaults to 'Remove all').
+     * 
+     * @param removeAll the remove all tooltip
+     */
+    public void setRemoveAll(String removeAll) {
+      this.removeAll = removeAll;
+    }
+
+    /**
+     * Sets the remove selected tooltip (defaults to 'Remove selected').
+     * 
+     * @param removeSelected the remove selected tooltip
+     */
+    public void setRemoveSelected(String removeSelected) {
+      this.removeSelected = removeSelected;
+    }
+
+  }
 
   public enum Mode {
     APPEND, INSERT;
@@ -50,6 +173,8 @@ public class DualListField<D extends ModelData> extends MultiField<Field> {
   public DualListField() {
     fromField = new ListField<D>();
     toField = new ListField<D>();
+    
+    messages = new DualListFieldMessages();
 
     buttonBar = new VerticalPanel();
     buttonBar.setStyleAttribute("margin", "7px");
@@ -74,6 +199,16 @@ public class DualListField<D extends ModelData> extends MultiField<Field> {
     return fromField;
   }
 
+  @Override
+  public DualListFieldMessages getMessages() {
+    return (DualListFieldMessages)messages;
+  }
+
+  /**
+   * Returns the list field's mode.
+   * 
+   * @return the mode
+   */
   public Mode getMode() {
     return mode;
   }
@@ -90,15 +225,15 @@ public class DualListField<D extends ModelData> extends MultiField<Field> {
   /**
    * Returns true if drag and drop is enabled.
    * 
-   * @return true of drag and rop
+   * @return true if drag and drop is enabled
    */
   public boolean isEnableDND() {
     return enableDND;
   }
 
   /**
-   * Sets the drag and drop grup name. A group name will be generated if none is
-   * specified.
+   * Sets the drag and drop group name. A group name will be generated if none
+   * is specified.
    * 
    * @param group the group name
    */
@@ -128,18 +263,53 @@ public class DualListField<D extends ModelData> extends MultiField<Field> {
 
   protected void initButtons() {
     if (mode == Mode.INSERT) {
-      IconButton top = new IconButton("arrow-top");
+      String tip = "";
+      if (getMessages().getMoveUp() == null) {
+        tip = GXT.MESSAGES.listField_moveSelectedUp();
+      } else {
+        tip = getMessages().getMoveUp();
+      }
+      
       IconButton up = new IconButton("arrow-up");
+      up.setHeight(18);
+      up.setToolTip(tip);
       up.addListener(Events.Select, new Listener<ComponentEvent>() {
         public void handleEvent(ComponentEvent be) {
           toField.getListView().moveSelectedUp();
         }
       });
-      buttonBar.add(top);
       buttonBar.add(up);
+    }
+    
+    String tip = "";
+    if (getMessages().getAddAll() == null) {
+      tip = GXT.MESSAGES.listField_addAll();
+    } else {
+      tip = getMessages().getAddAll();
+    }
+
+    IconButton allRight = new IconButton("arrow-double-right");
+    allRight.setHeight(18);
+    allRight.setToolTip(tip);
+    allRight.addListener(Events.Select, new Listener<ComponentEvent>() {
+      public void handleEvent(ComponentEvent be) {
+        List sel = fromField.getStore().getModels();
+        toField.getStore().add(sel);
+        fromField.getStore().removeAll();
+      }
+    });
+    buttonBar.add(allRight);
+    
+    tip = "";
+    if (getMessages().getAddSelected() == null) {
+      tip = GXT.MESSAGES.listField_addSelected();
+    } else {
+      tip = getMessages().getAddSelected();
     }
 
     IconButton right = new IconButton("arrow-right");
+    right.setHeight(18);
+    right.setToolTip(tip);
     right.addListener(Events.Select, new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent be) {
         List<D> sel = fromField.getSelection();
@@ -147,10 +317,20 @@ public class DualListField<D extends ModelData> extends MultiField<Field> {
           fromField.getStore().remove(model);
         }
         toField.getStore().add(sel);
+        select(toField, sel);
       }
     });
+    
+    tip = "";
+    if (getMessages().getRemoveSelected() == null) {
+      tip = GXT.MESSAGES.listField_removeSelected();
+    } else {
+      tip = getMessages().getRemoveSelected();
+    }
 
     IconButton left = new IconButton("arrow-left");
+    left.setHeight(18);
+    left.setToolTip(tip);
     left.addListener(Events.Select, new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent be) {
         List<D> sel = toField.getSelection();
@@ -158,22 +338,49 @@ public class DualListField<D extends ModelData> extends MultiField<Field> {
           toField.getStore().remove(model);
         }
         fromField.getStore().add(sel);
+        select(fromField, sel);
       }
     });
 
     buttonBar.add(right);
     buttonBar.add(left);
+    
+    tip = "";
+    if (getMessages().getRemoveAll() == null) {
+      tip = GXT.MESSAGES.listField_removeAll();
+    } else {
+      tip = getMessages().getRemoveAll();
+    }
+
+    IconButton allLeft = new IconButton("arrow-double-left");
+    allLeft.setHeight(18);
+    allLeft.setToolTip(tip);
+    allLeft.addListener(Events.Select, new Listener<ComponentEvent>() {
+      public void handleEvent(ComponentEvent be) {
+        List sel = toField.getStore().getModels();
+        fromField.getStore().add(sel);
+        toField.getStore().removeAll();
+      }
+    });
+    buttonBar.add(allLeft);
 
     if (mode == Mode.INSERT) {
+      tip = "";
+      if (getMessages().getMoveDown() == null) {
+        tip = GXT.MESSAGES.listField_moveSelectedDown();
+      } else {
+        tip = getMessages().getMoveDown();
+      }
+      
       IconButton down = new IconButton("arrow-down");
+      down.setHeight(18);
+      down.setToolTip(tip);
       down.addListener(Events.Select, new Listener<ComponentEvent>() {
         public void handleEvent(ComponentEvent be) {
           toField.getListView().moveSelectedDown();
         }
       });
-      IconButton bottom = new IconButton("arrow-bottom");
       buttonBar.add(down);
-      buttonBar.add(bottom);
     }
   }
 
@@ -189,11 +396,13 @@ public class DualListField<D extends ModelData> extends MultiField<Field> {
     source2.setGroup(dndGroup);
 
     ListViewDropTarget target1 = new ListViewDropTarget(fromField.getListView());
+    target1.setAutoSelect(true);
     ListViewDropTarget target2 = new ListViewDropTarget(toField.getListView());
+    target2.setAutoSelect(true);
 
     target1.setGroup(dndGroup);
     target2.setGroup(dndGroup);
-    
+
     if (mode == Mode.INSERT) {
       target1.setFeedback(Feedback.INSERT);
       target2.setFeedback(Feedback.INSERT);
@@ -236,6 +445,14 @@ public class DualListField<D extends ModelData> extends MultiField<Field> {
     if (enableDND) {
       initDND();
     }
+  }
+
+  private void select(final ListField field, final List list) {
+    DeferredCommand.addCommand(new Command() {
+      public void execute() {
+        field.getListView().getSelectionModel().select(list);
+      }
+    });
   }
 
 }

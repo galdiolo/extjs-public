@@ -20,6 +20,12 @@ import com.extjs.gxt.ui.client.widget.selection.AbstractStoreSelectionModel;
 
 /**
  * Grid selection model.
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>AbstractStoreSelectionModel BeforeSelect</dd>
+ * <dd>AbstractStoreSelectionModel SelectionChange</dd>
+ * </dl>
  */
 public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelectionModel<M>
     implements Listener<BaseEvent> {

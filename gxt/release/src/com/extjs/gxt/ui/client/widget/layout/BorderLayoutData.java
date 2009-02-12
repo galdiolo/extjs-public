@@ -23,6 +23,9 @@ public class BorderLayoutData extends LayoutData {
   private boolean collapsible;
   private Margins margins = new Margins();
   private boolean split;
+  private boolean hidden = false;
+  private boolean hideCollapseTool = false;
+  
   /**
    * The region the mapped content panel will be placed.
    */
@@ -101,6 +104,15 @@ public class BorderLayoutData extends LayoutData {
   }
 
   /**
+   * Returns true if the collapse tool is hidden.
+   * 
+   * @return the hide collapse tool state
+   */
+  public boolean getHideCollapseTool() {
+    return hideCollapseTool;
+  }
+  
+  /**
    * Returns true if collapsing is enabled.
    * 
    * @return the collapse state
@@ -116,6 +128,15 @@ public class BorderLayoutData extends LayoutData {
    */
   public boolean isFloatable() {
     return floatable;
+  }
+
+  /**
+   * Returns true if the component is hidden.
+   * 
+   * @return the hidden state
+   */
+  public boolean isHidden() {
+    return hidden;
   }
 
   /**
@@ -148,6 +169,15 @@ public class BorderLayoutData extends LayoutData {
    */
   public void setFloatable(boolean floatable) {
     this.floatable = floatable;
+  }
+
+  /**
+   * True to hide the component.
+   * 
+   * @param hidden true to hide
+   */
+  public void setHidden(boolean hidden) {
+    this.hidden = hidden;
   }
 
   /**
@@ -207,6 +237,16 @@ public class BorderLayoutData extends LayoutData {
    */
   public void setSplit(boolean split) {
     this.split = split;
+  }
+  
+  /**
+   * True to hide the contained panel's collapse toggle buttons, false to
+   * display it (defaults to false).
+   * 
+   * @param hideCollapseTool true to hide
+   */
+  public void setHideCollapseTool(boolean hideCollapseTool) {
+    this.hideCollapseTool = hideCollapseTool;
   }
 
 }

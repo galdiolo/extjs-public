@@ -17,20 +17,20 @@ import java.util.Set;
 /**
  * RpcMap is used to workaround a part of GWT RPC system.
  * 
- * The GWT RPC rebinder generates field serializers for every type that is
+ * <p /> The GWT RPC rebinder generates field serializers for every type that is
  * assignable to any type in the RPC interfaces.
  * 
- * If BaseModel was to use "Map<String, Serializable> map" this would trigger
+ * <p /> If BaseModel was to use "Map&lt;String, Serializable> map" this would trigger
  * the RPC system to generate field serializers for EVERY Serializable type in
  * your GWT Module's class path.
  * 
- * Therfore BaseModel uses "Map<String, RpcField> map" and relies on type
- * erasure (cast to Map<Object,Object>) to work around this.
+ * <p /> Therefore BaseModel uses "Map&lt;String, RpcField> map" and relies on type
+ * erasure (cast to Map&lt;Object,Object>) to work around this.
  * 
- * The only drawback is that if you have to ensure that field serializers are
+ * <p /> The only drawback is that if you have to ensure that field serializers are
  * generated for any type you add to this map
  * 
- * RpcMap ensures that the following types are supported Byte, Short, Integer,
+ * <p /> RpcMap ensures that the following types are supported Byte, Short, Integer,
  * Long, Float, Double, Date, Boolean, and arrays of these types. As well as
  * List, Set and Map
  */
@@ -82,7 +82,10 @@ public class RpcMap {
   }
 
   public boolean equals(Object o) {
-    return map.equals(o);
+    if(o instanceof RpcMap){
+      return map.equals(((RpcMap)o). map);
+    }
+    return false;
   }
 
   public Object get(Object key) {

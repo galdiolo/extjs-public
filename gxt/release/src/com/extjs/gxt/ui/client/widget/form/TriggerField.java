@@ -13,9 +13,7 @@ import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.FieldEvent;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.EventListener;
@@ -24,6 +22,7 @@ import com.google.gwt.user.client.EventListener;
  * Provides a convenient wrapper for TextFields that adds a clickable trigger
  * button (looks like a combobox by default).
  * 
+ * <dl>
  * <dt><b>Events:</b></dt>
  * 
  * <dd><b>TriggerClick</b> : FieldEvent(field, event)<br>
@@ -33,6 +32,18 @@ import com.google.gwt.user.client.EventListener;
  * <li>event : event</li>
  * </ul>
  * </dd>
+ * </dl>
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>Field Focus</dd>
+ * <dd>Field Blur</dd>
+ * <dd>Field Change</dd>
+ * <dd>Field Invalid</dd>
+ * <dd>Field Valid</dd>
+ * <dd>Field KeyPress</dd>
+ * <dd>Field SpecialKey</dd>
+ * </dl>
  */
 public class TriggerField<Data> extends TextField<Data> {
 
@@ -43,24 +54,6 @@ public class TriggerField<Data> extends TextField<Data> {
   protected String triggerStyle = "x-form-trigger-arrow";
 
   private boolean hideTrigger;
-
-  /**
-   * Returns true if the trigger is hidden.
-   * 
-   * @return the hide trigger state
-   */
-  public boolean isHideTrigger() {
-    return hideTrigger;
-  }
-
-  /**
-   * True to hide the trigger (defaults to false, pre-render).
-   * 
-   * @param hideTrigger true to hide the trigger
-   */
-  public void setHideTrigger(boolean hideTrigger) {
-    this.hideTrigger = hideTrigger;
-  }
 
   @Override
   public Element getElement() {
@@ -81,6 +74,24 @@ public class TriggerField<Data> extends TextField<Data> {
   }
 
   /**
+   * Returns true if the trigger is hidden.
+   * 
+   * @return the hide trigger state
+   */
+  public boolean isHideTrigger() {
+    return hideTrigger;
+  }
+
+  /**
+   * True to hide the trigger (defaults to false, pre-render).
+   * 
+   * @param hideTrigger true to hide the trigger
+   */
+  public void setHideTrigger(boolean hideTrigger) {
+    this.hideTrigger = hideTrigger;
+  }
+
+  /**
    * Sets the trigger style name.
    * 
    * @param triggerStyle
@@ -90,12 +101,18 @@ public class TriggerField<Data> extends TextField<Data> {
   }
 
   @Override
-  protected void alignErrorIcon() {
-    DeferredCommand.addCommand(new Command() {
-      public void execute() {
-        errorIcon.el().alignTo(wrap.dom, "tl-tr", new int[] {1, 1});
+  protected void afterRender() {
+    super.afterRender();
+    wrap.removeStyleName(fieldStyle);
+    if (GXT.isIE && !hideTrigger) {
+      int y1, y2;
+      if ((y1 = input.getY()) != (y2 = trigger.getY())) {
+        int dif = y2 - y1;
+        if (dif == 1) dif = 0;
+        input.makePositionable();
+        input.setTop(dif);
       }
-    });
+    }
   }
 
   @Override
@@ -185,6 +202,10 @@ public class TriggerField<Data> extends TextField<Data> {
     };
     DOM.sinkEvents(wrap.dom, Event.FOCUSEVENTS);
     DOM.sinkEvents(trigger.dom, Event.ONCLICK | Event.MOUSEEVENTS);
+
+    if (width == null) {
+      setWidth(150);
+    }
   }
 
   @Override
@@ -195,7 +216,7 @@ public class TriggerField<Data> extends TextField<Data> {
         tw = 17;
       }
       getInputEl().setWidth(this.adjustWidth("input", width - tw));
-      wrap.setWidth(getInputEl().getWidth() + trigger.getWidth(), true);
+      wrap.setWidth(width, true);
     }
   }
 

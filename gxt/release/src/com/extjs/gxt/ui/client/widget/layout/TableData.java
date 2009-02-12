@@ -12,7 +12,7 @@ import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.core.El;
 
 /**
- * Layout data for <code>TableLayout</code>.
+ * Layout data for {@link TableLayout}.
  */
 public class TableData extends LayoutData {
 
@@ -36,8 +36,8 @@ public class TableData extends LayoutData {
   /**
    * Creates a new table data instance.
    * 
-   * @param horizontalAlign the horiztonal alignment
-   * @param verticalAlign the vertical aligment
+   * @param horizontalAlign the horizontal alignment
+   * @param verticalAlign the vertical alignment
    */
   public TableData(HorizontalAlignment horizontalAlign, VerticalAlignment verticalAlign) {
     this.setHorizontalAlign(horizontalAlign);

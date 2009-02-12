@@ -36,11 +36,7 @@ public class TreeSelectionModel extends AbstractSelectionModel<Tree, TreeItem> {
         if (singleSelect) {
           doSelect(new Items(item), false, false);
         } else {
-          if (isSelected(item) && ce.isControlKey()) {
-            deselect(item);
-          } else {
-            doSelect(new Items(item), ce.isControlKey(), false);
-          }
+          doMultiSelect(item, ce);
         }
 
       }
@@ -51,7 +47,27 @@ public class TreeSelectionModel extends AbstractSelectionModel<Tree, TreeItem> {
   protected void doMultiSelect(TreeItem item, ContainerEvent ce) {
     if (locked) return;
     if (ce.isShiftKey() && selectedItem != null) {
-      // not implemented
+      List<TreeItem> items = new ArrayList<TreeItem>();
+      if(selectedItem==item)
+        return;
+      if (selectedItem.getAbsoluteTop() < item.getAbsoluteTop()) {
+        TreeItem next = next();
+        while (next != null) {
+          items.add(next);
+          selectedItem = next;
+          if (next == item) break;
+          next = next();
+        }
+      } else {
+        TreeItem prev = previous();
+        while (prev != null) {
+          items.add(prev);
+          selectedItem = prev;
+          if (prev == item) break;
+          prev = previous();
+        }
+      }
+      doSelect(new Items(items), true, false);
     } else {
       if (ce.isControlKey() && isSelected(item)) {
         deselect(item);
@@ -132,7 +148,8 @@ public class TreeSelectionModel extends AbstractSelectionModel<Tree, TreeItem> {
     if (selectedItem == null) return;
     if (!selectedItem.isLeaf() && selectedItem.isExpanded()) {
       selectedItem.setExpanded(false);
-    } else if (selectedItem.getParentItem() != null && !selectedItem.getParentItem().isRoot()) {
+    } else if (selectedItem.getParentItem() != null
+        && !selectedItem.getParentItem().isRoot()) {
       doSelect(new Items(selectedItem.getParentItem()), false, false);
     }
   }
@@ -174,13 +191,15 @@ public class TreeSelectionModel extends AbstractSelectionModel<Tree, TreeItem> {
     if (sel == null) {
       return null;
     }
-    TreeItem prev = sel.previousSibling();
-    if (prev != null) {
-      if (!prev.isExpanded() || prev.getItemCount() < 1) {
+
+    if (sel.previousSibling() != null) {
+      TreeItem prev = sel.previousSibling();
+      if ((!prev.isExpanded() || prev.getItemCount() < 1)) {
         return prev;
       } else {
         TreeItem lastChild = prev.lastChild();
-        while (lastChild != null && lastChild.getItemCount() > 0 && lastChild.isExpanded()) {
+        while (lastChild != null && lastChild.getItemCount() > 0
+            && lastChild.isExpanded()) {
           lastChild = lastChild.lastChild();
         }
         return lastChild;

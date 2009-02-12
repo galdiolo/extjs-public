@@ -23,6 +23,8 @@ import com.google.gwt.user.client.Element;
  */
 public class ThemeSelector extends ComboBox<Theme> {
 
+  private Theme last;
+
   /**
    * Creates a new theme selector.
    */
@@ -30,6 +32,7 @@ public class ThemeSelector extends ComboBox<Theme> {
     setEditable(false);
     setDisplayField("name");
     setWidth("100px");
+    setTriggerAction(TriggerAction.ALL);
   }
 
   @Override
@@ -49,17 +52,22 @@ public class ThemeSelector extends ComboBox<Theme> {
         }
       }
     }
+    last = getValue();
   }
 
   @Override
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
-    addListener(Events.Change, new Listener<FieldEvent>() {
+    Listener<FieldEvent> l = new Listener<FieldEvent>() {
       public void handleEvent(FieldEvent be) {
-        Theme t = (Theme) be.value;
-        GXT.switchTheme(t);
+        Theme c = getValue();
+        if (c != last) {
+          last = c;
+          GXT.switchTheme(c);
+        }
       }
-    });
-
+    };
+    addListener(Events.Change, l);
+    addListener(Events.Collapse, l);
   }
 }

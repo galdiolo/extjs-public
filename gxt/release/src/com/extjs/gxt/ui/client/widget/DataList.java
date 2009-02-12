@@ -32,7 +32,8 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 
 /**
- * Displays a list of list items.
+ * Displays a list of list items. Similar in appearance to {@link ListView} but
+ * without the custom template or store requirements.
  * 
  * <dl>
  * <dt><b>Events:</b></dt>
@@ -71,7 +72,7 @@ import com.google.gwt.user.client.Event;
  * <ul>
  * <li>dataList : this</li>
  * <li>item : the item that was removed</li>
- * <li>index : the index of hte item that was removed</li>
+ * <li>index : the index of the item that was removed</li>
  * </ul>
  * </dd>
  * 
@@ -108,14 +109,43 @@ import com.google.gwt.user.client.Event;
  * <li>item : the item that was is checked</li>
  * </ul>
  * </dd>
+ * </dl>
  * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>ScrollContainer Scroll</dd>
+ * <dd>Container BeforeAdd</dd>
+ * <dd>Container Add</dd>
+ * <dd>Container BeforeRemove</dd>
+ * <dd>Container Remove</dd>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
+ * </dl>
+ * 
+ * <dl>
  * <dt><b>CSS:</b></dt>
  * <dd>.my-list (the list itself)</dd>
  * <dd>.my-listitem (list item)</dd>
  * <dd>.my-listitem .my-listitem-text (list item text)</dd>
  * </dl>
  */
-public class DataList extends ScrollContainer<DataListItem> implements Selectable<DataListItem> {
+public class DataList extends ScrollContainer<DataListItem> implements
+    Selectable<DataListItem> {
 
   /**
    * The default template for data list items.
@@ -481,7 +511,8 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
 
   @Override
   protected ComponentEvent createComponentEvent(Event event) {
-    return new DataListEvent(this, (event == null) ? null : findItem(DOM.eventGetTarget(event)));
+    return new DataListEvent(this, (event == null) ? null
+        : findItem(DOM.eventGetTarget(event)));
   }
 
   @Override
@@ -574,7 +605,8 @@ public class DataList extends ScrollContainer<DataListItem> implements Selectabl
 
     renderAll();
 
-    el().addEventsSunk(Event.ONCLICK | Event.ONDBLCLICK | Event.KEYEVENTS | Event.MOUSEEVENTS);
+    el().addEventsSunk(
+        Event.ONCLICK | Event.ONDBLCLICK | Event.KEYEVENTS | Event.MOUSEEVENTS);
   }
 
   protected void onRenderItem(DataListItem item, Element target, int index) {

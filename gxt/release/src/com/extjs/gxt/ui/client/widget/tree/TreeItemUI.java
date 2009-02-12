@@ -329,26 +329,22 @@ public class TreeItemUI {
 
     if (!item.isLeaf()) {
       String s = null;
+      boolean children = false;
+      boolean binder = item.tree != null ? item.tree.getData("binder") != null : false;
+      boolean loaded = item.getData("loaded") != null;
+      if ((!binder) || (binder && !loaded) || (binder && item.hasChildren())) {
+        children = true;
+      }
       if (item.isExpanded()) {
-        s = style.getJointOpenIconStyle() != null ? style.getJointOpenIconStyle() : classTreeOpen;
+        s = children ? (style.getJointOpenIconStyle() != null ? style.getJointOpenIconStyle() : classTreeOpen) : "";
       } else {
-        boolean children = false;
-        boolean binder = item.tree != null ? item.tree.getData("binder") != null : false;
-        boolean loaded = item.getData("loaded") != null;
-        if ((!binder && !item.isLeaf()) || (binder && !loaded) || (binder && item.hasChildren())) {
-          children = true;
-        }
-        if (!binder && item.hasChildren()) {
-          children = true;
-        }
-        s = children ? (style.getJointCloseIconStyle() != null ? style.getJointCloseIconStyle()
-            : classTreeClose) : "";
+        s = children ? (style.getJointCloseIconStyle() != null ? style.getJointCloseIconStyle() : classTreeClose) : "";
       }
       String cls = s;
       jointDivEl.setClassName(cls);
-      jointDivEl.getStyle().setProperty("vibility", "visible");
+      jointDivEl.getStyle().setProperty("visibility", "visible");
     } else {
-      jointDivEl.getStyle().setProperty("vibility", "hidden");
+      jointDivEl.getStyle().setProperty("visibility", "hidden");
     }
 
     if (item.tree.getCheckable()) {

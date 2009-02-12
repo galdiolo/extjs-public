@@ -21,19 +21,21 @@ import com.google.gwt.user.client.ui.Widget;
  * internal element structure, inserting its child components at any location.
  * For example, a TableLayout lays out its children using HTML tables.
  * 
- * <p/> Many layouts support layout data which are configurable objects that
- * provide additional information to the layout. These objects can be passed
- * when adding and inserting child components into the container. Each layout
- * will document if and what layout data it supports. </p>
+ * <p/>
+ * Many layouts support layout data which are configurable objects that provide
+ * additional information to the layout. These objects can be passed when adding
+ * and inserting child components into the container. Each layout will document
+ * if and what layout data it supports.
+ * </p>
  * 
  * Code snippet:
  * 
  * <pre>
-   LayoutContainer container = new LayoutContainer();
-   container.add(new Button("Click Me"));
-   container.setSize(300,300);
-   container.setBorders(true);
-   RootPanel.get().add(container);
+ * LayoutContainer container = new LayoutContainer();
+ * container.add(new Button(&quot;Click Me&quot;));
+ * container.setSize(300, 300);
+ * container.setBorders(true);
+ * RootPanel.get().add(container);
  * </pre>
  * 
  * {@link FlowLayout} is the the default layout and will be used if not a layout
@@ -43,42 +45,6 @@ import com.google.gwt.user.client.ui.Widget;
  * <dl>
  * <dt><b>Events:</b></dt>
  * 
- * <dd><b>BeforeAdd</b> : ContainerEvent(container, item, index)<br>
- * <div>Fires before a item is added or inserted. Listeners can set the
- * <code>doit</code> field to <code>false</code> to cancel the action.</div>
- * <ul>
- * <li>container : this</li>
- * <li>item : the component being added</li>
- * <li>index : the index at which the component will be added</li>
- * </ul>
- * </dd>
- * 
- * <dd><b>BeforeRemove</b> : ContainerEvent(container, item)<br>
- * <div>Fires before a item is removed. Listeners can set the <code>doit</code>
- * field to <code>false</code> to cancel the action.</div>
- * <ul>
- * <li>container : this</li>
- * <li>item : the component being removed</li>
- * </ul>
- * </dd>
- * 
- * <dd><b>Add</b> : ContainerEvent(container, item, index)<br>
- * <div>Fires after a item has been added or inserted.</div>
- * <ul>
- * <li>container : this</li>
- * <li>item : the item that was added</li>
- * <li>index : the index at which the item will be added</li>
- * </ul>
- * </dd>
- * 
- * <dd><b>Remove</b> : ContainerEvent(container, item)<br>
- * <div>Fires after a item has been removed.</div>
- * <ul>
- * <li>container : this</li>
- * <li>item : the item being removed</li>
- * </ul>
- * </dd>
- * 
  * <dd><b>AfterLayout</b> : ContainerEvent(container)<br>
  * <div>Fires when the widgets in this container are arranged by the associated
  * layout.</div>
@@ -86,6 +52,32 @@ import com.google.gwt.user.client.ui.Widget;
  * <li>container : this</li>
  * </ul>
  * </dd>
+ * </dl>
+ * 
+ * <dl>
+ * <dt>Inherited Events:</dt>
+ * <dd>ScrollContainer Scroll</dd>
+ * <dd>Container BeforeAdd</dd>
+ * <dd>Container Add</dd>
+ * <dd>Container BeforeRemove</dd>
+ * <dd>Container Remove</dd>
+ * <dd>BoxComponent Move</dd>
+ * <dd>BoxComponent Resize</dd>
+ * <dd>Component Enable</dd>
+ * <dd>Component Disable</dd>
+ * <dd>Component BeforeHide</dd>
+ * <dd>Component Hide</dd>
+ * <dd>Component BeforeShow</dd>
+ * <dd>Component Show</dd>
+ * <dd>Component Attach</dd>
+ * <dd>Component Detach</dd>
+ * <dd>Component BeforeRender</dd>
+ * <dd>Component Render</dd>
+ * <dd>Component BrowserEvent</dd>
+ * <dd>Component BeforeStateRestore</dd>
+ * <dd>Component StateRestore</dd>
+ * <dd>Component BeforeStateSave</dd>
+ * <dd>Component SaveState</dd>
  * </dl>
  * 
  * @see Layout
