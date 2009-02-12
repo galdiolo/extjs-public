@@ -549,7 +549,7 @@ table.x-date-inner{width:100%;table-layout:fixed;}
 .x-date-inner .x-date-selected span{font-weight:bold;}
 .x-date-inner .x-date-prevday a,.x-date-inner .x-date-nextday a{color:#aaa;text-decoration:none!important;}
 .x-date-bottom{padding:4px;border-top:1px solid #a3bad9;background:#dfecfb url(../images/default/shared/glass-bg.gif) repeat-x left top;}
-.x-date-inner a:hover,.x-date-inner .x-date-disabled a:hover{text-decoration:none!important;color:black;background:#ddecfe;}
+
 .x-date-inner .x-date-disabled a{cursor:default;background:#eee;color:#bbb;}
 .x-date-mmenu{background:#eee!important;}
 .x-date-mmenu .x-menu-item{font-size:10px;padding:1px 24px 1px 4px;white-space:nowrap;color:#000;}

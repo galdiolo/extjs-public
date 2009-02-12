@@ -35,10 +35,18 @@
 
 .x-icon-btn {
   width: 16px;
-  height: 18px;
+  height: 16px;
   overflow: hidden;
   background-repeat: no-repeat;
   cursor: pointer;
+}
+
+.x-panel-tl .x-panel-header {
+ line-height: 15px;
+}
+
+.x-panel-inline-icon {
+  margin-top: 0;
 }
 
 .x-modal {

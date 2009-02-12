@@ -16,7 +16,7 @@
 .x-vsplitbar {
   background: url(../images/default/s.gif);
   position: absolute;
-  z-index: 999999;
+  z-index: 3;
   cursor: e-resize;
   cursor: col-resize;
 }

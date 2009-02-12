@@ -13,6 +13,12 @@
 .arrow-left {
   background: url(../images/gxt/icons/left2.gif) no-repeat center left !important;
 }
+.arrow-double-left {
+  background: url(../images/gxt/icons/doubleleft2.gif) no-repeat center left !important;
+}
 .arrow-right {
   background: url(../images/gxt/icons/right2.gif) no-repeat center left !important;
+}
+.arrow-double-right {
+  background: url(../images/gxt/icons/doubleright2.gif) no-repeat center left !important;
 }
