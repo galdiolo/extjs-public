@@ -1,0 +1,28 @@
+Add the following entry to you projects module xml file.
+
+<inherits name='com.extjs.gxt.ui.GXT'/>
+
+Add the following stylesheet to your host page.
+
+<link rel="stylesheet" type="text/css" href="css/ext-all.css" />
+
+Ext GWT requires no doctype or the following doctype (quirksmode).
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+Eclipse Setup (should be similiar for other development enviornments)
+These instructions assume you have a existing project and launch confifuration.
+
+1. Add gxt.jar to the project.
+	a. Right click on project name in 'Package Explorer'.
+	b. Select 'Properties' from content menu.
+	c. Select 'Java Build Path'.
+	d. Select 'Libraries' tab.
+	e. Add the gxt.jar either with 'Add JARs...' or 'Add External JARs...'.
+	
+2. Add GXT jar to launch configuration.
+	a. Choose Run / Open Run Dialog.
+	b. Select your appropriate launch configuration under 'Java Application'.
+	c. Select the 'Classpath' tab.
+	d. Add the gxt.jar to the classpath.
+
