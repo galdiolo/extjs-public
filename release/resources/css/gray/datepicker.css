@@ -1,0 +1,11 @@
+.x-date-right-icon {
+  background-image: url(../images/default/shared/right-btn.gif);
+  margin-right: 2px;
+  text-decoration: none !important;
+}
+
+.x-date-left-icon {
+  background-image: url(../images/default/shared/left-btn.gif);
+  margin-right: 2px;
+  text-decoration: none !important;
+}

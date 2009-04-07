@@ -1,0 +1,157 @@
+.x-info {
+  border-style: solid;
+  border-color: #99bbe8;
+  border-width: 0;
+  z-index: 99999999;
+}
+
+.x-info-header {
+  overflow: hidden;
+  zoom: 1;
+  color: black;
+  font: bold 13px tahoma, arial, verdana, sans-serif;
+  padding: 5px 3px 4px 5px;
+  line-height: 15px;
+  background: transparent url(../images/default/panel/white-top-bottom.gif) repeat-x 0 -1px;
+}
+
+.x-info-body {
+  border-top: 0 none;
+  overflow: hidden;
+  background: white;
+  position: relative; /* added for item scroll positioning */
+}
+
+.x-info-header {
+  overflow: hidden;
+  zoom: 1;
+}
+
+.x-info-tl .x-info-header {
+  color: #555555;
+  font-family: tahoma, arial, sans-serif;
+  font-size: 13px;
+  font-size-adjust: none;
+  font-stretch: normal;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: bold;
+  line-height: normal;
+  padding: 5px 0 4px 0;
+  border: 0 none;
+  background: transparent;
+}
+
+.x-info-tl .x-info-icon,.x-window-tl .x-info-icon {
+  padding-left: 20px !important;
+  background-repeat: no-repeat;
+  background-position: 0 4px;
+  zoom: 1;
+}
+
+.x-info-inline-icon {
+  width: 16px;
+  height: 16px;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  vertical-align: middle;
+  margin-right: 4px;
+  margin-top: -1px;
+  margin-bottom: -1px;
+}
+
+.x-info-tc {
+  background: transparent url(../images/gxt/info/top-bottom.gif) repeat-x 0 0;
+  overflow: hidden;
+}
+
+/* fix ie7 strict mode bug */
+.ext-ie7 .x-info-tc {
+  overflow: visible;
+}
+
+.x-info-tl {
+  background: transparent url(../images/gxt/info/corners-sprite.gif) no-repeat 0 0;
+  padding-left: 6px;
+  zoom: 1;
+}
+
+.x-info-tr {
+  background: transparent url(../images/gxt/info/corners-sprite.gif) no-repeat right 0;
+  zoom: 1;
+  padding-right: 6px;
+}
+
+.x-info-bc {
+  background: transparent url(../images/default/panel/top-bottom.gif) repeat-x 0 bottom;
+  zoom: 1;
+  font-size: 0px;
+}
+
+.x-info-bc .x-info-footer {
+  zoom: 1;
+}
+
+.x-info-bl {
+  background: transparent url(../images/default/panel/corners-sprite.gif) no-repeat 0 bottom;
+  padding-left: 6px;
+  zoom: 1;
+}
+
+.x-info-br {
+  background: transparent url(../images/default/panel/corners-sprite.gif) no-repeat right bottom;
+  padding-right: 6px;
+  zoom: 1;
+}
+
+.x-info-mc {
+  border: 0 none;
+  padding: 0;
+  margin: 0;
+  font: normal 11px tahoma, arial, helvetica, sans-serif;
+  background: #dfe8f6;
+}
+
+.x-info-mc .x-info-body {
+  background: transparent;
+  border: 0 none;
+}
+
+.x-info-ml {
+  background: #fff url(../images/default/panel/left-right.gif) repeat-y 0 0;
+  padding-left: 6px;
+  zoom: 1;
+}
+
+.x-info-mr {
+  background: transparent url(../images/default/panel/left-right.gif) repeat-y right 0;
+  padding-right: 6px;
+  zoom: 1;
+}
+
+.x-info-bc .x-info-footer {
+  padding-bottom: 6px;
+}
+
+.x-info-nofooter .x-info-bc,.x-panel-nofooter .x-info-bc {
+  height: 6px;
+  font-size: 0;
+  line-height: 0;
+}
+
+.x-info-bwrap {
+  overflow: hidden;
+  zoom: 1;
+}
+
+.x-info-body {
+  overflow: hidden;
+  zoom: 1;
+  color: #555555;
+  font-family: tahoma, arial, sans-serif;
+  font-size: 12px;
+  font-size-adjust: none;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+}

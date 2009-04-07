@@ -1,0 +1,6 @@
+.x-status-text {
+	margin: 0;;
+	font: normal 12px tahoma, arial, helvetica, sans-serif;
+	white-space: nowrap;
+	color: black !important;
+}

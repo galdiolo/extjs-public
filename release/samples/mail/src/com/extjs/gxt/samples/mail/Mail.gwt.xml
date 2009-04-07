@@ -1,0 +1,6 @@
+<module>
+  <inherits name='com.extjs.gxt.samples.resources.Resources' />
+  <stylesheet src="Mail.css" />
+  <servlet path="/service" class="com.extjs.gxt.samples.mail.server.MailServiceImpl"/>
+  <entry-point class='com.extjs.gxt.samples.mail.client.Mail'/>
+</module>

@@ -1,0 +1,57 @@
+<html>
+<head>
+<link rel="stylesheet" href="../../css/SyntaxHighlighter.css" type="text/css" />
+<script src="../../js/shCore.js"></script>
+<script src="../../js/shBrushJava.js"></script>
+<script>
+    window.onload = function() {
+      dp.SyntaxHighlighter.HighlightAll("code");
+    }
+</script>
+<style>
+* {
+font-family:monospace;
+  padding: 0px;
+  margin: 0px;
+  white-space: nowrap;
+  font-size: 11px;
+}
+body {
+  border: none;
+}
+.dp-highlighter {
+  white-space: nowrap;
+  overflow: visible;
+  width: 700;
+  font-size: 11px;  
+  font-family:monospace;
+}
+.dp-highlighter ol, .dp-highlighter ol li {
+  font-family:monospace;
+}
+</style>
+</head>
+<body>
+<textarea name="code" class="java:nogutter:nocontrols" rows="15" cols="100">package com.extjs.gxt.samples.client.examples.layouts;
+
+import com.extjs.gxt.ui.client.widget.ContentPanel;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
+
+public class CenterLayoutExample extends LayoutContainer {
+
+  public CenterLayoutExample() {
+    setLayout(new CenterLayout());
+
+    ContentPanel panel = new ContentPanel();
+    panel.setBodyStyle("padding: 6px");
+    panel.setFrame(true);
+    panel.setHeading("CenterLayout");
+    panel.addText("I should be centered");
+    panel.setWidth(200);
+
+    add(panel);
+  }
+}</textarea>
+</body>
+</html>

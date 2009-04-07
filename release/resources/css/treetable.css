@@ -1,0 +1,240 @@
+.tree-folder {
+  background: url(../images/gxt/icons/folder-closed.gif) no-repeat -1px -1px;
+}
+
+.tree-folder-open {
+  background: url(../images/gxt/icons/folder.gif) no-repeat -1px -1px;
+}
+
+.my-treetbl-tree {
+  cursor: default;
+}
+
+.my-treetblitem,.my-treetblitem table,.my-treetblitem table td {
+  -moz-outline: none;
+  -moz-user-focus: normal;
+}
+
+.my-treetblitem td {
+  height: 19px;
+}
+
+.my-treetbl-indent {
+  line-height: 1px;
+  font-size: 1px;
+}
+
+.my-treetbl-joint div {
+  width: 15px;
+  height: 19px;
+  line-height: 1px;
+  font-size: 1px;
+}
+
+.my-treetbl-left,.my-treetbl-left div,.my-treetbl-right {
+  line-height: 1px;
+  font-size: 1px;
+  width: 3px;
+}
+
+.my-treetbl-left div,.my-treetbl-right div {
+  width: 3px;
+}
+
+.my-treetbl-check div {
+  width: 17px;
+  height: 19px;
+  line-height: 1px;
+  font-size: 1px;
+  display: block;
+}
+
+.my-treetbl-icon div {
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  cursor: pointer;
+}
+
+.my-ie .my-treetbl-icon {
+  padding-top: 2px;
+}
+
+.my-ie .my-treetbl-icon div {
+  position: static;
+}
+
+.my-treetbl-item-text span {
+  font-family: arial, tahoma, helvetica, sans-serif;
+  font-size: 12px;
+  white-space: nowrap;
+  padding-left: 3px;
+  padding-right: 3px;
+  display: block;
+  height: 15px;
+  cursor: pointer;
+}
+
+.my-treetbl-over .my-treetbl-left {
+  background: url(../images/gxt/shared/select-19-bg.gif) no-repeat left -57px;
+}
+
+.my-treetbl-over .my-treetbl-right {
+  background: url(../images/gxt/shared/select-19-bg.gif) no-repeat right -76px;
+}
+
+.my-treetbl-over .my-treetbl-check,.my-treetbl-over .my-treetbl-icon,.my-treetbl-over .my-treetbl-item-text
+  {
+  background: url(../images/gxt/shared/select-19-bg.gif) left -95px;
+}
+
+.my-treetbl-sel .my-treetbl-left {
+  background: url(../images/gxt/shared/select-19-bg.gif) no-repeat left 0px;
+}
+
+.my-treetbl-sel .my-treetbl-right {
+  background: url(../images/gxt/shared/select-19-bg.gif) no-repeat right -19px;
+}
+
+.my-treetbl-sel .my-treetbl-check,.my-treetbl-sel .my-treetbl-icon,.my-treetbl-sel .my-treetbl-item-text
+  {
+  background: url(../images/gxt/shared/select-19-bg.gif) left -38px;
+}
+
+.my-treetbl-close {
+  background: url(../images/gxt/tree/vnode_transparent.gif) no-repeat 0px 1px;
+}
+
+.my-treetbl-open {
+  background: url(../images/gxt/tree/vnode_transparent.gif) no-repeat 0px -32px;
+}
+
+.my-treetbl-joint-over  .my-treetbl-open {
+  background: url(../images/gxt/tree/vnode_transparent.gif) no-repeat 0px -48px;
+}
+
+.my-treetbl-joint-over .my-treetbl-close {
+  background: url(../images/gxt/tree/vnode_transparent.gif) no-repeat 0px -15px;
+}
+
+.my-treetbl-notchecked {
+  background: url(../images/gxt/tree/notchecked.gif) no-repeat 0px 50%;
+}
+
+.my-treetbl-checked {
+  background: url(../images/gxt/tree/checked.gif) no-repeat 0px 50%;
+}
+
+.my-treetbl-loading .tree-folder {
+  background: url(../images/gxt/icons/wait.gif) no-repeat 0px -1px;
+}
+
+.my-treetbl-loading .my-treetbl-item-text span {
+  font-style: italic;
+}
+
+.my-treetbl {
+  border: 1px solid #99BBE8;
+  cursor: default;
+  background-color: white;
+  overflow: hidden;
+  -moz-outline: none;
+  -moz-user-focus: normal;
+}
+
+.my-treetbl-col-overflow {
+  overflow: hidden;
+  -moz-outline: none;
+  -moz-user-focus: normal;
+}
+
+.my-treetbl-col-text {
+  color: black;
+  padding: 5 4 0 4px;
+  display: block;
+  white-space: nowrap;
+  font-family: arial, tahoma, helvetica, sans-serif;
+  font-size: 12px;
+}
+
+.my-treetbl-col {
+  border-right: 1px solid #D5D5D5;
+  background: url(../images/gxt/table/vs-column-bg.gif) repeat-x;
+}
+
+.my-treetbl-col-splitter {
+  position: absolute;
+  top: 0;
+  width: 6px;
+  z-index: 100;
+  height: 100%;
+  right: 0px;
+}
+
+.my-treetbl-col-over {
+  background: url(../images/gxt/table/vs-column-bg.gif) repeat-x 0px -24px;
+}
+
+.my-treetbl-col-sort {
+  background-position: 0px -48px;
+}
+
+.my-treetbl-col-asc {
+  background: url(../images/gxt/table/vsort-asc.gif) no-repeat 50% top;
+}
+
+.my-treetbl-col-desc {
+  background: url(../images/gxt/table/vsort-desc.gif) no-repeat 50% top;
+}
+
+.my-treetbl-col-splitter {
+  background: none;
+}
+
+.my-treetbl-data {
+  background-color: white;
+  overflow: hidden;
+}
+
+.my-treetbl-data .my-treetbl-cell {
+  height: 20px;
+  -moz-outline: none;
+  -moz-user-focus: normal;
+}
+
+.my-treetbl-data .my-treetbl-cell-overflow {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.my-treetbl-data .my-treetbl-cell-text {
+  padding: 1 4 1 4px;
+  font-family: arial, tahoma, helvetica, sans-serif;
+  font-size: 12px;
+}
+
+.my-treetbl-data tr {
+  overflow: hidden;
+}
+
+.my-treetbl-item {
+  border-top: 1px solid white;
+  border-bottom: 1px solid white;
+  border-bottom: 1px solid #EDEDED;
+  cursor: default;
+  -moz-outline: none;
+  -moz-user-focus: normal;
+}
+
+.my-treetbl-item-over {
+  border-top: 1px solid #dddddd;
+  border-bottom: 1px solid #dddddd;
+  background: #efefef url(../images/default/grid/row-over.gif) repeat-x left top;
+}
+
+.my-treetbl-item-sel {
+  background-image: none;
+  background-color: #D9E1ED;
+  border-top: 1px dotted #9EB8ED;
+  border-bottom: 1px dotted #9EB8ED;
+}
