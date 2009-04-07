@@ -1,1 +1,33 @@
-Ext.util.TaskRunner=function(e){e=e||10;var f=[],a=[];var b=0;var g=false;var d=function(){g=false;clearInterval(b);b=0};var h=function(){if(!g){g=true;b=setInterval(i,e)}};var c=function(j){a.push(j);if(j.onStop){j.onStop.apply(j.scope||j)}};var i=function(){if(a.length>0){for(var o=0,k=a.length;o<k;o++){f.remove(a[o])}a=[];if(f.length<1){d();return}}var m=new Date().getTime();for(var o=0,k=f.length;o<k;++o){var n=f[o];var j=m-n.taskRunTime;if(n.interval<=j){var l=n.run.apply(n.scope||n,n.args||[++n.taskRunCount]);n.taskRunTime=m;if(l===false||n.taskRunCount===n.repeat){c(n);return}}if(n.duration&&n.duration<=(m-n.taskStartTime)){c(n)}}};this.start=function(j){f.push(j);j.taskStartTime=new Date().getTime();j.taskRunTime=0;j.taskRunCount=0;h();return j};this.stop=function(j){c(j);return j};this.stopAll=function(){d();for(var k=0,j=f.length;k<j;k++){if(f[k].onStop){f[k].onStop()}}f=[];a=[]}};Ext.TaskMgr=new Ext.util.TaskRunner();
+/*
+ * Ext Core Library 3.0 Beta
+ * http://extjs.com/
+ * Copyright(c) 2006-2009, Ext JS, LLC.
+ * 
+ * The MIT License
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * 
+ */
+
+
+Ext.util.TaskRunner=function(interval){interval=interval||10;var tasks=[],removeQueue=[],id=0,running=false,stopThread=function(){running=false;clearInterval(id);id=0;},startThread=function(){if(!running){running=true;id=setInterval(runTasks,interval);}},removeTask=function(t){removeQueue.push(t);if(t.onStop){t.onStop.apply(t.scope||t);}},runTasks=function(){var rqLen=removeQueue.length,now=new Date().getTime();if(rqLen>0){for(var i=0;i<rqLen;i++){tasks.remove(removeQueue[i]);}
+removeQueue=[];if(tasks.length<1){stopThread();return;}}
+for(var i=0,t,itime,rt,len=tasks.length;i<len;++i){t=tasks[i];itime=now-t.taskRunTime;if(t.interval<=itime){rt=t.run.apply(t.scope||t,t.args||[++t.taskRunCount]);t.taskRunTime=now;if(rt===false||t.taskRunCount===t.repeat){removeTask(t);return;}}
+if(t.duration&&t.duration<=(now-t.taskStartTime)){removeTask(t);}}};this.start=function(task){tasks.push(task);task.taskStartTime=new Date().getTime();task.taskRunTime=0;task.taskRunCount=0;startThread();return task;};this.stop=function(task){removeTask(task);return task;};this.stopAll=function(){stopThread();for(var i=0,len=tasks.length;i<len;i++){if(tasks[i].onStop){tasks[i].onStop();}}
+tasks=[];removeQueue=[];};};Ext.TaskMgr=new Ext.util.TaskRunner();
