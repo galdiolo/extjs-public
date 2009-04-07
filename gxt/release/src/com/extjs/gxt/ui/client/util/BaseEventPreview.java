@@ -7,8 +7,6 @@
  */
 package com.extjs.gxt.ui.client.util;
 
-import java.util.List;
-
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.core.CompositeElement;
 import com.extjs.gxt.ui.client.event.BaseObservable;
@@ -51,7 +49,8 @@ import com.google.gwt.user.client.EventPreview;
 public class BaseEventPreview extends BaseObservable implements EventPreview {
 
   private static int lastX, lastY;
-
+  private boolean active = false;
+  
   /**
    * Returns the last client x value when a base event preview is on top of the
    * preview stack.
@@ -82,11 +81,6 @@ public class BaseEventPreview extends BaseObservable implements EventPreview {
     return lastY;
   }
 
-  private static native List getPreviewStack() /*-{
-   var stack = @com.google.gwt.user.client.DOM::sEventPreviewStack;
-   return stack;
-  }-*/;
-
   private CompositeElement ignoreList = new CompositeElement();
   private boolean autoHide = true;
   private boolean autoHideAllowEvent;
@@ -95,6 +89,7 @@ public class BaseEventPreview extends BaseObservable implements EventPreview {
    * Adds this instance to the event preview stack.
    */
   public void add() {
+    active = true;
     DOM.addEventPreview(this);
     onAdd();
     fireEvent(Events.Add);
@@ -145,8 +140,7 @@ public class BaseEventPreview extends BaseObservable implements EventPreview {
    * Pushes the event preview to the stop of the stack.
    */
   public void push() {
-    List l = getPreviewStack();
-    if (l != null && l.contains(this)) {
+    if (active) {
       remove();
       add();
     }
@@ -156,6 +150,7 @@ public class BaseEventPreview extends BaseObservable implements EventPreview {
    * Removes event preview.
    */
   public void remove() {
+    active = false;
     DOM.removeEventPreview(this);
     onRemove();
     fireEvent(Events.Remove);

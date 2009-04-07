@@ -118,7 +118,6 @@ public class ButtonBar extends Container<Button> {
             break;
         }
       }
-
     }
   };
 
@@ -264,7 +263,7 @@ public class ButtonBar extends Container<Button> {
   }
 
   @Override
-  protected El getLayoutTarget() {
+  public El getLayoutTarget() {
     return inner;
   }
 
@@ -300,7 +299,7 @@ public class ButtonBar extends Container<Button> {
     }
 
     StringBuffer sb = new StringBuffer();
-    sb.append("<div class=x-panel-btn-ct>");
+    sb.append("<div>");
     sb.append("<table width=100% cellpadding=100 cellspacing=0><tr><td class=inner-cell align="
         + align + "></td></tr></table>");
 

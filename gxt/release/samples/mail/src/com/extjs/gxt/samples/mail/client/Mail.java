@@ -25,7 +25,6 @@ public class Mail implements EntryPoint {
   
   public void onModuleLoad() {
     GXT.setDefaultTheme(Theme.GRAY, true);
-    GXT.hideLoadingPanel("loading");
 
     MailServiceAsync service = (MailServiceAsync) GWT.create(MailService.class);
     ServiceDefTarget endpoint = (ServiceDefTarget) service;
@@ -40,7 +39,8 @@ public class Mail implements EntryPoint {
     dispatcher.addController(new ContactController());
 
     dispatcher.dispatch(AppEvents.Login);
-
+    
+    GXT.hideLoadingPanel("loading");
   }
 
 }

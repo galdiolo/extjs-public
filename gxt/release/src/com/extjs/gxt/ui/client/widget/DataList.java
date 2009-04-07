@@ -386,20 +386,33 @@ public class DataList extends ScrollContainer<DataListItem> implements
       item.removeStyleName(itemStyle + "-sel");
     }
   }
-
+  
   /**
    * Removes the item from the list.
    * 
    * @param item the item to be removed
    * @return true if the item was removed
    */
+  @Override
   public boolean remove(DataListItem item) {
+    return remove(item, false);
+  }
+  
+  /**
+   * Removes the item from the list.
+   * 
+   * @param item the item to be removed
+   * @param force true to force
+   * @return true if the item was removed
+   */
+  @Override
+  public boolean remove(DataListItem item, boolean force) {
     DataListEvent dle = new DataListEvent(this);
     dle.item = item;
     if (fireEvent(Events.BeforeRemove, dle)) {
       checked.remove(item);
       item.list = null;
-      boolean result = super.remove(item);
+      boolean result = super.remove(item, force);
       fireEvent(Events.Remove, dle);
       return result;
     }
@@ -528,7 +541,7 @@ public class DataList extends ScrollContainer<DataListItem> implements
   }
 
   @Override
-  protected El getLayoutTarget() {
+  public El getLayoutTarget() {
     return inner;
   }
 

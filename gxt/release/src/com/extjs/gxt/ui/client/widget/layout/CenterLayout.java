@@ -25,6 +25,10 @@ import com.extjs.gxt.ui.client.widget.Layout;
  */
 public class CenterLayout extends Layout {
 
+  public CenterLayout() {
+    monitorResize = true;
+  }
+  
   @Override
   protected void renderComponent(Component component, int index, El target) {
     super.renderComponent(component, index, target);

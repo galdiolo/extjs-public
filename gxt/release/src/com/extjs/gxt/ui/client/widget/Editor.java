@@ -96,7 +96,7 @@ import com.google.gwt.user.client.ui.RootPanel;
  */
 public class Editor extends BoxComponent {
 
-  private boolean revertInvalid;
+  private boolean revertInvalid = true;
   private String alignment = "c-c";
   private boolean constrain;
   private boolean swallowKeys = true;
@@ -304,7 +304,7 @@ public class Editor extends BoxComponent {
   }
 
   /**
-   * True to revert to start value on invalid value (defaults to false).
+   * True to revert to start value on invalid value (defaults to true).
    * 
    * @param revertInvalid true to revert
    */
@@ -488,9 +488,6 @@ public class Editor extends BoxComponent {
     el().setVisibility(true);
 
     setStyleAttribute("overflow", GXT.isGecko ? "auto" : "hidden");
-    if (!field.getMessageTarget().equals("title")) {
-      field.setMessageTarget("gtip");
-    }
 
     field.setMessageTarget("tooltip");
 

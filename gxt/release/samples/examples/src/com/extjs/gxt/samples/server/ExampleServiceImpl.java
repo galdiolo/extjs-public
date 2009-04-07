@@ -8,6 +8,7 @@
 package com.extjs.gxt.samples.server;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -148,7 +149,14 @@ public class ExampleServiceImpl extends RemoteServiceServlet implements ExampleS
 
     URL url = getClass().getClassLoader().getResource(
         "com/extjs/gxt/samples/public/view/images/thumbs/");
-    File folder = new File(url.getFile());
+    File folder;
+    try {
+      // %20 will be converted to a space
+      folder = new File(url.toURI());
+    } catch (URISyntaxException e) {
+      // fallback
+      folder = new File(url.getFile());
+    }
     File[] pics = folder.listFiles();
     Arrays.sort(pics, new Comparator<File>() {
       public int compare(File o1, File o2) {

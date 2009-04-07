@@ -108,11 +108,15 @@ public class FileUploadField extends TextField<String> {
     return super.getName();
   }
 
+  @Override
   public void setName(String name) {
     super.setName(name);
     if (rendered) {
+      file.dom.removeAttribute("name");
       getInputEl().dom.removeAttribute("name");
-      file.setElementAttribute("name", name);
+      if(name != null) {
+        file.setElementAttribute("name", name); 
+      }
     }
   }
 

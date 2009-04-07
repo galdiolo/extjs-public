@@ -29,7 +29,7 @@ import java.util.Map;
  * <dl>
  * <dt><b>Events:</b></dt>
  *  
- * <dd><b>ChangeEventSource.Update</b> : (source, name, oldvalue, newvalue)<br>
+ * <dd><b>ChangeEventSource.Update</b> : ChangeEvent(source, name, oldvalue, newvalue)<br>
  * <div>Fires after the item is updated.</div>
  * <ul>
  * <li>source : this</li>

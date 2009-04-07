@@ -13,6 +13,7 @@ import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.event.LayoutEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.DelayedTask;
@@ -43,6 +44,7 @@ public abstract class Layout extends BaseObservable {
   protected boolean monitorResize;
 
   private String extraStyle;
+  private Listener<ContainerEvent> listener;
   private int resizeDelay = 100;
 
   private Listener resizeListener = new Listener<ComponentEvent>() {
@@ -98,6 +100,18 @@ public abstract class Layout extends BaseObservable {
    * @param ct the container
    */
   public void setContainer(Container ct) {
+    if (listener == null) {
+      listener = new Listener<ContainerEvent>() {
+        public void handleEvent(ContainerEvent be) {
+          onRemove(be.item);
+        }
+      };
+    }
+
+    if (this.container != null) {
+      this.container.removeListener(Events.BeforeRemove, listener);
+    }
+    
     if (monitorResize && container != ct) {
       if (container != null) {
         container.removeListener(Events.Resize, resizeListener);
@@ -108,6 +122,8 @@ public abstract class Layout extends BaseObservable {
 
     }
     this.container = ct;
+    
+    this.container.addListener(Events.BeforeRemove, listener);
   }
 
   /**
@@ -202,7 +218,7 @@ public abstract class Layout extends BaseObservable {
     }
     return false;
   }
-
+  
   protected void layoutContainer() {
     container.layout();
   }
@@ -212,6 +228,10 @@ public abstract class Layout extends BaseObservable {
     renderAll(container, target);
   }
 
+  protected void onRemove(Component component) {
+    
+  }
+  
   protected void onResize(ComponentEvent ce) {
     if (resizeDelay != -1) {
       task.delay(resizeDelay);

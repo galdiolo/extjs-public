@@ -49,6 +49,7 @@ public class ThemeSelector extends ComboBox<Theme> {
       for (Theme t : store.getModels()) {
         if (theme.equals(t.getId().toLowerCase())) {
           setValue(t);
+          break;
         }
       }
     }

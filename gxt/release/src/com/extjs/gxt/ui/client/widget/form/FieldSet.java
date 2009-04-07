@@ -223,6 +223,9 @@ public class FieldSet extends LayoutContainer {
     } else {
       collapse();
     }
+    if(checkboxToggle && checkbox != null) {
+      checkbox.setChecked(expand);
+    }
   }
 
   /**

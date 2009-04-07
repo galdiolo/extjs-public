@@ -222,6 +222,16 @@ public abstract class Container<T extends Component> extends BoxComponent {
   }
 
   /**
+   * Returns the container's layout target. Only applies to container with
+   * layouts.
+   * 
+   * @return the layout target
+   */
+  public El getLayoutTarget() {
+    return el();
+  }
+
+  /**
    * Returns the widget at the given index. If the child is a WidgetComponent,
    * the wrapped widget is returned.
    * 
@@ -338,18 +348,24 @@ public abstract class Container<T extends Component> extends BoxComponent {
   protected boolean doLayout() {
     if (!enableLayout) return false;
 
-    layoutExecuted = true;
-
     if (layout == null) {
       setLayout(new FlowLayout());
     }
 
+    if (!layoutExecuted) {
+      layoutExecuted = true;
+    }
+    
     // execute the layout
     layout.layout();
 
     for (Component c : items) {
+
       if (attachChildren && c.isRendered() && !c.isAttached()) {
         ComponentHelper.doAttach(c);
+      }
+      if (!c.isVisible()) {
+        continue;
       }
 
       if (c instanceof Composite) {
@@ -375,10 +391,6 @@ public abstract class Container<T extends Component> extends BoxComponent {
 
   protected Layout getLayout() {
     return layout;
-  }
-
-  protected El getLayoutTarget() {
-    return el();
   }
 
   /**
@@ -444,23 +456,23 @@ public abstract class Container<T extends Component> extends BoxComponent {
   }
 
   protected void onAfterLayout() {
-
+    sync(true);
   }
 
   @Override
   protected void onAttach() {
     super.onAttach();
-    if (!layoutExecuted && layoutOnAttach) {
+    if (!layoutExecuted && layoutOnAttach && !(getParent() instanceof Container)) {
       layout();
     }
   }
 
   protected void onInsert(T item, int index) {
-
+    
   }
 
   protected void onRemove(T item) {
-
+    
   }
 
   @Override
@@ -601,7 +613,7 @@ public abstract class Container<T extends Component> extends BoxComponent {
   }
 
   private native void setParent(Widget parent, Widget child) /*-{
-      child.@com.google.gwt.user.client.ui.Widget::parent = parent;
-    }-*/;
+       child.@com.google.gwt.user.client.ui.Widget::parent = parent;
+     }-*/;
 
 }

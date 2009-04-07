@@ -192,7 +192,11 @@ public class NavigationView extends View {
         binder.setSelection(new ArrayList());
         break;
       case AppEvents.TabChange:
-        binder.setSelection((Entry) event.data);
+        if(((Entry) event.data).getName() == "Overview") {
+          binder.setSelection(new ArrayList());
+        } else {
+          binder.setSelection((Entry) event.data);
+        }
         break;
     }
   }

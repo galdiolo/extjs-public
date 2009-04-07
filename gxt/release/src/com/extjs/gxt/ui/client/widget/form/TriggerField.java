@@ -81,6 +81,19 @@ public class TriggerField<Data> extends TextField<Data> {
   public boolean isHideTrigger() {
     return hideTrigger;
   }
+  
+  public void onAttach() {
+    super.onAttach();
+    if (GXT.isIE && !hideTrigger) {
+      int y1, y2;
+      if ((y1 = input.getY()) != (y2 = trigger.getY())) {
+        int dif = y2 - y1;
+        if (dif == 1) dif = 0;
+        input.makePositionable();
+        input.setTop(dif);
+      }
+    }
+  }
 
   /**
    * True to hide the trigger (defaults to false, pre-render).
@@ -104,15 +117,6 @@ public class TriggerField<Data> extends TextField<Data> {
   protected void afterRender() {
     super.afterRender();
     wrap.removeStyleName(fieldStyle);
-    if (GXT.isIE && !hideTrigger) {
-      int y1, y2;
-      if ((y1 = input.getY()) != (y2 = trigger.getY())) {
-        int dif = y2 - y1;
-        if (dif == 1) dif = 0;
-        input.makePositionable();
-        input.setTop(dif);
-      }
-    }
   }
 
   @Override
@@ -216,7 +220,7 @@ public class TriggerField<Data> extends TextField<Data> {
         tw = 17;
       }
       getInputEl().setWidth(this.adjustWidth("input", width - tw));
-      wrap.setWidth(width, true);
+      wrap.setWidth(width - (GXT.isIE ? 1 : 0), true);
     }
   }
 

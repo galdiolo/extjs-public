@@ -314,7 +314,6 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
 
   protected void doSelect(final Items<T> items, boolean keepExisting, boolean supressEvent) {
     if (locked) return;
-    createContainerEvent(container);
     List<T> previous = new ArrayList<T>(selected);
     if (!items.isSingle()) {
       if (!keepExisting) {

@@ -19,6 +19,7 @@ public class CheckBoxGroup extends MultiField<CheckBox> {
    * Creates a new checkbox group.
    */
   public CheckBoxGroup() {
+    setSpacing(5);
   }
 
   /**

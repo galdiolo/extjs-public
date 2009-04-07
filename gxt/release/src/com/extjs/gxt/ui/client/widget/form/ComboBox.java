@@ -1114,7 +1114,8 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements
     }
 
     String style = listStyle;
-    listView.setStyleAttribute("overflow", "visible");
+
+    listView.setStyleAttribute("overflow-Y", "auto");
     listView.setStyleName(style + "-inner");
     listView.setStyleAttribute("padding", "0px");
     listView.setItemSelector(itemSelector != null ? itemSelector : "." + style + "-item");
@@ -1143,14 +1144,14 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements
         eventPreview.getIgnoreList().add(getElement());
       }
     };
-    list.setScrollMode(Scroll.AUTOY);
+    list.setScrollMode(Scroll.NONE);
     list.setShim(true);
     list.setShadow(true);
     list.setBorders(true);
     list.setStyleName(style);
     list.hide();
 
-    assert store != null;
+    assert store != null : "ComboBox needs a store";
 
     list.add(listView);
 
@@ -1193,7 +1194,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements
         return;
       }
     }
-    hasFocus = false;
+   
     doBlur(ce);
   }
 
@@ -1414,11 +1415,9 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements
         validate();
       }
     }
-
+    hasFocus = false;
     super.onBlur(ce);
-
     updateHiddenValue();
-
     focusPreview.remove();
   }
 
@@ -1429,7 +1428,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements
   private void restrict() {
     listView.setHeight("");
     list.setHeight("");
-    int w = Math.max(getWidth(), minListWidth);
+    int w = Math.max(getWidth() + (GXT.isIE ? 1 : 0), minListWidth);
     list.setWidth(w);
     listView.setWidth("100%");
 
@@ -1446,7 +1445,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements
     if (footer != null) {
       h -= fh;
     }
-    listView.setHeight("100%");
+    listView.setHeight(h);
 
     int y = list.el().getY();
     int b = y + h;

@@ -29,19 +29,19 @@ import com.google.gwt.user.client.Event;
  * A basic tab container.
  * 
  * <pre>
-   TabPanel panel = new TabPanel();
-   panel.setResizeTabs(true);
-   panel.setEnableTabScroll(true);
-   panel.setAnimScroll(true);
-  
-   TabItem item = new TabItem();
-   item.setClosable(true);
-   item.setText("Tab Item");
-  
-   item.setLayout(new FitLayout());
-   item.add(new Label("Test Content"));
-  
-   panel.add(item);
+ * TabPanel panel = new TabPanel();
+ * panel.setResizeTabs(true);
+ * panel.setEnableTabScroll(true);
+ * panel.setAnimScroll(true);
+ * 
+ * TabItem item = new TabItem();
+ * item.setClosable(true);
+ * item.setText(&quot;Tab Item&quot;);
+ * 
+ * item.setLayout(new FitLayout());
+ * item.add(new Label(&quot;Test Content&quot;));
+ * 
+ * panel.add(item);
  * </pre>
  * 
  * <dl>
@@ -192,7 +192,7 @@ public class TabPanel extends Container<TabItem> {
     setLayout(cardLayout);
     enableLayout = true;
   }
-  
+
   /**
    * Adds a tab item. Fires the <i>BeforeAdd</i> event before inserting, then
    * fires the <i>Add</i> event after the widget has been inserted.
@@ -249,6 +249,16 @@ public class TabPanel extends Container<TabItem> {
     return border;
   }
 
+  @Override
+  public CardLayout getLayout() {
+    return cardLayout;
+  }
+
+  @Override
+  public El getLayoutTarget() {
+    return body;
+  }
+
   /**
    * Returns the minimum tab width.
    * 
@@ -268,7 +278,7 @@ public class TabPanel extends Container<TabItem> {
   }
 
   /**
-   * Returns the scroll duration in millseconds.
+   * Returns the scroll duration in milliseconds.
    * 
    * @return the duration
    */
@@ -355,6 +365,15 @@ public class TabPanel extends Container<TabItem> {
    */
   public boolean isAutoSelect() {
     return autoSelect;
+  }
+
+  /**
+   * Returns true if children items are rendered when first accessed.
+   * 
+   * @return true to defer rendering
+   */
+  public boolean isDeferredRender() {
+    return cardLayout.isDeferredRender();
   }
 
   /**
@@ -496,6 +515,18 @@ public class TabPanel extends Container<TabItem> {
   }
 
   /**
+   * True to render each child tab item when it accessed, false to render all
+   * (defaults to true). Setting to false would be useful when using forms as
+   * validation would need to be applied to all children even if they had not
+   * bee selected.
+   * 
+   * @param deferredRender true to defer rendering
+   */
+  public void setDeferredRender(boolean deferredRender) {
+    cardLayout.setDeferredRender(deferredRender);
+  }
+
+  /**
    * The minimum width in pixels for each tab when {@link #resizeTabs} = true
    * (defaults to 30).
    * 
@@ -577,10 +608,6 @@ public class TabPanel extends Container<TabItem> {
       stack.add(activeItem);
       cardLayout.setActiveItem(item);
 
-      if (isAttached()) {
-        ComponentHelper.doAttach(item);
-      }
-
       if (scrolling) {
         scrollToTab(item, getAnimScroll());
       }
@@ -657,11 +684,6 @@ public class TabPanel extends Container<TabItem> {
   }
 
   @Override
-  protected El getLayoutTarget() {
-    return body;
-  }
-
-  @Override
   protected void onAfterLayout() {
     delegateUpdates();
   }
@@ -690,7 +712,8 @@ public class TabPanel extends Container<TabItem> {
       bar = el().createChild("<div class='x-tab-panel-header'></div>");
       body = el().createChild("<div class='x-tab-panel-body x-tab-panel-body-top'></div");
     } else {
-      body = el().createChild("<div class='x-tab-panel-body x-tab-panel-body-bottom'></div");
+      body = el().createChild(
+          "<div class='x-tab-panel-body x-tab-panel-body-bottom'></div");
       bar = el().createChild("<div class='x-tab-panel-footer'></div>");
     }
 
@@ -716,8 +739,6 @@ public class TabPanel extends Container<TabItem> {
     strip = stripWrap.firstChild();
     edge = strip.createChild("<li class=x-tab-edge></li>");
     strip.createChild("<div class=x-clear></div>");
-
-    body.addStyleName("x-tab-panel-body-" + tabPosition);
 
     if (plain) {
       String p = tabPosition == TabPosition.BOTTOM ? "bottom" : "header";
@@ -857,8 +878,8 @@ public class TabPanel extends Container<TabItem> {
     int count = getItemCount();
     if (count == 0) return;
     int aw = bar.getClientWidth();
-    int each = (int) Math.max(Math.min(Math.floor((aw - 4) / count) - getTabMargin(), tabWidth),
-        getMinTabWidth());
+    int each = (int) Math.max(Math.min(Math.floor((aw - 4) / count) - getTabMargin(),
+        tabWidth), getMinTabWidth());
 
     for (int i = 0; i < count; i++) {
       El el = getItem(i).header.el();

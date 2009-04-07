@@ -100,11 +100,7 @@ public class ListViewDropTarget extends DropTarget {
 
   @Override
   protected void onDragMove(DNDEvent event) {
-    if (feedback == Feedback.APPEND) {
-      event.doit = true;
-    } else {
-      event.doit = true;
-    }
+    event.doit = true;
   }
 
   /**

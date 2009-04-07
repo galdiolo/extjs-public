@@ -13,16 +13,14 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.Component;
-import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
 
 /**
  * This is a layout that contains multiple content panels in an expandable
  * accordion style such that only one panel can be open at any given time.
  * 
- * <p /> Child Widgets are:
+ * <p />
+ * Child Widgets are:
  * <ul>
  * <li><b>Sized</b> : Yes - default expands to fill parent container.</li>
  * <li><b>Positioned</b> : No - widgets are located at 0,0.</li>
@@ -39,13 +37,12 @@ public class AccordionLayout extends FitLayout {
   private boolean hideCollapseTool = false;
   private boolean autoWidth;
   private boolean activeOnTop = false;
-
   private Listener listener;
 
   public AccordionLayout() {
     listener = new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent ce) {
-        setActiveItem(ce.component);
+        onBeforeExpand(ce);
       }
     };
   }
@@ -116,11 +113,6 @@ public class AccordionLayout extends FitLayout {
     }
 
     layout();
-    DeferredCommand.addCommand(new Command() {
-      public void execute() {
-        layout();
-      }
-    });
   }
 
   /**
@@ -176,11 +168,9 @@ public class AccordionLayout extends FitLayout {
   public void setTitleCollapse(boolean titleCollapse) {
     this.titleCollapse = titleCollapse;
   }
-
-  @Override
-  protected void onLayout(Container container, El target) {
-    super.onLayout(container, target);
-    updateStyles();
+  
+  protected void onBeforeExpand(ComponentEvent ce) {
+    setActiveItem(ce.component);
   }
 
   @Override
@@ -212,11 +202,6 @@ public class AccordionLayout extends FitLayout {
 
     El.fly(cp.getElement("header")).addStyleName("x-accordion-hd");
     cp.addListener(Events.BeforeExpand, listener);
-    cp.addListener(Events.Collapse, new Listener<ComponentEvent>() {
-      public void handleEvent(ComponentEvent ce) {
-        layout();
-      }
-    });
   }
 
   @Override
@@ -229,7 +214,6 @@ public class AccordionLayout extends FitLayout {
         if (cp != item) {
           hh += (cp.getOffsetHeight() - El.fly(cp.getElement("bwrap")).getHeight());
           cp.el().setWidth(size.width);
-          cp.el().setHeight("auto");
         }
       }
       size.height -= hh;
@@ -237,38 +221,13 @@ public class AccordionLayout extends FitLayout {
       if (cp.isExpanded()) {
         setSize(item, size.width, size.height);
       } else {
-        setSize(item, size.width, -1);
-        cp.el().setHeight("auto");
+        item.el().setWidth(size.width, true);
       }
     }
-  }
-
-  protected void updateStyles() {
-    int count = container.getItemCount();
-    boolean anyexpanded = false;
-    for (int i = 0; i < count; i++) {
-      ContentPanel panel = (ContentPanel) container.getItem(i);
-      panel.getHeader().removeStyleName("x-border-bottom-none");
-      if (i != (count - 1) && panel.isExpanded()) {
-        anyexpanded = true;
-      }
-      panel.getHeader().el().setStyleName("x-border-top", isPriorExpanded(i));
-      if (i == (count - 1) && (anyexpanded && !panel.isExpanded())) {
-        panel.getHeader().addStyleName("x-border-bottom-none");
-      }
-    }
-  }
-
-  private boolean isPriorExpanded(int current) {
-    if (--current >= 0) {
-      ContentPanel panel = (ContentPanel) container.getItem(current);
-      return panel.isExpanded();
-    }
-    return false;
   }
 
   private native void markExpanded(ContentPanel panel) /*-{
-        panel.@com.extjs.gxt.ui.client.widget.ContentPanel::collapsed = false;
-      }-*/;
+     panel.@com.extjs.gxt.ui.client.widget.ContentPanel::collapsed = false;
+   }-*/;
 
 }

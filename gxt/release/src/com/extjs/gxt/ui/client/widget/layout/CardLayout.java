@@ -31,7 +31,9 @@ import com.extjs.gxt.ui.client.widget.Component;
  * @see CardPanel
  */
 public class CardLayout extends FitLayout {
-
+  
+  private boolean deferredRender = true;
+  
   /**
    * Creates a new card layout instance.
    */
@@ -47,6 +49,15 @@ public class CardLayout extends FitLayout {
    */
   public Component getActiveItem() {
     return activeItem;
+  }
+  
+  /**
+   * Returns true if children are rendered when first accessed.
+   * 
+   * @return true to defer rendering
+   */
+  public boolean isDeferredRender() {
+    return deferredRender;
   }
 
   /**
@@ -66,10 +77,20 @@ public class CardLayout extends FitLayout {
       }
     }
   }
-
+  
+  /**
+   * True to render each child when it accessed, false to render all (defaults
+   * to true).
+   * 
+   * @param deferredRender true to defer rendering
+   */
+  public void setDeferredRender(boolean deferredRender) {
+    this.deferredRender = deferredRender;
+  }
+  
   @Override
   protected void renderComponent(Component component, int index, El target) {
-    if (activeItem == component) {
+    if (activeItem == component || !deferredRender) {
       super.renderComponent(component, index, target);
     }
   }

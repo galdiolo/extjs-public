@@ -1465,7 +1465,7 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
   position: absolute;
   right: 0;
   -moz-opacity: 0;
-  filter: alpha(opacity :     0);
+  filter: alpha(opacity :       0);
   opacity: 0;
   z-index: 2;
   height: 22px;
@@ -1490,6 +1490,10 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
 
 .ext-ie .x-grid-panel .x-small-editor .x-form-text {
   top: 0 !important;
+}
+
+.x-form-item label {
+  padding: 3px 0px 3px 0px !important;
 }.arrow-top {
   background: url(../images/gxt/icons/top2.gif) no-repeat center left !important;
 }

@@ -12,7 +12,6 @@ import java.util.List;
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseEvent;
-import com.extjs.gxt.ui.client.event.DomEvent;
 import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.store.StoreEvent;
 import com.google.gwt.user.client.Event;
@@ -24,20 +23,6 @@ import com.google.gwt.user.client.ui.KeyboardListener;
  * @param <M> the model type
  */
 public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<M> {
-
-  public class CellSelection {
-    public M model;
-    public int row;
-    public int cell;
-
-    public CellSelection(M model, int row, int cell) {
-      this.model = model;
-      this.row = row;
-      this.cell = cell;
-    }
-  }
-
-  private CellSelection selection;
 
   private Callback callback = new Callback(this);
   private EditorGrid editGrid;
@@ -97,6 +82,7 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
    * @param row the row index
    * @param cell the cell index
    */
+  @Override
   public void selectCell(int row, int cell) {
     deselectAll();
     M m = store.getAt(row);
@@ -122,35 +108,6 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
   protected void onClear(StoreEvent<M> se) {
     super.onClear(se);
     selection = null;
-  }
-
-  protected void onEditorKey(DomEvent e) {
-    int r = selection.row;
-    int c = selection.cell;
-
-    Cell newCell = null;
-
-    switch (e.getKeyCode()) {
-      case KeyboardListener.KEY_TAB:
-        if (e.isShiftKey()) {
-          newCell = grid.walkCells(r, c - 1, -1, callback, true);
-        } else {
-          newCell = grid.walkCells(r, c + 1, 1, callback, true);
-        }
-        e.stopEvent();
-        break;
-      case KeyboardListener.KEY_ESCAPE:
-        e.stopEvent();
-        editGrid.stopEditing();
-        break;
-    }
-
-    if (newCell != null) {
-      final int rr = newCell.row;
-      final int cc = newCell.cell;
-      selectCell(newCell.row, newCell.cell);
-      ((EditorGrid) grid).startEditing(rr, cc);
-    }
   }
 
   @Override
@@ -220,14 +177,6 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
     super.onRemove(model);
     if (selection != null && selection.model == model) {
       selection = null;
-    }
-  }
-
-  boolean isSelectable(int row, int cell, boolean acceptsNav) {
-    if (acceptsNav) {
-      return !grid.getColumnModel().isHidden(cell) && grid.getColumnModel().isCellEditble(cell);
-    } else {
-      return !grid.getColumnModel().isHidden(cell);
     }
   }
 

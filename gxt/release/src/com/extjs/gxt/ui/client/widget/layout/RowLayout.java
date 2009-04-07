@@ -214,7 +214,6 @@ public class RowLayout extends Layout {
         height = height * ph;
       }
 
-      height -= c.el().getMargins("tb");
       setSize(c, (int) width, (int) height);
     }
   }

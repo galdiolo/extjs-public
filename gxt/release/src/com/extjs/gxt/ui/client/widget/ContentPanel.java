@@ -165,6 +165,7 @@ public class ContentPanel extends LayoutContainer {
     baseStyle = "x-panel";
     buttonBar = new ButtonBar();
     head = new Header();
+    disabledStyle = null;
   }
 
   /**
@@ -790,6 +791,16 @@ public class ContentPanel extends LayoutContainer {
     if (head != null && ce.within(head.getElement()) && collapsible && titleCollapse) {
       setExpanded(!isExpanded());
     }
+  }
+  
+  protected void onDisable() {
+    mask();
+    super.onDisable();
+  }
+
+  protected void onEnable() {
+    unmask();
+    super.onEnable();
   }
 
   protected void onCollapse() {

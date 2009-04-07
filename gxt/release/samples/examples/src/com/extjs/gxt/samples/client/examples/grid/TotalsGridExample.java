@@ -79,7 +79,6 @@ public class TotalsGridExample extends LayoutContainer {
     NumberField nf = new NumberField();
     nf.setAutoValidate(true);
     CellEditor ce = new CellEditor(nf);
-    ce.setRevertInvalid(true);
     ce.setCancelOnEsc(true);
     rate.setEditor(ce);
 

@@ -324,7 +324,9 @@ public class Layer extends El {
             GWT.log("shim error", e);
           }
         } else {
-          shim.setVisible(false);
+          if(shim != null) {
+            shim.setVisible(false);
+          }
         }
       }
     }

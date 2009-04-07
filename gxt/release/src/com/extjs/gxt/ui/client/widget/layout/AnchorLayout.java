@@ -127,7 +127,7 @@ public class AnchorLayout extends Layout {
   private int parseAnchor(String a, int v, int start, int cstart) {
     if (a != null && !a.equals("none")) {
       if (standard(a)) {
-        int diff = cstart = start;
+        int diff = cstart - start;
         return v - diff;
       } else if (a.indexOf("%") != -1) {
         double ratio = Float.parseFloat(a.replaceAll("%", "")) * .01;

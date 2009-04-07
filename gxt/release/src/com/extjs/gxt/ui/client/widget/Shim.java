@@ -16,7 +16,6 @@ import com.extjs.gxt.ui.client.util.Rectangle;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.RootPanel;
 
 /**
  * An class that supports placing a shim over the client window, and optionally
@@ -50,6 +49,12 @@ public class Shim {
       shims.add(createShim(0, 0, Window.getClientWidth(), Window.getClientHeight()));
     }
   }
+  
+  public void setStyleAttribute(String attr, String value) {
+    for(El shim : shims) {
+      shim.setStyleAttribute(attr, value);
+    }
+  }
 
   /**
    * Uncovers and removes the shim.
@@ -63,13 +68,11 @@ public class Shim {
 
   protected El createShim(int left, int top, int width, int height) {
     El shim = new El(DOM.createDiv());
+    shim.addStyleName("x-drag-overlay");
     shim.setSize(width, height);
-    shim.setStyleAttribute("backgroundColor", "red");
-    RootPanel.getBodyElement().appendChild(shim.dom);
-    shim.makePositionable(true);
     shim.setLeftTop(left, top);
-    shim.setStyleAttribute("opacity", 0);
-    shim.updateZIndex(-1);
+    shim.update("&#160;");
+    XDOM.getBody().appendChild(shim.dom);
     shim.setVisible(true);
     return shim;
   }

@@ -8,6 +8,7 @@
 package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.DelayedTask;
@@ -69,13 +70,11 @@ public class Viewport extends LayoutContainer {
 
   private DelayedTask task = new DelayedTask(new Listener<ComponentEvent>() {
     public void handleEvent(ComponentEvent ce) {
-      el().setBounds(0, 0, Window.getClientWidth(), Window.getClientHeight());
       layout();
     }
   });
 
   public Viewport() {
-    baseStyle = "x-viewport";
     layoutOnAttach = true;
   }
 
@@ -142,8 +141,9 @@ public class Viewport extends LayoutContainer {
   }
 
   protected void onRender(Element parent, int pos) {
+    setElement(XDOM.getBody());
     super.onRender(parent, pos);
-    el().setLeftTop(0, 0);
+    el().getParent().addStyleName("x-viewport");
 
     Window.enableScrolling(enableScroll);
 

@@ -502,7 +502,7 @@ public class GroupingView extends GridView {
     if (!enableGrouping || ds.getCount() < 1) {
       return;
     }
-    String tw = Math.max(cm.getTotalWidth(), el.dom.getOffsetWidth() - scrollOffset) + "px";
+    String tw = Math.max(cm.getTotalWidth(), el.dom.getOffsetWidth() - getScrollAdjust()) + "px";
     NodeList gs = getGroups();
     for (int i = 0, len = gs.getLength(); i < len; i++) {
       Element e = gs.getItem(i).getFirstChild().cast();

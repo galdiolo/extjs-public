@@ -8,6 +8,7 @@
 package com.extjs.gxt.desktop.client;
 
 import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
@@ -20,10 +21,11 @@ import com.google.gwt.user.client.Event;
  * A selectable icon and text added to the desktop. Each shortcut requires an id
  * that has matching css styles for the icon.
  * 
- * <pre><code>
+ * <pre>
+ * &lt;code&gt;
  * Shortcut s2 = new Shortcut();
- * s2.setText("Accordion Window");
- * s2.setId("acc-win-shortcut");
+ * s2.setText(&quot;Accordion Window&quot;);
+ * s2.setId(&quot;acc-win-shortcut&quot;);
  * 
  * #acc-win-shortcut img {
  *  width: 48px;
@@ -31,7 +33,8 @@ import com.google.gwt.user.client.Event;
  *  background-image: url(../images/im48x48.png);
  * }
  * 
- * </code></pre>
+ * &lt;/code&gt;
+ * </pre>
  */
 public class Shortcut extends Component {
 
@@ -109,7 +112,7 @@ public class Shortcut extends Component {
     super.onRender(target, index);
     setElement(DOM.createElement("dt"), target, index);
     El a = el().createChild("<a href='#'></a>");
-    a.createChild("<img src='images/default/s.gif'></img>");
+    a.createChild("<img src='" + GXT.BLANK_IMAGE_URL + "'></img>");
     El txt = a.createChild("<div></div>");
 
     if (txt != null) {

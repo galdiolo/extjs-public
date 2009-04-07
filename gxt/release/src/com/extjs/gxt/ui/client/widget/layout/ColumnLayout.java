@@ -14,16 +14,19 @@ import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.Layout;
 
 /**
- * This is the layout style of choice for creating structural layouts in a
- * multi-column format where the width of each column can be specified as a
- * percentage or fixed width, but the height is allowed to vary based on the
- * content.
- * <p>
- * ColumnLayout supports a ColumnData layout object. The layout will use the
- * width (if pixels) or columnWidth (if percent) of each panel during layout to
- * determine how to size each panel. If width or columnWidth is not specified
- * for a given panel, its width will default to the panel's width (or auto).
- * <p>
+ * This layout positions and sizes the container's children in columns
+ * horizontally. Each component may specify its width in pixels or as percentage
+ * of the parent remaining width.
+ * 
+ * <p />
+ * Child Widgets are:
+ * <ul>
+ * <li><b>Sized</b> : Yes - the width of a widget is adjusted by the ColumnData
+ * hint</li>
+ * <li><b>Positioned</b> : Yes - widgets are placed in columns</li>
+ * </ul>
+ * 
+ * <p />
  * Code snippet:
  * 
  * <code><pre>
@@ -86,7 +89,10 @@ public class ColumnLayout extends Layout {
     for (int i = 0; i < count; i++) {
       Component c = container.getItem(i);
       ColumnData data = (ColumnData) getLayoutData(c);
-
+      if (data == null) {
+        data = new ColumnData();
+        setLayoutData(c, data);
+      }
       if (data.getWidth() > 1) {
         pw -= data.getWidth();
       }

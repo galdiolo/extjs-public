@@ -152,7 +152,7 @@ public class BorderLayout extends Layout {
     Component c = getRegionWidget(region);
     if (c != null) {
       BorderLayoutData data = (BorderLayoutData) getLayoutData(c);
-      data.setHidden(false);
+      data.setHidden(true);
       layout();
     }
   }
@@ -181,7 +181,7 @@ public class BorderLayout extends Layout {
     Component c = getRegionWidget(region);
     if (c != null) {
       BorderLayoutData data = (BorderLayoutData) getLayoutData(c);
-      data.setHidden(true);
+      data.setHidden(false);
       layout();
     }
   }

@@ -8,6 +8,7 @@
 package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.BoxComponentEvent;
@@ -16,6 +17,7 @@ import com.extjs.gxt.ui.client.util.Point;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.util.Size;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Base class for any visual {@link Component} that uses a box container.
@@ -516,15 +518,29 @@ public class BoxComponent extends Component {
   public void setWidth(String width) {
     setSize(width, Style.UNDEFINED);
   }
+  
+  /**
+   * Syncs the layer of the component. Automatically delegates up to the most top parent.
+   */
+  public void sync(boolean show) {
+    Widget parent = getParent();
+    if(parent != null && parent instanceof BoxComponent) {
+      ((BoxComponent) parent).sync(show);
+    } else if (layer != null) {
+      layer.sync(show);
+    }
+  }
 
   protected void afterRender() {
     super.afterRender();
     boxReady = true;
 
-    if (shadow || shim) {
+    if (shadow || (shim && GXT.useShims)) {
       layer = new Layer(getElement());
-      layer.enableShadow(getShadow());
-      if (shim) layer.enableShim();
+      layer.enableShadow(shadow);
+      if (shim && GXT.useShims) {
+        layer.enableShim();
+      }
       setEl(layer);
     }
 
@@ -539,9 +555,7 @@ public class BoxComponent extends Component {
       setPagePosition(pageX, pageY);
     }
 
-    if (layer != null) {
-      layer.sync(true);
-    }
+    sync(true);
 
   }
 

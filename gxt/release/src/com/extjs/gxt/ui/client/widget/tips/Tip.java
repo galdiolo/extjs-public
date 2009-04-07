@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.widget.tips;
 
+import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Point;
@@ -142,6 +143,8 @@ public class Tip extends ContentPanel {
     }
     Point p = new Point(x, y);
     p = el().adjustForConstraints(p);
+    p.x += XDOM.getBody().getScrollLeft();
+    p.y += XDOM.getBody().getScrollTop();
     setPagePosition(p.x, p.y);
   }
 

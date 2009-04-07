@@ -507,9 +507,6 @@ public class Draggable extends BaseObservable {
       proxyEl.setVisibility(true);
     }
 
-    if (startDragDistance == 0) {
-      startDrag(ce.event);
-    }
   }
 
   protected void onMouseMove(Event event) {

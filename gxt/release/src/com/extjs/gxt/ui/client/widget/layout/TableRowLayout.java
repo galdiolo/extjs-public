@@ -102,7 +102,7 @@ public class TableRowLayout extends TableLayout {
     }
 
     if (getHeight() != null) {
-      table.setPropertyString("height", getHeight());
+      table.setAttribute("height", getHeight());
     }
 
     tbody = DOM.createTBody();

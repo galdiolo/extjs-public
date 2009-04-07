@@ -93,57 +93,57 @@ public class El {
   }
 
   private static native String addUnitsInternal(String v, String defaultUnit) /*-{
-     if(v === "" || v == "auto"){
-       return v;
-     }
-     if(v === undefined){
-       return '';
-     }
-     if(typeof v == "number" || !/\d+(px|em|%|en|ex|pt|in|cm|mm|pc)$/i.test(v)){
-       return v + (defaultUnit || 'px');
-     }
-     return v;
-   }-*/;
+    if(v === "" || v == "auto"){
+      return v;
+    }
+    if(v === undefined){
+      return '';
+    }
+    if(typeof v == "number" || !/\d+(px|em|%|en|ex|pt|in|cm|mm|pc)$/i.test(v)){
+      return v + (defaultUnit || 'px');
+    }
+    return v;
+  }-*/;
 
   private native static void disableContextMenuInternal(Element elem, boolean disable) /*-{
-     if (disable) {
-       elem.oncontextmenu = function() {  return false};
-     } else {
-       elem.oncontextmenu = null;
-     }
-   }-*/;
+    if (disable) {
+      elem.oncontextmenu = function() {  return false};
+    } else {
+      elem.oncontextmenu = null;
+    }
+  }-*/;
 
   private native static void disableTextSelectInternal(Element e, boolean disable)/*-{
-     if (disable) {
-       e.ondrag = function (evt) {
-        var targ;
-        if (!e) var e = $wnd.event;
-        if (e.target) targ = e.target;
-        else if (e.srcElement) targ = e.srcElement;
-        if (targ.nodeType == 3) // defeat Safari bug
-        targ = targ.parentNode;
-        if (targ.tagName == 'INPUT') {
-          return true;
-        }
-        return false; 
-       };
-       e.onselectstart = function (e) { 
-        var targ;
-        if (!e) var e = $wnd.event;
-        if (e.target) targ = e.target;
-        else if (e.srcElement) targ = e.srcElement;
-        if (targ.nodeType == 3) // defeat Safari bug
-        targ = targ.parentNode;
-        if (targ.tagName == 'INPUT') {
-          return true;
-        }
-        return false; 
-       };
-     } else {
-       e.ondrag = null;
-       e.onselectstart = null;
-     }
-     }-*/;
+   if (disable) {
+     e.ondrag = function (evt) {
+      var targ;
+      if (!e) var e = $wnd.event;
+      if (e.target) targ = e.target;
+      else if (e.srcElement) targ = e.srcElement;
+      if (targ.nodeType == 3) // defeat Safari bug
+      targ = targ.parentNode;
+      if (targ.tagName == 'INPUT') {
+        return true;
+      }
+      return false; 
+     };
+     e.onselectstart = function (e) { 
+      var targ;
+      if (!e) var e = $wnd.event;
+      if (e.target) targ = e.target;
+      else if (e.srcElement) targ = e.srcElement;
+      if (targ.nodeType == 3) // defeat Safari bug
+      targ = targ.parentNode;
+      if (targ.tagName == 'INPUT') {
+        return true;
+      }
+      return false; 
+     };
+   } else {
+     e.ondrag = null;
+     e.onselectstart = null;
+   }
+   }-*/;
 
   /**
    * The wrapped dom element.
@@ -307,7 +307,8 @@ public class El {
    */
   public El boxWrap(String style) {
     String s = style != null ? style : "x-box";
-    El temp = insertHtml("beforeBegin", Format.substitute("<div class={0}>" + Markup.BBOX, s)
+    El temp = insertHtml("beforeBegin", Format.substitute(
+        "<div class={0}>" + Markup.BBOX, s)
         + "</div>");
     temp.child("." + s + "-mc").appendChild(dom);
     return temp;
@@ -331,10 +332,11 @@ public class El {
    */
   public El center(boolean constrainViewport) {
     makePositionable(true);
-    
+
     Element container = null;
     int width = container == null ? Window.getClientWidth() : container.getOffsetWidth();
-    int height = container == null ? Window.getClientHeight() : container.getOffsetHeight();
+    int height = container == null ? Window.getClientHeight()
+        : container.getOffsetHeight();
 
     if (container == null) {
       container = XDOM.getBody();
@@ -367,7 +369,8 @@ public class El {
   public El center(Element container) {
     makePositionable(true);
     int width = container == null ? Window.getClientWidth() : container.getOffsetWidth();
-    int height = container == null ? Window.getClientHeight() : container.getOffsetHeight();
+    int height = container == null ? Window.getClientHeight()
+        : container.getOffsetHeight();
 
     if (container == null) {
       container = XDOM.getBody();
@@ -425,17 +428,17 @@ public class El {
    * @return this
    */
   public native El click() /*-{
-     var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-     if (dom.click) {
-       dom.click();
-     }
-     else {
-       var event = $doc.createEvent("MouseEvents");
-       event.initEvent('click', true, true, $wnd, 0, 0, 0, 0, 0, false, false, false, false, 1, dom);
-       dom.dispatchEvent(event);    
-     }
-     return this;
-   }-*/;
+    var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+    if (dom.click) {
+      dom.click();
+    }
+    else {
+      var event = $doc.createEvent("MouseEvents");
+      event.initEvent('click', true, true, $wnd, 0, 0, 0, 0, 0, false, false, false, false, 1, dom);
+      dom.dispatchEvent(event);    
+    }
+    return this;
+  }-*/;
 
   /**
    * Clips overflow on the element.
@@ -463,9 +466,9 @@ public class El {
    * @return the new element
    */
   public native Element cloneNode(boolean deep) /*-{
-     var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-     return dom.cloneNode(deep);
-   }-*/;
+    var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+    return dom.cloneNode(deep);
+  }-*/;
 
   /**
    * Creates and adds a child using the HTML fragment.
@@ -497,10 +500,10 @@ public class El {
    * @return this
    */
   public native El disable() /*-{
-     var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-     dom.disabled = true;
-     return this;
-   }-*/;
+    var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+    dom.disabled = true;
+    return this;
+  }-*/;
 
   /**
    * Enables and disables the browsers default context menu for the specified
@@ -551,10 +554,10 @@ public class El {
    * @return this
    */
   public native El enable()/*-{
-       var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-       dom.disabled = false;
-       return this;
-     }-*/;
+     var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+     dom.disabled = false;
+     return this;
+   }-*/;
 
   /**
    * Convenience method for setVisibilityMode(VisibilityMode.DISPLAY).
@@ -728,7 +731,19 @@ public class El {
    * @return the bounds
    */
   public Rectangle getBounds() {
-    return getBounds(false);
+    return getBounds(false, false);
+  }
+
+  /**
+   * Returns the elements bounds in page coordiates.
+   * 
+   * @param local if true the element's left and top are returned instead of
+   *          page coordinates
+   * 
+   * @return the bounds
+   */
+  public Rectangle getBounds(boolean local) {
+    return getBounds(local, false);
   }
 
   /**
@@ -736,10 +751,12 @@ public class El {
    * 
    * @param local if true the element's left and top are returned instead of
    *          page coordinates
+   * @param adjust if true sizes get adjusted
+   * 
    * @return the element's bounds
    */
-  public Rectangle getBounds(boolean local) {
-    Size s = getSize();
+  public Rectangle getBounds(boolean local, boolean adjust) {
+    Size s = getSize(adjust);
     Rectangle rect = new Rectangle();
     rect.width = s.width;
     rect.height = s.height;
@@ -847,8 +864,8 @@ public class El {
    * @return the element's height
    */
   public int getHeight(boolean content) {
-    int h = DOM.getElementPropertyInt(dom, "offsetHeight");
-    if (content & !XDOM.isVisibleBox) {
+    int h = dom.getOffsetHeight();
+    if (content) {
       h -= getFrameWidth("tb");
     }
     return h;
@@ -860,7 +877,7 @@ public class El {
    * @return the id
    */
   public String getId() {
-    return DOM.getElementProperty(dom, "id");
+    return dom.getId();
   }
 
   /**
@@ -1543,11 +1560,33 @@ public class El {
   /**
    * Puts a mask over this element to disable user interaction.
    * 
+   * @return the mask element
+   */
+  public El mask() {
+    return mask(null, null);
+  }
+
+  /**
+   * Puts a mask over this element to disable user interaction.
+   * 
    * @param message a message to display in the mask
    * @return the mask element
    */
   public El mask(String message) {
-    makePositionable();
+    return mask(message, null);
+  }
+
+  /**
+   * Puts a mask over this element to disable user interaction.
+   * 
+   * @param message a message to display in the mask
+   * @param messageStyleName a CSS style name to be applied to the message text
+   * @return the mask element
+   */
+  public El mask(String message, String messageStyleName) {
+    if (getStyleAttribute("position") == "static") {
+      addStyleName("x-masked-relative");
+    }
     if (_maskMsg != null) {
       _maskMsg.remove();
     }
@@ -1561,19 +1600,21 @@ public class El {
     _mask.setDisplayed(true);
 
     appendChild(_mask.dom);
+    if (message != null) {
+      _maskMsg = new El("<div class='ext-el-mask-msg'><div></div></div>");
+      if (messageStyleName != null) {
+        _maskMsg.addStyleName(messageStyleName);
+      }
+      _maskMsg.firstChild().setInnerHtml(message);
+      _maskMsg.setDisplayed(true);
 
-    _maskMsg = new El(
-        "<div class='ext-el-mask-msg' style='z-index: 100'><div style='background-color: white'></div></div>");
-    _maskMsg.firstChild().setInnerHtml(message);
-    _maskMsg.setDisplayed(true);
-
-    appendChild(_maskMsg.dom);
-
-    if (GXT.isIE && !(GXT.isIE && GXT.isStrict) && "auto".equals(getStyleAttribute("height"))) {
-      _mask.setSize(getClientWidth(), getHeight());
+      appendChild(_maskMsg.dom);
+      _maskMsg.center(dom);
     }
-
-    _maskMsg.center(dom);
+    if (GXT.isIE && !(GXT.isIE7 && GXT.isStrict)
+        && "auto".equals(getStyleAttribute("height"))) {
+      _mask.setSize(getWidth(), getHeight());
+    }
 
     return _mask;
   }
@@ -1683,38 +1724,38 @@ public class El {
    * @param hscroll <code>false</code> to disable horizontal scrolling.
    */
   public native void scrollIntoView(Element container, boolean hscroll) /*-{
-     var elem = this.@com.extjs.gxt.ui.client.core.El::dom;
-     var c = container || $doc.body;
-     var o = this.@com.extjs.gxt.ui.client.core.El::offsetsTo(Lcom/google/gwt/user/client/Element;)(container);
-     var l = o.@com.extjs.gxt.ui.client.util.Point::x;
-     var t = o.@com.extjs.gxt.ui.client.util.Point::y;
-     l = l + c.scrollLeft;
-     t = t + c.scrollTop;
-     var b = t + elem.offsetHeight;
-     var r = l + elem.offsetWidth;
-     
-     var ch = c.clientHeight;
-     var ct = parseInt(c.scrollTop, 10);
-     var cl = parseInt(c.scrollLeft, 10);
-     var cb = ct + ch;
-     var cr = cl + c.clientWidth;
-     
-     if (t < ct){
-       c.scrollTop = t;
-     }else if(b > cb){
-       c.scrollTop = b-ch;
-     }
-     c.scrollTop = c.scrollTop; 
-     
-     if(hscroll !== false){
-       if(l < cl){
-         c.scrollLeft = l;
-       } else if(r > cr){
-         c.scrollLeft = r-c.clientWidth;
-       }
-       c.scrollLeft = c.scrollLeft;
-     }
-   }-*/;
+      var elem = this.@com.extjs.gxt.ui.client.core.El::dom;
+      var c = container || $doc.body;
+      var o = this.@com.extjs.gxt.ui.client.core.El::offsetsTo(Lcom/google/gwt/user/client/Element;)(container);
+      var l = o.@com.extjs.gxt.ui.client.util.Point::x;
+      var t = o.@com.extjs.gxt.ui.client.util.Point::y;
+      l = l + c.scrollLeft;
+      t = t + c.scrollTop;
+      var b = t + elem.offsetHeight;
+      var r = l + elem.offsetWidth;
+      
+      var ch = c.clientHeight;
+      var ct = parseInt(c.scrollTop, 10);
+      var cl = parseInt(c.scrollLeft, 10);
+      var cb = ct + ch;
+      var cr = cl + c.clientWidth;
+      
+      if (t < ct){
+        c.scrollTop = t;
+      }else if(b > cb){
+        c.scrollTop = b-ch;
+      }
+      c.scrollTop = c.scrollTop; 
+      
+      if(hscroll !== false){
+        if(l < cl){
+          c.scrollLeft = l;
+        } else if(r > cr){
+          c.scrollLeft = r-c.clientWidth;
+        }
+        c.scrollLeft = c.scrollLeft;
+      }
+    }-*/;
 
   /**
    * Scrolls this element the specified scroll point.
@@ -1905,18 +1946,18 @@ public class El {
    * @param focus the new focus state
    */
   public native El setFocus(boolean focus) /*-{
-     var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-     try {
-       if (focus) {
-         dom.focus();
-       } else {
-         dom.blur();
-       }
-     } 
-     catch(err) {
-     }
-     return this;
-   }-*/;
+      var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+      try {
+        if (focus) {
+          dom.focus();
+        } else {
+          dom.blur();
+        }
+      } 
+      catch(err) {
+      }
+      return this;
+    }-*/;
 
   /**
    * Sets the elements height.
@@ -2481,9 +2522,11 @@ public class El {
         _maskMsg.remove();
         _maskMsg = null;
       }
-      removeStyleName("x-masked");
+      _mask.setVisible(false);
       _mask.remove();
       _mask = null;
+      removeStyleName("x-masked");
+      removeStyleName("x-masked-relative");
     }
     return this;
   }

@@ -123,6 +123,15 @@ public class Desktop {
   public StartMenu getStartMenu() {
     return taskBar.getStartMenu();
   }
+  
+  /**
+   * Returns a list of the desktop's shortcuts.
+   * 
+   * @return the shortcuts
+   */
+  public List<Shortcut> getShortcuts() {
+    return shortcuts;
+  }
 
   /**
    * Returns the desktop's task bar.

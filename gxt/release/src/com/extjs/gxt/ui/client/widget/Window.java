@@ -214,6 +214,7 @@ public class Window extends ContentPanel {
     baseStyle = "x-window";
     focusable = true;
     frame = true;
+    layoutOnAttach = false;
     setShadow(true);
     shim = true;
     hidden = true;
@@ -284,6 +285,7 @@ public class Window extends ContentPanel {
     RootPanel.get().remove(this);
     if (modal) {
       ModalPanel.push(modalPanel);
+      modalPanel = null;
     }
     if (layer != null) {
       layer.disableShadow();
@@ -425,6 +427,7 @@ public class Window extends ContentPanel {
     RootPanel.get().remove(this);
     if (modal) {
       ModalPanel.push(modalPanel);
+      modalPanel = null;
     }
     fireEvent(Events.Hide, new WindowEvent(this, buttonPressed));
   }
@@ -929,8 +932,16 @@ public class Window extends ContentPanel {
     }
 
     layout();
-    fireEvent(Events.Show, new WindowEvent(this));
+    
+    if (GXT.isSafari) {
+      DeferredCommand.addCommand(new Command() {
+        public void execute() {
+          layout();
+        }
+      });
+    }
 
+    fireEvent(Events.Show, new WindowEvent(this));
     toFront();
   }
 
@@ -1002,6 +1013,10 @@ public class Window extends ContentPanel {
 
   @Override
   protected void onClick(ComponentEvent ce) {
+    if(ce.event.getTarget() == focusEl.dom) {
+      ce.stopEvent();
+      return;
+    }
     super.onClick(ce);
     // dont bring to front on clicks where active is model as active window
     // may have just been opened from this click event
@@ -1101,7 +1116,7 @@ public class Window extends ContentPanel {
       });
     }
 
-    if (maximizable) {
+    if (maximizable || modal) {
       windowResizeTask = new DelayedTask(new Listener<ComponentEvent>() {
         public void handleEvent(ComponentEvent ce) {
           onWindowResized(com.google.gwt.user.client.Window.getClientWidth(),
@@ -1155,6 +1170,9 @@ public class Window extends ContentPanel {
   protected void onWindowResized(int width, int height) {
     if (maximized) {
       fitContainer();
+    }
+    if(modal && modalPanel != null) {
+      modalPanel.syncModal();
     }
   }
 

@@ -126,6 +126,11 @@ public class GXT {
   public static boolean isBorderBox;
 
   /**
+   * <code>true</code> if the browser uses shims. 
+   */
+  public static boolean useShims;
+  
+  /**
    * URL to a blank file used by GXT when in secure mode for iframe src to
    * prevent the IE insecure content. Default value is 'blank.html'.
    */
@@ -224,35 +229,45 @@ public class GXT {
     isMac = (ua.indexOf("macintosh") != -1 || ua.indexOf("mac os x") != -1);
     isAir = (ua.indexOf("adobeair") != -1);
     isLinux = (ua.indexOf("linux") != -1);
-
+    
+    useShims =  ((isIE && !isIE7) || (isMac && isGecko && !isGecko3));
+    
     String mode = DOM.getElementProperty(XDOM.getDocument(), "compatMode");
     isStrict = mode != null ? mode.equals("CSS1Compat") : false;
 
     isSecure = isSecure();
 
-    String cls = "";
+    initInternal();
+    
+    El bodyEl = XDOM.getBodyEl();
+    
     if (isIE) {
-      cls = "ext-ie";
-      cls += " "+ (isIE6 ? "ext-ie6" : (isIE7 ? "ext-ie7" : "ext-ie8"));
+      bodyEl.addStyleName("ext-ie");
+      String cls = (isIE6 ? "ext-ie6" : (isIE7 ? "ext-ie7" : "ext-ie8"));
+      bodyEl.addStyleName(cls);
     } else if (isGecko) {
-      cls = "ext-gecko";
-      cls +=" "+ (isGecko2 ? "ext-gecko2" : "ext-gecko3");
+      bodyEl.addStyleName("ext-gecko");
+      String cls =  (isGecko2 ? "ext-gecko2" : "ext-gecko3");
+      bodyEl.addStyleName(cls);
     } else if (isOpera) {
-      cls = "ext-opera";
+      bodyEl.addStyleName("ext-opera");
     } else if (isSafari) {
-      cls = "ext-safari";
+      bodyEl.addStyleName("ext-safari");
+    } else if (isChrome) {
+      bodyEl.addStyleName("ext-chrome");
     }
 
     if (isMac) {
-      cls += " ext-mac";
+      bodyEl.addStyleName("ext-mac");
     }
 
     if (isLinux) {
-      cls += " ext-linux";
+      bodyEl.addStyleName("ext-linux");
     }
    
-    if(isBorderBox)
-      cls +=" ext-border-box";
+    if(isBorderBox) {
+      bodyEl.addStyleName("ext-border-box");
+    }
 
     CookieProvider provider = new CookieProvider("/", null, null, false);
     StateManager.get().setProvider(provider);
@@ -267,13 +282,9 @@ public class GXT {
       if (!fileName.equalsIgnoreCase("ext-all.css")) {
         CSS.addStyleSheet(themeId, GWT.getModuleBaseURL() + "css/" + fileName);
       }
-      cls += " x-theme-" + themeId;
+      bodyEl.addStyleName("x-theme-" + themeId);
       StateManager.get().set(GWT.getModuleBaseURL() + "theme", theme);
     }
-
-    XDOM.getBody().setClassName(cls);
-
-    initInternal();
     
     if(isStrict){ // add to the parent to allow for selectors like ".ext-strict .ext-ie"
       Element p = (Element) XDOM.getBody().getParentElement();

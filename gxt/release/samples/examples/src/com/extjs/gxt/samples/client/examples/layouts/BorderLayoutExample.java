@@ -7,21 +7,14 @@
  */
 package com.extjs.gxt.samples.client.examples.layouts;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
 import com.extjs.gxt.ui.client.Style.Scroll;
-import com.extjs.gxt.ui.client.data.BaseModelData;
-import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.form.ComboBox;
-import com.extjs.gxt.ui.client.widget.form.FormPanel;
-import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -58,9 +51,9 @@ public class BorderLayoutExample extends LayoutContainer {
           } else if (txt.equals("Collapse")) {
             layout.collapse(r);
           } else if (txt.equals("Show")) {
-            layout.hide(r);
-          } else {
             layout.show(r);
+          } else {
+            layout.hide(r);
           }
 
         }
@@ -72,59 +65,6 @@ public class BorderLayoutExample extends LayoutContainer {
       table.setWidget(i, 4, new Button("Hide", sl));
     }
     center.add(table);
-
-    FormPanel panel = new FormPanel();
-    panel.setBodyBorder(false);
-    panel.setWidth(300);
-    panel.setFieldWidth(150);
-    panel.setHeaderVisible(false);
-
-    final SimpleComboBox<String> action = new SimpleComboBox<String>();
-    action.setFieldLabel("Action");
-    action.add("Collapse");
-    action.add("Expand");
-    action.setSimpleValue("Collapse");
-    panel.add(action);
-
-    class Region extends BaseModelData {
-      Region(String name, LayoutRegion region) {
-        set("name", name);
-        set("region", region);
-      }
-    }
-
-    ListStore<ModelData> store = new ListStore<ModelData>();
-    store.add(new Region("North", LayoutRegion.NORTH));
-    store.add(new Region("West", LayoutRegion.WEST));
-    store.add(new Region("South", LayoutRegion.SOUTH));
-    store.add(new Region("East", LayoutRegion.EAST));
-
-    final ComboBox region = new ComboBox();
-    region.setForceSelection(true);
-    region.setEditable(false);
-    region.setFieldLabel("Region");
-    region.setDisplayField("name");
-    region.setStore(store);
-
-    region.setValue(store.getAt(0));
-    panel.add(region);
-
-    Button doit = new Button("Change");
-    doit.addSelectionListener(new SelectionListener<ButtonEvent>() {
-
-      @Override
-      public void componentSelected(ButtonEvent ce) {
-        if (action.getSimpleValue().equals("Collapse")) {
-          layout.collapse((LayoutRegion) region.getValue().get("region"));
-        } else {
-          layout.expand((LayoutRegion) region.getValue().get("region"));
-        }
-      }
-    });
-    panel.setButtonAlign(HorizontalAlignment.CENTER);
-    panel.addButton(doit);
-
-    // center.add(panel);
 
     ContentPanel east = new ContentPanel();
     ContentPanel south = new ContentPanel();

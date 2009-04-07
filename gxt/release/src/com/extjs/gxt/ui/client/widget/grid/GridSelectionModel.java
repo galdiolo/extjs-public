@@ -13,10 +13,12 @@ import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseEvent;
+import com.extjs.gxt.ui.client.event.DomEvent;
 import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.widget.selection.AbstractStoreSelectionModel;
+import com.google.gwt.user.client.ui.KeyboardListener;
 
 /**
  * Grid selection model.
@@ -27,10 +29,37 @@ import com.extjs.gxt.ui.client.widget.selection.AbstractStoreSelectionModel;
  * <dd>AbstractStoreSelectionModel SelectionChange</dd>
  * </dl>
  */
-public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelectionModel<M>
-    implements Listener<BaseEvent> {
+public class GridSelectionModel<M extends ModelData> extends
+    AbstractStoreSelectionModel<M> implements Listener<BaseEvent> {
 
+  public class CellSelection {
+    public M model;
+    public int row;
+    public int cell;
+
+    public CellSelection(M model, int row, int cell) {
+      this.model = model;
+      this.row = row;
+      this.cell = cell;
+    }
+  }
+
+  class Callback {
+
+    private GridSelectionModel sm;
+
+    public Callback(GridSelectionModel sm) {
+      this.sm = sm;
+    }
+
+    public boolean isSelectable(int row, int cell, boolean acceptsNav) {
+      return sm.isSelectable(row, cell, acceptsNav);
+    }
+  }
   protected Grid grid;
+  protected CellSelection selection;
+  protected boolean editmode;
+
   protected KeyNav<GridEvent> keyNav = new KeyNav<GridEvent>() {
 
     @Override
@@ -49,6 +78,8 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
     }
 
   };
+
+  private Callback callback = new Callback(this);
 
   public void bindGrid(Grid grid) {
     if (this.grid != null) {
@@ -118,10 +149,16 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
     }
   }
 
+  protected void doFocus(int row, int cell) {
+    GridView view = grid.getView();
+    view.focusRow(row);
+  }
+
   protected void handleMouseDown(GridEvent e) {
-    if (isLocked() || e.isRightClick()) {
+    if (isLocked() || e.isRightClick() || editmode) {
       return;
     }
+
     GridView view = grid.getView();
     M sel = store.getAt(e.rowIndex);
 
@@ -134,6 +171,7 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
         deselect(sel);
       } else if (!isSelected(sel)) {
         select(sel);
+        view.focusCell(e.rowIndex, e.colIndex, true);
       }
     } else {
       if (e.isShiftKey() && lastSelected != null) {
@@ -153,17 +191,53 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
     }
   }
 
-  protected void doFocus(int row, int cell) {
-    GridView view = grid.getView();
-    view.focusRow(row);
-  }
-
   protected boolean hasNext() {
     return lastSelected != null && store.indexOf(lastSelected) < (store.getCount() - 1);
   }
 
   protected boolean hasPrevious() {
     return lastSelected != null && store.indexOf(lastSelected) > 0;
+  }
+
+  protected void onContextMenu(GridEvent e) {
+    if (locked) return;
+    if (e.rowIndex != -1) {
+      if (isSelected(store.getAt(e.rowIndex)) && selectionMode != SelectionMode.SINGLE) {
+        return;
+      }
+      select(e.rowIndex);
+    }
+  }
+
+  protected void onEditorKey(DomEvent e) {
+    int r = selection.row;
+    int c = selection.cell;
+
+    EditorGrid editGrid = (EditorGrid) grid;
+
+    Cell newCell = null;
+
+    switch (e.getKeyCode()) {
+      case KeyboardListener.KEY_TAB:
+        if (e.isShiftKey()) {
+          newCell = grid.walkCells(r, c - 1, -1, callback, true);
+        } else {
+          newCell = grid.walkCells(r, c + 1, 1, callback, true);
+        }
+        e.stopEvent();
+        break;
+      case KeyboardListener.KEY_ESCAPE:
+        e.stopEvent();
+        editGrid.stopEditing();
+        break;
+    }
+
+    if (newCell != null) {
+      final int rr = newCell.row;
+      final int cc = newCell.cell;
+      selectCell(newCell.row, newCell.cell);
+      ((EditorGrid) grid).startEditing(rr, cc);
+    }
   }
 
   protected void onKeyDown(GridEvent e) {
@@ -175,16 +249,6 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
 
   protected void onKeyPress(GridEvent e) {
 
-  }
-
-  protected void onContextMenu(GridEvent e) {
-    if (locked) return;
-    if (e.rowIndex != -1) {
-      if (isSelected(store.getAt(e.rowIndex)) && selectionMode != SelectionMode.SINGLE) {
-        return;
-      }
-      select(e.rowIndex);
-    }
   }
 
   protected void onKeyUp(GridEvent e) {
@@ -207,10 +271,36 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
       return;
     }
     if (select) {
-      grid.getView().onRowSelect(store.indexOf(model));
+      grid.getView().onRowSelect(idx);
     } else {
-      grid.getView().onRowDeselect(store.indexOf(model));
+      grid.getView().onRowDeselect(idx);
     }
+  }
+
+  protected void selectCell(int row, int cell) {
+    select(row);
+    M m = store.getAt(row);
+    selection = new CellSelection(m, row, cell);
+    grid.getView().focusCell(row, cell, true);
+  }
+
+  boolean isSelectable(int row, int cell, boolean acceptsNav) {
+    if (acceptsNav) {
+      return !grid.getColumnModel().isHidden(cell)
+          && grid.getColumnModel().isCellEditble(cell);
+    } else {
+      return !grid.getColumnModel().isHidden(cell);
+    }
+  }
+}
+
+class Cell {
+  public int row;
+  public int cell;
+
+  public Cell(int row, int cell) {
+    this.row = row;
+    this.cell = cell;
   }
 
 }

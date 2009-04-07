@@ -139,7 +139,7 @@ public class Composite extends BoxComponent {
 
   @Override
   protected void onRender(Element target, int index) {
-    component.onRender(target, index);
+    component.render(target, index);
     setElement(component.getElement());
   }
 

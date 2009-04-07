@@ -436,7 +436,6 @@ public class FormPanel extends ContentPanel implements FormPanelImplHost {
   @Override
   protected void onAttach() {
     super.onAttach();
-    layout();
     createFrame();
     XDOM.getBody().appendChild(iframe);
     impl.hookEvents(iframe, form.dom, this);
@@ -467,6 +466,7 @@ public class FormPanel extends ContentPanel implements FormPanelImplHost {
     body.setStyleAttribute("background", "none");
 
     form = new El(DOM.createForm());
+    form.setStyleAttribute("overflow", "hidden");
     body.appendChild(form.dom);
 
     setMethod(method);

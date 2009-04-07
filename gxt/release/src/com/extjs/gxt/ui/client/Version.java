@@ -13,10 +13,10 @@ package com.extjs.gxt.ui.client;
  */
 public final class Version {
 
-  private static final String release = "1.2.2";
+  private static final String release = "1.2.3";
   private static final int major = 1;
   private static final int minor = 2;
-  private static final int revision = 2;
+  private static final int revision = 3;
 
   Version() {
 

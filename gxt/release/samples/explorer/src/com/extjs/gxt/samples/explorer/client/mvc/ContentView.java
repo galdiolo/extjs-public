@@ -27,7 +27,6 @@ import com.google.gwt.user.client.History;
 public class ContentView extends View {
 
   private TabPanel tabPanel;
-  private Page current;
 
   public ContentView(Controller controller) {
     super(controller);
@@ -68,10 +67,6 @@ public class ContentView extends View {
       page = new Page(entry);
       entry.set("page", page);
     }
-    if (page == current) {
-      return;
-    }
-    current = page;
 
     TabItem item = tabPanel.findItem(page.getId(), false);
     if (item == null) {
@@ -84,7 +79,10 @@ public class ContentView extends View {
       item.add(page);
       tabPanel.add(item);
     }
-    tabPanel.setSelection(item);
+    
+    if(item != tabPanel.getSelectedItem()) {
+      tabPanel.setSelection(item);
+    }
   }
 
   protected void handleEvent(AppEvent event) {
@@ -92,9 +90,6 @@ public class ContentView extends View {
       case AppEvents.ShowPage:
         Entry entry = (Entry) event.data;
         onShowPage(entry);
-        break;
-      case AppEvents.HidePage:
-        current = null;
         break;
     }
   }

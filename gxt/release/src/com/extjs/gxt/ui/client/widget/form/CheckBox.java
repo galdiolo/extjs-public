@@ -52,7 +52,8 @@ public class CheckBox extends Field<Boolean> {
 
   protected El wrap, input, boxLabelEl;
   private String boxLabel;
-
+  private String valueAttribute;
+  
   public CheckBox() {
     value = false;
     propertyEditor = new BooleanPropertyEditor();
@@ -75,7 +76,18 @@ public class CheckBox extends Field<Boolean> {
     String propName = isAttached() ? "checked" : "defaultChecked";
     return input.dom.getPropertyString(propName);
   }
-
+  
+  /**
+   * 
+   * Returns the value property of the input element
+   */
+  public String getValueAttribute() {
+    if (rendered) {
+      input.getValue();
+    }
+    return valueAttribute;
+  }
+  
   @Override
   public void markInvalid(String msg) {
 
@@ -107,6 +119,18 @@ public class CheckBox extends Field<Boolean> {
       String v = value == null ? "" : propertyEditor.getStringValue(value);
       setRawValue(v);
       validate();
+    }
+  }
+  
+  /**
+   * Sets a new value attribute to the input element
+   * 
+   * @param valueAttribute the value attribute to set
+   */
+  public void setValueAttribute(String valueAttribute) {
+    this.valueAttribute = valueAttribute;
+    if (rendered) {
+      input.setValue(valueAttribute);
     }
   }
 
@@ -176,7 +200,9 @@ public class CheckBox extends Field<Boolean> {
     }
 
     super.onRender(target, index);
-
+    
+    setValueAttribute(valueAttribute);
+    
     focusStyle = null;
   }
 

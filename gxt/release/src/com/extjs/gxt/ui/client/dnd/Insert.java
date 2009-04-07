@@ -28,7 +28,7 @@ public class Insert extends BoxComponent {
   }
 
   Insert() {
-    setShadow(true);
+    setShadow(false);
   }
 
   @Override

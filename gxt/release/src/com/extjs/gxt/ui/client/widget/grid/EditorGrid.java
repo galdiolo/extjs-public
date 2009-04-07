@@ -99,15 +99,6 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
   }
 
   /**
-   * Returns true if editing is active.
-   * 
-   * @return the editing state
-   */
-  public boolean isEditing() {
-    return editing;
-  }
-
-  /**
    * Returns the clicks to edit.
    * 
    * @return the clicks to edit
@@ -117,12 +108,27 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
   }
 
   /**
+   * Returns true if editing is active.
+   * 
+   * @return the editing state
+   */
+  public boolean isEditing() {
+    return editing;
+  }
+
+  /**
    * Sets the number of clicks to edit (defaults to ONE).
    * 
    * @param clicksToEdit the clicks to edit
    */
   public void setClicksToEdit(ClicksToEdit clicksToEdit) {
     this.clicksToEdit = clicksToEdit;
+  }
+
+  @Override
+  public void setSelectionModel(GridSelectionModel<M> sm) {
+    super.setSelectionModel(sm);
+    sm.editmode = true;
   }
 
   /**
@@ -135,9 +141,8 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
     stopEditing();
     if (cm.isCellEditble(col)) {
       getView().ensureVisible(row, col, false);
-      if (sm instanceof CellSelectionModel) {
-        ((CellSelectionModel) sm).selectCell(row, col);
-      }
+
+      sm.selectCell(row, col);
 
       final M m = store.getAt(row);
       activeRecord = store.getRecord(m);
@@ -169,7 +174,7 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
                     EditorEvent ee = (EditorEvent) e;
                     onEditComplete((CellEditor) ee.editor, ee.value, ee.startValue);
                   } else if (e.type == Events.SpecialKey) {
-                    ((CellSelectionModel) sm).onEditorKey(e);
+                    sm.onEditorKey(e);
                   }
                 }
               };
@@ -189,6 +194,8 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
         });
 
       }
+    } else {
+      sm.selectCell(row, col);
     }
   }
 
@@ -224,6 +231,10 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
     if (row != -1 && cell != -1) {
       stopEditing();
     }
+  }
+
+  protected void onCellDoubleClick(GridEvent e) {
+    startEditing(e.rowIndex, e.colIndex);
   }
 
   protected void onEditComplete(CellEditor ed, Object value, Object startValue) {
@@ -287,10 +298,6 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
       el().setScrollTop(0);
       el().makePositionable(false);
     }
-  }
-
-  protected void onCellDoubleClick(GridEvent e) {
-    startEditing(e.rowIndex, e.colIndex);
   }
 
 }

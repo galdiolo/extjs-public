@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -351,7 +352,8 @@ public class Resizable extends BaseObservable {
     }
 
     shim.cover(false);
-
+    shim.setStyleAttribute("cursor", handle.el().getStyleAttribute("cursor"));
+    
     dir = handle.dir;
 
     startBox = resize.getBounds(false);
@@ -507,7 +509,13 @@ public class Resizable extends BaseObservable {
     resizing = false;
     DOM.removeEventPreview(preview);
     shim.uncover();
-    Rectangle rect = proxyEl.getBounds();
+    
+    Rectangle rect;
+    if(!GXT.isBorderBox) {
+      rect = proxyEl.getBounds(false, true);
+    } else {
+      rect = proxyEl.getBounds();
+    }
 
     rect.width = Math.min(rect.width, maxWidth);
     rect.height = Math.min(rect.height, maxHeight);

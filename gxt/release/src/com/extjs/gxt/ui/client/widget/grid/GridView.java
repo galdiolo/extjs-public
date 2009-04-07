@@ -229,6 +229,7 @@ public class GridView extends BaseObservable {
   private int rowSelectorDepth = 10;
   private Element overRow;
   private boolean focusEnabled = true;
+  private boolean vbar;
 
   /**
    * Returns the cell.
@@ -555,11 +556,11 @@ public class GridView extends BaseObservable {
   protected void afterRender() {
     applyEmptyText();
   }
-
+  
   protected void autoExpand(boolean preventUpdate) {
     if (!userResized && grid.getAutoExpandColumn() != null) {
       int tw = cm.getTotalWidth(false);
-      int aw = grid.getWidth(true) - scrollOffset;
+      int aw = grid.getWidth(true) - getScrollAdjust();
       if (tw != aw) {
         int ci = cm.getIndexById(grid.getAutoExpandColumn());
         int currentWidth = cm.getColumnWidth(ci);
@@ -572,6 +573,17 @@ public class GridView extends BaseObservable {
           }
         }
       }
+    }
+  }
+
+  protected void calculateVBar() {
+    int sh = scroller.getHeight();
+    int dh = mainBody.getHeight();
+    boolean vbar = dh > sh;
+    if (this.vbar != vbar) {
+      this.vbar = vbar;
+      lastViewWidth = -1;
+      layout();
     }
   }
 
@@ -801,7 +813,7 @@ public class GridView extends BaseObservable {
 
   protected void fitColumns(boolean preventRefresh, boolean onlyExpand, int omitColumn) {
     int tw = cm.getTotalWidth(false);
-    double aw = grid.el().getWidth(true) - scrollOffset;
+    double aw = grid.el().getWidth(true) - getScrollAdjust();
     if (aw < 0) {
       aw = grid.el().getStyleWidth();
     }
@@ -951,6 +963,16 @@ public class GridView extends BaseObservable {
     }
     return body.childNodes;
   }-*/;
+  
+  protected int getScrollAdjust() {
+    if (scroller != null){
+      int sh = scroller.getHeight();
+      int dh = mainBody.getHeight();
+      vbar = dh > sh;
+      return vbar ? scrollOffset : 2;
+    }
+    return scrollOffset;
+  }
 
   protected Point getScrollState() {
     return new Point(scroller.getScrollLeft(), scroller.getScrollTop());
@@ -960,9 +982,14 @@ public class GridView extends BaseObservable {
     return cm.getTotalWidth() + "px";
   }
 
-  protected void handleComponentEvent(ComponentEvent ce) {
-    Element row = findRow(ce.getTarget());
+  protected void handleComponentEvent(GridEvent ce) {
+    Element row = ce.rowIndex == -1 ? null : getRow(ce.rowIndex);
     switch (ce.type) {
+      case Event.ONCLICK:
+        if (ce.getTarget() == focusEl.dom) {
+          ce.stopEvent();
+        }
+        break;
       case Event.ONMOUSEOVER:
         if (row != null) onRowOver(row);
         break;
@@ -1171,6 +1198,7 @@ public class GridView extends BaseObservable {
 
   protected void onAdd(ListStore store, List models, int index) {
     insertRows(store, index, index + (models.size() - 1), false);
+    calculateVBar();
   }
 
   protected void onBeforeDataChanged(StoreEvent se) {
@@ -1269,6 +1297,7 @@ public class GridView extends BaseObservable {
   protected void onRemove(ListStore ds, ModelData m, int index, boolean isUpdate) {
     removeRow(index);
     processRows(0, false);
+    calculateVBar();
     applyEmptyText();
   }
 

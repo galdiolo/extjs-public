@@ -30,7 +30,7 @@ public final class XDOM {
    */
   public static boolean isVisibleBox;
 
-  private static El bodyEl = new El(getBody());
+  private static El bodyEl;
   private static Element escapeElement = DOM.createDiv();
   private static int scrollBarHeight = Style.DEFAULT;
   private static int autoId = 0;
@@ -82,6 +82,9 @@ public final class XDOM {
    * @return the body
    */
   public static El getBodyEl() {
+    if (bodyEl == null) {
+      bodyEl = new El(getBody());
+    }
     return bodyEl;
   }
 

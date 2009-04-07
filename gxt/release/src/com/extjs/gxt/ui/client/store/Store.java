@@ -159,7 +159,7 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
     if (!filtersEnabled) {
       snapshot = all;
     }
-    
+
     filtersEnabled = true;
     filtered = new ArrayList<M>();
     for (M items : snapshot) {
@@ -191,6 +191,7 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
     if (isFiltered()) {
       filtersEnabled = false;
       all = snapshot;
+      snapshot = null;
       fireEvent(Filter, createStoreEvent());
     }
   }
@@ -415,6 +416,9 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
     all.clear();
     modified.clear();
     recordMap.clear();
+    if (snapshot != null) {
+      snapshot.clear();
+    }
     fireEvent(Clear, createStoreEvent());
   }
 
@@ -578,11 +582,11 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
       unregisterModel(oldModel);
       registerModel(newModel);
     }
-    if(isFiltered()) {
-      index=snapshot.indexOf(oldModel);
-      if(index!=-1) {
+    if (isFiltered()) {
+      index = snapshot.indexOf(oldModel);
+      if (index != -1) {
         snapshot.remove(oldModel);
-        snapshot.add(index,newModel);
+        snapshot.add(index, newModel);
       }
     }
   }

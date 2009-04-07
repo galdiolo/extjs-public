@@ -15,6 +15,7 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
+import com.extjs.gxt.ui.client.widget.grid.GridSelectionModel.Callback;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -349,19 +350,19 @@ public class Grid<M extends ModelData> extends BoxComponent {
   @Override
   public void onComponentEvent(ComponentEvent ce) {
     super.onComponentEvent(ce);
+    GridEvent ge = (GridEvent)ce;
     switch (ce.type) {
       case Event.ONCLICK:
-        onClick((GridEvent) ce);
+        onClick(ge);
         break;
       case Event.ONDBLCLICK:
-        onDoubleClick((GridEvent) ce);
+        onDoubleClick(ge);
         break;
       case Event.ONMOUSEDOWN:
-        onMouseDown((GridEvent) ce);
+        onMouseDown(ge);
         break;
     }
-
-    view.handleComponentEvent(ce);
+    view.handleComponentEvent(ge);
   }
 
   /**
@@ -528,7 +529,6 @@ public class Grid<M extends ModelData> extends BoxComponent {
 
   @Override
   protected void onAttach() {
-    super.onAttach();
     if (!viewReady) {
       view.init(this);
       view.render();
@@ -537,6 +537,7 @@ public class Grid<M extends ModelData> extends BoxComponent {
       view.afterRender();
     }
     view.doAttach();
+    super.onAttach();
   }
 
   protected void onClick(GridEvent e) {
@@ -661,26 +662,4 @@ public class Grid<M extends ModelData> extends BoxComponent {
 
 }
 
-class Callback {
 
-  private CellSelectionModel sm;
-
-  public Callback(CellSelectionModel sm) {
-    this.sm = sm;
-  }
-
-  public boolean isSelectable(int row, int cell, boolean acceptsNav) {
-    return sm.isSelectable(row, cell, acceptsNav);
-  }
-}
-
-class Cell {
-  public int row;
-  public int cell;
-
-  public Cell(int row, int cell) {
-    this.row = row;
-    this.cell = cell;
-  }
-
-}

@@ -13,6 +13,8 @@ import java.util.Map;
 
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.widget.form.Field;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 
 /**
  * Aggregates one to many field bindings.
@@ -45,14 +47,18 @@ public class Bindings {
    * 
    * @param model the model
    */
-  public void bind(ModelData model) {
-    if (this.model != null) {
-      unbind();
-    }
-    this.model = model;
-    for (FieldBinding binding : bindings.values()) {
-      binding.bind(model);
-    }
+  public void bind(final ModelData model) {
+    DeferredCommand.addCommand(new Command( ) {
+      public void execute() {
+        if (Bindings.this.model != null) {
+          unbind();
+        }
+        Bindings.this.model = model;
+        for (FieldBinding binding : bindings.values()) {
+          binding.bind(model);
+        }
+      }
+    });
   }
 
   /**

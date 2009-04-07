@@ -45,6 +45,7 @@ import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Stock;
 import com.extjs.gxt.ui.client.binding.FieldBinding;
 import com.extjs.gxt.ui.client.binding.FormBinding;
+import com.extjs.gxt.ui.client.binding.SimpleComboBoxFieldBinding;
 import com.extjs.gxt.ui.client.core.XTemplate;
 import com.extjs.gxt.ui.client.data.ChangeEvent;
 import com.extjs.gxt.ui.client.data.ChangeListener;
@@ -54,6 +55,7 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.form.DateField;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.NumberField;
+import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Element;
@@ -120,12 +122,22 @@ public class BasicBindingExample extends LayoutContainer {
     last.setName("date");
     last.setFieldLabel("Updated");
     panel.add(last);
+    
+    SimpleComboBox<String> scb = new SimpleComboBox<String>();
+    for(Stock s: TestData.getStocks()) {
+      scb.add(s.getName());
+    }
+    scb.setFieldLabel("Name");
+    scb.setName("company");
+    panel.add(scb);
+    
     hp.add(panel);
 
     FormBinding binding = new FormBinding(panel);
     // manually add bindings
     binding.addFieldBinding(new FieldBinding(name, "name"));
     binding.addFieldBinding(new FieldBinding(symbol, "symbol"));
+    binding.addFieldBinding(new SimpleComboBoxFieldBinding(scb, "name"));
 
     // auto bind remaining fields, field name must match model property name
     binding.autoBind();

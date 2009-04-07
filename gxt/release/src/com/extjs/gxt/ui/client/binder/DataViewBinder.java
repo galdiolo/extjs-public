@@ -181,7 +181,9 @@ public class DataViewBinder<M extends ModelData> extends StoreBinder<ListStore<M
   protected void update(M model) {
     DataViewItem item = (DataViewItem) findItem(model);
     if (item != null) {
-      setModel(item, model);
+      int idx = store.indexOf(model);
+      view.remove(item);
+      view.insert(createItem(model), idx);
     }
   }
 

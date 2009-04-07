@@ -17,7 +17,6 @@ public class ContentController extends Controller {
 
   public ContentController() {
     registerEventTypes(AppEvents.Init, AppEvents.ShowPage);
-    registerEventTypes(AppEvents.HidePage);
   }
 
   public void initialize() {

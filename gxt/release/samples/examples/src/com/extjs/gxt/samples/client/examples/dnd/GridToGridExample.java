@@ -20,6 +20,7 @@ import com.extjs.gxt.ui.client.dnd.DND.Feedback;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
@@ -78,7 +79,10 @@ public class GridToGridExample extends LayoutContainer {
     grid.setBorders(false);
     grid.setAutoExpandColumn("name");
     grid.setBorders(true);
-    cp.add(grid, new RowData(.5, 1));
+    
+    RowData data = new RowData(.5, 1);
+    data.setMargins(new Margins(5));
+    cp.add(grid, data);
 
     store = new ListStore<Stock>();
 
@@ -86,7 +90,7 @@ public class GridToGridExample extends LayoutContainer {
     grid2.setBorders(false);
     grid2.setAutoExpandColumn("name");
     grid2.setBorders(true);
-    cp.add(grid2, new RowData(.5, 1));
+    cp.add(grid2, data);
 
     new GridDragSource(grid);
     new GridDragSource(grid2);

@@ -403,10 +403,10 @@ public class TextField<D> extends Field<D> {
   @Override
   protected void onAttach() {
     super.onAttach();
-    if (GXT.isIE && (!(this instanceof TriggerField)) && !(this instanceof FileUploadField)) {
-      int y;
-      if (el().getY() != (y = el().getParent().getY())) {
-        el().setY(y);
+    if (GXT.isIE && (!(this instanceof TriggerField || this instanceof TextArea)) && !(this instanceof FileUploadField)) {
+      if (el().getY() != el().getParent().getY()) {
+        el().makePositionable();
+        el().setTop(-1);
       }
     }
   }
@@ -465,6 +465,12 @@ public class TextField<D> extends Field<D> {
         }
       });
     }
+    
+    // text cell somtimes jumps when in tabe cell on click
+    if (GXT.isIE && target.getTagName().equals("TD")) {
+      fly(target).makePositionable();
+    }
+    
     getInputEl().addStyleName("x-form-text");
     applyEmptyText();
   }

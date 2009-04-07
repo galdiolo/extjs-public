@@ -172,6 +172,28 @@ public class ModalPanel extends BoxComponent {
       eventPreview.getIgnoreList().add(component.getElement());
       eventPreview.add();
     }
+    
+    syncModal();
+  }
+  
+  /**
+   * Syncs to the viewport.
+   */
+  public void syncModal() {
+    El body = XDOM.getBodyEl();
+    int width = body.dom.getScrollWidth();
+    int height = body.dom.getScrollHeight();
+    Size vp = XDOM.getViewportSize();
+
+    String w = "100%";
+    String h = "100%";
+    if (width > vp.width) {
+      w = width + "px";
+    }
+    if (height > vp.height) {
+      h = height + "px";
+    }
+    el().setSize(w, h);
   }
 
   @Override
@@ -190,21 +212,6 @@ public class ModalPanel extends BoxComponent {
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
     setElement(DOM.createDiv(), target, index);
-
-    El body = XDOM.getBodyEl();
-    int width = body.dom.getScrollWidth();
-    int height = body.dom.getScrollHeight();
-    Size vp = XDOM.getViewportSize();
-
-    String w = "100%";
-    String h = "100%";
-    if (width > vp.width) {
-      w = width + "px";
-    }
-    if (height > vp.height) {
-      h = height + "px";
-    }
-    el().setSize(w, h);
 
     eventPreview = new BaseEventPreview() {
 

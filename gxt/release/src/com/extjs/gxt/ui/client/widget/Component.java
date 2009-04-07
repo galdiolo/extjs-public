@@ -260,6 +260,9 @@ public abstract class Component extends Widget implements Observable {
   private boolean afterRender;
   private boolean setElementRender;
   private LayoutData layoutData;
+  private boolean mask;
+  private String maskMessage;
+  private String maskMessageStyleName;
   private ModelData model;
   private int events;
   private List<ComponentPlugin> plugins;
@@ -632,7 +635,43 @@ public abstract class Component extends Widget implements Observable {
       return rendered && el.isVisible();
     }
   }
+  
+  /**
+   * Puts a mask over this component to disable user interaction.
+   * 
+   * @return the mask element
+   */
+  public El mask() {
+    return mask(null, null);
+  }
+  
+  /**
+   * Puts a mask over this component to disable user interaction.
+   * 
+   * @param message a message to display in the mask
+   * @return the mask element
+   */
+  public El mask (String message) {
+    return mask(message, null);
+  }
 
+  /**
+   * Puts a mask over this component to disable user interaction.
+   * 
+   * @param message a message to display in the mask
+   * @param messageStyleName a CSS style name to be applied to the message text
+   * @return the mask element
+   */
+  public El mask(String message, String messageStyleName) {
+    mask = true;
+    maskMessage = message;
+    maskMessageStyleName = messageStyleName;
+    if(rendered) {
+      return el().mask(message, messageStyleName);
+    }
+    return null;
+  }
+  
   /**
    * Components delegate event handling to
    * {@link #onComponentEvent(ComponentEvent)}. Sublcasses should not override.
@@ -1126,6 +1165,17 @@ public abstract class Component extends Widget implements Observable {
   }
 
   /**
+   * Unmasks the component.
+   */
+  public void unmask() {
+    mask = false;
+    maskMessage = null;
+    maskMessageStyleName = null;
+    if(rendered) {
+      el().unmask();
+    }
+  }
+  /**
    * Adds a style to the given element on mousever. The component must be
    * sinking mouse events for the over style to function.
    * 
@@ -1155,7 +1205,7 @@ public abstract class Component extends Widget implements Observable {
    * when retrieving location and offsets.
    */
   protected void afterRender() {
-
+    
   }
 
   protected void applyState(Map<String, Object> state) {
@@ -1261,6 +1311,11 @@ public abstract class Component extends Widget implements Observable {
     if (disableContextMenu > 0) {
       el.disableContextMenu(disableContextMenu == 1);
     }
+    
+    if(mask) {
+      mask(maskMessage, maskMessageStyleName);
+    }
+    
     super.onAttach();
 
   }

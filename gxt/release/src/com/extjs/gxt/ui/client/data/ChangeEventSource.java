@@ -23,7 +23,7 @@ public interface ChangeEventSource {
   public static final int Remove = 30;
 
   /**
-   * Fired when the model has beed updated (value is 40).
+   * Fired when the model has been updated (value is 40).
    */
   public static final int Update = 40;
 

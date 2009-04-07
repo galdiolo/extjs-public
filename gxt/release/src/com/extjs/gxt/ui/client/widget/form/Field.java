@@ -674,7 +674,10 @@ public abstract class Field<D> extends BoxComponent {
   public void setName(String name) {
     this.name = name;
     if (rendered) {
-      getInputEl().dom.setAttribute("name", name);
+      getInputEl().dom.removeAttribute("name");
+      if(name != null) {
+        getInputEl().dom.setAttribute("name", name); 
+      }
     }
   }
 
@@ -939,9 +942,7 @@ public abstract class Field<D> extends BoxComponent {
     String type = getInputEl().dom.getAttribute("type");
     getInputEl().addStyleName("x-form-" + type);
 
-    if (name != null) {
-      getInputEl().dom.setAttribute("name", name);
-    }
+    setName(name);
 
     if (readOnly) {
       setReadOnly(true);

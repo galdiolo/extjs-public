@@ -260,6 +260,9 @@ public class Portal extends Container<LayoutContainer> {
    */
   public void setSpacing(int spacing) {
     this.spacing = spacing;
+    for(LayoutContainer l : columns) {
+      l.setStyleAttribute("padding", "" + spacing + " 0 0 " + spacing);
+    }
   }
 
   @Override

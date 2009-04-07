@@ -100,7 +100,7 @@ public class ColumnModel extends BaseObservable {
    */
   public ColumnConfig getColumnById(String id) {
     for (ColumnConfig c : config) {
-      if (c.getId().equals(id)) {
+      if (c.getId() != null && c.getId().equals(id)) {
         return c;
       }
     }

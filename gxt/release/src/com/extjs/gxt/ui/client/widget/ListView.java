@@ -742,6 +742,9 @@ public class ListView<M extends ModelData> extends BoxComponent {
     List list = Util.createList(model);
     Element node = bufferRender(list)[0];
     all.replaceElement(original, node);
+    if(fly(original).hasStyleName(selectStyle)) {
+      fly(node).addStyleName(selectStyle);
+    }
     el().insertChild(node, index);
     el().removeChild(original);
   }

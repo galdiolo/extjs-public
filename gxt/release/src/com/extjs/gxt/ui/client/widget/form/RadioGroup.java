@@ -60,6 +60,7 @@ public class RadioGroup extends MultiField<Radio> {
   public RadioGroup(String name) {
     this.groupName = name;
     messages = new RadioGroupMessages();
+    setSpacing(5);
   }
 
   @Override
@@ -151,11 +152,11 @@ public class RadioGroup extends MultiField<Radio> {
 
   @Override
   protected void onRender(Element target, int index) {
-    super.onRender(target, index);
     for (Radio r : fields) {
       r.group = this;
       r.setName(groupName);
     }
+    super.onRender(target, index);
   }
 
 }

@@ -289,7 +289,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
       se.index = index;
       fireEvent(Remove, se);
     }
-    modified.remove(model);
+    modified.remove(getRecord(model));
     if(isFiltered())
       snapshot.remove(model);
   }
@@ -398,6 +398,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
   protected void insert(List<M> items, int index, boolean supressEvent) {
     if(items.size() > 0) {
       if (storeSorter != null) {
+        boolean defer =  index == 0 || getCount() == 0;
         for (M m : items) {
           if (isFiltered()) {
             snapshot.add(m);
@@ -408,12 +409,18 @@ public class ListStore<M extends ModelData> extends Store<M> {
           applySort(true);
           int idx = indexOf(m);
           registerModel(m);
-          if (!supressEvent) {
+          if (!defer &&  !supressEvent) {
             StoreEvent evt = createStoreEvent();
             evt.models = Util.createList(m);
             evt.index = idx;
             fireEvent(Add, evt);
           }
+        }
+        if (defer && !supressEvent) {
+            StoreEvent evt = createStoreEvent();
+            evt.models = getModels();
+            evt.index = index;
+            fireEvent(Add, evt);
         }
       } else {
         if (!isFiltered()) {
@@ -480,7 +487,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
   }
 
   protected void onLoadException(LoadEvent le) {
-    throw new RuntimeException(le.exception);
+   
   }
 
   protected void sortData(final String field, SortDir direction) {

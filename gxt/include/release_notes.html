@@ -33,6 +33,7 @@ code {
 <body>
 <h1>Ext GWT Library Release Notes</h1>
 <ul>
+	<li><a href="#Release_1.2.3">Release 1.2.3</a></li>
 	<li><a href="#Release_1.2.2">Release 1.2.2</a></li>
 	<li><a href="#Release_1.2.1">Release 1.2.1</a></li>
 	<li><a href="#Release_1.2">Release 1.2</a></li>
@@ -43,8 +44,60 @@ code {
 	<li><a href="#Release_1.1">Release 1.1</a></li>
 	<li><a href="#Release_1.0">Release 1.0</a></li>
 </ul>
+<h2><a name="Release_Current">Release 1.2.3 (released February 17, 2009)</a></h2>
+<h2>General Changes &amp; Enhancements</h2>
+<ul>
+    <li>Shim improvements, shim only when needed.</li> 
+    <li>Significant performance enhancements around layouts.</li>
+    <li>Added SimpleComboBoxFieldBinding.</li>
+    <li>ContentPanel nows masks itself when disabled.</li>
+    <li>EditorGrid now supports row selection model, including CheckBoxSelectionModel.</li>
+    <li>Grid adjusts width when vertical scrollbar is not needed.</li>
+    <li>After removing all from a store, adding multiple models was resulting in a add event being fired for each model.</li>
+	<li>Added Hungarion translation.</li>
+</ul>
 
-<h2><a name="Release_Current">Release 1.2.2 (released January 28, 2009)</a></h2>
+<h2>API Changes</h2>
+<ul>
+	<li>Container getLayoutTarget visibility changed from protected to public.</li>
+	<li>Added deferredRender config to TabPanel and CardLayout.</li>
+	<li>Added getShortcuts() to Desktop.</li>
+</ul>
+
+<h2>Bug fixes</h2>
+<ul>
+	<li>PagingToolBar hidden within ComboBox.</li>
+	<li>Error in Catalan translation.</li>
+	<li>ToolTip not adjusting for scrolling on body element.</li>
+	<li>RadioGroup not setting value to be box label.</li>
+	<li>Multiple RadioGroups not working.</li>
+	<li>App reloads in IE when hitting enter key with selected row in grid.</li>
+	<li>DND firing DragStart twice.</li>
+	<li>Forms not working property when using AnchorData.</li>
+	<li>Hitting enter with Window causes app to reload.</li>
+	<li>Multiple resizes in one direction, change size in other direction.</li>
+	<li>ListStore remove, trying to remove mode from record collection, not the record.</li>
+	<li>FileUploadName collision issue.</li>
+	<li>ButtonBar using wrong style name.</li>
+	<li>Window modal panel not resizing on window resize.</li>
+	<li>Hide / show mixed in BorderLayout.</li>
+	<li>Added null check for ColumnData in ColumnLayout.</li>
+	<li>Keyboard nav not working Safari single select Grid.</li>
+	<li>DataViewBinder not updating when model instance not the same.</li>
+	<li>Resizeable size calculations off for IE.</li>
+	<li>GXT overwriting user styles on body element.</li>
+	<li>Store not clearing snapshot when filters removed.</li>
+	<li>Portal not setting padding properly.</li>
+	<li>Fixed remove method in DataList.</li>
+	<li>Added setValueAttribute to checkbox.</li>
+	<li>Shim null pointer in Layout.</li>
+	<li>Fixed TreeItemUI handling of mouse events.</li>
+	<li>Replaced hardcoded image path with GXT.BLANK_IMAGE_URL in Shortcut.</li>
+	<li>StartMenu setHeading can now be called after render.</li>
+	<li>Draggble starting drag before early, not respecting startDragDistance.</li>
+</ul>
+
+<h2><a name="Release_1.2.2">Release 1.2.2 (released January 28, 2009)</a></h2>
 <h2>General Changes &amp; Enhancements</h2>
 <ul>
 	<li>Updated BorderLayoutExample.</li>

@@ -34,6 +34,7 @@ public class AnchorLayoutExample extends LayoutContainer {
     panel.setBorders(false);
     panel.setBodyBorder(false);
     panel.setLabelWidth(55);
+    panel.setPadding(5);
     panel.setHeaderVisible(false);
 
     TextField<String> field = new TextField<String>();

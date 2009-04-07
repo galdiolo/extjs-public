@@ -41,7 +41,6 @@ body {
  */
 package com.extjs.gxt.samples.client.examples.forms;
 
-import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.TabItem;
@@ -59,6 +58,7 @@ import com.extjs.gxt.ui.client.widget.layout.ColumnData;
 import com.extjs.gxt.ui.client.widget.layout.ColumnLayout;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
+import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.google.gwt.user.client.Element;
 
@@ -81,6 +81,7 @@ public class AdvancedFormsExample extends LayoutContainer {
   }
 
   private void createTabForm() {
+    FormData formData = new FormData("100%");
     FormPanel panel = new FormPanel();
     panel.setFrame(false);
     panel.setHeaderVisible(false);
@@ -89,7 +90,8 @@ public class AdvancedFormsExample extends LayoutContainer {
     panel.setLayout(new FitLayout());
 
     TabPanel tabs = new TabPanel();
-
+    tabs.setDeferredRender(false);
+    
     TabItem personal = new TabItem();
     personal.setText("Personal Details");
     personal.setLayout(new FormLayout());
@@ -97,20 +99,20 @@ public class AdvancedFormsExample extends LayoutContainer {
     TextField<String> name = new TextField<String>();
     name.setFieldLabel("First Name");
     name.setValue("Darrell");
-    personal.add(name);
+    personal.add(name, formData);
 
     TextField<String> last = new TextField<String>();
     last.setFieldLabel("Last Name");
     last.setValue("Meyer");
-    personal.add(last);
+    personal.add(last, formData);
 
     TextField<String> company = new TextField<String>();
     company.setFieldLabel("Company");
-    personal.add(company);
+    personal.add(company, formData);
 
     TextField<String> email = new TextField<String>();
     email.setFieldLabel("Email");
-    personal.add(email);
+    personal.add(email, formData);
 
     tabs.add(personal);
 
@@ -121,19 +123,19 @@ public class AdvancedFormsExample extends LayoutContainer {
     TextField<String> home = new TextField<String>();
     home.setFieldLabel("Home");
     home.setValue("800-555-1212");
-    numbers.add(home);
+    numbers.add(home, formData);
 
     TextField<String> business = new TextField<String>();
     business.setFieldLabel("Business");
-    numbers.add(business);
+    numbers.add(business, formData);
 
     TextField<String> mobile = new TextField<String>();
     mobile.setFieldLabel("Mobile");
-    numbers.add(mobile);
+    numbers.add(mobile, formData);
 
     TextField<String> fax = new TextField<String>();
     fax.setFieldLabel("Fax");
-    numbers.add(fax);
+    numbers.add(fax, formData);
 
     tabs.add(numbers);
 
@@ -147,6 +149,7 @@ public class AdvancedFormsExample extends LayoutContainer {
   }
 
   private void createColumnForm() {
+    FormData formData = new FormData("100%");
     FormPanel panel = new FormPanel();
     panel.setFrame(true);
     panel.setIconStyle("icon-form");
@@ -157,7 +160,6 @@ public class AdvancedFormsExample extends LayoutContainer {
     panel.setLayout(new FlowLayout());
 
     LayoutContainer main = new LayoutContainer();
-    main.setWidth(450);
     main.setLayout(new ColumnLayout());
 
     LayoutContainer left = new LayoutContainer();
@@ -168,15 +170,15 @@ public class AdvancedFormsExample extends LayoutContainer {
 
     TextField<String> first = new TextField<String>();
     first.setFieldLabel("First Name");
-    left.add(first);
+    left.add(first, formData);
 
     TextField<String> company = new TextField<String>();
     company.setFieldLabel("Company");
-    left.add(company);
+    left.add(company, formData);
 
     DateField birthday = new DateField();
     birthday.setFieldLabel("Birthday");
-    left.add(birthday);
+    left.add(birthday, formData);
 
     LayoutContainer right = new LayoutContainer();
 
@@ -186,11 +188,11 @@ public class AdvancedFormsExample extends LayoutContainer {
 
     TextField<String> last = new TextField<String>();
     last.setFieldLabel("Last");
-    right.add(last);
+    right.add(last, formData);
 
     TextField<String> email = new TextField<String>();
     email.setFieldLabel("Email");
-    right.add(email);
+    right.add(email, formData);
 
     Radio radio1 = new Radio();
     radio1.setBoxLabel("Yes");
@@ -211,7 +213,6 @@ public class AdvancedFormsExample extends LayoutContainer {
 
     LayoutContainer area = new LayoutContainer();
     area.setStyleAttribute("padding", "0 10px 5px 10px");
-    area.setWidth(450);
 
     layout = new FormLayout();
     layout.setLabelAlign(LabelAlign.TOP);
@@ -221,9 +222,7 @@ public class AdvancedFormsExample extends LayoutContainer {
     TextArea a = new TextArea();
     a.setFieldLabel("Comment");
 
-    String adj = GXT.isIE ? "100%" : "-20"; // looking into
-    a.setData("anchorSpec", adj);
-    area.add(a);
+    area.add(a, formData);
 
     panel.add(area);
 

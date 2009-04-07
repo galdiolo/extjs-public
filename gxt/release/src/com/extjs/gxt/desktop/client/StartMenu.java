@@ -80,6 +80,9 @@ public class StartMenu extends Menu {
    */
   public void setHeading(String heading) {
     this.heading = heading;
+    if (rendered) {
+      headerText.setInnerHtml(heading);
+    }
   }
 
   /**
@@ -97,10 +100,10 @@ public class StartMenu extends Menu {
     el().updateZIndex(0);
     int tPanelWidth = 100;
     Rectangle box = menuBWrap.getBounds();
-    menuPanel.setWidth(box.width - tPanelWidth,true);
-    menuPanel.setHeight(box.height,true);
-    toolsPanel.setWidth(tPanelWidth,true);
-    toolsPanel.setHeight(box.height,true);
+    menuPanel.setWidth(box.width - tPanelWidth, true);
+    menuPanel.setHeight(box.height, true);
+    toolsPanel.setWidth(tPanelWidth, true);
+    toolsPanel.setHeight(box.height, true);
     toolsPanel.alignTo(menuPanel.dom, "tl-tr", null);
   }
 
@@ -143,8 +146,8 @@ public class StartMenu extends Menu {
     El tl = el().createChild("<div class='ux-start-menu-tl'></div>");
     El tr = tl.createChild("<div class='ux-start-menu-tr'></div>");
     El tc = tr.createChild("<div class='ux-start-menu-tc'></div>");
-    header = tc.createChild("<div class='x-window-header x-unselectable x-panel-icon " + iconStyle
-        + "'></div>");
+    header = tc.createChild("<div class='x-window-header x-unselectable x-panel-icon "
+        + iconStyle + "'></div>");
     headerText = header.createChild("<span class='x-window-header-text'></span>");
     headerText.setInnerHtml(heading);
 

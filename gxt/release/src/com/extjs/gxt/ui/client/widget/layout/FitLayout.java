@@ -17,14 +17,16 @@ import com.extjs.gxt.ui.client.widget.Layout;
  * This is a base class for layouts that contain a single item that
  * automatically expands to fill the layout's container.
  * 
- * <p /> Child Widgets are:
+ * <p />
+ * Child Widgets are:
  * <ul>
  * <li><b>Sized</b> : Yes - expands to fill parent container</li>
  * <li><b>Positioned</b> : No</li>
  * </ul>
  * 
- * <p /> In the following code, the child panel will be sized to 400 by 400 when
- * the parent container is sized:
+ * <p />
+ * In the following code, the child panel will be sized to 400 by 400 when the
+ * parent container is sized:
  * 
  * <code><pre>
    LayoutContainer container = new LayoutContainer();

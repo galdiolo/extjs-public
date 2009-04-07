@@ -13,7 +13,6 @@ import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.TreeEvent;
 import com.extjs.gxt.ui.client.util.Markup;
-import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.widget.table.TableColumnModel;
 import com.extjs.gxt.ui.client.widget.tree.TreeItemUI;
 import com.google.gwt.user.client.DOM;
@@ -47,13 +46,12 @@ public class TreeTableItemUI extends TreeItemUI {
   @Override
   public void handleEvent(TreeEvent e) {
     TreeTableItem item = (TreeTableItem) e.item;
-    TreeTableItemUI ui = (TreeTableItemUI) item.getUI();
     Element target = e.getTarget();
     int type = e.type;
     switch (type) {
       case Event.ONMOUSEOVER:
       case Event.ONMOUSEOUT:
-        ui.handleMouseEvent(e);
+        handleMouseEvent(e);
         break;
       case Event.ONCLICK:
       case Event.ONDBLCLICK:
@@ -180,16 +178,14 @@ public class TreeTableItemUI extends TreeItemUI {
 
   @Override
   protected void handleMouseEvent(TreeEvent ce) {
-    TreeTableItemUI treeUI = (TreeTableItemUI) item.getUI();
-    Rectangle rect = item.el().firstChild().getBounds();
-    if (rect.contains(ce.getClientX(), ce.getClientY())) {
-      if (!treeUI.hovering) {
-        treeUI.hovering = true;
-        treeUI.onMouseOver(ce);
+    if(ce.event.getTypeInt() == Event.ONMOUSEOVER) {
+      if (!hovering) {
+        hovering = true;
+        onMouseOver(ce);
       }
     } else {
-      treeUI.hovering = false;
-      treeUI.onMouseOut(ce);
+      hovering = false;
+      onMouseOut(ce);
     }
 
   }

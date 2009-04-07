@@ -98,7 +98,6 @@ class DNDManager {
     event.doit = false;
     event.target = currentTarget;
     currentTarget.handleDragEnter(event);
-    currentTarget.fireEvent(Events.DragEnter, event);
   }
 
   void handleDragStart(DragSource source, DNDEvent event) {
