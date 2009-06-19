@@ -1,33 +1,14 @@
 /*
- * Ext Core Library 3.0 Beta
+ * Ext Core Library 3.0
  * http://extjs.com/
  * Copyright(c) 2006-2009, Ext JS, LLC.
  * 
- * The MIT License
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * MIT Licensed - http://extjs.com/license/mit.txt
  * 
  */
 
 
-(function(){var EXTUTIL=Ext.util,TOARRAY=Ext.toArray,EACH=Ext.each,ISOBJECT=Ext.isObject
-TRUE=true,FALSE=false;EXTUTIL.Observable=function(){var me=this,e=me.events;if(me.listeners){me.on(me.listeners);delete me.listeners;}
+(function(){var EXTUTIL=Ext.util,TOARRAY=Ext.toArray,EACH=Ext.each,ISOBJECT=Ext.isObject,TRUE=true,FALSE=false;EXTUTIL.Observable=function(){var me=this,e=me.events;if(me.listeners){me.on(me.listeners);delete me.listeners;}
 me.events=e||{};};EXTUTIL.Observable.prototype=function(){var filterOptRe=/^(?:scope|delay|buffer|single)$/,toLower=function(s){return s.toLowerCase();};return{fireEvent:function(){var a=TOARRAY(arguments),ename=toLower(a[0]),me=this,ret=TRUE,ce=me.events[ename],q,c;if(me.eventsSuspended===TRUE){if(q=me.suspendedEventsQueue){q.push(a);}}
 else if(ISOBJECT(ce)&&ce.bubble){if(ce.fire.apply(ce,a.slice(1))===FALSE){return FALSE;}
 c=me.getBubbleTarget&&me.getBubbleTarget();if(c&&c.enableBubble){c.enableBubble(ename);return c.fireEvent.apply(c,a);}}
@@ -40,7 +21,6 @@ me.listeners.push(l);}},createListener:function(fn,scope,o){o=o||{},scope=scope|
 if(o.delay){h=createDelayed(h,o,scope);}
 if(o.single){h=createSingle(h,this,fn,scope);}
 if(o.buffer){h=createBuffered(h,o,scope);}
-l.fireFn=h;return l;},findListener:function(fn,scope){var s,ret=-1
-EACH(this.listeners,function(l,i){s=l.scope;if(l.fn==fn&&(s==scope||s==this.obj)){ret=i;return FALSE;}},this);return ret;},isListening:function(fn,scope){return this.findListener(fn,scope)!=-1;},removeListener:function(fn,scope){var index,me=this,ret=FALSE;if((index=me.findListener(fn,scope))!=-1){if(me.firing){me.listeners=me.listeners.slice(0);}
+l.fireFn=h;return l;},findListener:function(fn,scope){var s,ret=-1;EACH(this.listeners,function(l,i){s=l.scope;if(l.fn==fn&&(s==scope||s==this.obj)){ret=i;return FALSE;}},this);return ret;},isListening:function(fn,scope){return this.findListener(fn,scope)!=-1;},removeListener:function(fn,scope){var index,me=this,ret=FALSE;if((index=me.findListener(fn,scope))!=-1){if(me.firing){me.listeners=me.listeners.slice(0);}
 me.listeners.splice(index,1);ret=TRUE;}
 return ret;},clearListeners:function(){this.listeners=[];},fire:function(){var me=this,args=TOARRAY(arguments),ret=TRUE;EACH(me.listeners,function(l){me.firing=TRUE;if(l.fireFn.apply(l.scope||me.obj||window,args)===FALSE){return ret=me.firing=FALSE;}});me.firing=FALSE;return ret;}};})();

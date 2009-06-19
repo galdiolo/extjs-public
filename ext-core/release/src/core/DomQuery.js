@@ -1,27 +1,9 @@
 /*
- * Ext Core Library 3.0 Beta
+ * Ext Core Library 3.0
  * http://extjs.com/
  * Copyright(c) 2006-2009, Ext JS, LLC.
  * 
- * The MIT License
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * MIT Licensed - http://extjs.com/license/mit.txt
  * 
  */
 
@@ -48,7 +30,7 @@ All selectors, attribute filters and pseudos below can be combined infinitely in
     <li> <b>E ~ F</b> all elements with the tag F that are preceded by a sibling element with the tag E</li>
 </ul>
 <h4>Attribute Selectors:</h4>
-<p>The use of @ and quotes are optional. For example, div[@foo='bar'] is also a valid attribute selector.</p>
+<p>The use of &#64; and quotes are optional. For example, div[&#64;foo='bar'] is also a valid attribute selector.</p>
 <ul class="list">
     <li> <b>E[foo]</b> has an attribute "foo"</li>
     <li> <b>E[foo=bar]</b> has an attribute "foo" that equals "bar"</li>
@@ -105,6 +87,7 @@ Ext.DomQuery = function(){
 	    // IE runs the same speed using setAttribute, however FF slows way down
 	    // and Safari completely fails so they need to continue to use expandos.
 	    isIE = window.ActiveXObject ? true : false,
+        isOpera = Ext.isOpera,
 	    key = 30803;
 	    
     // this eval is stop the compressor from
@@ -199,7 +182,7 @@ Ext.DomQuery = function(){
         }else if(mode == "/" || mode == ">"){
             var utag = tagName.toUpperCase();
             for(var i = 0, ni, cn; ni = ns[i]; i++){
-                cn = ni.children || ni.childNodes;
+                cn = isOpera ? ni.childNodes : (ni.children || ni.childNodes);
                 for(var j = 0, cj; cj = cn[j]; j++){
                     if(cj.nodeName == utag || cj.nodeName == tagName  || tagName == '*'){
                         result[++ri] = cj;
@@ -215,10 +198,12 @@ Ext.DomQuery = function(){
                 }
             }
         }else if(mode == "~"){
+            var utag = tagName.toUpperCase();
             for(var i = 0, n; n = ns[i]; i++){
-                while((n = n.nextSibling) && (n.nodeType != 1 || (tagName == '*' || n.tagName.toLowerCase()!=tagName)));
-                if(n){
-                    result[++ri] = n;
+                while((n = n.nextSibling)){
+                    if (n.nodeName == utag || n.nodeName == tagName || tagName == '*'){
+                        result[++ri] = n;
+                    }
                 }
             }
         }
@@ -275,6 +260,9 @@ Ext.DomQuery = function(){
         	st = custom=="{",
         	f = Ext.DomQuery.operators[op];
         for(var i = 0, ci; ci = cs[i]; i++){
+            if(ci.nodeType != 1){
+                continue;
+            }
             var a;
             if(st){
                 a = Ext.DomQuery.getStyle(ci, attr);

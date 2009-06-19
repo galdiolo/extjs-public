@@ -1,27 +1,9 @@
 /*
- * Ext Core Library 3.0 Beta
+ * Ext Core Library 3.0
  * http://extjs.com/
  * Copyright(c) 2006-2009, Ext JS, LLC.
  * 
- * The MIT License
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * MIT Licensed - http://extjs.com/license/mit.txt
  * 
  */
 
@@ -32,7 +14,10 @@ Ext.Element.addMethods(
 function() {
 	var GETDOM = Ext.getDom,
 		GET = Ext.get,
-		DH = Ext.DomHelper;
+		DH = Ext.DomHelper,
+        isEl = function(el){
+            return  (el.nodeType || el.dom || typeof el == 'string');  
+        };
 	
 	return {
 	    /**
@@ -70,7 +55,7 @@ function() {
 	     * @return {Ext.Element} this
 	     */
 	    insertAfter: function(el){
-	        GETDOM(el).parentNode.insertBefore(this.dom, el.nextSibling);
+	        (el = GETDOM(el)).parentNode.insertBefore(this.dom, el.nextSibling);
 	        return this;
 	    },
 	
@@ -80,15 +65,15 @@ function() {
 	     * @return {Ext.Element} The new child
 	     */
 	    insertFirst: function(el, returnDom){
-	        el = el || {};
-	        if (Ext.isObject(el) && !el.nodeType && !el.dom) { // dh config
-	            return this.createChild(el, this.dom.firstChild, returnDom);
-	        } else {
-	            el = GETDOM(el);
-	            this.dom.insertBefore(el, this.dom.firstChild);
-	            return !returnDom ? GET(el) : el;
-	        }
-	    },
+            el = el || {};
+            if(isEl(el)){ // element
+                el = GETDOM(el);
+                this.dom.insertBefore(el, this.dom.firstChild);
+                return !returnDom ? GET(el) : el;
+            }else{ // dh config
+                return this.createChild(el, this.dom.firstChild, returnDom);
+            }
+    },
 	
 	    /**
 	     * Replaces the passed element with this element
@@ -110,14 +95,14 @@ function() {
 	    replaceWith: function(el){
 		    var me = this,
 		    	Element = Ext.Element;
-	        if (Ext.isObject(el) && !el.nodeType && !el.dom){ // dh config	            
-	            el = DH.insertBefore(me.dom, el);
-	        } else {
-	            el = GETDOM(el);
-	            me.dom.parentNode.insertBefore(el, me.dom);
-	        }
+            if(isEl(el)){
+                el = GETDOM(el);
+                me.dom.parentNode.insertBefore(el, me.dom);
+            }else{
+                el = DH.insertBefore(me.dom, el);
+            }
 	        
-	        delete El.cache[me.id];
+	        delete Element.cache[me.id];
 	        Ext.removeNode(me.dom);      
 	        me.id = Ext.id(me.dom = el);
 	        return Element.cache[me.id] = me;        

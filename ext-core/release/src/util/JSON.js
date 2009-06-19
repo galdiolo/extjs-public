@@ -1,27 +1,9 @@
 /*
- * Ext Core Library 3.0 Beta
+ * Ext Core Library 3.0
  * http://extjs.com/
  * Copyright(c) 2006-2009, Ext JS, LLC.
  * 
- * The MIT License
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * MIT Licensed - http://extjs.com/license/mit.txt
  * 
  */
 
@@ -33,7 +15,8 @@
  * @singleton
  */
 Ext.util.JSON = new (function(){
-    var useHasOwn = !!{}.hasOwnProperty;
+    var useHasOwn = !!{}.hasOwnProperty,
+        isNative = Ext.USE_NATIVE_JSON && JSON && JSON.toString() == '[object JSON]';
 
     // crashes Safari in some instances
     //var validRE = /^("(\\.|[^"\\\n\r])*?"|[,:{}\[\]0-9.\-+Eaeflnr-u \n\r\t])+?$/;
@@ -103,12 +86,12 @@ Ext.util.JSON = new (function(){
      * @param {Mixed} o The variable to encode
      * @return {String} The JSON string
      */
-    this.encode = function(o){
+    this.encode = isNative ? JSON.stringify : function(o){
         if(typeof o == "undefined" || o === null){
             return "null";
         }else if(Ext.isArray(o)){
             return encodeArray(o);
-        }else if(Ext.isDate(o)){
+        }else if(Object.prototype.toString.apply(o) === '[object Date]'){
             return Ext.util.JSON.encodeDate(o);
         }else if(typeof o == "string"){
             return encodeString(o);
@@ -144,22 +127,10 @@ Ext.util.JSON = new (function(){
     /**
      * Decodes (parses) a JSON string to an object. If the JSON is invalid, this function throws a SyntaxError unless the safe option is set.
      * @param {String} json The JSON string
-     * @param {Boolean} safe (optional) If set to true and the JSON is malformed, null is returned.
      * @return {Object} The resulting object
      */
-    this.decode = function(json, safe){
-        var fn = function(){
-            return eval("(" + json + ')');    
-        };
-        if(safe){
-            try{
-                return fn();
-            }catch(e){
-                return null;
-            }
-        }else{
-            return fn();
-        }
+    this.decode = isNative ? JSON.parse : function(json){
+        return eval("(" + json + ')');    
     };
 })();
 /**

@@ -1,27 +1,9 @@
 /*
- * Ext Core Library 3.0 Beta
+ * Ext Core Library 3.0
  * http://extjs.com/
  * Copyright(c) 2006-2009, Ext JS, LLC.
  * 
- * The MIT License
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * MIT Licensed - http://extjs.com/license/mit.txt
  * 
  */
 
@@ -42,7 +24,8 @@ Ext.EventManager = function(){
     	WINDOW = window,
     	IEDEFERED = "ie-deferred-loader",
     	DOMCONTENTLOADED = "DOMContentLoaded",
-    	elHash = {};
+    	elHash = {},
+    	propRe = /^(?:scope|delay|buffer|single|stopEvent|preventDefault|stopPropagation|normalized|args|delegate)$/;
 
     /// There is some jquery work around stuff here that isn't needed in Ext Core.
     function addListener(el, ename, fn, wrap, scope){	    
@@ -102,7 +85,7 @@ Ext.EventManager = function(){
                     fireDocReady();
                 }
             };
-        } else if (Ext.isSafari){
+        } else if (Ext.isWebKit){
             docReadyProcId = setInterval(function(){                
                 if(DOC.readyState == COMPLETE) {
                     fireDocReady();
@@ -376,8 +359,13 @@ Ext.onReady = Ext.EventManager.onDocumentReady;
                 Ext.isIE ? "ext-ie " + (Ext.isIE6 ? 'ext-ie6' : (Ext.isIE7 ? 'ext-ie7' : 'ext-ie8'))
                 : Ext.isGecko ? "ext-gecko " + (Ext.isGecko2 ? 'ext-gecko2' : 'ext-gecko3')
                 : Ext.isOpera ? "ext-opera"
-                : Ext.isSafari ? "ext-safari"
-                : Ext.isChrome ? "ext-chrome" : ""];
+                : Ext.isWebKit ? "ext-webkit" : ""];
+
+        if(Ext.isSafari){
+            cls.push("ext-safari " + (Ext.isSafari2 ? 'ext-safari2' : (Ext.isSafari3 ? 'ext-safari3' : 'ext-safari4')));
+        }else if(Ext.isChrome){
+            cls.push("ext-chrome");
+        }
 
         if(Ext.isMac){
             cls.push("ext-mac");
@@ -470,7 +458,7 @@ Ext.EventObject = function(){
                 me.type = e.type;
                 me.shiftKey = e.shiftKey;
                 // mac metaKey behaves like ctrlKey
-                me.ctrlKey = e.ctrlKey || e.metaKey;
+                me.ctrlKey = e.ctrlKey || e.metaKey || false;
                 me.altKey = e.altKey;
                 // in getKey these will be normalized for the mac
                 me.keyCode = e.keyCode;
@@ -540,9 +528,13 @@ Ext.EventObject = function(){
          * @return {Number} The key code
          */
         getKey : function(){
-            var k = this.keyCode || this.charCode;
-            return Ext.isSafari ? (safariKeys[k] || k) : k;
+            return this.normalizeKey(this.keyCode || this.charCode)
         },
+		
+		// private
+		normalizeKey: function(k){
+			return Ext.isSafari ? (safariKeys[k] || k) : k; 
+		},
 
         /**
          * Gets the x coordinate of the event.
@@ -637,8 +629,11 @@ Ext.EventObject = function(){
 		 * @return {Boolean}
 		 */
 		within : function(el, related, allowEl){
-			var t = this[related ? "getRelatedTarget" : "getTarget"]();
-			return t && ((allowEl ? (t == Ext.getDom(el)) : false) || Ext.fly(el).contains(t));
+            if(el){
+			    var t = this[related ? "getRelatedTarget" : "getTarget"]();
+			    return t && ((allowEl ? (t == Ext.getDom(el)) : false) || Ext.fly(el).contains(t));
+            }
+            return false;
 		}
 	 };
 

@@ -1,5 +1,5 @@
 /*
- * Ext Core Library Examples 3.0 Beta
+ * Ext Core Library Examples 3.0
  * http://extjs.com/
  * Copyright(c) 2006-2009, Ext JS, LLC.
  * 

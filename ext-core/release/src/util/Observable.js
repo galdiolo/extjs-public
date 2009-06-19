@@ -1,27 +1,9 @@
 /*
- * Ext Core Library 3.0 Beta
+ * Ext Core Library 3.0
  * http://extjs.com/
  * Copyright(c) 2006-2009, Ext JS, LLC.
  * 
- * The MIT License
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * MIT Licensed - http://extjs.com/license/mit.txt
  * 
  */
 
@@ -30,30 +12,104 @@
 var EXTUTIL = Ext.util, 
     TOARRAY = Ext.toArray, 
     EACH = Ext.each, 
-    ISOBJECT = Ext.isObject
+    ISOBJECT = Ext.isObject,
     TRUE = true,
     FALSE = false;
 /**
  * @class Ext.util.Observable
- * Abstract base class that provides a common interface for publishing events. Subclasses are expected to
- * to have a property "events" with all the events defined.<br>
+ * Base class that provides a common interface for publishing events. Subclasses are expected to
+ * to have a property "events" with all the events defined, and, optionally, a property "listeners"
+ * with configured listeners defined.<br>
  * For example:
  * <pre><code>
- Employee = function(name){
-    this.name = name;
-    this.addEvents({
-        "fired" : true,
-        "quit" : true
-    });
- }
- Ext.extend(Employee, Ext.util.Observable);
+Employee = Ext.extend(Ext.util.Observable, {
+    constructor: function(config){
+        this.name = config.name;
+        this.addEvents({
+            "fired" : true,
+            "quit" : true
+        });
+
+//      Copy configured listeners into *this* object so that the base class's
+//      constructor will add them.
+        this.listeners = config.listeners;
+
+//      Call our superclass constructor to complete construction process.
+        Employee.superclass.constructor.call(config)
+    }
+});
 </code></pre>
+ * This could then be used like this:<code><pre>
+var newEmployee = new Employee({
+    name: employeeName,
+    listeners: {
+        quit: function() {
+//          By default, "this" will be the object that fired the event.
+            alert(this.name + " has quit!");
+        }
+    }
+});
+</pre></code>
  */
 EXTUTIL.Observable = function(){
     /**
-     * @cfg {Object} listeners (optional) A config object containing one or more event handlers to be added to this
+     * @cfg {Object} listeners (optional)<p>A config object containing one or more event handlers to be added to this
      * object during initialization.  This should be a valid listeners config object as specified in the
-     * {@link #addListener} example for attaching multiple handlers at once.
+     * {@link #addListener} example for attaching multiple handlers at once.</p>
+     * <h2>DOM events from ExtJs {@link Ext.Component Components}</h2>
+     * <p>While <i>some</i> ExtJs Component classes export selected DOM events (eg "click", "mouseover" etc), this
+     * is usually only done when extra value can be added. For example the {@link Ext.DataView DataView}'s
+     * <b><code>{@link Ext.DataView#click click}</code></b> event passing the node clicked on. To access DOM
+     * events directly from a Component's HTMLElement, listeners must be added to the <i>{@link Ext.Component#getEl Element}</i> after the Component
+     * has been rendered. A plugin can simplify this step:<code><pre>
+// Plugin is configured with a listeners config object.
+// The Component is appended to the argument list of all handler functions.
+Ext.DomObserver = Ext.extend(Object, {
+    constructor: function(config) {
+        this.listeners = config.listeners ? config.listeners : config;
+    },
+
+//  Component passes itself into plugin's init method
+    init: function(c) {
+        var p, l = this.listeners;
+        for (p in l) {
+            if (Ext.isFunction(l[p])) {
+                l[p] = this.createHandler(l[p], c);
+            } else {
+                l[p].fn = this.createHandler(l[p].fn, c);
+            }
+        }
+
+//      Add the listeners to the Element immediately following the render call
+        c.render = c.render.{@link Function#createSequence createSequence}(function() {
+            var e = c.getEl();
+            if (e) {
+                e.on(l);
+            }
+        });
+    },
+
+    createHandler: function(fn, c) {
+        return function(e) {
+            fn.call(this, e, c);
+        };
+    }
+});
+
+var combo = new Ext.form.ComboBox({
+
+// Collapse combo when its element is clicked on
+    plugins: [ new Ext.DomObserver({
+        click: function(evt, comp) {
+            comp.collapse();
+        }
+    })],
+    store: myStore,
+    typeAhead: true,
+    mode: 'local',
+    triggerAction: 'all'
+});
+</pre></code></p>
      */
     var me = this, e = me.events;
     if(me.listeners){
@@ -86,7 +142,7 @@ EXTUTIL.Observable.prototype = function(){
                 ce = me.events[ename],
                 q,
                 c;
-            if (me.eventsSuspended === TRUE) {            
+            if (me.eventsSuspended === TRUE) {
                 if (q = me.suspendedEventsQueue) {
                     q.push(a);
                 }
@@ -109,14 +165,14 @@ EXTUTIL.Observable.prototype = function(){
             }
             return ret;
         },
-    
+
         /**
-         * Appends an event handler to this component
-         * @param {String}   eventName The type of event to listen for
-         * @param {Function} handler The method the event invokes
+         * Appends an event handler to this object.
+         * @param {String}   eventName The name of the event to listen for.
+         * @param {Function} handler The method the event invokes.
          * @param {Object}   scope (optional) The scope (<code><b>this</b></code> reference) in which the handler function is executed.
          * <b>If omitted, defaults to the object which fired the event.</b>
-         * @param {Object}   options (optional) An object containing handler configuration
+         * @param {Object}   options (optional) An object containing handler configuration.
          * properties. This may contain any of the following properties:<ul>
          * <li><b>scope</b> : Object<div class="sub-desc">The scope (<code><b>this</b></code> reference) in which the handler function is executed.
          * <b>If omitted, defaults to the object which fired the event.</b></div></li>
@@ -177,27 +233,27 @@ EXTUTIL.Observable.prototype = function(){
             ce;
             if (ISOBJECT(eventName)) {
                 o = eventName;
-                for (e in o){                    
+                for (e in o){
                     oe = o[e];
-                    if (!filterOptRe.test(e)) {                    
-                        me.addListener(e, oe.fn || oe, oe.scope || o.scope, oe.fn ? oe : o);              
+                    if (!filterOptRe.test(e)) {
+                        me.addListener(e, oe.fn || oe, oe.scope || o.scope, oe.fn ? oe : o);
                     }
-                }            
-            } else {            
+                }
+            } else {
                 eventName = toLower(eventName);
                 ce = me.events[eventName] || TRUE;
-                if (typeof ce == "boolean") {                
+                if (typeof ce == "boolean") {
                     me.events[eventName] = ce = new EXTUTIL.Event(me, eventName);
                 }
                 ce.addListener(fn, scope, ISOBJECT(o) ? o : {});
             }
         },
-    
+
         /**
-         * Removes a listener
-         * @param {String}   eventName     The type of event to listen for
-         * @param {Function} handler        The handler to remove
-         * @param {Object}   scope  (optional) The scope (this object) for the handler
+         * Removes an event handler.
+         * @param {String}   eventName     The type of event the handler was associated with.
+         * @param {Function} handler       The handler to remove. <b>This must be a reference to the function passed into the {@link #addListener} call.</b>
+         * @param {Object}   scope         (optional) The scope originally specified for the handler.
          */
         removeListener : function(eventName, fn, scope){
             var ce = this.events[toLower(eventName)];
@@ -205,30 +261,30 @@ EXTUTIL.Observable.prototype = function(){
                 ce.removeListener(fn, scope);
             }
         },
-    
+
         /**
          * Removes all listeners for this object
          */
         purgeListeners : function(){
             var events = this.events,
                 evt,
-                key;                
+                key;
             for(key in events){
                 evt = events[key];
                 if(ISOBJECT(evt)){
-                    evt.clearListeners();               
+                    evt.clearListeners();
                 }
             }
-        },        
-    
+        },
+
         /**
          * Used to define events on this Observable
          * @param {Object} object The object with the events defined
          */
         addEvents : function(o){
             var me = this;
-            me.events = me.events || {};        
-            if (typeof o == 'string') {            
+            me.events = me.events || {};
+            if (typeof o == 'string') {
                 EACH(arguments, function(a) {
                     me.events[a] = me.events[a] || TRUE;
                 });
@@ -236,7 +292,7 @@ EXTUTIL.Observable.prototype = function(){
                 Ext.applyIf(me.events, o);
             }
         },
-    
+
         /**
          * Checks to see if this object has any listeners for a specified event
          * @param {String} eventName The name of the event to check for
@@ -246,19 +302,19 @@ EXTUTIL.Observable.prototype = function(){
             var e = this.events[eventName];
             return ISOBJECT(e) && e.listeners.length > 0;
         },
-    
+
         /**
          * Suspend the firing of all events. (see {@link #resumeEvents})
-         * @param queueSuspended {Boolean} Pass as true to queue up suspended events to be fired
+         * @param {Boolean} queueSuspended Pass as true to queue up suspended events to be fired
          * after the {@link #resumeEvents} call instead of discarding all suspended events;
          */
         suspendEvents : function(queueSuspended){
             this.eventsSuspended = TRUE;
             if (queueSuspended){
-                this.suspendedEventsQueue = [];         
+                this.suspendedEventsQueue = [];
             }
         },
-    
+
         /**
          * Resume firing events. (see {@link #suspendEvents})
          * If events were suspended using the <tt><b>queueSuspended</b></tt> parameter, then all
@@ -266,30 +322,30 @@ EXTUTIL.Observable.prototype = function(){
          */
         resumeEvents : function(){
             var me = this;
-            me.eventsSuspended = !delete me.suspendedEventQueue;        
+            me.eventsSuspended = !delete me.suspendedEventQueue;
             EACH(me.suspendedEventsQueue, function(e) {
                 me.fireEvent.apply(me, e);
-            });     
+            });
         }
     }
 }();
 
 var OBSERVABLE = EXTUTIL.Observable.prototype;
 /**
- * Appends an event handler to this element (shorthand for addListener)
+ * Appends an event handler to this object (shorthand for {@link #addListener}.)
  * @param {String}   eventName     The type of event to listen for
- * @param {Function} handler        The method the event invokes
- * @param {Object}   scope (optional) The scope in which to execute the handler
- * function. The handler function's "this" context.
- * @param {Object}   options  (optional)
+ * @param {Function} handler       The method the event invokes
+ * @param {Object}   scope         (optional) The scope (<code><b>this</b></code> reference) in which the handler function is executed.
+ * <b>If omitted, defaults to the object which fired the event.</b>
+ * @param {Object}   options       (optional) An object containing handler configuration.
  * @method
  */
 OBSERVABLE.on = OBSERVABLE.addListener;
 /**
- * Removes a listener (shorthand for removeListener)
- * @param {String}   eventName     The type of event to listen for
- * @param {Function} handler        The handler to remove
- * @param {Object}   scope  (optional) The scope (this object) for the handler
+ * Removes an event handler (shorthand for {@link #removeListener}.)
+ * @param {String}   eventName     The type of event the handler was associated with.
+ * @param {Function} handler       The handler to remove. <b>This must be a reference to the function passed into the {@link #addListener} call.</b>
+ * @param {Object}   scope         (optional) The scope originally specified for the handler.
  * @method
  */
 OBSERVABLE.un = OBSERVABLE.removeListener;
@@ -378,7 +434,7 @@ EXTUTIL.Event.prototype = {
     },
 
     findListener : function(fn, scope){ 
-        var s, ret = -1                    
+        var s, ret = -1;
         EACH(this.listeners, function(l, i) {
             s = l.scope;
             if(l.fn == fn && (s == scope || s == this.obj)){
@@ -398,7 +454,7 @@ EXTUTIL.Event.prototype = {
         var index,
             me = this,
             ret = FALSE;
-        if((index = me.findListener(fn, scope)) != -1){                
+        if((index = me.findListener(fn, scope)) != -1){
             if (me.firing) {
                 me.listeners = me.listeners.slice(0);
             }
@@ -413,10 +469,10 @@ EXTUTIL.Event.prototype = {
     },
 
     fire : function(){
-        var me = this,                                
+        var me = this,
             args = TOARRAY(arguments),
-            ret = TRUE;                                                 
-        
+            ret = TRUE;
+
         EACH(me.listeners, function(l) {
             me.firing = TRUE;
             if (l.fireFn.apply(l.scope || me.obj || window, args) === FALSE) {

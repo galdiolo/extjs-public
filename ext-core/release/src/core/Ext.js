@@ -1,32 +1,12 @@
 /*
- * Ext Core Library 3.0 Beta
+ * Ext Core Library 3.0
  * http://extjs.com/
  * Copyright(c) 2006-2009, Ext JS, LLC.
  * 
- * The MIT License
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * MIT Licensed - http://extjs.com/license/mit.txt
  * 
  */
 
-
-Ext = {version: '3.0'};
 
 // for old browsers
 window.undefined = window.undefined;
@@ -36,6 +16,14 @@ window.undefined = window.undefined;
  * Ext core utilities and functions.
  * @singleton
  */
+
+Ext = {
+    /**
+     * The version of the framework
+     * @type String
+     */
+    version: '3.0'
+};
 
 /**
  * Copies all the properties of config to obj.
@@ -47,7 +35,9 @@ window.undefined = window.undefined;
  */
 Ext.apply = function(o, c, defaults){
     // no "this" reference for friendly out of scope calls
-    if (defaults) Ext.apply(o, defaults)
+    if(defaults){
+        Ext.apply(o, defaults);
+    }
     if(o && c && typeof c == 'object'){
         for(var p in c){
             o[p] = c[p];
@@ -72,6 +62,7 @@ Ext.apply = function(o, c, defaults){
         isIE = !isOpera && check(/msie/),
         isIE7 = isIE && check(/msie 7/),
         isIE8 = isIE && check(/msie 8/),
+        isIE6 = isIE && !isIE7 && !isIE8,
         isGecko = !isWebKit && check(/gecko/),
         isGecko3 = isGecko && check(/rv:1\.9/),
         isBorderBox = isIE && !isStrict,
@@ -82,7 +73,7 @@ Ext.apply = function(o, c, defaults){
         isSecure = /^https/i.test(window.location.protocol);
 
     // remove css image flicker
-    if(isIE && !isIE7){
+    if(isIE6){
         try{
             document.execCommand("BackgroundImageCache", false, true);
         }catch(e){}
@@ -125,6 +116,15 @@ Ext.apply = function(o, c, defaults){
         enableListenerCollection : false,
 
         /**
+         * Indicates whether to use native browser parsing for JSON methods.
+         * This option is ignored if the browser does not support native JSON methods.
+         * <b>Note: Native JSON methods will not work with objects that have functions.
+         * Also, property names must be quoted, otherwise the data will not parse.</b> (Defaults to false)
+         * @type Boolean
+         */
+        USE_NATIVE_JSON : false,
+
+        /**
          * Copies all the properties of config to obj if they don't already exist.
          * @param {Object} obj The receiver of the properties
          * @param {Object} config The source of the properties
@@ -133,7 +133,9 @@ Ext.apply = function(o, c, defaults){
         applyIf : function(o, c){
             if(o){
                 for(var p in c){
-                    if(Ext.isEmpty(o[p])){ o[p] = c[p]; }
+                    if(Ext.isEmpty(o[p])){ 
+                        o[p] = c[p]; 
+                    }
                 }
             }
             return o;
@@ -284,23 +286,23 @@ Company.data.CustomStore = function(config) { ... }
         /**
          * Takes an object and converts it to an encoded URL. e.g. Ext.urlEncode({foo: 1, bar: 2}); would return "foo=1&bar=2".  Optionally, property values can be arrays, instead of keys and the resulting string that's returned will contain a name/value pair for each array value.
          * @param {Object} o
+         * @param {String} pre (optional) A prefix to add to the url encoded string
          * @return {String}
          */
-        urlEncode : function(o, pre){
-            var buf = [],
-                key,
-                e = encodeURIComponent;
+        urlEncode: function(o, pre){
+            var undef, buf = [], key, e = encodeURIComponent;
 
-            for(key in o) {
-                Ext.each(o[key] || key, function(val, i) {
-                    buf.push("&", e(key), "=", val != key ? e(val) : "");
-                });
-            }
-            if(!pre) {
-                buf.shift();
-                pre = "";
-            }
-            return pre + buf.join('');
+	        for(key in o){
+	            undef = typeof o[key] == 'undefined';
+	            Ext.each(undef ? key : o[key], function(val, i){
+	                buf.push("&", e(key), "=", (val != key || !undef) ? e(val) : "");
+	            });
+	        }
+	        if(!pre){
+	            buf.shift();
+	            pre = "";
+	        }
+	        return pre + buf.join('');
         },
 
         /**
@@ -357,13 +359,17 @@ Ext.urlDecode("foo=1&bar=2&bar=3&bar=4", false); // returns {foo: "1", bar: ["2"
          * @param {Function} fn
          * @param {Object} scope
          */
-        each : function(array, fn, scope){
-            if(Ext.isEmpty(array, true)) return;
-            if (typeof array.length == "undefined" || typeof array == "string"){
+        each: function(array, fn, scope){
+            if(Ext.isEmpty(array, true)){
+                return;
+            }
+            if(typeof array.length == "undefined" || Ext.isPrimitive(array)){
                 array = [array];
             }
             for(var i = 0, len = array.length; i < len; i++){
-                if(fn.call(scope || array[i], array[i], i, array) === false){ return i; };
+                if(fn.call(scope || array[i], array[i], i, array) === false){
+                    return i;
+                };
             }
         },
 
@@ -372,9 +378,9 @@ Ext.urlDecode("foo=1&bar=2&bar=3&bar=4", false); // returns {foo: "1", bar: ["2"
          * Here are some examples:
          * <pre><code>
 // gets dom node based on id
-var elDom = Ext.getDom('elId'); 
+var elDom = Ext.getDom('elId');
 // gets dom node based on the dom node
-var elDom1 = Ext.getDom(elDom); 
+var elDom1 = Ext.getDom(elDom);
 
 // If we don&#39;t know if we are working with an
 // Ext.Element or a dom node use Ext.getDom
@@ -394,14 +400,14 @@ function(el){
             }
             return el.dom ? el.dom : (typeof el == 'string' ? document.getElementById(el) : el);
         },
-        
+
         /**
-        * Returns the current document body as an {@link Ext.Element}.
-        * @return Ext.Element The document body
-        */
+         * Returns the current document body as an {@link Ext.Element}.
+         * @return Ext.Element The document body
+         */
         getBody : function(){
             return Ext.get(document.body || document.documentElement);
-        },        
+        },
 
         /**
          * Removes a DOM node from the document.  The body node will be ignored if passed in.
@@ -455,13 +461,13 @@ function(el){
         isObject : function(v){
             return v && typeof v == "object";
         },
-        
+
         /**
          * Returns true if the passed object is a JavaScript 'primitive', a string, number or boolean.
          * @param {Mixed} value The value to test
          * @return {Boolean}
          */
-        isPrimitive: function(v){
+        isPrimitive : function(v){
             var t = typeof v;
             return t == 'string' || t == 'number' || t == 'boolean';
         },
@@ -481,7 +487,7 @@ function(el){
          */
         isOpera : isOpera,
         /**
-         * True if the detected browser uses Webkit.
+         * True if the detected browser uses WebKit.
          * @type Boolean
          */
         isWebKit: isWebKit,
@@ -509,7 +515,7 @@ function(el){
          * True if the detected browser is Safari 2.x.
          * @type Boolean
          */
-        isSafari2 : isSafari && !isSafari3,
+        isSafari2 : isSafari && !(isSafari3 || isSafari4),
         /**
          * True if the detected browser is Internet Explorer.
          * @type Boolean
@@ -519,7 +525,7 @@ function(el){
          * True if the detected browser is Internet Explorer 6.x.
          * @type Boolean
          */
-        isIE6 : isIE && !isIE7 && !isIE8,
+        isIE6 : isIE6,
         /**
          * True if the detected browser is Internet Explorer 7.x.
          * @type Boolean
@@ -572,7 +578,20 @@ function(el){
         isAir : isAir
     });
 
-    // in intellij using keyword "namespace" causes parsing errors
+    /**
+     * Creates namespaces to be used for scoping variables and classes so that they are not global.
+     * Specifying the last node of a namespace implicitly creates all other nodes. Usage:
+     * <pre><code>
+Ext.namespace('Company', 'Company.data');
+Ext.namespace('Company.data'); // equivalent and preferable to above syntax
+Company.Widget = function() { ... }
+Company.data.CustomStore = function(config) { ... }
+</code></pre>
+     * @param {String} namespace1
+     * @param {String} namespace2
+     * @param {String} etc
+     * @method namespace
+     */
     Ext.ns = Ext.namespace;
 })();
 
@@ -721,7 +740,7 @@ sayHi.defer(2000, this, ['Fred']);
     alert('Anonymous');
 }).defer(100);
 </code></pre>
-     * @param {Number} millis The number of milliseconds for the setTimeout call (if 0 the function is executed immediately)
+     * @param {Number} millis The number of milliseconds for the setTimeout call (if less than or equal to 0 the function is executed immediately)
      * @param {Object} obj (optional) The object for which the scope is set
      * @param {Array} args (optional) Overrides arguments for the call. (Defaults to the arguments passed by the caller)
      * @param {Boolean/Number} appendArgs (optional) if True args are appended to call args instead of overriding,
@@ -730,7 +749,7 @@ sayHi.defer(2000, this, ['Fred']);
      */
     defer : function(millis, obj, args, appendArgs){
         var fn = this.createDelegate(obj, args, appendArgs);
-        if(millis){
+        if(millis > 0){
             return setTimeout(fn, millis);
         }
         fn();
@@ -750,7 +769,7 @@ Ext.applyIf(String, {
 var cls = 'my-class', text = 'Some text';
 var s = String.format('&lt;div class="{0}">{1}&lt;/div>', cls, text);
 // s now contains the string: '&lt;div class="my-class">Some text&lt;/div>'
-</code></pre>
+     * </code></pre>
      * @param {String} string The tokenized string to be formatted
      * @param {String} value1 The value to replace token {0}
      * @param {String} value2 Etc...

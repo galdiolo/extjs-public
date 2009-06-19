@@ -1,27 +1,9 @@
 /*
- * Ext Core Library 3.0 Beta
+ * Ext Core Library 3.0
  * http://extjs.com/
  * Copyright(c) 2006-2009, Ext JS, LLC.
  * 
- * The MIT License
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * MIT Licensed - http://extjs.com/license/mit.txt
  * 
  */
 
@@ -60,11 +42,13 @@
         }    
         
         // private
-        function createExceptionObject(tId, callbackArg, isAbort) {	        
+        function createExceptionObject(tId, callbackArg, isAbort, isTimeout) {	        
             return {
 	            tId : tId,
 	            status : isAbort ? -1 : 0,
 	            statusText : isAbort ? 'transaction aborted' : 'communication failure',
+                    isAbort: true,
+                    isTimeout: true,
 	            argument : callbackArg
             };
         }  
@@ -83,8 +67,8 @@
             try {
                 headerStr = o.conn.getAllResponseHeaders();                
                 Ext.each(headerStr.split('\n'), function(v){
-	            	var t = v.split(':');
-	            	headerObj[t[0]] = t[1]; 
+	            	var t = v.indexOf(':');
+                    headerObj[v.substr(0, t)] = v.substr(t + 1);
                 });
             } catch(e) {}
                         
@@ -92,48 +76,85 @@
 		        tId : o.tId,
 	            status : conn.status,
 	            statusText : conn.statusText,
-	            getResponseHeader : headerObj,
-	            getAllResponseHeaders : headerStr,
+	            getResponseHeader : function(header){return headerObj[header];},
+                getAllResponseHeaders : function(){return headerStr},
 	            responseText : conn.responseText,
 	            responseXML : conn.responseXML,
 	            argument : callbackArg
         	};
-        }	   
+        }
+        
+        // private
+        function releaseObject(o) {
+            o.conn = null;
+            o = null;
+        }        
 	    
         // private
-        function handleTransactionResponse(o, callback, isAbort) {
-	        var	status = o.conn.status,
-	        	httpStatus, 
-            	responseObject;
-	        	
-			if (callback) {
-	            // Not sure the point of the try catch...?
-	            //try {
-		           	httpStatus = status || 13030;                
-	            //} catch(e) {
-	            //    httpStatus = 13030;
-	            //}
-	
-	            if (httpStatus >= 200 && httpStatus < 300) {
-	                responseObject = createResponseObject(o, callback.argument);
-	                if (callback.success) {
-		                callback.success.call(callback.scope, responseObject);                    
-	                }
-	            } else {	                
-					if ([12002, 12029, 12030, 12031, 12152, 13030].indexOf( httpStatus ) > -1) {
-		                responseObject = createExceptionObject(o.tId, callback.argument, (isAbort ? isAbort : false));
-	                    if (callback.failure) {
-		                    callback.failure.call(callback.scope, responseObject);                        
-	                    }
-	                } else {
-		                responseObject = createResponseObject(o, callback.argument);
-	                    if (callback.failure) {
-		                    callback.failure.call(callback.scope, responseObject);                                                
-	                    }
-	                }
-	            }
-			}	
-            o = o.conn = responseObject = null;
+        function handleTransactionResponse(o, callback, isAbort, isTimeout) {
+            if (!callback) {
+                releaseObject(o);
+                return;
+            }
+
+            var httpStatus, responseObject;
+
+            try {
+                if (o.conn.status !== undefined && o.conn.status != 0) {
+                    httpStatus = o.conn.status;
+                }
+                else {
+                    httpStatus = 13030;
+                }
+            }
+            catch(e) {
+                httpStatus = 13030;
+            }
+
+            if ((httpStatus >= 200 && httpStatus < 300) || (Ext.isIE && httpStatus == 1223)) {
+                responseObject = createResponseObject(o, callback.argument);
+                if (callback.success) {
+                    if (!callback.scope) {
+                        callback.success(responseObject);
+                    }
+                    else {
+                        callback.success.apply(callback.scope, [responseObject]);
+                    }
+                }
+            }
+            else {
+                switch (httpStatus) {
+                    case 12002:
+                    case 12029:
+                    case 12030:
+                    case 12031:
+                    case 12152:
+                    case 13030:
+                        responseObject = createExceptionObject(o.tId, callback.argument, (isAbort ? isAbort : false), isTimeout);
+                        if (callback.failure) {
+                            if (!callback.scope) {
+                                callback.failure(responseObject);
+                            }
+                            else {
+                                callback.failure.apply(callback.scope, [responseObject]);
+                            }
+                        }
+                        break;
+                    default:
+                        responseObject = createResponseObject(o, callback.argument);
+                        if (callback.failure) {
+                            if (!callback.scope) {
+                                callback.failure(responseObject);
+                            }
+                            else {
+                                callback.failure.apply(callback.scope, [responseObject]);
+                            }
+                        }
+                }
+            }
+
+            releaseObject(o);
+            responseObject = null;
         }  
         
         // private
@@ -235,7 +256,7 @@
 		            
 		            if(xmlData || jsonData){
 			            initHeader('Content-Type', xmlData ? 'text/xml' : 'application/json');
-			            data = xmlData || Ext.encode(jsonData);
+			            data = xmlData || (Ext.isObject(jsonData) ? Ext.encode(jsonData) : jsonData);
 			        }
 			    }		    		    
 			    return asyncRequest(method || options.method || "POST", uri, cb, data);
@@ -326,13 +347,14 @@
 	                    me.timeout[tId] = null;
 	                }
 					
-	                handleTransactionResponse(o, callback, (isAbort = true));                
+	                handleTransactionResponse(o, callback, (isAbort = true), isTimeout);                
 	            }
 	            return isAbort;
 	        },
 	
-	        isCallInProgress : function(o) {		        
-	            return o.conn && !{1:1,4:4}[o.conn.readyState];	        
+	        isCallInProgress : function(o) {
+	            // if there is a connection and readyState is not 0 or 4
+	            return o.conn && !{0:true,4:true}[o.conn.readyState];	        
 	        }
 	    };
 	    return pub;
