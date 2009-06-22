@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.2.1
+ * Ext JS Library 3.0 RC2
  * Copyright(c) 2006-2009, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -159,9 +159,7 @@ Ext.extend(MainPanel, Ext.TabPanel, {
 
     movePreview : function(m, pressed){
         if(!m){ // cycle if not a menu item click
-            var readMenu = Ext.menu.MenuMgr.get('reading-menu');
-            readMenu.render();
-            var items = readMenu.items.items;
+            var items = Ext.menu.MenuMgr.get('reading-menu').items.items;
             var b = items[0], r = items[1], h = items[2];
             if(b.checked){
                 r.setChecked(true);

@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.2.1
+ * Ext JS Library 3.0 RC2
  * Copyright(c) 2006-2009, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -28,11 +28,11 @@ Ext.onReady(function(){
     });
 
     // define a custom summary function
-    Ext.grid.GroupSummary.Calculations['totalCost'] = function(v, record, field){
+    Ext.ux.GroupSummary.Calculations['totalCost'] = function(v, record, field){
         return v + (record.data.estimate * record.data.rate);
     }
 
-    var summary = new Ext.grid.GroupSummary(); 
+    var summary = new Ext.ux.GroupSummary(); 
 
     var grid = new xg.EditorGridPanel({
         ds: new Ext.data.GroupingStore({

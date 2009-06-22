@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.2.1
+ * Ext JS Library 3.0 RC2
  * Copyright(c) 2006-2009, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -21,59 +21,59 @@ Ext.grid.GridView = function(config){
     Ext.apply(this, config);
     // These events are only used internally by the grid components
     this.addEvents(
-      /**
+        /**
          * @event beforerowremoved
          * Internal UI Event. Fired before a row is removed.
          * @param {Ext.grid.GridView} view
          * @param {Number} rowIndex The index of the row to be removed.
          * @param {Ext.data.Record} record The Record to be removed
-       */
-      "beforerowremoved",
-      /**
+         */
+        "beforerowremoved",
+        /**
          * @event beforerowsinserted
          * Internal UI Event. Fired before rows are inserted.
          * @param {Ext.grid.GridView} view
          * @param {Number} firstRow The index of the first row to be inserted.
          * @param {Number} lastRow The index of the last row to be inserted.
-       */
-      "beforerowsinserted",
-      /**
+         */
+        "beforerowsinserted",
+        /**
          * @event beforerefresh
          * Internal UI Event. Fired before the view is refreshed.
          * @param {Ext.grid.GridView} view
-       */
-      "beforerefresh",
-      /**
+         */
+        "beforerefresh",
+        /**
          * @event rowremoved
          * Internal UI Event. Fired after a row is removed.
          * @param {Ext.grid.GridView} view
          * @param {Number} rowIndex The index of the row that was removed.
          * @param {Ext.data.Record} record The Record that was removed
-       */
-      "rowremoved",
-      /**
+         */
+        "rowremoved",
+        /**
          * @event rowsinserted
          * Internal UI Event. Fired after rows are inserted.
          * @param {Ext.grid.GridView} view
          * @param {Number} firstRow The index of the first inserted.
          * @param {Number} lastRow The index of the last row inserted.
-       */
-      "rowsinserted",
-      /**
+         */
+        "rowsinserted",
+        /**
          * @event rowupdated
          * Internal UI Event. Fired after a row has been updated.
          * @param {Ext.grid.GridView} view
          * @param {Number} firstRow The index of the row updated.
          * @param {Ext.data.record} record The Record backing the row updated.
-       */
-      "rowupdated",
-      /**
+         */
+        "rowupdated",
+        /**
          * @event refresh
          * Internal UI Event. Fired after the GridView's body has been refreshed.
          * @param {Ext.grid.GridView} view
-       */
-      "refresh"
-  );
+         */
+        "refresh"
+    );
     Ext.grid.GridView.superclass.constructor.call(this);
 };
 
@@ -83,16 +83,35 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
      * parameters to the row template for the current row to customize how it is rendered using the <b>rowParams</b>
      * parameter.  This function should return the CSS class name (or empty string '' for none) that will be added
      * to the row's wrapping div.  To apply multiple class names, simply return them space-delimited within the string
-     * (e.g., 'my-class another-class').
-     * @param {Record} record The {@link Ext.data.Record} corresponding to the current row
-     * @param {Number} index The row index
+     * (e.g., 'my-class another-class'). Example usage:
+    <pre><code>
+viewConfig: {
+    forceFit: true,
+    showPreview: true, // custom property
+    enableRowBody: true, // required to create a second, full-width row to show expanded Record data
+    getRowClass: function(record, rowIndex, rp, ds){ // rp = rowParams
+        if(this.showPreview){
+            rp.body = '&lt;p>'+record.data.excerpt+'&lt;/p>';
+            return 'x-grid3-row-expanded';
+        }
+        return 'x-grid3-row-collapsed';
+    }
+},     
+    </code></pre>
+     * @param {Record} record The {@link Ext.data.Record} corresponding to the current row.
+     * @param {Number} index The row index.
      * @param {Object} rowParams A config object that is passed to the row template during rendering that allows
-     * customization of various aspects of a body row, if applicable.  Note that this object will only be applied if
-     * {@link #enableRowBody} = true, otherwise it will be ignored. The object may contain any of these properties:<ul>
-     * <li><code>body</code> : String <div class="sub-desc">An HTML fragment to be rendered as the cell's body content (defaults to '').</div></li>
-     * <li><code>bodyStyle</code> : String <div class="sub-desc">A CSS style string that will be applied to the row's TR style attribute (defaults to '').</div></li>
-     * <li><code>cols</code> : Number <div class="sub-desc">The column count to apply to the body row's TD colspan attribute (defaults to the current
-     * column count of the grid).</div></li>
+     * customization of various aspects of a grid row.
+     * <p>If {@link #enableRowBody} is configured <b><tt></tt>true</b>, then the following properties may be set
+     * by this function, and will be used to render a full-width expansion row below each grid row:</p>
+     * <ul>
+     * <li><code>body</code> : String <div class="sub-desc">An HTML fragment to be used as the expansion row's body content (defaults to '').</div></li>
+     * <li><code>bodyStyle</code> : String <div class="sub-desc">A CSS style specification that will be applied to the expansion row's &lt;tr> element. (defaults to '').</div></li>
+     * </ul>
+     * The following property will be passed in, and may be appended to:
+     * <ul>
+     * <li><code>tstyle</code> : String <div class="sub-desc">A CSS style specification that willl be applied to the &lt;table> element which encapsulates
+     * both the standard grid row, and any expansion row.</div></li>
      * </ul>
      * @param {Store} store The {@link Ext.data.Store} this grid is bound to
      * @method getRowClass
@@ -103,77 +122,118 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
      * that spans beneath the data row.  Use the {@link #getRowClass} method's rowParams config to customize the row body.
      */
     /**
-     * @cfg {String} emptyText Default text to display in the grid body when no rows are available (defaults to '').
+     * @cfg {String} emptyText Default text (html tags are accepted) to display in the grid body when no rows
+     * are available (defaults to ''). This value will be used to update the <tt>{@link #mainBody}</tt>:
+    <pre><code>
+    this.mainBody.update('&lt;div class="x-grid-empty">' + this.emptyText + '&lt;/div>');
+    </code></pre>
      */
     /**
+     * @cfg {Boolean} headersDisabled True to disable the grid column headers (defaults to <tt>false</tt>). 
+     * Use the {@link Ext.grid.ColumnModel ColumnModel} <tt>{@link Ext.grid.ColumnModel#menuDisabled menuDisabled}</tt>
+     * config to disable the <i>menu</i> for individual columns.  While this config is true the
+     * following will be disabled:<div class="mdetail-params"><ul>
+     * <li>clicking on header to sort</li>
+     * <li>the trigger to reveal the menu.</li>
+     * </ul></div>
+     */
+    /**
+     * <p>A customized implementation of a {@link Ext.dd.DragZone DragZone} which provides default implementations
+     * of the template methods of DragZone to enable dragging of the selected rows of a GridPanel.
+     * See {@link Ext.grid.GridDragZone} for details.</p>
+     * <p>This will <b>only</b> be present:<div class="mdetail-params"><ul>
+     * <li><i>if</i> the owning GridPanel was configured with {@link Ext.grid.GridPanel#enableDragDrop enableDragDrop}: <tt>true</tt>.</li>
+     * <li><i>after</i> the owning GridPanel has been rendered.</li>
+     * </ul></div>
      * @property dragZone
-     * @type Ext.grid.GridDragZone
-     * <p><b>This will only be present if the owning GridPanel was configured with {@link Ext.grid.GridPanel#enableDragDrop enableDragDrop} <tt>true</tt>.</b></p>
-     * <p><b>This will only be present after the owning GridPanel has been rendered</b>.</p>
-     * <p>A customized implementation of a {@link Ext.dd.DragZone DragZone} which provides default implementations of the
-     * template methods of DragZone to enable dragging of the selected rows of a GridPanel. See {@link Ext.grid.GridDragZone} for details.</p>
+     * @type {Ext.grid.GridDragZone}
      */
     /**
-     * @cfg {Boolean} deferEmptyText True to defer emptyText being applied until the store's first load
+     * @cfg {Boolean} deferEmptyText True to defer <tt>{@link #emptyText}</tt> being applied until the store's
+     * first load (defaults to <tt>true</tt>).
      */
-    deferEmptyText: true,
+    deferEmptyText : true,
     /**
-     * The amount of space to reserve for the scrollbar (defaults to 19 pixels)
-     * @type Number
+     * @cfg {Number} scrollOffset The amount of space to reserve for the vertical scrollbar
+     * (defaults to <tt>19</tt> pixels).
      */
-    scrollOffset: 19,
+    scrollOffset : 19,
     /**
-     * @cfg {Boolean} autoFill True to auto expand the columns to fit the grid <b>when the grid is created</b>.
+     * @cfg {Boolean} autoFill
+     * Defaults to <tt>false</tt>.  Specify <tt>true</tt> to have the column widths re-proportioned
+     * when the grid is <b>initially rendered</b>.  The 
+     * {@link Ext.grid.Column#width initially configured width}</tt> of each column will be adjusted
+     * to fit the grid width and prevent horizontal scrolling. If columns are later resized (manually
+     * or programmatically), the other columns in the grid will <b>not</b> be resized to fit the grid width.
+     * See <tt>{@link #forceFit}</tt> also.
      */
-    autoFill: false,
+    autoFill : false,
     /**
-     * @cfg {Boolean} forceFit True to auto expand/contract the size of the columns to fit the grid width and prevent horizontal scrolling.
-     * This option overrides any (@link Ext.grid.ColumnModel#width width} settings in the ColumnModel.
+     * @cfg {Boolean} forceFit
+     * Defaults to <tt>false</tt>.  Specify <tt>true</tt> to have the column widths re-proportioned
+     * at <b>all times</b>.  The {@link Ext.grid.Column#width initially configured width}</tt> of each
+     * column will be adjusted to fit the grid width and prevent horizontal scrolling. If columns are
+     * later resized (manually or programmatically), the other columns in the grid <b>will</b> be resized
+     * to fit the grid width. See <tt>{@link #autoFill}</tt> also.
      */
-    forceFit: false,
+    forceFit : false,
     /**
-     * The CSS classes applied to a header when it is sorted. (defaults to ["sort-asc", "sort-desc"])
-     * @type Array
+     * @cfg {Array} sortClasses The CSS classes applied to a header when it is sorted. (defaults to <tt>["sort-asc", "sort-desc"]</tt>)
      */
     sortClasses : ["sort-asc", "sort-desc"],
     /**
-     * The text displayed in the "Sort Ascending" menu item
-     * @type String
+     * @cfg {String} sortAscText The text displayed in the "Sort Ascending" menu item (defaults to <tt>"Sort Ascending"</tt>)
      */
     sortAscText : "Sort Ascending",
     /**
-     * The text displayed in the "Sort Descending" menu item
-     * @type String
+     * @cfg {String} sortDescText The text displayed in the "Sort Descending" menu item (defaults to <tt>"Sort Descending"</tt>)
      */
     sortDescText : "Sort Descending",
     /**
-     * The text displayed in the "Columns" menu item
-     * @type String
+     * @cfg {String} columnsText The text displayed in the "Columns" menu item (defaults to <tt>"Columns"</tt>)
      */
     columnsText : "Columns",
 
+    /**
+     * @cfg {String} selectedRowClass The CSS class applied to a selected row (defaults to <tt>"x-grid3-row-selected"</tt>). An
+     * example overriding the default styling:
+    <pre><code>
+    .x-grid3-row-selected {background-color: yellow;}
+    </code></pre>
+     * Note that this only controls the row, and will not do anything for the text inside it.  To style inner
+     * facets (like text) use something like:
+    <pre><code>
+    .x-grid3-row-selected .x-grid3-cell-inner {
+        color: #FFCC00;
+    }
+    </code></pre>
+     * @type String
+     */
+    selectedRowClass : "x-grid3-row-selected",
+
     // private
-    borderWidth: 2,
-    tdClass: 'x-grid3-cell',
-    hdCls: 'x-grid3-hd',
+    borderWidth : 2,
+    tdClass : 'x-grid3-cell',
+    hdCls : 'x-grid3-hd',
+    markDirty : true,
 
     /**
-     * @cfg {Number} cellSelectorDepth The number of levels to search for cells in event delegation (defaults to 4)
+     * @cfg {Number} cellSelectorDepth The number of levels to search for cells in event delegation (defaults to <tt>4</tt>)
      */
-    cellSelectorDepth: 4,
+    cellSelectorDepth : 4,
     /**
-     * @cfg {Number} rowSelectorDepth The number of levels to search for rows in event delegation (defaults to 10)
+     * @cfg {Number} rowSelectorDepth The number of levels to search for rows in event delegation (defaults to <tt>10</tt>)
      */
-    rowSelectorDepth: 10,
+    rowSelectorDepth : 10,
 
     /**
-     * @cfg {String} cellSelector The selector used to find cells internally
+     * @cfg {String} cellSelector The selector used to find cells internally (defaults to <tt>'td.x-grid3-cell'</tt>)
      */
-    cellSelector: 'td.x-grid3-cell',
+    cellSelector : 'td.x-grid3-cell',
     /**
-     * @cfg {String} rowSelector The selector used to find rows internally
+     * @cfg {String} rowSelector The selector used to find rows internally (defaults to <tt>'div.x-grid3-row'</tt>)
      */
-    rowSelector: 'div.x-grid3-row',
+    rowSelector : 'div.x-grid3-row',
 
     /* -------------------------------- UI Specific ----------------------------- */
 
@@ -184,12 +244,12 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
             ts.master = new Ext.Template(
                     '<div class="x-grid3" hidefocus="true">',
                         '<div class="x-grid3-viewport">',
-                            '<div class="x-grid3-header"><div class="x-grid3-header-inner"><div class="x-grid3-header-offset">{header}</div></div><div class="x-clear"></div></div>',
-                            '<div class="x-grid3-scroller"><div class="x-grid3-body">{body}</div><a href="#" class="x-grid3-focus" tabIndex="-1"></a></div>',
-                        "</div>",
+                            '<div class="x-grid3-header"><div class="x-grid3-header-inner"><div class="x-grid3-header-offset" style="{ostyle}">{header}</div></div><div class="x-clear"></div></div>',
+                            '<div class="x-grid3-scroller"><div class="x-grid3-body" style="{bstyle}">{body}</div><a href="#" class="x-grid3-focus" tabIndex="-1"></a></div>',
+                        '</div>',
                         '<div class="x-grid3-resize-marker">&#160;</div>',
                         '<div class="x-grid3-resize-proxy">&#160;</div>',
-                    "</div>"
+                    '</div>'
                     );
         }
 
@@ -197,7 +257,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
             ts.header = new Ext.Template(
                     '<table border="0" cellspacing="0" cellpadding="0" style="{tstyle}">',
                     '<thead><tr class="x-grid3-hd-row">{cells}</tr></thead>',
-                    "</table>"
+                    '</table>'
                     );
         }
 
@@ -205,7 +265,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
             ts.hcell = new Ext.Template(
                     '<td class="x-grid3-hd x-grid3-cell x-grid3-td-{id} {css}" style="{style}"><div {tooltip} {attr} class="x-grid3-hd-inner x-grid3-hd-{id}" unselectable="on" style="{istyle}">', this.grid.enableHdMenu ? '<a class="x-grid3-hd-btn" href="#"></a>' : '',
                     '{value}<img class="x-grid3-sort-icon" src="', Ext.BLANK_IMAGE_URL, '" />',
-                    "</div></td>"
+                    '</div></td>'
                     );
         }
 
@@ -226,7 +286,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
             ts.cell = new Ext.Template(
                     '<td class="x-grid3-col x-grid3-cell x-grid3-td-{id} {css}" style="{style}" tabIndex="0" {cellAttr}>',
                     '<div class="x-grid3-cell-inner x-grid3-col-{id}" unselectable="on" {attr}>{value}</div>',
-                    "</td>"
+                    '</td>'
                     );
         }
 
@@ -252,7 +312,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
     },
 
     // private
-    getEditorParent : function(){
+    getEditorParent : function(ed){
         return this.scroller.dom;
     },
 
@@ -278,8 +338,8 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
             this.scroller.setStyle('overflow-x', 'hidden');
         }
         /**
-         * The GridView's body Element which encapsulates all rows in the Grid. {@link Ext.Element Element}. Read-only.
-         * <p>This Element is only available after the GridPanel has been rendered.</p>
+         * <i>Read-only</i>. The GridView's body Element which encapsulates all rows in the Grid.
+         * This {@link Ext.Element Element} is only available after the GridPanel has been rendered.
          * @type Ext.Element
          * @property mainBody
          */
@@ -475,9 +535,9 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
         for(var i = 0; i < clen; i++){
             ws[i] = this.getColumnWidth(i);
         }
-
+        this.innerHd.firstChild.style.width = this.getOffsetWidth();
         this.innerHd.firstChild.firstChild.style.width = tw;
-
+        this.mainBody.dom.style.width = tw;
         for(var i = 0; i < clen; i++){
             var hd = this.getHeaderCell(i);
             hd.style.width = ws[i];
@@ -503,8 +563,9 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
     updateColumnWidth : function(col, width){
         var w = this.getColumnWidth(col);
         var tw = this.getTotalWidth();
-
+        this.innerHd.firstChild.style.width = this.getOffsetWidth();
         this.innerHd.firstChild.firstChild.style.width = tw;
+        this.mainBody.dom.style.width = tw;
         var hd = this.getHeaderCell(col);
         hd.style.width = w;
 
@@ -524,9 +585,9 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
     // private
     updateColumnHidden : function(col, hidden){
         var tw = this.getTotalWidth();
-
+        this.innerHd.firstChild.style.width = this.getOffsetWidth();
         this.innerHd.firstChild.firstChild.style.width = tw;
-
+        this.mainBody.dom.style.width = tw;
         var display = hidden ? 'none' : '';
 
         var hd = this.getHeaderCell(col);
@@ -543,7 +604,6 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
         }
 
         this.onColumnHiddenUpdated(col, hidden, tw);
-
         delete this.lastViewWidth; // force recalc
         this.layout();
     },
@@ -565,7 +625,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
                 p.value = c.renderer(r.data[c.name], p, r, rowIndex, i, ds);
                 p.style = c.style;
                 if(p.value == undefined || p.value === "") p.value = "&#160;";
-                if(r.dirty && typeof r.modified[c.name] !== 'undefined'){
+                if(this.markDirty && r.dirty && typeof r.modified[c.name] !== 'undefined'){
                     p.css += ' x-grid3-dirty-cell';
                 }
                 cb[cb.length] = ct.apply(p);
@@ -590,7 +650,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
 
     // private
     processRows : function(startRow, skipStripe){
-        if(this.ds.getCount() < 1){
+        if(!this.ds || this.ds.getCount() < 1){
             return;
         }
         skipStripe = skipStripe || !this.grid.stripeRows;
@@ -617,8 +677,11 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
         }
     },
 
-    afterRender: function(){
-        this.mainBody.dom.innerHTML = this.renderRows();
+    afterRender : function(){
+        if(!this.ds || !this.cm){
+            return;
+        }
+        this.mainBody.dom.innerHTML = this.renderRows() || '&#160;';
         this.processRows(0, true);
 
         if(this.deferEmptyText !== true){
@@ -630,12 +693,14 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
     renderUI : function(){
 
         var header = this.renderHeaders();
-        var body = this.templates.body.apply({rows:''});
+        var body = this.templates.body.apply({rows:'&#160;'});
 
 
         var html = this.templates.master.apply({
             body: body,
-            header: header
+            header: header,
+            ostyle: 'width:'+this.getOffsetWidth()+';',
+            bstyle: 'width:'+this.getTotalWidth()+';'
         });
 
         var g = this.grid;
@@ -646,9 +711,12 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
 
         // get mousedowns early
         Ext.fly(this.innerHd).on("click", this.handleHdDown, this);
-        this.mainHd.on("mouseover", this.handleHdOver, this);
-        this.mainHd.on("mouseout", this.handleHdOut, this);
-        this.mainHd.on("mousemove", this.handleHdMove, this);
+        this.mainHd.on({
+            scope: this,
+            mouseover: this.handleHdOver,
+            mouseout: this.handleHdOut,
+            mousemove: this.handleHdMove
+        })
 
         this.scroller.on('scroll', this.syncScroll,  this);
         if(g.enableColumnResize !== false){
@@ -661,30 +729,37 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
         }
 
         if(g.enableHdMenu !== false){
-            if(g.enableColumnHide !== false){
-                this.colMenu = new Ext.menu.Menu({id:g.id + "-hcols-menu"});
-                this.colMenu.on("beforeshow", this.beforeColMenuShow, this);
-                this.colMenu.on("itemclick", this.handleHdMenuClick, this);
-            }
             this.hmenu = new Ext.menu.Menu({id: g.id + "-hctx"});
             this.hmenu.add(
-                {id:"asc", text: this.sortAscText, cls: "xg-hmenu-sort-asc"},
-                {id:"desc", text: this.sortDescText, cls: "xg-hmenu-sort-desc"}
+                {itemId:"asc", text: this.sortAscText, cls: "xg-hmenu-sort-asc"},
+                {itemId:"desc", text: this.sortDescText, cls: "xg-hmenu-sort-desc"}
             );
             if(g.enableColumnHide !== false){
-                this.hmenu.add('-',
-                    {id:"columns", text: this.columnsText, menu: this.colMenu, iconCls: 'x-cols-icon'}
-                );
+                this.colMenu = new Ext.menu.Menu({id:g.id + "-hcols-menu"});
+                this.colMenu.on({
+                    scope: this,
+                    beforeshow: this.beforeColMenuShow,
+                    itemclick: this.handleHdMenuClick
+                });
+                this.hmenu.add('-', {
+                    itemId:"columns",
+                    hideOnClick: false,
+                    text: this.columnsText,
+                    menu: this.colMenu,
+                    iconCls: 'x-cols-icon'
+                });
             }
             this.hmenu.on("itemclick", this.handleHdMenuClick, this);
-
-            //g.on("headercontextmenu", this.handleHdCtx, this);
         }
 
         if(g.trackMouseOver){
-            this.mainBody.on("mouseover", this.onRowOver, this);
-            this.mainBody.on("mouseout", this.onRowOut, this);
+            this.mainBody.on({
+                scope: this,
+                mouseover: this.onRowOver,
+                mouseout: this.onRowOut
+            });
         }
+
         if(g.enableDragDrop || g.enableDrag){
             this.dragZone = new Ext.grid.GridDragZone(g, {
                 ddGroup : g.ddGroup || 'GridDD'
@@ -708,10 +783,10 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
         if(vw < 20 || csize.height < 20){ // display: none?
             return;
         }
-
+        
         if(g.autoHeight){
             this.scroller.dom.style.overflow = 'visible';
-            if(Ext.isSafari){
+            if(Ext.isWebKit){
                 this.scroller.dom.style.position = 'static';
             }
         }else{
@@ -745,17 +820,14 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
 
     onColumnWidthUpdated : function(col, w, tw){
         //template method
-        this.focusEl.setWidth(tw);
     },
 
     onAllColumnWidthsUpdated : function(ws, tw){
         //template method
-        this.focusEl.setWidth(tw);
     },
 
     onColumnHiddenUpdated : function(col, hidden, tw){
         // template method
-        this.focusEl.setWidth(tw);
     },
 
     updateColumnText : function(col, text){
@@ -768,7 +840,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
 
     /* ----------------------------------- Core Specific -------------------------------------------*/
     // private
-    init: function(grid){
+    init : function(grid){
         this.grid = grid;
 
         this.initTemplates();
@@ -780,13 +852,18 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
     getColumnId : function(index){
       return this.cm.getColumnId(index);
     },
+    
+    // private 
+    getOffsetWidth : function() {
+        return (this.cm.getTotalWidth() + this.scrollOffset) + 'px';
+    },
 
     // private
     renderHeaders : function(){
         var cm = this.cm, ts = this.templates;
         var ct = ts.hcell;
 
-        var cb = [], sb = [], p = {};
+        var cb = [], p = {};
         var len = cm.getColumnCount();
         var last = len - 1;
         for(var i = 0; i < len; i++){
@@ -826,6 +903,8 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
     // private
     updateHeaders : function(){
         this.innerHd.firstChild.innerHTML = this.renderHeaders();
+        this.innerHd.firstChild.style.width = this.getOffsetWidth();
+        this.innerHd.firstChild.firstChild.style.width = this.getTotalWidth();
     },
 
     /**
@@ -842,7 +921,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
      * @param {Number} col The column index
      */
     focusCell : function(row, col, hscroll){
-		this.syncFocusEl(this.ensureVisible(row, col, hscroll));
+        this.syncFocusEl(this.ensureVisible(row, col, hscroll));
         if(Ext.isGecko){
             this.focusEl.focus();
         }else{
@@ -850,8 +929,8 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
         }
     },
 
-	resolveCell : function(row, col, hscroll){
-		if(typeof row != "number"){
+    resolveCell : function(row, col, hscroll){
+        if(typeof row != "number"){
             row = row.rowIndex;
         }
         if(!this.ds){
@@ -870,35 +949,35 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
             cellEl = this.getCell(row, col);
         }
 
-		return {row: rowEl, cell: cellEl};
-	},
+        return {row: rowEl, cell: cellEl};
+    },
 
-	getResolvedXY : function(resolved){
-		if(!resolved){
-			return null;
-		}
-		var s = this.scroller.dom, c = resolved.cell, r = resolved.row;
-		return c ? Ext.fly(c).getXY() : [this.el.getX(), Ext.fly(r).getY()];
-	},
+    getResolvedXY : function(resolved){
+        if(!resolved){
+            return null;
+        }
+        var s = this.scroller.dom, c = resolved.cell, r = resolved.row;
+        return c ? Ext.fly(c).getXY() : [this.el.getX(), Ext.fly(r).getY()];
+    },
 
-	syncFocusEl : function(row, col, hscroll){
-		var xy = row;
-		if(!Ext.isArray(xy)){
-			row = Math.min(row, Math.max(0, this.getRows().length-1));
-        	xy = this.getResolvedXY(this.resolveCell(row, col, hscroll));
-		}
+    syncFocusEl : function(row, col, hscroll){
+        var xy = row;
+        if(!Ext.isArray(xy)){
+            row = Math.min(row, Math.max(0, this.getRows().length-1));
+            xy = this.getResolvedXY(this.resolveCell(row, col, hscroll));
+        }
         this.focusEl.setXY(xy||this.scroller.getXY());
     },
 
-	ensureVisible : function(row, col, hscroll){
+    ensureVisible : function(row, col, hscroll){
         var resolved = this.resolveCell(row, col, hscroll);
-		if(!resolved || !resolved.row){
-			return;
-		}
+        if(!resolved || !resolved.row){
+            return;
+        }
 
-		var rowEl = resolved.row, cellEl = resolved.cell;
+        var rowEl = resolved.row, cellEl = resolved.cell;
 
-		var c = this.scroller.dom;
+        var c = this.scroller.dom;
 
         var ctop = 0;
         var p = rowEl, stop = this.el.dom;
@@ -914,7 +993,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
         var stop = parseInt(c.scrollTop, 10);
         var sbot = stop + ch;
 
-		if(ctop < stop){
+        if(ctop < stop){
           c.scrollTop = ctop;
         }else if(cbot > sbot){
             c.scrollTop = cbot-ch;
@@ -1002,7 +1081,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
 
     // private
     fitColumns : function(preventRefresh, onlyExpand, omitColumn){
-        var cm = this.cm, leftOver, dist, i;
+        var cm = this.cm, i;
         var tw = cm.getTotalWidth(false);
         var aw = this.grid.getGridEl().getWidth(true)-this.scrollOffset;
 
@@ -1115,7 +1194,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
 
     // private
     renderBody : function(){
-        var markup = this.renderRows();
+        var markup = this.renderRows() || '&#160;';
         return this.templates.body.apply({rows: markup});
     },
 
@@ -1125,10 +1204,15 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
         if(typeof record == 'number'){
             index = record;
             record = ds.getAt(index);
+            if(!record){
+                return;
+            }
         }else{
             index = ds.indexOf(record);
+            if(index < 0){
+                return;
+            }
         }
-        var cls = [];
         this.insertRows(ds, index, index, true);
         this.getRow(index).rowIndex = index;
         this.onRemove(ds, record, index+1, true);
@@ -1212,7 +1296,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
                 delete Ext.dd.DDM.ids['gridHeader' + this.grid.getGridEl().id];
             }
         }
-        
+
         if(this.dragZone){
             this.dragZone.unreg();
         }
@@ -1265,14 +1349,20 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
             this.ds.un("remove", this.onRemove, this);
             this.ds.un("update", this.onUpdate, this);
             this.ds.un("clear", this.onClear, this);
+            if(this.ds !== ds && this.ds.autoDestroy){
+                this.ds.destroy();
+            }
         }
         if(ds){
-            ds.on("load", this.onLoad, this);
-            ds.on("datachanged", this.onDataChange, this);
-            ds.on("add", this.onAdd, this);
-            ds.on("remove", this.onRemove, this);
-            ds.on("update", this.onUpdate, this);
-            ds.on("clear", this.onClear, this);
+            ds.on({
+                scope: this,
+                load: this.onLoad,
+                datachanged: this.onDataChange,
+                add: this.onAdd,
+                remove: this.onRemove,
+                update: this.onUpdate,
+                clear: this.onClear
+            });
         }
         this.ds = ds;
 
@@ -1282,16 +1372,17 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
             this.cm.un("headerchange", this.onHeaderChange, this);
             this.cm.un("hiddenchange", this.onHiddenChange, this);
             this.cm.un("columnmoved", this.onColumnMove, this);
-            this.cm.un("columnlockchange", this.onColumnLock, this);
         }
         if(cm){
             delete this.lastViewWidth;
-            cm.on("configchange", this.onColConfigChange, this);
-            cm.on("widthchange", this.onColWidthChange, this);
-            cm.on("headerchange", this.onHeaderChange, this);
-            cm.on("hiddenchange", this.onHiddenChange, this);
-            cm.on("columnmoved", this.onColumnMove, this);
-            cm.on("columnlockchange", this.onColumnLock, this);
+            cm.on({
+                scope: this,
+                configchange: this.onColConfigChange,
+                widthchange: this.onColWidthChange,
+                headerchange: this.onHeaderChange,
+                hiddenchange: this.onHiddenChange,
+                columnmoved: this.onColumnMove
+            });
         }
         this.cm = cm;
     },
@@ -1376,7 +1467,6 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
 
     // private
     initEvents : function(){
-
     },
 
     // private
@@ -1411,12 +1501,12 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
 
     // private
     onRowSelect : function(row){
-        this.addRowClass(row, "x-grid3-row-selected");
+        this.addRowClass(row, this.selectedRowClass);
     },
 
     // private
     onRowDeselect : function(row){
-        this.removeRowClass(row, "x-grid3-row-selected");
+        this.removeRowClass(row, this.selectedRowClass);
     },
 
     // private
@@ -1456,7 +1546,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
     handleHdMenuClick : function(item){
         var index = this.hdCtxIndex;
         var cm = this.cm, ds = this.ds;
-        switch(item.id){
+        switch(item.itemId){
             case "asc":
                 ds.sort(cm.getDataIndex(index), "ASC");
                 break;
@@ -1464,7 +1554,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
                 ds.sort(cm.getDataIndex(index), "DESC");
                 break;
             default:
-                index = cm.getIndexById(item.id.substr(4));
+                index = cm.getIndexById(item.itemId.substr(4));
                 if(index != -1){
                     if(item.checked && cm.getColumnsBy(this.isHideableColumn, this).length <= 1){
                         this.onDenyColumnHide();
@@ -1488,7 +1578,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
         for(var i = 0; i < colCount; i++){
             if(cm.config[i].fixed !== true && cm.config[i].hideable !== false){
                 this.colMenu.add(new Ext.menu.CheckItem({
-                    id: "col-"+cm.getColumnId(i),
+                    itemId: "col-"+cm.getColumnId(i),
                     text: cm.getColumnHeader(i),
                     checked: !cm.isHidden(i),
                     hideOnClick:false,
@@ -1542,9 +1632,9 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
             var x = e.getPageX();
             var ss = this.activeHd.style;
             if(x - r.left <= hw && this.cm.isResizable(this.activeHdIndex-1)){
-                ss.cursor = Ext.isAir ? 'move' : Ext.isSafari ? 'e-resize' : 'col-resize'; // col-resize not always supported
+                ss.cursor = Ext.isAir ? 'move' : Ext.isWebKit ? 'e-resize' : 'col-resize'; // col-resize not always supported
             }else if(r.right - x <= (!this.activeHdBtn ? hw : 2) && this.cm.isResizable(this.activeHdIndex)){
-                ss.cursor = Ext.isAir ? 'move' : Ext.isSafari ? 'w-resize' : 'col-resize';
+                ss.cursor = Ext.isAir ? 'move' : Ext.isWebKit ? 'w-resize' : 'col-resize';
             }else{
                 ss.cursor = '';
             }
@@ -1564,7 +1654,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
     // private
     hasRows : function(){
         var fc = this.mainBody.dom.firstChild;
-        return fc && fc.className != 'x-grid-empty';
+        return fc && fc.nodeType == 1 && fc.className != 'x-grid-empty';
     },
 
     // back compat
@@ -1613,7 +1703,7 @@ Ext.extend(Ext.grid.GridView.SplitDragZone, Ext.dd.DDProxy, {
         var t = this.view.findHeaderCell(e.getTarget());
         if(t){
             var xy = this.view.fly(t).getXY(), x = xy[0], y = xy[1];
-            var exy = e.getXY(), ex = exy[0], ey = exy[1];
+            var exy = e.getXY(), ex = exy[0];
             var w = t.offsetWidth, adjust = false;
             if((ex - x) <= this.hw){
                 adjust = -1;

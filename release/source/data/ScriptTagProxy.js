@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.2.1
+ * Ext JS Library 3.0 RC2
  * Copyright(c) 2006-2009, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -46,10 +46,12 @@ if (scriptTag) {
  * @param {Object} config A configuration object.
  */
 Ext.data.ScriptTagProxy = function(config){
-    Ext.data.ScriptTagProxy.superclass.constructor.call(this);
     Ext.apply(this, config);
+
+    Ext.data.ScriptTagProxy.superclass.constructor.call(this, config);
+
     this.head = document.getElementsByTagName("head")[0];
-    
+
     /**
      * @event loadexception
      * Fires if an exception occurs in the Proxy during data loading.  This event can be fired for one of two reasons:
@@ -57,7 +59,7 @@ Ext.data.ScriptTagProxy = function(config){
      * specified by {@link #timeout}.  In this case, this event will be raised and the
      * fourth parameter (read error) will be null.</li>
      * <li><b>The load succeeded but the reader could not read the response.</b>  This means the server returned
-     * data, but the configured Reader threw an error while reading the data.  In this case, this event will be 
+     * data, but the configured Reader threw an error while reading the data.  In this case, this event will be
      * raised and the caught error will be passed along as the fourth parameter of this event.</li></ul>
      * Note that this event is also relayed through {@link Ext.data.Store}, so you can listen for it directly
      * on any Store instance.
@@ -94,9 +96,9 @@ Ext.extend(Ext.data.ScriptTagProxy, Ext.data.DataProxy, {
     nocache : true,
 
     /**
-     * Load data from the configured URL, read the data object into
-     * a block of Ext.data.Records using the passed Ext.data.DataReader implementation, and
-     * process that block using the passed callback.
+     * HttpProxy implementation of DataProxy#doRequest
+     * @param {String} action
+     * @param {Ext.data.Record/Ext.data.Record[]} rs If action is load, rs will be null
      * @param {Object} params An object containing properties which are to be used as HTTP parameters
      * for the request to the remote server.
      * @param {Ext.data.DataReader} reader The Reader object which converts the data
@@ -110,52 +112,114 @@ Ext.extend(Ext.data.ScriptTagProxy, Ext.data.DataProxy, {
      * @param {Object} scope The scope in which to call the callback
      * @param {Object} arg An optional argument which is passed to the callback as its second parameter.
      */
-    load : function(params, reader, callback, scope, arg){
-        if(this.fireEvent("beforeload", this, params) !== false){
+    doRequest : function(action, rs, params, reader, callback, scope, arg) {
+        var p = Ext.urlEncode(Ext.apply(params, this.extraParams));
 
-            var p = Ext.urlEncode(Ext.apply(params, this.extraParams));
-
-            var url = this.url;
-            url += (url.indexOf("?") != -1 ? "&" : "?") + p;
-            if(this.nocache){
-                url += "&_dc=" + (new Date().getTime());
-            }
-            var transId = ++Ext.data.ScriptTagProxy.TRANS_ID;
-            var trans = {
-                id : transId,
-                cb : "stcCallback"+transId,
-                scriptId : "stcScript"+transId,
-                params : params,
-                arg : arg,
-                url : url,
-                callback : callback,
-                scope : scope,
-                reader : reader
-            };
-            var conn = this;
-
-            window[trans.cb] = function(o){
-                conn.handleResponse(o, trans);
-            };
-
-            url += String.format("&{0}={1}", this.callbackParam, trans.cb);
-
-            if(this.autoAbort !== false){
-                this.abort();
-            }
-
-            trans.timeoutId = this.handleFailure.defer(this.timeout, this, [trans]);
-
-            var script = document.createElement("script");
-            script.setAttribute("src", url);
-            script.setAttribute("type", "text/javascript");
-            script.setAttribute("id", trans.scriptId);
-            this.head.appendChild(script);
-
-            this.trans = trans;
-        }else{
-            callback.call(scope||this, null, arg, false);
+        var url = this.buildUrl(action, rs);
+        if (!url) {
+            throw new Ext.data.Api.Error('invalid-url', url);
         }
+        url += (url.indexOf("?") != -1 ? "&" : "?") + p;
+
+        if(this.nocache){
+            url += "&_dc=" + (new Date().getTime());
+        }
+        var transId = ++Ext.data.ScriptTagProxy.TRANS_ID;
+        var trans = {
+            id : transId,
+            action: action,
+            cb : "stcCallback"+transId,
+            scriptId : "stcScript"+transId,
+            params : params,
+            arg : arg,
+            url : url,
+            callback : callback,
+            scope : scope,
+            reader : reader
+        };
+        window[trans.cb] = this.createCallback(action, rs, trans);
+        url += String.format("&{0}={1}", this.callbackParam, trans.cb);
+        if(this.autoAbort !== false){
+            this.abort();
+        }
+
+        trans.timeoutId = this.handleFailure.defer(this.timeout, this, [trans]);
+
+        var script = document.createElement("script");
+        script.setAttribute("src", url);
+        script.setAttribute("type", "text/javascript");
+        script.setAttribute("id", trans.scriptId);
+        this.head.appendChild(script);
+
+        this.trans = trans;
+    },
+
+    // @private createCallback
+    createCallback : function(action, rs, trans) {
+        var self = this;
+        return function(res) {
+            self.trans = false;
+            self.destroyTrans(trans, true);
+            if (action === Ext.data.Api.actions.read) {
+                self.onRead.call(self, action, trans, res);
+            } else {
+                self.onWrite.call(self, action, trans, res, rs);
+            }
+        }
+    },
+    /**
+     * Callback for read actions
+     * @param {String} action [Ext.data.Api.actions.create|read|update|destroy]
+     * @param {Object} trans The request transaction object
+     * @param {Object} res The server response
+     * @private
+     */
+    onRead : function(action, trans, res) {
+        var result;
+        try {
+            result = trans.reader.readRecords(res);
+        }catch(e){
+            // @deprecated: fire loadexception
+            this.fireEvent("loadexception", this, trans, res, e);
+
+            this.fireEvent('exception', this, 'response', action, trans, res, e);
+            trans.callback.call(trans.scope||window, null, trans.arg, false);
+            return;
+        }
+        if (result.success === false) {
+            // @deprecated: fire old loadexception for backwards-compat.
+            this.fireEvent('loadexception', this, trans, res);
+
+            this.fireEvent('exception', this, 'remote', action, trans, res, null);
+        } else {
+            this.fireEvent("load", this, res, trans.arg);
+        }
+        trans.callback.call(trans.scope||window, result, trans.arg, result.success);
+    },
+    /**
+     * Callback for write actions
+     * @param {String} action [Ext.data.Api.actions.create|read|update|destroy]
+     * @param {Object} trans The request transaction object
+     * @param {Object} res The server response
+     * @private
+     */
+    onWrite : function(action, trans, res, rs) {
+        var reader = trans.reader;
+        try {
+            // though we already have a response object here in STP, run through readResponse to catch any meta-data exceptions.
+            reader.readResponse(action, res);
+        } catch (e) {
+            this.fireEvent('exception', this, 'response', action, trans, res, e);
+            trans.callback.call(trans.scope||window, null, res, false);
+            return;
+        }
+        if(!res[reader.meta.successProperty] === true){
+            this.fireEvent('exception', this, 'remote', action, trans, res, rs);
+            trans.callback.call(trans.scope||window, null, res, false);
+            return;
+        }
+        this.fireEvent("write", this, action, res[reader.meta.root], res, rs, trans.arg );
+        trans.callback.call(trans.scope||window, res[reader.meta.root], res, true);
     },
 
     // private
@@ -193,26 +257,24 @@ Ext.extend(Ext.data.ScriptTagProxy, Ext.data.DataProxy, {
     },
 
     // private
-    handleResponse : function(o, trans){
-        this.trans = false;
-        this.destroyTrans(trans, true);
-        var result;
-        try {
-            result = trans.reader.readRecords(o);
-        }catch(e){
-            this.fireEvent("loadexception", this, o, trans.arg, e);
-            trans.callback.call(trans.scope||window, null, trans.arg, false);
-            return;
-        }
-        this.fireEvent("load", this, o, trans.arg);
-        trans.callback.call(trans.scope||window, result, trans.arg, true);
-    },
-
-    // private
     handleFailure : function(trans){
         this.trans = false;
         this.destroyTrans(trans, false);
-        this.fireEvent("loadexception", this, null, trans.arg);
+        if (trans.action === Ext.data.Api.actions.read) {
+            // @deprecated firing loadexception
+            this.fireEvent("loadexception", this, null, trans.arg);
+        }
+
+        this.fireEvent('exception', this, 'response', trans.action, {
+            response: null,
+            options: trans.arg
+        });
         trans.callback.call(trans.scope||window, null, trans.arg, false);
+    },
+
+    // inherit docs
+    destroy: function(){
+        this.abort();
+        Ext.data.ScriptTagProxy.superclass.destroy.call(this);
     }
 });

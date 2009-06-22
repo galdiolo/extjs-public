@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.2.1
+ * Ext JS Library 3.0 RC2
  * Copyright(c) 2006-2009, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -48,11 +48,27 @@ Ext.StoreMgr = Ext.apply(new Ext.util.MixedCollection(), {
      * @return {Ext.data.Store}
      */
     lookup : function(id){
-        return typeof id == "object" ? id : this.get(id);
+        if(Ext.isArray(id)){
+            var fields = ['field1'], expand = !Ext.isArray(id[0]);
+            if(!expand){
+                for(var i = 2, len = id[0].length; i <= len; ++i){
+                    fields.push('field' + i);
+                }
+            }
+            return new Ext.data.ArrayStore({
+                fields: fields,
+                data: id,
+                expandData: expand,
+                autoDestroy: true,
+                autoCreated: true
+
+            });
+        }
+        return Ext.isObject(id) ? (id.events ? id : Ext.create(id, 'store')) : this.get(id);
     },
 
     // getKey implementation for MixedCollection
     getKey : function(o){
-         return o.storeId || o.id;
+         return o.storeId;
     }
 });

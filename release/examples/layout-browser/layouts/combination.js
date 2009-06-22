@@ -1,6 +1,14 @@
 /*
- * Ext JS Library 2.2.1
+ * Ext JS Library 3.0 RC2
  * Copyright(c) 2006-2009, Ext JS, LLC.
+ * licensing@extjs.com
+ * 
+ * http://extjs.com/license
+ */
+
+/*
+ * Ext JS Library 3.0 Pre-alpha
+ * Copyright(c) 2006-2008, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -116,7 +124,7 @@ var tabsNestedLayouts = {
 						title: 'Nested Grid',
 						xtype: 'grid',
 						layout: 'fit',
-				        store: new Ext.data.SimpleStore({
+				        store: new Ext.data.ArrayStore({
 					        fields: [
 					           {name: 'company'},
 					           {name: 'price', type: 'float'},

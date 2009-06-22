@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.2.1
+ * Ext JS Library 3.0 RC2
  * Copyright(c) 2006-2009, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -26,28 +26,32 @@ Ext.form.Action = function(form, options){
 
 /**
  * Failure type returned when client side validation of the Form fails
- * thus aborting a submit action.
+ * thus aborting a submit action. Client side validation is performed unless
+ * {@link #clientValidation} is explicitly set to <tt>false</tt>.
  * @type {String}
  * @static
  */
 Ext.form.Action.CLIENT_INVALID = 'client';
 /**
- * Failure type returned when server side validation of the Form fails
- * indicating that field-specific error messages have been returned in the
- * response's <tt style="font-weight:bold">errors</tt> property.
+ * <p>Failure type returned when server side processing fails and the {@link #result}'s
+ * <tt style="font-weight:bold">success</tt> property is set to <tt>false</tt>.</p>
+ * <p>In the case of a form submission, field-specific error messages may be returned in the
+ * {@link #result}'s <tt style="font-weight:bold">errors</tt> property.</p>
  * @type {String}
  * @static
  */
 Ext.form.Action.SERVER_INVALID = 'server';
 /**
  * Failure type returned when a communication error happens when attempting
- * to send a request to the remote server.
+ * to send a request to the remote server. The {@link #response} may be examined to
+ * provide further information.
  * @type {String}
  * @static
  */
 Ext.form.Action.CONNECT_FAILURE = 'connect';
 /**
- * Failure type returned when no field values are returned in the response's
+ * Failure type returned when the response's <tt style="font-weight:bold">success</tt>
+ * property is set to <tt>false</tt>, or no field values are returned in the response's
  * <tt style="font-weight:bold">data</tt> property.
  * @type {String}
  * @static
@@ -69,13 +73,16 @@ Ext.form.Action.prototype = {
  * {@link Ext.form.BasicForm}'s method, or if that is not specified, the underlying DOM form's method.
  */
 /**
- * @cfg {Mixed} params Extra parameter values to pass. These are added to the Form's
+ * @cfg {Mixed} params <p>Extra parameter values to pass. These are added to the Form's
  * {@link Ext.form.BasicForm#baseParams} and passed to the specified URL along with the Form's
- * input fields.
+ * input fields.</p>
+ * <p>Parameters are encoded as standard HTTP parameters using {@link Ext#urlEncode}.</p>
  */
 /**
- * @cfg {Number} timeout The number of milliseconds to wait for a server response before
- * failing with the {@link #failureType} as {@link #Action.CONNECT_FAILURE}.
+ * @cfg {Number} timeout The number of seconds to wait for a server response before
+ * failing with the {@link #failureType} as {@link #Action.CONNECT_FAILURE}. If not specified,
+ * defaults to the configured <tt>{@link Ext.form.BasicForm#timeout timeout}</tt> of the
+ * {@link Ext.form.BasicForm form}.
  */
 /**
  * @cfg {Function} success The function to call when a valid success return packet is recieved.
@@ -94,7 +101,7 @@ Ext.form.Action.prototype = {
  * error ocurred, the failure type will be in {@link #failureType}. The {@link #result}
  * property of this object may be examined to perform custom postprocessing.</div></li>
  * </ul>
-*/
+ */
 /**
  * @cfg {Object} scope The scope in which to call the callback functions (The <tt>this</tt> reference
  * for the callback functions).
@@ -115,16 +122,53 @@ Ext.form.Action.prototype = {
  */
     type : 'default',
 /**
- * The type of failure detected. See {@link link Ext.form.Action#Action.CLIENT_INVALID CLIENT_INVALID},
- * {@link link Ext.form.Action#Action.SERVER_INVALID SERVER_INVALID},
- * {@link #link Ext.form.ActionAction.CONNECT_FAILURE CONNECT_FAILURE}, {@link Ext.form.Action#Action.LOAD_FAILURE LOAD_FAILURE}
+ * The type of failure detected will be one of these: {@link #CLIENT_INVALID},
+ * {@link #SERVER_INVALID}, {@link #CONNECT_FAILURE}, or {@link #LOAD_FAILURE}.  Usage:
+ * <pre><code>
+var fp = new Ext.form.FormPanel({
+...
+buttons: [{
+    text: 'Save',
+    formBind: true,
+    handler: function(){
+        if(fp.getForm().isValid()){
+            fp.getForm().submit({
+                url: 'form-submit.php',
+                waitMsg: 'Submitting your data...',
+                success: function(form, action){
+                    // server responded with success = true
+                    var result = action.{@link #result};
+                },
+                failure: function(form, action){
+                    if (action.{@link #failureType} === Ext.form.Action.{@link #CONNECT_FAILURE}) {
+                        Ext.Msg.alert('Error',
+                            'Status:'+action.{@link #response}.status+': '+
+                            action.{@link #response}.statusText);
+                    }
+                    if (action.failureType === Ext.form.Action.{@link #SERVER_INVALID}){
+                        // server responded with success = false
+                        Ext.Msg.alert('Invalid', action.{@link #result}.errormsg);
+                    }
+                }
+            });
+        }
+    }
+},{
+    text: 'Reset',
+    handler: function(){
+        fp.getForm().reset();
+    }
+}]
+ * </code></pre>
  * @property failureType
  * @type {String}
- *//**
+ */
+ /**
  * The XMLHttpRequest object used to perform the action.
  * @property response
  * @type {Object}
- *//**
+ */
+ /**
  * The decoded response object containing a boolean <tt style="font-weight:bold">success</tt> property and
  * other, action-specific properties.
  * @property result
@@ -154,9 +198,11 @@ Ext.form.Action.prototype = {
     },
 
     // private
+    // shared code among all Actions to validate that there was a response
+    // with either responseText or responseXml
     processResponse : function(response){
         this.response = response;
-        if(!response.responseText){
+        if(!response.responseText && !response.responseXML){
             return true;
         }
         this.result = this.handleResponse(response);
@@ -403,7 +449,91 @@ Ext.extend(Ext.form.Action.Load, Ext.form.Action, {
     }
 });
 
+
+
+/**
+ * @class Ext.form.Action.DirectLoad
+ * @extends Ext.form.Action.Load
+ */
+Ext.form.Action.DirectLoad = Ext.extend(Ext.form.Action.Load, {
+    constructor: function(form, opts) {        
+        Ext.form.Action.DirectLoad.superclass.constructor.call(this, form, opts);
+    },
+    type: 'directload',
+    
+    run : function(){
+        var args = this.getParams();
+        args.push(this.success, this);                
+        this.form.api.load.apply(window, args);
+    },
+    
+    getParams: function() {
+        var buf = [], o = {};
+        var bp = this.form.baseParams;
+        var p = this.options.params;
+        Ext.apply(o, p, bp);
+        var paramOrder = this.form.paramOrder;
+        if(paramOrder){
+            for(var i = 0, len = paramOrder.length; i < len; i++){
+                buf.push(o[paramOrder[i]]);
+            }
+        }else if(this.form.paramsAsHash){
+            buf.push(o);
+        }
+        return buf;
+    },
+    // Direct actions have already been processed and therefore
+    // we can directly set the result; Direct Actions do not have
+    // a this.response property.
+    processResponse: function(result) {
+        this.result = result;
+        return result;          
+    }
+});
+
+/**
+ * @class Ext.form.Action.DirectSubmit
+ * @extends Ext.form.Action.Submit
+ */
+Ext.form.Action.DirectSubmit = Ext.extend(Ext.form.Action.Submit, {
+    constructor: function(form, opts) {
+        Ext.form.Action.DirectSubmit.superclass.constructor.call(this, form, opts);
+    },
+    type: 'directsubmit',
+    // override of Submit
+    run : function(){
+        var o = this.options;
+        if(o.clientValidation === false || this.form.isValid()){
+            // tag on any additional params to be posted in the
+            // form scope
+            this.success.params = this.getParams();
+            this.form.api.submit(this.form.el.dom, this.success, this);
+        }else if (o.clientValidation !== false){ // client validation failed
+            this.failureType = Ext.form.Action.CLIENT_INVALID;
+            this.form.afterAction(this, false);
+        }
+    },
+    
+    getParams: function() {
+        var o = {};
+        var bp = this.form.baseParams;
+        var p = this.options.params;
+        Ext.apply(o, p, bp);
+        return o;
+    },    
+    // Direct actions have already been processed and therefore
+    // we can directly set the result; Direct Actions do not have
+    // a this.response property.
+    processResponse: function(result) {
+        this.result = result;
+        return result;          
+    }
+});
+
+
 Ext.form.Action.ACTION_TYPES = {
     'load' : Ext.form.Action.Load,
-    'submit' : Ext.form.Action.Submit
+    'submit' : Ext.form.Action.Submit,
+    'directload': Ext.form.Action.DirectLoad,
+    'directsubmit': Ext.form.Action.DirectSubmit
 };

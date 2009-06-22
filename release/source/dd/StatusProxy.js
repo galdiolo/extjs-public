@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.2.1
+ * Ext JS Library 3.0 RC2
  * Copyright(c) 2006-2009, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -81,7 +81,7 @@ Ext.dd.StatusProxy.prototype = {
         }
         var el = this.ghost.dom.firstChild; 
         if(el){
-            Ext.fly(el).setStyle(Ext.isIE ? 'styleFloat' : 'cssFloat', 'none');
+            Ext.fly(el).setStyle('float', 'none');
         }
     },
 

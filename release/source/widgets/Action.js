@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.2.1
+ * Ext JS Library 3.0 RC2
  * Copyright(c) 2006-2009, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -20,20 +20,22 @@
 // Define the shared action.  Each component below will have the same
 // display text and icon, and will display the same message on click.
 var action = new Ext.Action({
-    text: 'Do something',
-    handler: function(){
+    {@link #text}: 'Do something',
+    {@link #handler}: function(){
         Ext.Msg.alert('Click', 'You did something.');
     },
-    iconCls: 'do-something'
+    {@link #iconCls}: 'do-something',
+    {@link #itemId}: 'myAction'
 });
 
 var panel = new Ext.Panel({
     title: 'Actions',
-    width:500,
-    height:300,
+    width: 500,
+    height: 300,
     tbar: [
         // Add the action directly to a toolbar as a menu button
-        action, {
+        action,
+        {
             text: 'Action Menu',
             // Add the action to a menu as a text item
             menu: [action]
@@ -48,12 +50,18 @@ var panel = new Ext.Panel({
 
 // Change the text for all components using the action
 action.setText('Something else');
+
+// Reference an action through a container using the itemId
+var btn = panel.getComponent('myAction');
+var aRef = btn.baseAction;
+aRef.setText('New text');
 </code></pre>
  * @constructor
  * @param {Object} config The configuration options
  */
 Ext.Action = function(config){
     this.initialConfig = config;
+    this.itemId = config.itemId = (config.itemId || config.id || Ext.id());
     this.items = [];
 }
 
@@ -62,8 +70,18 @@ Ext.Action.prototype = {
      * @cfg {String} text The text to set for all components using this action (defaults to '').
      */
     /**
-     * @cfg {String} iconCls The icon CSS class for all components using this action (defaults to '').
-     * The class should supply a background image that will be used as the icon image.
+     * @cfg {String} iconCls
+     * The CSS class selector that specifies a background image to be used as the header icon for
+     * all components using this action (defaults to '').
+     * <p>An example of specifying a custom icon class would be something like:
+     * </p><code><pre>
+// specify the property in the config for the class:
+     ...
+     iconCls: 'do-something'
+
+// css class that specifies background image to be used as the icon image:
+.do-something { background-image: url(../images/my-icon.gif) 0 6px no-repeat !important; }
+</pre></code>
      */
     /**
      * @cfg {Boolean} disabled True to disable all components using this action, false to enable them (defaults to false).
@@ -74,6 +92,10 @@ Ext.Action.prototype = {
     /**
      * @cfg {Function} handler The function that will be invoked by each component tied to this action
      * when the component's primary event is triggered (defaults to undefined).
+     */
+    /**
+     * @cfg {String} itemId
+     * See {@link Ext.Component}.{@link Ext.Component#itemId itemId}.
      */
     /**
      * @cfg {Object} scope The scope in which the {@link #handler} function will execute.
@@ -149,7 +171,7 @@ Ext.Action.prototype = {
 
     /**
      * Sets the hidden state of all components using this action.  Shortcut method
-     * for {@link #hide} and {@link #show}.
+     * for <code>{@link #hide}</code> and <code>{@link #show}</code>.
      * @param {Boolean} hidden True to hide the component, false to show it
      */
     setHidden : function(v){
@@ -221,8 +243,9 @@ Ext.Action.prototype = {
     },
 
     /**
-     * Executes this action manually using the default handler specified in the original config object.  Any arguments
-     * passed to this function will be passed on to the handler function.
+     * Executes this action manually using the handler function specified in the original config object
+     * or the handler function set with <code>{@link #setHandler}</code>.  Any arguments passed to this
+     * function will be passed on to the handler function.
      * @param {Mixed} arg1 (optional) Variable number of arguments passed to the handler function 
      * @param {Mixed} arg2 (optional)
      * @param {Mixed} etc... (optional)

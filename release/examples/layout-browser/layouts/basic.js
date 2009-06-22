@@ -1,6 +1,14 @@
 /*
- * Ext JS Library 2.2.1
+ * Ext JS Library 3.0 RC2
  * Copyright(c) 2006-2009, Ext JS, LLC.
+ * licensing@extjs.com
+ * 
+ * http://extjs.com/license
+ */
+
+/*
+ * Ext JS Library 3.0 Pre-alpha
+ * Copyright(c) 2006-2008, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -163,8 +171,8 @@ var border = {
 /*
  * ================  CardLayout config (TabPanel)  =======================
  */
-// Note that the TabPanel component uses an internal CardLayout -- it's not
-// something you have to explicitly configure.  However, it's still a perfect
+// Note that the TabPanel component uses an internal CardLayout -- it is not
+// something you have to explicitly configure.  However, it is still a perfect
 // example of how this layout style can be used in a complex component.
 var cardTabs = {
 	xtype: 'tabpanel',
@@ -350,3 +358,64 @@ var table = {
 		colspan: 4
 	}]
 };
+
+
+var vbox = {
+	id     : 'vbox-panel',
+	title  : 'vBox Layout',
+	layout : {
+		type  : 'vbox',
+		pack  : 'start',
+		align : 'stretch'
+	},
+	defaults : {
+		frame : true
+	},
+	items  : [
+		{
+			title : 'Panel 1',
+			flex  : 1,
+			html  : "flex : 1"
+		},
+                {
+                        title  : 'Panel 2',
+                        height : 100,
+                        html   : "height: 100"
+                },
+                {
+                        title : 'Panel 3',
+                        flex  : 2,
+                        html  : "flex : 2"
+                }
+	]	
+}
+
+var hbox = {
+        id     : 'hbox-panel',
+        title  : 'hBox Layout',
+        layout : {
+                type  : 'hbox',
+                pack  : 'start',
+                align : 'stretch'
+        },
+        defaults : {
+                frame : true
+        },
+        items  : [
+                {
+                        title : 'Panel 1',
+                        flex  : 1,
+                        html  : "flex : 1"
+                },
+                {
+                        title : 'Panel 2',
+                        width : 100,
+                        html  : "width : 100"
+                },
+                {
+                        title : 'Panel 3',
+                        flex  : 2,
+                        html  : "flex : 2"
+                }
+        ]
+}
