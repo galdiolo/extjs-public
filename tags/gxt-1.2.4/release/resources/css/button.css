@@ -1,0 +1,29 @@
+.x-btn-focus .x-btn-left{
+	background-position:0 -147px;
+}
+.x-btn-focus .x-btn-right{
+	background-position:0 -168px;
+}
+.x-btn-focus .x-btn-center{
+	background-position:0 -189px;
+}
+
+.x-btn-over .x-btn-left{
+	background-position:0 -63px;
+}
+.x-btn-over .x-btn-right{
+	background-position:0 -84px;
+}
+.x-btn-over .x-btn-center{
+	background-position:0 -105px;
+}
+
+.x-btn-click .x-btn-center{
+	background-position:0 -126px;
+}
+.x-btn-click  .x-btn-right{
+	background-position:0 -84px;
+}
+.x-btn-click .x-btn-left{
+	background-position:0 -63px;
+}
