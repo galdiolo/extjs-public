@@ -1,0 +1,165 @@
+<html>
+<head>
+<link rel="stylesheet" href="../../css/SyntaxHighlighter.css" type="text/css" />
+<script src="../../js/shCore.js"></script>
+<script src="../../js/shBrushJava.js"></script>
+<script>
+    window.onload = function() {
+      dp.SyntaxHighlighter.HighlightAll("code");
+    }
+</script>
+<style>
+* {
+font-family:monospace;
+  padding: 0px;
+  margin: 0px;
+  white-space: nowrap;
+  font-size: 11px;
+}
+body {
+  border: none;
+}
+.dp-highlighter {
+  white-space: nowrap;
+  overflow: visible;
+  width: 700;
+  font-size: 11px;  
+  font-family:monospace;
+}
+.dp-highlighter ol, .dp-highlighter ol li {
+  font-family:monospace;
+}
+</style>
+</head>
+<body>
+<textarea name="code" class="java:nogutter:nocontrols" rows="15" cols="100">/*
+ * Ext GWT - Ext for GWT
+ * Copyright(c) 2007, 2008, Ext JS, LLC.
+ * licensing@extjs.com
+ * 
+ * http://extjs.com/license
+ */
+package com.extjs.gxt.samples.client.examples.tree;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.client.FileServiceAsync;
+import com.extjs.gxt.samples.client.examples.model.FileModel;
+import com.extjs.gxt.samples.client.examples.model.FolderModel;
+import com.extjs.gxt.ui.client.Registry;
+import com.extjs.gxt.ui.client.binder.TreeTableBinder;
+import com.extjs.gxt.ui.client.data.BaseTreeLoader;
+import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.data.RpcProxy;
+import com.extjs.gxt.ui.client.data.TreeLoader;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.store.Store;
+import com.extjs.gxt.ui.client.store.StoreSorter;
+import com.extjs.gxt.ui.client.store.TreeStore;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.button.ButtonBar;
+import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
+import com.extjs.gxt.ui.client.widget.table.DateTimeCellRenderer;
+import com.extjs.gxt.ui.client.widget.treetable.TreeTable;
+import com.extjs.gxt.ui.client.widget.treetable.TreeTableColumn;
+import com.extjs.gxt.ui.client.widget.treetable.TreeTableColumnModel;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
+public class TreeTableExample extends LayoutContainer {
+  @Override
+  protected void onRender(Element parent, int pos) {
+    super.onRender(parent, pos);
+
+    setLayout(new FlowLayout(10));
+
+    final FileServiceAsync service = (FileServiceAsync) Registry.get(Examples.FILE_SERVICE);
+
+    List<TreeTableColumn> columns = new ArrayList<TreeTableColumn>();
+
+    TreeTableColumn column = new TreeTableColumn("name", "Name", 300);
+    column.setMinWidth(75);
+    columns.add(column);
+
+    column = new TreeTableColumn("date", "Date", 170);
+    column.setRenderer(new DateTimeCellRenderer(DateTimeFormat.getMediumDateTimeFormat()));
+    columns.add(column);
+
+    column = new TreeTableColumn("size", "Size", 120);
+    columns.add(column);
+
+    TreeTableColumnModel cm = new TreeTableColumnModel(columns);
+
+    final TreeTable table = new TreeTable(cm);
+    table.setAnimate(false);
+    table.getStyle().setLeafIconStyle("icon-page");
+
+    // data proxy
+    RpcProxy<FileModel, List<FileModel>> proxy = new RpcProxy<FileModel, List<FileModel>>() {
+      @Override
+      protected void load(FileModel loadConfig, AsyncCallback<List<FileModel>> callback) {
+        service.getFolderChildren(loadConfig, callback);
+      }
+    };
+
+    // tree loader
+    final TreeLoader loader = new BaseTreeLoader(proxy) {
+      @Override
+      public boolean hasChildren(ModelData parent) {
+        return parent instanceof FolderModel;
+      }
+    };
+
+    // trees store
+    final TreeStore<FileModel> store = new TreeStore<FileModel>(loader);
+    store.setStoreSorter(new StoreSorter<FileModel>() {
+
+      @Override
+      public int compare(Store store, FileModel m1, FileModel m2, String property) {
+        boolean m1Folder = m1 instanceof FolderModel;
+        boolean m2Folder = m2 instanceof FolderModel;
+
+        if (m1Folder && !m2Folder) {
+          return -1;
+        } else if (!m1Folder && m2Folder) {
+          return 1;
+        }
+
+        return super.compare(store, m1, m2, property);
+      }
+    });
+
+    final TreeTableBinder<FileModel> binder = new TreeTableBinder<FileModel>(table, store);
+    binder.setDisplayProperty("name");
+
+    loader.load(null);
+
+    table.setSize(700, 300);
+
+    addText("<div style='font-size: 12px;padding-bottom: 8px'>TreeTable example using a TreeStore with a TreeLoader using RCP.</div>");
+    add(table);
+
+    ButtonBar buttonBar = new ButtonBar();
+    buttonBar.add(new Button("Store Remove All", new SelectionListener<ComponentEvent>() {
+      public void componentSelected(ComponentEvent ce) {
+        store.removeAll();
+      }
+
+    }));
+
+    buttonBar.add(new Button("Loader Reload", new SelectionListener<ComponentEvent>() {
+      public void componentSelected(ComponentEvent ce) {
+        loader.load(null);
+      }
+    }));
+
+    add(buttonBar);
+  }
+}</textarea>
+</body>
+</html>
