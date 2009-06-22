@@ -54,7 +54,7 @@ public final class XDOM {
     // support text node creation
     return (firstChild != null) ? firstChild : div;
   }
-  
+
   /**
    * Escapes HTML string and returns valid text that will be shown rather than
    * rendered.
@@ -73,8 +73,8 @@ public final class XDOM {
    * @return the body
    */
   public static native Element getBody() /*-{
-      return $doc.body;
-    }-*/;
+       return $doc.body;
+     }-*/;
 
   /**
    * Returns the body El.
@@ -92,8 +92,8 @@ public final class XDOM {
    * Reloads the page.
    */
   public native static void reload() /*-{
-     $wnd.location.reload();
-   }-*/;
+      $wnd.location.reload();
+    }-*/;
 
   /**
    * Returns the body elements horizontal scroll.
@@ -101,8 +101,8 @@ public final class XDOM {
    * @return the scroll amount in pixels
    */
   public static native int getBodyScrollLeft() /*-{
-      return $doc.body.scrollLeft;
-    }-*/;
+       return $doc.body.scrollLeft;
+     }-*/;
 
   /**
    * Return the body elements vertical scroll.
@@ -110,8 +110,8 @@ public final class XDOM {
    * @return the scroll amount in pixels
    */
   public static native int getBodyScrollTop() /*-{
-      return $doc.body.scrollTop;
-    }-*/;
+       return $doc.body.scrollTop;
+     }-*/;
 
   /**
    * Returns the element's bounds.
@@ -142,8 +142,8 @@ public final class XDOM {
    * @return the docuemnt
    */
   public static native Element getDocument() /*-{
-      return $doc;
-    }-*/;
+       return $doc;
+     }-*/;
 
   /**
    * Returns the element with the unique id.
@@ -165,8 +165,8 @@ public final class XDOM {
    * @return the head
    */
   public static native Element getHead() /*-{
-      return $doc.getElementsByTagName('head')[0];
-    }-*/;
+       return $doc.getElementsByTagName('head')[0];
+     }-*/;
 
   /**
    * Returns the width of the scroll bar.
@@ -190,6 +190,17 @@ public final class XDOM {
   }
 
   /**
+   * Increments and returns the top z-index value.
+   * 
+   * @param adj amount of adjustment
+   * @return the z-index
+   */
+  public static int getTopZIndex(int adj) {
+    zIndexId += adj + 1;
+    return zIndexId;
+  }
+
+  /**
    * Returns an unique id.
    * 
    * @return the id
@@ -204,23 +215,23 @@ public final class XDOM {
    * @return the size
    */
   public static native Size getViewportSize() /*-{
-     var vw;
-     var vh;
-     if (typeof $wnd.innerWidth != 'undefined') {
-       vw = $wnd.innerWidth;
-       vh = $wnd.innerHeight;
-     } else if (typeof $doc.documentElement != 'undefined'
-               && typeof $doc.documentElement.clientWidth !=
-               'undefined' && $doc.documentElement.clientWidth != 0) {
-       vw = $doc.documentElement.clientWidth;
-       vh = $doc.documentElement.clientHeight;
-     } else {
-       vw = $doc.getElementsByTagName('body')[0].clientWidth;
-       vh = $doc.getElementsByTagName('body')[0].clientHeight;
-     }
-     var size = @com.extjs.gxt.ui.client.util.Size::newInstance(II)(vw, vh);
-     return size;
-   }-*/;
+      var vw;
+      var vh;
+      if (typeof $wnd.innerWidth != 'undefined') {
+        vw = $wnd.innerWidth;
+        vh = $wnd.innerHeight;
+      } else if (typeof $doc.documentElement != 'undefined'
+                && typeof $doc.documentElement.clientWidth !=
+                'undefined' && $doc.documentElement.clientWidth != 0) {
+        vw = $doc.documentElement.clientWidth;
+        vh = $doc.documentElement.clientHeight;
+      } else {
+        vw = $doc.getElementsByTagName('body')[0].clientWidth;
+        vh = $doc.getElementsByTagName('body')[0].clientHeight;
+      }
+      var size = @com.extjs.gxt.ui.client.util.Size::newInstance(II)(vw, vh);
+      return size;
+    }-*/;
 
   /**
    * Inserts this element after the passed element in the DOM.
@@ -229,8 +240,8 @@ public final class XDOM {
    * @param after the element to insert after
    */
   public native static void insertAfter(Element elem, Element after) /*-{
-       after.parentNode.insertBefore(elem, after.nextSibling);
-    }-*/;
+        after.parentNode.insertBefore(elem, after.nextSibling);
+     }-*/;
 
   /**
    * Sets the element's style name.
@@ -269,19 +280,19 @@ public final class XDOM {
   }
 
   private static native boolean isVisibleBoxInternal() /*-{
-      if (!$wnd.isVisibleBox) {
-        var d = $wnd.document;
-        var test = d.createElement('div');
-        d.body.appendChild(test);
-        test.style.position = "absolute";
-        test.style.border = "2px solid";
-        test.style.height = "50";
-        $wnd.isVisibleValue = test.offsetHeight == 50 ? true : false;
-        $wnd.isVisibleBox = true;
-        d.body.removeChild(test);
-      }
-     return $wnd.isVisibleValue;
-   }-*/;
+       if (!$wnd.isVisibleBox) {
+         var d = $wnd.document;
+         var test = d.createElement('div');
+         d.body.appendChild(test);
+         test.style.position = "absolute";
+         test.style.border = "2px solid";
+         test.style.height = "50";
+         $wnd.isVisibleValue = test.offsetHeight == 50 ? true : false;
+         $wnd.isVisibleBox = true;
+         d.body.removeChild(test);
+       }
+      return $wnd.isVisibleValue;
+    }-*/;
 
   private XDOM() {
 

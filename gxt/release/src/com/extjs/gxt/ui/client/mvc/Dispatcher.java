@@ -58,7 +58,7 @@ public class Dispatcher extends BaseObservable {
    */
   public static final int AfterDispatch = 960;
 
-  private static Dispatcher instance;
+  private static Dispatcher instance = new Dispatcher();
 
   /**
    * Forwards an app event to the dispatcher.
@@ -107,9 +107,6 @@ public class Dispatcher extends BaseObservable {
    * @return the dispatcher
    */
   public static Dispatcher get() {
-    if (instance == null) {
-      instance = new Dispatcher();
-    }
     return instance;
   }
 
@@ -118,7 +115,6 @@ public class Dispatcher extends BaseObservable {
   private List<Controller> controllers;
 
   private Dispatcher() {
-    instance = this;
     controllers = new ArrayList<Controller>();
     history = new HashMap<String, AppEvent>();
     History.addHistoryListener(new HistoryListener() {
@@ -129,7 +125,7 @@ public class Dispatcher extends BaseObservable {
       }
     });
   }
-
+  
   /**
    * Adds a controller.
    * 

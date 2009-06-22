@@ -55,7 +55,9 @@ public class FieldBinding {
 
     modelListener = new ChangeListener() {
       public void modelChanged(ChangeEvent event) {
-        if (event.type == ChangeEventSource.Update) onModelChange((PropertyChangeEvent) event);
+        if (event.type == ChangeEventSource.Update) {
+          onModelChange((PropertyChangeEvent) event);
+        }
       }
     };
   }
@@ -78,9 +80,9 @@ public class FieldBinding {
   }
 
   /**
-   * Returns the bindings covertor.
+   * Returns the bindings converter.
    * 
-   * @return the convertor
+   * @return the converter
    */
   public Converter getConvertor() {
     return convertor;
@@ -123,7 +125,7 @@ public class FieldBinding {
   }
 
   /**
-   * Sets the convertor which is used to translate data types when updating
+   * Sets the converter which is used to translate data types when updating
    * either the field or model.
    * 
    * @param convertor the converter
@@ -162,7 +164,7 @@ public class FieldBinding {
     Object val = onConvertModelValue(model.get(property));
     field.setValue(val);
   }
-  
+
   /**
    * Updates the model's value with the field value.
    */
@@ -179,7 +181,7 @@ public class FieldBinding {
     }
 
   }
-  
+
   protected Object onConvertFieldValue(Object value) {
     if (convertor != null) {
       return convertor.convertFieldValue(value);

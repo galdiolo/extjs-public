@@ -278,7 +278,7 @@ public class LayoutContainer extends ScrollContainer<Component> {
    * Sets the component's layout data.
    * 
    * @param component the component
-   * @param layoutData the layou data
+   * @param layoutData the layout data
    */
   public void setLayoutData(Component component, LayoutData layoutData) {
     ComponentHelper.setLayoutData(component, layoutData);

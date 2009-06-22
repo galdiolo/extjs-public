@@ -29,10 +29,9 @@ public class PortalEvent extends ContainerEvent<Portal, Portlet> {
     this.portal = portal;
   }
 
-  public PortalEvent(Portal portal, Portlet portlet, int startColumn, int startRow, int column,
-      int row) {
-    super(portal);
-    this.portlet = portlet;
+  public PortalEvent(Portal portal, Portlet portlet, int startColumn, int startRow,
+      int column, int row) {
+    this(portal, portlet);
     this.startColumn = startColumn;
     this.startRow = startRow;
     this.column = column;

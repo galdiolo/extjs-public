@@ -338,12 +338,12 @@ public class TimeField extends ComboBox<Time> {
   @Override
   protected void initList() {
     initialized = true;
-    DateWrapper min = minValue != null ? new DateWrapper(minValue) : new DateWrapper();
+    DateWrapper min = minValue != null ? new DateWrapper(minValue) : new DateWrapper(1970, 1, 1);
     if (minValue == null) {
       min = min.clearTime();
     }
 
-    DateWrapper max = maxValue != null ? new DateWrapper(maxValue) : new DateWrapper();
+    DateWrapper max = maxValue != null ? new DateWrapper(maxValue) : new DateWrapper(1970, 1, 1);
     if (maxValue == null) {
       max = max.clearTime().addMinutes((24 * 60) - 1);
     }

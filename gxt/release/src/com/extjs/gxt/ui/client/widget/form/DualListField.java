@@ -131,6 +131,7 @@ public class DualListField<D extends ModelData> extends MultiField<Field> {
 
     /**
      * Sets the move selected up tooltip (defaults to 'Move selected up').
+     * 
      * @param moveUp
      */
     public void setMoveUp(String moveUp) {
@@ -173,7 +174,7 @@ public class DualListField<D extends ModelData> extends MultiField<Field> {
   public DualListField() {
     fromField = new ListField<D>();
     toField = new ListField<D>();
-    
+
     messages = new DualListFieldMessages();
 
     buttonBar = new VerticalPanel();
@@ -201,7 +202,7 @@ public class DualListField<D extends ModelData> extends MultiField<Field> {
 
   @Override
   public DualListFieldMessages getMessages() {
-    return (DualListFieldMessages)messages;
+    return (DualListFieldMessages) messages;
   }
 
   /**
@@ -269,7 +270,7 @@ public class DualListField<D extends ModelData> extends MultiField<Field> {
       } else {
         tip = getMessages().getMoveUp();
       }
-      
+
       IconButton up = new IconButton("arrow-up");
       up.setHeight(18);
       up.setToolTip(tip);
@@ -280,7 +281,7 @@ public class DualListField<D extends ModelData> extends MultiField<Field> {
       });
       buttonBar.add(up);
     }
-    
+
     String tip = "";
     if (getMessages().getAddAll() == null) {
       tip = GXT.MESSAGES.listField_addAll();
@@ -299,7 +300,7 @@ public class DualListField<D extends ModelData> extends MultiField<Field> {
       }
     });
     buttonBar.add(allRight);
-    
+
     tip = "";
     if (getMessages().getAddSelected() == null) {
       tip = GXT.MESSAGES.listField_addSelected();
@@ -320,7 +321,7 @@ public class DualListField<D extends ModelData> extends MultiField<Field> {
         select(toField, sel);
       }
     });
-    
+
     tip = "";
     if (getMessages().getRemoveSelected() == null) {
       tip = GXT.MESSAGES.listField_removeSelected();
@@ -344,7 +345,7 @@ public class DualListField<D extends ModelData> extends MultiField<Field> {
 
     buttonBar.add(right);
     buttonBar.add(left);
-    
+
     tip = "";
     if (getMessages().getRemoveAll() == null) {
       tip = GXT.MESSAGES.listField_removeAll();
@@ -371,7 +372,7 @@ public class DualListField<D extends ModelData> extends MultiField<Field> {
       } else {
         tip = getMessages().getMoveDown();
       }
-      
+
       IconButton down = new IconButton("arrow-down");
       down.setHeight(18);
       down.setToolTip(tip);
@@ -444,6 +445,23 @@ public class DualListField<D extends ModelData> extends MultiField<Field> {
 
     if (enableDND) {
       initDND();
+    }
+  }
+
+  protected void onResize(int width, int height) {
+    super.onResize(width, height);
+    if (orientation == Orientation.HORIZONTAL) {
+      int w = (width - buttonAdapter.el().getParent().getWidth()) / 2;
+      if (!GXT.isBorderBox) {
+        w -= 2;
+      }
+      w -= (fields.size() * spacing);
+      fromField.setWidth(w);
+      toField.setWidth(w);
+    } else {
+      for (Field f : fields) {
+        f.setWidth(width);
+      }
     }
   }
 

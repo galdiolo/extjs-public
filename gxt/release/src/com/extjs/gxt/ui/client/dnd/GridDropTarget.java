@@ -109,7 +109,7 @@ public class GridDropTarget extends DropTarget {
         int y = event.getClientY();
         boolean before = y < mid;
         int idx = grid.getView().findRowIndex(row);
-        insertIndex = before ? idx : idx + 1;
+        insertIndex = before ? idx : (event.source.component == grid) ? idx : idx + 1;
         if (before) {
           showInsert(event, row, true);
         } else {

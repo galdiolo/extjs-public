@@ -31,6 +31,11 @@ public class GXT {
   public static MyMessages MESSAGES = (MyMessages) GWT.create(MyMessages.class);
 
   /**
+   * <code>true</code> if the browser uses the webkit engine.
+   */
+  public static boolean isWebKit;
+  
+  /**
    * <code>true</code> if the browser is safari.
    */
   public static boolean isSafari;
@@ -229,6 +234,8 @@ public class GXT {
     isMac = (ua.indexOf("macintosh") != -1 || ua.indexOf("mac os x") != -1);
     isAir = (ua.indexOf("adobeair") != -1);
     isLinux = (ua.indexOf("linux") != -1);
+    
+    isWebKit = isChrome || isSafari;
     
     useShims =  ((isIE && !isIE7) || (isMac && isGecko && !isGecko3));
     

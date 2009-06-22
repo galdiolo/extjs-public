@@ -12,9 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
-
 public class BaseObservable implements Observable {
 
   private boolean firesEvents = true;
@@ -52,7 +49,7 @@ public class BaseObservable implements Observable {
    * @return <code>true</code> if any listeners cancel the event.
    */
   public boolean fireEvent(int eventType) {
-    return fireEvent(eventType, new BaseEvent());
+    return fireEvent(eventType, new BaseEvent(this));
   }
 
   /**
@@ -70,7 +67,9 @@ public class BaseObservable implements Observable {
 
       List<Listener> list = listeners.get(eventType);
       if (list != null) {
-        for (Listener l : list) {
+        List<Listener> copy = new ArrayList<Listener>();
+        copy.addAll(list);
+        for (Listener l : copy) {
           l.handleEvent(be);
         }
       }
@@ -89,6 +88,15 @@ public class BaseObservable implements Observable {
     return firesEvents;
   }
 
+  /**
+   * Returns true if there is an active event.
+   * 
+   * @return the active event state
+   */
+  public boolean hasActiveEvent() {
+    return activeEvent;
+  }
+  
   /**
    * Returns true if the observable has any listeners.
    * 
@@ -134,15 +142,6 @@ public class BaseObservable implements Observable {
    */
   public void removeListener(final int eventType, final Listener listener) {
     if (listeners == null) {
-      return;
-    }
-    if (activeEvent) {
-      DeferredCommand.addCommand(new Command() {
-        public void execute() {
-          removeListener(eventType, listener);
-        }
-
-      });
       return;
     }
     List<Listener> list = listeners.get(eventType);

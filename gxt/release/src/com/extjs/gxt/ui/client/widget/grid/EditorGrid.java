@@ -78,9 +78,9 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
     ONE, TWO;
   }
 
+  protected CellEditor activeEditor;
   private boolean editing;
   private ClicksToEdit clicksToEdit = ClicksToEdit.ONE;
-  private CellEditor activeEditor;
   private Record activeRecord;
   private Listener<DomEvent> editorListener;
   private Listener<GridEvent> gridListener;
@@ -139,7 +139,7 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
    */
   public void startEditing(final int row, final int col) {
     stopEditing();
-    if (cm.isCellEditble(col)) {
+    if (cm.isCellEditable(col)) {
       getView().ensureVisible(row, col, false);
 
       sm.selectCell(row, col);
@@ -150,6 +150,7 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
       final String field = cm.getDataIndex(col);
       GridEvent e = new GridEvent(this);
       e.model = m;
+      e.record = activeRecord;
       e.property = field;
       e.rowIndex = row;
       e.colIndex = col;
@@ -175,6 +176,9 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
                     onEditComplete((CellEditor) ee.editor, ee.value, ee.startValue);
                   } else if (e.type == Events.SpecialKey) {
                     sm.onEditorKey(e);
+                  } else if (e.type == Events.CancelEdit) {
+                    EditorEvent ee = (EditorEvent) e;
+                    onEditCancel((CellEditor) ee.editor, ee.value, ee.startValue);
                   }
                 }
               };
@@ -182,6 +186,7 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
 
             ed.addListener(Events.Complete, editorListener);
             ed.addListener(Events.SpecialKey, editorListener);
+            ed.addListener(Events.CancelEdit, editorListener);
 
             activeEditor = ed;
             // when inserting the editor into the last row, the body is
@@ -219,7 +224,6 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
         activeEditor.completeEdit();
       }
     }
-    activeEditor = null;
   }
 
   protected void onAutoEditClick(GridEvent e) {
@@ -233,6 +237,15 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
     }
   }
 
+  protected void onEditCancel(CellEditor ed, Object value, Object startValue) {
+    editing = false;
+    activeEditor = null;
+    ed.removeListener(Events.SpecialKey, editorListener);
+    ed.removeListener(Events.Complete, editorListener);
+    ed.removeListener(Events.CancelEdit, editorListener);
+    getView().focusCell(ed.row, ed.col, false);
+  }
+
   protected void onCellDoubleClick(GridEvent e) {
     startEditing(e.rowIndex, e.colIndex);
   }
@@ -241,9 +254,12 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
     editing = false;
     activeEditor = null;
     ed.removeListener(Events.SpecialKey, editorListener);
+    ed.removeListener(Events.Complete, editorListener);
+    ed.removeListener(Events.CancelEdit, editorListener);
     Record r = activeRecord;
     String field = cm.getDataIndex(ed.col);
-    if ((value == null && startValue != null) || !value.equals(startValue)) {
+    if ((value == null && startValue != null)
+        || (value != null && !value.equals(startValue))) {
       GridEvent ge = new GridEvent(this);
       ge.record = r;
       ge.property = field;

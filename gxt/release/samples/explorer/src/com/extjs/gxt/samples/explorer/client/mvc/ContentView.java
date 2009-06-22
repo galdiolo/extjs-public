@@ -68,19 +68,19 @@ public class ContentView extends View {
       entry.set("page", page);
     }
 
-    TabItem item = tabPanel.findItem(page.getId(), false);
+    TabItem item = tabPanel.findItem("page__" + page.getId(), false);
     if (item == null) {
       item = new TabItem();
       item.setData("entry", entry);
       item.setClosable(entry.isClosable());
-      item.setId(page.getId());
+      item.setId("page__" + page.getId());
       item.setText(entry.getName());
       item.setLayout(new FitLayout());
       item.add(page);
       tabPanel.add(item);
     }
-    
-    if(item != tabPanel.getSelectedItem()) {
+
+    if (item != tabPanel.getSelectedItem()) {
       tabPanel.setSelection(item);
     }
   }

@@ -47,7 +47,7 @@ import com.google.gwt.animation.client.Animation;
  */
 public class Fx extends BaseObservable {
 
-  private static boolean isRunning;
+  private boolean isRunning;
 
   protected Effect effect;
   protected Animation animation;

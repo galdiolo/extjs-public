@@ -60,10 +60,6 @@ import com.google.gwt.user.client.ui.RootPanel;
  */
 public class SplitBar extends BoxComponent {
 
-  /**
-   * Transparent shim that allows drags over iframes.
-   */
-  private Shim shim = new Shim();
   private static List<SplitBar> attachedBars;
   private static DelayedTask delayedTask;
 
@@ -149,6 +145,7 @@ public class SplitBar extends BoxComponent {
 
     draggable = new Draggable(this);
     draggable.setUpdateZIndex(false);
+    draggable.setStartDragDistance(0);
     draggable.setProxyStyle("x-splitbar-proxy");
 
     Listener dragListener = new Listener<DragEvent>() {
@@ -183,6 +180,7 @@ public class SplitBar extends BoxComponent {
     });
 
     setElement(DOM.createDiv());
+    disableTextSelection(true);
     el().makePositionable(true);
     sinkEvents(Event.MOUSEEVENTS);
   }
@@ -397,14 +395,11 @@ public class SplitBar extends BoxComponent {
   }
 
   private void onCancelDrag(BaseEvent be) {
-    shim.uncover();
     resizeWidget.enableEvents(true);
     sync();
   }
 
   private void onEndDrag(DragEvent de) {
-    shim.uncover();
-
     int x = de.x;
     int y = de.y;
     int width = resizeWidget.getOffsetWidth();
@@ -467,8 +462,6 @@ public class SplitBar extends BoxComponent {
     SplitBarEvent se = new SplitBarEvent(this);
     se.dragEvent = de;
     fireEvent(Events.DragStart, se);
-
-    shim.cover(false);
 
     resizeWidget.enableEvents(false);
 

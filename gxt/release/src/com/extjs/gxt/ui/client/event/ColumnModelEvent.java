@@ -42,10 +42,12 @@ public class ColumnModelEvent extends BaseEvent {
   public boolean hidden;
 
   public ColumnModelEvent(ColumnModel cm) {
+    super(cm);
     this.cm = cm;
   }
 
   public ColumnModelEvent(ColumnModel cm, int colIndex) {
+    super(cm);
     this.colIndex = colIndex;
     this.cm = cm;
   }

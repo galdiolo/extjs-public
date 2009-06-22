@@ -20,10 +20,10 @@ import com.google.gwt.user.client.ui.Frame;
  * and support icons.</p>Code snippet:
  * 
  * <pre>
-   TabItem ti = new TabItem("Tab One");
-   ti.setClosable(true);
-   ti.setEnabled(false);
-   tabPanel.add(ti);
+ * TabItem ti = new TabItem(&quot;Tab One&quot;);
+ * ti.setClosable(true);
+ * ti.setEnabled(false);
+ * tabPanel.add(ti);
  * </pre>
  * 
  * <dl>
@@ -83,8 +83,16 @@ public class TabItem extends LayoutContainer {
     @Override
     public void onComponentEvent(ComponentEvent ce) {
       super.onComponentEvent(ce);
-      if (ce.getEventType() == Event.ONCLICK) {
-        onClick(ce);
+      switch (ce.getEventType()) {
+        case Event.ONCLICK:
+          onClick(ce);
+          break;
+        case Event.ONMOUSEOVER:
+          onMouseOver(ce);
+          break;
+        case Event.ONMOUSEOUT:
+          onMouseOut(ce);
+          break;
       }
     }
 
@@ -94,8 +102,8 @@ public class TabItem extends LayoutContainer {
      * 
      * <pre>
      * 
-     * <code> .my-icon { background: url(images/icons/my-icon.png) no-repeat
-     * center left !important; } </code>
+     * &lt;code&gt; .my-icon { background: url(images/icons/my-icon.png) no-repeat
+     * center left !important; } &lt;/code&gt;
      * 
      * </pre>
      * 
@@ -103,7 +111,8 @@ public class TabItem extends LayoutContainer {
      */
     public void setIconStyle(String iconStyle) {
       if (rendered) {
-        el().selectNode(".x-tab-strip-text").removeStyleName(this.iconStyle).addStyleName(iconStyle);
+        el().selectNode(".x-tab-strip-text").removeStyleName(this.iconStyle).addStyleName(
+            iconStyle);
       }
       this.iconStyle = iconStyle;
     }
@@ -259,7 +268,7 @@ public class TabItem extends LayoutContainer {
    * specifies a background image using the following format:
    * 
    * <pre>
-     .my-icon { background: url(images/icons/my-icon.png) no-repeat center left !important; } 
+   * .my-icon { background: url(images/icons/my-icon.png) no-repeat center left !important; }
    * </pre>
    * 
    * @param iconStyle the icon style
@@ -294,7 +303,7 @@ public class TabItem extends LayoutContainer {
    */
   public Frame setUrl(String url) {
     Frame f = new Frame(url);
-    fly(f.getElement()).setStyleAttribute("frameBorder", "0");
+    f.getElement().setPropertyInt("frameBorder", 0);
     f.setSize("100%", "100%");
     removeAll();
     add(new WidgetComponent(f));

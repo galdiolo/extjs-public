@@ -15,9 +15,9 @@ import com.google.gwt.user.client.Event;
 /**
  * Component event type.
  * 
- * <p/>Note: For a given event, only the fields which are appropriate will be
- * filled in. The appropriate fields for each event are documented by the event
- * source.
+ * <p/>
+ * Note: For a given event, only the fields which are appropriate will be filled
+ * in. The appropriate fields for each event are documented by the event source.
  * 
  * @see Component
  */
@@ -39,6 +39,7 @@ public class ComponentEvent extends DomEvent {
    * @param component the source component
    */
   public ComponentEvent(Component component) {
+    super(component);
     this.component = component;
   }
 

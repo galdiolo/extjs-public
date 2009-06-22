@@ -121,7 +121,7 @@ public class Portal extends Container<LayoutContainer> {
       LayoutContainer l = new LayoutContainer();
       l.addStyleName("x-portal x-portal-column");
       l.setStyleAttribute("minHeight", "20px");
-      l.setStyleAttribute("padding", "" + spacing + " 0 0 " + spacing);
+      l.setStyleAttribute("padding", "" + spacing + "px 0 0 " + spacing+"px");
       l.setLayout(new RowLayout());
       l.setLayoutOnChange(true);
       add(l);
@@ -261,7 +261,7 @@ public class Portal extends Container<LayoutContainer> {
   public void setSpacing(int spacing) {
     this.spacing = spacing;
     for(LayoutContainer l : columns) {
-      l.setStyleAttribute("padding", "" + spacing + " 0 0 " + spacing);
+      l.setStyleAttribute("padding", "" + spacing + "px 0 0 " + spacing+"px");
     }
   }
 

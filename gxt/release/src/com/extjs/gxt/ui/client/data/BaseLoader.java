@@ -61,6 +61,15 @@ public class BaseLoader<C, D> extends BaseObservable implements Loader<C> {
   }
 
   /**
+   * returns the last config
+   * 
+   * @return the last config
+   */
+  public C getLastConfig() {
+    return lastConfig;
+  }
+
+  /**
    * Returns the loader's data proxy.
    * 
    * @return the data proxy

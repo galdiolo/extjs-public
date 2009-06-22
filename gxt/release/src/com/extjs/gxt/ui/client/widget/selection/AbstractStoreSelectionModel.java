@@ -49,8 +49,8 @@ import com.extjs.gxt.ui.client.store.StoreListener;
  * 
  * @param <M> the model type contained within the store
  */
-public abstract class AbstractStoreSelectionModel<M extends ModelData> extends BaseObservable
-    implements StoreSelectionModel<M>, SelectionProvider<M> {
+public abstract class AbstractStoreSelectionModel<M extends ModelData> extends
+    BaseObservable implements StoreSelectionModel<M>, SelectionProvider<M> {
 
   protected ListStore<M> store;
   protected SelectionMode selectionMode = SelectionMode.MULTI;
@@ -72,6 +72,11 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     @Override
     public void storeRemove(StoreEvent<M> se) {
       onRemove(se.model);
+    }
+
+    @Override
+    public void storeUpdate(StoreEvent<M> se) {
+      onUpdate(se.model);
     }
 
   };
@@ -237,11 +242,11 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     boolean change = false;
     for (M m : models) {
       if (isSelected(m)) {
-        onSelectChange(m, false);
         selected.remove(m);
         if (lastSelected == m) {
           lastSelected = null;
         }
+        onSelectChange(m, false);
         change = true;
       }
     }
@@ -260,13 +265,13 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     for (M m : models) {
       SelectionEvent e = new SelectionEvent(this, m);
       e.index = store.indexOf(m);
-      if (!fireEvent(Events.BeforeSelect, e)) {
+      if (e.index == -1 || !fireEvent(Events.BeforeSelect, e)) {
         continue;
       }
       change = true;
-      onSelectChange(m, true);
       lastSelected = m;
       selected.add(m);
+      onSelectChange(m, true);
     }
 
     if (change && !supressEvent) {
@@ -290,11 +295,8 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     if (locked) return;
     SelectionEvent e = new SelectionEvent(this, model);
     e.index = store.indexOf(model);
-    if (!fireEvent(Events.BeforeSelect, e)) {
-      return;
-    }
 
-    if (isSelected(model)) {
+    if (e.index == -1 || isSelected(model) || !fireEvent(Events.BeforeSelect, e)) {
       return;
     }
 
@@ -306,9 +308,9 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     if (selected.size() == 0) {
       change = true;
     }
-    onSelectChange(model, true);
     selected.add(model);
     lastSelected = model;
+    onSelectChange(model, true);
     if (change && !supressEvent) {
       fireSelectionChange();
     }
@@ -338,8 +340,18 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
 
   protected abstract void onSelectChange(M model, boolean select);
 
+  protected void onUpdate(M model) {
+    if (locked) return;
+    if (isSelected(model)) {
+      int index = selected.indexOf(model);
+      selected.remove(model);
+      selected.add(index, model);
+    }
+  }
+
   private void fireSelectionChange() {
-    fireEvent(Events.SelectionChange, new SelectionChangedEvent(this, new ArrayList(selected)));
+    fireEvent(Events.SelectionChange, new SelectionChangedEvent(this, new ArrayList(
+        selected)));
   }
 
 }

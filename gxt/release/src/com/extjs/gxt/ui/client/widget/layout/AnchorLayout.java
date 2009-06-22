@@ -113,7 +113,7 @@ public class AnchorLayout extends Layout {
             ch = parseAnchor(vs[1], h, ah, ah);
           }
 
-          cw -= comp.el().getMargins("lr");
+          getSideMargins(comp);
           ch -= comp.el().getMargins("tb");
 
           cw = adjustWidthAnchor(cw, comp);

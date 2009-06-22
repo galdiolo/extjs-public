@@ -81,7 +81,7 @@ public class TriggerField<Data> extends TextField<Data> {
   public boolean isHideTrigger() {
     return hideTrigger;
   }
-  
+
   public void onAttach() {
     super.onAttach();
     if (GXT.isIE && !hideTrigger) {
@@ -197,11 +197,13 @@ public class TriggerField<Data> extends TextField<Data> {
 
     triggerListener = new EventListener() {
       public void onBrowserEvent(Event event) {
-        FieldEvent ce = new FieldEvent(TriggerField.this);
-        ce.event = event;
-        ce.type = DOM.eventGetType(event);
-        ce.stopEvent();
-        onTriggerEvent(ce);
+        if (!disabled) {
+          FieldEvent ce = new FieldEvent(TriggerField.this);
+          ce.event = event;
+          ce.type = DOM.eventGetType(event);
+          ce.stopEvent();
+          onTriggerEvent(ce);
+        }
       }
     };
     DOM.sinkEvents(wrap.dom, Event.FOCUSEVENTS);
@@ -220,7 +222,7 @@ public class TriggerField<Data> extends TextField<Data> {
         tw = 17;
       }
       getInputEl().setWidth(this.adjustWidth("input", width - tw));
-      wrap.setWidth(width - (GXT.isIE ? 1 : 0), true);
+      wrap.setWidth(width, true);
     }
   }
 

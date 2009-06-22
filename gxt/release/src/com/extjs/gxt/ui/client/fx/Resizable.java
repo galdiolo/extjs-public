@@ -375,7 +375,7 @@ public class Resizable extends BaseObservable {
     proxyEl.setLeft(startBox.x).setTop(startBox.y);
     proxyEl.setSize(startBox.width, startBox.height);
     proxyEl.setVisible(true);
-    proxyEl.updateZIndex(0);
+    proxyEl.updateZIndex(5);
 
     DOM.addEventPreview(preview);
   }

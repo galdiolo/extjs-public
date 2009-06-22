@@ -193,7 +193,7 @@ public class ModalPanel extends BoxComponent {
     if (height > vp.height) {
       h = height + "px";
     }
-    el().setSize(w, h);
+    setSize(w, h);
   }
 
   @Override

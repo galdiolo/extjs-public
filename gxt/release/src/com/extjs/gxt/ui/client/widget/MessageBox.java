@@ -347,6 +347,7 @@ public class MessageBox {
     if (dialog == null) {
       dialog = new Dialog() {
 
+
         @Override
         protected void afterRender() {
           super.afterRender();
@@ -394,6 +395,30 @@ public class MessageBox {
           setIcon(icon);
         }
 
+        @Override
+        protected void doAttachChildren() {
+          super.doAttachChildren();
+          if (type == MessageBoxType.PROMPT) {
+            ComponentHelper.doAttach(textBox);
+          } else if (type == MessageBoxType.MULTIPROMPT) {
+            ComponentHelper.doAttach(textArea);
+          } else if (type == MessageBoxType.PROGRESSS || type == MessageBoxType.WAIT) {
+            ComponentHelper.doAttach(progressBar);
+          }
+        }
+
+        @Override
+        protected void doDetachChildren() {
+          super.doDetachChildren();
+          if (type == MessageBoxType.PROMPT) {
+            ComponentHelper.doDetach(textBox);
+          } else if (type == MessageBoxType.MULTIPROMPT) {
+            ComponentHelper.doDetach(textArea);
+          } else if (type == MessageBoxType.PROGRESSS || type == MessageBoxType.WAIT) {
+            ComponentHelper.doDetach(progressBar);
+          }
+        }
+        
         @Override
         protected void initTools() {
           setClosable(closable);

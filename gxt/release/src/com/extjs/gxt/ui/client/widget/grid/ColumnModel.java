@@ -263,7 +263,7 @@ public class ColumnModel extends BaseObservable {
    * @param colIndex the column index
    * @return true if editable
    */
-  public boolean isCellEditble(int colIndex) {
+  public boolean isCellEditable(int colIndex) {
     return config.get(colIndex).getEditor() != null;
   }
 

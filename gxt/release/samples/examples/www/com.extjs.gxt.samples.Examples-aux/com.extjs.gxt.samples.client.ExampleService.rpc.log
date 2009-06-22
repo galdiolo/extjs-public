@@ -1,4 +1,4 @@
-Reachable types computed on: Tue Feb 17 13:56:50 EST 2009
+Reachable types computed on: Mon Apr 27 15:22:11 EDT 2009
 com.extjs.gxt.samples.client.examples.model.BeanPost
    Serialization status
       Instantiable
@@ -22,8 +22,8 @@ com.extjs.gxt.samples.client.examples.model.Photo
       Instantiable
    Path
       'com.extjs.gxt.samples.client.examples.model.Photo' is reachable as a subtype of type 'class com.extjs.gxt.samples.client.examples.model.Photo'
-      'com.extjs.gxt.samples.client.examples.model.Photo' is reachable from type argument 0 of type 'java.util.Vector<E>'
-      'java.util.Vector<com.extjs.gxt.samples.client.examples.model.Photo>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.Photo>'
+      'com.extjs.gxt.samples.client.examples.model.Photo' is reachable from type argument 0 of type 'java.util.LinkedList<E>'
+      'java.util.LinkedList<com.extjs.gxt.samples.client.examples.model.Photo>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.client.examples.model.Photo>'
       Started from 'java.util.List<com.extjs.gxt.samples.client.examples.model.Photo>'
 
 com.extjs.gxt.samples.client.examples.model.Photo[]
@@ -57,8 +57,8 @@ com.extjs.gxt.samples.resources.client.model.Customer
       Instantiable
    Path
       'com.extjs.gxt.samples.resources.client.model.Customer' is reachable as a subtype of type 'class com.extjs.gxt.samples.resources.client.model.Customer'
-      'com.extjs.gxt.samples.resources.client.model.Customer' is reachable from type argument 0 of type 'java.util.Vector<E>'
-      'java.util.Vector<com.extjs.gxt.samples.resources.client.model.Customer>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.resources.client.model.Customer>'
+      'com.extjs.gxt.samples.resources.client.model.Customer' is reachable from type argument 0 of type 'java.util.LinkedList<E>'
+      'java.util.LinkedList<com.extjs.gxt.samples.resources.client.model.Customer>' is reachable as a subtype of type 'interface java.util.List<com.extjs.gxt.samples.resources.client.model.Customer>'
       Started from 'java.util.List<com.extjs.gxt.samples.resources.client.model.Customer>'
 
 com.extjs.gxt.samples.resources.client.model.Customer[]
@@ -675,33 +675,12 @@ java.util.ArrayList<T>
       'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.Post>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.Post>'
       Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.Post>'
 
-java.util.ArrayList<com.google.gwt.user.client.ui.MouseListener>
+java.util.ArrayList<com.google.gwt.user.client.ui.LoadListener>
    Serialization status
       Field serializable
    Path
-      'java.util.ArrayList<com.google.gwt.user.client.ui.MouseListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.MouseListenerCollection'
-      'com.google.gwt.user.client.ui.MouseListenerCollection' is reachable as a subtype of type 'interface java.util.List<Data>'
-      'java.util.List<Data>' is reachable from field 'list' of type 'com.extjs.gxt.ui.client.data.BaseListLoadResult<Data>'
-      'com.extjs.gxt.ui.client.data.BaseListLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-      'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-      Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-
-java.util.ArrayList<Data>
-   Serialization status
-      Instantiable
-   Path
-      'java.util.ArrayList<Data>' is reachable as a subtype of type 'interface java.util.List<Data>'
-      'java.util.List<Data>' is reachable from field 'list' of type 'com.extjs.gxt.ui.client.data.BaseListLoadResult<Data>'
-      'com.extjs.gxt.ui.client.data.BaseListLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-      'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-      Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-
-java.util.ArrayList<com.google.gwt.user.client.ui.MouseWheelListener>
-   Serialization status
-      Field serializable
-   Path
-      'java.util.ArrayList<com.google.gwt.user.client.ui.MouseWheelListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.MouseWheelListenerCollection'
-      'com.google.gwt.user.client.ui.MouseWheelListenerCollection' is reachable as a subtype of type 'interface java.util.List<Data>'
+      'java.util.ArrayList<com.google.gwt.user.client.ui.LoadListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.LoadListenerCollection'
+      'com.google.gwt.user.client.ui.LoadListenerCollection' is reachable as a subtype of type 'interface java.util.List<Data>'
       'java.util.List<Data>' is reachable from field 'list' of type 'com.extjs.gxt.ui.client.data.BaseListLoadResult<Data>'
       'com.extjs.gxt.ui.client.data.BaseListLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
       'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
@@ -718,6 +697,17 @@ java.util.ArrayList<com.google.gwt.user.client.ui.TreeListener>
       'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
       Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
 
+java.util.ArrayList<com.google.gwt.user.client.ui.MouseListener>
+   Serialization status
+      Field serializable
+   Path
+      'java.util.ArrayList<com.google.gwt.user.client.ui.MouseListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.MouseListenerCollection'
+      'com.google.gwt.user.client.ui.MouseListenerCollection' is reachable as a subtype of type 'interface java.util.List<Data>'
+      'java.util.List<Data>' is reachable from field 'list' of type 'com.extjs.gxt.ui.client.data.BaseListLoadResult<Data>'
+      'com.extjs.gxt.ui.client.data.BaseListLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+      'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+      Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+
 java.util.ArrayList<com.google.gwt.user.client.ui.ChangeListener>
    Serialization status
       Field serializable
@@ -729,78 +719,12 @@ java.util.ArrayList<com.google.gwt.user.client.ui.ChangeListener>
       'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
       Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
 
-java.util.ArrayList<com.google.gwt.user.client.ui.PopupListener>
+java.util.ArrayList<com.google.gwt.user.client.ui.MouseWheelListener>
    Serialization status
       Field serializable
    Path
-      'java.util.ArrayList<com.google.gwt.user.client.ui.PopupListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.PopupListenerCollection'
-      'com.google.gwt.user.client.ui.PopupListenerCollection' is reachable as a subtype of type 'interface java.util.List<Data>'
-      'java.util.List<Data>' is reachable from field 'list' of type 'com.extjs.gxt.ui.client.data.BaseListLoadResult<Data>'
-      'com.extjs.gxt.ui.client.data.BaseListLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-      'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-      Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-
-java.util.ArrayList<com.google.gwt.user.client.ui.ScrollListener>
-   Serialization status
-      Field serializable
-   Path
-      'java.util.ArrayList<com.google.gwt.user.client.ui.ScrollListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.ScrollListenerCollection'
-      'com.google.gwt.user.client.ui.ScrollListenerCollection' is reachable as a subtype of type 'interface java.util.List<Data>'
-      'java.util.List<Data>' is reachable from field 'list' of type 'com.extjs.gxt.ui.client.data.BaseListLoadResult<Data>'
-      'com.extjs.gxt.ui.client.data.BaseListLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-      'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-      Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-
-java.util.ArrayList<com.google.gwt.user.client.ui.LoadListener>
-   Serialization status
-      Field serializable
-   Path
-      'java.util.ArrayList<com.google.gwt.user.client.ui.LoadListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.LoadListenerCollection'
-      'com.google.gwt.user.client.ui.LoadListenerCollection' is reachable as a subtype of type 'interface java.util.List<Data>'
-      'java.util.List<Data>' is reachable from field 'list' of type 'com.extjs.gxt.ui.client.data.BaseListLoadResult<Data>'
-      'com.extjs.gxt.ui.client.data.BaseListLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-      'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-      Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-
-java.util.ArrayList<com.google.gwt.user.client.ui.KeyboardListener>
-   Serialization status
-      Field serializable
-   Path
-      'java.util.ArrayList<com.google.gwt.user.client.ui.KeyboardListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.KeyboardListenerCollection'
-      'com.google.gwt.user.client.ui.KeyboardListenerCollection' is reachable as a subtype of type 'interface java.util.List<Data>'
-      'java.util.List<Data>' is reachable from field 'list' of type 'com.extjs.gxt.ui.client.data.BaseListLoadResult<Data>'
-      'com.extjs.gxt.ui.client.data.BaseListLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-      'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-      Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-
-java.util.ArrayList<com.google.gwt.user.client.ui.FocusListener>
-   Serialization status
-      Field serializable
-   Path
-      'java.util.ArrayList<com.google.gwt.user.client.ui.FocusListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.FocusListenerCollection'
-      'com.google.gwt.user.client.ui.FocusListenerCollection' is reachable as a subtype of type 'interface java.util.List<Data>'
-      'java.util.List<Data>' is reachable from field 'list' of type 'com.extjs.gxt.ui.client.data.BaseListLoadResult<Data>'
-      'com.extjs.gxt.ui.client.data.BaseListLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-      'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-      Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-
-java.util.ArrayList<com.google.gwt.user.client.ui.TabListener>
-   Serialization status
-      Field serializable
-   Path
-      'java.util.ArrayList<com.google.gwt.user.client.ui.TabListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.TabListenerCollection'
-      'com.google.gwt.user.client.ui.TabListenerCollection' is reachable as a subtype of type 'interface java.util.List<Data>'
-      'java.util.List<Data>' is reachable from field 'list' of type 'com.extjs.gxt.ui.client.data.BaseListLoadResult<Data>'
-      'com.extjs.gxt.ui.client.data.BaseListLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-      'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-      Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
-
-java.util.ArrayList<com.google.gwt.user.client.ui.TableListener>
-   Serialization status
-      Field serializable
-   Path
-      'java.util.ArrayList<com.google.gwt.user.client.ui.TableListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.TableListenerCollection'
-      'com.google.gwt.user.client.ui.TableListenerCollection' is reachable as a subtype of type 'interface java.util.List<Data>'
+      'java.util.ArrayList<com.google.gwt.user.client.ui.MouseWheelListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.MouseWheelListenerCollection'
+      'com.google.gwt.user.client.ui.MouseWheelListenerCollection' is reachable as a subtype of type 'interface java.util.List<Data>'
       'java.util.List<Data>' is reachable from field 'list' of type 'com.extjs.gxt.ui.client.data.BaseListLoadResult<Data>'
       'com.extjs.gxt.ui.client.data.BaseListLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
       'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
@@ -823,6 +747,82 @@ java.util.ArrayList<com.google.gwt.user.client.ui.ClickListener>
    Path
       'java.util.ArrayList<com.google.gwt.user.client.ui.ClickListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.ClickListenerCollection'
       'com.google.gwt.user.client.ui.ClickListenerCollection' is reachable as a subtype of type 'interface java.util.List<Data>'
+      'java.util.List<Data>' is reachable from field 'list' of type 'com.extjs.gxt.ui.client.data.BaseListLoadResult<Data>'
+      'com.extjs.gxt.ui.client.data.BaseListLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+      'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+      Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+
+java.util.ArrayList<com.google.gwt.user.client.ui.ScrollListener>
+   Serialization status
+      Field serializable
+   Path
+      'java.util.ArrayList<com.google.gwt.user.client.ui.ScrollListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.ScrollListenerCollection'
+      'com.google.gwt.user.client.ui.ScrollListenerCollection' is reachable as a subtype of type 'interface java.util.List<Data>'
+      'java.util.List<Data>' is reachable from field 'list' of type 'com.extjs.gxt.ui.client.data.BaseListLoadResult<Data>'
+      'com.extjs.gxt.ui.client.data.BaseListLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+      'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+      Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+
+java.util.ArrayList<com.google.gwt.user.client.ui.TableListener>
+   Serialization status
+      Field serializable
+   Path
+      'java.util.ArrayList<com.google.gwt.user.client.ui.TableListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.TableListenerCollection'
+      'com.google.gwt.user.client.ui.TableListenerCollection' is reachable as a subtype of type 'interface java.util.List<Data>'
+      'java.util.List<Data>' is reachable from field 'list' of type 'com.extjs.gxt.ui.client.data.BaseListLoadResult<Data>'
+      'com.extjs.gxt.ui.client.data.BaseListLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+      'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+      Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+
+java.util.ArrayList<com.google.gwt.user.client.ui.TabListener>
+   Serialization status
+      Field serializable
+   Path
+      'java.util.ArrayList<com.google.gwt.user.client.ui.TabListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.TabListenerCollection'
+      'com.google.gwt.user.client.ui.TabListenerCollection' is reachable as a subtype of type 'interface java.util.List<Data>'
+      'java.util.List<Data>' is reachable from field 'list' of type 'com.extjs.gxt.ui.client.data.BaseListLoadResult<Data>'
+      'com.extjs.gxt.ui.client.data.BaseListLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+      'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+      Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+
+java.util.ArrayList<com.google.gwt.user.client.ui.FocusListener>
+   Serialization status
+      Field serializable
+   Path
+      'java.util.ArrayList<com.google.gwt.user.client.ui.FocusListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.FocusListenerCollection'
+      'com.google.gwt.user.client.ui.FocusListenerCollection' is reachable as a subtype of type 'interface java.util.List<Data>'
+      'java.util.List<Data>' is reachable from field 'list' of type 'com.extjs.gxt.ui.client.data.BaseListLoadResult<Data>'
+      'com.extjs.gxt.ui.client.data.BaseListLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+      'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+      Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+
+java.util.ArrayList<Data>
+   Serialization status
+      Instantiable
+   Path
+      'java.util.ArrayList<Data>' is reachable as a subtype of type 'interface java.util.List<Data>'
+      'java.util.List<Data>' is reachable from field 'list' of type 'com.extjs.gxt.ui.client.data.BaseListLoadResult<Data>'
+      'com.extjs.gxt.ui.client.data.BaseListLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+      'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+      Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+
+java.util.ArrayList<com.google.gwt.user.client.ui.PopupListener>
+   Serialization status
+      Field serializable
+   Path
+      'java.util.ArrayList<com.google.gwt.user.client.ui.PopupListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.PopupListenerCollection'
+      'com.google.gwt.user.client.ui.PopupListenerCollection' is reachable as a subtype of type 'interface java.util.List<Data>'
+      'java.util.List<Data>' is reachable from field 'list' of type 'com.extjs.gxt.ui.client.data.BaseListLoadResult<Data>'
+      'com.extjs.gxt.ui.client.data.BaseListLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+      'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+      Started from 'com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
+
+java.util.ArrayList<com.google.gwt.user.client.ui.KeyboardListener>
+   Serialization status
+      Field serializable
+   Path
+      'java.util.ArrayList<com.google.gwt.user.client.ui.KeyboardListener>' is reachable as a supertype of type 'class com.google.gwt.user.client.ui.KeyboardListenerCollection'
+      'com.google.gwt.user.client.ui.KeyboardListenerCollection' is reachable as a subtype of type 'interface java.util.List<Data>'
       'java.util.List<Data>' is reachable from field 'list' of type 'com.extjs.gxt.ui.client.data.BaseListLoadResult<Data>'
       'com.extjs.gxt.ui.client.data.BaseListLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a supertype of type 'class com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
       'com.extjs.gxt.ui.client.data.BasePagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>' is reachable as a subtype of type 'interface com.extjs.gxt.ui.client.data.PagingLoadResult<com.extjs.gxt.samples.client.examples.model.BeanPost>'
@@ -946,8 +946,7 @@ java.util.HashSet<java.lang.String>
    Serialization status
       Instantiable
    Path
-      'java.util.HashSet<java.lang.String>' is reachable as a supertype of type 'class java.util.LinkedHashSet<java.lang.String>'
-      'java.util.LinkedHashSet<java.lang.String>' is reachable as a subtype of type 'interface java.util.Set<java.lang.String>'
+      'java.util.HashSet<java.lang.String>' is reachable as a subtype of type 'interface java.util.Set<java.lang.String>'
       'java.util.Set<java.lang.String>' is reachable from field '_set' of type 'com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable as a subtype of type 'class com.extjs.gxt.ui.client.data.RpcMap'
       'com.extjs.gxt.ui.client.data.RpcMap' is reachable from field 'map' of type 'com.extjs.gxt.ui.client.data.BaseModelData'

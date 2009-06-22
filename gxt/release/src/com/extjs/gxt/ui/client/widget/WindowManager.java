@@ -166,9 +166,8 @@ public class WindowManager extends BaseObservable {
       }
       for (int i = 0; i < accessList.size(); i++) {
         Window w = (Window) accessList.get(i);
-        if(w.isModal())
-          XDOM.getTopZIndex();
-        w.updateZIndex(XDOM.getTopZIndex());
+        
+        w.updateZIndex(XDOM.getTopZIndex(10));
       }
       activateLast();
     }

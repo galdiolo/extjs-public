@@ -388,6 +388,15 @@ public class Draggable extends BaseObservable {
   public void setProxy(Element element) {
     proxyEl = new El(element);
   }
+  
+  /**
+   * Sets the proxy element.
+   * 
+   * @param element the proxy element
+   */
+  public void setProxy(El element) {
+    proxyEl = element;
+  }
 
   /**
    * Sets the style name used for proxy drags (defaults to 'my-drag-proxy').
@@ -483,9 +492,9 @@ public class Draggable extends BaseObservable {
     if (s != null && s.indexOf("x-nodrag") != -1) {
       return;
     }
-    
-    ce.preventDefault();
 
+    ce.preventDefault();
+    
     startBounds = dragWidget.el().getBounds();
 
     dragStartX = ce.getClientX();

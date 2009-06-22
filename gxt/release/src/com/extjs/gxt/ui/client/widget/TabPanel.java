@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.widget;
 import java.util.Stack;
 
 import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.Template;
@@ -518,7 +519,7 @@ public class TabPanel extends Container<TabItem> {
    * True to render each child tab item when it accessed, false to render all
    * (defaults to true). Setting to false would be useful when using forms as
    * validation would need to be applied to all children even if they had not
-   * bee selected.
+   * been selected.
    * 
    * @param deferredRender true to defer rendering
    */
@@ -815,7 +816,7 @@ public class TabPanel extends Container<TabItem> {
       style += " x-tab-with-icon";
     }
     Params p = new Params();
-    p.set("id", item.getId());
+    p.set("id", getId() + "__" + item.getId());
     p.set("text", item.getText());
     p.set("style", style);
     p.set("textStyle", item.getTextStyle());
@@ -849,10 +850,18 @@ public class TabPanel extends Container<TabItem> {
         bar.removeStyleName("x-tab-scrolling");
         scrollLeft.setVisible(false);
         scrollRight.setVisible(false);
+        if (GXT.isWebKit) {
+          stripWrap.setStyleAttribute("marginLeft", null);
+          stripWrap.setStyleAttribute("marginRight", null);
+        }
       }
     } else {
       if (!scrolling) {
         bar.addStyleName("x-tab-scrolling");
+        if (GXT.isWebKit) {
+          stripWrap.setStyleAttribute("marginLeft", "18px");
+          stripWrap.setStyleAttribute("marginRight", "18px");
+        }
       }
       tw -= stripWrap.getMargins("lr");
       stripWrap.setWidth(tw > 20 ? tw : 20);

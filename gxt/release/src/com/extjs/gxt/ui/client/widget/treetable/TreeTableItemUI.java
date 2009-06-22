@@ -97,7 +97,6 @@ public class TreeTableItemUI extends TreeItemUI {
 
     TableColumnModel cm = getTreeTableItem().getTreeTable().getColumnModel();
 
-    DOM.appendChild(item.getParentItem().getContainer(), item.getElement());
     DOM.setInnerHTML(item.getElement(), Markup.TREETABLE_ITEM);
     tableItemEl = item.el().firstChild().dom;
 

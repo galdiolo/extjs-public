@@ -139,6 +139,8 @@ public abstract class Container<T extends Component> extends BoxComponent {
   private List<T> items;
   private DelayedTask windowResizeTask;
 
+  private WindowResizeListener resizeListener;
+
   /**
    * Creates a new container.
    */
@@ -355,7 +357,7 @@ public abstract class Container<T extends Component> extends BoxComponent {
     if (!layoutExecuted) {
       layoutExecuted = true;
     }
-    
+
     // execute the layout
     layout.layout();
 
@@ -465,14 +467,25 @@ public abstract class Container<T extends Component> extends BoxComponent {
     if (!layoutExecuted && layoutOnAttach && !(getParent() instanceof Container)) {
       layout();
     }
+    if (resizeListener != null) {
+      Window.addWindowResizeListener(resizeListener);
+    }
+  }
+
+  @Override
+  protected void onDetach() {
+    super.onDetach();
+    if (resizeListener != null) {
+      Window.removeWindowResizeListener(resizeListener);
+    }
   }
 
   protected void onInsert(T item, int index) {
-    
+
   }
 
   protected void onRemove(T item) {
-    
+
   }
 
   @Override
@@ -484,11 +497,11 @@ public abstract class Container<T extends Component> extends BoxComponent {
           onWindowResize(Window.getClientWidth(), Window.getClientHeight());
         }
       });
-      Window.addWindowResizeListener(new WindowResizeListener() {
+      resizeListener = new WindowResizeListener() {
         public void onWindowResized(int width, int height) {
           windowResizeTask.delay(400);
         }
-      });
+      };
     }
   }
 
@@ -613,7 +626,7 @@ public abstract class Container<T extends Component> extends BoxComponent {
   }
 
   private native void setParent(Widget parent, Widget child) /*-{
-       child.@com.google.gwt.user.client.ui.Widget::parent = parent;
-     }-*/;
+         child.@com.google.gwt.user.client.ui.Widget::parent = parent;
+       }-*/;
 
 }

@@ -44,6 +44,7 @@ public class AppEvent<Data> extends BaseEvent {
    * @param type the event type
    */
   public AppEvent(int type) {
+    super(null);
     this.type = type;
   }
 
@@ -54,6 +55,7 @@ public class AppEvent<Data> extends BaseEvent {
    * @param data the data
    */
   public AppEvent(int type, Data data) {
+    super(null);
     this.type = type;
     this.data = data;
   }

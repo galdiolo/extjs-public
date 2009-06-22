@@ -59,7 +59,7 @@ Ext.EventManager.on(window, 'load', function(){
             desc: 'A mail application with a preview pane that retrieves data using the Ext GWT data loading API.'
         },{
             text: 'Web Desktop',
-            url: 'http://extjs.com/deploy/gxt-1.2.3/samples/desktop/www/com.extjs.gxt.samples.desktop.DesktopApp/',
+            url: 'http://extjs.com/deploy/gxt-1.2.4/samples/desktop/www/com.extjs.gxt.samples.desktop.DesktopApp/',
             icon: 'desktop.gif',
             desc: 'Demonstrates how one could build a desktop in the browser using Ext components including a module plugin system.'
         }]
@@ -85,6 +85,11 @@ Ext.EventManager.on(window, 'load', function(){
             url: 'grid/paging.html',
             icon: 'paging.gif',
             desc: 'A grid with server side paging, using GWT RPC.'
+        },{
+            text: 'Local Paging',
+            url: 'grid/localpaging.html',
+            icon: 'localpaging.gif',
+            desc: 'A grid which pages a clients side collections of models.'
         },{
             text: 'Grouping',
             url: 'grid/grouping.html',
@@ -388,11 +393,6 @@ Ext.EventManager.on(window, 'load', function(){
     tpl.overwrite('sample-menu', catalog);
 
     Ext.select('#sample-spacer').remove();
-
-    setTimeout(function(){
-        Ext.get('loading').remove();
-        Ext.get('loading-mask').fadeOut({remove:true});
-    }, 250);
 
     if(window.console && window.console.firebug){
         Ext.Msg.alert('Warning', 'Firebug is known to cause performance issues with Ext JS.');

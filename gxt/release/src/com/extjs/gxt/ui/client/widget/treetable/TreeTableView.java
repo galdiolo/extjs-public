@@ -112,7 +112,7 @@ public class TreeTableView {
     }
 
     int columnModelWidth = cm.getTotalWidth();
-    dataEl.setWidth(Math.min(width, columnModelWidth));
+    dataEl.setWidth(columnModelWidth);
     treeTable.getTableHeader().setWidth(columnModelWidth);
 
     bodyHeight -= treeTable.el().getBorderWidth("tb");

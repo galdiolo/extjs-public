@@ -726,7 +726,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
   protected void onSelectChange(M model, boolean select) {
     if (rendered && all != null) {
       int index = store.indexOf(model);
-      if (index != -1) {
+      if (index != -1 && index < all.getCount()) {
         if (select) {
           fly(all.getElement(index)).addStyleName(selectStyle);
         } else {
@@ -742,7 +742,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
     List list = Util.createList(model);
     Element node = bufferRender(list)[0];
     all.replaceElement(original, node);
-    if(fly(original).hasStyleName(selectStyle)) {
+    if (fly(original).hasStyleName(selectStyle)) {
       fly(node).addStyleName(selectStyle);
     }
     el().insertChild(node, index);

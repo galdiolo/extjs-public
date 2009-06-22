@@ -713,7 +713,7 @@ public class ContentPanel extends LayoutContainer {
    */
   public Frame setUrl(String url) {
     Frame f = new Frame(url);
-    fly(f.getElement()).setStyleAttribute("frameBorder", "0");
+    f.getElement().setPropertyInt("frameBorder", 0);
     f.setSize("100%", "100%");
     removeAll();
     add(new WidgetComponent(f));

@@ -133,6 +133,11 @@ public class CheckBox extends Field<Boolean> {
       input.setValue(valueAttribute);
     }
   }
+  
+  @Override
+  protected El getFocusEl() {
+    return input;
+  }
 
   @Override
   protected El getInputEl() {

@@ -12,7 +12,6 @@ import java.util.List;
 
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
-import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.store.Store;
 import com.extjs.gxt.ui.client.store.StoreFilter;
 import com.extjs.gxt.ui.client.widget.form.TriggerField;
@@ -79,7 +78,7 @@ public abstract class StoreFilterField<M extends ModelData> extends TriggerField
    * 
    * @param store the store to be unbound
    */
-  public void unbind(ListStore store) {
+  public void unbind(Store store) {
     store.removeFilter(filter);
     stores.remove(store);
   }

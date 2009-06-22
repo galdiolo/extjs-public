@@ -54,6 +54,15 @@ import com.google.gwt.user.client.ui.RootPanel;
  * </ul>
  * </dd>
  * 
+ * <dd><b>CancelEdit</b> : EditorEvent(editor, value, startValue)<br>
+ * <div>Fires after editing is canceled</div>
+ * <ul>
+ * <li>editor : this</li>
+ * <li>value : the current field value</li>
+ * <li>startValue : the original field value</li>
+ * </ul>
+ * </dd>
+ * 
  * <dd><b>Complete</b> : EditorEvent(editor, value, startValue)<br>
  * <div>Fires after editing is complete and any changed value has been written
  * to the underlying field.</div>
@@ -397,10 +406,16 @@ public class Editor extends BoxComponent {
 
   protected void cancelEdit(boolean remainVisible) {
     if (editing) {
-      setValue(startValue);
+      Object v = field.getValue();
+      setValue(preProcessValue(startValue));
       if (!remainVisible) {
         hide();
       }
+      
+      EditorEvent e = new EditorEvent(this);
+      e.value = v;
+      e.startValue = startValue;
+      fireEvent(Events.CancelEdit, e);
     }
   }
 
@@ -491,6 +506,7 @@ public class Editor extends BoxComponent {
 
     field.setMessageTarget("tooltip");
 
+    field.setInEditor(true);
     field.render(getElement());
 
     if (GXT.isGecko) {

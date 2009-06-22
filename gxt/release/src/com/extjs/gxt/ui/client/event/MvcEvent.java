@@ -41,6 +41,7 @@ public class MvcEvent extends BaseEvent {
    * @param ae the app event
    */
   public MvcEvent(Dispatcher d, AppEvent ae) {
+    super(d);
     this.dispatcher = d;
     this.appEvent = ae;
   }

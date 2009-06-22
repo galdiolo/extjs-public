@@ -165,6 +165,11 @@ public class ProgressBar extends BoxComponent {
    * @return this
    */
   public ProgressBar updateProgress(double value, String text) {
+    if(value > 1) {
+      value = 1;
+    } else if(value < 0) {
+      value = 0;
+    }
     this.value = value;
     if (text != null) {
       updateText(text);
@@ -174,8 +179,10 @@ public class ProgressBar extends BoxComponent {
     }
     double w = Math.floor(value * el().firstChild().getWidth());
     progressBar.setWidth((int) w);
-    if (textTopElem != null) {
+    if (textTopElem != null && w != 0) {
       textTopElem.removeStyleName("x-hidden").setWidth((int) w, true);
+    } else if (textTopElem != null && w == 0){
+      textTopElem.addStyleName("x-hidden");
     }
     fireEvent(Events.Update, new ComponentEvent(this));
     return this;

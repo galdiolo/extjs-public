@@ -81,12 +81,6 @@ public class Shadow extends BoxComponent {
     sync(fly(target).getBounds());
   }
 
-  @Override
-  protected void onHide() {
-    super.onHide();
-    el().removeFromParent();
-  }
-
   public void show(Widget widget) {
     show(widget.getElement());
   }
@@ -114,6 +108,12 @@ public class Shadow extends BoxComponent {
 
   public void sync(Rectangle rect) {
     sync(rect.x, rect.y, rect.width, rect.height);
+  }
+
+  @Override
+  protected void onHide() {
+    super.onHide();
+    el().removeFromParent();
   }
 
   protected void onRender(Element parent, int pos) {

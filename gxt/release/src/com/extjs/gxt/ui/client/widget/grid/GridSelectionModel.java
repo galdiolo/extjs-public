@@ -155,7 +155,7 @@ public class GridSelectionModel<M extends ModelData> extends
   }
 
   protected void handleMouseDown(GridEvent e) {
-    if (isLocked() || e.isRightClick() || editmode) {
+    if (isLocked() || e.isRightClick()) {
       return;
     }
 
@@ -228,7 +228,7 @@ public class GridSelectionModel<M extends ModelData> extends
         break;
       case KeyboardListener.KEY_ESCAPE:
         e.stopEvent();
-        editGrid.stopEditing();
+        editGrid.stopEditing(true);
         break;
     }
 
@@ -287,7 +287,7 @@ public class GridSelectionModel<M extends ModelData> extends
   boolean isSelectable(int row, int cell, boolean acceptsNav) {
     if (acceptsNav) {
       return !grid.getColumnModel().isHidden(cell)
-          && grid.getColumnModel().isCellEditble(cell);
+          && grid.getColumnModel().isCellEditable(cell);
     } else {
       return !grid.getColumnModel().isHidden(cell);
     }

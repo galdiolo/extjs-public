@@ -155,7 +155,7 @@ public class DesktopApp implements EntryPoint {
 
   private Window createAccordionWindow() {
     final Window w = new Window();
-    w.setCloseAction(CloseAction.CLOSE);
+    w.setCloseAction(CloseAction.HIDE);
     w.setMinimizable(true);
     w.setMaximizable(true);
     w.setIconStyle("accordion");
@@ -229,7 +229,7 @@ public class DesktopApp implements EntryPoint {
 
   private Window createGridWindow() {
     Window w = new Window();
-    w.setCloseAction(CloseAction.CLOSE);
+    w.setCloseAction(CloseAction.HIDE);
     w.setIconStyle("icon-grid");
     w.setMinimizable(true);
     w.setMaximizable(true);
@@ -278,7 +278,7 @@ public class DesktopApp implements EntryPoint {
 
   private Window createTabWindow() {
     Window w = new Window();
-    w.setCloseAction(CloseAction.CLOSE);
+    w.setCloseAction(CloseAction.HIDE);
     w.setMinimizable(true);
     w.setMaximizable(true);
     w.setSize(740, 480);

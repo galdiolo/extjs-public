@@ -48,10 +48,6 @@ public class DomEvent extends BaseEvent {
 
   private El el;
 
-  protected DomEvent() {
-
-  }
-
   public DomEvent(Object source) {
     super(source);
   }
@@ -62,6 +58,7 @@ public class DomEvent extends BaseEvent {
    * @param event the dom event
    */
   public DomEvent(Event event) {
+    super(event);
     this.event = event;
   }
 

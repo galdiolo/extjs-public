@@ -39,7 +39,7 @@ public class KeyNav<E extends ComponentEvent> extends BaseObservable implements 
     // FF yes yes
     // Safari no yes
     // Opera yes yes
-    if (GXT.isIE || GXT.isSafari || GXT.isGecko) {
+    if (GXT.isIE || GXT.isWebKit || GXT.isGecko) {
       keyEvent = Event.ONKEYDOWN;
     } else {
       keyEvent = Event.ONKEYPRESS;

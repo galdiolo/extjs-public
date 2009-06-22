@@ -45,6 +45,7 @@ public class ColumnLayout extends Layout {
   protected boolean adjustForScroll = false;
 
   public ColumnLayout() {
+    monitorResize = true;
     setExtraStyle("x-column");
   }
 

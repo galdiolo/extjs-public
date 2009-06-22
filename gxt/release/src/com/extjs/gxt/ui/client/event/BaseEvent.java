@@ -34,10 +34,6 @@ public class BaseEvent {
    */
   public boolean doit = true;
 
-  public BaseEvent() {
-
-  }
-
   /**
    * Creates a new base event instance.
    * 

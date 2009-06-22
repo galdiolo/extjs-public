@@ -29,6 +29,7 @@ public class CheckChangedEvent<M extends ModelData> extends BaseEvent {
    * @param selection the selection
    */
   public CheckChangedEvent(CheckProvider provider, M selection) {
+    super(provider);
     this.provider = provider;
     this.selection = Util.createList(selection);
   }
@@ -40,6 +41,7 @@ public class CheckChangedEvent<M extends ModelData> extends BaseEvent {
    * @param selection the selection
    */
   public CheckChangedEvent(CheckProvider provider, List<M> selection) {
+    super(provider);
     this.provider = provider;
     this.selection = selection;
   }

@@ -156,6 +156,8 @@ public abstract class Field<D> extends BoxComponent {
   private String labelSeparator;
   private String inputStyle;
   private boolean hideLabel;
+  
+  private boolean inEditor;
 
   /**
    * Creates a new field.
@@ -425,6 +427,15 @@ public abstract class Field<D> extends BoxComponent {
   public boolean isHideLabel() {
     return hideLabel;
   }
+  
+  /**
+   * Returns true if the field is inside an editor.
+   * 
+   * @return true if inside an editor
+   */
+  public boolean isInEditor() {
+    return inEditor;
+  }
 
   /**
    * Returns the read only state.
@@ -508,7 +519,16 @@ public abstract class Field<D> extends BoxComponent {
         onFocus(ce);
         break;
       case Event.ONBLUR:
-        onBlur(ce);
+        if (inEditor && GXT.isWindows && GXT.isGecko) {
+          final ComponentEvent e = ce;
+          DeferredCommand.addCommand(new Command() {
+            public void execute() {
+              onBlur(e);
+            }
+          });
+        } else {
+          onBlur(ce);
+        }
         break;
       case Event.ONCLICK:
         // in some cases, focus event is not fired when event preview was
@@ -521,13 +541,13 @@ public abstract class Field<D> extends BoxComponent {
         break;
       case Event.ONKEYDOWN:
         onKeyDown(fe);
-        if (GXT.isIE || GXT.isSafari) {
+        if (GXT.isIE || GXT.isWebKit) {
           fireKey(fe);
         }
         break;
       case Event.ONKEYPRESS:
         onKeyPress(fe);
-        if (!GXT.isIE && !GXT.isSafari) {
+        if (!GXT.isIE && !GXT.isWebKit) {
           fireKey(fe);
         }
         break;
@@ -616,6 +636,15 @@ public abstract class Field<D> extends BoxComponent {
    */
   public void setHideLabel(boolean hideLabel) {
     this.hideLabel = hideLabel;
+  }
+  
+  /**
+   * True to mark this field being in an editor.
+   * 
+   * @param inEditor true mark this field being in an editor
+   */
+  public void setInEditor(boolean inEditor) {
+    this.inEditor = inEditor;
   }
 
   /**

@@ -40,6 +40,7 @@ public class LoadEvent<C, D> extends BaseEvent {
    * @param loader the data loader
    */
   public LoadEvent(Loader loader) {
+    super(loader);
     this.loader = loader;
   }
 
@@ -50,7 +51,7 @@ public class LoadEvent<C, D> extends BaseEvent {
    * @param config the config object
    */
   public LoadEvent(Loader loader, C config) {
-    this.loader = loader;
+    this(loader);
     this.config = config;
   }
 
@@ -62,8 +63,7 @@ public class LoadEvent<C, D> extends BaseEvent {
    * @param data the data
    */
   public LoadEvent(Loader loader, C config, D data) {
-    this.loader = loader;
-    this.config = config;
+    this(loader, config);
     this.data = data;
   }
 
@@ -75,8 +75,7 @@ public class LoadEvent<C, D> extends BaseEvent {
    * @param t the exception
    */
   public LoadEvent(Loader loader, C config, Throwable t) {
-    this.loader = loader;
-    this.config = config;
+    this(loader, config);
     this.exception = t;
   }
 

@@ -30,6 +30,7 @@ import com.extjs.gxt.samples.client.examples.grid.EditableGridExample;
 import com.extjs.gxt.samples.client.examples.grid.GridExample;
 import com.extjs.gxt.samples.client.examples.grid.GridPluginsExample;
 import com.extjs.gxt.samples.client.examples.grid.GroupingGridExample;
+import com.extjs.gxt.samples.client.examples.grid.MemoryPagingGridExample;
 import com.extjs.gxt.samples.client.examples.grid.PagingBeanModelGridExample;
 import com.extjs.gxt.samples.client.examples.grid.PagingGridExample;
 import com.extjs.gxt.samples.client.examples.grid.TotalsGridExample;
@@ -80,6 +81,7 @@ public class ExamplesModel extends BaseTreeModel {
     grids.addEntry("Editable Grid", new EditableGridExample());
     grids.addEntry("Xml Grid", new XmlGridExample());
     grids.addEntry("Paging", new PagingGridExample());
+    grids.addEntry("Local Paging", new MemoryPagingGridExample());
     grids.addEntry("Grouping", new GroupingGridExample());
     grids.addEntry("Live Group Summary", new TotalsGridExample());
     grids.addEntry("BeanModel Grid", new BeanModelGridExample());

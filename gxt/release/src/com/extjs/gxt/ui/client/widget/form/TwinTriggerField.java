@@ -109,22 +109,24 @@ public class TwinTriggerField extends TriggerField {
     if (isHideTrigger()) {
       span.setVisible(false);
     }
-    
+
     super.onRender(target, index);
 
     triggerListener = new EventListener() {
       public void onBrowserEvent(Event event) {
-        FieldEvent ce = new FieldEvent(TwinTriggerField.this);
-        ce.event = event;
-        ce.type = DOM.eventGetType(event);
-        ce.stopEvent();
-        onTriggerEvent(ce);
+        if (!disabled) {
+          FieldEvent ce = new FieldEvent(TwinTriggerField.this);
+          ce.event = event;
+          ce.type = DOM.eventGetType(event);
+          ce.stopEvent();
+          onTriggerEvent(ce);
+        }
       }
     };
     DOM.sinkEvents(wrap.dom, Event.FOCUSEVENTS);
     DOM.sinkEvents(trigger.dom, Event.ONCLICK | Event.MOUSEEVENTS);
     DOM.sinkEvents(twinTrigger.dom, Event.ONCLICK | Event.MOUSEEVENTS);
-    
+
     if (width == null) {
       setWidth(150);
     }
@@ -134,7 +136,8 @@ public class TwinTriggerField extends TriggerField {
   protected void onResize(int width, int height) {
     if (width != Style.DEFAULT) {
       int tw = span.getWidth();
-      if (!this.isHideTrigger() && tw == 0) { // need to look into why 0 is returned
+      if (!this.isHideTrigger() && tw == 0) { // need to look into why 0 is
+                                              // returned
         tw = 34;
       }
       getInputEl().setWidth(this.adjustWidth("input", width - tw));
@@ -160,7 +163,7 @@ public class TwinTriggerField extends TriggerField {
     int type = ce.getEventType();
     switch (type) {
       case Event.ONMOUSEOVER:
-       twinTrigger.addStyleName("x-form-trigger-over");
+        twinTrigger.addStyleName("x-form-trigger-over");
         break;
       case Event.ONMOUSEOUT:
         twinTrigger.removeStyleName("x-form-trigger-over");

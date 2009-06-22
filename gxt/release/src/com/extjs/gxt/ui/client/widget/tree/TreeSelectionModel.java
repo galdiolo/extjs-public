@@ -30,6 +30,9 @@ public class TreeSelectionModel extends AbstractSelectionModel<Tree, TreeItem> {
 
   @Override
   protected void onMouseDown(ContainerEvent ce) {
+    if (ce.isRightClick()) {
+      return;
+    }
     TreeItem item = (TreeItem) ce.item;
     if (item != null) {
       if (!ce.within(item.getUI().getJointEl()) && !ce.within(item.getUI().getCheckEl())) {

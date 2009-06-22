@@ -11,7 +11,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.event.BaseObservable;
+import com.extjs.gxt.ui.client.event.BindingEvent;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
@@ -19,9 +22,37 @@ import com.google.gwt.user.client.DeferredCommand;
 /**
  * Aggregates one to many field bindings.
  * 
+ * <dl>
+ * <dt>Events:</dt>
+ * 
+ * <dd><b>BeforeBind</b> : BindingEvent(source, model)<br>
+ * <div>Fires before binding.</div>
+ * <ul>
+ * <li>source : this</li>
+ * <li>model : the model to bind</li>
+ * </ul>
+ * </dd>
+ * 
+ * <dd><b>Bind</b> : BindingEvent(source, model)<br>
+ * <div>Fires after successful binding.</div>
+ * <ul>
+ * <li>source : this</li>
+ * <li>model : the binded model</li>
+ * </ul>
+ * </dd>
+ * 
+ * <dd><b>UnBind</b> : BindingEvent(source, model)<br>
+ * <div>Fires after successful unbinding.</div>
+ * <ul>
+ * <li>source : this</li>
+ * <li>model : the unbound model</li>
+ * </ul>
+ * </dd>
+ * </dl>
+ * 
  * @see FieldBinding
  */
-public class Bindings {
+public class Bindings extends BaseObservable {
 
   protected ModelData model;
   protected Map<Field, FieldBinding> bindings;
@@ -48,14 +79,18 @@ public class Bindings {
    * @param model the model
    */
   public void bind(final ModelData model) {
-    DeferredCommand.addCommand(new Command( ) {
+    DeferredCommand.addCommand(new Command() {
       public void execute() {
-        if (Bindings.this.model != null) {
-          unbind();
-        }
-        Bindings.this.model = model;
-        for (FieldBinding binding : bindings.values()) {
-          binding.bind(model);
+        BindingEvent e = new BindingEvent(Bindings.this, model);
+        if (fireEvent(Events.BeforeBind, e)) {
+          if (Bindings.this.model != null) {
+            unbind();
+          }
+          Bindings.this.model = model;
+          for (FieldBinding binding : bindings.values()) {
+            binding.bind(model);
+          }
+          fireEvent(Events.Bind, e);
         }
       }
     });
@@ -106,6 +141,7 @@ public class Bindings {
       for (FieldBinding binding : bindings.values()) {
         binding.unbind();
       }
+      fireEvent(Events.UnBind, new BindingEvent(this, model));
       model = null;
     }
   }

@@ -136,7 +136,7 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
 
   @Override
   public void hide() {
-    clearTimer("dismiss");
+    clearTimers();
     lastActive = new Date();
     super.hide();
   }
@@ -366,7 +366,7 @@ public class ToolTip extends Tip implements Listener<ComponentEvent> {
     target.addListener(Event.ONMOUSEMOVE, this);
     target.addListener(Events.Hide, this);
     target.addListener(Events.Detach, this);
-    target.sinkEvents(Event.MOUSEEVENTS);
+    target.sinkEvents(Event.ONMOUSEOVER | Event.ONMOUSEOUT | Event.ONMOUSEMOVE);
   }
 
   private void updateConfig(ToolTipConfig config) {

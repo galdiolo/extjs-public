@@ -254,7 +254,7 @@ public class PagingToolBar extends Component implements Listener {
   private boolean reuseConfig = true;
   private LoadEvent<PagingLoadConfig, PagingLoadResult> renderEvent;
   private List<ToolItem> items = new ArrayList<ToolItem>();
-
+  private boolean savedEnableState = true;
   /**
    * Creates a new paging tool bar with the given page size.
    * 
@@ -354,14 +354,15 @@ public class PagingToolBar extends Component implements Listener {
   public void handleEvent(BaseEvent be) {
     switch (be.type) {
       case Loader.BeforeLoad:
-        disable();
+        savedEnableState = isEnabled();
+        setEnabled(false);
         break;
       case Loader.Load:
+        setEnabled(savedEnableState);
         onLoad((LoadEvent) be);
-        enable();
         break;
       case Loader.LoadException:
-        enable();
+        setEnabled(savedEnableState);
         break;
     }
   }
@@ -411,7 +412,7 @@ public class PagingToolBar extends Component implements Listener {
    * Refreshes the data using the current configuration.
    */
   public void refresh() {
-    loader.load(start, pageSize);
+    doLoadRequest(start, pageSize);
   }
 
   /**
@@ -435,7 +436,7 @@ public class PagingToolBar extends Component implements Listener {
       return;
     }
     if (page != activePage && page > 0 && page <= pages) {
-      loader.load(--page * pageSize, pageSize);
+      doLoadRequest(--page * pageSize, pageSize);
     } else {
       pageText.setText(String.valueOf((int) activePage));
     }
@@ -488,6 +489,20 @@ public class PagingToolBar extends Component implements Listener {
     ComponentHelper.doDetach(toolBar);
   }
 
+  @Override
+  protected void onDisable() {
+    if (toolBar != null) {
+      toolBar.disable();
+    }
+  }
+
+  @Override
+  protected void onEnable() {
+    if (toolBar != null) {
+      toolBar.enable();
+    }
+  }
+
   protected void doLoadRequest(int offset, int limit) {
     if (reuseConfig && config != null) {
       config.setOffset(offset);
@@ -529,7 +544,8 @@ public class PagingToolBar extends Component implements Listener {
       String[] params = new String[] {"" + (start + 1), "" + temp, "" + totalLength};
       display = Format.substitute(msgs.getDisplayMsg(), (Object[]) params);
     } else {
-      display = GXT.MESSAGES.pagingToolBar_displayMsg(start + 1, (int) temp, (int) totalLength);
+      display = GXT.MESSAGES.pagingToolBar_displayMsg(start + 1, (int) temp,
+          (int) totalLength);
     }
 
     String msg = display;
@@ -555,16 +571,21 @@ public class PagingToolBar extends Component implements Listener {
 
     msgs.setRefreshText(msgs.getRefreshText() == null ? msg.pagingToolBar_refreshText()
         : msgs.getRefreshText());
-    msgs.setNextText(msgs.getNextText() == null ? msg.pagingToolBar_nextText() : msgs.getNextText());
-    msgs.setPrevText(msgs.getPrevText() == null ? msg.pagingToolBar_prevText() : msgs.getPrevText());
+    msgs.setNextText(msgs.getNextText() == null ? msg.pagingToolBar_nextText()
+        : msgs.getNextText());
+    msgs.setPrevText(msgs.getPrevText() == null ? msg.pagingToolBar_prevText()
+        : msgs.getPrevText());
     msgs.setFirstText(msgs.getFirstText() == null ? msg.pagingToolBar_firstText()
         : msgs.getFirstText());
-    msgs.setLastText(msgs.getLastText() == null ? msg.pagingToolBar_lastText() : msgs.getLastText());
-    msgs.setBeforePageText(msgs.getBeforePageText() == null ? msg.pagingToolBar_beforePageText()
-        : msgs.getBeforePageText());
-    msgs.setEmptyMsg(msgs.getEmptyMsg() == null ? msg.pagingToolBar_emptyMsg() : msgs.getEmptyMsg());
+    msgs.setLastText(msgs.getLastText() == null ? msg.pagingToolBar_lastText()
+        : msgs.getLastText());
+    msgs.setBeforePageText(msgs.getBeforePageText() == null
+        ? msg.pagingToolBar_beforePageText() : msgs.getBeforePageText());
+    msgs.setEmptyMsg(msgs.getEmptyMsg() == null ? msg.pagingToolBar_emptyMsg()
+        : msgs.getEmptyMsg());
 
     toolBar = new ToolBar();
+    toolBar.setEnabled(isEnabled());
 
     first = new TextToolItem();
     first.setIconStyle("x-tbar-page-first");
@@ -616,7 +637,7 @@ public class PagingToolBar extends Component implements Listener {
     afterText = new Label();
     afterText.setStyleName("my-paging-text");
     pageText = new TextBox();
-    if (!GXT.isGecko && !GXT.isSafari) {
+    if (!GXT.isGecko && !GXT.isWebKit) {
       pageText.addKeyboardListener(new KeyboardListenerAdapter() {
         public void onKeyDown(Widget sender, char keyCode, int modifiers) {
           if (keyCode == KeyboardListener.KEY_ENTER) {

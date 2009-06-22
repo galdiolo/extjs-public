@@ -284,11 +284,11 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
     for (T item : items.getItems(container)) {
       if (isSelected(item)) {
         change = true;
-        onSelectChange(item, false);
         selected.remove(item);
         if (selectedItem == item) {
           selectedItem = null;
         }
+        onSelectChange(item, false);
       }
     }
     if (change) {
@@ -334,9 +334,9 @@ public abstract class AbstractSelectionModel<C extends Container<T>, T extends C
           if (!keepExisting) {
             deselectAll(true);
           }
-          onSelectChange(item, true);
           selected.add(item);
           selectedItem = item;
+          onSelectChange(item, true);
           if (!supressEvent && hasSelectionChanged(previous, selected)) {
             fireSelectionChanged();
           }

@@ -200,6 +200,10 @@ public class FileUploadField extends TextField<String> {
     input.addStyleName(fieldStyle);
     input.addStyleName("x-form-file-text");
     
+    if (GXT.isIE && target.getTagName().equals("TD")) {
+      input.setStyleAttribute("position", "static");
+    }
+    
     file = new El((Element) Document.get().createFileInputElement().cast());
     file.setElementAttribute("size", 1);
     file.addStyleName("x-form-file");

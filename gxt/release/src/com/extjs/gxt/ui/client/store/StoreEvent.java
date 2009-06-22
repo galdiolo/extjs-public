@@ -56,6 +56,7 @@ public class StoreEvent<M extends ModelData> extends BaseEvent {
    * @param store the store event
    */
   public StoreEvent(Store store) {
+    super(store);
     this.store = store;
   }
 

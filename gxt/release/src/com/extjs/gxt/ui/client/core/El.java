@@ -347,8 +347,8 @@ public class El {
     int w = getWidth();
     int h = getHeight();
 
-    int left = (width / 2) - (w / 2) + container.getScrollTop();
-    int top = (height / 2) - (h / 2) + container.getScrollLeft();
+    int left = (width / 2) - (w / 2) + container.getScrollLeft();
+    int top = (height / 2) - (h / 2) + container.getScrollTop();
 
     if (constrainViewport) {
       left = Math.max(5, left);
@@ -381,8 +381,8 @@ public class El {
     int w = getWidth();
     int h = getHeight();
 
-    int left = (width / 2) - (w / 2) + container.getScrollTop();
-    int top = (height / 2) - (h / 2) + container.getScrollLeft();
+    int left = (width / 2) - (w / 2) + container.getScrollLeft();
+    int top = (height / 2) - (h / 2) + container.getScrollTop();
 
     setLeftTop(left, top);
     sync(true);
@@ -1766,10 +1766,9 @@ public class El {
    * @return this
    */
   public El scrollTo(String side, int value) {
-    if ("left".equalsIgnoreCase("left")) {
+    if (side.equalsIgnoreCase("left")) {
       setScrollLeft(value);
-    }
-    if ("right".equalsIgnoreCase("top")) {
+    } else if (side.equalsIgnoreCase("top")) {
       setScrollTop(value);
     }
     return this;

@@ -283,15 +283,16 @@ public class ListStore<M extends ModelData> extends Store<M> {
   public void remove(M model) {
     int index = indexOf(model);
     if (all.remove(model)) {
+      modified.remove(getRecord(model));
+      if (isFiltered()) {
+        snapshot.remove(model);
+      }
       unregisterModel(model);
       StoreEvent se = createStoreEvent();
       se.model = model;
       se.index = index;
       fireEvent(Remove, se);
     }
-    modified.remove(getRecord(model));
-    if(isFiltered())
-      snapshot.remove(model);
   }
 
   /**
@@ -396,20 +397,22 @@ public class ListStore<M extends ModelData> extends Store<M> {
   }
 
   protected void insert(List<M> items, int index, boolean supressEvent) {
-    if(items.size() > 0) {
+    if (items.size() > 0) {
       if (storeSorter != null) {
-        boolean defer =  index == 0 || getCount() == 0;
+        boolean defer = index == 0 && getCount() == 0;
         for (M m : items) {
           if (isFiltered()) {
             snapshot.add(m);
+            if(!isFiltered(m, filterProperty)) {
+              all.add(m);
+            }
           } else {
             all.add(m);
           }
-          if (isFiltered() && !isFiltered(m, filterProperty)) all.add(m);
           applySort(true);
           int idx = indexOf(m);
           registerModel(m);
-          if (!defer &&  !supressEvent) {
+          if (!defer && !supressEvent) {
             StoreEvent evt = createStoreEvent();
             evt.models = Util.createList(m);
             evt.index = idx;
@@ -417,10 +420,10 @@ public class ListStore<M extends ModelData> extends Store<M> {
           }
         }
         if (defer && !supressEvent) {
-            StoreEvent evt = createStoreEvent();
-            evt.models = getModels();
-            evt.index = index;
-            fireEvent(Add, evt);
+          StoreEvent evt = createStoreEvent();
+          evt.models = getModels();
+          evt.index = index;
+          fireEvent(Add, evt);
         }
       } else {
         if (!isFiltered()) {
@@ -443,8 +446,8 @@ public class ListStore<M extends ModelData> extends Store<M> {
   }
 
   protected void onBeforeLoad(LoadEvent le) {
-    if(!fireEvent(BeforeDataChanged, createStoreEvent())){
-      le.doit=false;
+    if (!fireEvent(BeforeDataChanged, createStoreEvent())) {
+      le.doit = false;
     }
   }
 
@@ -487,7 +490,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
   }
 
   protected void onLoadException(LoadEvent le) {
-   
+
   }
 
   protected void sortData(final String field, SortDir direction) {

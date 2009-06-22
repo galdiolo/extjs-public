@@ -150,7 +150,7 @@
 
 .my-treetbl-col-text {
   color: black;
-  padding: 5 4 0 4px;
+  padding: 5px 4px 0 4px;
   display: block;
   white-space: nowrap;
   font-family: arial, tahoma, helvetica, sans-serif;
@@ -208,7 +208,7 @@
 }
 
 .my-treetbl-data .my-treetbl-cell-text {
-  padding: 1 4 1 4px;
+  padding: 1px 4px;
   font-family: arial, tahoma, helvetica, sans-serif;
   font-size: 12px;
 }

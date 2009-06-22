@@ -963,6 +963,9 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
 .ext-el-mask {
   z-index: 100;
 }
+.ext-el-mask-msg {
+  z-index: 101;
+}	
 
 .x-hide {
   display: none;
@@ -1810,6 +1813,8 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
 
 .my-list-item-sel .my-list-item-r {
   background: url(../images/gxt/shared/select-19-bg.gif) no-repeat right -19px;
+}.x-accordion-hd {
+  background: #9b9b9b url(../images/default/panel/light-hd.gif) repeat-x scroll 0 -9px;
 }.x-view {
   -moz-outline: none;
   -moz-user-focus: normal;
@@ -1873,7 +1878,6 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
   position: absolute;
   font-size: 1px;
   line-height: 1px;
-  z-index: 999999;
   cursor: s-resize;
   cursor: row-resize;
 }
@@ -1943,7 +1947,7 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
 
 .my-tbl-col-text {
   color: black;
-  padding: 5 4 0 4px;
+  padding: 5px 4px 0 4px;
   display: block;
   white-space: nowrap;
   font-family: arial, tahoma, helvetica, sans-serif;
@@ -2037,7 +2041,7 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
 }
 
 .my-tbl-data .my-tbl-item-cell-text {
-  padding: 3 4 3 4px;
+  padding: 3px 4px;
   font-family: arial, tahoma, helvetica, sans-serif;
   font-size: 11px;
   -moz-outline: none;
@@ -2045,7 +2049,7 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
 }
 
 .my-tbl-data .my-tbl-item-cell-widget {
-  padding: 1 4 1 4px;
+  padding: 1px 4px;
 }
 
 .my-tbl-data tr {
@@ -2361,7 +2365,7 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
 
 .my-treetbl-col-text {
   color: black;
-  padding: 5 4 0 4px;
+  padding: 5px 4px 0 4px;
   display: block;
   white-space: nowrap;
   font-family: arial, tahoma, helvetica, sans-serif;
@@ -2419,7 +2423,7 @@ body.x-body-masked .x-window-plain .x-window-mc{background:#C7D6E9;}
 }
 
 .my-treetbl-data .my-treetbl-cell-text {
-  padding: 1 4 1 4px;
+  padding: 1px 4px;
   font-family: arial, tahoma, helvetica, sans-serif;
   font-size: 12px;
 }

@@ -501,7 +501,6 @@ public class DataList extends ScrollContainer<DataListItem> implements
    * @param trackMouseOver true to highlight items on mouse over
    */
   public void setTrackMouseOver(boolean trackMouseOver) {
-    assertPreRender();
     this.trackMouseOver = trackMouseOver;
   }
 
@@ -618,7 +617,7 @@ public class DataList extends ScrollContainer<DataListItem> implements
 
     renderAll();
 
-    el().addEventsSunk(
+    sinkEvents(
         Event.ONCLICK | Event.ONDBLCLICK | Event.KEYEVENTS | Event.MOUSEEVENTS);
   }
 

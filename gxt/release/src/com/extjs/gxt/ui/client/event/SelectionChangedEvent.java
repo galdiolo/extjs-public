@@ -39,6 +39,7 @@ public class SelectionChangedEvent<M extends ModelData> extends BaseEvent {
    * @param selection the selection
    */
   public SelectionChangedEvent(SelectionProvider provider, List<M> selection) {
+    super(provider);
     this.provider = provider;
     this.selection = selection;
   }
@@ -50,6 +51,7 @@ public class SelectionChangedEvent<M extends ModelData> extends BaseEvent {
    * @param selection the selection
    */
   public SelectionChangedEvent(SelectionProvider provider, M selection) {
+    super(provider);
     this.provider = provider;
     this.selection = Util.createList(selection);
   }

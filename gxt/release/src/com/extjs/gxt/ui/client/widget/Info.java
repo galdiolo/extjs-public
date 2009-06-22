@@ -179,8 +179,9 @@ public class Info extends ContentPanel {
 
   protected Point position() {
     Size s = XDOM.getViewportSize();
-    int left = (s.width - config.width - 10);
-    int top = s.height - config.height - 10 - (level * (config.height + 10));
+    int left = s.width - config.width - 10 + XDOM.getBodyScrollLeft();
+    int top = s.height - config.height - 10 - (level * (config.height + 10))
+        + XDOM.getBodyScrollTop();
     return new Point(left, top);
   }
 

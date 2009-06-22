@@ -125,14 +125,17 @@ class DNDManager {
     currentTarget = null;
   }
 
-  private DropTarget getTarget(Element elem) {
+  protected DropTarget getTarget(Element elem) {
+    DropTarget target = null;
     for (int i = 0, len = targets.size(); i < len; i++) {
-      DropTarget target = targets.get(i);
-      if (DOM.isOrHasChild(target.component.getElement(), elem)) {
-        return target;
+      DropTarget t = targets.get(i);
+      if (DOM.isOrHasChild(t.component.getElement(), elem)
+          && (target == null || (target != null && DOM.isOrHasChild(
+              target.getComponent().getElement(), t.component.getElement())))) {
+        target = t;
       }
     }
-    return null;
+    return target;
   }
 
 }

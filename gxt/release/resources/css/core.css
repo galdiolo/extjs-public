@@ -10,6 +10,9 @@
 .ext-el-mask {
   z-index: 100;
 }
+.ext-el-mask-msg {
+  z-index: 101;
+}	
 
 .x-hide {
   display: none;

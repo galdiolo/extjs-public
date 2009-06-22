@@ -57,26 +57,26 @@ import com.extjs.gxt.ui.client.widget.button.ToolButton;
  * Code snippet:
  * 
  * <pre>
-  public class BorderLayoutExample extends LayoutContainer {
-  
-    public BorderLayoutExample() {
-      setLayout(new BorderLayout());
-  
-      ContentPanel west = new ContentPanel();
-      ContentPanel center = new ContentPanel();
-  
-      BorderLayoutData westData = new BorderLayoutData(LayoutRegion.WEST, 200);
-      westData.setSplit(true);
-      westData.setCollapsible(true);
-      westData.setMargins(new Margins(5));
-  
-      BorderLayoutData centerData = new BorderLayoutData(LayoutRegion.CENTER);
-      centerData.setMargins(new Margins(5, 0, 5, 0));
-  
-      add(west, westData);
-      add(center, centerData);
-    }
-  } 
+ * public class BorderLayoutExample extends LayoutContainer {
+ * 
+ *   public BorderLayoutExample() {
+ *     setLayout(new BorderLayout());
+ * 
+ *     ContentPanel west = new ContentPanel();
+ *     ContentPanel center = new ContentPanel();
+ * 
+ *     BorderLayoutData westData = new BorderLayoutData(LayoutRegion.WEST, 200);
+ *     westData.setSplit(true);
+ *     westData.setCollapsible(true);
+ *     westData.setMargins(new Margins(5));
+ * 
+ *     BorderLayoutData centerData = new BorderLayoutData(LayoutRegion.CENTER);
+ *     centerData.setMargins(new Margins(5, 0, 5, 0));
+ * 
+ *     add(west, westData);
+ *     add(center, centerData);
+ *   }
+ * }
  * </pre>
  * 
  * </p>
@@ -207,9 +207,9 @@ public class BorderLayout extends Layout {
         if (enableState) {
           BorderLayoutData data = (BorderLayoutData) getLayoutData(c);
           Map<String, Object> st = c.getState();
-          if (st.containsKey("collapsed")) {
+          if (st.containsKey("collapsed") && (c instanceof ContentPanel)) {
             switchPanels((ContentPanel) c);
-          } else if (st.containsKey("size") && (!(c instanceof CollapsePanel))) {
+          } else if (st.containsKey("size") && (c instanceof BoxComponent) && (!(c instanceof CollapsePanel))) {
             data.setSize((Float) st.get("size"));
           }
         }
@@ -344,6 +344,24 @@ public class BorderLayout extends Layout {
       lastCenter.height = centerH - (m.top + m.bottom);
       applyLayout(center, lastCenter);
     }
+  }
+
+  @Override
+  protected void onRemove(Component component) {
+    super.onRemove(component);
+    if (component instanceof ContentPanel) {
+      ContentPanel panel = (ContentPanel) component;
+      if (panel.getData("collapseBtn") != null) {
+        Component tool = (Component) panel.getData("collapseBtn");
+        tool.removeAllListeners();
+        panel.getHeader().removeTool(tool);
+      }
+      panel.removeListener(Events.BeforeCollapse, collapseListener);
+      panel.removeListener(Events.BeforeExpand, collapseListener);
+    }
+    component.setData("init", null);
+    component.setData("collapseBtn", null);
+    component.setData("collapse", null);
   }
 
   private void applyLayout(BoxComponent component, Rectangle box) {
@@ -504,8 +522,8 @@ public class BorderLayout extends Layout {
   }
 
   private native void setCollapsed(ContentPanel panel, boolean collapse) /*-{
-      panel.@com.extjs.gxt.ui.client.widget.ContentPanel::collapsed = collapse;
-    }-*/;
+       panel.@com.extjs.gxt.ui.client.widget.ContentPanel::collapsed = collapse;
+     }-*/;
 
   private void switchPanels(ContentPanel panel) {
     BorderLayoutData data = (BorderLayoutData) getLayoutData(panel);

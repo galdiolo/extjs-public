@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.widget.form;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -263,6 +264,9 @@ public class MultiField<F extends Field> extends Field<F> {
       lc = new VerticalPanel();
     } else {
       lc = new HorizontalPanel();
+    }
+    if (GXT.isIE) {
+      lc.setStyleAttribute("position", "relative");
     }
 
     for (int i = 0, len = fields.size(); i < len; i++) {

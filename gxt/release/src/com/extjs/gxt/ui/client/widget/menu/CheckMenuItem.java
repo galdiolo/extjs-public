@@ -110,7 +110,7 @@ public class CheckMenuItem extends MenuItem {
     }
     MenuEvent me = new MenuEvent(parentMenu);
     me.item = this;
-    if (fireEvent(Events.BeforeCheckChange, me)) {
+    if (supressEvent || fireEvent(Events.BeforeCheckChange, me)) {
       if (el().getParent() != null) {
         el().getParent().setStyleName("x-menu-item-checked", state);
       }

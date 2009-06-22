@@ -76,7 +76,7 @@ public class Layer extends El {
   }
 
   public void destroy() {
-    hideUnders(true);
+    hideUnders();
   }
 
   /**
@@ -113,7 +113,6 @@ public class Layer extends El {
    */
   public void enableShim() {
     shimEnabled = true;
-    shim = getShim();
   }
 
   /**
@@ -143,7 +142,7 @@ public class Layer extends El {
     } else if (pn.dom != p.dom) {
       pn.insertBefore(shim.dom, dom);
     }
-    shim.setStyleAttribute("zIndex", Math.max(0, getZIndex() - 1));
+    shim.setStyleAttribute("zIndex", Math.max(0, getZIndex() - 2));
     return shim;
   }
 
@@ -155,6 +154,12 @@ public class Layer extends El {
       shadow.hide();
     }
   }
+  
+  @Override
+  public void remove() {
+    super.remove();
+    hideUnders();
+  }
 
   /**
    * Hides the shim.
@@ -162,7 +167,7 @@ public class Layer extends El {
   public void hideShim() {
     if (shim != null) {
       shim.setVisible(false);
-//      shim.removeFromParent();
+      shim.removeFromParent();
       shims.push(shim);
       shim = null;
     }
@@ -178,7 +183,7 @@ public class Layer extends El {
   @Override
   public El setHeight(int height, boolean adjust) {
     super.setHeight(height, adjust);
-    sync(false);
+    sync(true);
     return this;
   }
 
@@ -192,7 +197,7 @@ public class Layer extends El {
   @Override
   public El setLeft(int left) {
     super.setLeft(left);
-    sync(false);
+    sync(true);
     return this;
   }
 
@@ -206,21 +211,28 @@ public class Layer extends El {
   @Override
   public El setSize(int width, int height) {
     super.setSize(width, height);
-    sync(false);
+    sync(true);
+    return this;
+  }
+  
+  @Override
+  public El setSize(String width, String height) {
+    super.setSize(width, height);
+    sync(true);
     return this;
   }
 
   @Override
   public El setSize(Size size) {
     super.setSize(size);
-    sync(false);
+    sync(true);
     return this;
   }
 
   @Override
   public El setTop(int top) {
     super.setTop(top);
-    sync(false);
+    sync(true);
     return this;
   }
 
@@ -229,7 +241,7 @@ public class Layer extends El {
     super.setVisibility(visible);
     sync(visible);
     if (!visible) {
-      hideUnders(true);
+      hideUnders();
     }
     return this;
   }
@@ -239,7 +251,7 @@ public class Layer extends El {
     super.setVisible(visible);
     sync(visible);
     if (!visible) {
-      hideUnders(true);
+      hideUnders();
     }
     return this;
   }
@@ -247,28 +259,28 @@ public class Layer extends El {
   @Override
   public El setWidth(int width) {
     super.setWidth(width);
-    sync(false);
+    sync(true);
     return this;
   }
 
   @Override
   public El setWidth(int width, boolean adjust) {
     super.setWidth(width, adjust);
-    sync(false);
+    sync(true);
     return this;
   }
 
   @Override
   public El setWidth(String width) {
     super.setWidth(width);
-    sync(false);
+    sync(true);
     return this;
   }
 
   @Override
   public El setX(int x) {
     super.setX(x);
-    sync(false);
+    sync(true);
     return this;
   }
 
@@ -297,7 +309,7 @@ public class Layer extends El {
       int h = getHeight();
       int l = getLeft();
       int t = getTop();
-
+      
       if (shadowEnabled) {
         if (show && !shadow.isVisible()) {
           shadow.show(dom);
@@ -314,6 +326,11 @@ public class Layer extends El {
 
           Rectangle a = shadow == null ? null : shadow.adjusts;
           if (a == null) a = new Rectangle(0, 0, 0, 0);
+          
+          if (GXT.isIE && shadow != null && shadow.isVisible()) {
+            w += 8;
+            h += 8;
+          }
 
           try {
             shim.setLeft(Math.min(l, l + a.x));
@@ -331,17 +348,20 @@ public class Layer extends El {
       }
     }
   }
-
+  
   @Override
-  public El updateZIndex(int adj) {
-    super.updateZIndex(adj);
+  public El setZIndex(int zIndex) {
+    super.setZIndex(zIndex+2);
     if (shim != null) {
-      shim.setZIndex(Math.max(0, XDOM.getTopZIndex() - 2));
+      shim.setZIndex(zIndex);
+    }
+    if(shadow != null && shadow.isRendered()){
+      shadow.el().setZIndex(zIndex + 1);
     }
     return this;
   }
 
-  private void hideUnders(boolean hide) {
+  private void hideUnders() {
     hideShadow();
     hideShim();
   }

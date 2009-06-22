@@ -106,6 +106,11 @@ public class Events {
    * BeforeAdd event type (value is 40).
    */
   public static final int BeforeAdd = 40;
+  
+  /**
+   * BeforeBind event type (value is 45).
+   */
+  public static final int BeforeBind = 45;
 
   /**
    * BeforeCheckChange event type (value is 50).
@@ -186,6 +191,11 @@ public class Events {
    * BeforeStartEdit event type (value is 132).
    */
   public static final int BeforeStartEdit = 132;
+  
+  /**
+   * Bind event type (value is 134).
+   */
+  public static final int Bind = 134;
 
   /**
    * Blur event type (value is 140).
@@ -202,6 +212,11 @@ public class Events {
    */
   public static final int BrowserEvent = 142;
 
+  /**
+   * CancelEdit event type (value is 145).
+   */
+  public static final int CancelEdit = 145;
+  
   /**
    * CellClick event type (value is 150).
    */
@@ -567,6 +582,11 @@ public class Events {
    */
   public static final int Update = 700;
 
+  /**
+   * UnBind event type (value is 701).
+   */
+  public static final int UnBind = 701;
+  
   /**
    * Unregister event type (value is 702).
    */

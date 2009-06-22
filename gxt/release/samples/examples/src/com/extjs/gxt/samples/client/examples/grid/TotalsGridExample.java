@@ -45,7 +45,7 @@ public class TotalsGridExample extends LayoutContainer {
 
     List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
 
-    SummaryColumnConfig desc = new SummaryColumnConfig("description", "Task", 80);
+    SummaryColumnConfig desc = new SummaryColumnConfig("description", "Task", 65);
     desc.setSummaryType(SummaryType.COUNT);
     desc.setSummaryRenderer(new SummaryRenderer() {
       public String render(Double value, Map<String, Double> data) {
@@ -53,7 +53,7 @@ public class TotalsGridExample extends LayoutContainer {
       }
     });
 
-    SummaryColumnConfig project = new SummaryColumnConfig("project", "Project", 80);
+    SummaryColumnConfig project = new SummaryColumnConfig("project", "Project", 55);
     SummaryColumnConfig due = new SummaryColumnConfig("due", "Due Date", 20);
 
     SummaryColumnConfig estimate = new SummaryColumnConfig("estimate", "Estimate", 20);
@@ -125,7 +125,7 @@ public class TotalsGridExample extends LayoutContainer {
     panel.setIconStyle("icon-table");
     panel.setCollapsible(true);
     panel.setFrame(true);
-    panel.setSize(700, 450);
+    panel.setSize(800, 450);
     panel.setLayout(new FitLayout());
     panel.add(grid);
     add(panel);

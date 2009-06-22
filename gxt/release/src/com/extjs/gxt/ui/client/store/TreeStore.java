@@ -30,16 +30,19 @@ import com.extjs.gxt.ui.client.util.Util;
 /**
  * A store for hierarchical data.
  * 
- * <p/> The parent child relationshiops are handled internally by the store. It
- * is important to note that the store does not use the the parent and children
- * of any TreeModel instances added to the store.
+ * <p/>
+ * The parent child relationships are handled internally by the store. It is
+ * important to note that the store does not use the the parent and children of
+ * any TreeModel instances added to the store.
  * 
- * <p/> It is important to note the sorting behavior when working with
- * TreeStore. When a sorter is set, it is applied to all existing models in the
- * cache and the Sort event is fired. At this point, the sorter is enabled and
- * active. All sorter will be applied to all inserts into the store.
+ * <p/>
+ * It is important to note the sorting behavior when working with TreeStore.
+ * When a sorter is set, it is applied to all existing models in the cache and
+ * the Sort event is fired. At this point, the sorter is enabled and active. All
+ * sorter will be applied to all inserts into the store.
  * 
- * <p/> Remote sorting is not supported with TreeStore.
+ * <p/>
+ * Remote sorting is not supported with TreeStore.
  * 
  * <dt><b>Events:</b></dt>
  * 
@@ -147,7 +150,7 @@ public class TreeStore<M extends ModelData> extends Store<M> {
    * Adds the models to the root of the store and fires the <i>Add</i> event.
    * 
    * @param models the models to be added
-   * @param addChildren true to recursivly add all children
+   * @param addChildren true to recursively add all children
    */
   public void add(List<M> models, boolean addChildren) {
     insert(models, rootWrapper.getChildCount(), addChildren);
@@ -157,7 +160,7 @@ public class TreeStore<M extends ModelData> extends Store<M> {
    * Adds the items to the store and fires the <i>Add</i> event.
    * 
    * @param item the item to add
-   * @param addChildren true to recursivly add all children
+   * @param addChildren true to recursively add all children
    */
   public void add(M item, boolean addChildren) {
     add(Util.createList(item), addChildren);
@@ -168,7 +171,7 @@ public class TreeStore<M extends ModelData> extends Store<M> {
    * 
    * @param parent the parent
    * @param children the children
-   * @param addChildren true to recursivly add all children
+   * @param addChildren true to recursively add all children
    */
   public void add(M parent, List<M> children, boolean addChildren) {
     insert(parent, children, getChildCount(parent), addChildren);
@@ -265,6 +268,25 @@ public class TreeStore<M extends ModelData> extends Store<M> {
   }
 
   /**
+   * Returns the parent-child relationships for the given model. The actual
+   * model can be retrieved in each TreeModel's "model" property using the
+   * {@link TreeModel#get(String)} method. The children of each tree model
+   * contains tree model instances which wrap the actual child model.
+   * 
+   * @param model the model
+   * @return the model and it's children
+   */
+  public TreeModel getModelState(M model) {
+    TreeModel tm = new BaseTreeModel();
+    tm.set("model", model);
+    int count = getChildCount(model);
+    for (int i = 0; i < count; i++) {
+      tm.add(getModelState(getChild(model, i)));
+    }
+    return tm;
+  }
+
+  /**
    * Returns the store's loader.
    * 
    * @return the loader
@@ -331,7 +353,7 @@ public class TreeStore<M extends ModelData> extends Store<M> {
    * @param parent the parent
    * @param children the children
    * @param index the insert index
-   * @param addChildren true to recursivly add all children
+   * @param addChildren true to recursively add all children
    */
   public void insert(M parent, List<M> children, int index, boolean addChildren) {
     TreeModel wrapper = findWrapper(parent);
@@ -350,10 +372,19 @@ public class TreeStore<M extends ModelData> extends Store<M> {
    * @param parent the parent model
    * @param model the child model
    * @param index the insert index
-   * @param addChildren true to recursivly add all children
+   * @param addChildren true to recursively add all children
    */
   public void insert(M parent, M model, int index, boolean addChildren) {
     insert(parent, Util.createList(model), index, addChildren);
+  }
+
+  public void move(M model, M newParent) {
+    TreeModel tm = findWrapper(model);
+    M parent = getParent(model);
+    TreeModel tp = findWrapper(parent);
+    remove(tp, tm, false);
+    doInsert(findWrapper(newParent), Util.createList(tm), getChildCount(newParent),
+        false, false);
   }
 
   /**
@@ -487,7 +518,7 @@ public class TreeStore<M extends ModelData> extends Store<M> {
   }
 
   protected void onLoadException(LoadEvent le) {
-    throw new RuntimeException(le.exception);
+
   }
 
   @Override
@@ -538,8 +569,8 @@ public class TreeStore<M extends ModelData> extends Store<M> {
     return wrapper;
   }
 
-  private void doInsert(TreeModel parent, List<TreeModel> children, int index, boolean addChildren,
-      boolean supressEvent) {
+  private void doInsert(TreeModel parent, List<TreeModel> children, int index,
+      boolean addChildren, boolean supressEvent) {
     if (parent != null && children != null) {
       M modelParent = unwrap(parent);
       for (int i = children.size() - 1; i >= 0; i--) {

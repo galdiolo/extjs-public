@@ -8,7 +8,6 @@
 package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.GXT;
-import com.extjs.gxt.ui.client.XDOM;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.DelayedTask;
@@ -70,11 +69,15 @@ public class Viewport extends LayoutContainer {
 
   private DelayedTask task = new DelayedTask(new Listener<ComponentEvent>() {
     public void handleEvent(ComponentEvent ce) {
+      Viewport.this.setBounds(0, 0, Window.getClientWidth(), Window.getClientHeight());
       layout();
     }
   });
+  
+  private WindowResizeListener listener;
 
   public Viewport() {
+    baseStyle = "x-viewport";
     layoutOnAttach = true;
   }
 
@@ -105,10 +108,18 @@ public class Viewport extends LayoutContainer {
     return loadingPanelId;
   }
 
+  @Override
   public void onAttach() {
     super.onAttach();
     task.delay(delay);
     GXT.hideLoadingPanel(loadingPanelId);
+    Window.addWindowResizeListener(listener);
+  }
+
+  @Override
+  public void onDetach() {
+    super.onDetach();
+    Window.removeWindowResizeListener(listener);
   }
 
   /**
@@ -141,17 +152,16 @@ public class Viewport extends LayoutContainer {
   }
 
   protected void onRender(Element parent, int pos) {
-    setElement(XDOM.getBody());
     super.onRender(parent, pos);
-    el().getParent().addStyleName("x-viewport");
+    el().setLeftTop(0, 0);
 
     Window.enableScrolling(enableScroll);
 
-    Window.addWindowResizeListener(new WindowResizeListener() {
+    listener = new WindowResizeListener() {
       public void onWindowResized(int width, int height) {
         task.delay(delay);
       }
-    });
+    };
   }
 
 }

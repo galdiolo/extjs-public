@@ -353,7 +353,7 @@ public class DateField extends TriggerField<Date> {
   @Override
   protected void onTriggerClick(ComponentEvent ce) {
     super.onTriggerClick(ce);
-    if (disabled || isReadOnly()) {
+    if (isReadOnly()) {
       return;
     }
 

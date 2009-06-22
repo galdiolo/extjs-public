@@ -63,6 +63,7 @@ public class DragEvent extends DomEvent {
   }
 
   public DragEvent(Draggable draggable) {
+    super(draggable);
     this.draggable = draggable;
   }
 

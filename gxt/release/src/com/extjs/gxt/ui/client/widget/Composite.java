@@ -120,8 +120,14 @@ public class Composite extends BoxComponent {
   @Override
   protected void onAttach() {
     if (!rendered) {
-      Element p = getElement().getParentElement().cast();
-      System.out.println(p);
+      String widgetIndex = dummy.getPropertyString("__widgetID");
+      Element parent = DOM.getParent(dummy);
+      int index = DOM.getChildIndex(parent, dummy);
+      parent.removeChild(dummy);
+      component.render(parent, index);
+      if (widgetIndex != null) {
+        getElement().setPropertyInt("__widgetID", Integer.parseInt(widgetIndex));
+      }
     }
     component.onAttach();
     DOM.setEventListener(getElement(), this);

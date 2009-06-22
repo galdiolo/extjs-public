@@ -33,6 +33,7 @@ public class EditorEvent extends DomEvent {
   public Object startValue;
 
   public EditorEvent(Editor editor) {
+    super(editor);
     this.editor = editor;
   }
 

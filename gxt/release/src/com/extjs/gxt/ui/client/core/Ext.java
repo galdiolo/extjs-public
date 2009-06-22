@@ -1080,7 +1080,7 @@ class Ext {
          }
          return r;
        };
-       function attrValue(n, attr) {
+       $wnd.GXT.__attrValue = function(n, attr) {
          if (! n.tagName && typeof n.length != "undefined") {
            n = n[0];
          }
@@ -1299,7 +1299,7 @@ class Ext {
          }
          return r;
        }
-       function quickId(ns, mode, root, id) {
+       $wnd.GXT.__quickId = function(ns, mode, root, id) {
          if (ns == root) {
            var d = root.ownerDocument || root;
            return d.getElementById(id);
@@ -1334,7 +1334,7 @@ class Ext {
              if (type == "select") {
                if (tm) {
                  if (tm[1] == "#") {
-                   fn[fn.length] = 'n = quickId(n, mode, root, "' + tm[2] + '");';
+                   fn[fn.length] = 'n = $wnd.GXT.__quickId(n, mode, root, "' + tm[2] + '");';
                  } else {
                    fn[fn.length] = 'n = $wnd.GXT.__getNodes(n, mode, "' + tm[2] + '");';
                  }
@@ -1459,7 +1459,7 @@ class Ext {
            },
            {
              re: /^@([\w-]+)/,
-             select: 'return {firstChild:{nodeValue:attrValue(n, "{1}")}};'
+             select: 'return {firstChild:{nodeValue:$wnd.GXT.__attrValue(n, "{1}")}};'
            }
          ],
          operators: {

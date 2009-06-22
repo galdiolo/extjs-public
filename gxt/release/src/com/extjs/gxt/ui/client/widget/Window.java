@@ -53,19 +53,20 @@ import com.google.gwt.user.client.ui.Widget;
  * Code snippet:
  * 
  * <pre>
-   Window w = new Window();        
-   w.setHeading("Product Information");
-   w.setModal(true);
-   w.setSize(600, 400);
-   w.setMaximizable(true);
-   w.setToolTip("The ExtGWT product page...");
-   w.setUrl("http://www.extjs.com/products/gxt");
-   w.show();
+ * Window w = new Window();
+ * w.setHeading(&quot;Product Information&quot;);
+ * w.setModal(true);
+ * w.setSize(600, 400);
+ * w.setMaximizable(true);
+ * w.setToolTip(&quot;The ExtGWT product page...&quot;);
+ * w.setUrl(&quot;http://www.extjs.com/products/gxt&quot;);
+ * w.show();
  * </pre>
  * 
- * <p /> The window is automatically registered with the
- * <code>WindowManager</code> when created and is unregistered when the window
- * is closed or by calling {@link WindowManager#unregister(Window)} directly.
+ * <p />
+ * The window is automatically registered with the <code>WindowManager</code>
+ * when created and is unregistered when the window is closed or by calling
+ * {@link WindowManager#unregister(Window)} directly.
  * 
  * <dl>
  * <dt><b>Events:</b></dt>
@@ -206,6 +207,7 @@ public class Window extends ContentPanel {
   private boolean resizing;
   private Element container;
   private DelayedTask windowResizeTask;
+  private WindowResizeListener windowResizeListener;
 
   /**
    * Creates a new window.
@@ -277,8 +279,11 @@ public class Window extends ContentPanel {
       return;
     }
     hidden = true;
-    restoreSize = getSize();
-    restorePos = getPosition(true);
+
+    if (!maximized) {
+      restoreSize = getSize();
+      restorePos = getPosition(true);
+    }
 
     super.onHide();
 
@@ -415,8 +420,10 @@ public class Window extends ContentPanel {
     }
     hidden = true;
 
-    restoreSize = getSize();
-    restorePos = getPosition(true);
+    if (!maximized) {
+      restoreSize = getSize();
+      restorePos = getPosition(true);
+    }
 
     super.onHide();
 
@@ -475,6 +482,15 @@ public class Window extends ContentPanel {
    */
   public boolean isMaximizable() {
     return maximizable;
+  }
+
+  /**
+   * Returns true if window the window is maximized
+   * 
+   * @return true if maximized
+   */
+  public boolean isMaximized() {
+    return maximized;
   }
 
   /**
@@ -548,6 +564,8 @@ public class Window extends ContentPanel {
       restoreBtn.setVisible(true);
       dragger.setEnabled(false);
       fireEvent(Events.Maximize, new WindowEvent(this));
+    } else {
+      fitContainer();
     }
   }
 
@@ -662,8 +680,8 @@ public class Window extends ContentPanel {
   }
 
   /**
-   * True to constrain the window to the {@link Viewport}, false to allow it to fall
-   * outside of the Viewport (defaults to true).
+   * True to constrain the window to the {@link Viewport}, false to allow it to
+   * fall outside of the Viewport (defaults to true).
    * 
    * @param constrain true to constrain, otherwise false
    */
@@ -861,9 +879,6 @@ public class Window extends ContentPanel {
   }
 
   protected void afterShow() {
-    if (maximized) {
-      maximize();
-    }
 
     hidden = false;
 
@@ -923,6 +938,10 @@ public class Window extends ContentPanel {
       eventPreview.add();
     }
 
+    if (maximized) {
+      maximize();
+    }
+
     if (focusWidget != null) {
       if (focusWidget instanceof Component) {
         ((Component) focusWidget).focus();
@@ -932,7 +951,7 @@ public class Window extends ContentPanel {
     }
 
     layout();
-    
+
     if (GXT.isSafari) {
       DeferredCommand.addCommand(new Command() {
         public void execute() {
@@ -1013,7 +1032,7 @@ public class Window extends ContentPanel {
 
   @Override
   protected void onClick(ComponentEvent ce) {
-    if(ce.event.getTarget() == focusEl.dom) {
+    if (ce.event.getTarget() == focusEl.dom) {
       ce.stopEvent();
       return;
     }
@@ -1035,6 +1054,20 @@ public class Window extends ContentPanel {
       hide();
     } else {
       close();
+    }
+  }
+
+  protected void onAttach() {
+    super.onAttach();
+    if (windowResizeListener != null) {
+      com.google.gwt.user.client.Window.addWindowResizeListener(windowResizeListener);
+    }
+  }
+
+  protected void onDetach() {
+    super.onDetach();
+    if (windowResizeListener != null) {
+      com.google.gwt.user.client.Window.removeWindowResizeListener(windowResizeListener);
     }
   }
 
@@ -1116,18 +1149,18 @@ public class Window extends ContentPanel {
       });
     }
 
-    if (maximizable || modal) {
+    if (maximizable || modal || constrain) {
       windowResizeTask = new DelayedTask(new Listener<ComponentEvent>() {
         public void handleEvent(ComponentEvent ce) {
           onWindowResized(com.google.gwt.user.client.Window.getClientWidth(),
               com.google.gwt.user.client.Window.getClientHeight());
         }
       });
-      com.google.gwt.user.client.Window.addWindowResizeListener(new WindowResizeListener() {
+      windowResizeListener = new WindowResizeListener() {
         public void onWindowResized(int width, int height) {
           windowResizeTask.delay(100);
         }
-      });
+      };
     }
 
     if (width != -1) {
@@ -1168,11 +1201,18 @@ public class Window extends ContentPanel {
   }
 
   protected void onWindowResized(int width, int height) {
-    if (maximized) {
-      fitContainer();
-    }
-    if(modal && modalPanel != null) {
-      modalPanel.syncModal();
+    if (isVisible()) {
+      if (maximized) {
+        fitContainer();
+      } else {
+        if (constrain) {
+          setPagePosition(el().adjustForConstraints(getPosition(false)));
+        }
+      }
+      if (modal && modalPanel != null) {
+        modalPanel.syncModal();
+      }
+
     }
   }
 
@@ -1185,20 +1225,25 @@ public class Window extends ContentPanel {
     ghost.setVisible(true);
     showWindow(false);
     Draggable d = de.draggable;
-    d.setProxy(ghost.dom);
+    d.setProxy(ghost);
   }
 
   protected void updateZIndex(int zIndex) {
     el().setZIndex(zIndex);
+    if(ghost != null) {
+      ghost.setZIndex(zIndex);
+    }
     if (modalPanel != null && modalPanel.rendered) {
-      modalPanel.el().setZIndex(zIndex - 1);
+      modalPanel.el().setZIndex(zIndex - 9);
     }
   }
 
   private Layer createGhost() {
     Element div = DOM.createDiv();
     Layer l = new Layer(div);
-
+    if(shim && GXT.useShims) {
+      l.enableShim();
+    }
     l.dom.setClassName("x-panel-ghost");
     if (head != null) {
       DOM.appendChild(div, el().firstChild().cloneNode(true));
@@ -1220,6 +1265,7 @@ public class Window extends ContentPanel {
 
   private Layer ghost() {
     Layer g = ghost != null ? ghost : createGhost();
+    g.setVisibility(false);
     Rectangle box = getBounds(false);
     g.setBounds(box, true);
     int h = bwrap.getHeight();

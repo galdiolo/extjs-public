@@ -347,8 +347,6 @@ public class DropTarget extends BaseObservable {
       event.status.setStatus(false);
       return false;
     }
-
-    event.status.setStatus(true);
     if (overStyle != null) {
       component.addStyleName(overStyle);
     }

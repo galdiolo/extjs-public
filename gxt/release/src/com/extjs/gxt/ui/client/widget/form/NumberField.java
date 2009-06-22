@@ -30,7 +30,7 @@ import com.google.gwt.user.client.ui.KeyboardListener;
  * appropriate number type.
  * 
  * <code><pre>
- * NumberField&lt;Integer&gt; field = new NumberField&lt;Integer&gt;;
+ * NumberField field = new NumberField();
  * field.setPropertyEdtiorType(Integer.class);
  * </pre></code>
  * 

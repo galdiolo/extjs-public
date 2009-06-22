@@ -37,6 +37,7 @@ public class StateEvent extends BaseEvent {
    * @param manager the source manager
    */
   public StateEvent(StateManager manager) {
+    super(manager);
     this.manager = manager;
   }
 
@@ -48,6 +49,7 @@ public class StateEvent extends BaseEvent {
    * @param value the property value
    */
   public StateEvent(StateManager manager, String name, Object value) {
+    super(manager);
     this.manager = manager;
     this.name = name;
     this.value = value;

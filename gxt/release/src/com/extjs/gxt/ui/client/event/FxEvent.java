@@ -28,7 +28,9 @@ public class FxEvent extends BaseEvent {
   public Effect effect;
 
   public FxEvent(Fx fx, Effect effect) {
+    super(fx);
     this.fx = fx;
+    this.effect = effect;
   }
 
 }

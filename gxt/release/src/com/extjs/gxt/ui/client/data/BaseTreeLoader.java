@@ -49,7 +49,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class BaseTreeLoader<M extends ModelData> extends BaseLoader<M, List<M>> implements
     TreeLoader<M> {
 
-  protected ModelData lastConfig;
   protected List<M> children = new ArrayList<M>();
 
   /**
@@ -90,11 +89,6 @@ public class BaseTreeLoader<M extends ModelData> extends BaseLoader<M, List<M>> 
       return !((TreeModel) parent).isLeaf();
     }
     return false;
-  }
-
-  @Override
-  public boolean load() {
-    return load(null);
   }
 
   @Override

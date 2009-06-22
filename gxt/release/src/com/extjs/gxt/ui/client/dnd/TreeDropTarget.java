@@ -12,6 +12,7 @@ import java.util.List;
 import com.extjs.gxt.ui.client.binder.TreeBinder;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.data.TreeModel;
 import com.extjs.gxt.ui.client.dnd.DND.Feedback;
 import com.extjs.gxt.ui.client.event.DNDEvent;
 import com.extjs.gxt.ui.client.util.Rectangle;
@@ -23,9 +24,9 @@ import com.google.gwt.user.client.Timer;
 /**
  * A <code>DropTarget</code> implementation for Trees.
  * 
- * <p /> The implementation of onDragDrop expects either a list of TreeItems
- * when using only a Tree, or a list of ModelData instances if using a
- * TreeBinder.
+ * <p />
+ * The implementation of onDragDrop expects either a list of TreeItems when
+ * using only a Tree, or a list of TreeModel instances if using a TreeBinder.
  */
 public class TreeDropTarget extends DropTarget {
 
@@ -98,7 +99,7 @@ public class TreeDropTarget extends DropTarget {
    * a collapsed item (defaults to true). Use {@link #setAutoExpandDelay(int)}
    * to set the delay.
    * 
-   * @param autoExpand true to auot expand
+   * @param autoExpand true to auto expand
    */
   public void setAutoExpand(boolean autoExpand) {
     this.autoExpand = autoExpand;
@@ -146,12 +147,26 @@ public class TreeDropTarget extends DropTarget {
     activeItem.el().firstChild().addStyleName("my-tree-drop");
   }
 
+  protected void appendModel(ModelData p, TreeModel model, int index) {
+    ModelData child = model.get("model");
+    if (p == null) {
+      binder.getTreeStore().insert(child, index, false);
+    } else {
+      binder.getTreeStore().insert(p, child, index, false);
+    }
+    List<TreeModel> children = model.getChildren();
+    for (int i = 0; i < children.size(); i++) {
+      appendModel(child, children.get(i), i);
+    }
+  }
+
   protected void handleAppendDrop(DNDEvent event, TreeItem item) {
     List sel = (List) event.data;
     if (sel.size() > 0) {
       if (sel.get(0) instanceof ModelData) {
+        TreeModel tm = (TreeModel) sel.get(0);
         ModelData p = item.getModel();
-        binder.getTreeStore().add(p, sel, true);
+        appendModel(p, tm, item.getItemCount());
       } else {
         for (int i = 0; i < sel.size(); i++) {
           TreeItem ti = (TreeItem) sel.get(i);
@@ -159,7 +174,6 @@ public class TreeDropTarget extends DropTarget {
         }
       }
     }
-
   }
 
   protected void handleInsert(DNDEvent event, final TreeItem item) {
@@ -215,11 +229,7 @@ public class TreeDropTarget extends DropTarget {
       idx = status == 0 ? idx : idx + 1;
       if (sel.get(0) instanceof ModelData) {
         ModelData p = item.getParentItem().getModel();
-        if (p == null) {
-          binder.getTreeStore().insert((List) sel, idx, true);
-        } else {
-          binder.getTreeStore().insert(p, (List) sel, idx, true);
-        }
+        appendModel(p, (TreeModel)sel.get(0), idx);
       } else {
         for (int i = 0; i < sel.size(); i++) {
           TreeItem ti = (TreeItem) sel.get(i);
@@ -227,7 +237,6 @@ public class TreeDropTarget extends DropTarget {
         }
       }
     }
-
   }
 
   @Override

@@ -90,7 +90,7 @@ public class BaseModel extends BaseModelData implements Model, Serializable {
 
   @Override
   public <X> X remove(String name) {
-    if (map.containsKey(name)) {
+    if (map != null && map.containsKey(name)) {
       X oldValue = (X) super.remove(name);
       notifyPropertyChanged(name, null, oldValue);
       return oldValue;

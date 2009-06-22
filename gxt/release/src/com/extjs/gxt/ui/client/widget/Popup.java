@@ -369,7 +369,7 @@ public class Popup extends LayoutContainer {
    * Displays the popup.
    * 
    * @param elem the element to align to
-   * @param pos the postion
+   * @param pos the position
    * @param offsets the offsets
    */
   public void show(Element elem, String pos, int[] offsets) {
@@ -418,6 +418,9 @@ public class Popup extends LayoutContainer {
     if (isAutoFocus()) {
       focus();
     }
+    
+    el().setZIndex(XDOM.getTopZIndex());
+    
     fireEvent(Events.Open, new ComponentEvent(this));
   }
 
@@ -447,7 +450,6 @@ public class Popup extends LayoutContainer {
 
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
-    setStyleAttribute("zIndex", "100");
     el().makePositionable(true);
 
     preview.getIgnoreList().add(getElement());
@@ -474,7 +476,7 @@ public class Popup extends LayoutContainer {
     alignOffsets = null;
     alignPoint = null;
 
-    el().setStyleAttribute("zIndex", XDOM.getTopZIndex());
+    
     el().makePositionable(true).setVisibility(false);
 
     if (constrainViewport) {

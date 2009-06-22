@@ -184,7 +184,7 @@ public abstract class Layout extends BaseObservable {
   }
 
   protected int getSideMargins(Component c) {
-    if (GXT.isSafari) {
+    if (GXT.isWebKit) {
       try {
         Object data = getLayoutData(c);
         if (data != null && data instanceof MarginData) {

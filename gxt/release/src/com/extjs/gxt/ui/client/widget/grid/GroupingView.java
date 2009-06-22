@@ -415,7 +415,7 @@ public class GroupingView extends GridView {
         lastGroupField = null;
       } else if (eg && lastGroupField == null) {
         lastGroupField = groupField;
-        cm.setHidden(colIndex, true);
+        cm.setHidden(colIndex, false);
       } else if (eg && lastGroupField != null && !groupField.equals(lastGroupField)) {
         mainBody.update("");
         int oldIndex = cm.findColumnIndex(lastGroupField);

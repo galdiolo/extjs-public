@@ -568,13 +568,9 @@ public class Grid<M extends ModelData> extends BoxComponent {
       fireEvent(Events.HeaderDoubleClick, e);
       return;
     }
-    int row = view.findRowIndex(t);
-    int cell = view.findCellIndex(t, null);
-    if (row != -1) {
-      e.rowIndex = row;
-      e.colIndex = cell;
+    if (e.rowIndex != -1) {
       fireEvent(Events.RowDoubleClick, e);
-      if (cell != -1) {
+      if (e.colIndex != -1) {
         fireEvent(Events.CellDoubleClick, e);
       }
     }
@@ -588,13 +584,9 @@ public class Grid<M extends ModelData> extends BoxComponent {
       fireEvent(Events.HeaderMouseDown, e);
       return;
     }
-    int row = e.rowIndex;
-    int cell = e.colIndex;
-    if (row != -1) {
-      e.rowIndex = row;
-      e.colIndex = cell;
+    if (e.rowIndex != -1) {
       fireEvent(Events.RowMouseDown, e);
-      if (cell != -1) {
+      if (e.colIndex != -1) {
         fireEvent(Events.CellMouseDown, e);
       }
     }

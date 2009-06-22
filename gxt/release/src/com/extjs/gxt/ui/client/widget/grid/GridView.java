@@ -677,6 +677,7 @@ public class GridView extends BaseObservable {
   protected String doRender(List<ColumnData> cs, List rows, int startRow, int colCount,
       boolean stripe) {
     int last = colCount - 1;
+    
     String tstyle = "width:" + getTotalWidth() + ";";
 
     StringBuilder buf = new StringBuilder();
@@ -693,7 +694,8 @@ public class GridView extends BaseObservable {
         c.css = c.css == null ? "" : c.css;
         String rv = getRenderedValue(c, rowIndex, i, model, c.name);
 
-        String css = (i == 0 ? "x-grid-cell-first " : (i == last ? "x-grid3-cell-last " : " "))
+        String css = (i == 0 ? "x-grid-cell-first " : (i == last ? "x-grid3-cell-last "
+            : " "))
             + " " + (c.css == null ? "" : c.css);
         String attr = c.cellAttr != null ? c.cellAttr : "";
         String cellAttr = c.cellAttr != null ? c.cellAttr : "";
@@ -702,10 +704,21 @@ public class GridView extends BaseObservable {
           css += " x-grid3-dirty-cell";
         }
 
-        cb.append("<td class=\"x-grid3-col x-grid3-cell x-grid3-td-" + c.id + " " + css
-            + "\" style=\"" + c.style + "\" tabIndex=0 " + cellAttr
-            + "><div class=\"x-grid3-cell-inner x-grid3-col-" + c.id + "\" " + attr + ">" + rv
-            + "</div></td>");
+        cb.append("<td class=\"x-grid3-col x-grid3-cell x-grid3-td-");
+        cb.append(c.id);
+        cb.append(" ");
+        cb.append(css);
+        cb.append("\" style=\"");
+        cb.append(c.style);
+        cb.append("\" tabIndex=0 ");
+        cb.append(cellAttr);
+        cb.append("><div class=\"x-grid3-cell-inner x-grid3-col-");
+        cb.append(c.id);
+        cb.append("\" ");
+        cb.append(attr);
+        cb.append(">");
+        cb.append(rv);
+        cb.append("</div></td>");
 
       }
 
@@ -722,18 +735,17 @@ public class GridView extends BaseObservable {
         alt += " " + viewConfig.getRowStyle(model, rowIndex, ds);
       }
 
-      buf.append("<div class=\"x-grid3-row "
-          + alt
-          + "\" style=\""
-          + tstyle
-          + "\"><table class=x-grid3-row-table border=0 cellspacing=0 cellpadding=0 style=\""
-          + tstyle
-          + "\"><tbody><tr>"
-          + cb.toString()
-          + "</tr>"
-          + (enableRowBody
-              ? ("<tr class=x-grid3-row-body-tr style=\"\"><td colspan=" + colCount + " class=x-grid3-body-cell tabIndex=0><div class=x-grid3-row-body>${body}</div></td></tr>")
-              : "") + "</tbody></table></div>");
+      buf.append("<div class=\"x-grid3-row ");
+      buf.append(alt);
+      buf.append("\" style=\"");
+      buf.append(tstyle);
+      buf.append("\"><table class=x-grid3-row-table border=0 cellspacing=0 cellpadding=0 style=\"");
+      buf.append(tstyle);
+      buf.append("\"><tbody><tr>");
+      buf.append(cb.toString());
+      buf.append("</tr>");
+      buf.append((enableRowBody ? ("<tr class=x-grid3-row-body-tr style=\"\"><td colspan=" + colCount + " class=x-grid3-body-cell tabIndex=0><div class=x-grid3-row-body>${body}</div></td></tr>")  : ""));
+      buf.append("</tbody></table></div>");
       cb = new StringBuilder();
     }
     return buf.toString();

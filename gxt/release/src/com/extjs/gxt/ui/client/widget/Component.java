@@ -236,6 +236,7 @@ public abstract class Component extends Widget implements Observable {
 
   protected boolean hasListeners;
   protected ToolTip toolTip;
+  protected Element dummy;
 
   private El el;
   private Map<String, Object> state;
@@ -251,7 +252,6 @@ public abstract class Component extends Widget implements Observable {
   private int borders = Style.DEFAULT;
   private El focusEl;
   private Map overElements;
-  private Element dummy;
   private boolean disableEvents;
   private boolean disableBrowserEvents;
   private boolean hasBrowserListener;
@@ -629,13 +629,13 @@ public abstract class Component extends Widget implements Observable {
    * Returns <code>true</code> if the component is visible.
    */
   public boolean isVisible() {
-    if(getParent() != null) {
+    if (getParent() != null) {
       return rendered && el.isVisible() && getParent().isVisible();
     } else {
       return rendered && el.isVisible();
     }
   }
-  
+
   /**
    * Puts a mask over this component to disable user interaction.
    * 
@@ -644,14 +644,14 @@ public abstract class Component extends Widget implements Observable {
   public El mask() {
     return mask(null, null);
   }
-  
+
   /**
    * Puts a mask over this component to disable user interaction.
    * 
    * @param message a message to display in the mask
    * @return the mask element
    */
-  public El mask (String message) {
+  public El mask(String message) {
     return mask(message, null);
   }
 
@@ -666,12 +666,12 @@ public abstract class Component extends Widget implements Observable {
     mask = true;
     maskMessage = message;
     maskMessageStyleName = messageStyleName;
-    if(rendered) {
+    if (rendered) {
       return el().mask(message, messageStyleName);
     }
     return null;
   }
-  
+
   /**
    * Components delegate event handling to
    * {@link #onComponentEvent(ComponentEvent)}. Sublcasses should not override.
@@ -686,7 +686,7 @@ public abstract class Component extends Widget implements Observable {
     int type = DOM.eventGetType(event);
 
     // hack to receive keyboard events in safari
-    if (GXT.isSafari && type == Event.ONCLICK && focusable) {
+    if (GXT.isWebKit && type == Event.ONCLICK && focusable) {
       if (getElement().getTagName().equals("input")
           || event.getTarget().getPropertyString("__eventBits") == null) {
         focus();
@@ -768,9 +768,12 @@ public abstract class Component extends Widget implements Observable {
    * @param eventType the event type
    * @param listener the listener to be removed
    */
-  public void removeListener(int eventType, Listener listener) {
+  public void removeListener(final int eventType, Listener listener) {
     observable.removeListener(eventType, listener);
     hasListeners = observable.hasListeners();
+    if (eventType == Events.BrowserEvent) {
+      hasBrowserListener = observable.hasListeners(eventType);
+    }
   }
 
   /**
@@ -867,8 +870,6 @@ public abstract class Component extends Widget implements Observable {
     }
     getElement().setId(id);
 
-    initState();
-
     addStyleName(baseStyle);
 
     if (cls != null) {
@@ -889,14 +890,6 @@ public abstract class Component extends Widget implements Observable {
       setToolTip(toolTipConfig);
     }
 
-    if (hidden) {
-      hide();
-    }
-
-    if (disabled) {
-      disable();
-    }
-
     if (focused) {
       DeferredCommand.addCommand(new Command() {
         public void execute() {
@@ -909,13 +902,23 @@ public abstract class Component extends Widget implements Observable {
       setBorders(borders == 1);
     }
 
-    if (focusable && GXT.isSafari) {
+    if (focusable && GXT.isWebKit) {
       focusEl = new El(createHiddenInput());
       getElement().appendChild(focusEl.dom);
     }
 
     afterRender = true;
     afterRender();
+
+    if (hidden) {
+      hide();
+    }
+
+    if (disabled) {
+      disable();
+    }
+
+    initState();
 
     fireEvent(Events.Render);
   }
@@ -1171,10 +1174,11 @@ public abstract class Component extends Widget implements Observable {
     mask = false;
     maskMessage = null;
     maskMessageStyleName = null;
-    if(rendered) {
+    if (rendered) {
       el().unmask();
     }
   }
+
   /**
    * Adds a style to the given element on mousever. The component must be
    * sinking mouse events for the over style to function.
@@ -1205,7 +1209,7 @@ public abstract class Component extends Widget implements Observable {
    * when retrieving location and offsets.
    */
   protected void afterRender() {
-    
+
   }
 
   protected void applyState(Map<String, Object> state) {
@@ -1215,7 +1219,7 @@ public abstract class Component extends Widget implements Observable {
   protected void assertPreRender() {
     assert !afterRender : "Method must be called before the component is rendered";
   }
-  
+
   protected void assertAfterRender() {
     assert rendered : "Method must be called after the component is rendered";
   }
@@ -1311,11 +1315,11 @@ public abstract class Component extends Widget implements Observable {
     if (disableContextMenu > 0) {
       el.disableContextMenu(disableContextMenu == 1);
     }
-    
-    if(mask) {
+
+    if (mask) {
       mask(maskMessage, maskMessageStyleName);
     }
-    
+
     super.onAttach();
 
   }
@@ -1451,15 +1455,15 @@ public abstract class Component extends Widget implements Observable {
   }
 
   private native Element createHiddenInput() /*-{
-        var input = $doc.createElement('input');
-        input.type = 'text';
-        input.className = '_focus';
-        input.style.opacity = 0;
-        input.style.zIndex = -1;
-        input.style.height = '1px';
-        input.style.width = '1px';
-        input.style.overflow = 'hidden';
-        input.style.position = 'absolute';
-        return input;
-        }-*/;
+          var input = $doc.createElement('input');
+          input.type = 'text';
+          input.className = '_focus';
+          input.style.opacity = 0;
+          input.style.zIndex = -1;
+          input.style.height = '1px';
+          input.style.width = '1px';
+          input.style.overflow = 'hidden';
+          input.style.position = 'absolute';
+          return input;
+          }-*/;
 }

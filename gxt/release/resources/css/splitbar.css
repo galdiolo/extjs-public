@@ -26,7 +26,6 @@
   position: absolute;
   font-size: 1px;
   line-height: 1px;
-  z-index: 999999;
   cursor: s-resize;
   cursor: row-resize;
 }
