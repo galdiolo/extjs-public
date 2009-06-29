@@ -19,6 +19,9 @@ import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel.TreeNode;
 
+/**
+ * <code>DragSource</code> implementation for TreePanel.
+ */
 public class TreePanelDragSource extends DragSource {
 
   protected TreePanel<ModelData> tree;
@@ -32,7 +35,7 @@ public class TreePanelDragSource extends DragSource {
   }
 
   /**
-   * Returns the type if items that can be dragged.
+   * Returns the type of items that can be dragged.
    * 
    * @return the tree source type
    */
@@ -41,7 +44,7 @@ public class TreePanelDragSource extends DragSource {
   }
 
   /**
-   * Sets witch tree items can be dragged (defaults to BOTH).
+   * Sets which tree items can be dragged (defaults to BOTH).
    * 
    * @param treeSource the tree source type
    */
@@ -55,16 +58,11 @@ public class TreePanelDragSource extends DragSource {
       List<TreeModel> sel = event.getData();
       for (TreeModel tm : sel) {
         ModelData m = (ModelData) tm.get("model");
-        ModelData p = tree.getStore().getParent(m);
-        if (p != null) {
-          tree.getStore().remove(p, m);
-        } else {
-          tree.getStore().remove(m);
-        }
+        tree.getStore().remove(m);
       }
     }
   }
-  
+
   @Override
   @SuppressWarnings("unchecked")
   protected void onDragStart(DNDEvent e) {
@@ -74,7 +72,7 @@ public class TreePanelDragSource extends DragSource {
       e.setCancelled(true);
       return;
     }
-    
+
     boolean leaf = treeSource == TreeSource.LEAF || treeSource == TreeSource.BOTH;
     boolean node = treeSource == TreeSource.NODE || treeSource == TreeSource.BOTH;
 
@@ -89,11 +87,11 @@ public class TreePanelDragSource extends DragSource {
         break;
       }
       if (ok) {
-          List models = new ArrayList();
-          for (ModelData mi : sel) {
-            models.add(tree.getStore().getModelState(mi));
-          }
-          e.setData(models);
+        List models = new ArrayList();
+        for (ModelData mi : sel) {
+          models.add(tree.getStore().getModelState(mi));
+        }
+        e.setData(models);
         e.setCancelled(false);
         e.getStatus().update(Format.substitute(getStatusText(), sel.size()));
 

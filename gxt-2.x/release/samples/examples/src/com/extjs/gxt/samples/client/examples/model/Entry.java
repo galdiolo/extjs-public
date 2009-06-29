@@ -19,26 +19,25 @@ public class Entry extends BaseTreeModel {
   private boolean closable = true;
   private HideMode hideMode = HideMode.DISPLAY;
 
-  public Entry(String name, LayoutContainer example) {
+  public Entry(String name, LayoutContainer example, String image) {
     this.name = name;
     set("name", name);
+    set("image", image);
     set("example", example);
-    set("path", "samples/images/thumbs/" + getId() + ".gif");
   }
 
-  public Entry(String name, LayoutContainer example, boolean fill) {
-    this(name, example);
+  public Entry(String name, LayoutContainer example, String image, boolean fill) {
+    this(name, example, image);
     this.fill = fill;
   }
 
-  public Entry(String name, LayoutContainer example, boolean fill, boolean closable) {
-    this(name, example, fill);
+  public Entry(String name, LayoutContainer example, String image, boolean fill, boolean closable) {
+    this(name, example, image, fill);
     this.closable = closable;
   }
 
-  public Entry(String name, LayoutContainer example, boolean fill, boolean closable,
-      HideMode hideMode) {
-    this(name, example, fill, closable);
+  public Entry(String name, LayoutContainer example, String image, boolean fill, boolean closable, HideMode hideMode) {
+    this(name, example, image, fill, closable);
     this.setHideMode(hideMode);
   }
 

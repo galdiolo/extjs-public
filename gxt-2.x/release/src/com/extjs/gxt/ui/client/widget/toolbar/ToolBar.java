@@ -181,11 +181,12 @@ public class ToolBar extends Container<Component> {
   }
 
   /**
-   * Sets the ailgnment of the items. Defaults to left.
+   * Sets the ailgnment of the items. (defaults to LEFT, pre-render).
    * 
    * @param alignment the alignment to set
    */
   public void setAlignment(HorizontalAlignment alignment) {
+    assertPreRender();
     this.alignment = alignment;
   }
 
@@ -238,6 +239,13 @@ public class ToolBar extends Container<Component> {
     setElement(DOM.createDiv(), target, index);
     super.onRender(target, index);
     addStyleName("x-small-editor");
+    if (alignment.equals(HorizontalAlignment.CENTER)) {
+      addStyleName("x-panel-btns-center");
+    } else if (alignment.equals(HorizontalAlignment.RIGHT)) {
+      if (getItemCount() == 0 || (getItemCount() > 0 && !(getItem(0) instanceof FillToolItem))) {
+        insert(new FillToolItem(), 0);
+      }
+    }
   }
 
 }

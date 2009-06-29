@@ -39,7 +39,7 @@ public class DialogExample extends LayoutContainer {
 
     final Dialog complex = new Dialog();
     complex.setBodyBorder(false);
-    complex.setIcon(Examples.IMAGES.side_list());
+    complex.setIcon(Examples.ICONS.side_list());
     complex.setHeading("BorderLayout Dialog");
     complex.setWidth(400);
     complex.setHeight(225);

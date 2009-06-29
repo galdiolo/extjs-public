@@ -218,8 +218,6 @@ public abstract class Component extends Widget implements Observable {
    */
   protected String disabledStyle = "x-item-disabled";
 
-  protected Element dummy;
-
   /**
    * True if the component is can receive focus (defaults to false). A hidden
    * input field will be created created for Safari.
@@ -231,31 +229,23 @@ public abstract class Component extends Widget implements Observable {
    */
   protected boolean hidden;
 
-  protected boolean hideParent;
-
   /**
    * True if this component has been rendered. Read-only.
    */
   protected boolean rendered;
-  /**
-   * True to enable state (defaults to true).
-   */
-  protected boolean stateful = true;
 
-  /**
-   * The state id (defaults to null).
-   */
+  protected Element dummy;
+  protected boolean hideParent;
   protected String stateId;
   protected List<SwallowEvent> swallowEvents;
   protected ToolTip toolTip;
-
   protected boolean mask;
   protected String maskMessage;
   protected String maskMessageStyleName;
-
   protected List<ComponentAttachable> attachables;
-
   private boolean afterRender;
+
+  private boolean stateful;
   private int borders = Style.DEFAULT;
   private Menu contextMenu;
   private Map<String, Object> dataMap;
@@ -264,7 +254,6 @@ public abstract class Component extends Widget implements Observable {
   private boolean disableEvents;
   private int disableTextSelection = Style.DEFAULT;
   private El el;
-  private boolean enableState = true;
   private int events;
   private boolean focused;
   private El focusEl;
@@ -279,9 +268,9 @@ public abstract class Component extends Widget implements Observable {
   private Map<String, Object> state;
   private String styles = "";
   private ToolTipConfig toolTipConfig;
-
   protected boolean monitorWindowResize;
   protected int windowResizeDelay = 100;
+
   protected DelayedTask windowResizeTask;
   protected HandlerRegistration resizeHandler;
 
@@ -359,10 +348,8 @@ public abstract class Component extends Widget implements Observable {
    * Clears the component's state.
    */
   public void clearState() {
-    if (state != null) {
-      state.clear();
-      saveState();
-    }
+    getState().clear();
+    saveState();
   }
 
   /**
@@ -497,6 +484,15 @@ public abstract class Component extends Widget implements Observable {
   }
 
   /**
+   * Returns the component's context menu.
+   * 
+   * @return the context menu
+   */
+  public Menu getContextMenu() {
+    return contextMenu;
+  }
+
+  /**
    * Returns the application defined property for the given name, or
    * <code>null</code> if it has not been set.
    * 
@@ -570,15 +566,26 @@ public abstract class Component extends Widget implements Observable {
   }
 
   /**
-   * Returns the component's state.
+   * Returns the component's state. To save changes made to the state map
+   * returned by this method, call {@link #saveState()}.
    * 
-   * @return the state
+   * @return the component's state
    */
   public Map<String, Object> getState() {
-    if (!enableState || state == null) {
+    if (!stateful || state == null) {
       state = new FastMap<Object>();
     }
     return state;
+  }
+
+  /**
+   * Returns the component's state id. If a state id is specified, it is used as
+   * the key when saving and retrieving the component's state.
+   * 
+   * @return the state id
+   */
+  public String getStateId() {
+    return stateId;
   }
 
   /**
@@ -710,8 +717,7 @@ public abstract class Component extends Widget implements Observable {
     Element eventTarget = (Element) event.getEventTarget().cast();
     if (swallowEvents != null) {
       for (SwallowEvent e : swallowEvents) {
-        if (e.getEventType().getEventCode() == type
-            && e.getElement().isOrHasChild(eventTarget)) {
+        if (e.getEventType().getEventCode() == type && e.getElement().isOrHasChild(eventTarget)) {
           event.stopPropagation();
           if (e.isPreventDefault()) {
             event.preventDefault();
@@ -722,8 +728,7 @@ public abstract class Component extends Widget implements Observable {
 
     // hack to receive keyboard events in safari
     if (GXT.isWebKit && type == Event.ONCLICK && focusable) {
-      if (getElement().getTagName().equals("input")
-          || eventTarget.getPropertyString("__eventBits") == null) {
+      if (getElement().getTagName().equals("input") || eventTarget.getPropertyString("__eventBits") == null) {
         focus();
       }
     }
@@ -739,8 +744,7 @@ public abstract class Component extends Widget implements Observable {
       return;
     }
 
-    if (type == (GXT.isSafari && GXT.isMac ? Event.ONMOUSEDOWN : Event.ONMOUSEUP)
-        && ce.isRightClick()) {
+    if (type == (GXT.isSafari && GXT.isMac ? Event.ONMOUSEDOWN : Event.ONMOUSEUP) && ce.isRightClick()) {
       onRightClick(ce);
     }
 
@@ -872,6 +876,8 @@ public abstract class Component extends Widget implements Observable {
       return;
     }
 
+    initState();
+
     beforeRender();
 
     if (plugins != null) {
@@ -892,9 +898,7 @@ public abstract class Component extends Widget implements Observable {
       onRender(target, index);
     }
 
-    if (el == null)
-      throw new RuntimeException(getClass().getName()
-          + " must call setElement in onRender");
+    if (el == null) throw new RuntimeException(getClass().getName() + " must call setElement in onRender");
 
     if (events != 0) {
       el().addEventsSunk(events);
@@ -956,8 +960,6 @@ public abstract class Component extends Widget implements Observable {
       disable();
     }
 
-    initState();
-
     fireEvent(Events.Render);
   }
 
@@ -971,10 +973,12 @@ public abstract class Component extends Widget implements Observable {
   }
 
   /**
-   * Saves the component's current state.
+   * Saves the component's current state by passing it to the
+   * <code>StateManager</code> and saving it using the state id or component id
+   * as the key.
    */
   public void saveState() {
-    if (enableState && state != null) {
+    if (stateful && state != null) {
       ComponentEvent ce = createComponentEvent(null);
       ce.setState(state);
       if (fireEvent(Events.BeforeStateSave, ce)) {
@@ -996,6 +1000,17 @@ public abstract class Component extends Widget implements Observable {
     if (rendered) {
       fly(getStyleElement()).setBorders(show);
     }
+  }
+
+  /**
+   * Sets the component's context menu.
+   * 
+   * @param menu the context menu
+   */
+  public void setContextMenu(Menu menu) {
+    contextMenu = menu;
+    disableContextMenu(true);
+    sinkEvents(GXT.isSafari && GXT.isMac ? Event.ONMOUSEDOWN : Event.ONMOUSEUP);
   }
 
   /**
@@ -1033,12 +1048,26 @@ public abstract class Component extends Widget implements Observable {
   }
 
   /**
-   * Sets whether the component's state is enabled (defaults to true).
+   * A flag which causes the Component to attempt to restore the state of
+   * internal properties from a saved state on startup (defaults to false). The
+   * component must have either a {@link #stateId} or {@link #id} assigned for
+   * state to be managed. Auto-generated ids are not guaranteed to be stable
+   * across page loads and cannot be relied upon to save and restore the same
+   * state for a component.
    * 
-   * @param enable true to enable
+   * @param stateful true to enable state
    */
-  public void setEnableState(boolean enable) {
-    this.enableState = enable;
+  public void setStateful(boolean stateful) {
+    this.stateful = stateful;
+  }
+
+  /**
+   * Returns true if the component is saving and restore it's state.
+   * 
+   * @return true if stateful
+   */
+  public boolean isStateful() {
+    return stateful;
   }
 
   /**
@@ -1064,7 +1093,7 @@ public abstract class Component extends Widget implements Observable {
   public void setId(String id) {
     this.id = id;
     if (el != null) {
-      DOM.setElementProperty(getElement(), "id", id);
+      getElement().setId(id);
     }
   }
 
@@ -1097,6 +1126,17 @@ public abstract class Component extends Widget implements Observable {
    * Overrides UIObject and does nothing.
    */
   public void setSize(String width, String height) {
+  }
+
+  /**
+   * Sets the component's state id which is a unique id for this component to
+   * use for state management purposes (defaults to the component id if one was
+   * set, otherwise null if the component is using a generated id).
+   * 
+   * @param stateId the state id
+   */
+  public void setStateId(String stateId) {
+    this.stateId = stateId;
   }
 
   /**
@@ -1217,8 +1257,7 @@ public abstract class Component extends Widget implements Observable {
    * @return the swallow event config that can be used when removing a
    *         swallowing event
    */
-  public SwallowEvent swallowEvent(EventType eventType, Element element,
-      boolean preventDefault) {
+  public SwallowEvent swallowEvent(EventType eventType, Element element, boolean preventDefault) {
     return swallowEvent(new SwallowEvent(eventType, element, preventDefault));
   }
 
@@ -1357,16 +1396,6 @@ public abstract class Component extends Widget implements Observable {
 
   protected void frame() {
     FocusFrame.get().frame(this);
-  }
-
-  /**
-   * Returns the component's context menu. This method is marked protected,
-   * subclasses can change access to public to expose the context menu.
-   * 
-   * @return the context menu
-   */
-  protected Menu getContextMenu() {
-    return contextMenu;
   }
 
   protected El getFocusEl() {
@@ -1575,17 +1604,6 @@ public abstract class Component extends Widget implements Observable {
     if (overElements != null) {
       overElements.remove(fly(elem).getId());
     }
-  }
-
-  /**
-   * Sets the component's context menu.
-   * 
-   * @param menu the context menu
-   */
-  protected void setContextMenu(Menu menu) {
-    contextMenu = menu;
-    disableContextMenu(true);
-    sinkEvents(GXT.isSafari && GXT.isMac ? Event.ONMOUSEDOWN : Event.ONMOUSEUP);
   }
 
   protected void setEl(El el) {

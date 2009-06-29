@@ -35,7 +35,7 @@ public class StateManager {
   /**
    * Returns the singleton instance.
    * 
-   * @return the state mananger
+   * @return the state manager
    */
   public static StateManager get() {
     return instance;

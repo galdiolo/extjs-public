@@ -7,8 +7,6 @@
  */
 package com.extjs.gxt.ui.client.widget.grid;
 
-import java.util.List;
-
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.Events;
@@ -38,7 +36,6 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
   }
 
   private Callback callback = new Callback(this);
-  private EditSupport editGrid;
   protected CellSelection selection;
 
   @Override
@@ -57,7 +54,6 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
       grid.addListener(Events.BeforeEdit, this);
       grid.addListener(Events.CellMouseDown, this);
       grid.getView().addListener(Events.Refresh, this);
-      editGrid = grid instanceof EditSupport ? ((EditSupport) grid) : null;
       keyNav.bind(grid);
       bind(grid.getStore());
       this.listStore = (ListStore)grid.getStore();
@@ -121,11 +117,6 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
   }
 
   @Override
-  protected void onAdd(List<? extends M> models) {
-    deselectAll();
-  }
-
-  @Override
   protected void onClear(StoreEvent<M> se) {
     super.onClear(se);
     selection = null;
@@ -133,7 +124,7 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
 
   @Override
   protected void onKeyPress(GridEvent<M> e) {
-    if (editGrid != null) {
+    if (grid.editSupport != null) {
       // ignore events whose source is an input element
       String tag = e.getTarget().getTagName();
       if (tag.equals("INPUT") && !e.getTarget().getClassName().equals("_focus")) {
@@ -177,9 +168,9 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
         newCell = grid.walkCells(r, c + 1, 1, callback, false);
         break;
       case KeyCodes.KEY_ENTER:
-        if (editGrid != null) {
-          if (!editGrid.isEditing()) {
-            editGrid.startEditing(r, c);
+        if (grid.editSupport != null) {
+          if (!grid.editSupport.isEditing()) {
+            grid.editSupport.startEditing(r, c);
             e.stopEvent();
             return;
           }

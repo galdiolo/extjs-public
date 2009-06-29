@@ -33,6 +33,7 @@ code {
 <body>
 <h1>Ext GWT Library Release Notes</h1>
 <ul>
+  <li><a href="#Release_2.0.RC1">Release 2.0 RC1</a></li>
   <li><a href="#Release_2.0.M3">Release 2.0 M3</a></li>
   <li><a href="#Release_1.2.3">Release 1.2.4</a></li>
   <li><a href="#Release_1.2.3">Release 1.2.3</a></li>
@@ -50,6 +51,64 @@ code {
 <h2>1.x to 2.0 Migration Guide</h2>
 <ul>
   <li>The <a href="2.0_migration_guide.html">migration guide</a> details changes from 1.x to 2.0.</li>
+</ul>
+
+<h2><a name="Release_2.0.RC1">Release 2.0 RC1 (Released June 25 2009)</a></h2>
+<h2>General Changes &amp; Enhancements</h2>
+<ul>
+    <li>Grid now saves and restores column hidden, width, and sort state.</li>
+    <li>TreePanel and TreeGrid now save and restore expand states when state is enabled.</li>
+    <li>Added TreeGridDragSource and TreeGridDropTarget.</li>
+    <li>Added TreeGrid to TreeGrid DND example.</li>
+    <li>Added widget support to columns, previously on groups could have widgets. See ColumnConfig setWidget.</li>
+    <li>Added ModelKeyProvider class, and setKeyProvider getKeyProvider to Store.</li>
+    <li>BufferView (Grid and TreeGrid) now supports widgets.</li>
+    <li>Added WidgetTreeGridCellRenderer that allows adding widgets to the tree column in TreeGrid.</li>
+    <li>Added ComboBox to CheckBoxTreePanelExample to change check cascade type.</li>
+    <li>Added build time to Version.</li>
+</ul>
+
+<h2>API Changes</h2>
+<ul>
+    <li>Component state now applied before component is rendered, not after.</li>
+    <li>Added setStateId and getStateId methods to Component.</li>
+	<li>setEnableState removed from Component.</li>
+	<li>Added setStateful and isStateful to Component.</li>
+	<li>Component stateful default changed to FALSE.</li>
+	<li>Added getKeyProvider and setKeyProvider to Store.</li>
+	<li>A column can be resizable when it is also fixed. Previously, isResizable checked the fixed value.</li>
+	<li>DragEvent.getTarget was overridding DomEvent getTarget and calling getRelatedEventTarget(). Removed the override.</li>
+	<li>Made getContextMenu and setContentMenu in Component public.</li>
+	<li>TreeStore public M getChild(M parent, int index) will return root node if parent is null.</li>
+	<li>Added setWidget and getWidget to ColumnConfig.</li>
+	<li>TreePanel.setAutoLoad(true) now works when not using a loader, previously only worked with a loader.</li>
+	<li>Added TreeStore.getChildren(M parent, boolean deep).</li>
+	<li>Added getters / setters for quickShowInterval in Tip.</li>
+</ul>
+
+<h2>Bug Fixes</h2>
+<ul>
+	<li>GridView only allowing Components to be added to cells, changed to Widget.</li>
+	<li>Component clearState() not clearing state if called pre-render.</li>
+	<li>QuickTip not displaying after first show if target element not changed.</li>
+	<li>Wrong sizes for column widths with force fit and auto fill.</li>
+	<li>Disappearing text with TreePanel during DND.</li>
+	<li>TreePanelDropTarget and TreeGridDropTarget not handling multiple items in drop.</li>
+	<li>Grid, TreePanel, and TreeGrid deselecting previous selections when clicking a selected row without shift or control.</li>
+	<li>Grid over effect (gray background) should not show on selected rows.</li>
+	<li>Grid column group not showing with groups with only one column.</li>
+	<li>TreePanel CheckCascade.CHILDREN cascade not cascading checks to leaf nodes.</li>
+	<li>TreePanel right click not selecting element before firing event.</li>
+	<li>TreePanel CheckCascade.CHILDREN not cascading to collapsed nodes.</li>
+	<li>PagingModelMemoryProxy not using reader if specified.</li>
+	<li>TreePanel and TreeGrid allowing drops on self and self's children.</li>
+	<li>Added missing background style when hovering over a valid drop target.</li>
+	<li>TreePanel not unregistering children of model being removed.</li>
+	<li>HtmlContainer now supports calling setUrl multiple times.</li>
+	<li>Fixed null pointer exception on TreePanel collapse.</li>
+	<li>Radio not firing change event when clicking label.</li>
+	<li>Tree right click not selecting item before content menu shows.</li>
+	<li>TreePanelSelectionModel not properly handling Add and Remove events.</li>
 </ul>
 
 <h2><a name="Release_2.0.M3">Release 2.0 M3 (released June 11, 2009)</a></h2>

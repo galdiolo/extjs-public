@@ -170,13 +170,13 @@ public class ButtonsExample extends LayoutContainer {
   private void setIcon(Button btn, ButtonScale scale) {
     switch (scale) {
       case SMALL:
-        btn.setIcon(Examples.IMAGES.add16());
+        btn.setIcon(Examples.ICONS.add16());
         break;
       case MEDIUM:
-        btn.setIcon(Examples.IMAGES.add24());
+        btn.setIcon(Examples.ICONS.add24());
         break;
       case LARGE:
-        btn.setIcon(Examples.IMAGES.add32());
+        btn.setIcon(Examples.ICONS.add32());
         break;
     }
 

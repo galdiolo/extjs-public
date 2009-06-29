@@ -74,6 +74,7 @@ public class GridPluginsExample extends LayoutContainer {
   @Override
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
+
     createExpander();
     createCheckBox();
     createNumberer();
@@ -123,7 +124,7 @@ public class GridPluginsExample extends LayoutContainer {
     ContentPanel cp = new ContentPanel();
     cp.setHeading("Framed with Checkbox Selection and Horizontal Scrolling");
     cp.setFrame(true);
-    cp.setIcon(Examples.IMAGES.table());
+    cp.setIcon(Examples.ICONS.table());
     cp.setLayout(new FitLayout());
     cp.setSize(600, 300);
 
@@ -190,7 +191,7 @@ public class GridPluginsExample extends LayoutContainer {
 
     ContentPanel cp = new ContentPanel();
     cp.setHeading("Expander Rows, Collapse and Auto Fill");
-    cp.setIcon(Examples.IMAGES.table());
+    cp.setIcon(Examples.ICONS.table());
     cp.setAnimCollapse(false);
     cp.setCollapsible(true);
     cp.setLayout(new FitLayout());
@@ -251,7 +252,7 @@ public class GridPluginsExample extends LayoutContainer {
     ContentPanel cp = new ContentPanel();
     cp.setHeading("Support for standard Panel features such as framing, buttons and toolbars");
     cp.setFrame(true);
-    cp.setIcon(Examples.IMAGES.table());
+    cp.setIcon(Examples.ICONS.table());
     cp.addButton(new Button("Save"));
     cp.addButton(new Button("Cancel"));
     cp.setButtonAlign(HorizontalAlignment.CENTER);
@@ -259,11 +260,11 @@ public class GridPluginsExample extends LayoutContainer {
     cp.setSize(600, 300);
 
     ToolBar toolBar = new ToolBar();
-    toolBar.add(new Button("Add", Examples.IMAGES.add()));
+    toolBar.add(new Button("Add", Examples.ICONS.add()));
     toolBar.add(new SeparatorToolItem());
-    toolBar.add(new Button("Remove", Examples.IMAGES.delete()));
+    toolBar.add(new Button("Remove", Examples.ICONS.delete()));
     toolBar.add(new SeparatorToolItem());
-    toolBar.add(new Button("Configure", Examples.IMAGES.plugin()));
+    toolBar.add(new Button("Configure", Examples.ICONS.plugin()));
     cp.setTopComponent(toolBar);
 
     Grid<Stock> grid = new Grid<Stock>(store, cm);
@@ -328,11 +329,11 @@ public class GridPluginsExample extends LayoutContainer {
       }
 
     });
-    btn.setIcon(Examples.IMAGES.delete());
+    btn.setIcon(Examples.ICONS.delete());
 
     ContentPanel cp = new ContentPanel();
     cp.setHeading("Grid with Numbered Rows and Force Fit");
-    cp.setIcon(Examples.IMAGES.table());
+    cp.setIcon(Examples.ICONS.table());
     cp.setLayout(new FitLayout());
     cp.setSize(600, 300);
     cp.add(grid);

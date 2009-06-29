@@ -107,6 +107,11 @@ public class GXT {
    * <code>true</code> if the browser is gecko3.
    */
   public static boolean isGecko3;
+  
+  /**
+   * <code>true</code> if the browser is gecko3.5.
+   */
+  public static boolean isGecko35;
 
   /**
    * <code>true</code> if the browser is in strict mode.
@@ -241,8 +246,9 @@ public class GXT {
     isIE8 = !isOpera && ua.indexOf("msie 8") != -1;
     isIE6 = isIE && !isIE7 && !isIE8;
     isGecko = !isWebKit && ua.indexOf("gecko") != -1;
-    isGecko3 = isGecko && ua.indexOf("rv:1.9") != -1;
-    isGecko2 = isGecko && !isGecko3;
+    isGecko3 = isGecko && ua.indexOf("rv:1.9.0") != -1;
+    isGecko35 = isGecko && ua.indexOf("rv:1.9.1") != -1;
+    isGecko2 = isGecko && !isGecko3 && !isGecko35;
 
     isWindows = (ua.indexOf("windows") != -1 || ua.indexOf("win32") != -1);
     isMac = (ua.indexOf("macintosh") != -1 || ua.indexOf("mac os x") != -1);
@@ -251,8 +257,7 @@ public class GXT {
 
     useShims = isIE6 || (isMac && isGecko2);
 
-    String mode = DOM.getElementProperty(XDOM.getDocument(), "compatMode");
-    isStrict = mode != null ? mode.equals("CSS1Compat") : false;
+    isStrict = "CSS1Compat".equals(DOM.getElementProperty(XDOM.getDocument(), "compatMode"));
 
     isBorderBox = isIE && !isStrict;
 
@@ -266,6 +271,9 @@ public class GXT {
       bodyEl.addStyleName("ext-ie");
       String cls = (isIE6 ? "ext-ie6" : (isIE7 ? "ext-ie7" : "ext-ie8"));
       bodyEl.addStyleName(cls);
+      if(isIE7 && isIE8compatibility()){
+        bodyEl.addStyleName("ext-ie8-compatibility");
+      }
       if (isBorderBox) {
         bodyEl.addStyleName("ext-border-box");
       }
@@ -321,6 +329,8 @@ public class GXT {
       removeBackgroundFlicker();
     }
   }
+  
+  
 
   /**
    * Returns the ARIA enabled state.
@@ -377,5 +387,14 @@ public class GXT {
       $doc.execCommand("BackgroundImageCache", false, true);
     }catch(e){}
   }-*/;
+  
+  private native static boolean isIE8compatibility() /*-{
+  if(@com.extjs.gxt.ui.client.GXT::isIE7){
+    if($doc.documentMode){
+      return true;
+    }
+    
+  }return false;
+}-*/;
 
 }

@@ -64,7 +64,7 @@ public class RowEditorTreeGridExample extends LayoutContainer {
 
     TreeGrid<ModelData> tree = new TreeGrid<ModelData>(store, cm);
     tree.setBorders(true);
-    tree.getStyle().setLeafIcon(Examples.IMAGES.music());
+    tree.getStyle().setLeafIcon(Examples.ICONS.music());
     tree.setSize(400, 400);
     tree.setAutoExpandColumn("name");
     tree.setTrackMouseOver(false);

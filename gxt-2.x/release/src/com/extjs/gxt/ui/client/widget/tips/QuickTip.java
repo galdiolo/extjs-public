@@ -58,6 +58,27 @@ public class QuickTip extends ToolTip {
     super(component);
   }
 
+  @Override
+  public void initTarget(Component target) {
+    if (listener == null) {
+      listener = new Listener<ComponentEvent>() {
+        public void handleEvent(ComponentEvent be) {
+          EventType type = be.getType();
+          if (type == Events.OnMouseOver) {
+            onTargetOver(be);
+          } else if (type == Events.OnMouseOut) {
+            onTargetOut(be);
+          } else if (type == Events.OnMouseMove) {
+            onMouseMove(be);
+          } else if (type == Events.Hide || type == Events.Detach) {
+            hide();
+          }
+        }
+      };
+    }
+    super.initTarget(target);
+  }
+
   /**
    * Returns true if intercept titles is enabled.
    * 
@@ -78,24 +99,9 @@ public class QuickTip extends ToolTip {
   }
 
   @Override
-  public void initTarget(Component target) {
-    if (listener == null) {
-      listener = new Listener<ComponentEvent>() {
-        public void handleEvent(ComponentEvent be) {
-          EventType type = be.getType();
-          if (type == Events.OnMouseOver) {
-            onTargetOver(be);
-          } else if (type == Events.OnMouseOut) {
-            onTargetOut(be);
-          } else if (type == Events.OnMouseMove) {
-            onMouseMove(be);
-          } else if (type == Events.Hide || type == Events.Detach) {
-            hide();
-          }
-        }
-      };
-    }
-    super.initTarget(target);
+  protected void onHide() {
+    super.onHide();
+    targetElem = null;
   }
 
   @Override
@@ -120,7 +126,7 @@ public class QuickTip extends ToolTip {
     }
 
     boolean hasTip = t != null && hasTip(t);
-
+    
     if (!initialized && !hasTip) {
       return;
     }

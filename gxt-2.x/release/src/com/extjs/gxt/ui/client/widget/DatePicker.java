@@ -36,6 +36,7 @@ import com.extjs.gxt.ui.client.widget.layout.TableData;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.i18n.client.constants.DateTimeConstants;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -54,7 +55,7 @@ import com.google.gwt.user.client.ui.Grid;
  * <li>datePicker : this</li>
  * <li>date : the selected date</li>
  * </ul>
- * </dd> 
+ * </dd>
  * </dl>
  * 
  * <dl>
@@ -291,10 +292,8 @@ public class DatePicker extends BoxComponent {
 
       el().setWidth(175, true);
 
-      String pt = messages.getPrevText() != null ? messages.getPrevText()
-          : myMessages.datePicker_prevText();
-      String nt = messages.getNextText() != null ? messages.getNextText()
-          : myMessages.datePicker_nextText();
+      String pt = messages.getPrevText() != null ? messages.getPrevText() : myMessages.datePicker_prevText();
+      String nt = messages.getNextText() != null ? messages.getNextText() : myMessages.datePicker_nextText();
 
       monthBtn = new Button("&#160;", new SelectionListener<ButtonEvent>() {
         public void componentSelected(ButtonEvent ce) {
@@ -343,7 +342,7 @@ public class DatePicker extends BoxComponent {
   private IconButton prevBtn, nextBtn;
   private CompositeElement mpMonths, mpYears;
   private El monthPicker;
-  private DateTimeConstants constants = (DateTimeConstants) GWT.create(DateTimeConstants.class);
+  private DateTimeConstants constants;
   private XMessages myMessages = (XMessages) GWT.create(XMessages.class);
   private DatePickerMessages messages;
 
@@ -353,6 +352,7 @@ public class DatePicker extends BoxComponent {
   public DatePicker() {
     baseStyle = "x-date-picker";
     messages = new DatePickerMessages();
+    constants = LocaleInfo.getCurrentLocale().getDateTimeConstants();
   }
 
   @Override
@@ -585,8 +585,7 @@ public class DatePicker extends BoxComponent {
     days.setBorderWidth(0);
 
     String[] dn = constants.narrowWeekdays();
-    firstDOW = startDay != 0 ? startDay
-        : Integer.parseInt(constants.firstDayOfTheWeek()) - 1;
+    firstDOW = startDay != 0 ? startDay : Integer.parseInt(constants.firstDayOfTheWeek()) - 1;
 
     days.setHTML(0, 0, "<span>" + dn[(0 + firstDOW) % 7] + "</span>");
     days.setHTML(0, 1, "<span>" + dn[(1 + firstDOW) % 7] + "</span>");
@@ -601,7 +600,7 @@ public class DatePicker extends BoxComponent {
     grid.setCellSpacing(0);
     grid.setCellPadding(0);
     grid.addClickHandler(new ClickHandler() {
-    
+
       public void onClick(ClickEvent event) {
         Event evt = DOM.eventGetCurrentEvent();
         ComponentEvent be = new ComponentEvent(DatePicker.this, evt);
@@ -655,18 +654,15 @@ public class DatePicker extends BoxComponent {
   }
 
   private void createMonthPicker() {
-    String ok = messages.getOkText() != null ? messages.getOkText()
-        : myMessages.datePicker_okText();
-    String cancel = messages.getCancelText() != null ? messages.getCancelText()
-        : myMessages.datePicker_cancelText();
+    String ok = messages.getOkText() != null ? messages.getOkText() : myMessages.datePicker_okText();
+    String cancel = messages.getCancelText() != null ? messages.getCancelText() : myMessages.datePicker_cancelText();
 
     StringBuffer buf = new StringBuffer();
     buf.append("<table border=0 cellspacing=0>");
     String[] monthNames = constants.shortMonths();
     for (int i = 0; i < 6; i++) {
       buf.append("<tr><td class=x-date-mp-month><a href=#>" + monthNames[i] + "</a></td>");
-      buf.append("<td class='x-date-mp-month x-date-mp-sep'><a href=#>"
-          + monthNames[i + 6] + "</a></td>");
+      buf.append("<td class='x-date-mp-month x-date-mp-sep'><a href=#>" + monthNames[i + 6] + "</a></td>");
       if (i == 0) {
         buf.append("<td class=x-date-mp-ybtn align=center><a class=x-date-mp-prev href=#></a></td><td class='x-date-mp-ybtn' align=center><a class='x-date-mp-next'></a></td></tr>");
       } else {
@@ -824,8 +820,7 @@ public class DatePicker extends BoxComponent {
     DateWrapper vd = activeDate;
     activeDate = date;
     if (vd != null && el() != null) {
-      if (vd.getMonth() == activeDate.getMonth()
-          && vd.getFullYear() == activeDate.getFullYear()) {
+      if (vd.getMonth() == activeDate.getMonth() && vd.getFullYear() == activeDate.getFullYear()) {
 
       }
       int days = date.getDaysInMonth();
@@ -870,8 +865,7 @@ public class DatePicker extends BoxComponent {
       }
 
       int month = activeDate.getMonth();
-      monthBtn.setText(constants.standaloneMonths()[month] + " "
-          + activeDate.getFullYear());
+      monthBtn.setText(constants.standaloneMonths()[month] + " " + activeDate.getFullYear());
     }
   }
 

@@ -196,7 +196,7 @@ public class AdvancedToolBarExample extends LayoutContainer {
     group.setHeading("Clipboard");
     toolBar.add(group);
 
-    Button btn = new Button("Paste", Examples.IMAGES.add32());
+    Button btn = new Button("Paste", Examples.ICONS.add32());
     btn.addStyleName("x-btn-as-arrow");
     btn.setScale(ButtonScale.LARGE);
     btn.setIconAlign(IconAlign.TOP);
@@ -206,7 +206,7 @@ public class AdvancedToolBarExample extends LayoutContainer {
 
     group.add(btn, data);
 
-    btn = new Button("Format", Examples.IMAGES.add32());
+    btn = new Button("Format", Examples.ICONS.add32());
     btn.setScale(ButtonScale.LARGE);
     btn.setIconAlign(IconAlign.TOP);
     btn.setArrowAlign(ButtonArrowAlign.BOTTOM);
@@ -231,7 +231,7 @@ public class AdvancedToolBarExample extends LayoutContainer {
     group.setHeading("Clipboard");
     toolBar.add(group);
 
-    btn = new Button("Paste", Examples.IMAGES.add32());
+    btn = new Button("Paste", Examples.ICONS.add32());
     btn.addStyleName("x-btn-as-arrow");
     btn.setScale(ButtonScale.LARGE);
     btn.setIconAlign(IconAlign.TOP);
@@ -241,7 +241,7 @@ public class AdvancedToolBarExample extends LayoutContainer {
 
     group.add(btn, data);
 
-    btn = new Button("Format", Examples.IMAGES.add32());
+    btn = new Button("Format", Examples.ICONS.add32());
     btn.setScale(ButtonScale.LARGE);
     btn.setIconAlign(IconAlign.TOP);
     btn.setArrowAlign(ButtonArrowAlign.BOTTOM);

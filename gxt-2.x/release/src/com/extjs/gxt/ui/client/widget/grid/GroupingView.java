@@ -278,7 +278,7 @@ public class GroupingView extends GridView {
       String g = getGroup(gvalue, model, rowIndex, colIndex, ds);
 
       if (curGroup == null || !curGroup.group.equals(g)) {
-        gid = gidPrefix + "-gp-" + groupField + "-" + g;
+        gid = getGroupId(gidPrefix, groupField, g);
 
         boolean isCollapsed = state.get(gid) != null ? !state.get(gid) : startCollapsed;
         String gcls = isCollapsed ? "x-grid-group-collapsed" : "";
@@ -298,7 +298,7 @@ public class GroupingView extends GridView {
       } else {
         curGroup.models.add(model);
       }
-      model.set("_groupId", gid);
+      // model.set("_groupId", gid);
 
     }
 
@@ -326,6 +326,14 @@ public class GroupingView extends GridView {
 
   protected String getGroup(Object value, ModelData m, int rowIndex, int colIndex, ListStore<ModelData> ds) {
     return value == null ? "" : value.toString();
+  }
+
+  protected String getGroupField() {
+    return groupingStore.getGroupState();
+  }
+
+  protected String getGroupId(String gidPrefix, String groupField, String group) {
+    return gidPrefix + "-gp-" + groupField + "-" + group;
   }
 
   @SuppressWarnings("unchecked")
@@ -393,8 +401,10 @@ public class GroupingView extends GridView {
   @Override
   protected void onRemove(ListStore<ModelData> ds, ModelData m, int index, boolean isUpdate) {
     super.onRemove(ds, m, index, isUpdate);
-    Element g = XDOM.getElementById(m.<String> get("_groupId"));
-    if (g != null && g.getChildNodes().getItem(1).getChildNodes().getLength() < 1) {
+    String groupField = getGroupField();
+    Element g = XDOM.getElementById(getGroupId(grid.getId(), groupField, getGroup(m.get(groupField), m, index,
+        cm.findColumnIndex(groupField), ds)));
+    if (g != null && !g.getChildNodes().getItem(1).hasChildNodes()) {
       fly(g).removeFromParent();
     }
     // appply empty text
@@ -445,25 +455,24 @@ public class GroupingView extends GridView {
 
   @Override
   protected void templateOnAllColumnWidthsUpdated(List<Integer> ws, int tw) {
+    super.templateOnAllColumnWidthsUpdated(ws, tw);
     updateGroupWidths();
   }
 
   @Override
   protected void templateOnColumnWidthUpdated(int col, int w, int tw) {
+    super.templateOnColumnWidthUpdated(col, w, tw);
     updateGroupWidths();
   }
 
   @Override
-  protected void templateOnLayout(int vw, int vh) {
+  protected void templateOnColumnHiddenUpdated(int col, boolean hidden, int tw) {
+    super.templateOnColumnHiddenUpdated(col, hidden, tw);
     updateGroupWidths();
   }
 
   private Element findGroup(Element el) {
-    return new El((com.google.gwt.user.client.Element) el).findParentElement(".x-grid-group", 10);
-  }
-
-  private String getGroupField() {
-    return groupingStore.getGroupState();
+    return fly(el).findParentElement(".x-grid-group", 10);
   }
 
   private boolean isGroupExpanded(Element g) {

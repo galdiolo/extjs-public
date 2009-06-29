@@ -48,7 +48,10 @@ public class BarDataProvider extends PieDataProvider {
     for (ModelData m : store.getModels()) {
       Object v = m.get(valueProperty);
       Number n = v instanceof String ? Double.parseDouble((String) v) : (Number) v;
-      chart.addBars(new Bar(n));      
+      if (n == null) {
+        n = 0;
+      }
+      chart.addBars(new Bar(n));
       minYValue = Math.min(minYValue, n.doubleValue());
       maxYValue = Math.max(maxYValue, n.doubleValue());
       if (xAxis != null) xAxis.addLabels(getLabel(m, valueProperty));

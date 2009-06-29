@@ -36,7 +36,7 @@ public class VBoxLayoutExample extends LayoutContainer {
   private String button1Text = "Button 1";
   private String button2Text = "Button 2";
   private String button3Text = "Button 3";
-  private String button4Text = "ButtonLong 4";
+  private String button4Text = "Button Long 4";
 
   public VBoxLayoutExample() {
     setScrollMode(Scroll.AUTO);

@@ -39,10 +39,14 @@ import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.user.client.Element;
 
 public class EditableGridExample extends LayoutContainer {
 
-  public EditableGridExample() {
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
+
     setLayout(new FlowLayout(10));
 
     List<Stock> stocks = TestData.getStocks();
@@ -133,7 +137,7 @@ public class EditableGridExample extends LayoutContainer {
     ContentPanel cp = new ContentPanel();
     cp.setHeading("Edit Plants");
     cp.setFrame(true);
-    cp.setIcon(Examples.IMAGES.table());
+    cp.setIcon(Examples.ICONS.table());
     cp.setSize(600, 300);
     cp.setLayout(new FitLayout());
 

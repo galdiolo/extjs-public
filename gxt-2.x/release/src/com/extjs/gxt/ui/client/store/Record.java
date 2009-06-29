@@ -8,11 +8,11 @@
 package com.extjs.gxt.ui.client.store;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import com.extjs.gxt.ui.client.core.FastMap;
+import com.extjs.gxt.ui.client.core.FastSet;
 import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.RpcMap;
@@ -169,7 +169,7 @@ public class Record {
   }
 
   public Collection<String> getPropertyNames() {
-    Set<String> names = new HashSet<String>();
+    Set<String> names = new FastSet();
 
     for (String name : model.getPropertyNames()) {
       names.add(name);

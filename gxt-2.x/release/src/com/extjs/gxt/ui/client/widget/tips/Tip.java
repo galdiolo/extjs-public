@@ -141,20 +141,6 @@ public class Tip extends ContentPanel {
     showAt(point.x, point.y);
   }
 
-  @Override
-  protected void onRender(Element parent, int pos) {
-    if (closable) {
-      setHeaderVisible(true);
-      head.addTool(new ToolButton("x-tool-close",
-          new SelectionListener<IconButtonEvent>() {
-            public void componentSelected(IconButtonEvent ce) {
-              hide();
-            }
-          }));
-    }
-    super.onRender(parent, pos);
-  }
-
   protected void doAutoWidth() {
     if (width == null) {
       Element body = getElement("body");
@@ -167,6 +153,25 @@ public class Tip extends ContentPanel {
       setWidth(Util.constrain(bw, minWidth, maxWidth));
     }
 
+  }
+
+  @Override
+  protected void onDisable() {
+    super.onDisable();
+    hide();
+  }
+
+  @Override
+  protected void onRender(Element parent, int pos) {
+    if (closable) {
+      setHeaderVisible(true);
+      head.addTool(new ToolButton("x-tool-close", new SelectionListener<IconButtonEvent>() {
+        public void componentSelected(IconButtonEvent ce) {
+          hide();
+        }
+      }));
+    }
+    super.onRender(parent, pos);
   }
 
   protected void updateContent() {

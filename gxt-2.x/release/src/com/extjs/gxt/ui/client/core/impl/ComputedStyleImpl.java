@@ -7,7 +7,10 @@
  */
 package com.extjs.gxt.ui.client.core.impl;
 
+import java.util.Map;
+
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.core.FastMap;
 import com.extjs.gxt.ui.client.util.Format;
 import com.google.gwt.user.client.Element;
 
@@ -17,31 +20,48 @@ public class ComputedStyleImpl {
     return getStyleAttribute(elem.dom, name);
   }
 
+  protected Map<String, String> camelCache = new FastMap<String>();
+  protected Map<String, String> hyphenCache = new FastMap<String>();
+
   public String getStyleAttribute(Element elem, String name) {
-    return getComputedStyle(elem, Format.hyphenize(getPropertyName(name)), null);
+    return getComputedStyle(elem, checkHyphenCache(name), checkCamelCache(name), "");
   }
-  
-  public void setStyleAttribute(Element elem, String name, Object value){
-    elem.getStyle().setProperty(Format.camelize(getPropertyName(name)), String.valueOf(value));
+
+  public void setStyleAttribute(Element elem, String name, Object value) {
+    elem.getStyle().setProperty(checkCamelCache(name), String.valueOf(value));
+  }
+
+  protected String checkCamelCache(String s) {
+    String t = camelCache.get(s);
+    if (t == null) {
+      t = Format.camelize(getPropertyName(s));
+      camelCache.put(s, t);
+    }
+    return t;
+  }
+
+  protected String checkHyphenCache(String s) {
+    String t = hyphenCache.get(s);
+    if (t == null) {
+      t = Format.hyphenize(getPropertyName(s));
+      hyphenCache.put(s, t);
+    }
+    return t;
   }
 
   protected String getPropertyName(String name) {
     if ("float".equals(name)) {
       return "cssFloat";
-    } else if ("class".equals(name)) {
-      return "className";
-    } else if ("for".equals(name)) {
-      return "htmlFor";
     }
     return name;
   }
 
-  protected native String getComputedStyle(Element elem, String name, String pseudo) /*-{
-    var cStyle = $doc.defaultView.getComputedStyle(elem, pseudo);
-    var v;
-    if(v = elem.style[name]){
-      v;
+  protected native String getComputedStyle(Element elem, String name, String name2, String pseudo) /*-{
+    var v = elem.style[name2];
+    if(v){
+      return v;
     }
+    var cStyle = $doc.defaultView.getComputedStyle(elem, pseudo);
     return cStyle ? String(cStyle.getPropertyValue(name)) : null;
   }-*/;
 

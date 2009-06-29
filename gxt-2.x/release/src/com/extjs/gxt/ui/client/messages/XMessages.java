@@ -192,6 +192,10 @@ public interface XMessages extends Messages {
 
   String groupingView_showGroupsText();
 
+  String rowEditor_cancelText();
+  
+  String rowEditor_saveText();
+  
   String propertyColumnModel_nameText();
 
   String propertyColumnModel_valueText();

@@ -26,8 +26,7 @@ import com.google.gwt.user.client.Event;
  * 
  * @param <M> the model data type
  */
-public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionModel<M> implements
-    ComponentPlugin {
+public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionModel<M> implements ComponentPlugin {
 
   protected ColumnConfig config;
 
@@ -42,8 +41,8 @@ public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionMo
     config.setMenuDisabled(true);
     config.setDataIndex("");
     config.setRenderer(new GridCellRenderer<M>() {
-      public String render(M model, String property, ColumnData config, int rowIndex,
-          int colIndex, ListStore<M> store, Grid<M> grid) {
+      public String render(M model, String property, ColumnData config, int rowIndex, int colIndex, ListStore<M> store,
+          Grid<M> grid) {
         config.cellAttr = "rowspan='2'";
         return "<div class='x-grid3-row-checker'>&#160;</div>";
       }
@@ -73,13 +72,9 @@ public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionMo
   @SuppressWarnings("unchecked")
   @Override
   protected void handleMouseDown(GridEvent<M> e) {
-    if (e.getEvent().getButton() == Event.BUTTON_LEFT
-        && e.getTarget().getClassName().equals("x-grid3-row-checker")) {
-      El row = e.getTarget(".x-grid3-row", 15);
-      if (row != null) {
-
-        M m = listStore.getAt(e.getRowIndex());
-
+    if (e.getEvent().getButton() == Event.BUTTON_LEFT && e.getTarget().getClassName().equals("x-grid3-row-checker")) {
+      M m = listStore.getAt(e.getRowIndex());
+      if (m != null) {
         if (isSelected(m)) {
           doDeselect(Arrays.asList(m), false);
         } else {
@@ -109,16 +104,16 @@ public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionMo
       }
     }
   }
-  
+
   @Override
   protected void onSelectChange(M model, boolean select) {
     super.onSelectChange(model, select);
     El hd = grid.getView().innerHd.child("div.x-grid3-hd-checker");
-    if(getSelection().size() == grid.getStore().getCount()) {
+    if (getSelection().size() == grid.getStore().getCount()) {
       hd.addStyleName("x-grid3-hd-checker-on");
     } else {
       hd.removeStyleName("x-grid3-hd-checker-on");
     }
-  } 
+  }
 
 }

@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.ui.client.widget.treegrid;
 
-import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.store.TreeStore;
@@ -37,7 +36,7 @@ public class TreeGridCellRenderer<M extends ModelData> implements GridCellRender
     
     
     String text = model.get(property);
-    String id = XDOM.getUniqueId();
+    String id = tree.findNode(model).id;
     return tree.getTreeView().getTemplate(model, id, text, iconStyle, false, j, level - 1);
   }
 }

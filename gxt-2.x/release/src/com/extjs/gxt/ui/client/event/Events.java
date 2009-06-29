@@ -447,6 +447,11 @@ public class Events {
    * Enable event type.
    */
   public static final EventType Enable = new EventType();
+  
+  /**
+   * Exception event type.
+   */
+  public static final EventType Exception = new EventType();
 
   /**
    * Expand event type.

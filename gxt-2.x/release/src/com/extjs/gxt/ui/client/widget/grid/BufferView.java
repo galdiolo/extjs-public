@@ -37,6 +37,7 @@ public class BufferView extends GridView {
   private DelayedTask cleanTask;
   private DelayedTask renderTask;
   private int scrollDelay = 100;
+  private boolean bufferEnabled = true;
 
   /**
    * Returns the amount of rows that should be cached.
@@ -74,10 +75,28 @@ public class BufferView extends GridView {
     return scrollDelay;
   }
 
+  /**
+   * Returns true if buffering is enabled.
+   * 
+   * @return true for buffering
+   */
+  public boolean isBufferEnabled() {
+    return bufferEnabled;
+  }
+
   @Override
   public void layout() {
     super.layout();
     update();
+  }
+
+  /**
+   * True to enabled buffered functionality (defaults to true).
+   * 
+   * @param bufferEnabled true to buffer, otherwise false
+   */
+  public void setBufferEnabled(boolean bufferEnabled) {
+    this.bufferEnabled = bufferEnabled;
   }
 
   /**
@@ -130,8 +149,9 @@ public class BufferView extends GridView {
   }
 
   protected void doClean() {
-    if (getVisibleRowCount() > 0) {
-      int[] vr = getVisibleRows();
+    int count = getVisibleRowCount();
+    if (count > 0) {
+      int[] vr = getVisibleRows(count);
       vr[0] -= cacheSize;
       vr[1] += cacheSize;
 
@@ -146,6 +166,7 @@ public class BufferView extends GridView {
         // if current row is outside of first and last and
         // has content, update the innerHTML to nothing
         if ((i < vr[0] || i > vr[1])) {
+          detachWidget(i, true);
           rows.getItem(i).setInnerHTML("");
         }
       }
@@ -154,6 +175,9 @@ public class BufferView extends GridView {
 
   @Override
   protected String doRender(List<ColumnData> cs, List<ModelData> rows, int startRow, int colCount, boolean stripe) {
+    if (!bufferEnabled) {
+      return super.doRender(cs, rows, startRow, colCount, stripe);
+    }
     return doRender(cs, rows, startRow, colCount, stripe, false);
   }
 
@@ -162,7 +186,7 @@ public class BufferView extends GridView {
 
     int last = colCount - 1;
     int rh = getStyleRowHeight();
-    int[] vr = getVisibleRows();
+    int[] vr = getVisibleRows(getVisibleRowCount());
     String tstyle = "width:" + getTotalWidth() + "px;height:" + rh + "px;";
     // buffers
     StringBuilder buf = new StringBuilder();
@@ -254,13 +278,14 @@ public class BufferView extends GridView {
   }
 
   protected void doUpdate() {
-    if (getVisibleRowCount() > 0) {
+    int count = getVisibleRowCount();
+    if (count > 0) {
       ColumnModel cm = grid.getColumnModel();
 
       ListStore<ModelData> store = grid.getStore();
       List<ColumnData> cs = getColumnData();
       boolean stripe = grid.isStripeRows();
-      int[] vr = getVisibleRows();
+      int[] vr = getVisibleRows(count);
       for (int i = vr[0]; i <= vr[1]; i++) {
         // if row is NOT rendered and is visible, render it
         if (!isRowRendered(i)) {
@@ -278,25 +303,22 @@ public class BufferView extends GridView {
     return rowHeight + borderWidth;
   }
 
+  protected int getStyleRowHeight() {
+    return rowHeight + (GXT.isBorderBox ? borderWidth : 0);
+  }
+
   protected int getVisibleRowCount() {
     int rh = getCalculatedRowHeight();
     int visibleHeight = scroller.getHeight(true);
     return (int) ((visibleHeight < 1) ? 0 : Math.ceil(((double) visibleHeight / rh)));
   }
 
-  protected int[] getVisibleRows() {
-    int count = getVisibleRowCount();
+  protected int[] getVisibleRows(int count) {
     int sc = scroller.getScrollTop();
     int start = (int) (sc == 0 ? 0 : Math.floor(sc / getCalculatedRowHeight()) - 1);
     int first = Math.max(start, 0);
     int last = Math.min(start + count + 2, grid.getStore().getCount() - 1);
-
     return new int[] {first, last};
-
-  }
-
-  protected int getStyleRowHeight() {
-    return rowHeight + (GXT.isBorderBox ? borderWidth : 0);
   }
 
   protected boolean isRowRendered(int index) {
@@ -311,6 +333,7 @@ public class BufferView extends GridView {
   }
 
   protected void update() {
+    if (!bufferEnabled) return;
     if (renderTask == null) {
       renderTask = new DelayedTask(new Listener<BaseEvent>() {
         public void handleEvent(BaseEvent be) {

@@ -13,8 +13,8 @@ import java.util.List;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.util.Format;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.i18n.client.constants.NumberConstants;
 import com.google.gwt.user.client.Element;
@@ -138,7 +138,7 @@ public class NumberField extends TextField<Number> {
   private List<Character> allowed;
   private boolean allowNegative = true;
   private String baseChars = "0123456789";
-  private NumberConstants constants = (NumberConstants) GWT.create(NumberConstants.class);
+  private NumberConstants constants;
   private String decimalSeparator = ".";
   private int lastKeyCode;
   private Number maxValue = Double.MAX_VALUE;
@@ -150,6 +150,7 @@ public class NumberField extends TextField<Number> {
   public NumberField() {
     messages = new NumberFieldMessages();
     propertyEditor = new NumberPropertyEditor();
+    constants = LocaleInfo.getCurrentLocale().getNumberConstants();
     decimalSeparator = constants.decimalSeparator();
   }
 

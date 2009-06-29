@@ -24,6 +24,7 @@ import com.extjs.gxt.samples.client.examples.dnd.DualListFieldExample;
 import com.extjs.gxt.samples.client.examples.dnd.GridToGridExample;
 import com.extjs.gxt.samples.client.examples.dnd.ListViewDNDExample;
 import com.extjs.gxt.samples.client.examples.dnd.ReorderingTreePanelDNDExample;
+import com.extjs.gxt.samples.client.examples.dnd.TreeGridToTreeGridExample;
 import com.extjs.gxt.samples.client.examples.dnd.TreePanelToTreePanelExample;
 import com.extjs.gxt.samples.client.examples.forms.AdvancedComboBoxExample;
 import com.extjs.gxt.samples.client.examples.forms.AdvancedFormsExample;
@@ -78,6 +79,7 @@ import com.extjs.gxt.samples.client.examples.treegrid.EditorTreeGridExample;
 import com.extjs.gxt.samples.client.examples.treegrid.RowEditorTreeGridExample;
 import com.extjs.gxt.samples.client.examples.treegrid.RowNumberTreeGridExample;
 import com.extjs.gxt.samples.client.examples.treegrid.TreeGridExample;
+import com.extjs.gxt.samples.client.examples.treegrid.WidgetTreeGridExample;
 import com.extjs.gxt.samples.client.examples.treepanel.AsyncTreePanelExample;
 import com.extjs.gxt.samples.client.examples.treepanel.AsyncXmlTreePanelExample;
 import com.extjs.gxt.samples.client.examples.treepanel.BasicTreePanelExample;
@@ -92,6 +94,7 @@ import com.extjs.gxt.samples.client.examples.windows.AccordionWindowExample;
 import com.extjs.gxt.samples.client.examples.windows.DialogExample;
 import com.extjs.gxt.samples.client.examples.windows.HelloWindowExample;
 import com.extjs.gxt.samples.client.examples.windows.MessageBoxExample;
+import com.extjs.gxt.samples.client.images.ExampleImages;
 import com.extjs.gxt.ui.client.Style.HideMode;
 import com.extjs.gxt.ui.client.data.BaseTreeModel;
 import com.extjs.gxt.ui.client.data.ModelData;
@@ -102,129 +105,133 @@ public class ExamplesModel extends BaseTreeModel {
   protected List<Entry> entries = new ArrayList<Entry>();
 
   public ExamplesModel() {
+    ExampleImages g = Examples.IMAGES;
+    
     Category grids = new Category("Grids");
-    grids.addEntry("Basic Grid", new GridExample());
-    grids.addEntry("Column Grouping", new ColumnGroupingExample());
-    grids.addEntry("Aggregation Row Grid", new AggregationGridExample());
-    grids.addEntry("Grid Plugins", new GridPluginsExample());
-    grids.addEntry("Editable Grid", new EditableGridExample());
-    grids.addEntry("Xml Grid", new XmlGridExample());
-    grids.addEntry("Json Grid", new JsonGridExample());
-    grids.addEntry("Paging", new PagingGridExample());
-    grids.addEntry("Local Paging", new MemoryPagingGridExample());
-    grids.addEntry("Grouping", new GroupingGridExample());
-    grids.addEntry("Live Group Summary", new TotalsGridExample());
-    grids.addEntry("BeanModel Grid", new BeanModelGridExample());
-    grids.addEntry("Paging BeanModel Grid", new PagingBeanModelGridExample());
-    grids.addEntry("Buffered Grid", new BufferedGridExample());
-    grids.addEntry("Editable Buffered Grid", new EditableBufferedGridExample());
-    grids.addEntry("RowEditor Grid", new RowEditorExample());
-    grids.addEntry("Widget Renderer Grid", new WidgetRenderingExample());
+    grids.add("Basic Grid", new GridExample(), g.basicgrid().getHTML());
+    grids.add("Column Grouping", new ColumnGroupingExample(), g.columngrouping().getHTML());
+    grids.add("Aggregation Row Grid", new AggregationGridExample(), g.aggregationrowgrid().getHTML());
+    grids.add("Grid Plugins", new GridPluginsExample(), g.gridplugins().getHTML());
+    grids.add("Editable Grid", new EditableGridExample(), g.editablegrid().getHTML());
+    grids.add("RowEditor Grid", new RowEditorExample(), g.roweditorgrid().getHTML());
+    grids.add("Xml Grid", new XmlGridExample(), g.xmlgrid().getHTML());
+    grids.add("Json Grid", new JsonGridExample(), g.jsongrid().getHTML());
+    grids.add("Paging", new PagingGridExample(), g.paging().getHTML());
+    grids.add("Local Paging", new MemoryPagingGridExample(), g.localpaging().getHTML());
+    grids.add("Grouping", new GroupingGridExample(), g.grouping().getHTML());
+    grids.add("Live Group Summary", new TotalsGridExample(), g.livegroupsummary().getHTML());
+    grids.add("BeanModel Grid", new BeanModelGridExample(), g.beanmodelgrid().getHTML());
+    grids.add("Paging BeanModel Grid", new PagingBeanModelGridExample(), g.pagingbeanmodelgrid().getHTML());
+    grids.add("Buffered Grid", new BufferedGridExample(), g.bufferedgrid().getHTML());
+    grids.add("Editable Buffered Grid", new EditableBufferedGridExample(), g.editablebufferedgrid().getHTML());
+    grids.add("Widget Renderer Grid", new WidgetRenderingExample(), g.widgetrenderergrid().getHTML());
     add(grids);
 
     Category treeGrids = new Category("TreeGrid");
-    treeGrids.addEntry("Basic TreeGrid", new TreeGridExample());
-    treeGrids.addEntry("Async TreeGrid", new AsyncTreeGridExample());
-    treeGrids.addEntry("RowNumber TreeGrid", new RowNumberTreeGridExample());
-    treeGrids.addEntry("EditorTreeGrid", new EditorTreeGridExample());
-    treeGrids.addEntry("RowEditor TreeGrid", new RowEditorTreeGridExample());
+    treeGrids.add("Basic TreeGrid", new TreeGridExample(), Examples.IMAGES.basictreegrid().getHTML());
+    treeGrids.add("Async TreeGrid", new AsyncTreeGridExample(), Examples.IMAGES.asynctreegrid().getHTML());
+    treeGrids.add("RowNumber TreeGrid", new RowNumberTreeGridExample(), g.rownumbertreegrid().getHTML());
+    treeGrids.add("EditorTreeGrid", new EditorTreeGridExample(), Examples.IMAGES.editortreegrid().getHTML());
+    treeGrids.add("RowEditor TreeGrid", new RowEditorTreeGridExample(), g.roweditortreegrid().getHTML());
+    treeGrids.add("Widget Renderer TreeGrid", new WidgetTreeGridExample(), g.widgetrenderertreegrid().getHTML());
     add(treeGrids);
 
     Category treePanels = new Category("TreePanel");
-    treePanels.addEntry("Basic Tree", new BasicTreePanelExample());
-    treePanels.addEntry("Context Menu Tree", new ContextMenuTreePanelExample());
-    treePanels.addEntry("Async Tree", new AsyncTreePanelExample());
-    treePanels.addEntry("Async Xml TreePanel", new AsyncXmlTreePanelExample());
-    treePanels.addEntry("Filter Tree", new FilterTreePanelExample());
-    treePanels.addEntry("Checkbox Tree", new CheckBoxTreePanelExample());
-    treePanels.addEntry("Fast Tree", new FastTreePanelExample());
+    treePanels.add("Basic Tree", new BasicTreePanelExample(), g.basictree().getHTML());
+    treePanels.add("Context Menu Tree", new ContextMenuTreePanelExample(), g.contextmenutree().getHTML());
+    treePanels.add("Async Tree", new AsyncTreePanelExample(), g.asynctree().getHTML());
+    treePanels.add("Async Xml Tree", new AsyncXmlTreePanelExample(), g.asyncxmltreepanel().getHTML());
+    treePanels.add("Filter Tree", new FilterTreePanelExample(), g.filtertree().getHTML());
+    treePanels.add("Checkbox Tree", new CheckBoxTreePanelExample(), g.checkboxtree().getHTML());
+    treePanels.add("Fast Tree", new FastTreePanelExample(), g.fasttree().getHTML());
     add(treePanels);
 
     Category tabs = new Category("Tabs");
-    tabs.addEntry("Basic Tabs", new BasicTabExample());
-    tabs.addEntry("Advanced Tabs", new AdvancedTabExample());
+    tabs.add("Basic Tabs", new BasicTabExample(), g.basictabs().getHTML());
+    tabs.add("Advanced Tabs", new AdvancedTabExample(), g.advancedtabs().getHTML());
     add(tabs);
 
-    Category charts = new Category("Charts");
-    charts.addEntry("Basic Chart", new BasicChartExample(), false, true, HideMode.OFFSETS);
-    charts.addEntry("Chart Gallery", new ChartGalleryExample(), false, true, HideMode.OFFSETS);
-    charts.addEntry("Advanced Charts", new AdvancedChartExample(), false, true, HideMode.OFFSETS);
-    add(charts);
+    Category ch = new Category("Charts");
+    ch.add("Basic Chart", new BasicChartExample(), g.basicchart().getHTML(), false, true, HideMode.OFFSETS);
+    ch.add("Chart Gallery", new ChartGalleryExample(), g.chartgallery().getHTML(), false, true, HideMode.OFFSETS);
+    ch.add("Advanced Charts", new AdvancedChartExample(), g.advancedcharts().getHTML(), false, true, HideMode.OFFSETS);
+    add(ch);
 
     Category dnd = new Category("Drag and Drop");
-    dnd.addEntry("Basic DnD", new BasicDNDExample());
-    dnd.addEntry("List to List", new ListViewDNDExample());
-    dnd.addEntry("Grid to Grid", new GridToGridExample());
-    dnd.addEntry("Tree to Tree", new TreePanelToTreePanelExample());
-    dnd.addEntry("Reordering Tree", new ReorderingTreePanelDNDExample());
-    dnd.addEntry("Image Organizer", new ImageOrganizerExample());
+    dnd.add("Basic DnD", new BasicDNDExample(), g.basicdnd().getHTML());
+    dnd.add("List to List", new ListViewDNDExample(), g.listtolist().getHTML());
+    dnd.add("Grid to Grid", new GridToGridExample(), g.gridtogrid().getHTML());
+    dnd.add("Tree to Tree", new TreePanelToTreePanelExample(), g.treetotree().getHTML());
+    dnd.add("TreeGrid to TreeGrid", new TreeGridToTreeGridExample(), g.treegridtotreegrid().getHTML());
+    dnd.add("Reordering Tree", new ReorderingTreePanelDNDExample(), g.reorderingtree().getHTML());
+    dnd.add("Image Organizer", new ImageOrganizerExample(), g.imageorganizer().getHTML());
     add(dnd);
 
     Category windows = new Category("Windows");
-    windows.addEntry("Hello World", new HelloWindowExample());
-    windows.addEntry("Accordion Window", new AccordionWindowExample());
-    windows.addEntry("Dialog", new DialogExample());
-    windows.addEntry("MessageBox", new MessageBoxExample());
+    windows.add("Hello World", new HelloWindowExample(), g.helloworld().getHTML());
+    windows.add("Accordion Window", new AccordionWindowExample(), g.accordionwindow().getHTML());
+    windows.add("Dialog", new DialogExample(), Examples.IMAGES.dialog().getHTML());
+    windows.add("MessageBox", new MessageBoxExample(), g.messagebox().getHTML());
     add(windows);
 
     Category layouts = new Category("Layouts");
-    layouts.addEntry("AccordionLayout", new AccordionLayoutExample());
-    layouts.addEntry("AnchorLayout", new AnchorLayoutExample());
-    layouts.addEntry("BorderLayout", new BorderLayoutExample(), true);
-    layouts.addEntry("CardLayout", new CardLayoutExample());
-    layouts.addEntry("CenterLayout", new CenterLayoutExample(), true);
-    layouts.addEntry("RowLayout", new RowLayoutExample(), true);
-    layouts.addEntry("Portal", new PortalExample(), true);
-    layouts.addEntry("VBoxLayout", new VBoxLayoutExample(), true);
-    layouts.addEntry("HBoxLayout", new HBoxLayoutExample(), true);
+    layouts.add("AccordionLayout", new AccordionLayoutExample(), Examples.IMAGES.accordionlayout().getHTML());
+    layouts.add("AnchorLayout", new AnchorLayoutExample(), Examples.IMAGES.anchorlayout().getHTML());
+    layouts.add("BorderLayout", new BorderLayoutExample(), Examples.IMAGES.borderlayout().getHTML(), true);
+    layouts.add("CardLayout", new CardLayoutExample(), Examples.IMAGES.cardlayout().getHTML());
+    layouts.add("CenterLayout", new CenterLayoutExample(), Examples.IMAGES.centerlayout().getHTML(), true);
+    layouts.add("RowLayout", new RowLayoutExample(), Examples.IMAGES.rowlayout().getHTML(), true);
+    layouts.add("Portal", new PortalExample(), Examples.IMAGES.portal().getHTML(), true);
+    layouts.add("VBoxLayout", new VBoxLayoutExample(), Examples.IMAGES.vboxlayout().getHTML(), true);
+    layouts.add("HBoxLayout", new HBoxLayoutExample(), Examples.IMAGES.hboxlayout().getHTML(), true);
     add(layouts);
 
     Category combos = new Category("Combos");
-    combos.addEntry("ComboBox", new ComboBoxExample());
-    combos.addEntry("Advanced ComboBox", new AdvancedComboBoxExample());
+    combos.add("ComboBox", new ComboBoxExample(), g.combobox().getHTML());
+    combos.add("Advanced ComboBox", new AdvancedComboBoxExample(), g.advancedcombobox().getHTML());
     add(combos);
 
     Category forms = new Category("Forms");
-    forms.addEntry("Forms", new FormsExample());
-    forms.addEntry("Advanced Forms", new AdvancedFormsExample(), false, true, HideMode.OFFSETS);
-    forms.addEntry("DualListField", new DualListFieldExample());
-    forms.addEntry("File Upload", new FileUploadExample());
+    forms.add("Forms", new FormsExample(), g.forms().getHTML());
+    forms.add("Advanced Forms", new AdvancedFormsExample(), g.advancedforms().getHTML(), false, true, HideMode.OFFSETS);
+    forms.add("DualListField", new DualListFieldExample(), g.duallistfield().getHTML());
+    forms.add("File Upload", new FileUploadExample(), g.fileupload().getHTML());
     add(forms);
 
     Category binding = new Category("Binding");
-    binding.addEntry("Basic Binding", new BasicBindingExample());
-    binding.addEntry("Grid Binding", new GridBindingExample());
-    binding.addEntry("Grid Store Binding", new GridStoreBindingExample());
+    binding.add("Basic Binding", new BasicBindingExample(), g.basicbinding().getHTML());
+    binding.add("Grid Binding", new GridBindingExample(), g.gridbinding().getHTML());
+    binding.add("Grid Store Binding", new GridStoreBindingExample(), g.gridstorebinding().getHTML());
     add(binding);
 
     Category toolbar = new Category("ToolBar & Menus");
-    toolbar.addEntry("Basic Toolbar", new ToolBarExample());
-    toolbar.addEntry("Status Toolbar", new StatusToolBarExample());
-    toolbar.addEntry("Advanced Toolbar", new AdvancedToolBarExample());
-    toolbar.addEntry("Overflow Toolbar", new ToolBarOverflowExample());
-    toolbar.addEntry("MenuBar", new MenuBarExample());
+    toolbar.add("Basic Toolbar", new ToolBarExample(), g.basictoolbar().getHTML());
+    toolbar.add("Status Toolbar", new StatusToolBarExample(), g.statustoolbar().getHTML());
+    toolbar.add("Advanced Toolbar", new AdvancedToolBarExample(), g.advancedtoolbar().getHTML());
+    toolbar.add("Overflow Toolbar", new ToolBarOverflowExample(), g.overflowtoolbar().getHTML());
+    toolbar.add("MenuBar", new MenuBarExample(), g.menubar().getHTML());
     add(toolbar);
 
     Category templates = new Category("Templates & Lists");
-    templates.addEntry("Templates", new TemplateExample());
-    templates.addEntry("ListView", new ListViewExample());
-    templates.addEntry("CheckBoxListView", new CheckBoxListViewExample());
-    templates.addEntry("Advanced ListView", new ImageChooserExample());
+    templates.add("Templates", new TemplateExample(), g.templates().getHTML());
+    templates.add("ListView", new ListViewExample(), g.listview().getHTML());
+    templates.add("CheckBoxListView", new CheckBoxListViewExample(), g.checkboxlistview().getHTML());
+    templates.add("Advanced ListView", new ImageChooserExample(), g.advancedlistview().getHTML());
     add(templates);
 
     Category button = new Category("Button");
-    button.addEntry("Buttons", new ButtonsExample());
-    button.addEntry("Button Aligning", new ButtonAlignExample());
+    button.add("Buttons", new ButtonsExample(), g.buttons().getHTML());
+    button.add("Button Aligning", new ButtonAlignExample(), g.buttonaligning().getHTML());
     add(button);
 
     Category misc = new Category("Misc");
-    misc.addEntry("ToolTips", new ToolTipsExample());
-    misc.addEntry("DatePicker", new DatePickerExample());
-    misc.addEntry("Draggable", new DraggableExample(), true);
-    misc.addEntry("Resizable", new ResizableExample(), true);
-    misc.addEntry("Slider", new SliderExample());
-    misc.addEntry("Custom Slider", new CustomSliderExample());
-    misc.addEntry("Fx", new FxExample(), true);
+    misc.add("ToolTips", new ToolTipsExample(), g.tooltips().getHTML());
+    misc.add("DatePicker", new DatePickerExample(), g.datepicker().getHTML());
+    misc.add("Draggable", new DraggableExample(), g.draggable().getHTML(), true);
+    misc.add("Resizable", new ResizableExample(), g.resizable().getHTML(), true);
+    misc.add("Slider", new SliderExample(), g.slider().getHTML());
+    misc.add("Custom Slider", new CustomSliderExample(), g.customslider().getHTML());
+    misc.add("Fx", new FxExample(), g.fx().getHTML(), true);
     add(misc);
 
     loadEntries(this);
@@ -244,7 +251,6 @@ public class ExamplesModel extends BaseTreeModel {
 
   public List<Entry> getEntries() {
     return entries;
-
   }
 
   private void loadEntries(TreeModel model) {

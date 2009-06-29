@@ -16,14 +16,19 @@ import com.extjs.gxt.samples.client.examples.model.FolderModel;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.data.BaseTreeLoader;
 import com.extjs.gxt.ui.client.data.ModelIconProvider;
+import com.extjs.gxt.ui.client.data.ModelKeyProvider;
 import com.extjs.gxt.ui.client.data.RpcProxy;
 import com.extjs.gxt.ui.client.data.TreeLoader;
 import com.extjs.gxt.ui.client.store.Store;
 import com.extjs.gxt.ui.client.store.StoreSorter;
 import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.util.IconHelper;
+import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.button.ToolButton;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
+import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -60,11 +65,15 @@ public class AsyncTreePanelExample extends LayoutContainer {
 
     // trees store
     TreeStore<FileModel> store = new TreeStore<FileModel>(loader);
+    store.setKeyProvider(new ModelKeyProvider<FileModel>() {
+      public String getKey(FileModel model) {
+        return model.getName();
+      }
+    });
     store.setStoreSorter(new StoreSorter<FileModel>() {
 
       @Override
-      public int compare(Store<FileModel> store, FileModel m1, FileModel m2,
-          String property) {
+      public int compare(Store<FileModel> store, FileModel m1, FileModel m2, String property) {
         boolean m1Folder = m1 instanceof FolderModel;
         boolean m2Folder = m2 instanceof FolderModel;
 
@@ -79,7 +88,9 @@ public class AsyncTreePanelExample extends LayoutContainer {
     });
 
     tree = new TreePanel<FileModel>(store);
+    tree.setStateful(true);
     tree.setDisplayProperty("name");
+
     tree.setIconProvider(new ModelIconProvider<FileModel>() {
 
       public AbstractImagePrototype getIcon(FileModel model) {
@@ -101,6 +112,25 @@ public class AsyncTreePanelExample extends LayoutContainer {
       }
     });
 
-    add(tree);
+    ContentPanel cp = new ContentPanel();
+    cp.setHeading("Async TreePanel");
+    cp.setLayout(new FitLayout());
+    cp.add(tree);
+    cp.setSize(315, 400);
+
+    ToolTipConfig config = new ToolTipConfig();
+    config.setTitle("Example Information");
+    config.setShowDelay(1);
+    config.setText("In this example state has been enabled for the tree. When enabled, the expand state of the tree is "
+        + "saved and restored using the StateManager. Try refreshing the browser after expanding some nodes in the "
+        + "tree. Notice that this works with asynchronous loading of nodes.");
+    
+
+    ToolButton btn = new ToolButton("x-tool-help");
+    btn.setToolTip(config);
+
+    cp.getHeader().addTool(btn);
+
+    add(cp);
   }
 }

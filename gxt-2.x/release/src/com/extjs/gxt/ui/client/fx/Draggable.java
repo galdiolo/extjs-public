@@ -490,7 +490,7 @@ public class Draggable extends BaseObservable {
       return;
     }
 
-    ce.preventDefault();
+    
 
     startBounds = dragWidget.el().getBounds();
 
@@ -509,6 +509,10 @@ public class Draggable extends BaseObservable {
       conHeight = container.getOffsetHeight();
     }
 
+    if (startDragDistance == 0) {
+      startDrag(ce.getEvent());
+    }
+    
   }
 
   protected void onMouseMove(Event event) {
@@ -607,6 +611,8 @@ public class Draggable extends BaseObservable {
     XDOM.getBodyEl().addStyleName("x-unselectable");
     XDOM.getBodyEl().addStyleName("x-dd-cursor");
     dragWidget.el().makePositionable();
+    
+    event.preventDefault();
 
     Shim.get().cover(true);
 

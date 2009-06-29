@@ -163,7 +163,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
    * @return the model at the passed index
    */
   public M getAt(int index) {
-    return index < all.size() ? all.get(index) : null;
+    return index >= 0 && index < all.size() ? all.get(index) : null;
   }
 
   /**
@@ -307,7 +307,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
   }
 
   /**
-   * Ses the sort direction.
+   * Sets the sort direction.
    * 
    * @param dir the sort direction
    */

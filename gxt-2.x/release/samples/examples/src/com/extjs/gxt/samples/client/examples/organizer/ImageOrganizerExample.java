@@ -74,7 +74,7 @@ public class ImageOrganizerExample extends LayoutContainer {
 
     ToolBar toolBar = new ToolBar();
     Button newAlbum = new Button("New Album");
-    newAlbum.setIcon(Examples.IMAGES.album());
+    newAlbum.setIcon(Examples.ICONS.album());
     newAlbum.addSelectionListener(new SelectionListener<ButtonEvent>() {
       @Override
       public void componentSelected(ButtonEvent ce) {

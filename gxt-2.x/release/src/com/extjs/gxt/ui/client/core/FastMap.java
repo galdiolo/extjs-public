@@ -156,10 +156,11 @@ public class FastMap<V> extends AbstractMap<String, V> {
       javaMap.clear();
     }
   }
-
-  public boolean containsKey(String key) {
+  
+  @Override
+  public boolean containsKey(Object key) {
     if (GWT.isScript()) {
-      return map.containsKey(key);
+      return map.containsKey(String.valueOf(key));
     } else {
       return javaMap.containsKey(key);
     }

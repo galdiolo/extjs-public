@@ -66,10 +66,10 @@ public class GroupSummaryView extends GroupingView {
       }
     }
   }
-  
+
   @SuppressWarnings("unchecked")
-  protected Map<String, Object> calculate(List<ModelData> models, List<ColumnData> cs) {
-    Map<String, Object> data = new FastMap<Object>();
+  protected Map<String, Number> calculate(List<ModelData> models, List<ColumnData> cs) {
+    Map<String, Number> data = new FastMap<Number>();
 
     for (int j = 0, jlen = models.size(); j < jlen; j++) {
       ModelData m = models.get(j);
@@ -150,25 +150,26 @@ public class GroupSummaryView extends GroupingView {
   protected void onRemove(ListStore<ModelData> ds, ModelData m, int index, boolean isUpdate) {
     super.onRemove(ds, m, index, isUpdate);
     if (!isUpdate) {
-      refreshSummaryById(m.<String> get("_groupId"));
+      String groupField = getGroupField();
+      refreshSummary(groupField, getGroup(m.get(groupField), m, index, cm.findColumnIndex(groupField), ds));
     }
   }
 
   @Override
   protected void onUpdate(ListStore<ModelData> store, ModelData model) {
     super.onUpdate(store, model);
-    refreshSummaryById(model.<String> get("_groupId"));
+    String groupField = getGroupField();
+    refreshSummary(groupField, getGroup(model.get(groupField), model, -1, cm.findColumnIndex(groupField), ds));
   }
 
-  @SuppressWarnings("unchecked")
-  protected void refreshSummaryById(String id) {
-    Element g = XDOM.getElementById(id);
+  protected void refreshSummary(String groupField, String group) {
+    Element g = XDOM.getElementById(getGroupId(grid.getId(), groupField, group));
     if (g == null) {
       return;
     }
-    List<ModelData> models = grid.store.findModels("_groupId", id);
+    List<ModelData> models = grid.store.findModels(groupField, group);
     List<ColumnData> cs = getColumnData();
-    Map data = calculate(models, cs);
+    Map<String, Number> data = calculate(models, cs);
     String markup = renderSummary(data, cs);
     El existing = getSummaryNode(g);
     if (existing != null) {
@@ -190,7 +191,7 @@ public class GroupSummaryView extends GroupingView {
       String css = i == 0 ? "x-grid3-cell-first " : (i == last ? "x-grid3-cell-last " : "");
       p.set("css", css);
       if (cf.getSummaryFormat() != null) {
-        p.set("value", cf.getSummaryFormat().format(((Number)data.get(c.name)).doubleValue()));
+        p.set("value", cf.getSummaryFormat().format(((Number) data.get(c.name)).doubleValue()));
       } else if (cf.getSummaryRenderer() != null) {
         p.set("value", cf.getSummaryRenderer().render(data.get(c.name), data));
       } else {

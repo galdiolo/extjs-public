@@ -32,21 +32,16 @@ public class ToolTip extends Tip {
 
   protected Component target;
   protected Point targetXY = new Point(0, 0);
-
   protected Timer dismissTimer;
   protected Timer showTimer;
   protected Timer hideTimer;
-
   protected String anchorStyle;
   protected El anchorEl;
+  protected String title, text;
+  protected Listener<ComponentEvent> listener;
+  protected ToolTipConfig toolTipConfig;
 
   private Date lastActive;
-
-  protected String title, text;
-
-  protected Listener<ComponentEvent> listener;
-
-  protected ToolTipConfig toolTipConfig;
 
   /**
    * Creates a new tool tip.
@@ -78,6 +73,20 @@ public class ToolTip extends Tip {
     initTarget(target);
   }
 
+  /**
+   * Returns the quick show interval.
+   * 
+   * @return the quick show interval
+   */
+  public int getQuickShowInterval() {
+    return quickShowInterval;
+  }
+
+  /**
+   * Returns the current tool tip config.
+   * 
+   * @return the tool tip config
+   */
   public ToolTipConfig getToolTipConfig() {
     return toolTipConfig;
   }
@@ -88,7 +97,7 @@ public class ToolTip extends Tip {
     lastActive = new Date();
     super.hide();
   }
-
+  
   public void initTarget(final Component target) {
     if (this.target != null) {
       this.target.addListener(Events.OnMouseOver, listener);
@@ -131,8 +140,18 @@ public class ToolTip extends Tip {
     target.sinkEvents(Event.ONMOUSEOVER | Event.ONMOUSEOUT | Event.ONMOUSEMOVE);
   }
 
+  /**
+   * Sets the quick show interval (defaults to 250).
+   * 
+   * @param quickShowInterval the quick show interval
+   */
+  public void setQuickShowInterval(int quickShowInterval) {
+    this.quickShowInterval = quickShowInterval;
+  }
+
   @Override
   public void show() {
+    if (disabled) return;
     String origAnchor = null;
     boolean origConstrainPosition = false;
     if (toolTipConfig.getAnchor() != null) {
@@ -159,6 +178,7 @@ public class ToolTip extends Tip {
 
   @Override
   public void showAt(int x, int y) {
+    if (disabled) return;
     lastActive = new Date();
     clearTimers();
     super.showAt(x, y);
@@ -182,6 +202,11 @@ public class ToolTip extends Tip {
     if (!hidden) {
       updateContent();
     }
+  }
+
+  protected void afterRender() {
+    super.afterRender();
+    anchorEl.setStyleAttribute("zIndex", el().getZIndex() + 1);
   }
 
   protected void clearTimer(String timer) {
@@ -225,45 +250,6 @@ public class ToolTip extends Tip {
     } else if (!hidden && toolTipConfig.isAutoHide()) {
       show();
     }
-  }
-
-  protected void onMouseMove(ComponentEvent ce) {
-    targetXY = ce.getXY();
-    if (!hidden && toolTipConfig.isTrackMouse()) {
-      setPagePosition(getTargetXY(0));
-    }
-  }
-
-  protected void onTargetOut(ComponentEvent ce) {
-    if (disabled) {
-      return;
-    }
-    clearTimer("show");
-    if (toolTipConfig.isAutoHide()) {
-      delayHide();
-    }
-  }
-
-  protected void onTargetOver(ComponentEvent ce) {
-    if (disabled || !ce.within(target.getElement())) {
-      return;
-    }
-
-    clearTimer("hide");
-    targetXY = ce.getXY();
-    delayShow();
-  }
-
-  protected void onRender(Element target, int index) {
-    super.onRender(target, index);
-    anchorEl = new El(DOM.createDiv());
-    anchorEl.addStyleName("x-tip-anchor");
-    el().appendChild(anchorEl.dom);
-  }
-
-  protected void afterRender() {
-    super.afterRender();
-    anchorEl.setStyleAttribute("zIndex", el().getZIndex() + 1);
   }
 
   protected String getAnchorAlign() {
@@ -318,6 +304,44 @@ public class ToolTip extends Tip {
     offsets[1] += mouseOffset[1];
 
     return offsets;
+  }
+
+  protected void onMouseMove(ComponentEvent ce) {
+    targetXY = ce.getXY();
+    if (!hidden && toolTipConfig.isTrackMouse()) {
+      Point p = getTargetXY(0);
+      if (constrainPosition) {
+        p = el().adjustForConstraints(p);
+      }
+      setPagePosition(p);
+    }
+  }
+
+  protected void onRender(Element target, int index) {
+    super.onRender(target, index);
+    anchorEl = new El(DOM.createDiv());
+    anchorEl.addStyleName("x-tip-anchor");
+    el().appendChild(anchorEl.dom);
+  }
+
+  protected void onTargetOut(ComponentEvent ce) {
+    if (disabled) {
+      return;
+    }
+    clearTimer("show");
+    if (toolTipConfig.isAutoHide()) {
+      delayHide();
+    }
+  }
+
+  protected void onTargetOver(ComponentEvent ce) {
+    if (disabled || !ce.within(target.getElement())) {
+      return;
+    }
+
+    clearTimer("hide");
+    targetXY = ce.getXY();
+    delayShow();
   }
 
   protected void syncAnchor() {
@@ -382,8 +406,8 @@ public class ToolTip extends Tip {
     if (toolTipConfig.getAnchor() != null) {
       targetCounter++;
       int[] offsets = getOffsets();
-      Point xy = (toolTipConfig.isAnchorToTarget() && !toolTipConfig.isTrackMouse())
-          ? el().getAlignToXY(target.el().dom, getAnchorAlign(), null) : targetXY;
+      Point xy = (toolTipConfig.isAnchorToTarget() && !toolTipConfig.isTrackMouse()) ? el().getAlignToXY(
+          target.el().dom, getAnchorAlign(), null) : targetXY;
 
       int dw = XDOM.getViewWidth(false) - 5;
       int dh = XDOM.getViewHeight(false) - 5;

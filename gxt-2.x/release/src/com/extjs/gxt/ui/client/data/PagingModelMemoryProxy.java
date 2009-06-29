@@ -48,8 +48,13 @@ public class PagingModelMemoryProxy implements
     return data;
   }
 
+  @SuppressWarnings("unchecked")
   public void load(DataReader<PagingLoadResult<? extends ModelData>> reader,
       Object loadConfig, AsyncCallback<PagingLoadResult<? extends ModelData>> callback) {
+    
+    if (reader != null) {
+      data = (List)reader.read(loadConfig, data);
+    }
 
     PagingLoadConfig config = (PagingLoadConfig) loadConfig;
 

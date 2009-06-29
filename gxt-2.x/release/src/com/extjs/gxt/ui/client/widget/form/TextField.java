@@ -458,11 +458,6 @@ public class TextField<D> extends Field<D> {
       });
     }
 
-    // text cell somtimes jumps when in tabe cell on click
-    if (GXT.isIE && target.getTagName().equals("TD")) {
-      fly(target).makePositionable();
-    }
-
     applyEmptyText();
   }
 

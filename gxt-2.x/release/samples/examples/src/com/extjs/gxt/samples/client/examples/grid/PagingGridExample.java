@@ -9,11 +9,14 @@ package com.extjs.gxt.samples.client.examples.grid;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.extjs.gxt.samples.client.ExampleServiceAsync;
 import com.extjs.gxt.samples.client.Examples;
 import com.extjs.gxt.samples.client.examples.model.Post;
 import com.extjs.gxt.ui.client.Registry;
+import com.extjs.gxt.ui.client.Style.SortDir;
+import com.extjs.gxt.ui.client.data.BasePagingLoadConfig;
 import com.extjs.gxt.ui.client.data.BasePagingLoader;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.PagingLoadConfig;
@@ -74,10 +77,27 @@ public class PagingGridExample extends LayoutContainer {
 
     ColumnModel cm = new ColumnModel(columns);
 
-    Grid<Post> grid = new Grid<Post>(store, cm);
+    final Grid<Post> grid = new Grid<Post>(store, cm);
+    grid.setStateId("pagingGridExample");
+    grid.setStateful(true);
     grid.addListener(Events.Attach, new Listener<GridEvent<Post>>() {
       public void handleEvent(GridEvent<Post> be) {
-        loader.load(0, 50);
+        PagingLoadConfig config = new BasePagingLoadConfig();
+        config.setOffset(0);
+        config.setLimit(50);
+        
+        Map<String, Object> state = grid.getState();
+        if (state.containsKey("offset")) {
+          int offset = (Integer)state.get("offset");
+          int limit = (Integer)state.get("limit");
+          config.setOffset(offset);
+          config.setLimit(limit);
+        }
+        if (state.containsKey("sortField")) {
+          config.setSortField((String)state.get("sortField"));
+          config.setSortDir(SortDir.valueOf((String)state.get("sortDir")));
+        }
+        loader.load(config);
       }
     });
     grid.setLoadMask(true);
@@ -88,7 +108,7 @@ public class PagingGridExample extends LayoutContainer {
     panel.setFrame(true);
     panel.setCollapsible(true);
     panel.setAnimCollapse(false);
-    panel.setIcon(Examples.IMAGES.table());
+    panel.setIcon(Examples.ICONS.table());
     panel.setHeading("Paging Grid");
     panel.setLayout(new FitLayout());
     panel.add(grid);

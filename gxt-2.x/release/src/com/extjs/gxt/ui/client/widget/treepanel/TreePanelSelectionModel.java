@@ -16,7 +16,10 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.TreePanelEvent;
+import com.extjs.gxt.ui.client.store.StoreEvent;
+import com.extjs.gxt.ui.client.store.StoreListener;
 import com.extjs.gxt.ui.client.store.TreeStore;
+import com.extjs.gxt.ui.client.store.TreeStoreEvent;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.selection.AbstractStoreSelectionModel;
@@ -59,6 +62,35 @@ public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreS
     }
 
   };
+
+  public TreePanelSelectionModel() {
+    storeListener = new StoreListener<M>() {
+      @Override
+      public void storeAdd(StoreEvent<M> se) {
+        TreeStoreEvent<M> tse = (TreeStoreEvent) se;
+        onAdd(tse.getChildren());
+      }
+
+      @Override
+      public void storeClear(StoreEvent<M> se) {
+        onClear(se);
+      }
+
+      @Override
+      public void storeRemove(StoreEvent<M> se) {
+        TreeStoreEvent<M> tse = (TreeStoreEvent) se;
+        onRemove(tse.getChild());
+        for (M child : tse.getChildren()) {
+          onRemove(child);
+        }
+      }
+
+      @Override
+      public void storeUpdate(StoreEvent<M> se) {
+        onUpdate(se.getModel());
+      }
+    };
+  }
 
   public void bindTree(TreePanel tree) {
     if (this.tree != null) {
@@ -261,6 +293,10 @@ public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreS
       return;
     }
 
+    if (be.isRightClick() && isSelected((M) be.getItem())) {
+      return;
+    }
+
     M sel = (M) be.getItem();
 
     switch (selectionMode) {
@@ -275,6 +311,9 @@ public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreS
         doSingleSelect(sel, false);
         break;
       case MULTI:
+        if (isSelected(sel) && !be.isControlKey() && !be.isShiftKey()) {
+          return;
+        }
         if (be.isShiftKey() && lastSelected != null) {
           List<M> items = new ArrayList<M>();
           if (lastSelected == sel) {

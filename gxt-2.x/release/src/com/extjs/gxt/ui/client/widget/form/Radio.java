@@ -45,6 +45,7 @@ public class Radio extends CheckBox {
     if (value == null) {
       value = new Boolean(false);
     }
+    focusValue = value;
     super.setValue(value);
     if (value && group != null) {
       group.onRadioSelected(this);

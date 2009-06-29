@@ -46,7 +46,7 @@ public class FilterTreePanelExample extends LayoutContainer {
     tree.setIconProvider(new ModelIconProvider<ModelData>() {
       public AbstractImagePrototype getIcon(ModelData model) {
         if (((TreeModel) model).isLeaf()) {
-          return Examples.IMAGES.music();
+          return Examples.ICONS.music();
         }
         return null;
       }

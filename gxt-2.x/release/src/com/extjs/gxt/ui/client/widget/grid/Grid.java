@@ -7,7 +7,10 @@
  */
 package com.extjs.gxt.ui.client.widget.grid;
 
+import java.util.Map;
+
 import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.ModelStringProvider;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -17,14 +20,69 @@ import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.grid.GridSelectionModel.Callback;
-import com.extjs.gxt.ui.client.widget.menu.Menu;
+import com.extjs.gxt.ui.client.widget.grid.GridSelectionModel.Cell;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.Timer;
 
 /**
  * This class represents the primary interface of a component based grid
- * control.
+ * control. The grid requires a <code>ListStore</code> and
+ * <code>ColumnModel</code> when constructed. Each model in the store will be
+ * rendered as a row in the grid. Any updates to the store are automatically
+ * pushed to the grid. This includes inserting, removing, sorting and filter.
+ * 
+ * <p />
+ * Grid support several ways to manage column widths.
+ * 
+ * <ol>
+ * <li>The most basic approach is to simply give pixel widths to each column.
+ * Columns widths will match the specified values.</li>
+ * <li>A column can be set to "fill" all available space. As the width of the
+ * grid changes, or columns are resized, the "filling" column's width is
+ * adjusted so that the column's fill the available width with no horizontal
+ * scrolling. See @link {@link Grid#setAutoExpandColumn(String)}.</li>
+ * <li>Grid can resize columns based on a "weight". As the width of the grid, or
+ * columns change, the "weight" is used to allocate the extra space, or the
+ * space needed to be reduced. Use {@link GridView#setAutoFill(boolean)} to
+ * enable this feature. With auto fill, the calculations are only run once.
+ * After the grid is rendered, the columns widths will not be adjusted when
+ * available width changes. You can use @link
+ * {@link GridView#setForceFit(boolean)} to always run the width calculations on
+ * any changes to available width or column sizes. Columns can be "fixed" which
+ * prevents their columns widths to be adjusted by the grid "weight"
+ * calculations. See @link {@link ColumnConfig#setFixed(boolean)}.</li>
+ * </ol>
+ * 
+ * <p />
+ * When state is enabled (default is false), Grid will save and restore the
+ * column width, column hidden state, sort direction, and sort field. To enable
+ * state, see {@link #setStateful(boolean)}. When the store uses a
+ * <code>PagingListLoader</code> the offset and limit parameter are saved with
+ * the Grid's state. These 2 values can be retrieved and used to make the first
+ * load request to return the user to the same location they left the grid.
+ * 
+ * Code snippet:
+ * 
+ * <pre>
+      PagingLoadConfig config = new BasePagingLoadConfig();
+      config.setOffset(0);
+      config.setLimit(50);
+      
+      Map<String, Object> state = grid.getState();
+      if (state.containsKey("offset")) {
+        int offset = (Integer)state.get("offset");
+        int limit = (Integer)state.get("limit");
+        config.setOffset(offset);
+        config.setLimit(limit);
+      }
+      if (state.containsKey("sortField")) {
+        config.setSortField((String)state.get("sortField"));
+        config.setSortDir(SortDir.valueOf((String)state.get("sortDir")));
+      }
+      loader.load(config);
+ * </pre>
  * 
  * <dl>
  * <dt><b>Events:</b></dt>
@@ -204,6 +262,7 @@ public class Grid<M extends ModelData> extends BoxComponent {
   protected GridView view;
   protected boolean viewReady;
   protected ModelStringProvider<M> stringProvider;
+  protected EditorSupport<M> editSupport;
 
   // config
   private int minColumnWidth = 25;
@@ -214,11 +273,8 @@ public class Grid<M extends ModelData> extends BoxComponent {
   private int autoExpandMin = 25;
   private boolean enableColumnResize = true;
   private boolean hideHeaders;
+  private int lazyRowRender = 10;
   private boolean loadMask;
-
-  protected Grid() {
-
-  }
 
   /**
    * Creates a new grid.
@@ -233,6 +289,10 @@ public class Grid<M extends ModelData> extends BoxComponent {
     focusable = true;
     baseStyle = "x-grid-panel";
     setSelectionModel(new GridSelectionModel<M>());
+  }
+
+  protected Grid() {
+
   }
 
   /**
@@ -269,6 +329,15 @@ public class Grid<M extends ModelData> extends BoxComponent {
    */
   public ColumnModel getColumnModel() {
     return cm;
+  }
+
+  /**
+   * Returns the time in ms after the rows get rendered.
+   * 
+   * @return the lazy row rendering time
+   */
+  public int getLazyRowRender() {
+    return lazyRowRender;
   }
 
   /**
@@ -430,12 +499,6 @@ public class Grid<M extends ModelData> extends BoxComponent {
     this.autoExpandMin = autoExpandMin;
   }
 
-  @Override
-  public void setContextMenu(Menu menu) {
-    // make public
-    super.setContextMenu(menu);
-  }
-
   /**
    * Sets whether columns may be resized (defaults to true).
    * 
@@ -452,6 +515,16 @@ public class Grid<M extends ModelData> extends BoxComponent {
    */
   public void setHideHeaders(boolean hideHeaders) {
     this.hideHeaders = hideHeaders;
+  }
+
+  /**
+   * Sets the time in ms after the row gets rendered (defaults to 10). 0 means
+   * that the rows get rendered as soon as the grid gets rendered.
+   * 
+   * @param lazyRowRender the time in ms after the rows get rendered.
+   */
+  public void setLazyRowRender(int lazyRowRender) {
+    this.lazyRowRender = lazyRowRender;
   }
 
   /**
@@ -527,19 +600,53 @@ public class Grid<M extends ModelData> extends BoxComponent {
   }
 
   protected void afterRender() {
-    super.afterRender();
-    view.init(this);
     view.render();
+    super.afterRender();
+    if (lazyRowRender > 0) {
+      Timer t = new Timer() {
+        @Override
+        public void run() {
+          afterRenderView();
+        }
+      };
+      t.schedule(lazyRowRender);
+    } else {
+      afterRenderView();
+    }
+  }
+
+  protected void afterRenderView() {
     view.afterRender();
     viewReady = true;
+  }
+
+  @Override
+  protected void applyState(Map<String, Object> state) {
+    super.applyState(state);
+    if (isStateful()) {
+      for (ColumnConfig c : cm.getColumns()) {
+        String id = c.getId();
+        if (state.containsKey("hidden" + id)) {
+          c.setHidden((Boolean) state.get("hidden" + id));
+        }
+        if (state.containsKey("width" + id)) {
+          c.setWidth((Integer) state.get("width" + id));
+        }
+
+      }
+      String sortField = (String) state.get("sortField");
+      if (store.getLoader() == null && sortField != null) {
+        String sortDir = (String) state.get("sortDir");
+        SortDir dir = SortDir.findDir(sortDir);
+        store.sort(sortField, dir);
+      }
+    }
   }
 
   @Override
   protected ComponentEvent createComponentEvent(Event event) {
     return new GridEvent<M>(this, event);
   }
-  
-
 
   @Override
   protected void doAttachChildren() {
@@ -551,6 +658,10 @@ public class Grid<M extends ModelData> extends BoxComponent {
   protected void doDetachChildren() {
     super.doDetachChildren();
     view.doDetach();
+  }
+
+  protected EditorSupport<M> getEditSupport() {
+    return new EditorSupport<M>();
   }
 
   protected void onClick(GridEvent<M> e) {
@@ -589,6 +700,7 @@ public class Grid<M extends ModelData> extends BoxComponent {
     setElement(DOM.createDiv(), target, index);
     super.onRender(target, index);
     el().setStyleAttribute("position", "relative");
+    view.init(this);
   }
 
   @Override
@@ -596,12 +708,12 @@ public class Grid<M extends ModelData> extends BoxComponent {
     super.onResize(width, height);
     if (viewReady) {
       view.calculateVBar(true);
+    } else {
+      view.layout();
     }
   }
 
-  @SuppressWarnings("unchecked")
-  protected Cell walkCells(int row, int col, int step, Callback callback,
-      boolean acceptNavs) {
+  protected Cell walkCells(int row, int col, int step, Callback callback, boolean acceptNavs) {
     boolean first = true;
     int clen = cm.getColumnCount();
     int rlen = store.getCount();

@@ -46,7 +46,7 @@ public class GridToGridExample extends LayoutContainer {
 
     ContentPanel cp = new ContentPanel();
     cp.setSize(600, 300);
-    cp.setHeading("DD Test");
+    cp.setHeading("Grid DND Example");
     cp.setLayout(new RowLayout(Orientation.HORIZONTAL));
 
     ToolBar toolBar = new ToolBar();
@@ -80,7 +80,7 @@ public class GridToGridExample extends LayoutContainer {
     grid.setBorders(true);
     
     RowData data = new RowData(.5, 1);
-    data.setMargins(new Margins(10));
+    data.setMargins(new Margins(6));
     cp.add(grid, data);
 
     store = new ListStore<Stock>();
@@ -89,6 +89,9 @@ public class GridToGridExample extends LayoutContainer {
     grid2.setBorders(false);
     grid2.setAutoExpandColumn("name");
     grid2.setBorders(true);
+    
+    data = new RowData(.5, 1);
+    data.setMargins(new Margins(6, 6, 6, 0));
     cp.add(grid2, data);
 
     new GridDragSource(grid);

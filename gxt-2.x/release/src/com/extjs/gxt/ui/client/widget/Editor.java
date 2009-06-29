@@ -402,12 +402,11 @@ public class Editor extends BoxComponent {
     startValue = preProcessValue(value);
     field.setValue(startValue);
 
-    doAutoSize();
-
     editing = true;
 
     el().setVisible(true);
     el().makePositionable(true);
+    doAutoSize();
     el().alignTo(boundEl.dom, alignment, new int[] {0, -1});
 
     show();

@@ -892,11 +892,11 @@ public class TabPanel extends Container<TabItem> {
     stack = new AccessStack();
 
     if (tabPosition == TabPosition.TOP) {
-      bar = el().createChild("<div class='x-tab-panel-header'></div>");
-      body = el().createChild("<div class='x-tab-panel-body x-tab-panel-body-top'></div");
+      bar = el().createChild("<div class='" + baseStyle + "-header'></div>");
+      body = el().createChild("<div class='" + baseStyle + "-body " + baseStyle + "-body-top'></div");
     } else {
-      body = el().createChild("<div class='x-tab-panel-body x-tab-panel-body-bottom'></div");
-      bar = el().createChild("<div class='x-tab-panel-footer'></div>");
+      body = el().createChild("<div class='" + baseStyle + "-body " + baseStyle + "-body-bottom'></div");
+      bar = el().createChild("<div class='" + baseStyle + "-footer'></div>");
     }
 
     if (!bodyBorder) {
@@ -924,7 +924,7 @@ public class TabPanel extends Container<TabItem> {
 
     if (plain) {
       String p = tabPosition == TabPosition.BOTTOM ? "bottom" : "header";
-      bar.addStyleName("x-tab-panel-" + p + "-plain");
+      bar.addStyleName(baseStyle+"-" + p + "-plain");
     }
 
     if (itemTemplate == null) {
@@ -968,8 +968,6 @@ public class TabPanel extends Container<TabItem> {
     width -= el().getFrameWidth("lr");
     if (height != Style.DEFAULT) {
       body.setHeight(height - hh, true);
-    } else {
-      body.setHeight("auto");
     }
     if (width != Style.DEFAULT) {
       bar.setWidth(width, true);

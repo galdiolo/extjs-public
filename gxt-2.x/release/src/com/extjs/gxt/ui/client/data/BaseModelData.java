@@ -9,11 +9,11 @@ package com.extjs.gxt.ui.client.data;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import com.extjs.gxt.ui.client.core.FastMap;
+import com.extjs.gxt.ui.client.core.FastSet;
 
 /**
  * Default <code>ModelData</code> implementation.
@@ -69,7 +69,7 @@ public class BaseModelData implements ModelData, Serializable {
   }
 
   public Collection<String> getPropertyNames() {
-    Set<String> set = new HashSet<String>();
+    Set<String> set = new FastSet();
     if (map != null) {
       set.addAll(map.keySet());
     }

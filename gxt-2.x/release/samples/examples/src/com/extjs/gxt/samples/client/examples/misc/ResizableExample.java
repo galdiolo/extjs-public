@@ -25,7 +25,7 @@ public class ResizableExample extends LayoutContainer {
 
     ContentPanel cp = new ContentPanel();
     cp.setHeading("8-Way Resizing");
-    cp.setIcon(Examples.IMAGES.text());
+    cp.setIcon(Examples.ICONS.text());
     cp.setBodyStyleName("pad-text");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
 

@@ -34,7 +34,7 @@ public class BasicTreePanelExample extends LayoutContainer {
 
     final TreePanel<ModelData> tree = new TreePanel<ModelData>(store);
     tree.setDisplayProperty("name");
-    tree.getStyle().setLeafIcon(Examples.IMAGES.music());
+    tree.getStyle().setLeafIcon(Examples.ICONS.music());
     tree.setWidth(250);
 
     ButtonBar buttonBar = new ButtonBar();

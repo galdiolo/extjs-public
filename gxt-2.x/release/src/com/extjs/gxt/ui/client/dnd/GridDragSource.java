@@ -35,7 +35,6 @@ public class GridDragSource extends DragSource {
   public GridDragSource(Grid grid) {
     super(grid);
     this.grid = grid;
-    draggable.setStartDragDistance(0);
   }
 
   /**

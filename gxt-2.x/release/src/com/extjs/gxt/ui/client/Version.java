@@ -7,16 +7,21 @@
  */
 package com.extjs.gxt.ui.client;
 
+import java.util.Date;
+
+import com.google.gwt.i18n.client.DateTimeFormat;
+
 /**
  * Contains the current codes release information. Use {@link GXT#getVersion()} to get
  * an instance of this class.
  */
 public final class Version {
 
-  private static final String release = "2.0-m3";
+  private static final String release = "2.0-rc1";
   private static final int major = 2;
   private static final int minor = 0;
   private static final int revision = 0;
+  private static final String buildTime = "06/25/2009 10:17";
 
   Version() {
 
@@ -56,6 +61,15 @@ public final class Version {
    */
   public int getRevision() {
     return revision;
+  }
+  
+  /**
+   * Returns the build time.
+   * 
+   * @return the build time
+   */
+  public Date getBuildTime() {
+    return DateTimeFormat.getFormat("MM/dd/yyyy hh:mm").parse(buildTime);
   }
 
 }

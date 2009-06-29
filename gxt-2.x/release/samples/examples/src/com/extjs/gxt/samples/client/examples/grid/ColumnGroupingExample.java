@@ -19,6 +19,7 @@ import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.Slider;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
+import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnData;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
@@ -99,10 +100,17 @@ public class ColumnGroupingExample extends LayoutContainer {
     column.setRenderer(change);
     configs.add(column);
 
-    column = new ColumnConfig("date", 100);
-    column.setHeader("Last Updated");
-    column.setWidth(100);
-    column.setAlignment(HorizontalAlignment.RIGHT);
+    column = new ColumnConfig("date", 125);
+    if (widget) {
+      Button btn = new Button("Updated");
+      btn.setStyleAttribute("float", "left");
+      column.setWidget(btn, "Last Updated");
+    } else {
+      column.setAlignment(HorizontalAlignment.RIGHT);
+      column.setHeader("Last Updated");
+    }
+    
+    
     column.setDateTimeFormat(DateTimeFormat.getShortDateFormat());
     configs.add(column);
 
@@ -135,7 +143,7 @@ public class ColumnGroupingExample extends LayoutContainer {
 
     ContentPanel cp = new ContentPanel();
     cp.setBodyBorder(false);
-    cp.setIcon(Examples.IMAGES.table());
+    cp.setIcon(Examples.ICONS.table());
     cp.setHeading(widget ? "Column Grouping with Widget" : "Column Grouping");
     cp.setButtonAlign(HorizontalAlignment.CENTER);
     cp.setLayout(new FitLayout());

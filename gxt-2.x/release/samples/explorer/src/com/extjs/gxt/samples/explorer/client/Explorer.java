@@ -23,6 +23,7 @@ import com.extjs.gxt.ui.client.mvc.Dispatcher;
 import com.extjs.gxt.ui.client.widget.Viewport;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.GWT.UncaughtExceptionHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
@@ -34,6 +35,13 @@ public class Explorer implements EntryPoint {
   private ExplorerModel model;
 
   public void onModuleLoad() {
+    if (!GWT.isScript()) {
+      GWT.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+        public void onUncaughtException(Throwable e) {
+          e.printStackTrace();
+        }
+      });
+    }
     ExampleServiceAsync service = (ExampleServiceAsync) GWT.create(ExampleService.class);
     ServiceDefTarget endpoint = (ServiceDefTarget) service;
     String moduleRelativeURL = "service";

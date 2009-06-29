@@ -42,21 +42,21 @@ public class AccordionWindowExample extends LayoutContainer {
 
     ToolBar toolBar = new ToolBar();
     Button item = new Button();
-    item.setIcon(Examples.IMAGES.connect());
+    item.setIcon(Examples.ICONS.connect());
     toolBar.add(item);
 
     toolBar.add(new SeparatorToolItem());
     complex.setTopComponent(toolBar);
 
     item = new Button();
-    item.setIcon(Examples.IMAGES.user_add());
+    item.setIcon(Examples.ICONS.user_add());
     toolBar.add(item);
 
     item = new Button();
-    item.setIcon(Examples.IMAGES.user_delete());
+    item.setIcon(Examples.ICONS.user_delete());
     toolBar.add(item);
 
-    complex.setIcon(Examples.IMAGES.accordion());
+    complex.setIcon(Examples.ICONS.accordion());
     complex.setLayout(new AccordionLayout());
 
     ContentPanel cp = new ContentPanel();

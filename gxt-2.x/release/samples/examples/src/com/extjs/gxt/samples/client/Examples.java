@@ -12,6 +12,7 @@ import java.util.Map;
 import com.extjs.gxt.samples.client.examples.model.Category;
 import com.extjs.gxt.samples.client.examples.model.Entry;
 import com.extjs.gxt.samples.client.icons.ExampleIcons;
+import com.extjs.gxt.samples.client.images.ExampleImages;
 import com.extjs.gxt.themes.client.Slate;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
@@ -50,7 +51,8 @@ public class Examples implements EntryPoint {
   public static final String SERVICE = "service";
   public static final String FILE_SERVICE = "fileservice";
   public static final String MODEL = "model";
-  public static final ExampleIcons IMAGES = GWT.create(ExampleIcons.class);
+  public static final ExampleIcons ICONS = GWT.create(ExampleIcons.class);
+  public static final ExampleImages IMAGES = GWT.create(ExampleImages.class);
 
   private Viewport viewport;
 
@@ -133,7 +135,7 @@ public class Examples implements EntryPoint {
     sb.append("<div id='demo-header' class='x-small-editor'><div id='demo-theme'></div><div id=demo-title>Ext GWT Examples</div></div>");
 
     HtmlContainer northPanel = new HtmlContainer(sb.toString());
-    northPanel.setEnableState(false);
+    northPanel.setStateful(false);
 
     ThemeManager.register(Slate.SLATE);
     ThemeSelector selector = new ThemeSelector();

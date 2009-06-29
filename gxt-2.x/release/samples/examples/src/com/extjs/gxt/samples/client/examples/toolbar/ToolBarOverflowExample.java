@@ -36,19 +36,19 @@ public class ToolBarOverflowExample extends LayoutContainer {
     ButtonGroup group = new ButtonGroup(2);
     group.setHeading("Clipboard");
 
-    Button btn = new Button("Cool", Examples.IMAGES.add16());
+    Button btn = new Button("Cool", Examples.ICONS.add16());
     group.add(btn);
 
-    btn = new Button("Cut", Examples.IMAGES.add16());
+    btn = new Button("Cut", Examples.ICONS.add16());
     Menu menu = new Menu();
     menu.add(new MenuItem("Copy me"));
     btn.setMenu(menu);
     group.add(btn);
 
-    btn = new Button("Copy", Examples.IMAGES.add16());
+    btn = new Button("Copy", Examples.ICONS.add16());
     group.add(btn);
 
-    btn = new Button("Paste", Examples.IMAGES.add16());
+    btn = new Button("Paste", Examples.ICONS.add16());
     group.add(btn);
 
     toolBar.add(group);
@@ -58,19 +58,19 @@ public class ToolBarOverflowExample extends LayoutContainer {
     group = new ButtonGroup(2);
     group.setHeading("Other Bugus Actions");
 
-    btn = new Button("Cool", Examples.IMAGES.add16());
+    btn = new Button("Cool", Examples.ICONS.add16());
     group.add(btn);
 
-    btn = new Button("Cut", Examples.IMAGES.add16());
+    btn = new Button("Cut", Examples.ICONS.add16());
     menu = new Menu();
     menu.add(new MenuItem("Copy me"));
     btn.setMenu(menu);
     group.add(btn);
 
-    btn = new Button("Copy", Examples.IMAGES.add16());
+    btn = new Button("Copy", Examples.ICONS.add16());
     group.add(btn);
 
-    btn = new Button("Paste", Examples.IMAGES.add16());
+    btn = new Button("Paste", Examples.ICONS.add16());
     group.add(btn);
 
     toolBar.add(group);

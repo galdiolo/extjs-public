@@ -63,7 +63,7 @@ public class ColumnModel extends BaseObservable {
   protected Grid<ModelData> grid;
   protected List<HeaderGroupConfig> groups = new ArrayList<HeaderGroupConfig>();
   protected List<AggregationRowConfig<?>> rows = new ArrayList<AggregationRowConfig<?>>();
-  
+
   /**
    * Creates a new column model.
    * 
@@ -72,7 +72,7 @@ public class ColumnModel extends BaseObservable {
   public ColumnModel(List<ColumnConfig> columns) {
     this.configs = columns;
   }
-  
+
   /**
    * Adds an aggregation row config to the column model.
    * 
@@ -81,7 +81,7 @@ public class ColumnModel extends BaseObservable {
   public void addAggregationRow(AggregationRowConfig<?> row) {
     rows.add(row);
   }
-  
+
   /**
    * Returns the aggregation row.
    * 
@@ -91,7 +91,7 @@ public class ColumnModel extends BaseObservable {
   public AggregationRowConfig<?> getAggregationRow(int rowIndex) {
     return rowIndex < rows.size() ? rows.get(rowIndex) : null;
   }
-  
+
   /**
    * Adds a group to the column model.
    * 
@@ -104,7 +104,7 @@ public class ColumnModel extends BaseObservable {
     config.setColumn(column);
     groups.add(config);
   }
-  
+
   /**
    * Finds the index of the first matching column for the given dataIndex.
    * 
@@ -119,7 +119,7 @@ public class ColumnModel extends BaseObservable {
     }
     return -1;
   }
-  
+
   /**
    * Returns the aggregation rows.
    * 
@@ -128,7 +128,7 @@ public class ColumnModel extends BaseObservable {
   public List<AggregationRowConfig<?>> getAggregationRows() {
     return rows;
   }
-  
+
   /**
    * Returns the column at the given index.
    * 
@@ -138,7 +138,7 @@ public class ColumnModel extends BaseObservable {
   public ColumnConfig getColumn(int colIndex) {
     return colIndex < configs.size() ? configs.get(colIndex) : null;
   }
-  
+
   /**
    * Returns the column's alignment.
    * 
@@ -396,8 +396,7 @@ public class ColumnModel extends BaseObservable {
    * @return true if resizable
    */
   public boolean isResizable(int colIndex) {
-    return colIndex >= 0 && configs.get(colIndex).isResizable()
-        && !configs.get(colIndex).isFixed();
+    return colIndex >= 0 && configs.get(colIndex).isResizable();
   }
 
   /**
@@ -490,10 +489,10 @@ public class ColumnModel extends BaseObservable {
       Rectangle r = new Rectangle();
       r.x = config.getColumn();
       r.y = config.getRow();
-      
+
       r.width = config.getColspan();
       r.height = config.getRowspan();
-      
+
       if (r.contains(column, row)) {
         return config;
       }

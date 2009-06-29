@@ -18,6 +18,7 @@ import com.extjs.gxt.ui.client.data.ChangeListener;
 import com.extjs.gxt.ui.client.data.DefaultModelComparer;
 import com.extjs.gxt.ui.client.data.ModelComparer;
 import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.data.ModelKeyProvider;
 import com.extjs.gxt.ui.client.data.SortInfo;
 import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.extjs.gxt.ui.client.event.EventType;
@@ -118,6 +119,7 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
   private ModelComparer<M> comparer;
   private ChangeListener changeListener;
   private boolean monitorChanges;
+  private ModelKeyProvider<M> keyProvider;
 
   @SuppressWarnings("unchecked")
   public Store() {
@@ -226,6 +228,17 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
   }
 
   /**
+   * Returns true if the two models are equal as defined by the model comparer.
+   * 
+   * @param model1 the first model
+   * @param model2 the second model
+   * @return true if equals
+   */
+  public boolean equals(M model1, M model2) {
+    return comparer.equals(model1, model2);
+  }
+
+  /**
    * Filters the store using the given property.
    * 
    * @param property the property to filter by
@@ -263,16 +276,17 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
     }
     return null;
   }
-
-  /**
-   * Returns true if the two models are equal as defined by the model comparer.
-   * 
-   * @param model1 the first model
-   * @param model2 the second model
-   * @return true if equals
-   */
-  public boolean equals(M model1, M model2) {
-    return comparer.equals(model1, model2);
+  
+  public M findModel(String key) {
+    if (keyProvider != null) {
+      for (int i = 0, len = all.size(); i < len; i++) {
+        String id = keyProvider.getKey(all.get(i));
+        if (key.equals(id)) {
+          return all.get(i);
+        }
+      }
+    }
+    return null;
   }
 
   /**
@@ -318,6 +332,15 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
    */
   public List<StoreFilter<M>> getFilters() {
     return filters;
+  }
+
+  /**
+   * Returns the model key provider.
+   * 
+   * @return the key provider
+   */
+  public ModelKeyProvider<M> getKeyProvider() {
+    return keyProvider;
   }
 
   /**
@@ -453,6 +476,16 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
     removeListener(Remove, listener);
     removeListener(Update, listener);
     removeListener(Clear, listener);
+  }
+
+  /**
+   * Sets the model key provider which is used to uniquely identify a model from
+   * an id. The store itself, does not use the key provider.
+   * 
+   * @param keyProvider the model key provider
+   */
+  public void setKeyProvider(ModelKeyProvider<M> keyProvider) {
+    this.keyProvider = keyProvider;
   }
 
   /**

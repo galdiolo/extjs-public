@@ -163,7 +163,7 @@ public class TreeSelectionModel extends AbstractSelectionModel<Tree, TreeItem> {
 
   @Override
   protected void onMouseDown(ContainerEvent ce) {
-    if (ce.isRightClick()) {
+    if (ce.isRightClick() && isSelected((TreeItem)ce.getItem())) {
       return;
     }
     TreeItem item = (TreeItem)ce.getItem();

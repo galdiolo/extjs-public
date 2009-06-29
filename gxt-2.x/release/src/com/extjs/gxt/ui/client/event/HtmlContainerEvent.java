@@ -22,20 +22,10 @@ import com.google.gwt.http.client.Response;
  */
 public class HtmlContainerEvent extends ContainerEvent<HtmlContainer, Component> {
 
-  /**
-   * The exception for remote requests.
-   */
   private Throwable exception;
-
-  /**
-   * The remote html.
-   */
   private String html;
-
-  /**
-   * The remote response.
-   */
   private Response response;
+  private HtmlContainer htmlContainer;
 
   /**
    * Creates a new event.
@@ -44,6 +34,7 @@ public class HtmlContainerEvent extends ContainerEvent<HtmlContainer, Component>
    */
   public HtmlContainerEvent(HtmlContainer container) {
     super(container);
+    this.htmlContainer = container;
   }
 
   /**
@@ -54,6 +45,7 @@ public class HtmlContainerEvent extends ContainerEvent<HtmlContainer, Component>
    */
   public HtmlContainerEvent(HtmlContainer container, Component component) {
     super(container, component);
+    this.htmlContainer = container;
   }
 
   /**
@@ -72,6 +64,15 @@ public class HtmlContainerEvent extends ContainerEvent<HtmlContainer, Component>
    */
   public String getHtml() {
     return html;
+  }
+
+  /**
+   * Returns the source html container.
+   * 
+   * @return the html container
+   */
+  public HtmlContainer getHtmlContainer() {
+    return htmlContainer;
   }
 
   /**
@@ -99,6 +100,15 @@ public class HtmlContainerEvent extends ContainerEvent<HtmlContainer, Component>
    */
   public void setHtml(String html) {
     this.html = html;
+  }
+
+  /**
+   * Sets the source html container.
+   * 
+   * @param htmlContainer the html container
+   */
+  public void setHtmlContainer(HtmlContainer htmlContainer) {
+    this.htmlContainer = htmlContainer;
   }
 
   /**

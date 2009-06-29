@@ -125,7 +125,7 @@ public class CompositeElement {
    * @return the element
    */
   public Element getElement(int index) {
-    return (Element) items.get(index);
+    return (Element) (index < items.size() ? items.get(index) : null);
   }
 
   /**

@@ -591,7 +591,7 @@ public class Button extends BoxComponent implements IconSupport {
         StringBuffer sb = new StringBuffer();
         sb.append("<table cellspacing=\"0\" class=\"x-btn\" role=\"presentation\"><tbody class=\"{2}\" >");
         sb.append("<tr><td class=\"x-btn-tl\"><i>&#160;</i></td><td class=\"x-btn-tc\"></td><td class=\"x-btn-tr\"><i>&#160;</i></td></tr>");
-        sb.append("<tr><td class=\"x-btn-ml\"><i>&#160;</i></td><td class=\"x-btn-mc\"><em class=\"{3}\" unselectable=\"on\"><button class=\"x-btn-text\" type=\"{1}\">{0}</button></em></td><td class=\"x-btn-mr\"><i>&#160;</i></td></tr>");
+        sb.append("<tr><td class=\"x-btn-ml\"><i>&#160;</i></td><td class=\"x-btn-mc\"><em class=\"{3}\" unselectable=\"on\"><button class=\"x-btn-text\" type=\"{1}\" style='position: static'>{0}</button></em></td><td class=\"x-btn-mr\"><i>&#160;</i></td></tr>");
         sb.append("<tr><td class=\"x-btn-bl\"><i>&#160;</i></td><td class=\"x-btn-bc\"></td><td class=\"x-btn-br\"><i>&#160;</i></td></tr>");
         sb.append("</tbody></table>");
 

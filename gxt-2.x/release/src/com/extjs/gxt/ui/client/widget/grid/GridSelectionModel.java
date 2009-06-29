@@ -31,11 +31,22 @@ import com.google.gwt.event.dom.client.KeyCodes;
  * <dd>AbstractStoreSelectionModel SelectionChange</dd>
  * </dl>
  */
-public class GridSelectionModel<M extends ModelData> extends
-    AbstractStoreSelectionModel<M> implements Listener<BaseEvent> {
+public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelectionModel<M> implements
+    Listener<BaseEvent> {
+
+  public static class Cell {
+    public int row;
+    public int cell;
+
+    public Cell(int row, int cell) {
+      this.row = row;
+      this.cell = cell;
+    }
+
+  }
 
   @SuppressWarnings("unchecked")
-  class Callback {
+  public static class Callback {
 
     private GridSelectionModel sm;
 
@@ -130,6 +141,36 @@ public class GridSelectionModel<M extends ModelData> extends
     return moveEditorOnEnter;
   }
 
+  public void onEditorKey(DomEvent e) {
+    int k = e.getKeyCode();
+    Cell newCell = null;
+    CellEditor editor = grid.editSupport.getActiveEditor();
+    switch (k) {
+      case KeyCodes.KEY_ENTER:
+      case KeyCodes.KEY_TAB:
+        e.stopEvent();
+        editor.completeEdit();
+        if ((k == KeyCodes.KEY_ENTER && moveEditorOnEnter) || k == KeyCodes.KEY_TAB) {
+          if (e.isShiftKey()) {
+            newCell = grid.walkCells(editor.row, editor.col - 1, -1, callback, true);
+          } else {
+            newCell = grid.walkCells(editor.row, editor.col + 1, 1, callback, true);
+          }
+        }
+        break;
+      case KeyCodes.KEY_ESCAPE:
+        editor.cancelEdit();
+        break;
+    }
+    if (newCell != null) {
+      grid.editSupport.startEditing(newCell.row, newCell.cell);
+    } else {
+      if (k == KeyCodes.KEY_ENTER || k == KeyCodes.KEY_TAB || k == KeyCodes.KEY_ESCAPE) {
+        grid.getView().focusCell(editor.row, editor.col, false);
+      }
+    }
+  }
+
   /**
    * Selects the next row.
    * 
@@ -178,8 +219,7 @@ public class GridSelectionModel<M extends ModelData> extends
     }
     if (e.isRightClick()) {
       if (e.getRowIndex() != -1) {
-        if (isSelected(listStore.getAt(e.getRowIndex()))
-            && selectionMode != SelectionMode.SINGLE) {
+        if (isSelected(listStore.getAt(e.getRowIndex())) && selectionMode != SelectionMode.SINGLE) {
           return;
         }
         select(e.getRowIndex(), false);
@@ -207,6 +247,9 @@ public class GridSelectionModel<M extends ModelData> extends
         } else if (isSelected(sel) && e.isControlKey()) {
           doDeselect(Arrays.asList(sel), false);
         } else {
+          if (isSelected(sel) && !e.isControlKey()) {
+            return;
+          }
           doSelect(Arrays.asList(sel), e.isControlKey(), false);
           view.focusCell(e.getRowIndex(), e.getColIndex(), true);
         }
@@ -215,8 +258,7 @@ public class GridSelectionModel<M extends ModelData> extends
   }
 
   protected boolean hasNext() {
-    return lastSelected != null
-        && listStore.indexOf(lastSelected) < (listStore.getCount() - 1);
+    return lastSelected != null && listStore.indexOf(lastSelected) < (listStore.getCount() - 1);
   }
 
   protected boolean hasPrevious() {
@@ -225,41 +267,9 @@ public class GridSelectionModel<M extends ModelData> extends
 
   protected boolean isSelectable(int row, int cell, boolean acceptsNav) {
     if (acceptsNav) {
-      return !grid.getColumnModel().isHidden(cell)
-          && grid.getColumnModel().isCellEditable(cell);
+      return !grid.getColumnModel().isHidden(cell) && grid.getColumnModel().isCellEditable(cell);
     } else {
       return !grid.getColumnModel().isHidden(cell);
-    }
-  }
-
-  public void onEditorKey(DomEvent e) {
-    EditSupport editGrid = (EditSupport) grid;
-    int k = e.getKeyCode();
-    Cell newCell = null;
-    CellEditor editor = editGrid.getActiveEditor();
-    switch (k) {
-      case KeyCodes.KEY_ENTER:
-      case KeyCodes.KEY_TAB:
-        e.stopEvent();
-        editor.completeEdit();
-        if ((k == KeyCodes.KEY_ENTER && moveEditorOnEnter) || k == KeyCodes.KEY_TAB) {
-          if (e.isShiftKey()) {
-            newCell = grid.walkCells(editor.row, editor.col - 1, -1, callback, true);
-          } else {
-            newCell = grid.walkCells(editor.row, editor.col + 1, 1, callback, true);
-          }
-        }
-        break;
-      case KeyCodes.KEY_ESCAPE:
-        editor.cancelEdit();
-        break;
-    }
-    if (newCell != null) {
-      editGrid.startEditing(newCell.row, newCell.cell);
-    } else {
-      if (k == KeyCodes.KEY_ENTER || k == KeyCodes.KEY_TAB || k == KeyCodes.KEY_ESCAPE) {
-        grid.getView().focusCell(editor.row, editor.col, false);
-      }
     }
   }
 
@@ -303,15 +313,4 @@ public class GridSelectionModel<M extends ModelData> extends
       grid.getView().onRowDeselect(listStore.indexOf(model));
     }
   }
-}
-
-class Cell {
-  public int row;
-  public int cell;
-
-  public Cell(int row, int cell) {
-    this.row = row;
-    this.cell = cell;
-  }
-
 }

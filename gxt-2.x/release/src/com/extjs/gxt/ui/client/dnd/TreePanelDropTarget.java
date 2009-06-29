@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.dnd;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.core.El;
@@ -30,6 +31,7 @@ public class TreePanelDropTarget extends DropTarget {
   private boolean allowDropOnLeaf = false;
   private boolean autoExpand = true;
   private int autoExpandDelay = 800;
+  private boolean restoreTrackMouse;
 
   public TreePanelDropTarget(TreePanel tree) {
     super(tree);
@@ -92,35 +94,50 @@ public class TreePanelDropTarget extends DropTarget {
     this.autoExpandDelay = autoExpandDelay;
   }
 
-  protected void appendModel(ModelData p, TreeModel model, int index) {
-    ModelData child = model.get("model");
-    if (p == null) {
-      tree.getStore().insert(child, index, false);
-    } else {
-      tree.getStore().insert(p, child, index, false);
-    }
-    try {
-      List<TreeModel> children = (List) model.getChildren();
-      for (int i = 0; i < children.size(); i++) {
-        appendModel(child, children.get(i), i);
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+  protected void appendModel(ModelData p, List<ModelData> models, int index) {
+    if (models.size() == 0) return;
+    if (models.get(0) instanceof TreeModel) {
+      TreeModel test = (TreeModel) models.get(0);
+      // drop is in form from tree store
+      if (test.getPropertyNames().contains("model")) {
+        List<ModelData> children = new ArrayList<ModelData>();
 
+        for (ModelData tm : models) {
+          ModelData child = tm.get("model");
+          children.add(child);
+        }
+        if (p == null) {
+          tree.getStore().insert(children, index, false);
+        } else {
+          tree.getStore().insert(p, children, index, false);
+        }
+        for (ModelData tm : models) {
+          ModelData child = tm.get("model");
+          List sub = (List) ((TreeModel) tm).getChildren();
+          appendModel(child, sub, 0);
+        }
+
+      }
+      return;
+    }
+    if (p == null) {
+      tree.getStore().insert(models, index, false);
+    } else {
+      tree.getStore().insert(p, models, index, false);
+    }
   }
 
   protected void handleAppend(DNDEvent event, final TreeNode item) {
     // clear any active append item
     if (activeItem != null && activeItem != item) {
-      El.fly(activeItem.getElement()).firstChild().removeStyleName("my-tree-drop");
+      tree.getView().onDropChange(activeItem, false);
     }
     status = -1;
 
     Insert.get().hide();
     event.getStatus().setStatus(true);
     if (activeItem != null) {
-      El.fly(activeItem.getElement()).firstChild().removeStyleName("my-tree-drop");
+      tree.getView().onDropChange(activeItem, false);
     }
 
     if (item != appendItem && autoExpand && !item.isExpanded()) {
@@ -138,22 +155,21 @@ public class TreePanelDropTarget extends DropTarget {
     }
     appendItem = item;
     activeItem = item;
-    El.fly(activeItem.getElement()).firstChild().addStyleName("my-tree-drop");
+    tree.getView().onDropChange(activeItem, true);
   }
 
   protected void handleAppendDrop(DNDEvent event, TreeNode item) {
     List sel = event.getData();
     if (sel.size() > 0) {
-      TreeModel tm = (TreeModel) sel.get(0);
       ModelData p = item.getModel();
-      appendModel(p, tm, tree.getStore().getChildCount(item.getModel()));
+      appendModel(p, sel, tree.getStore().getChildCount(item.getModel()));
     }
   }
 
   protected void handleInsert(DNDEvent event, final TreeNode item) {
     // clear any active append item
     if (activeItem != null && activeItem != item) {
-      El.fly(activeItem.getElement()).firstChild().removeStyleName("my-tree-drop");
+      tree.getView().onDropChange(activeItem, false);
     }
 
     int height = item.getElement().getOffsetHeight();
@@ -169,13 +185,23 @@ public class TreePanelDropTarget extends DropTarget {
         return;
       }
     }
+    
+    if (event.getDropTarget().component == event.getDragSource().component) {
+      TreePanel source = (TreePanel) event.getDragSource().component;
+      ModelData sel = source.getSelectionModel().getSelectedItem();
+      ModelData overModel = item.getModel();
+      if (before && overModel == tree.getStore().getNextSibling(sel)) {
+        clearStyles(event);
+        return;
+      }
+    }
 
     appendItem = null;
 
     status = before ? 0 : 1;
 
     if (activeItem != null) {
-      El.fly(activeItem.getElement()).firstChild().removeStyleName("my-tree-drop");
+      tree.getView().onDropChange(activeItem, false);
     }
 
     activeItem = item;
@@ -203,7 +229,7 @@ public class TreePanelDropTarget extends DropTarget {
       int idx = item.getParent().indexOf(item);
       idx = status == 0 ? idx : idx + 1;
       ModelData p = item.getParent().getModel();
-      appendModel(p, (TreeModel) sel.get(0), idx);
+      appendModel(p, sel, idx);
     }
   }
 
@@ -212,7 +238,7 @@ public class TreePanelDropTarget extends DropTarget {
     super.onDragDrop(event);
 
     if (activeItem != null && status == -1) {
-      El.fly(activeItem.getElement()).firstChild().removeStyleName("my-tree-drop");
+      tree.getView().onDropChange(activeItem, false);
       if (event.getData() != null) {
         handleAppendDrop(event, activeItem);
       }
@@ -223,41 +249,59 @@ public class TreePanelDropTarget extends DropTarget {
     } else {
       event.setCancelled(true);
     }
+    tree.setTrackMouseOver(restoreTrackMouse);
   }
 
   @Override
   protected void onDragEnter(DNDEvent e) {
     super.onDragEnter(e);
     e.getStatus().setStatus(false);
+    restoreTrackMouse = tree.isTrackMouseOver();
+    tree.setTrackMouseOver(false);
   }
 
   @Override
   protected void onDragLeave(DNDEvent e) {
     super.onDragLeave(e);
     if (activeItem != null) {
-      El.fly(activeItem.getElement()).firstChild().removeStyleName("my-tree-drop");
+      tree.getView().onDropChange(activeItem, false);
       activeItem = null;
     }
+    tree.setTrackMouseOver(restoreTrackMouse);
   }
-  
+
   @Override
   protected void onDragMove(DNDEvent event) {
     event.setCancelled(false);
   }
+  
+  protected void clearStyles(DNDEvent event) {
+    Insert.get().hide();
+    event.getStatus().setStatus(false);
+    if (activeItem != null) {
+      tree.getView().onDropChange(activeItem, false);
+    }
+  }
 
   @Override
   protected void showFeedback(DNDEvent event) {
-    final TreeNode item = tree.findNode(event.getTarget());
-    if (item == null) {
-      event.getStatus().setStatus(false);
+    final TreeNode overItem = tree.findNode(event.getTarget());
+    if (overItem == null) {
+      clearStyles(event);
       return;
     }
+
     if (event.getDropTarget().component == event.getDragSource().component) {
       TreePanel source = (TreePanel) event.getDragSource().component;
       ModelData sel = source.getSelectionModel().getSelectedItem();
-      List<ModelData> children = tree.getStore().getChildren(sel);
-      if (children.contains(item)) {
-        event.getStatus().setStatus(false);
+      ModelData overModel = overItem.getModel();
+      if (overModel == sel) {
+        clearStyles(event);
+        return;
+      }
+      List<ModelData> children = tree.getStore().getChildren(sel, true);
+      if (children.contains(overItem.getModel())) {
+        clearStyles(event);
         return;
       }
     }
@@ -266,12 +310,12 @@ public class TreePanelDropTarget extends DropTarget {
     boolean insert = feedback == Feedback.INSERT || feedback == Feedback.BOTH;
 
     if (insert) {
-      handleInsert(event, item);
-    } else if ((!item.isLeaf() || allowDropOnLeaf) && append) {
-      handleAppend(event, item);
+      handleInsert(event, overItem);
+    } else if ((!overItem.isLeaf() || allowDropOnLeaf) && append) {
+      handleAppend(event, overItem);
     } else {
       if (activeItem != null) {
-        El.fly(activeItem.getElement()).firstChild().removeStyleName("my-tree-drop");
+        tree.getView().onDropChange(activeItem, false);
       }
       status = -1;
       activeItem = null;

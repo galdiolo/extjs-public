@@ -88,7 +88,7 @@ public class AppView extends View {
     sb.append("<div id='demo-theme'></div><div id=demo-title>Ext GWT Explorer Demo</div>");
 
     northPanel = new HtmlContainer(sb.toString());
-    northPanel.setEnableState(false);
+    northPanel.setStateful(false);
     northPanel.setId("demo-header");
     northPanel.addStyleName("x-small-editor");
     ThemeManager.register(Slate.SLATE);

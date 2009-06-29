@@ -69,7 +69,7 @@ public class BeanModelGridExample extends LayoutContainer {
     ContentPanel panel = new ContentPanel();
     panel.setHeading("BeanModel Grid Example");
     panel.setSize(400, 200);
-    panel.setIcon(Examples.IMAGES.table());
+    panel.setIcon(Examples.ICONS.table());
     panel.setLayout(new FitLayout());
     panel.add(grid);
 

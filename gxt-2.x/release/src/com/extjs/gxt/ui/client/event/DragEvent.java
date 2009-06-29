@@ -9,7 +9,6 @@ package com.extjs.gxt.ui.client.event;
 
 import com.extjs.gxt.ui.client.fx.Draggable;
 import com.extjs.gxt.ui.client.widget.Component;
-import com.google.gwt.user.client.Element;
 
 /**
  * Draggable event type.
@@ -87,15 +86,6 @@ public class DragEvent extends DomEvent {
    */
   public int getHeight() {
     return height;
-  }
-
-  /**
-   * Returns the event target.
-   * 
-   * @return the target
-   */
-  public Element getTarget() {
-    return getEvent().getRelatedEventTarget().cast();
   }
 
   /**

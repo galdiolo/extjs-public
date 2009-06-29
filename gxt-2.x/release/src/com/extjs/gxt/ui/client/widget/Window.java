@@ -44,8 +44,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * A specialized content panel intended for use as an application window.
  * 
- * </p>
- * Code snippet:
+ * </p> Code snippet:
  * 
  * <pre>
    Window w = new Window();        
@@ -160,7 +159,7 @@ public class Window extends ContentPanel {
 
   protected Draggable dragger;
   protected WindowManager manager;
-  
+
   private boolean closable = true;
   private boolean constrain = true;
   private Widget focusWidget;
@@ -242,6 +241,16 @@ public class Window extends ContentPanel {
   public void center() {
     Point p = el().getAlignToXY(XDOM.getBody(), "c-c", null);
     setPagePosition(p.x, p.y);
+  }
+
+  @Deprecated
+  public void close() {
+    hide(null);
+  }
+
+  @Deprecated
+  public void close(Button b) {
+    hide(b);
   }
 
   /**
@@ -1013,7 +1022,7 @@ public class Window extends ContentPanel {
 
   protected void onKeyPress(WindowEvent we) {
     int keyCode = we.getKeyCode();
-    if (closable && onEsc && keyCode == KeyCodes.KEY_ESCAPE) {
+    if (closable && onEsc && keyCode == KeyCodes.KEY_ESCAPE && getElement().isOrHasChild((com.google.gwt.dom.client.Element) we.getEvent().getEventTarget().cast())) {
       hide();
     }
   }

@@ -53,6 +53,7 @@ public class CheckBox extends Field<Boolean> {
   private String valueAttribute;
 
   public CheckBox() {
+    setFireChangeEventOnSetValue(true);
     value = false;
     propertyEditor = new BooleanPropertyEditor();
   }

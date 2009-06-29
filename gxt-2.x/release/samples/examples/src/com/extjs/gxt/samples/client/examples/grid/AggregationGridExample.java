@@ -66,7 +66,6 @@ public class AggregationGridExample extends LayoutContainer {
     column.setId("name");
     column.setHeader("Company");
     column.setWidth(200);
-    column.setToolTip("sfsdf");
     configs.add(column);
 
     column = new ColumnConfig();
@@ -101,41 +100,41 @@ public class AggregationGridExample extends LayoutContainer {
     cm.addHeaderGroup(0, 2, new HeaderGroupConfig("Stock Performance", 1, 2));
     cm.addHeaderGroup(0, 0, new HeaderGroupConfig("Stock Information", 1, 2));
  
-    AggregationRowConfig<Stock> totals = new AggregationRowConfig<Stock>();
-    totals.setHtml("name", "Average");
+    AggregationRowConfig<Stock> averages = new AggregationRowConfig<Stock>();
+    averages.setHtml("name", "Average");
     
-    totals.setSummaryType("last", SummaryType.AVG);
-    totals.setRenderer("last", new AggregationRenderer<Stock>() {
-      public Object render(Number value, int colIndex, Grid<Stock> grid, ListStore<Stock> store) {
-        return NumberFormat.getCurrencyFormat().format(value.doubleValue());
-      }
-    });
+    // with summary type and format
+    averages.setSummaryType("last", SummaryType.AVG);
+    averages.setSummaryFormat("last", NumberFormat.getCurrencyFormat());
     
-    totals.setSummaryType("change", SummaryType.AVG);
-    totals.setRenderer("change", new AggregationRenderer<Stock>() {
+    // with renderer
+    averages.setSummaryType("change", SummaryType.AVG);
+    averages.setRenderer("change", new AggregationRenderer<Stock>() {
       public Object render(Number value, int colIndex, Grid<Stock> grid, ListStore<Stock> store) {
+        // you can return html here
         return number.format(value.doubleValue());
       }
     });
-    cm.addAggregationRow(totals);
+    cm.addAggregationRow(averages);
     
-    totals = new AggregationRowConfig<Stock>();
-    totals.setHtml("name", "Maximum");
+    averages = new AggregationRowConfig<Stock>();
+    averages.setHtml("name", "Maximum");
     
     
-    totals.setSummaryType("last", SummaryType.MAX);
-    totals.setSummaryFormat("last", NumberFormat.getCurrencyFormat());
+    averages.setSummaryType("last", SummaryType.MAX);
+    averages.setSummaryFormat("last", NumberFormat.getCurrencyFormat());
 
-    totals.setSummaryType("change", SummaryType.MAX);
-    totals.setRenderer("change", new AggregationRenderer<Stock>() {
+    averages.setSummaryType("change", SummaryType.MAX);
+    averages.setRenderer("change", new AggregationRenderer<Stock>() {
       public Object render(Number value, int colIndex, Grid<Stock> grid, ListStore<Stock> store) {
         return number.format(value.doubleValue());
       }
     });
-    cm.addAggregationRow(totals);
+    cm.addAggregationRow(averages);
     
     ContentPanel cp = new ContentPanel();
     cp.setCollapsible(true);
+    cp.setAnimCollapse(false);
     cp.setFrame(true);
     cp.setHeading("Aggregation Rows");
     cp.setButtonAlign(HorizontalAlignment.CENTER);

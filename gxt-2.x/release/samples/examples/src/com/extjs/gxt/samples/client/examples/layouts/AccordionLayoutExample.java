@@ -32,7 +32,7 @@ public class AccordionLayoutExample extends LayoutContainer {
     panel.setBodyBorder(false);
 
     panel.setLayout(new AccordionLayout());
-    panel.setIcon(Examples.IMAGES.accordion());
+    panel.setIcon(Examples.ICONS.accordion());
 
     ContentPanel cp = new ContentPanel();
     cp.setHeading("Online Users");

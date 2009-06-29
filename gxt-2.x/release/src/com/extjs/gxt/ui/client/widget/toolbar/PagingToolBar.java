@@ -57,6 +57,9 @@ import com.google.gwt.user.client.ui.TextBox;
  */
 public class PagingToolBar extends ToolBar {
 
+  /**
+   * PagingToolBar images.
+   */
   public class PagingToolBarImages {
     private AbstractImagePrototype first = GXT.IMAGES.paging_toolbar_first();
     private AbstractImagePrototype prev = GXT.IMAGES.paging_toolbar_prev();
@@ -143,6 +146,9 @@ public class PagingToolBar extends ToolBar {
 
   }
 
+  /**
+   * PagingToolBar messages.
+   */
   public class PagingToolBarMessages {
     private String afterPageText;
     private String beforePageText = GXT.MESSAGES.pagingToolBar_beforePageText();
@@ -329,14 +335,11 @@ public class PagingToolBar extends ToolBar {
   protected TextBox pageText;
   protected PagingToolBarMessages msgs;
   protected boolean showToolTips = true;
-
   protected LoadListener loadListener;
-
   protected PagingToolBarImages images;
 
   private boolean reuseConfig = true;
   private LoadEvent renderEvent;
-
   private boolean savedEnableState = true;
   private Listener<ComponentEvent> listener = new Listener<ComponentEvent>() {
 
@@ -595,7 +598,7 @@ public class PagingToolBar extends ToolBar {
   }
 
   /**
-   * Moves the the previos page.
+   * Moves the the previous page.
    */
   public void previous() {
     doLoadRequest(Math.max(0, start - pageSize), pageSize);

@@ -132,7 +132,7 @@ public class TotalsGridExample extends LayoutContainer {
 
     ContentPanel panel = new ContentPanel();
     panel.setHeading("Sponsored Projects");
-    panel.setIcon(Examples.IMAGES.table());
+    panel.setIcon(Examples.ICONS.table());
     panel.setCollapsible(true);
     panel.setFrame(true);
     panel.setSize(800, 450);

@@ -14,6 +14,13 @@ package com.extjs.gxt.ui.client.data;
  */
 public interface ModelComparer<M extends ModelData> {
 
+  /**
+   * Returns true if and model instances represent the same entity.
+   * 
+   * @param m1 model one
+   * @param m2 model two
+   * @return true if the models are equal
+   */
   public boolean equals(M m1, M m2);
 
 }

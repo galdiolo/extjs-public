@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.GXT;
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Events;
@@ -277,30 +276,6 @@ public class ToolBarLayout extends Layout {
     }
     El side = leftTr;
     int pos = 0;
-
-    if (container instanceof ToolBar) {
-
-      ToolBar toolBar = (ToolBar) container;
-      boolean layoutOnChange = isLayoutNeeded(toolBar);
-      setLayoutOnChange(toolBar, false);
-      if (!toolBar.getAlignment().equals(HorizontalAlignment.CENTER)) {
-        toolBar.removeStyleName("x-panel-btns-center");
-      }
-      if (!toolBar.getAlignment().equals(HorizontalAlignment.RIGHT)) {
-        if (toolBar.getItemCount() > 0 && (toolBar.getItem(0) instanceof FillToolItem)) {
-          toolBar.remove(toolBar.getItem(0));
-        }
-      }
-
-      if (toolBar.getAlignment().equals(HorizontalAlignment.CENTER)) {
-        toolBar.addStyleName("x-panel-btns-center");
-      } else if (toolBar.getAlignment().equals(HorizontalAlignment.RIGHT)) {
-        if (toolBar.getItemCount() > 0 && !(toolBar.getItem(0) instanceof FillToolItem)) {
-          toolBar.insert(new FillToolItem(), 0);
-        }
-      }
-      setLayoutOnChange(toolBar, layoutOnChange);
-    }
 
     for (int i = 0, len = container.getItemCount(); i < len; i++, pos++) {
       Component c = container.getItem(i);

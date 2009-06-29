@@ -78,6 +78,9 @@ public class ListViewEvent<M extends ModelData> extends BoxComponentEvent {
    * @return the model
    */
   public M getModel() {
+    if(model == null){
+      model = listView.getStore().getAt(getIndex());
+    }
     return model;
   }
 

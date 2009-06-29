@@ -153,7 +153,7 @@ class ColumnFooter extends BoxComponent {
     for (int i = 0; i < rows.size(); i++) {
       FooterRow row = rows.get(i);
       row.setWidth(offset);
-      row.table.getElement().getStyle().setProperty("width", width + "px");
+      row.table.getElement().getStyle().setPropertyPx("width", width);
     }
   }
 
@@ -187,7 +187,7 @@ class ColumnFooter extends BoxComponent {
 
       for (int j = 0; j < cols; j++) {
         String name = cm.getDataIndex(j);
-        
+
         if (config.getHtml(name) != null) {
           footer.setHtml(j, config.getHtml(name));
           continue;
@@ -197,7 +197,7 @@ class ColumnFooter extends BoxComponent {
         }
 
         Number value = null;
-        
+
         SummaryType<?> type = config.getSummaryType(name);
         if (type != null) {
           Map<String, Object> data = new HashMap<String, Object>();
@@ -205,11 +205,11 @@ class ColumnFooter extends BoxComponent {
             value = type.render(value, store.getAt(k), name, data);
           }
         }
-        
+
         if (config.getModel() != null) {
           Object obj = config.getModel().get(cm.getDataIndex(i));
           if (obj != null && obj instanceof Number) {
-            value = (Number)obj;
+            value = (Number) obj;
           } else if (obj != null) {
             footer.setHtml(j, obj.toString());
             continue;
@@ -217,7 +217,7 @@ class ColumnFooter extends BoxComponent {
         }
 
         NumberFormat format = config.getSummaryFormat(name);
-        if (format != null) {
+        if (format != null && value != null) {
           String svalue = format.format(value.doubleValue());
           footer.setHtml(j, svalue);
           continue;
@@ -228,7 +228,7 @@ class ColumnFooter extends BoxComponent {
           Object obj = renderer.render(value, j, (Grid) grid, (ListStore) store);
           if (obj instanceof Widget) {
             footer.setWidget(j, (Widget) obj);
-          } else {
+          } else if (obj != null) {
             footer.setHtml(j, obj.toString());
           }
         }

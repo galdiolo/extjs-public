@@ -7,7 +7,7 @@
  */
 package com.extjs.gxt.ui.client.widget.form;
 
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.i18n.client.constants.NumberConstants;
 
@@ -26,11 +26,11 @@ import com.google.gwt.i18n.client.constants.NumberConstants;
  */
 public class NumberPropertyEditor implements PropertyEditor<Number> {
 
-  protected NumberConstants numbers = (NumberConstants) GWT.create(NumberConstants.class);
+  protected NumberConstants numbers;
   protected NumberFormat format;
   protected String alpahRegex = "[a-zA-Z]";
   protected String currencySymbolRegex = "\\$";
-  protected String groupSeparator = numbers.groupingSeparator();
+  protected String groupSeparator;
   protected Class<?> type;
 
   private boolean stripCurrencySymbol;
@@ -41,7 +41,8 @@ public class NumberPropertyEditor implements PropertyEditor<Number> {
    * Creates a new number property editor with the default number type (Double).
    */
   public NumberPropertyEditor() {
-
+    numbers = LocaleInfo.getCurrentLocale().getNumberConstants();
+    groupSeparator = numbers.groupingSeparator();
   }
 
   /**
@@ -50,6 +51,7 @@ public class NumberPropertyEditor implements PropertyEditor<Number> {
    * @param type the number class (Short, Integer, Long, Float, Double)
    */
   public NumberPropertyEditor(Class<?> type) {
+    this();
     this.type = type;
   }
 
@@ -59,6 +61,7 @@ public class NumberPropertyEditor implements PropertyEditor<Number> {
    * @param format the number format
    */
   public NumberPropertyEditor(NumberFormat format) {
+    this();
     this.format = format;
   }
 
@@ -68,7 +71,7 @@ public class NumberPropertyEditor implements PropertyEditor<Number> {
    * @param pattern the number format pattern
    */
   public NumberPropertyEditor(String pattern) {
-    format = NumberFormat.getFormat(pattern);
+    this(NumberFormat.getFormat(pattern));
   }
 
   public Number convertStringValue(String value) {

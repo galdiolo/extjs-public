@@ -28,16 +28,16 @@ public class Category extends BaseTreeModel {
     return getName();
   }
 
-  public void addEntry(String title, LayoutContainer page) {
-    add(new Entry(title, page));
+  public void add(String title, LayoutContainer page, String image) {
+    add(new Entry(title, page, image));
   }
 
-  public void addEntry(String title, LayoutContainer page, boolean fill) {
-    add(new Entry(title, page, fill));
-  }
-  
-  public void addEntry(String title, LayoutContainer page, boolean fill, boolean closable, HideMode hideMode) {
-    add(new Entry(title, page, fill, closable, hideMode));
+  public void add(String title, LayoutContainer page, String image, boolean fill) {
+    add(new Entry(title, page, image, fill));
   }
 
+  public void add(String title, LayoutContainer page, String image, boolean fill, boolean closable,
+      HideMode hideMode) {
+    add(new Entry(title, page, image, fill, closable, hideMode));
+  }
 }

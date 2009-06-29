@@ -32,10 +32,10 @@ import com.google.gwt.user.rebind.SourceWriter;
 
 public class BeanModelGenerator extends Generator {
 
-  private TypeOracle oracle;
-  private JClassType beanModelMarkerType;
-  private JClassType beanModelTagType;
-  private List<JClassType> beans;
+  protected TypeOracle oracle;
+  protected JClassType beanModelMarkerType;
+  protected JClassType beanModelTagType;
+  protected List<JClassType> beans;
 
   @Override
   public String generate(TreeLogger logger, GeneratorContext context, String typeName)
@@ -97,7 +97,7 @@ public class BeanModelGenerator extends Generator {
 
   }
 
-  private String createFactory(JClassType bean, String beanModelName, TreeLogger logger,
+  protected String createFactory(JClassType bean, String beanModelName, TreeLogger logger,
       GeneratorContext context) throws Exception {
     final String genPackageName = "com.extjs.gxt.ui.client.data";
     final String genClassName = "BeanModel_" + bean.getQualifiedSourceName().replace(".", "_")
@@ -118,7 +118,7 @@ public class BeanModelGenerator extends Generator {
     return composer.getCreatedClassName();
   }
 
-  private String createBean(JClassType bean, TreeLogger logger, GeneratorContext context)
+  protected String createBean(JClassType bean, TreeLogger logger, GeneratorContext context)
       throws Exception {
     final String genPackageName = bean.getPackage().getName();
     final String genClassName = "BeanModel_" + bean.getQualifiedSourceName().replace(".", "_");
@@ -165,20 +165,20 @@ public class BeanModelGenerator extends Generator {
     return composer.getCreatedClassName();
   }
 
-  private JClassType getMarkerBean(JClassType type) throws NotFoundException {
+  protected JClassType getMarkerBean(JClassType type) throws NotFoundException {
     BEAN pojo = type.getAnnotation(BEAN.class);
     return oracle.getType(pojo.value().getCanonicalName());
   }
 
-  private boolean isBean(JClassType type) {
+  protected boolean isBean(JClassType type) {
     return !type.equals(beanModelTagType) && type.isAssignableTo(beanModelTagType);
   }
 
-  private boolean isBeanMarker(JClassType type) {
+  protected boolean isBeanMarker(JClassType type) {
     return !type.equals(beanModelMarkerType) && type.isAssignableTo(beanModelMarkerType);
   }
 
-  private void createGetMethods(List<JMethod> getters, SourceWriter sw, String typeName) {
+  protected void createGetMethods(List<JMethod> getters, SourceWriter sw, String typeName) {
     sw.println("public <X> X get(String s) {");
 
     sw.println("if (allowNestedValues && NestedModelUtil.isNestedProperty(s)) {");
@@ -251,7 +251,7 @@ public class BeanModelGenerator extends Generator {
     sw.println("}");
   }
 
-  private String lowerFirst(String propName) {
+  protected String lowerFirst(String propName) {
     if (propName.length() == 0) {
       return propName;
     } else if (propName.length() == 1) {
@@ -261,7 +261,7 @@ public class BeanModelGenerator extends Generator {
     }
   }
 
-  private void createSetMethods(List<JMethod> properties, SourceWriter sw, String typeName) {
+  protected void createSetMethods(List<JMethod> properties, SourceWriter sw, String typeName) {
     sw.println("public <X> X set(String s, X val) {");
     sw.indent();
     sw.println("Object obj = val;");
@@ -315,13 +315,13 @@ public class BeanModelGenerator extends Generator {
     sw.println("}");
   }
 
-  private List<JMethod> findGetters(JClassType cls) {
+  protected List<JMethod> findGetters(JClassType cls) {
     List<JMethod> methods = new ArrayList<JMethod>();
     addGetters(cls, methods);
     return methods;
   }
 
-  private void addGetters(JClassType cls, List<JMethod> methods) {
+  protected void addGetters(JClassType cls, List<JMethod> methods) {
 
     // ignore methods of Object
     if (cls.getSuperclass() != null) {
@@ -338,13 +338,13 @@ public class BeanModelGenerator extends Generator {
 
   }
 
-  private List<JMethod> findSetters(JClassType cls) {
+  protected List<JMethod> findSetters(JClassType cls) {
     List<JMethod> methods = new ArrayList<JMethod>();
     addSetters(cls, methods);
     return methods;
   }
 
-  private void addSetters(JClassType cls, List<JMethod> methods) {
+  protected void addSetters(JClassType cls, List<JMethod> methods) {
     if (cls.getSuperclass() != null) {
       addSetters(cls.getSuperclass(), methods);
     }

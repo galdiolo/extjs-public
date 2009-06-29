@@ -94,6 +94,15 @@ public class Style {
         };
       }
     };
+    
+    public static SortDir findDir(String sortDir) {
+      if ("ASC".equals(sortDir)) {
+        return SortDir.ASC;
+      } else if ("DESC".equals(sortDir)) {
+        return SortDir.DESC;
+      } 
+      return null;
+    }
 
     public static SortDir toggle(SortDir sortDir) {
       return (sortDir == ASC) ? DESC : ASC;

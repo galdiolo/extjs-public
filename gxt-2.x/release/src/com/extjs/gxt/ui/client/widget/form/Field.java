@@ -156,7 +156,7 @@ public abstract class Field<D> extends BoxComponent {
   protected String invalidStyle = "x-form-invalid";
   protected String fieldStyle = "x-form-field";
   protected boolean readOnly;
-  protected FieldMessages messages = new FieldMessages();
+  protected FieldMessages messages;
   protected PropertyEditor<D> propertyEditor;
   protected boolean hasFocus;
   protected Object focusValue;
@@ -185,6 +185,7 @@ public abstract class Field<D> extends BoxComponent {
   @SuppressWarnings("unchecked")
   protected Field() {
     propertyEditor = (PropertyEditor<D>) PropertyEditor.DEFAULT;
+    messages = new FieldMessages();
   }
 
   /**

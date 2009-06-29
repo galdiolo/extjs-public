@@ -116,7 +116,7 @@ public class MemoryPagingGridExample extends LayoutContainer {
     ContentPanel cp = new ContentPanel();
     cp.setFrame(true);
     cp.setHeading("Local Paging Grid");
-    cp.setIcon(Examples.IMAGES.table());
+    cp.setIcon(Examples.ICONS.table());
     cp.setButtonAlign(HorizontalAlignment.CENTER);
     cp.setLayout(new FitLayout());
     cp.setBottomComponent(toolBar);

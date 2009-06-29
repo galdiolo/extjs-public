@@ -244,11 +244,10 @@ public class FileUploadField extends TextField<String> {
     }
 
     file = new El((Element) Document.get().createFileInputElement().cast());
-    file.setElementAttribute("size", 1);
-    file.addStyleName("x-form-file");
     file.addEventsSunk(Event.ONCHANGE | Event.FOCUSEVENTS);
     file.setId(XDOM.getUniqueId());
-
+    file.addStyleName("x-form-file");
+    
     wrap.appendChild(input.dom);
     wrap.appendChild(file.dom);
 

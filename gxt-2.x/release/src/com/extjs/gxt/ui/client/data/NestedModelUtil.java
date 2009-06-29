@@ -20,11 +20,11 @@ public class NestedModelUtil {
   }
 
   public static Object convertIfNecessary(Object obj) {
-    if (obj instanceof BeanModelTag) {
-      BeanModelFactory factory = BeanModelLookup.get().getFactory(obj.getClass());
-      obj = factory.createModel(obj);
+    if (obj == null) {
+      return null;
     }
-    return obj;
+    BeanModelFactory factory = BeanModelLookup.get().getFactory(obj.getClass());
+    return factory != null ? factory.createModel(obj) : obj;
   }
 
   @SuppressWarnings("unchecked")
@@ -35,7 +35,6 @@ public class NestedModelUtil {
       return (X) obj;
     } else {
       Object obj = model.get(paths.get(0));
-
       obj = convertIfNecessary(obj);
 
       if (obj != null && obj instanceof ModelData) {

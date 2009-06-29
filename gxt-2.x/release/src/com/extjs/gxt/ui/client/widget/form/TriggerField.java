@@ -157,19 +157,19 @@ public class TriggerField<D> extends TextField<D> {
 
   protected void onAttach() {
     super.onAttach();
-    if (GXT.isIE && !hideTrigger) {
-      int y;
-      if ((y = input.getY()) != trigger.getY()) {
-        trigger.setY(y);
-      }
-    }
+    
   }
 
   @Override
   protected void afterRender() {
     super.afterRender();
     wrap.removeStyleName(fieldStyle);
-
+    if (GXT.isIE && !hideTrigger) {
+      int y;
+      if ((y = input.getY()) != trigger.getY()) {
+        trigger.setY(y);
+      }
+    }
   }
 
   @Override

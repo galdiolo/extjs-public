@@ -72,7 +72,7 @@ public class GroupingGridExample extends LayoutContainer {
 
     ContentPanel panel = new ContentPanel();
     panel.setHeading("Grouping Example");
-    panel.setIcon(Examples.IMAGES.table());
+    panel.setIcon(Examples.ICONS.table());
     panel.setCollapsible(true);
     panel.setFrame(true);
     panel.setSize(700, 450);

@@ -101,7 +101,7 @@ public class PagingBeanModelGridExample extends LayoutContainer {
     panel.setCollapsible(true);
     panel.setAnimCollapse(false);
     panel.setButtonAlign(HorizontalAlignment.CENTER);
-    panel.setIcon(Examples.IMAGES.table());
+    panel.setIcon(Examples.ICONS.table());
     panel.setHeading("Paging Grid");
     panel.setLayout(new FitLayout());
     panel.add(grid);

@@ -34,10 +34,13 @@ import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.table.NumberCellRenderer;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.user.client.Element;
 
 public class WidgetRenderingExample extends LayoutContainer {
 
-  public WidgetRenderingExample() {
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
     setLayout(new FlowLayout(10));
 
     GridCellRenderer<Stock> buttonRenderer = new GridCellRenderer<Stock>() {
@@ -131,7 +134,7 @@ public class WidgetRenderingExample extends LayoutContainer {
 
     ContentPanel cp = new ContentPanel();
     cp.setBodyBorder(false);
-    cp.setIcon(Examples.IMAGES.table());
+    cp.setIcon(Examples.ICONS.table());
     cp.setHeading("Widget Renderer Grid");
     cp.setButtonAlign(HorizontalAlignment.CENTER);
     cp.setLayout(new FitLayout());

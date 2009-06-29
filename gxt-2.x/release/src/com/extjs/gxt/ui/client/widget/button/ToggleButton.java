@@ -15,6 +15,7 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.ComponentManager;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Accessibility;
 
 /**
@@ -64,6 +65,17 @@ public class ToggleButton extends Button {
   }
 
   /**
+   * Creates a new toggle button with the given text and icon.
+   * 
+   * @param text the button text
+   * @param icon the icon
+   */
+  public ToggleButton(String text, AbstractImagePrototype icon) {
+    this(text);
+    setIcon(icon);
+  }
+
+  /**
    * Returns the toggle group name.
    * 
    * @return the toggle group name
@@ -89,37 +101,16 @@ public class ToggleButton extends Button {
    * Toggles the current state.
    */
   public void toggle() {
-    toggle(!pressed);
+    toggle(!pressed, false);
   }
-
+  
   /**
    * Sets the current pressed state.
    * 
    * @param state true to set pressed state
    */
   public void toggle(boolean state) {
-    this.pressed = state;
-    if (rendered) {
-      ButtonEvent be = new ButtonEvent(this);
-      el().setStyleName("x-btn-pressed", state);
-      if (state) {
-        onBlur(null);
-        removeStyleName(baseStyle + "-over");
-      } else {
-        onFocus(null);
-      }
-      if (state && toggleGroup != null && toggleGroup.length() > 0) {
-        List<ToggleButton> list = ComponentManager.get().get(ToggleButton.class);
-        for (ToggleButton tb : list) {
-          if (tb != this && tb.getToggleGroup() != null
-              && tb.getToggleGroup().equals(toggleGroup)) {
-            tb.toggle(false);
-          }
-        }
-      }
-      Accessibility.setState(buttonEl.dom, "aria-pressed", "" + state);
-      fireEvent(Events.Toggle, be);
-    }
+    toggle(state, false);
   }
 
   /**
@@ -186,7 +177,39 @@ public class ToggleButton extends Button {
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
     if (pressed) {
-      toggle(pressed);
+      toggle(pressed, true);
+    }
+  }
+
+  /**
+   * Sets the current pressed state.
+   * 
+   * @param state true to set pressed state
+   * @param silent true to not fire the toggle event
+   */
+  protected void toggle(boolean state, boolean silent) {
+    this.pressed = state;
+    if (rendered) {
+      ButtonEvent be = new ButtonEvent(this);
+      el().setStyleName("x-btn-pressed", state);
+      if (state) {
+        onBlur(null);
+        removeStyleName(baseStyle + "-over");
+      } else {
+        onFocus(null);
+      }
+      if (state && toggleGroup != null && toggleGroup.length() > 0) {
+        List<ToggleButton> list = ComponentManager.get().get(ToggleButton.class);
+        for (ToggleButton tb : list) {
+          if (tb != this && tb.getToggleGroup() != null && tb.getToggleGroup().equals(toggleGroup)) {
+            tb.toggle(false, silent);
+          }
+        }
+      }
+      Accessibility.setState(buttonEl.dom, "aria-pressed", "" + state);
+      if (!silent) {
+        fireEvent(Events.Toggle, be);
+      }
     }
   }
 }

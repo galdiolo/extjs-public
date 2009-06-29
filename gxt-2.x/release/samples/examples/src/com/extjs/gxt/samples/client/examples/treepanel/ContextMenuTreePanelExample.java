@@ -38,15 +38,15 @@ public class ContextMenuTreePanelExample extends LayoutContainer {
 
     final TreePanel<ModelData> tree = new TreePanel<ModelData>(store);
     tree.setDisplayProperty("name");
-    tree.getStyle().setLeafIcon(Examples.IMAGES.music());
+    tree.getStyle().setLeafIcon(Examples.ICONS.music());
     tree.setWidth(250);
 
     Menu contextMenu = new Menu();
-    contextMenu.setWidth(130);
+    contextMenu.setWidth(140);
 
     MenuItem insert = new MenuItem();
     insert.setText("Insert Item");
-    insert.setIcon(Examples.IMAGES.add());
+    insert.setIcon(Examples.ICONS.add());
     insert.addSelectionListener(new SelectionListener<MenuEvent>() {
       public void componentSelected(MenuEvent ce) {
         ModelData folder = tree.getSelectionModel().getSelectedItem();
@@ -61,17 +61,12 @@ public class ContextMenuTreePanelExample extends LayoutContainer {
 
     MenuItem remove = new MenuItem();
     remove.setText("Remove Selected");
-    remove.setIcon(Examples.IMAGES.delete());
+    remove.setIcon(Examples.ICONS.delete());
     remove.addSelectionListener(new SelectionListener<MenuEvent>() {
       public void componentSelected(MenuEvent ce) {
-        ModelData folder = tree.getSelectionModel().getSelectedItem();
-        if (folder != null) {
-          ModelData p = store.getParent(folder);
-          if (p == null) {
-            store.remove(folder);
-          } else {
-            store.remove(p, folder);
-          }
+        List<ModelData> selected = tree.getSelectionModel().getSelectedItems();
+        for (ModelData sel : selected) {
+          store.remove(sel);
         }
       }
     });

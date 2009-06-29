@@ -84,7 +84,7 @@ public class XmlGridExample extends LayoutContainer {
     panel.setCollapsible(true);
     panel.setAnimCollapse(false);
     panel.setButtonAlign(HorizontalAlignment.CENTER);
-    panel.setIcon(Examples.IMAGES.table());
+    panel.setIcon(Examples.ICONS.table());
     panel.setHeading("XML Table Demo");
     panel.setLayout(new FitLayout());
     panel.add(grid);

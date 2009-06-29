@@ -33,7 +33,7 @@ public class ToolBarExample extends LayoutContainer {
     ToolBar toolBar = new ToolBar();
 
     Button item1 = new Button("Button w/ Menu");
-    item1.setIcon(Examples.IMAGES.menu_show());
+    item1.setIcon(Examples.ICONS.menu_show());
 
     Menu menu = new Menu();
     CheckMenuItem menuItem = new CheckMenuItem("I Like Cats");
@@ -60,7 +60,7 @@ public class ToolBarExample extends LayoutContainer {
     radios.setSubMenu(radioMenu);
 
     MenuItem date = new MenuItem("Choose a Date");
-    date.setIcon(Examples.IMAGES.calendar());
+    date.setIcon(Examples.ICONS.calendar());
     menu.add(date);
 
     date.setSubMenu(new DateMenu());
@@ -70,7 +70,7 @@ public class ToolBarExample extends LayoutContainer {
     toolBar.add(new SeparatorToolItem());
 
     SplitButton splitItem = new SplitButton("Split Button");
-    splitItem.setIcon(Examples.IMAGES.list_items());
+    splitItem.setIcon(Examples.ICONS.list_items());
 
     menu = new Menu();
     menu.add(new MenuItem("<b>Bold</b>"));

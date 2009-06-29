@@ -9,6 +9,7 @@ package com.extjs.gxt.ui.client.widget.grid;
 
 import java.util.Map;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.FastMap;
 import com.extjs.gxt.ui.client.data.ModelData;
@@ -84,6 +85,48 @@ import com.google.gwt.user.client.Timer;
  * @param <M> the model type
  */
 public class RowEditor<M extends ModelData> extends ContentPanel implements ComponentPlugin {
+  public class RowEditorMessages {
+
+    private String cancelText = GXT.MESSAGES.rowEditor_cancelText();
+    private String saveText = GXT.MESSAGES.rowEditor_saveText();
+
+    /**
+     * Returns the buttons cancel text.
+     * 
+     * @return the text
+     */
+    public String getCancelText() {
+      return cancelText;
+    }
+
+    /**
+     * Returns the buttons save text.
+     * 
+     * @return the text
+     */
+    public String getSaveText() {
+      return saveText;
+    }
+
+    /**
+     * Sets the buttons cancel text
+     * 
+     * @param cancelText the cancel text
+     */
+    public void setCancelText(String cancelText) {
+      this.cancelText = cancelText;
+    }
+
+    /**
+     * Sets the buttons save text
+     * 
+     * @param saveText the save text
+     */
+    public void setSaveText(String saveText) {
+      this.saveText = saveText;
+    }
+
+  }
 
   private Grid<M> grid;
   private Listener<GridEvent<M>> listener;
@@ -103,6 +146,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   private boolean errorSummary = true;
   private boolean lastValid;
   private ToolTip tooltip;
+  protected RowEditorMessages messages;
 
   public RowEditor() {
     super();
@@ -110,6 +154,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     setLayout(new HBoxLayout());
     addStyleName("x-small-editor");
     baseStyle = "x-row-editor";
+    messages = new RowEditorMessages();
   }
 
   @SuppressWarnings("unchecked")
@@ -136,11 +181,9 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       }
 
     };
-    if (clicksToEdit == ClicksToEdit.TWO) {
-      grid.addListener(Events.RowDoubleClick, listener);
-    } else {
-      grid.addListener(Events.RowClick, listener);
-    }
+
+    grid.addListener(Events.RowDoubleClick, listener);
+    grid.addListener(Events.RowClick, listener);
     grid.addListener(Events.OnKeyDown, listener);
     grid.addListener(Events.ColumnResize, listener);
     grid.addListener(Events.BodyScroll, listener);
@@ -160,6 +203,51 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     });
   }
 
+  /**
+   * Returns the clicks to edit.
+   * 
+   * @return the clicks to edit
+   */
+  public ClicksToEdit getClicksToEdit() {
+    return clicksToEdit;
+  }
+
+  /**
+   * Returns the interval in ms in that the roweditor is validated
+   * 
+   * @return the interval in ms in that the roweditor is validated
+   */
+  public int getMonitorPoll() {
+    return monitorPoll;
+  }
+
+  /**
+   * Returns true if a tooltip with an error summary is shown.
+   * 
+   * @return true if a tooltip with an error summary is shown
+   */
+  public boolean isErrorSummary() {
+    return errorSummary;
+  }
+
+  /**
+   * Returns the roweditors's messages.
+   * 
+   * @return the messages
+   */
+  public RowEditorMessages getMessages() {
+    return messages;
+  }
+
+  /**
+   * Returns true if this roweditor is monitored.
+   * 
+   * @return true if the roweditor is monitored
+   */
+  public boolean isMonitorValid() {
+    return monitorValid;
+  }
+
   @Override
   public void onComponentEvent(ComponentEvent ce) {
     super.onComponentEvent(ce);
@@ -170,6 +258,52 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
         stopEditing(false);
       }
     }
+  }
+
+  /**
+   * Sets the number of clicks to edit (defaults to ONE).
+   * 
+   * @param clicksToEdit the clicks to edit
+   */
+  public void setClicksToEdit(ClicksToEdit clicksToEdit) {
+    this.clicksToEdit = clicksToEdit;
+  }
+
+  /**
+   * True to show a tooltip with an errorsummary (defaults to true)
+   * 
+   * @param errorSummary true to show an error summary.
+   */
+  public void setErrorSummary(boolean errorSummary) {
+    this.errorSummary = errorSummary;
+  }
+
+  /**
+   * Sets the roweditors's messages.
+   * 
+   * @param messages the messages
+   */
+  public void setMessages(RowEditorMessages messages) {
+    this.messages = messages;
+  }
+
+  /**
+   * True to monitor the valid status of this roweditor (defaults to true)
+   * 
+   * @param monitorValid true to monitor this roweditor
+   */
+  public void setMonitorValid(boolean monitorValid) {
+    this.monitorValid = monitorValid;
+  }
+
+  /**
+   * Sets the polling interval in ms in that the roweditor validation is done
+   * (defaults to 200)
+   * 
+   * @param monitorPoll the polling interval in ms in that validation is done
+   */
+  public void setMonitorPoll(int monitorPoll) {
+    this.monitorPoll = monitorPoll;
   }
 
   /**
@@ -196,7 +330,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     model = grid.getStore().getAt(rowIndex);
     record = getRecord(model);
     this.rowIndex = rowIndex;
-    // values = new ArrayList<Object>();
+
     if (!isRendered()) {
       render((Element) grid.getView().getEditorParent());
     }
@@ -288,7 +422,6 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     btns.setWidth((getMinButtonWidth() * 2) + (frameWidth * 2) + (buttonPad * 4));
   }
 
-  // private
   protected void bindHandler() {
     boolean valid = isValid();
     if (!valid) {
@@ -302,7 +435,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     }
 
     btns.getItem(0).setEnabled(valid);
-    // this.fireEvent('validation', this, valid);
+
     if (!isVisible()) {
       monitorTimer.cancel();
       stopEditing(false);
@@ -490,7 +623,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     btns.addStyleName("x-btns");
     btns.setLayout(new TableLayout(2));
 
-    Button saveBtn = new Button("Save", new SelectionListener<ButtonEvent>() {
+    Button saveBtn = new Button(getMessages().getSaveText(), new SelectionListener<ButtonEvent>() {
 
       @Override
       public void componentSelected(ButtonEvent ce) {
@@ -501,7 +634,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     saveBtn.setMinWidth(getMinButtonWidth());
     btns.add(saveBtn);
 
-    Button cancelBtn = new Button("Cancel", new SelectionListener<ButtonEvent>() {
+    Button cancelBtn = new Button(getMessages().getCancelText(), new SelectionListener<ButtonEvent>() {
 
       @Override
       public void componentSelected(ButtonEvent ce) {
@@ -517,13 +650,17 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   }
 
   protected void onRowClick(GridEvent<M> e) {
-    startEditing(e.getRowIndex(), false);
-    deferFocus(e.getXY());
+    if (clicksToEdit != ClicksToEdit.TWO) {
+      startEditing(e.getRowIndex(), false);
+      deferFocus(e.getXY());
+    }
   }
 
   protected void onRowDblClick(GridEvent<M> e) {
-    startEditing(e.getRowIndex(), false);
-    deferFocus(e.getXY());
+    if (clicksToEdit == ClicksToEdit.TWO) {
+      startEditing(e.getRowIndex(), false);
+      deferFocus(e.getXY());
+    }
   }
 
   protected void onShow() {

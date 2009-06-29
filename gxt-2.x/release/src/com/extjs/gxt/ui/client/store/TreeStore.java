@@ -85,7 +85,7 @@ import com.extjs.gxt.ui.client.util.Util;
  * <li>store : this</li>
  * <li>parent : the parent</li>
  * <li>child : the removed child</li>
- * <li>children : all the children of the removed item</li>
+ * <li>children : all the children (deep) of the removed item</li>
  * </ul>
  * </dd>
  * 
@@ -245,11 +245,14 @@ public class TreeStore<M extends ModelData> extends Store<M> {
   /**
    * Returns the child at the given index.
    * 
-   * @param parent the parent model
+   * @param parent the parent model or null if parent is root
    * @param index the index
    * @return the child of the parent at the given index
    */
   public M getChild(M parent, int index) {
+    if (parent == null) {
+      return getFilteredChildren(rootWrapper).get(index);
+    }
     TreeModel p = findWrapper(parent);
     if (p != null) {
       return getFilteredChildren(p).get(index);
@@ -283,13 +286,34 @@ public class TreeStore<M extends ModelData> extends Store<M> {
   /**
    * Returns the children of the parent.
    * 
-   * @param parent the children
+   * @param parent the parent
    * @return the children or null if parent not found in the store
    */
   public List<M> getChildren(M parent) {
+    return getChildren(parent, false);
+  }
+  
+  /**
+   * Returns the children of the parent.
+   * 
+   * @param parent the parent
+   * @param deep true to return all children recursively
+   * @return the children or null if parent not found in the store
+   */
+  public List<M> getChildren(M parent, boolean deep) {
     TreeModel p = findWrapper(parent);
     if (p != null) {
-      return getFilteredChildren(p);
+      if (deep) {
+        List<M> temp = new ArrayList<M>();
+        List<M> children = getFilteredChildren(p);
+        for (M child : children) {
+          temp.add(child);
+          temp.addAll(getChildren(child, true));
+        }
+        return temp;
+      } else {
+        return getFilteredChildren(p);
+      }
     }
     return null;
   }
@@ -503,12 +527,18 @@ public class TreeStore<M extends ModelData> extends Store<M> {
   }
 
   /**
-   * Removes the model from the store and fires the <i>Remove</i> event.
+   * Removes the model from the store and fires the <i>Remove</i> event. Works
+   * with both regular and root nodes.
    * 
    * @param model the item to be removed
    */
   public void remove(M model) {
-    remove(rootWrapper, findWrapper(model), false);
+    M parent = getParent(model);
+    if (parent == null) {
+      remove(rootWrapper, findWrapper(model), false);
+    } else {
+      remove(parent, model);
+    }
   }
 
   /**
@@ -581,8 +611,7 @@ public class TreeStore<M extends ModelData> extends Store<M> {
     if (storeSorter != null) {
       Collections.sort(list, new Comparator<TreeModel>() {
         public int compare(TreeModel m1, TreeModel m2) {
-          return storeSorter.compare(TreeStore.this, unwrap(m1), unwrap(m2),
-              sortInfo.getSortField());
+          return storeSorter.compare(TreeStore.this, unwrap(m1), unwrap(m2), sortInfo.getSortField());
         }
       });
       if (sortInfo.getSortDir() == SortDir.DESC) {
@@ -696,8 +725,7 @@ public class TreeStore<M extends ModelData> extends Store<M> {
   }
 
   @SuppressWarnings("unchecked")
-  private void doInsert(TreeModel parent, List<TreeModel> children, int index,
-      boolean addChildren, boolean supressEvent) {
+  private void doInsert(TreeModel parent, List<TreeModel> children, int index, boolean addChildren, boolean supressEvent) {
     if (parent != null && children != null) {
       M modelParent = unwrap(parent);
       for (int i = children.size() - 1; i >= 0; i--) {

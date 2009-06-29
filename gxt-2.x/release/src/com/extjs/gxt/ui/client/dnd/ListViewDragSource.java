@@ -35,7 +35,6 @@ public class ListViewDragSource extends DragSource {
   public ListViewDragSource(ListView listView) {
     super(listView);
     this.listView = listView;
-    draggable.setStartDragDistance(0);
     setStatusText("{0} items selected");
   }
 

@@ -34,7 +34,6 @@ import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.store.TreeStoreEvent;
 import com.extjs.gxt.ui.client.util.DelayedTask;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
-import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanelView.TreeViewRenderMode;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.user.client.DOM;
@@ -54,6 +53,12 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
  * is useful when the item's text is contained within the model's data. Second,
  * a model string provider can be specified using
  * {@link #setLabelProvider(ModelStringProvider)}.
+ * 
+ * <p />
+ * With state enabled, TreePanel will save and restore the expand state of the
+ * nodes in the tree. A <code>ModelKeyProvider</code> must specified with the
+ * <code>TreeStore</code> this tree is bound to. Save and restore works with
+ * both local, and asynchronous loading of children.
  * 
  * <dl>
  * <dt><b>Events:</b></dt>
@@ -260,6 +265,7 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
   protected TreePanelSelectionModel<M> sm;
   protected TreeStore<M> store;
   protected TreePanelView<M> view = new TreePanelView<M>();
+  protected int maxExpandEntries = 100;
 
   private boolean autoLoad, filtering;
   private boolean caching = true;
@@ -293,6 +299,11 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     @Override
     public void storeRemove(StoreEvent<M> se) {
       onRemove((TreeStoreEvent<M>) se);
+    }
+
+    @Override
+    public void storeUpdate(StoreEvent<M> se) {
+      onUpdate((TreeStoreEvent<M>) se);
     }
   };
   private TreeStyle style = new TreeStyle();
@@ -349,9 +360,7 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     if (item != null) {
       String id = item.getId();
       TreeNode node = nodes.get(id);
-      if (node != null) {
-        return node;
-      }
+      return node;
     }
     return null;
   }
@@ -567,8 +576,8 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
 
   /**
    * Sets whether all children should automatically be loaded recursively
-   * (defaults to false). Useful when using filters. Only applies when using a
-   * loader.
+   * (defaults to false). Useful when the tree must be fully populated when
+   * initially rendered.
    * 
    * @param autoLoad true to auto load
    */
@@ -607,14 +616,17 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
   }
 
   /**
-   * Sets the check state of the item.
+   * Sets the check state of the item. The checked state will only be set for
+   * nodes that have been rendered, {@link #setAutoLoad(boolean)} can be used to
+   * render all children.
    * 
    * @param item the item
    * @param checked true for checked
    */
   public void setChecked(M item, boolean checked) {
+    if (!checkable) return;
     TreeNode node = findNode(item);
-    if (node != null && node.check != null) {
+    if (node != null) {
       if (node.checked == checked) {
         return;
       }
@@ -623,32 +635,17 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
 
       if (fireEvent(Events.BeforeCheckChange, evt)) {
         node.checked = checked;
-        view.onCheckChange(node, checked);
+
+        if (view.getCheckElement(node) != null) {
+          view.onCheckChange(node, checked);
+        }
 
         fireEvent(Events.CheckChange, evt);
 
         CheckChangedEvent<M> cce = new CheckChangedEvent<M>(this, getCheckedSelection());
         fireEvent(Events.CheckChanged, cce);
 
-        switch (getCheckStyle()) {
-          case PARENTS:
-            if (checked) {
-              M p = store.getParent(item);
-              while (p != null) {
-                setChecked(p, true);
-                p = store.getParent(p);
-              }
-            } else {
-              for (M child : store.getChildren(item)) {
-                setChecked(child, false);
-              }
-            }
-            break;
-          case CHILDREN:
-            for (M child : store.getChildren(item)) {
-              setChecked(child, checked);
-            }
-        }
+        onCheckCascade(item, checked);
       }
     }
   }
@@ -677,7 +674,10 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
   }
 
   /**
-   * Sets the cascading behavior for check tree (defaults to PARENTS).
+   * Sets the cascading behavior for check tree (defaults to PARENTS). When
+   * using CHILDREN, it is important to note that the cascade will only be
+   * applied to rendered nodes. {@link #setAutoLoad(boolean)} can be used to
+   * fully render the tree on render.
    * <p>
    * Valid values are:
    * <ul>
@@ -690,11 +690,6 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
    */
   public void setCheckStyle(CheckCascade checkStyle) {
     this.checkStyle = checkStyle;
-  }
-
-  @Override
-  public void setContextMenu(Menu menu) {
-    super.setContextMenu(menu);
   }
 
   /**
@@ -732,61 +727,11 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
         node.expand = expand;
         return;
       }
-      TreePanelEvent<M> tpe = new TreePanelEvent<M>(this);
-      tpe.setItem(model);
-      tpe.setNode(node);
       if (expand) {
-        if (!node.isLeaf()) {
-          // if we have a loader and node is not loaded make
-          // load request and exit method
-          if (loader != null && (!node.loaded || !caching) && !filtering) {
-            store.removeAll(model);
-            node.expand = true;
-            loader.loadChildren(model);
-            return;
-          }
-          if (!node.expanded && fireEvent(Events.BeforeExpand, tpe)) {
-            node.expanded = true;
-
-            if (!node.childrenRendered) {
-              renderChildren(model);
-              node.childrenRendered = true;
-            }
-            // expand
-            view.expand(node);
-
-            M parent = store.getParent(model);
-            while (parent != null) {
-              TreeNode pnode = findNode(parent);
-              if (!pnode.expanded) {
-                setExpanded(pnode.m, true);
-              }
-              parent = store.getParent(parent);
-            }
-            update();
-            fireEvent(Events.Expand, tpe);
-          }
-        }
-        if (deep) {
-          setExpandChildren(model, true);
-        }
+        onExpand(model, node, deep);
       } else {
-        if (node.expanded && fireEvent(Events.BeforeCollapse, tpe)) {
-          node.expanded = false;
-          // collapse
-          view.collapse(node);
-          List<M> l = new ArrayList<M>();
-          l.add(node.m);
-
-          update();
-          cleanCollapsed(l);
-          fireEvent(Events.Collapse, tpe);
-        }
-        if (deep) {
-          setExpandChildren(model, false);
-        }
+        onCollapse(model, node, deep);
       }
-
     }
   }
 
@@ -911,11 +856,9 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     TreeNode node = findNode(model);
     TreeStyle ts = getStyle();
     if (!node.isLeaf()) {
-      if (isExpanded(model) && ts.getNodeOpenIcon() != null) {
+      if (isExpanded(model)) {
         style = ts.getNodeOpenIcon();
-      } else if (isExpanded(model) && ts.getNodeOpenIcon() != null) {
-        style = ts.getNodeCloseIcon();
-      } else if (!isExpanded(model)) {
+      } else {
         style = ts.getNodeCloseIcon();
       }
     } else {
@@ -948,9 +891,10 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
   }
 
   protected void doClean() {
-    if (getVisibleRowCount() > 0) {
+    int count = getVisibleRowCount();
+    if (count > 0) {
       List<M> rows = getChildModel(store.getRootItems(), true);
-      int[] vr = getVisibleRows(rows);
+      int[] vr = getVisibleRows(rows, count);
       vr[0] -= view.getCacheSize();
       vr[1] += view.getCacheSize();
 
@@ -973,10 +917,11 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
   }
 
   protected void doUpdate() {
-    if (getVisibleRowCount() > 0) {
+    int count = getVisibleRowCount();
+    if (count > 0) {
       List<M> rootItems = store.getRootItems();
       List<M> visible = getChildModel(rootItems, true);
-      int[] vr = getVisibleRows(visible);
+      int[] vr = getVisibleRows(visible, count);
 
       for (int i = vr[0]; i <= vr[1]; i++) {
         if (!isRowRendered(i, visible)) {
@@ -1044,16 +989,6 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     return false;
   }
 
-  protected void refresh(M model) {
-    if (rendered) {
-      TreeNode node = findNode(model);
-      if (node != null && node.getElement() != null) {
-        view.onIconStyleChange(node, calculateIconStyle(model));
-        view.onJointChange(node, calcualteJoint(model));
-      }
-    }
-  }
-
   protected void onAdd(TreeStoreEvent<M> se) {
     for (M child : se.getChildren()) {
       register(child);
@@ -1082,6 +1017,28 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
 
   }
 
+  protected void onCheckCascade(M model, boolean checked) {
+    switch (getCheckStyle()) {
+      case PARENTS:
+        if (checked) {
+          M p = store.getParent(model);
+          while (p != null) {
+            setChecked(p, true);
+            p = store.getParent(p);
+          }
+        } else {
+          for (M child : store.getChildren(model)) {
+            setChecked(child, false);
+          }
+        }
+        break;
+      case CHILDREN:
+        for (M child : store.getChildren(model)) {
+          setChecked(child, checked);
+        }
+    }
+  }
+
   @SuppressWarnings("unchecked")
   protected void onCheckClick(TreePanelEvent tpe, TreeNode node) {
     tpe.stopEvent();
@@ -1096,13 +1053,48 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
   protected void onClick(TreePanelEvent tpe) {
     TreeNode node = tpe.getNode();
     if (node != null) {
-      if (tpe.within(view.getJointElement(node))) {
+      Element jointEl = view.getJointElement(node);
+      if (jointEl != null && tpe.within(jointEl)) {
         toggle((M) tpe.getItem());
       }
-      if (checkable && tpe.within(view.getCheckElement(node))) {
+      Element checkEl = view.getCheckElement(node);
+      if (checkable && checkEl != null && tpe.within(checkEl)) {
         onCheckClick(tpe, node);
       }
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected void onCollapse(M model, TreeNode node, boolean deep) {
+    TreePanelEvent<M> tpe = new TreePanelEvent<M>(this);
+    tpe.setItem(model);
+    tpe.setNode(node);
+    if (node.expanded && fireEvent(Events.BeforeCollapse, tpe)) {
+      node.expanded = false;
+      // collapse
+      view.collapse(node);
+
+      if (isStateful() && store.getKeyProvider() != null) {
+        Map<String, Object> state = getState();
+        List<String> expanded = (List) state.get("expanded");
+        String id = store.getKeyProvider().getKey(model);
+        if (expanded != null && expanded.contains(id)) {
+          expanded.remove(id);
+          saveState();
+        }
+      }
+
+      List<M> l = new ArrayList<M>();
+      l.add(node.m);
+
+      update();
+      cleanCollapsed(node.m);
+      fireEvent(Events.Collapse, tpe);
+    }
+    if (deep) {
+      setExpandChildren(model, false);
+    }
+
   }
 
   protected void onDataChanged(TreeStoreEvent<M> se) {
@@ -1122,7 +1114,9 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
           sel.add(m);
           getSelectionModel().setSelection(sel);
         }
-
+      }
+      if (isStateful() && store.getKeyProvider() != null) {
+        statefulExpand(store.getRootItems());
       }
     } else {
       TreeNode n = findNode(p);
@@ -1138,6 +1132,10 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
         n.expand = false;
         setExpanded(p, true);
       }
+
+      if (isStateful() && store.getKeyProvider() != null) {
+        statefulExpand(store.getChildren(p));
+      }
     }
   }
 
@@ -1147,6 +1145,66 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     if (node != null) {
       setExpanded(node.m, !node.expanded);
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected void onExpand(M model, TreeNode node, boolean deep) {
+    TreePanelEvent<M> tpe = new TreePanelEvent<M>(this);
+    tpe.setItem(model);
+    tpe.setNode(node);
+
+    if (!node.isLeaf()) {
+      // if we have a loader and node is not loaded make
+      // load request and exit method
+      if (loader != null && (!node.loaded || !caching) && !filtering) {
+        store.removeAll(model);
+        node.expand = true;
+        loader.loadChildren(model);
+        return;
+      }
+      if (!node.expanded && fireEvent(Events.BeforeExpand, tpe)) {
+        node.expanded = true;
+
+        if (!node.childrenRendered) {
+          renderChildren(model);
+          node.childrenRendered = true;
+        }
+        // expand
+        view.expand(node);
+
+        if (isStateful() && store.getKeyProvider() != null) {
+          Map<String, Object> state = getState();
+          List<String> expanded = (List) state.get("expanded");
+          if (expanded == null) {
+            expanded = new ArrayList<String>();
+            state.put("expanded", expanded);
+          }
+          String id = store.getKeyProvider().getKey(model);
+          if (!expanded.contains(id)) {
+            if (expanded.size() > maxExpandEntries) {
+              expanded.remove(0);
+            }
+            expanded.add(id);
+            saveState();
+          }
+        }
+
+        M parent = store.getParent(model);
+        while (parent != null) {
+          TreeNode pnode = findNode(parent);
+          if (!pnode.expanded) {
+            setExpanded(pnode.m, true);
+          }
+          parent = store.getParent(parent);
+        }
+        update();
+        fireEvent(Events.Expand, tpe);
+      }
+    }
+    if (deep) {
+      setExpandChildren(model, true);
+    }
+
   }
 
   protected void onFilter(TreeStoreEvent<M> se) {
@@ -1164,6 +1222,9 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     if (node != null && node.getElement() != null) {
       El.fly(node.getElement()).removeFromParent();
       unregister(se.getChild());
+      for (M child : se.getChildren()) {
+        unregister(child);
+      }
       TreeNode p = findNode(se.getParent());
       if (p != null && p.expanded && p.getItemCount() == 0) {
         setExpanded(p.m, false);
@@ -1172,10 +1233,11 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     unregister(se.getChild());
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
-    String s = view.getTemplate(null, null, null, null, false, null, 0, TreeViewRenderMode.CONTAINER);
+    String s = view.getTemplate(null, null, null, null, false, false, null, 0, TreeViewRenderMode.CONTAINER);
     setElement(XDOM.create(s), target, index);
 
     el().show();
@@ -1191,6 +1253,16 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
       if (autoSelect) {
         getSelectionModel().select(0, false);
       }
+
+      if (isStateful() && store.getKeyProvider() != null) {
+        List<String> expanded = (List) getState().get("expanded");
+        for (M child : store.getRootItems()) {
+          String id = store.getKeyProvider().getKey(child);
+          if (expanded != null && expanded.contains(id)) {
+            setExpanded(child, true);
+          }
+        }
+      }
     }
 
     sinkEvents(Event.ONSCROLL | Event.ONCLICK | Event.ONDBLCLICK | Event.MOUSEEVENTS | Event.KEYEVENTS);
@@ -1205,10 +1277,18 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     update();
   }
 
-  protected void unregister(M m) {
-    if (m != null) {
-      nodes.remove(cache.get(m));
-      cache.remove(m);
+  protected void onUpdate(TreeStoreEvent<M> se) {
+    refresh(se.getModel());
+  }
+
+  protected void refresh(M model) {
+    if (rendered) {
+      TreeNode node = findNode(model);
+      if (node != null && node.getElement() != null) {
+        view.onIconStyleChange(node, calculateIconStyle(model));
+        view.onJointChange(node, calcualteJoint(model));
+        view.onTextChange(node, getText(model));
+      }
     }
   }
 
@@ -1224,7 +1304,8 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
 
   protected String renderChild(M parent, M child, int depth, TreeViewRenderMode renderMode) {
     String id = register(child);
-    boolean leaf = findNode(child).isLeaf();
+    TreeNode node = findNode(child);
+    boolean leaf = node.isLeaf();
     boolean check = checkable;
     switch (checkNodes) {
       case LEAF:
@@ -1237,8 +1318,8 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
           check = false;
         }
     }
-    return view.getTemplate(child, id, getText(child), calculateIconStyle(child), check, calcualteJoint(child), depth,
-        renderMode);
+    return view.getTemplate(child, id, getText(child), calculateIconStyle(child), check, node.checked,
+        calcualteJoint(child), depth, renderMode);
   }
 
   protected void renderChildren(M parent) {
@@ -1252,7 +1333,7 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     }
     List<M> rootItems = store.getRootItems();
     List<M> visible = getChildModel(rootItems, true);
-    int[] vr = getVisibleRows(visible);
+    int[] vr = getVisibleRows(visible, getVisibleRowCount());
 
     for (int i = 0; i < children.size(); i++) {
       int j = visible.indexOf(children.get(i));
@@ -1280,12 +1361,21 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
             loader.loadChildren(child);
           }
         }
+      } else if (autoLoad) {
+        renderChildren(child);
       }
     }
 
     TreeNode n = findNode(parent);
     if (n != null) {
       n.childrenRendered = true;
+    }
+  }
+
+  protected void unregister(M m) {
+    if (m != null) {
+      nodes.remove(cache.get(m));
+      cache.remove(m);
     }
   }
 
@@ -1300,20 +1390,18 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     updateTask.delay(view.getScrollDelay());
   }
 
-  private void cleanCollapsed(final List<M> l) {
-    List<M> list = store.getAllItems();
+  private void cleanCollapsed(M parent) {
+    List<M> list = store.getChildren(parent, true);
     for (M m : list) {
       TreeNode node = findNode(m);
-      if (node != null && !node.isLeaf() && !node.isExpanded()) {
-        for (M m2 : store.getChildren(m)) {
-          cleanNode(findNode(m2));
-        }
+      if (node != null && node.element != null) {
+        cleanNode(node);
       }
     }
   }
 
   private void cleanNode(TreeNode node) {
-    if (node != null) {
+    if (node != null && node.element != null) {
       node.clearElements();
       node.getElement().getFirstChildElement().setInnerHTML("");
     }
@@ -1328,8 +1416,7 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     }
   }
 
-  private int[] getVisibleRows(List<M> visible) {
-    int count = getVisibleRowCount();
+  private int[] getVisibleRows(List<M> visible, int count) {
     int sc = el().getScrollTop();
     int start = (int) (sc == 0 ? 0 : Math.floor(sc / view.getCalculatedRowHeight()) - 1);
     int first = Math.max(start, 0);
@@ -1346,6 +1433,19 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
   private void setExpandChildren(M m, boolean expand) {
     for (M child : store.getChildren(m)) {
       setExpanded(child, expand, true);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private void statefulExpand(List<M> children) {
+    if (isStateful() && store.getKeyProvider() != null) {
+      List<String> expanded = (List) getState().get("expanded");
+      for (M child : children) {
+        String id = store.getKeyProvider().getKey(child);
+        if (expanded != null && expanded.contains(id)) {
+          setExpanded(child, true);
+        }
+      }
     }
   }
 

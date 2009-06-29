@@ -383,8 +383,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
       all.removeAll();
       return;
     }
-    template.overwrite(getElement(), Util.getJsObjects((List) collectData(models, 0),
-        template.getMaxDepth()));
+    template.overwrite(getElement(), Util.getJsObjects((List) collectData(models, 0), template.getMaxDepth()));
     all = new CompositeElement(Util.toElementArray(el().select(itemSelector)));
     updateIndexes(0, -1);
     fireEvent(Events.Refresh);
@@ -606,10 +605,10 @@ public class ListView<M extends ModelData> extends BoxComponent {
   }
 
   protected void onAdd(List<M> models, int index) {
-    NodeList<Element> nodes = bufferRender(models);
-    Element[] e = Util.toElementArray(nodes);
-    all.insert(e, index);
     if (rendered) {
+      NodeList<Element> nodes = bufferRender(models);
+      Element[] e = Util.toElementArray(nodes);
+      all.insert(e, index);
       el().insertChild(e, index);
       updateIndexes(index, -1);
     }
@@ -690,8 +689,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
     }
 
     if (template == null) {
-      template = XTemplate.create("<tpl for=\".\"><div class='x-view-item'>{"
-          + displayProperty + "}</div></tpl>");
+      template = XTemplate.create("<tpl for=\".\"><div class='x-view-item'>{" + displayProperty + "}</div></tpl>");
     }
 
     if (store != null && store.getCount() > 0) {
@@ -718,15 +716,19 @@ public class ListView<M extends ModelData> extends BoxComponent {
 
   @SuppressWarnings("unchecked")
   protected void onUpdate(M model, int index) {
-    Element original = all.getElement(index);
-    List list = Util.createList(model);
-    Element node = bufferRender(list).getItem(0);
-    all.replaceElement(original, node);
-    if (fly(original).hasStyleName(selectStyle)) {
-      fly(node).addStyleName(selectStyle);
+    if (rendered) {
+      Element original = all.getElement(index);
+      if (original != null) {
+        List list = Util.createList(model);
+        Element node = bufferRender(list).getItem(0);
+        all.replaceElement(original, node);
+        if (fly(original).hasStyleName(selectStyle)) {
+          fly(node).addStyleName(selectStyle);
+        }
+        el().insertChild(node, index);
+        el().removeChild(original);
+      }
     }
-    el().insertChild(node, index);
-    el().removeChild(original);
   }
 
   protected M prepareData(M model) {
@@ -739,8 +741,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
   @SuppressWarnings("unchecked")
   private NodeList<Element> bufferRender(List<M> models) {
     Element div = DOM.createDiv();
-    template.overwrite(div, Util.getJsObjects((List) collectData((List) models, 0),
-        template.getMaxDepth()));
+    template.overwrite(div, Util.getJsObjects((List) collectData((List) models, 0), template.getMaxDepth()));
     return DomQuery.select(itemSelector, div);
   }
 

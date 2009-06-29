@@ -22,9 +22,11 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.fx.Draggable;
 import com.extjs.gxt.ui.client.util.Region;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
+import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
+import com.extjs.gxt.ui.client.widget.tips.QuickTip;
 import com.google.gwt.dom.client.AnchorElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.ImageElement;
@@ -112,17 +114,26 @@ class ColumnHeader extends BoxComponent {
       if (dragging) {
         return;
       }
+
+      // find the previous column which is not hidden
+      int before = activeHdIndex - 1;
+      for (int i = activeHdIndex; i >= 0; i--) {
+        if (!cm.isHidden(i)) {
+          before = i;
+          break;
+        }
+      }
       Event event = ce.getEvent();
       int x = event.getClientX();
       Region r = header.el().getRegion();
       int hw = splitterWidth;
-      
+
       el().setY(container.el().getY());
       el().setHeight(container.getHeight());
 
       Style ss = getElement().getStyle();
 
-      if (x - r.left <= hw && cm.isResizable(activeHdIndex - 1)) {
+      if (x - r.left <= hw && cm.isResizable(activeHdIndex - before)) {
         bar.el().setVisibility(true);
         el().setX(r.left);
         ss.setProperty("cursor", GXT.isSafari ? "e-resize" : "col-resize");
@@ -152,6 +163,7 @@ class ColumnHeader extends BoxComponent {
       d = new Draggable(this);
       d.setUseProxy(false);
       d.setConstrainVertical(true);
+      d.setStartDragDistance(0);
       d.addDragListener(listener);
     }
   }
@@ -171,6 +183,16 @@ class ColumnHeader extends BoxComponent {
     }
 
     @Override
+    protected void doAttachChildren() {
+      ComponentHelper.doAttach(config.getWidget());
+    }
+
+    @Override
+    protected void doDetachChildren() {
+      ComponentHelper.doDetach(config.getWidget());
+    }
+
+    @Override
     protected void onRender(Element target, int index) {
       setElement(DOM.createDiv(), target, index);
       setStyleName("x-grid3-hd-inner");
@@ -182,16 +204,6 @@ class ColumnHeader extends BoxComponent {
         el().setInnerHtml(config.getHtml());
       }
     }
-
-    @Override
-    protected void doDetachChildren() {
-      ComponentHelper.doDetach(config.getWidget());
-    }
-
-    @Override
-    protected void doAttachChildren() {
-      ComponentHelper.doAttach(config.getWidget());
-    }
   }
 
   class Head extends BoxComponent {
@@ -199,7 +211,7 @@ class ColumnHeader extends BoxComponent {
     private ColumnConfig config;
     private AnchorElement btn;
     private ImageElement img;
-    private Widget c;
+    private Widget widget;
     private Html text;
     private int column;
 
@@ -224,6 +236,7 @@ class ColumnHeader extends BoxComponent {
     @Override
     public void onComponentEvent(ComponentEvent ce) {
       super.onComponentEvent(ce);
+
       int type = ce.getEventTypeInt();
       switch (type) {
         case Event.ONMOUSEOVER:
@@ -248,7 +261,7 @@ class ColumnHeader extends BoxComponent {
     }
 
     public void setHeader(String header) {
-      text.setHtml(header);
+      if (text != null) text.setHtml(header);
     }
 
     public void updateWidth(int width) {
@@ -268,13 +281,13 @@ class ColumnHeader extends BoxComponent {
     @Override
     protected void doAttachChildren() {
       super.doAttachChildren();
-      ComponentHelper.doAttach(c);
+      ComponentHelper.doAttach(widget);
     }
 
     @Override
     protected void doDetachChildren() {
       super.doDetachChildren();
-      ComponentHelper.doDetach(c);
+      ComponentHelper.doDetach(widget);
     }
 
     @Override
@@ -290,11 +303,29 @@ class ColumnHeader extends BoxComponent {
       img.setSrc(GXT.BLANK_IMAGE_URL);
       img.setClassName("x-grid3-sort-icon");
 
-      text = new Html(config.getHeader());
-      text.setTagName("span");
-
       el().dom.appendChild(btn);
-      text.render(el().dom);
+
+      if (config.getWidget() != null) {
+        Element span = Document.get().createSpanElement().cast();
+        getElement().appendChild(span);
+
+        widget = config.getWidget();
+        if (widget instanceof Component) {
+          Component c = (Component) widget;
+          if (!c.isRendered()) {
+            c.render(span);
+          } else {
+            span.appendChild(c.getElement());
+          }
+
+        } else {
+          el().dom.appendChild(widget.getElement());
+        }
+      } else {
+        text = new Html(config.getHeader());
+        text.setTagName("span");
+        text.render(el().dom);
+      }
 
       el().dom.appendChild(img);
 
@@ -302,6 +333,8 @@ class ColumnHeader extends BoxComponent {
       if (tip != null) {
         getElement().setAttribute("qtip", tip);
       }
+
+      if (config.getToolTip() != null) new QuickTip(this);
 
       sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS);
     }
@@ -368,7 +401,9 @@ class ColumnHeader extends BoxComponent {
     }
     bar = new GridSplitBar();
     bar.render(container.getElement());
-    ComponentHelper.doAttach(bar);
+    if (isAttached()) {
+      ComponentHelper.doAttach(bar);
+    }
   }
 
   public int getMinColumnWidth() {
@@ -420,7 +455,7 @@ class ColumnHeader extends BoxComponent {
       Group group = new Group(config);
 
       boolean hide = true;
-      if (cs > 1 && rows > 1) {
+      if (rows > 1) {
         for (int i = col; i < (col + cs); i++) {
           if (!cm.isHidden(i)) {
             hide = false;
@@ -468,6 +503,8 @@ class ColumnHeader extends BoxComponent {
       if (i == (cols - 1)) tw++;
       if (!GXT.isBorderBox) tw -= 2;
 
+      h.render(DOM.createDiv());
+
       if (rowspan > 1) {
         int r = (rows - 1) - (rowspan - 1);
         table.setWidget(r, i, h);
@@ -481,6 +518,8 @@ class ColumnHeader extends BoxComponent {
       }
     }
     cleanCells();
+
+    adjustHeights();
   }
 
   public void setHeader(int column, String header) {
@@ -493,6 +532,12 @@ class ColumnHeader extends BoxComponent {
 
   public void setMinColumnWidth(int minColumnWidth) {
     this.minColumnWidth = minColumnWidth;
+  }
+
+  @Override
+  protected void onAttach() {
+    super.onAttach();
+    adjustHeights();
   }
 
   public void setSplitterWidth(int splitterWidth) {
@@ -513,18 +558,49 @@ class ColumnHeader extends BoxComponent {
     updateGroupWidths();
   }
 
-  protected void updateGroupWidths() {
-    for (Group group : groups) {
-      if (!group.isRendered()) {
-        continue;
+  public void updateSortIcon(int colIndex, SortDir dir) {
+    for (Head h : heads) {
+      if (h.isRendered()) {
+        h.el().findParent("td", 3).removeStyleName("sort-asc", "sort-desc");
       }
-      // the group must be sized as table layout is auto and we need
-      // content to clip if needed
-      int col = group.config.getColumn();
-      int w = getColumnWidths(col, col + group.config.getColspan());
-      w -= (2 * group.config.getColspan());
-      group.el().setWidth(w, true);
     }
+    String s = dir == SortDir.DESC ? "sort-desc" : "sort-asc";
+    Head h = heads.get(colIndex);
+    h.el().findParent("td", 3).addStyleName(s);
+    // fixes issue with IE initially hiding sort icon on change
+    h.el().repaint();
+  }
+
+  public void updateTotalWidth(int offset, int width) {
+    if (offset != -1) table.getElement().getParentElement().getStyle().setPropertyPx("width", offset);
+    table.getElement().getStyle().setProperty("width", width + "px");
+  }
+
+  protected void adjustHeights() {
+    for (Head head : heads) {
+      if (head.isRendered()) {
+        int h = head.el().getParent().getHeight();
+        head.el().setHeight(h, true);
+      }
+    }
+  }
+
+  protected ComponentEvent createColumnEvent(ColumnHeader header, int column, Menu menu) {
+    return new ComponentEvent(header);
+  }
+
+  @Override
+  protected void doAttachChildren() {
+    super.doAttachChildren();
+    ComponentHelper.doAttach(table);
+    ComponentHelper.doAttach(bar);
+  }
+
+  @Override
+  protected void doDetachChildren() {
+    super.doDetachChildren();
+    ComponentHelper.doDetach(table);
+    ComponentHelper.doDetach(bar);
   }
 
   protected int getColumnWidths(int start, int end) {
@@ -537,63 +613,12 @@ class ColumnHeader extends BoxComponent {
     return w;
   }
 
-  public void updateSortIcon(int colIndex, SortDir dir) {
-    for (Head h : heads) {
-      if (h.isRendered()) {
-        h.el().findParent("td", 3).removeStyleName("sort-asc", "sort-desc");
-      }
-    }
-    String s = dir == SortDir.DESC ? "sort-desc" : "sort-asc";
-    Head h = heads.get(colIndex);
-    h.el().findParent("td", 3).addStyleName(s);
-  }
-
-  protected ComponentEvent createColumnEvent(ColumnHeader header, int column, Menu menu) {
-    return new ComponentEvent(header);
-  }
-
-  @Override
-  protected void doAttachChildren() {
-    super.doAttachChildren();
-    ComponentHelper.doAttach(table);
-  }
-
-  @Override
-  protected void doDetachChildren() {
-    super.doDetachChildren();
-    ComponentHelper.doDetach(table);
-  }
-
   protected Menu getContextMenu(int column) {
     return menu;
   }
 
   protected Head getHead(int column) {
     return column < heads.size() ? heads.get(column) : null;
-  }
-
-  @Override
-  protected void onAttach() {
-    super.onAttach();
-    cleanCells();
-    adjustHeights();
-  }
-
-  private void cleanCells() {
-    NodeList<Element> tds = table.getElement().getElementsByTagName("td").cast();
-    for (int i = 0; i < tds.getLength(); i++) {
-      Element td = tds.getItem(i);
-      if (td.getInnerHTML().equals("")) {
-        El.fly(td).removeFromParent();
-      }
-    }
-    for (int i = 0; i < tds.getLength(); i++) {
-      Element td = tds.getItem(i);
-      if (td.getInnerHTML().equals("")) {
-        El.fly(td).removeFromParent();
-      }
-
-    }
   }
 
   protected void onColumnSplitterMoved(int colIndex, int width) {
@@ -624,21 +649,6 @@ class ColumnHeader extends BoxComponent {
     }
   }
 
-  protected void adjustHeights() {
-    for (Head head : heads) {
-      if (head.isRendered()) {
-        int h = head.el().getParent().getHeight();
-        head.el().setHeight(h, true);
-        // head.el().setWidth(cm.getColumnWidth(head.column) - 1, true);
-      }
-    }
-  }
-
-  public void updateTotalWidth(int offset, int width) {
-    table.getElement().getParentElement().getStyle().setPropertyPx("width", offset);
-    table.getElement().getStyle().setProperty("width", width + "px");
-  }
-
   protected void onHeaderClick(ComponentEvent ce, int column) {
     ComponentEvent evt = createColumnEvent(this, column, menu);
     evt.setEvent(ce.getEvent());
@@ -662,19 +672,56 @@ class ColumnHeader extends BoxComponent {
     table = new FlexTable();
     table.setCellPadding(0);
     table.setCellSpacing(0);
-
-    table.getElement().getStyle().setProperty("tableLayout", "fixed");
-
+    ComponentHelper.doAttach(table);
     setElement(table.getElement(), target, index);
-    refresh();
 
+    List<HeaderGroupConfig> configs = cm.getHeaderGroups();
+    rows = 0;
+    for (HeaderGroupConfig config : configs) {
+      rows = Math.max(rows, config.getRow() + 1);
+    }
+    rows += 1;
     // cannot use fixed layout with rows with colspan as widths
     // of child cells are evenly distributed, ignoring actual widths
-    if (rows > 1) {
-      table.getElement().getStyle().setProperty("tableLayout", "auto");
+    if (rows == 1) {
+      table.getElement().getStyle().setProperty("tableLayout", "fixed");
     }
 
-    sinkEvents(Event.ONMOUSEMOVE);
+    new QuickTip(this);
+
+    refresh();
+    ComponentHelper.doDetach(table);
+    sinkEvents(Event.ONMOUSEMOVE | Event.ONMOUSEDOWN | Event.ONCLICK);
+  }
+
+  protected void updateGroupWidths() {
+    for (Group group : groups) {
+      if (!group.isRendered()) {
+        continue;
+      }
+      // the group must be sized as table layout is auto and we need
+      // content to clip if needed
+      int col = group.config.getColumn();
+      int w = getColumnWidths(col, col + group.config.getColspan());
+      w -= (2 * group.config.getColspan());
+      group.el().setWidth(w, true);
+    }
+  }
+
+  private void cleanCells() {
+    NodeList<Element> tds = table.getElement().getElementsByTagName("td").cast();
+    for (int i = 0; i < tds.getLength(); i++) {
+      Element td = tds.getItem(i);
+      if (td.getInnerHTML().equals("") && td.getClassName().equals("")) {
+        El.fly(td).removeFromParent();
+      }
+    }
+    for (int i = 0; i < tds.getLength(); i++) {
+      Element td = tds.getItem(i);
+      if (td.getInnerHTML().equals("") && td.getClassName().equals("")) {
+        El.fly(td).removeFromParent();
+      }
+    }
   }
 
 }

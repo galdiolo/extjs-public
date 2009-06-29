@@ -15,6 +15,7 @@ import com.extjs.gxt.ui.client.event.HtmlContainerEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.RequestBuilder.Method;
 import com.google.gwt.user.client.DOM;
@@ -45,6 +46,26 @@ import com.google.gwt.user.client.ui.Widget;
  * }</pre>
  * 
  * <dl>
+ * <dt>Events:</dt>
+ * 
+ * <dd><b>Load</b> : HtmlContainerEvent(htmlContainer, response, html)<br>
+ * <div>Fires after the component is resized.</div>
+ * <ul>
+ * <li>htmlContainer : this</li>
+ * <li>html : the html</li>
+ * <li>response : the response</li>
+ * </ul>
+ * </dl>
+ * 
+ * <dd><b>LoadException</b> : HtmlContainerEvent(htmlContainer, exception)<br>
+ * <div>Fires after the component is resized.</div>
+ * <ul>
+ * <li>htmlContainer : this</li>
+ * <li>exception : the load exception</li>
+ * </ul>
+ * </dl>
+ * 
+ * <dl>
  * <dt>Inherited Events:</dt>
  * <dd>Container BeforeAdd</dd>
  * <dd>Container Add</dd>
@@ -71,29 +92,15 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class HtmlContainer extends Container<Component> {
 
-  /**
-   * The method used when requesting remote content (defaults to
-   * RequestBuilder.GET). Only applies when specifying a {@link #setUrl(String)}
-   * .
-   */
-  public Method httpMethod = RequestBuilder.GET;
-
-  /**
-   * True to defer remote requests until the component is rendered (defauls to
-   * false).
-   */
-  public boolean deferDownload;
-
-  /**
-   * The request data to be used in remote calls (defaults to null).
-   */
-  public String requestData;
   private Element elem;
   private String html;
   private String tagName = "div";
   private String url;
   private RequestBuilder requestBuilder;
   private RequestCallback callback;
+  private Method httpMethod = RequestBuilder.GET;
+  private String requestData;
+  private boolean deferDownload;
 
   /**
    * Creates a new container.
@@ -136,7 +143,8 @@ public class HtmlContainer extends Container<Component> {
    * 
    * @param widget the widget to add. If the widget is not a Component it will
    *          be wrapped in a WidgetComponent
-   * @param selector the css selector (ie div.class) used to identify the components parent
+   * @param selector the css selector (ie div.class) used to identify the
+   *          components parent
    */
   public void add(Widget widget, String selector) {
     Component component = wrapWidget(widget);
@@ -149,10 +157,48 @@ public class HtmlContainer extends Container<Component> {
   }
 
   /**
+   * Returns the HTTP method. Only applies when specifying a
+   * {@link #setUrl(String)}
+   * 
+   * @return the HTTP method
+   */
+  public Method getHttpMethod() {
+    return httpMethod;
+  }
+
+  /**
+   * Returns the request data.
+   * 
+   * @return the request data
+   */
+  public String getRequestData() {
+    return requestData;
+  }
+
+  /**
    * @return the tagName
    */
   public String getTagName() {
     return tagName;
+  }
+
+  /**
+   * Returns true if defer download is enabled.
+   * 
+   * @return true for deferred download
+   */
+  public boolean isDeferDownload() {
+    return deferDownload;
+  }
+
+  /**
+   * True to defer remote requests until the component is rendered (defaults to
+   * false).
+   * 
+   * @param deferDownload true to defer
+   */
+  public void setDeferDownload(boolean deferDownload) {
+    this.deferDownload = deferDownload;
   }
 
   /**
@@ -167,6 +213,25 @@ public class HtmlContainer extends Container<Component> {
       getElement().setInnerHTML(html);
       renderAll();
     }
+  }
+
+  /**
+   * The method used when requesting remote content (defaults to
+   * RequestBuilder.GET). Only applies when specifying a {@link #setUrl(String)}
+   * 
+   * @param httpMethod
+   */
+  public void setHttpMethod(Method httpMethod) {
+    this.httpMethod = httpMethod;
+  }
+
+  /**
+   * The request data to be used in remote calls (defaults to null).
+   * 
+   * @param requestData the request data
+   */
+  public void setRequestData(String requestData) {
+    this.requestData = requestData;
   }
 
   /**
@@ -189,6 +254,17 @@ public class HtmlContainer extends Container<Component> {
     if (!deferDownload) {
       requestData();
     }
+  }
+
+  @Override
+  protected ComponentEvent createComponentEvent(Event event) {
+    return new HtmlContainerEvent(this);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  protected ContainerEvent createContainerEvent(Component item) {
+    return new HtmlContainerEvent(this, item);
   }
 
   protected void handleError(Request request, Throwable exception) {
@@ -242,9 +318,8 @@ public class HtmlContainer extends Container<Component> {
   }
 
   protected void requestData() {
-    if (requestBuilder == null) {
-      requestBuilder = new RequestBuilder(httpMethod, url);
-    }
+    RequestBuilder rb = requestBuilder == null ? new RequestBuilder(httpMethod, url) : requestBuilder;
+
     if (callback == null) {
       callback = new RequestCallback() {
         public void onError(Request request, Throwable exception) {
@@ -257,21 +332,10 @@ public class HtmlContainer extends Container<Component> {
       };
     }
     try {
-      requestBuilder.sendRequest(requestData, callback);
-    } catch (Exception e) {
-
+      rb.sendRequest(requestData, callback);
+    } catch (RequestException e) {
+      handleError(null, e);
     }
-
   }
 
-  @Override
-  protected ComponentEvent createComponentEvent(Event event) {
-    return new HtmlContainerEvent(this);
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  protected ContainerEvent createContainerEvent(Component item) {
-    return new HtmlContainerEvent(this, item);
-  }
 }

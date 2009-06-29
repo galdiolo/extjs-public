@@ -12,6 +12,7 @@ import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * A column config for a column in a column model.
@@ -40,6 +41,7 @@ public class ColumnConfig extends BaseObservable {
   private NumberFormat numberFormat;
   private DateTimeFormat dateTimeFormat;
   private boolean groupable = true;
+  private Widget widget;
 
   /**
    * Creates a new column config.
@@ -166,6 +168,15 @@ public class ColumnConfig extends BaseObservable {
   }
 
   /**
+   * Returns the column's widget.
+   * 
+   * @return the widget
+   */
+  public Widget getWidget() {
+    return widget;
+  }
+
+  /**
    * Returns the column's width.
    * 
    * @return the column width
@@ -175,7 +186,9 @@ public class ColumnConfig extends BaseObservable {
   }
 
   /**
-   * Returns true if the column size is fixed.
+   * Returns true if the column width cannot be changed. Applies to both column
+   * width calculations (auto fill, force fit, auto expand column) and user
+   * resizing.
    * 
    * @return the fixed state
    */
@@ -265,7 +278,8 @@ public class ColumnConfig extends BaseObservable {
   }
 
   /**
-   * True if the column width cannot be changed (defaults to false, pre-render).
+   * True if the column width cannot be changed either by column model or user
+   * resizing (defaults to false, pre-render).
    * 
    * @param fixed true for fixed column width
    */
@@ -378,6 +392,17 @@ public class ColumnConfig extends BaseObservable {
    */
   public void setToolTip(String toolTip) {
     this.toolTip = toolTip;
+  }
+
+  /**
+   * Sets the column's widget.
+   * 
+   * @param widget the widget
+   * @param header the text used for the column context menu
+   */
+  public void setWidget(Widget widget, String header) {
+    this.widget = widget;
+    this.header = header;
   }
 
   /**
