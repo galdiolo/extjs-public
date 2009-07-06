@@ -1,11 +1,3 @@
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
 // Copyright 2007 Google Inc. All Rights Reserved.
 //
 // Sets up google.gears.*, which is *the only* supported way to access Gears.

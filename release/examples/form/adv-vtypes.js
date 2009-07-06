@@ -1,11 +1,3 @@
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
 // Add the additional 'advanced' VTypes
 Ext.apply(Ext.form.VTypes, {
     daterange : function(val, field) {
@@ -43,6 +35,7 @@ Ext.apply(Ext.form.VTypes, {
 
     passwordText : 'Passwords do not match'
 });
+
 
 Ext.onReady(function(){
 

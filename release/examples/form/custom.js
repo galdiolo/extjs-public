@@ -1,11 +1,3 @@
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
 Ext.onReady(function(){
     var ds = new Ext.data.Store({
         proxy: new Ext.data.ScriptTagProxy({
@@ -51,7 +43,7 @@ Ext.onReady(function(){
 
         tbar: [
             'Search: ', ' ',
-            new Ext.app.SearchField({
+            new Ext.ux.form.SearchField({
                 store: ds,
                 width:320
             })

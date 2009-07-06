@@ -1,11 +1,3 @@
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
 Ext.onReady(function(){
     Ext.QuickTips.init();
 
@@ -70,7 +62,7 @@ Ext.onReady(function(){
 
     var selections = new Ext.grid.RowSelectionModel();
 
-    // The main grid in all it's configuration option glory
+    // The main grid in all its configuration option glory
     var grid = new xg.EditorGridPanel({
         id:'tasks-grid',
         store: taskStore,

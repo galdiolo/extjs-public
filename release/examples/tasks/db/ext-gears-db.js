@@ -1,11 +1,3 @@
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
 Ext.data.GearsDB = Ext.extend(Ext.data.SqlDB, {
 	// abstract methods
     open : function(db, cb, scope){
