@@ -1,16 +1,16 @@
-/*
- * Ext JS Library 3.0 RC2
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
+Ext.ns('Ext.ux.tree');
 
-Ext.tree.ColumnTree = Ext.extend(Ext.tree.TreePanel, {
-    lines:false,
-    borderWidth: Ext.isBorderBox ? 0 : 2, // the combined left/right border for each cell
-    cls:'x-column-tree',
-    
+/**
+ * @class Ext.ux.tree.ColumnTree
+ * @extends Ext.tree.TreePanel
+ * 
+ * @xtype columntree
+ */
+Ext.ux.tree.ColumnTree = Ext.extend(Ext.tree.TreePanel, {
+    lines : false,
+    borderWidth : Ext.isBorderBox ? 0 : 2, // the combined left/right border for each cell
+    cls : 'x-column-tree',
+
     onRender : function(){
         Ext.tree.ColumnTree.superclass.onRender.apply(this, arguments);
         this.headers = this.header.createChild({cls:'x-tree-headers'});
@@ -38,7 +38,17 @@ Ext.tree.ColumnTree = Ext.extend(Ext.tree.TreePanel, {
     }
 });
 
-Ext.tree.ColumnNodeUI = Ext.extend(Ext.tree.TreeNodeUI, {
+Ext.reg('columntree', Ext.ux.tree.ColumnTree);
+
+//backwards compat
+Ext.tree.ColumnTree = Ext.ux.tree.ColumnTree;
+
+
+/**
+ * @class Ext.ux.tree.ColumnNodeUI
+ * @extends Ext.tree.TreeNodeUI
+ */
+Ext.ux.tree.ColumnNodeUI = Ext.extend(Ext.tree.TreeNodeUI, {
     focus: Ext.emptyFn, // prevent odd scrolling behavior
 
     renderElements : function(n, a, targetNode, bulkRender){
@@ -88,3 +98,6 @@ Ext.tree.ColumnNodeUI = Ext.extend(Ext.tree.TreeNodeUI, {
         this.textNode = cs[3].firstChild;
     }
 });
+
+//backwards compat
+Ext.tree.ColumnNodeUI = Ext.ux.tree.ColumnNodeUI;

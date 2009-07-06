@@ -1,11 +1,3 @@
-/*
- * Ext JS Library 3.0 RC2
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
 Ext.ns('App', 'App.user');
 /**
  * App.user.Grid
@@ -16,8 +8,8 @@ App.user.Grid = Ext.extend(Ext.grid.EditorGridPanel, {
     iconCls: 'silk-grid',
     frame: true,
     title: 'Users',
-    autoScroll: true,
     height: 300,
+    width: 500,
     style: 'margin-top: 10px',
 
     initComponent : function() {

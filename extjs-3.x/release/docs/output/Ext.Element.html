@@ -4,20 +4,20 @@
 access the underlying browser event, see <a href="output/Ext.EventObject.html#Ext.EventObject-browserEvent" ext:member="browserEvent" ext:cls="Ext.EventObject">Ext.EventObject.browserEvent</a>. Some older
 browsers may not support the full range of events. Which events are supported is beyond the control of ExtJs.</p>
 Usage:<br>
-<pre><code><i>// by id</i>
+<pre><code><i>// by id</i>
 <b>var</b> el = Ext.get(<em>"my-div"</em>);
 
-<i>// by DOM element reference</i>
+<i>// by DOM element reference</i>
 <b>var</b> el = Ext.get(myDivElement);</code></pre>
 <b>Animations</b><br />
 <p>When an element is manipulated, by default there is no animation.</p>
 <pre><code><b>var</b> el = Ext.get(<em>"my-div"</em>);
 
-<i>// no animation</i>
+<i>// no animation</i>
 el.setWidth(100);</code></pre>
 <p>Many of the functions for manipulating an element have an optional "animate" parameter.  This
 parameter can be specified as boolean (<tt>true</tt>) for default animation effects.</p>
-<pre><code><i>// <b>default</b> animation</i>
+<pre><code><i>// <b>default</b> animation</i>
 el.setWidth(100, true);</code></pre>
 <p>To configure the effects, an object literal with animation options to use as the Element animation
 configuration object can also be specified. Note that the supported Element animation configuration
@@ -31,18 +31,18 @@ Option    Default   Description
 <a href="output/Ext.Fx.html#Ext.Fx-callback" ext:member="callback" ext:cls="Ext.Fx">callback</a>  none      A function to execute when the anim completes
 <a href="output/Ext.Fx.html#Ext.Fx-scope" ext:member="scope" ext:cls="Ext.Fx">scope</a>     this      The scope (this) of the callback function
 </pre>
-<pre><code><i>// Element animation options object</i>
+<pre><code><i>// Element animation options object</i>
 <b>var</b> opt = {
     <a href="output/Ext.Fx.html#Ext.Fx-duration" ext:member="duration" ext:cls="Ext.Fx">duration</a>: 1,
     <a href="output/Ext.Fx.html#Ext.Fx-easing" ext:member="easing" ext:cls="Ext.Fx">easing</a>: <em>'elasticIn'</em>,
     <a href="output/Ext.Fx.html#Ext.Fx-callback" ext:member="callback" ext:cls="Ext.Fx">callback</a>: this.foo,
     <a href="output/Ext.Fx.html#Ext.Fx-scope" ext:member="scope" ext:cls="Ext.Fx">scope</a>: this
 };
-<i>// animation <b>with</b> some options set</i>
+<i>// animation <b>with</b> some options set</i>
 el.setWidth(100, opt);</code></pre>
 <p>The Element animation object being used for the animation will be set on the options
 object as "anim", which allows you to stop or manipulate the animation. Here is an example:</p>
-<pre><code><i>// using the <em>"anim"</em> property to get the Anim object</i>
+<pre><code><i>// using the <em>"anim"</em> property to get the Anim object</i>
 <b>if</b>(opt.anim.isAnimated()){
     opt.anim.stop();
 }</code></pre>
@@ -137,23 +137,23 @@ reduce memory consumption and prevent exposure to memory-leaks. By registering a
 for a container element as opposed to each element within a container. By setting this
 configuration option to a simple selector, the target element will be filtered to look for
 a descendant of the target.
-For example:<pre><code><i>// using this markup:</i>
+For example:<pre><code><i>// using this markup:</i>
 &lt;div id=<em>'elId'</em>>
     &lt;p id=<em>'p1'</em>>paragraph one&lt;/p>
     &lt;p id=<em>'p2'</em> class=<em>'clickable'</em>>paragraph two&lt;/p>
     &lt;p id=<em>'p3'</em>>paragraph three&lt;/p>
 &lt;/div>
-<i>// utilize event delegation to registering just one handler on the container element: </i>
+<i>// utilize event delegation to registering just one handler on the container element: </i>
 el = Ext.get(<em>'elId'</em>);
 el.on(
     <em>'click'</em>,
     <b>function</b>(e,t) {
-        <i>// handle click</i>
-        console.info(t.id); <i>// <em>'p2'</em></i>
+        <i>// handle click</i>
+        console.info(t.id); <i>// <em>'p2'</em></i>
     },
     this,
     {
-        <i>// filter the target element to be a descendant <b>with</b> the class <em>'clickable'</em></i>
+        <i>// filter the target element to be a descendant <b>with</b> the class <em>'clickable'</em></i>
         delegate: <em>'.clickable'</em> 
     }
 );</code></pre></p></div></li></ul><strong>Returns:</strong><ul><li><code>Ext.Element</code><div class="sub-desc">this</div></li></ul></div></div></div></td><td class="msource">Element</td></tr><tr class="method-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.Element-alignTo"></a><b><a href="source/Element.alignment.html#method-Ext.Element-alignTo">alignTo</a></b>(&nbsp;<code>Mixed&nbsp;element</code>,&nbsp;<code>String&nbsp;position</code>,&nbsp;<span title="Optional" class="optional">[<code>Array&nbsp;offsets</code>]</span>,&nbsp;<span title="Optional" class="optional">[<code>Boolean/Object&nbsp;animate</code>]</span>&nbsp;)
@@ -238,11 +238,11 @@ these properties:</p><div><ul class="mdetail-params">
 el.animate(
     <i>// animation control object</i>
     {
-    	borderWidth: {to: 3, from: 0},
-    	opacity: {to: .3, from: 1},
-    	height: {to: 50, from: el.getHeight()},
-    	width: {to: 300, from: el.getWidth()},
-    	top  : {by: - 100, unit: <em>'px'</em>},
+        borderWidth: {to: 3, from: 0},
+        opacity: {to: .3, from: 1},
+        height: {to: 50, from: el.getHeight()},
+        width: {to: 300, from: el.getWidth()},
+        top  : {by: - 100, unit: <em>'px'</em>},
     },
     0.35,      <i>// animation duration</i>
     null,      <i>// callback</i>
@@ -270,18 +270,18 @@ way points during transit.</p>
 <pre><code>el.animate(
     <i>// animation control object</i>
     {
-    	borderWidth: {to: 3, from: 0},
-    	opacity: {to: .3, from: 1},
-    	height: {to: 50, from: el.getHeight()},
-    	width: {to: 300, from: el.getWidth()},
-    	top  : {by: - 100, unit: <em>'px'</em>},
-    	points: {
-    	    to: [50, 100],  <i>// go to this point</i>
-    	    control: [      <i>// optional bezier way points</i>
-    	        [ 600, 800],
-    	        [-100, 200]
-    	    ]
-    	}
+        borderWidth: {to: 3, from: 0},
+        opacity: {to: .3, from: 1},
+        height: {to: 50, from: el.getHeight()},
+        width: {to: 300, from: el.getWidth()},
+        top  : {by: - 100, unit: <em>'px'</em>},
+        points: {
+            to: [50, 100],  <i>// go to this point</i>
+            control: [      <i>// optional bezier way points</i>
+                [ 600, 800],
+                [-100, 200]
+            ]
+        }
     },
     3000,      <i>// animation duration (milliseconds!)</i>
     null,      <i>// callback</i>
@@ -294,7 +294,7 @@ way points during transit.</p>
 <pre><code>el.animate(
     <i>// animation control object</i>
     {
-    	scroll: {to: [400, 300]}
+        scroll: {to: [400, 300]}
     },
     0.35,      <i>// animation duration</i>
     null,      <i>// callback</i>
@@ -328,8 +328,7 @@ is of this form:</p>
 <pre><code>Ext.Element.boxMarkup =
     &#39;&lt;div class=<em>"{0}-tl"</em>>&lt;div class=<em>"{0}-tr"</em>>&lt;div class=<em>"{0}-tc"</em>>&lt;/div>&lt;/div>&lt;/div>
      &lt;div class=<em>"{0}-ml"</em>>&lt;div class=<em>"{0}-mr"</em>>&lt;div class=<em>"{0}-mc"</em>>&lt;/div>&lt;/div>&lt;/div>
-     &lt;div class=<em>"{0}-bl"</em>>&lt;div class=<em>"{0}-br"</em>>&lt;div class=<em>"{0}-bc"</em>>&lt;/div>&lt;/div>&lt;/div>&#39;;
-</pre></code>
+     &lt;div class=<em>"{0}-bl"</em>>&lt;div class=<em>"{0}-br"</em>>&lt;div class=<em>"{0}-bc"</em>>&lt;/div>&lt;/div>&lt;/div>&#39;;</code></pre>
 <p>Example usage:</p>
 <pre><code><i>// Basic box wrap</i>
 Ext.get(<em>"foo"</em>).boxWrap();
@@ -337,8 +336,7 @@ Ext.get(<em>"foo"</em>).boxWrap();
 <i>// You can also add a custom class and use CSS inheritance rules to customize the box look.</i>
 <i>// <em>'x-box-blue'</em> is a built-<b>in</b> alternative -- look at the related CSS definitions as an example</i>
 <i>// <b>for</b> how to create a custom box wrap style.</i>
-Ext.get(<em>"foo"</em>).boxWrap().addClass(<em>"x-box-blue"</em>);
-</pre></code><div class="mdetail-params"><strong>Parameters:</strong><ul><li><code>class</code> : String<div class="sub-desc">(optional) A base CSS class to apply to the containing wrapper element
+Ext.get(<em>"foo"</em>).boxWrap().addClass(<em>"x-box-blue"</em>);</code></pre><div class="mdetail-params"><strong>Parameters:</strong><ul><li><code>class</code> : String<div class="sub-desc">(optional) A base CSS class to apply to the containing wrapper element
 (defaults to <tt>'x-box'</tt>). Note that there are a number of CSS rules that are dependent on
 this name to make the overall effect work, so if you supply an alternate base class, make sure you
 also supply all of the necessary rules.</div></li></ul><strong>Returns:</strong><ul><li><code>Ext.Element</code><div class="sub-desc">this</div></li></ul></div></div></div></td><td class="msource">Element</td></tr><tr class="method-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.Element-center"></a><b><a href="source/Element.alignment.html#method-Ext.Element-center">center</a></b>(&nbsp;<span title="Optional" class="optional">[<code>Mixed&nbsp;centerIn</code>]</span>&nbsp;)
@@ -373,8 +371,7 @@ showing through.<div class="mdetail-params"><strong>Parameters:</strong><ul><li>
     :
                                         Ext.Element<div class="mdesc"><div class="short">Convenience method for setVisibilityMode(Element.DISPLAY)</div><div class="long">Convenience method for setVisibilityMode(Element.DISPLAY)<div class="mdetail-params"><strong>Parameters:</strong><ul><li><code>display</code> : String<div class="sub-desc">(optional) What to set display to when visible</div></li></ul><strong>Returns:</strong><ul><li><code>Ext.Element</code><div class="sub-desc">this</div></li></ul></div></div></div></td><td class="msource">Element</td></tr><tr class="method-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.Element-findParent"></a><b><a href="source/Element.traversal.html#method-Ext.Element-findParent">findParent</a></b>(&nbsp;<code>String&nbsp;selector</code>,&nbsp;<span title="Optional" class="optional">[<code>Number/Mixed&nbsp;maxDepth</code>]</span>,&nbsp;<span title="Optional" class="optional">[<code>Boolean&nbsp;returnEl</code>]</span>&nbsp;)
     :
-                                        HTMLElement<div class="mdesc"><div class="short">Looks at this node and then at parent nodes for a match of the passed simple selector (e.g. div.some-class or span:fi...</div><div class="long">Looks at this node and then at parent nodes for a match of the passed simple selector (e.g. div.some-class or span:first-child)<div class="mdetail-params"><strong>Parameters:</strong><ul><li><code>selector</code> : String<div class="sub-desc">The simple selector to test</div></li><li><code>maxDepth</code> : Number/Mixed<div class="sub-desc">(optional) The max depth to
-	            search as a number or element (defaults to 10 || document.body)</div></li><li><code>returnEl</code> : Boolean<div class="sub-desc">(optional) True to return a Ext.Element object instead of DOM node</div></li></ul><strong>Returns:</strong><ul><li><code>HTMLElement</code><div class="sub-desc">The matching DOM node (or null if no match was found)</div></li></ul></div></div></div></td><td class="msource">Element</td></tr><tr class="method-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.Element-findParentNode"></a><b><a href="source/Element.traversal.html#method-Ext.Element-findParentNode">findParentNode</a></b>(&nbsp;<code>String&nbsp;selector</code>,&nbsp;<span title="Optional" class="optional">[<code>Number/Mixed&nbsp;maxDepth</code>]</span>,&nbsp;<span title="Optional" class="optional">[<code>Boolean&nbsp;returnEl</code>]</span>&nbsp;)
+                                        HTMLElement<div class="mdesc"><div class="short">Looks at this node and then at parent nodes for a match of the passed simple selector (e.g. div.some-class or span:fi...</div><div class="long">Looks at this node and then at parent nodes for a match of the passed simple selector (e.g. div.some-class or span:first-child)<div class="mdetail-params"><strong>Parameters:</strong><ul><li><code>selector</code> : String<div class="sub-desc">The simple selector to test</div></li><li><code>maxDepth</code> : Number/Mixed<div class="sub-desc">(optional) The max depth to search as a number or element (defaults to 50 || document.body)</div></li><li><code>returnEl</code> : Boolean<div class="sub-desc">(optional) True to return a Ext.Element object instead of DOM node</div></li></ul><strong>Returns:</strong><ul><li><code>HTMLElement</code><div class="sub-desc">The matching DOM node (or null if no match was found)</div></li></ul></div></div></div></td><td class="msource">Element</td></tr><tr class="method-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.Element-findParentNode"></a><b><a href="source/Element.traversal.html#method-Ext.Element-findParentNode">findParentNode</a></b>(&nbsp;<code>String&nbsp;selector</code>,&nbsp;<span title="Optional" class="optional">[<code>Number/Mixed&nbsp;maxDepth</code>]</span>,&nbsp;<span title="Optional" class="optional">[<code>Boolean&nbsp;returnEl</code>]</span>&nbsp;)
     :
                                         HTMLElement<div class="mdesc"><div class="short">Looks at parent nodes for a match of the passed simple selector (e.g. div.some-class or span:first-child)</div><div class="long">Looks at parent nodes for a match of the passed simple selector (e.g. div.some-class or span:first-child)<div class="mdetail-params"><strong>Parameters:</strong><ul><li><code>selector</code> : String<div class="sub-desc">The simple selector to test</div></li><li><code>maxDepth</code> : Number/Mixed<div class="sub-desc">(optional) The max depth to
 	            search as a number or element (defaults to 10 || document.body)</div></li><li><code>returnEl</code> : Boolean<div class="sub-desc">(optional) True to return a Ext.Element object instead of DOM node</div></li></ul><strong>Returns:</strong><ul><li><code>HTMLElement</code><div class="sub-desc">The matching DOM node (or null if no match was found)</div></li></ul></div></div></div></td><td class="msource">Element</td></tr><tr class="method-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.Element-first"></a><b><a href="source/Element.traversal.html#method-Ext.Element-first">first</a></b>(&nbsp;<span title="Optional" class="optional">[<code>String&nbsp;selector</code>]</span>,&nbsp;<span title="Optional" class="optional">[<code>Boolean&nbsp;returnDom</code>]</span>&nbsp;)
@@ -390,9 +387,9 @@ will be more appropriate to take advantage of the caching provided by the Ext.El
     :
                                         Ext.Element<div class="mdesc"><div class="short">Tries to focus the element. Any exceptions are caught and ignored.</div><div class="long">Tries to focus the element. Any exceptions are caught and ignored.<div class="mdetail-params"><strong>Parameters:</strong><ul><li><code>defer</code> : Number<div class="sub-desc">(optional) Milliseconds to defer the focus</div></li></ul><strong>Returns:</strong><ul><li><code>Ext.Element</code><div class="sub-desc">this</div></li></ul></div></div></div></td><td class="msource">Element</td></tr><tr class="method-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.Element-get"></a><b><a href="source/Element.html#method-Ext.Element-get">get</a></b>(&nbsp;<code>Mixed&nbsp;el</code>&nbsp;)
     :
-                                        Element<div class="mdesc"><div class="short">&lt;static&gt;&nbsp;Retrieves Ext.Element objects.
-This method does not retrieve Components. This method
-retrieves Ext.Element objects wh...</div><div class="long">&lt;static&gt;&nbsp;Retrieves Ext.Element objects.
+                                        Element<div class="mdesc"><div class="short">&lt;static&gt;&nbsp;Retrieves Ext.Element objects.&#13;
+This method does not retrieve Components. This method&#13;
+retrieves Ext.Element objects ...</div><div class="long">&lt;static&gt;&nbsp;Retrieves Ext.Element objects.
 <p><b>This method does not retrieve <a href="output/Ext.Component.html" ext:cls="Ext.Component">Component</a>s.</b> This method
 retrieves Ext.Element objects which encapsulate DOM elements. To retrieve a Component by
 its ID, use <a href="output/Ext.ComponentMgr.html#Ext.ComponentMgr-get" ext:member="get" ext:cls="Ext.ComponentMgr">Ext.ComponentMgr.get</a>.</p>
@@ -494,8 +491,7 @@ var vpSize = Ext.getBody().getViewSize();&#13;
             width: vpSize.width * 0.9,
             height: vpSize.height * 0.95
         });
-        <i>// To handle window resizing you would have to hook onto onWindowResize. </i>
-        </pre></code><div class="mdetail-params"><strong>Parameters:</strong><ul><li>None.</li></ul><strong>Returns:</strong><ul><li><code>Object</code><div class="sub-desc">An object containing the viewport's size {width: (viewport width), height: (viewport height)}</div></li></ul></div></div></div></td><td class="msource">Element</td></tr><tr class="method-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.Element-getWidth"></a><b><a href="source/Element.style.html#method-Ext.Element-getWidth">getWidth</a></b>(&nbsp;<span title="Optional" class="optional">[<code>Boolean&nbsp;contentWidth</code>]</span>&nbsp;)
+        <i>// To handle window resizing you would have to hook onto onWindowResize.</i></code></pre><div class="mdetail-params"><strong>Parameters:</strong><ul><li>None.</li></ul><strong>Returns:</strong><ul><li><code>Object</code><div class="sub-desc">An object containing the viewport's size {width: (viewport width), height: (viewport height)}</div></li></ul></div></div></div></td><td class="msource">Element</td></tr><tr class="method-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.Element-getWidth"></a><b><a href="source/Element.style.html#method-Ext.Element-getWidth">getWidth</a></b>(&nbsp;<span title="Optional" class="optional">[<code>Boolean&nbsp;contentWidth</code>]</span>&nbsp;)
     :
                                         Number<div class="mdesc"><div class="short">Returns the offset width of the element</div><div class="long">Returns the offset width of the element<div class="mdetail-params"><strong>Parameters:</strong><ul><li><code>contentWidth</code> : Boolean<div class="sub-desc">(optional) true to get the width minus borders and padding</div></li></ul><strong>Returns:</strong><ul><li><code>Number</code><div class="sub-desc">The element's width</div></li></ul></div></div></div></td><td class="msource">Element</td></tr><tr class="method-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.Element-getX"></a><b><a href="source/Element.position.html#method-Ext.Element-getX">getX</a></b>()
     :
@@ -541,8 +537,8 @@ var vpSize = Ext.getBody().getViewSize();&#13;
     :
                                         Ext.Element/HTMLElement<div class="mdesc"><div class="short">Gets the last child, skipping text nodes</div><div class="long">Gets the last child, skipping text nodes<div class="mdetail-params"><strong>Parameters:</strong><ul><li><code>selector</code> : String<div class="sub-desc">(optional) Find the previous sibling that matches the passed simple selector</div></li><li><code>returnDom</code> : Boolean<div class="sub-desc">(optional) True to return a raw dom node instead of an Ext.Element</div></li></ul><strong>Returns:</strong><ul><li><code>Ext.Element/HTMLElement</code><div class="sub-desc">The last child or null</div></li></ul></div></div></div></td><td class="msource">Element</td></tr><tr class="method-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.Element-load"></a><b><a href="source/Element.html#method-Ext.Element-load">load</a></b>(&nbsp;<code>Mixed&nbsp;options.</code>&nbsp;)
     :
-                                        Ext.Element<div class="mdesc"><div class="short">Updates the &lt;a href="http://developer.mozilla.org/en/DOM/element.innerHTML"&gt;innerHTML of this Element
-from a specifie...</div><div class="long"><p>Updates the <a href="http://developer.mozilla.org/en/DOM/element.innerHTML">innerHTML</a> of this Element
+                                        Ext.Element<div class="mdesc"><div class="short">Updates the &lt;a href="http://developer.mozilla.org/en/DOM/element.innerHTML"&gt;innerHTML of this Element&#13;
+from a specifi...</div><div class="long"><p>Updates the <a href="http://developer.mozilla.org/en/DOM/element.innerHTML">innerHTML</a> of this Element
 from a specified URL. Note that this is subject to the <a href="http://en.wikipedia.org/wiki/Same_origin_policy">Same Origin Policy</a></p>
 <p>Updating innerHTML of an element will <b>not</b> execute embedded <tt>&lt;script></tt> elements. This is a browser restriction.</p><div class="mdetail-params"><strong>Parameters:</strong><ul><li><code>options.</code> : Mixed<div class="sub-desc">Either a sring containing the URL from which to load the HTML, or an <a href="output/Ext.Ajax.html#Ext.Ajax-request" ext:member="request" ext:cls="Ext.Ajax">Ext.Ajax.request</a> options object specifying
 exactly how to request the HTML.</div></li></ul><strong>Returns:</strong><ul><li><code>Ext.Element</code><div class="sub-desc">this</div></li></ul></div></div></div></td><td class="msource">Element</td></tr><tr class="method-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.Element-mask"></a><b><a href="source/Element.fx-more.html#method-Ext.Element-mask">mask</a></b>(&nbsp;<span title="Optional" class="optional">[<code>String&nbsp;msg</code>]</span>,&nbsp;<span title="Optional" class="optional">[<code>String&nbsp;msgCls</code>]</span>&nbsp;)
@@ -584,13 +580,13 @@ for firing the relayed event</div></li></ul><strong>Returns:</strong><ul><li>voi
     :
                                         Ext.Element<div class="mdesc"><div class="short">Removes one or more CSS classes from the element.</div><div class="long">Removes one or more CSS classes from the element.<div class="mdetail-params"><strong>Parameters:</strong><ul><li><code>className</code> : String/Array<div class="sub-desc">The CSS class to remove, or an array of classes</div></li></ul><strong>Returns:</strong><ul><li><code>Ext.Element</code><div class="sub-desc">this</div></li></ul></div></div></div></td><td class="msource">Element</td></tr><tr class="method-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.Element-removeListener"></a><b><a href="source/Element.html#method-Ext.Element-removeListener">removeListener</a></b>(&nbsp;<code>String&nbsp;eventName</code>,&nbsp;<code>Function&nbsp;fn</code>,&nbsp;<span title="Optional" class="optional">[<code>Object&nbsp;scope</code>]</span>&nbsp;)
     :
-                                        Ext.Element<div class="mdesc"><div class="short">Removes an event handler from this element.  The shorthand version un is equivalent.
-Note: if a scope was explicitly ...</div><div class="long">Removes an event handler from this element.  The shorthand version <a href="output/Ext.Element.html#Ext.Element-un" ext:member="un" ext:cls="Ext.Element">un</a> is equivalent.
+                                        Ext.Element<div class="mdesc"><div class="short">Removes an event handler from this element.  The shorthand version un is equivalent.&#13;
+Note: if a scope was explicitly...</div><div class="long">Removes an event handler from this element.  The shorthand version <a href="output/Ext.Element.html#Ext.Element-un" ext:member="un" ext:cls="Ext.Element">un</a> is equivalent.
 <b>Note</b>: if a <i>scope</i> was explicitly specified when <a href="output/Ext.Element.html#Ext.Element-addListener" ext:member="addListener" ext:cls="Ext.Element">adding</a> the
 listener, the same scope must be specified here.
 Example:
 <pre><code>el.removeListener(<em>'click'</em>, this.handlerFn);
-<i>// or</i>
+<i>// or</i>
 el.un(<em>'click'</em>, this.handlerFn);</code></pre><div class="mdetail-params"><strong>Parameters:</strong><ul><li><code>eventName</code> : String<div class="sub-desc">the type of event to remove</div></li><li><code>fn</code> : Function<div class="sub-desc">the method the event invokes</div></li><li><code>scope</code> : Object<div class="sub-desc">(optional) The scope (The <tt>this</tt> reference) of the handler function. Defaults
 to this Element.</div></li></ul><strong>Returns:</strong><ul><li><code>Ext.Element</code><div class="sub-desc">this</div></li></ul></div></div></div></td><td class="msource">Element</td></tr><tr class="method-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.Element-repaint"></a><b><a href="source/Element.style-more.html#method-Ext.Element-repaint">repaint</a></b>()
     :
@@ -721,9 +717,9 @@ to this Element.</div></li></ul><strong>Returns:</strong><ul><li><code>Ext.Eleme
     :
                                         Ext.Element<div class="mdesc"><div class="short">Walks up the dom looking for a parent node that matches the passed simple selector (e.g. div.some-class or span:first...</div><div class="long">Walks up the dom looking for a parent node that matches the passed simple selector (e.g. div.some-class or span:first-child).
 This is a shortcut for findParentNode() that always returns an Ext.Element.<div class="mdetail-params"><strong>Parameters:</strong><ul><li><code>selector</code> : String<div class="sub-desc">The simple selector to test</div></li><li><code>maxDepth</code> : Number/Mixed<div class="sub-desc">(optional) The max depth to
-	            search as a number or element (defaults to 10 || document.body)</div></li></ul><strong>Returns:</strong><ul><li><code>Ext.Element</code><div class="sub-desc">The matching DOM node (or null if no match was found)</div></li></ul></div></div></div></td><td class="msource">Element</td></tr><tr class="method-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.Element-update"></a><b><a href="source/Element-more.html#method-Ext.Element-update">update</a></b>(&nbsp;<code>String&nbsp;html</code>,&nbsp;<span title="Optional" class="optional">[<code>Boolean&nbsp;loadScripts</code>]</span>,&nbsp;<span title="Optional" class="optional">[<code>Function&nbsp;callback</code>]</span>&nbsp;)
+	            search as a number or element (defaults to 10 || document.body)</div></li></ul><strong>Returns:</strong><ul><li><code>Ext.Element</code><div class="sub-desc">The matching DOM node (or null if no match was found)</div></li></ul></div></div></div></td><td class="msource">Element</td></tr><tr class="method-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.Element-update"></a><b><a href="source/Element.html#method-Ext.Element-update">update</a></b>(&nbsp;<code>String&nbsp;html</code>&nbsp;)
     :
-                                        Ext.Element<div class="mdesc"><div class="short">Update the innerHTML of this element, optionally searching for and processing scripts</div><div class="long">Update the innerHTML of this element, optionally searching for and processing scripts<div class="mdetail-params"><strong>Parameters:</strong><ul><li><code>html</code> : String<div class="sub-desc">The new HTML</div></li><li><code>loadScripts</code> : Boolean<div class="sub-desc">(optional) True to look for and process scripts (defaults to false)</div></li><li><code>callback</code> : Function<div class="sub-desc">(optional) For async script loading you can be notified when the update completes</div></li></ul><strong>Returns:</strong><ul><li><code>Ext.Element</code><div class="sub-desc">this</div></li></ul></div></div></div></td><td class="msource">Element</td></tr><tr class="method-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.Element-wrap"></a><b><a href="source/Element.insertion.html#method-Ext.Element-wrap">wrap</a></b>(&nbsp;<span title="Optional" class="optional">[<code>Object&nbsp;config</code>]</span>,&nbsp;<span title="Optional" class="optional">[<code>Boolean&nbsp;returnDom</code>]</span>&nbsp;)
+                                        Ext.Element<div class="mdesc"><div class="short">Update the innerHTML of this element</div><div class="long">Update the innerHTML of this element<div class="mdetail-params"><strong>Parameters:</strong><ul><li><code>html</code> : String<div class="sub-desc">The new HTML</div></li></ul><strong>Returns:</strong><ul><li><code>Ext.Element</code><div class="sub-desc">this</div></li></ul></div></div></div></td><td class="msource">Element</td></tr><tr class="method-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.Element-wrap"></a><b><a href="source/Element.insertion.html#method-Ext.Element-wrap">wrap</a></b>(&nbsp;<span title="Optional" class="optional">[<code>Object&nbsp;config</code>]</span>,&nbsp;<span title="Optional" class="optional">[<code>Boolean&nbsp;returnDom</code>]</span>&nbsp;)
     :
                                         HTMLElement/Element<div class="mdesc"><div class="short">Creates and wraps this element with another element</div><div class="long">Creates and wraps this element with another element<div class="mdetail-params"><strong>Parameters:</strong><ul><li><code>config</code> : Object<div class="sub-desc">(optional) DomHelper element config object for the wrapper element or null for an empty div</div></li><li><code>returnDom</code> : Boolean<div class="sub-desc">(optional) True to return the raw DOM element instead of Ext.Element</div></li></ul><strong>Returns:</strong><ul><li><code>HTMLElement/Element</code><div class="sub-desc">The newly created wrapper element</div></li></ul></div></div></div></td><td class="msource">Element</td></tr></tbody></table><a id="Ext.Element-events"></a><h2>Public Events</h2><table cellspacing="0" class="member-table"><tbody><tr><th colspan="2" class="sig-header">Event</th><th class="msource-header">Defined By</th></tr><tr class="method-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.Element-DOMActivate"></a><b><a href="source/Element.html#event-Ext.Element-DOMActivate">DOMActivate</a></b> :
                                       (&nbsp;<code>Ext.EventObject&nbsp;e</code>,&nbsp;<code>HtmlElement&nbsp;t</code>,&nbsp;<code>Object&nbsp;o</code>&nbsp;)

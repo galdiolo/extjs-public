@@ -1,11 +1,3 @@
-/*
- * Ext JS Library 3.0 RC2
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
 Ext.state.SessionProvider = Ext.extend(Ext.state.CookieProvider, {
     readCookies : function(){
         if(this.state){

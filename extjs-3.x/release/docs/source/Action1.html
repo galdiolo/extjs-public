@@ -214,7 +214,7 @@ buttons: [{
         if(appendParams){
             var p = this.getParams();
             if(p){
-                url += (url.indexOf('?') != -1 ? '&' : '?') + p;
+                url = Ext.urlAppend(url, p);
             }
         }
         return url;
@@ -243,7 +243,7 @@ buttons: [{
 
     // private
     createCallback : function(opts){
-		var opts = opts || {};
+        var opts = opts || {};
         return {
             success: this.success,
             failure: this.failure,
@@ -261,9 +261,16 @@ buttons: [{
  * and processes the returned response.</p>
  * <p>Instances of this class are only created by a {@link Ext.form.BasicForm Form} when
  * {@link Ext.form.BasicForm#submit submit}ting.</p>
- * <p>A response packet must contain a boolean <tt style="font-weight:bold">success</tt> property, and, optionally
- * an <tt style="font-weight:bold">errors</tt> property. The <tt style="font-weight:bold">errors</tt> property contains error
- * messages for invalid fields.</p>
+ * <p><u><b>Response Packet Criteria</b></u></p>
+ * <p>A response packet may contain:
+ * <div class="mdetail-params"><ul>
+ * <li><b><code>success</code></b> property : Boolean
+ * <div class="sub-desc">The <code>success</code> property is required.</div></li>
+ * <li><b><code>errors</code></b> property : Object
+ * <div class="sub-desc"><div class="sub-desc">The <code>errors</code> property,
+ * which is optional, contains error messages for invalid fields.</div></li>
+ * </ul></div>
+ * <p><u><b>JSON Packets</b></u></p>
  * <p>By default, response packets are assumed to be JSON, so a typical response
  * packet may look like this:</p><pre><code>
 {
@@ -274,7 +281,8 @@ buttons: [{
     }
 }</code></pre>
  * <p>Other data may be placed into the response for processing by the {@link Ext.form.BasicForm}'s callback
- * or event handler methods. The object decoded from this JSON is available in the {@link #result} property.</p>
+ * or event handler methods. The object decoded from this JSON is available in the
+ * {@link Ext.form.Action#result result} property.</p>
  * <p>Alternatively, if an {@link #errorReader} is specified as an {@link Ext.data.XmlReader XmlReader}:</p><pre><code>
     errorReader: new Ext.data.XmlReader({
             record : 'field',
@@ -308,16 +316,18 @@ Ext.form.Action.Submit = function(form, options){
 
 Ext.extend(Ext.form.Action.Submit, Ext.form.Action, {
     <div id="cfg-Ext.form.Action.Submit-errorReader"></div>/**
-    * @cfg {Ext.data.DataReader} errorReader <b>Optional. JSON is interpreted with no need for an errorReader.</b>
-    * <p>A Reader which reads a single record from the returned data. The DataReader's <b>success</b> property specifies
-    * how submission success is determined. The Record's data provides the error messages to apply to any invalid form Fields.</p>.
-    */
+     * @cfg {Ext.data.DataReader} errorReader <p><b>Optional. JSON is interpreted with
+     * no need for an errorReader.</b></p>
+     * <p>A Reader which reads a single record from the returned data. The DataReader's
+     * <b>success</b> property specifies how submission success is determined. The Record's
+     * data provides the error messages to apply to any invalid form Fields.</p>
+     */
     <div id="cfg-Ext.form.Action.Submit-clientValidation"></div>/**
-    * @cfg {boolean} clientValidation Determines whether a Form's fields are validated
-    * in a final call to {@link Ext.form.BasicForm#isValid isValid} prior to submission.
-    * Pass <tt>false</tt> in the Form's submit options to prevent this. If not defined, pre-submission field validation
-    * is performed.
-    */
+     * @cfg {boolean} clientValidation Determines whether a Form's fields are validated
+     * in a final call to {@link Ext.form.BasicForm#isValid isValid} prior to submission.
+     * Pass <tt>false</tt> in the Form's submit options to prevent this. If not defined, pre-submission field validation
+     * is performed.
+     */
     type : 'submit',
 
     // private
@@ -384,12 +394,41 @@ Ext.extend(Ext.form.Action.Submit, Ext.form.Action, {
  * <p>A class which handles loading of data from a server into the Fields of an {@link Ext.form.BasicForm}.</p>
  * <p>Instances of this class are only created by a {@link Ext.form.BasicForm Form} when
  * {@link Ext.form.BasicForm#load load}ing.</p>
- * <p>A response packet <b>must</b> contain a boolean <tt style="font-weight:bold">success</tt> property, and
- * a <tt style="font-weight:bold">data</tt> property. The <tt style="font-weight:bold">data</tt> property
- * contains the values of Fields to load. The individual value object for each Field
- * is passed to the Field's {@link Ext.form.Field#setValue setValue} method.</p>
- * <p>By default, response packets are assumed to be JSON, so a typical response
- * packet may look like this:</p><pre><code>
+ * <p><u><b>Response Packet Criteria</b></u></p>
+ * <p>A response packet <b>must</b> contain:
+ * <div class="mdetail-params"><ul>
+ * <li><b><code>success</code></b> property : Boolean</li>
+ * <li><b><code>data</code></b> property : Object</li>
+ * <div class="sub-desc">The <code>data</code> property contains the values of Fields to load.
+ * The individual value object for each Field is passed to the Field's
+ * {@link Ext.form.Field#setValue setValue} method.</div></li>
+ * </ul></div>
+ * <p><u><b>JSON Packets</b></u></p>
+ * <p>By default, response packets are assumed to be JSON, so for the following form load call:<pre><code>
+var myFormPanel = new Ext.form.FormPanel({
+    title: 'Client and routing info',
+    items: [{
+        fieldLabel: 'Client',
+        name: 'clientName'
+    }, {
+        fieldLabel: 'Port of loading',
+        name: 'portOfLoading'
+    }, {
+        fieldLabel: 'Port of discharge',
+        name: 'portOfDischarge'
+    }]
+});
+myFormPanel.{@link Ext.form.FormPanel#getForm getForm}().{@link Ext.form.BasicForm#load load}({
+    url: '/getRoutingInfo.php',
+    params: {
+        consignmentRef: myConsignmentRef
+    },
+    failure: function(form, action() {
+        Ext.Msg.alert("Load failed", action.result.errorMessage);
+    }
+});
+</code></pre>
+ * a <b>success response</b> packet may look like this:</p><pre><code>
 {
     success: true,
     data: {
@@ -398,8 +437,14 @@ Ext.extend(Ext.form.Action.Submit, Ext.form.Action, {
         portOfDischarge: "OSL"
     }
 }</code></pre>
- * <p>Other data may be placed into the response for processing the {@link Ext.form.BasicForm Form}'s callback
- * or event handler methods. The object decoded from this JSON is available in the {@link #result} property.</p>
+ * while a <b>failure response</b> packet may look like this:</p><pre><code>
+{
+    success: false,
+    errorMessage: "Consignment reference not found"
+}</code></pre>
+ * <p>Other data may be placed into the response for processing the {@link Ext.form.BasicForm Form}'s
+ * callback or event handler methods. The object decoded from this JSON is available in the
+ * {@link Ext.form.Action#result result} property.</p>
  */
 Ext.form.Action.Load = function(form, options){
     Ext.form.Action.Load.superclass.constructor.call(this, form, options);
@@ -453,6 +498,48 @@ Ext.extend(Ext.form.Action.Load, Ext.form.Action, {
 <div id="cls-Ext.form.Action.DirectLoad"></div>/**
  * @class Ext.form.Action.DirectLoad
  * @extends Ext.form.Action.Load
+ * Provides Ext.direct support for loading form data. This example illustrates usage
+ * of Ext.Direct to load a submit a form through Ext.Direct.
+ * <pre><code>
+var myFormPanel = new Ext.form.FormPanel({
+    // configs for FormPanel
+    title: 'Basic Information',
+    border: false,
+    padding: 10,
+    buttons:[{
+        text: 'Submit',
+        handler: function(){
+            basicInfo.getForm().submit({
+                params: {
+                    uid: 5
+                }
+            });
+        }
+    }],
+    
+    // configs apply to child items
+    defaults: {anchor: '100%'},
+    defaultType: 'textfield',
+    items: [
+        // form fields go here
+    ],
+    
+    // configs for BasicForm
+    api: {
+        load: Profile.getBasicInfo,
+        // The server-side must mark the submit handler as a 'formHandler'
+        submit: Profile.updateBasicInfo
+    },    
+    paramOrder: ['uid']
+});
+
+// load the form
+myFormPanel.getForm().load({
+    params: {
+        uid: 5
+    }
+});
+ * </code></pre>
  */
 Ext.form.Action.DirectLoad = Ext.extend(Ext.form.Action.Load, {
     constructor: function(form, opts) {        
@@ -493,6 +580,8 @@ Ext.form.Action.DirectLoad = Ext.extend(Ext.form.Action.Load, {
 <div id="cls-Ext.form.Action.DirectSubmit"></div>/**
  * @class Ext.form.Action.DirectSubmit
  * @extends Ext.form.Action.Submit
+ * Provides Ext.direct support for submitting form data.
+ * See {@link Ext.form.Action.DirectLoad}.
  */
 Ext.form.Action.DirectSubmit = Ext.extend(Ext.form.Action.Submit, {
     constructor: function(form, opts) {

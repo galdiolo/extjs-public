@@ -38,18 +38,19 @@ p.disconnect();</code></pre></div></div></td><td class="msource"><a href="output
 object during initialization.  This should ...</div><div class="long"><p>A config object containing one or more event handlers to be added to this
 object during initialization.  This should be a valid listeners config object as specified in the
 <a href="output/Ext.util.Observable.html#Ext.util.Observable-addListener" ext:member="addListener" ext:cls="Ext.util.Observable">addListener</a> example for attaching multiple handlers at once.</p>
-<p><b>Note:</b> While <i>some</i> Observable classes export selected DOM events (eg "click", "mouseover" etc), this
+<br><p><b><u>DOM events from ExtJs <a href="output/Ext.Component.html" ext:cls="Ext.Component">Components</a></u></b></p>
+<br><p>While <i>some</i> ExtJs Component classes export selected DOM events (eg "click", "mouseover" etc), this
 is usually only done when extra value can be added. For example the <a href="output/Ext.DataView.html" ext:cls="Ext.DataView">DataView</a>'s
 <b><code><a href="output/Ext.DataView.html#Ext.DataView-click" ext:member="click" ext:cls="Ext.DataView">click</a></code></b> event passing the node clicked on. To access DOM
-events directly from a Component's HTMLElement listeners must be added to the element after the Component
-has been rendered. A plugin can simplify this step:<code><pre>
-<i>// Plugin is configured <b>with</b> a listeners config object.</i>
+events directly from a Component's HTMLElement, listeners must be added to the <i><a href="output/Ext.Component.html#Ext.Component-getEl" ext:member="getEl" ext:cls="Ext.Component">Element</a></i> after the Component
+has been rendered. A plugin can simplify this step:<pre><code><i>// Plugin is configured <b>with</b> a listeners config object.</i>
 <i>// The Component is appended to the argument list of all handler functions.</i>
 Ext.DomObserver = Ext.extend(Object, {
     constructor: <b>function</b>(config) {
         this.listeners = config.listeners ? config.listeners : config;
     },
 
+    <i>// Component passes itself into plugin&#39;s init method</i>
     init: <b>function</b>(c) {
         <b>var</b> p, l = this.listeners;
         <b>for</b> (p <b>in</b> l) {
@@ -59,8 +60,13 @@ Ext.DomObserver = Ext.extend(Object, {
                 l[p].fn = this.createHandler(l[p].fn, c);
             }
         }
-        c.render = c.render.createSequence(<b>function</b>() {
-            c.el.on(l);
+
+        <i>// Add the listeners to the Element immediately following the render call</i>
+        c.render = c.render.<a href="output/Function.html#Function-createSequence" ext:member="createSequence" ext:cls="Function">createSequence</a>(<b>function</b>() {
+            <b>var</b> e = c.getEl();
+            <b>if</b> (e) {
+                e.on(l);
+            }
         });
     },
 
@@ -73,7 +79,7 @@ Ext.DomObserver = Ext.extend(Object, {
 
 <b>var</b> combo = <b>new</b> Ext.form.ComboBox({
 
-<i>// Collapse combo when its element is clicked on</i>
+    <i>// Collapse combo when its element is clicked on</i>
     plugins: [ <b>new</b> Ext.DomObserver({
         click: <b>function</b>(evt, comp) {
             comp.collapse();
@@ -83,8 +89,7 @@ Ext.DomObserver = Ext.extend(Object, {
     typeAhead: true,
     mode: <em>'local'</em>,
     triggerAction: <em>'all'</em>
-});
-</pre></code></p></div></div></td><td class="msource"><a href="output/Ext.util.Observable.html#listeners" ext:member="#listeners" ext:cls="Ext.util.Observable">Observable</a></td></tr><tr class="config-row  "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.direct.PollingProvider-priority"></a><b><a href="source/PollingProvider.html#cfg-Ext.direct.PollingProvider-priority">priority</a></b> : Number<div class="mdesc">Priority of the request (defaults to <tt>3</tt>). See <a href="output/Ext.direct.Provider.html#Ext.direct.Provider-priority" ext:member="priority" ext:cls="Ext.direct.Provider">Ext.direct.Provider.priority</a>.</div></td><td class="msource">PollingProvider</td></tr><tr class="config-row expandable inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.direct.Provider-type"></a><b><a href="source/Provider.html#cfg-Ext.direct.Provider-type">type</a></b> : String<div class="mdesc"><div class="short">Required, undefined by default.  The type of provider specified&#13;
+});</code></pre></p></div></div></td><td class="msource"><a href="output/Ext.util.Observable.html#listeners" ext:member="#listeners" ext:cls="Ext.util.Observable">Observable</a></td></tr><tr class="config-row  "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.direct.PollingProvider-priority"></a><b><a href="source/PollingProvider.html#cfg-Ext.direct.PollingProvider-priority">priority</a></b> : Number<div class="mdesc">Priority of the request (defaults to <tt>3</tt>). See <a href="output/Ext.direct.Provider.html#Ext.direct.Provider-priority" ext:member="priority" ext:cls="Ext.direct.Provider">Ext.direct.Provider.priority</a>.</div></td><td class="msource">PollingProvider</td></tr><tr class="config-row expandable inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.direct.Provider-type"></a><b><a href="source/Provider.html#cfg-Ext.direct.Provider-type">type</a></b> : String<div class="mdesc"><div class="short">Required, undefined by default.  The type of provider specified&#13;
 to Ext.Direct.addProvider to create a&#13;
 new Provider....</div><div class="long"><b>Required</b>, <tt>undefined</tt> by default.  The <tt>type</tt> of provider specified
 to <a href="output/Ext.Direct.html" ext:cls="Ext.Direct">Ext.Direct</a>.<a href="output/Ext.Direct.html#Ext.Direct-addProvider" ext:member="addProvider" ext:cls="Ext.Direct">addProvider</a> to create a
@@ -163,8 +168,11 @@ Original source: http://vlsm.org/etc/baku-0.txt
 by Farid GS
 farid [at] pulen.net
 10:13 04 Desember 2007
-Indonesian Translations</div></div></td><td class="msource">PollingProvider</td></tr><tr class="property-row  "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.direct.PollingProvider-indicatorText"></a><b><a href="source/ext-lang-lt.html#prop-Ext.direct.PollingProvider-indicatorText">indicatorText</a></b> : Object<div class="mdesc">Lithuanian Translations (UTF-8)
-By Vladas Saulis, October 18, 2007</div></td><td class="msource">PollingProvider</td></tr><tr class="property-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.direct.PollingProvider-indicatorText"></a><b><a href="source/ext-lang-ro.html#prop-Ext.direct.PollingProvider-indicatorText">indicatorText</a></b> : Object<div class="mdesc"><div class="short">Romanian translations for ExtJS 2.1
+Indonesian Translations</div></div></td><td class="msource">PollingProvider</td></tr><tr class="property-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.direct.PollingProvider-indicatorText"></a><b><a href="source/ext-lang-lt.html#prop-Ext.direct.PollingProvider-indicatorText">indicatorText</a></b> : Object<div class="mdesc"><div class="short">Lithuanian Translations (UTF-8)
+Vladas Saulis (vladas at prodata dot lt),  03-29-2009
+Vladas Saulis (vladas at prodat...</div><div class="long">Lithuanian Translations (UTF-8)
+Vladas Saulis (vladas at prodata dot lt),  03-29-2009
+Vladas Saulis (vladas at prodata dot lt),  10-18-2007</div></div></td><td class="msource">PollingProvider</td></tr><tr class="property-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.direct.PollingProvider-indicatorText"></a><b><a href="source/ext-lang-ro.html#prop-Ext.direct.PollingProvider-indicatorText">indicatorText</a></b> : Object<div class="mdesc"><div class="short">Romanian translations for ExtJS 2.1
 First released by Lucian Lature on 2007-04-24
 Changed locale for Romania (date fo...</div><div class="long">Romanian translations for ExtJS 2.1
 First released by Lucian Lature on 2007-04-24
@@ -235,37 +243,37 @@ Using the options argument, it is possible to combine different types of listene
 <br>
 A delayed, one-time listener.
 <pre><code>myDataView.on(<em>'click'</em>, this.onClick, this, {
-        single: true,
-        delay: 100
-    });</code></pre>
+    single: true,
+    delay: 100
+});</code></pre>
 <p>
 <b>Attaching multiple handlers in 1 call</b><br>
 The method also allows for a single argument to be passed which is a config object containing properties
 which specify multiple handlers.
 <p>
 <pre><code>myGridPanel.on({
-        <em>'click'</em> : {
-            fn: this.onClick,
-            scope: this,
-            delay: 100
-        },
-        <em>'mouseover'</em> : {
-            fn: this.onMouseOver,
-            scope: this
-        },
-        <em>'mouseout'</em> : {
-            fn: this.onMouseOut,
-            scope: this
-        }
-    });</code></pre>
+    <em>'click'</em> : {
+        fn: this.onClick,
+        scope: this,
+        delay: 100
+    },
+    <em>'mouseover'</em> : {
+        fn: this.onMouseOver,
+        scope: this
+    },
+    <em>'mouseout'</em> : {
+        fn: this.onMouseOut,
+        scope: this
+    }
+});</code></pre>
 <p>
 Or a shorthand syntax:<br>
 <pre><code>myGridPanel.on({
-        <em>'click'</em> : this.onClick,
-        <em>'mouseover'</em> : this.onMouseOver,
-        <em>'mouseout'</em> : this.onMouseOut,
-         scope: this
-    });</code></pre></div></li></ul><strong>Returns:</strong><ul><li>void</li></ul></div></div></div></td><td class="msource"><a href="output/Ext.util.Observable.html#addListener" ext:member="#addListener" ext:cls="Ext.util.Observable">Observable</a></td></tr><tr class="method-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.direct.PollingProvider-connect"></a><b><a href="source/PollingProvider.html#method-Ext.direct.PollingProvider-connect">connect</a></b>()
+    <em>'click'</em> : this.onClick,
+    <em>'mouseover'</em> : this.onMouseOver,
+    <em>'mouseout'</em> : this.onMouseOut,
+     scope: this
+});</code></pre></div></li></ul><strong>Returns:</strong><ul><li>void</li></ul></div></div></div></td><td class="msource"><a href="output/Ext.util.Observable.html#addListener" ext:member="#addListener" ext:cls="Ext.util.Observable">Observable</a></td></tr><tr class="method-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.direct.PollingProvider-connect"></a><b><a href="source/PollingProvider.html#method-Ext.direct.PollingProvider-connect">connect</a></b>()
     :
                                         void<div class="mdesc"><div class="short">Connect to the server-side and begin the polling process. To handle each&#13;
 response subscribe to the data event.</div><div class="long">Connect to the server-side and begin the polling process. To handle each

@@ -1,12 +1,4 @@
 /*
- * Ext JS Library 3.0 RC2
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
-/*
 	Cookie Plug-in
 	
 	This plug in automatically gets all the cookies for this site and adds them to the post_params.

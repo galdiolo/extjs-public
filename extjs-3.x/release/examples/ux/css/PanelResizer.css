@@ -1,11 +1,3 @@
-/*
- * Ext JS Library 3.0 RC2
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
 .x-panel-resize {
         height:5px;
         background:transparent url(../images/panel-handle.gif) no-repeat center bottom;

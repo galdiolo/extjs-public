@@ -1,11 +1,3 @@
-/*
- * Ext JS Library 3.0 RC2
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
 // Application instance for showing user-feedback messages.
 var App = new Ext.App({});
 
@@ -58,8 +50,8 @@ store.load();
 Ext.onReady(function() {
     Ext.QuickTips.init();
 
-    // We'll use the new RowEditor for this example.
-    var editor = new Ext.ux.RowEditor({
+    // use RowEditor for editing
+    var editor = new Ext.ux.grid.RowEditor({
         saveText: 'Update'
     });
 

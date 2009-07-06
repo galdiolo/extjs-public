@@ -1,11 +1,3 @@
-/*
- * Ext JS Library 3.0 RC2
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
 Imgorg.ImageDv = Ext.extend(Ext.DataView,{
     tpl: new Ext.XTemplate(
         '<tpl for=".">',
@@ -30,7 +22,7 @@ Imgorg.ImageDv = Ext.extend(Ext.DataView,{
                 dataIndex: 'filename'
             })],
             store: new Ext.data.DirectStore({
-                api: Imgorg.ss.Images,
+                directFn: Imgorg.ss.Images.load,
                 root: '',
                 fields: ['filename', 'url', 'id', 'size']
             })

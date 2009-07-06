@@ -1,11 +1,3 @@
-/*
- * Ext JS Library 3.0 RC2
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
 FeedPanel = function() {
     FeedPanel.superclass.constructor.call(this, {
         id:'feed-tree',
@@ -21,9 +13,8 @@ FeedPanel = function() {
         rootVisible:false,
         lines:false,
         autoScroll:true,
-        root: new Ext.tree.TreeNode('Feed Viewer'),
+        root: new Ext.tree.TreeNode('My Feeds'),
         collapseFirst:false,
-
         tbar: [{
             iconCls:'add-feed',
             text:'Add Feed',
@@ -179,3 +170,5 @@ Ext.extend(FeedPanel, Ext.tree.TreePanel, {
         });
     }
 });
+
+Ext.reg('appfeedpanel', FeedPanel); 

@@ -1,12 +1,4 @@
 /*
- * Ext JS Library 3.0 RC2
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
-/*
  Creates rounded, raised boxes like on the Ext website - the markup isn't pretty:
   <div class="x-box-blue">
         <div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>

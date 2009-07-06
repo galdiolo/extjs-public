@@ -1,11 +1,3 @@
-/*
- * Ext JS Library 3.0 RC2
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
 Ext.ns('Ext.ux');
 
 /**
@@ -441,7 +433,7 @@ Ext.ux.MultiCombo = Ext.extend(Ext.form.ComboBox, {
 		}
 	},
 	// filters-out already-selected items from type-ahead queries.
-	// eg: if store contains: "betty, barney, bart" and betty is already selected,
+	// e.g.: if store contains: "betty, barney, bart" and betty is already selected,
 	// when user types "b", only "bart" and "barney" should be returned as possible matches,
 	// since betty is *already* selected
 	createTypeAheadFilterFn : function(items) {
@@ -481,14 +473,16 @@ Ext.ux.MultiCombo = Ext.extend(Ext.form.ComboBox, {
 
 		if (typeof(v) == 'string') {	// <-- "1,2,3"
 			value = v.match(/\d+/g); // <-- strip multiple spaces and split on ","
-			for (var n=0,len=value.length;n<len;n++) {
-				value[n] = parseInt(value[n]);
-			}
+            if(value){
+			    for (var n=0,len=value.length;n<len;n++) {
+				    value[n] = parseInt(value[n]);
+			    }
+            }
 		}
 		else if (Ext.isArray(v)) {			// <-- [1,2,3]
 			value = v;
 		}
-		if (value.length) {
+		if (value && value.length) {
 			if (this.mode == 'local') {
 				this.updateValue(value);
 				this.setRawValue(this.getTextValue());

@@ -1,15 +1,7 @@
-/*
- * Ext JS Library 3.0 RC2
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
-Ext.Spotlight = function(config){
+Ext.ux.Spotlight = function(config){
     Ext.apply(this, config);
 }
-Ext.Spotlight.prototype = {
+Ext.ux.Spotlight.prototype = {
     active : false,
     animate : true,
     duration: .25,
@@ -143,3 +135,6 @@ Ext.Spotlight.prototype = {
         delete this.all;
     }
 };
+
+//backwards compat
+Ext.Spotlight = Ext.ux.Spotlight;

@@ -1,11 +1,3 @@
-/*
- * Ext JS Library 3.0 RC2
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
 Ext.ux.SlidingPager = Ext.extend(Object, {
     init : function(pbar){
         Ext.each(pbar.items.getRange(2,6), function(c){

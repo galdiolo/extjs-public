@@ -17,6 +17,13 @@
      * @hide 
      */
     enableScrolling: false,
+    
+    <div id="cfg-Ext.menu.ColorMenu-hideOnClick"></div>/** 
+     * @cfg {Boolean} hideOnClick
+     * False to continue showing the menu after a color is selected, defaults to true.
+     */
+    hideOnClick: true,
+    
     <div id="cfg-Ext.menu.ColorMenu-maxHeight"></div>/** 
      * @cfg {Number} maxHeight
      * @hide 
@@ -30,6 +37,18 @@
      * @type ColorPalette
      * The {@link Ext.ColorPalette} instance for this ColorMenu
      */
+    
+    
+    <div id="event-Ext.menu.ColorMenu-click"></div>/**
+     * @event click
+     * @hide
+     */
+    
+    <div id="event-Ext.menu.ColorMenu-itemclick"></div>/**
+     * @event itemclick
+     * @hide
+     */
+    
     initComponent: function(){
         Ext.apply(this, {
             plain: true,
@@ -39,10 +58,16 @@
         this.palette.purgeListeners();
         Ext.menu.ColorMenu.superclass.initComponent.call(this);
         this.relayEvents(this.palette, ['select']);
+        this.on('select', this.menuHide, this);
+        if(this.handler){
+            this.on('select', this.handler, this.scope || this)
+        }
     },
 
-    onClick: function() {
-        this.hide(true);
+    menuHide: function(){
+        if(this.hideOnClick){
+            this.hide(true);
+        }
     }
 });
 Ext.reg('colormenu', Ext.menu.ColorMenu);</pre>    

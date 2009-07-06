@@ -1,11 +1,3 @@
-/*
- * Ext JS Library 3.0 RC2
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
 Imgorg.DirectCombo = Ext.extend(Ext.form.ComboBox, {
     displayField: 'text',
     valueField: 'id',
@@ -31,7 +23,9 @@ Imgorg.TagCombo = Ext.extend(Imgorg.DirectCombo,{
         id: 'tag-store'
     },
     initComponent: function() {
-        this.api = Imgorg.ss.Tags;
+        Ext.apply(this.storeConfig, {
+            directFn: Imgorg.ss.Tags.load
+        });
         Imgorg.TagCombo.superclass.initComponent.call(this);
     }
 });
@@ -44,7 +38,7 @@ Imgorg.TagMultiCombo = Ext.extend(Ext.ux.MultiCombo,{
     
     initComponent: function() {
         this.store = new Ext.data.DirectStore(Ext.apply({
-            api: Imgorg.ss.Tags,
+            directFn: Imgorg.ss.Tags.load,
             root: '',
             autoLoad: true,
             fields: this.fields || ['text', 'id']
@@ -60,7 +54,9 @@ Imgorg.AlbumCombo = Ext.extend(Imgorg.DirectCombo, {
         id: 'album-store'
     },
     initComponent: function() {
-        this.api = Imgorg.ss.Albums;
+        Ext.apply(this.storeConfig, {
+            directFn: Imgorg.ss.Albums.getAllInfo
+        });
         Imgorg.AlbumCombo.superclass.initComponent.call(this);
     }
 });

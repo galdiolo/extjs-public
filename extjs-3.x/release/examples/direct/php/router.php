@@ -19,7 +19,7 @@ if(isset($HTTP_RAW_POST_DATA)){
 	$data = new BogusAction();
 	$data->action = $_POST['extAction'];
 	$data->method = $_POST['extMethod'];
-	$data->tid = $_POST['extTID'];
+    $data->tid = isset($_POST['extTID']) ? $_POST['extTID'] : null; // not set for upload
 	$data->data = array($_POST, $_FILES);
 }else{
 	die('Invalid request.');
@@ -99,4 +99,3 @@ if($isForm && $isUpload){
 }else{
 	echo json_encode($response);
 }
-?>

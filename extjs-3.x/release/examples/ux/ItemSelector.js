@@ -1,38 +1,23 @@
 /*
- * Ext JS Library 3.0 RC2
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
-/*
  * Note that this control will most likely remain as an example, and not as a core Ext form
  * control.  However, the API will be changing in a future release and so should not yet be
  * treated as a final, stable API at this time.
  */
- 
-/** 
- * @class Ext.ux.ItemSelector
+
+/**
+ * @class Ext.ux.form.ItemSelector
  * @extends Ext.form.Field
- * A control that allows selection of between two Ext.ux.MultiSelect controls.
- * 
+ * A control that allows selection of between two Ext.ux.form.MultiSelect controls.
+ *
  *  @history
  *    2008-06-19 bpm Original code contributed by Toby Stuart (with contributions from Robert Williams)
- * 
+ *
  * @constructor
  * Create a new ItemSelector
  * @param {Object} config Configuration options
+ * @xtype itemselector 
  */
-Ext.ux.ItemSelector = Ext.extend(Ext.form.Field,  {
+Ext.ux.form.ItemSelector = Ext.extend(Ext.form.Field,  {
     hideNavIcons:false,
     imagePath:"",
     iconUp:"up2.gif",
@@ -52,12 +37,12 @@ Ext.ux.ItemSelector = Ext.extend(Ext.form.Field,  {
     border:false,
     defaultAutoCreate:{tag: "div"},
     /**
-     * @cfg {Array} multiselects An array of {@link Ext.ux.Multiselect} config objects, with at least all required parameters (e.g., store)
+     * @cfg {Array} multiselects An array of {@link Ext.ux.form.MultiSelect} config objects, with at least all required parameters (e.g., store)
      */
     multiselects:null,
-    
+
     initComponent: function(){
-        Ext.ux.ItemSelector.superclass.initComponent.call(this);
+        Ext.ux.form.ItemSelector.superclass.initComponent.call(this);
         this.addEvents({
             'rowdblclick' : true,
             'change' : true
@@ -65,8 +50,8 @@ Ext.ux.ItemSelector = Ext.extend(Ext.form.Field,  {
     },
 
     onRender: function(ct, position){
-        Ext.ux.ItemSelector.superclass.onRender.call(this, ct, position);
-        
+        Ext.ux.form.ItemSelector.superclass.onRender.call(this, ct, position);
+
         // Internal default configuration for both multiselects
         var msConfig = [{
             legend: 'Available',
@@ -82,19 +67,19 @@ Ext.ux.ItemSelector = Ext.extend(Ext.form.Field,  {
             height: 100
         }];
 
-        this.fromMultiselect = new Ext.ux.Multiselect(Ext.applyIf(this.multiselects[0], msConfig[0]));
+        this.fromMultiselect = new Ext.ux.form.MultiSelect(Ext.applyIf(this.multiselects[0], msConfig[0]));
         this.fromMultiselect.on('dblclick', this.onRowDblClick, this);
 
-        this.toMultiselect = new Ext.ux.Multiselect(Ext.applyIf(this.multiselects[1], msConfig[1]));
+        this.toMultiselect = new Ext.ux.form.MultiSelect(Ext.applyIf(this.multiselects[1], msConfig[1]));
         this.toMultiselect.on('dblclick', this.onRowDblClick, this);
-                
+
         var p = new Ext.Panel({
             bodyStyle:this.bodyStyle,
             border:this.border,
             layout:"table",
             layoutConfig:{columns:3}
         });
-        
+
         p.add(this.fromMultiselect);
         var icons = new Ext.Panel({header:false});
         p.add(icons);
@@ -139,24 +124,29 @@ Ext.ux.ItemSelector = Ext.extend(Ext.form.Field,  {
         var tb = p.body.first();
         this.el.setWidth(p.body.first().getWidth());
         p.body.removeClass();
-        
+
         this.hiddenName = this.name;
         var hiddenTag = {tag: "input", type: "hidden", value: "", name: this.name};
         this.hiddenField = this.el.createChild(hiddenTag);
     },
     
+    doLayout: function(){
+        if(this.rendered){
+            this.fromMultiselect.fs.doLayout();
+            this.toMultiselect.fs.doLayout();
+        }
+    },
+
     afterRender: function(){
-        Ext.ux.ItemSelector.superclass.afterRender.call(this);
-        
+        Ext.ux.form.ItemSelector.superclass.afterRender.call(this);
+
         this.toStore = this.toMultiselect.store;
         this.toStore.on('add', this.valueChanged, this);
         this.toStore.on('remove', this.valueChanged, this);
         this.toStore.on('load', this.valueChanged, this);
         this.valueChanged(this.toStore);
     },
-    
-    initValue:Ext.emptyFn,
-    
+
     toTop : function() {
         var selectionsArray = this.toMultiselect.view.getSelectedIndexes();
         var records = [];
@@ -198,7 +188,7 @@ Ext.ux.ItemSelector = Ext.extend(Ext.form.Field,  {
         this.toMultiselect.view.refresh();
         this.toMultiselect.view.select(selectionsArray);
     },
-    
+
     up : function() {
         var record = null;
         var selectionsArray = this.toMultiselect.view.getSelectedIndexes();
@@ -237,7 +227,7 @@ Ext.ux.ItemSelector = Ext.extend(Ext.form.Field,  {
             this.toMultiselect.view.select(newSelectionsArray);
         }
     },
-    
+
     fromTo : function() {
         var selectionsArray = this.fromMultiselect.view.getSelectedIndexes();
         var records = [];
@@ -252,7 +242,7 @@ Ext.ux.ItemSelector = Ext.extend(Ext.form.Field,  {
                 if(this.allowDup){
                     var x=new Ext.data.Record();
                     record.id=x.id;
-                    delete x;   
+                    delete x;
                     this.toMultiselect.view.store.add(record);
                 }else{
                     this.fromMultiselect.view.store.remove(record);
@@ -269,7 +259,7 @@ Ext.ux.ItemSelector = Ext.extend(Ext.form.Field,  {
         }
         this.toMultiselect.view.select(selectionsArray);
     },
-    
+
     toFrom : function() {
         var selectionsArray = this.toMultiselect.view.getSelectedIndexes();
         var records = [];
@@ -296,7 +286,7 @@ Ext.ux.ItemSelector = Ext.extend(Ext.form.Field,  {
         }
         this.fromMultiselect.view.select(selectionsArray);
     },
-    
+
     valueChanged: function(store) {
         var record = null;
         var values = [];
@@ -307,11 +297,11 @@ Ext.ux.ItemSelector = Ext.extend(Ext.form.Field,  {
         this.hiddenField.dom.value = values.join(this.delimiter);
         this.fireEvent('change', this, this.getValue(), this.hiddenField.dom.value);
     },
-    
+
     getValue : function() {
         return this.hiddenField.dom.value;
     },
-    
+
     onRowDblClick : function(vw, index, node, e) {
         if (vw == this.toMultiselect.view){
             this.toFrom();
@@ -320,7 +310,7 @@ Ext.ux.ItemSelector = Ext.extend(Ext.form.Field,  {
         }
         return this.fireEvent('rowdblclick', vw, index, node, e);
     },
-    
+
     reset: function(){
         range = this.toMultiselect.store.getRange();
         this.toMultiselect.store.removeAll();
@@ -333,4 +323,7 @@ Ext.ux.ItemSelector = Ext.extend(Ext.form.Field,  {
     }
 });
 
-Ext.reg("itemselector", Ext.ux.ItemSelector);
+Ext.reg('itemselector', Ext.ux.form.ItemSelector);
+
+//backwards compat
+Ext.ux.ItemSelector = Ext.ux.form.ItemSelector;

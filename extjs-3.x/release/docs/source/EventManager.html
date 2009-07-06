@@ -456,7 +456,7 @@ Ext.EventObject = function(){
                 me.type = e.type;
                 me.shiftKey = e.shiftKey;
                 // mac metaKey behaves like ctrlKey
-                me.ctrlKey = e.ctrlKey || e.metaKey;
+                me.ctrlKey = e.ctrlKey || e.metaKey || false;
                 me.altKey = e.altKey;
                 // in getKey these will be normalized for the mac
                 me.keyCode = e.keyCode;
@@ -549,17 +549,6 @@ Ext.EventObject = function(){
         getPageY : function(){
             return this.xy[1];
         },
-
-//         <div id="method-Ext.EventObject-getTime"></div>/**
-//          * Gets the time of the event.
-//          * @return {Number}
-//          */
-//         getTime : function(){
-//             if(this.browserEvent){
-//                 return E.getTime(this.browserEvent);
-//             }
-//             return null;
-//         },
 
         <div id="method-Ext.EventObject-getXY"></div>/**
          * Gets the page coordinates of the event.

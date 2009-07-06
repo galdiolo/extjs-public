@@ -1,19 +1,3 @@
-/*
- * Ext JS Library 3.0 RC2
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
-/*
- * Ext JS Library 3.0 Pre-alpha
- * Copyright(c) 2006-2008, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
 FeedGrid = function(viewer, config) {
     this.viewer = viewer;
     Ext.apply(this, config);
@@ -169,5 +153,4 @@ Ext.extend(FeedGrid, Ext.grid.GridPanel, {
     }
 });
 
-// just registering to participate in determination of inherited xtypes
 Ext.reg('appfeedgrid', FeedGrid);

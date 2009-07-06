@@ -1,29 +1,5 @@
-/*
- * Ext JS Library 3.0 RC2
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
-/*
- * Ext JS Library 2.1
- * Copyright(c) 2006-2008, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
 Ext.onReady(function(){
-  
+
     var myData = {
 		records : [
 			{ name : "Rec 0", column1 : "0", column2 : "0" },
@@ -46,14 +22,14 @@ Ext.onReady(function(){
 	   {name: 'column1', mapping : 'column1'},
 	   {name: 'column2', mapping : 'column2'}
 	];
-	
+
     // create the data store
     var firstGridStore = new Ext.data.JsonStore({
         fields : fields,
 		data   : myData,
 		root   : 'records'
     });
-	
+
 
 	// Column Model shortcut array
 	var cols = [
@@ -61,17 +37,17 @@ Ext.onReady(function(){
 		{header: "column1", width: 50, sortable: true, dataIndex: 'column1'},
 		{header: "column2", width: 50, sortable: true, dataIndex: 'column2'}
 	];
-    
+
 	// declare the source Grid
     var firstGrid = new Ext.grid.GridPanel({
-		ddGroup          : 'secondGridDDGroup',
+	ddGroup          : 'secondGridDDGroup',
         store            : firstGridStore,
         columns          : cols,
-		enableDragDrop   : true,
+	enableDragDrop   : true,
         stripeRows       : true,
         autoExpandColumn : 'name',
         width            : 325,
-		region           : 'west',
+	region           : 'west',
         title            : 'First Grid'
     });
 
@@ -79,21 +55,21 @@ Ext.onReady(function(){
         fields : fields,
 		root   : 'records'
     });
-	
+
     // create the destination Grid
     var secondGrid = new Ext.grid.GridPanel({
-		ddGroup          : 'firstGridDDGroup',
+	ddGroup          : 'firstGridDDGroup',
         store            : secondGridStore,
         columns          : cols,
-		enableDragDrop   : true,
+	enableDragDrop   : true,
         stripeRows       : true,
         autoExpandColumn : 'name',
         width            : 325,
-		region           : 'center',
+	region           : 'center',
         title            : 'Second Grid'
     });
 
-	
+
 	//Simple 'border layout' panel to house both grids
 	var displayPanel = new Ext.Panel({
 		width    : 650,
@@ -111,7 +87,7 @@ Ext.onReady(function(){
 				handler : function() {
 					//refresh source grid
 					firstGridStore.loadData(myData);
-					
+
 					//purge destination grid
 					secondGridStore.removeAll();
 				}
@@ -131,19 +107,19 @@ Ext.onReady(function(){
 		ddGroup    : 'firstGridDDGroup',
 		copy       : true,
 		notifyDrop : function(ddSource, e, data){
-			
+
 			// Generic function to add records.
 			function addRow(record, index, allItems) {
-				
+
 				// Search for duplicates
-				var foundItem = firstGridStore.find('name', record.data.name);
+				var foundItem = firstGridStore.findExact('name', record.data.name);
 				// if not found
 				if (foundItem  == -1) {
 					firstGridStore.add(record);
-					
+
 					// Call a sort dynamically
 					firstGridStore.sort('name', 'ASC');
-					
+
 					//Remove Record from the source
 					ddSource.grid.store.remove(record);
 				}
@@ -153,28 +129,28 @@ Ext.onReady(function(){
 			Ext.each(ddSource.dragData.selections ,addRow);
 			return(true);
 		}
-	}); 	
+	});
 
-	
+
 	// This will make sure we only drop to the view container
 	var secondGridDropTargetEl = secondGrid.getView().el.dom.childNodes[0].childNodes[1]
-	
+
 	var destGridDropTarget = new Ext.dd.DropTarget(secondGridDropTargetEl, {
 		ddGroup    : 'secondGridDDGroup',
 		copy       : false,
 		notifyDrop : function(ddSource, e, data){
-			
+
 			// Generic function to add records.
 			function addRow(record, index, allItems) {
-				
+
 				// Search for duplicates
-				var foundItem = secondGridStore.find('name', record.data.name);
+				var foundItem = secondGridStore.findExact('name', record.data.name);
 				// if not found
 				if (foundItem  == -1) {
 					secondGridStore.add(record);
 					// Call a sort dynamically
 					secondGridStore.sort('name', 'ASC');
-			
+
 					//Remove Record from the source
 					ddSource.grid.store.remove(record);
 				}
@@ -183,5 +159,5 @@ Ext.onReady(function(){
 			Ext.each(ddSource.dragData.selections ,addRow);
 			return(true);
 		}
-	}); 
+	});
 });

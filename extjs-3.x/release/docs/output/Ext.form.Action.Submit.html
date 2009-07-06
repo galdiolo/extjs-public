@@ -2,9 +2,16 @@
 and processes the returned response.</p>
 <p>Instances of this class are only created by a <a href="output/Ext.form.BasicForm.html" ext:cls="Ext.form.BasicForm">Form</a> when
 <a href="output/Ext.form.BasicForm.html#Ext.form.BasicForm-submit" ext:member="submit" ext:cls="Ext.form.BasicForm">submit</a>ting.</p>
-<p>A response packet must contain a boolean <tt style="font-weight:bold">success</tt> property, and, optionally
-an <tt style="font-weight:bold">errors</tt> property. The <tt style="font-weight:bold">errors</tt> property contains error
-messages for invalid fields.</p>
+<p><u><b>Response Packet Criteria</b></u></p>
+<p>A response packet may contain:
+<div class="mdetail-params"><ul>
+<li><b><code>success</code></b> property : Boolean
+<div class="sub-desc">The <code>success</code> property is required.</div></li>
+<li><b><code>errors</code></b> property : Object
+<div class="sub-desc"><div class="sub-desc">The <code>errors</code> property,
+which is optional, contains error messages for invalid fields.</div></li>
+</ul></div>
+<p><u><b>JSON Packets</b></u></p>
 <p>By default, response packets are assumed to be JSON, so a typical response
 packet may look like this:</p><pre><code>{
     success: false,
@@ -14,7 +21,8 @@ packet may look like this:</p><pre><code>{
     }
 }</code></pre>
 <p>Other data may be placed into the response for processing by the <a href="output/Ext.form.BasicForm.html" ext:cls="Ext.form.BasicForm">Ext.form.BasicForm</a>'s callback
-or event handler methods. The object decoded from this JSON is available in the <a href="output/Ext.form.Action.Submit.html#Ext.form.Action.Submit-result" ext:member="result" ext:cls="Ext.form.Action.Submit">result</a> property.</p>
+or event handler methods. The object decoded from this JSON is available in the
+<a href="output/Ext.form.Action.html#Ext.form.Action-result" ext:member="result" ext:cls="Ext.form.Action">result</a> property.</p>
 <p>Alternatively, if an <a href="output/Ext.form.Action.Submit.html#Ext.form.Action.Submit-errorReader" ext:member="errorReader" ext:cls="Ext.form.Action.Submit">errorReader</a> is specified as an <a href="output/Ext.data.XmlReader.html" ext:cls="Ext.data.XmlReader">XmlReader</a>:</p><pre><code>errorReader: <b>new</b> Ext.data.XmlReader({
             record : <em>'field'</em>,
             success: <em>'@success'</em>
@@ -41,10 +49,13 @@ in a final call to isValid prior to submission.
 Pass false in the Fo...</div><div class="long">Determines whether a Form's fields are validated
 in a final call to <a href="output/Ext.form.BasicForm.html#Ext.form.BasicForm-isValid" ext:member="isValid" ext:cls="Ext.form.BasicForm">isValid</a> prior to submission.
 Pass <tt>false</tt> in the Form's submit options to prevent this. If not defined, pre-submission field validation
-is performed.</div></div></td><td class="msource">Action.Submit</td></tr><tr class="config-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.form.Action.Submit-errorReader"></a><b><a href="source/Action1.html#cfg-Ext.form.Action.Submit-errorReader">errorReader</a></b> : Ext.data.DataReader<div class="mdesc"><div class="short">Optional. JSON is interpreted with no need for an errorReader.
-A Reader which reads a single record from the returned...</div><div class="long"><b>Optional. JSON is interpreted with no need for an errorReader.</b>
-<p>A Reader which reads a single record from the returned data. The DataReader's <b>success</b> property specifies
-how submission success is determined. The Record's data provides the error messages to apply to any invalid form Fields.</p>.</div></div></td><td class="msource">Action.Submit</td></tr><tr class="config-row expandable inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.form.Action-failure"></a><b><a href="source/Action1.html#cfg-Ext.form.Action-failure">failure</a></b> : Function<div class="mdesc"><div class="short">The function to call when a failure packet was recieved, or when an
+is performed.</div></div></td><td class="msource">Action.Submit</td></tr><tr class="config-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.form.Action.Submit-errorReader"></a><b><a href="source/Action1.html#cfg-Ext.form.Action.Submit-errorReader">errorReader</a></b> : Ext.data.DataReader<div class="mdesc"><div class="short">Optional. JSON is interpreted with
+no need for an errorReader.
+A Reader which reads a single record from the returned...</div><div class="long"><p><b>Optional. JSON is interpreted with
+no need for an errorReader.</b></p>
+<p>A Reader which reads a single record from the returned data. The DataReader's
+<b>success</b> property specifies how submission success is determined. The Record's
+data provides the error messages to apply to any invalid form Fields.</p></div></div></td><td class="msource">Action.Submit</td></tr><tr class="config-row expandable inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.form.Action-failure"></a><b><a href="source/Action1.html#cfg-Ext.form.Action-failure">failure</a></b> : Function<div class="mdesc"><div class="short">The function to call when a failure packet was recieved, or when an
 error ocurred in the Ajax communication.
 The func...</div><div class="long">The function to call when a failure packet was recieved, or when an
 error ocurred in the Ajax communication.

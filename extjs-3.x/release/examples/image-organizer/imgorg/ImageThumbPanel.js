@@ -1,11 +1,3 @@
-/*
- * Ext JS Library 3.0 RC2
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
 Imgorg.ImageThumbPanel = Ext.extend(Ext.Panel, {
     minWidth: 80,
     title: 'All Photos',
@@ -16,7 +8,7 @@ Imgorg.ImageThumbPanel = Ext.extend(Ext.Panel, {
         var sliderValue = 0;
         var p = Ext.state.Manager.getProvider();
         if (p) {
-            sliderValue = p.get('sliderValue');
+            sliderValue = Ext.num(p.get('sliderValue'), 0);
         }
         
         Ext.apply(this,{
@@ -76,7 +68,7 @@ Imgorg.ImageThumbPanel = Ext.extend(Ext.Panel, {
         this.reload();
         var p = Ext.state.Manager.getProvider();
         if (p) {
-            sliderValue = p.get('sliderValue');
+            sliderValue = Ext.num(p.get('sliderValue'), 0);
             var slider = this.getBottomToolbar().getComponent('size-slider');
             slider.setValue(sliderValue);
             this.onChange(slider);

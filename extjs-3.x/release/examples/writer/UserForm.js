@@ -1,11 +1,3 @@
-/*
- * Ext JS Library 3.0 RC2
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
 Ext.ns('App', 'App.user');
 /**
  * @class App.user.FormPanel
@@ -18,6 +10,7 @@ App.user.Form = Ext.extend(Ext.form.FormPanel, {
     labelAlign: 'right',
     title: 'User -- All fields are required',
     frame: true,
+    width: 500,
     defaultType: 'textfield',
     defaults: {
         anchor: '100%'

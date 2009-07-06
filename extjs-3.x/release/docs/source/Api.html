@@ -8,9 +8,10 @@
     <pre class="prettyprint lang-js"><div id="cls-Ext.data.Api"></div>/**
  * @class Ext.data.Api
  * @extends Object
- * Ext.data.Api is a singleton designed to manage the data API including methods for validating
- * a developer's DataProxy API.  Defines variables for CRUD actions create, read, update and destroy in addition to a
- * mapping of RESTful HTTP methods GET, POST, PUT and DELETE to CRUD actions.
+ * Ext.data.Api is a singleton designed to manage the data API including methods
+ * for validating a developer's DataProxy API.  Defines variables for CRUD actions
+ * create, read, update and destroy in addition to a mapping of RESTful HTTP methods
+ * GET, POST, PUT and DELETE to CRUD actions.
  * @singleton
  */
 Ext.data.Api = (function() {
@@ -43,7 +44,8 @@ actions: {
         },
 
         <div id="prop-Ext.data.Api-restActions"></div>/**
-         * Defined {CRUD action}:{HTTP method} pairs corresponding to remote actions for RESTful proxies.
+         * Defined {CRUD action}:{HTTP method} pairs to associate HTTP methods with the
+         * corresponding actions for {@link Ext.data.DataProxy#restful RESTful proxies}.
          * Defaults to:
          * <pre><code>
 restActions : {
@@ -134,7 +136,7 @@ restActions : {
          * one can explicitly define the HTTP method (GET|POST) to use for each CRUD action.  This method will prepare the supplied API, setting
          * each action to the Object form.  If your API-actions do not explicitly define the HTTP method, the "method" configuration-parameter will
          * be used.  If the method configuration parameter is not specified, POST will be used.
-         <code><pre>
+         <pre><code>
 new Ext.data.HttpProxy({
     method: "POST",     // <-- default HTTP method when not specified.
     api: {
@@ -154,7 +156,7 @@ new Ext.data.HttpProxy({
         save: 'update.php'
     }
 });
-        </pre></code>
+        </code></pre>
          *
          * @param {Ext.data.DataProxy} proxy
          */
@@ -187,9 +189,10 @@ new Ext.data.HttpProxy({
     };
 })();
 
-
-<div id="prop-Ext.data.Api-Error"></div>/**
- * Error class for Ext.data.Api errors.
+<div id="cls-Ext.data.Api.Error"></div>/**
+ * @class Ext.data.Api.Error
+ * @extends Ext.Error
+ * Error class for Ext.data.Api errors
  */
 Ext.data.Api.Error = Ext.extend(Ext.Error, {
     constructor : function(message, arg) {

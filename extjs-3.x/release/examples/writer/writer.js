@@ -1,11 +1,3 @@
-/*
- * Ext JS Library 3.0 RC2
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
 // Application instance for showing user-feedback messages.
 var App = new Ext.App({});
 
@@ -35,7 +27,7 @@ var reader = new Ext.data.JsonReader({
 
 // The new DataWriter component.
 var writer = new Ext.data.JsonWriter({
-    returnJson: true,
+    encode: true,
     writeAllFields: false
 });
 
@@ -55,7 +47,8 @@ var store = new Ext.data.Store({
                 Ext.Msg.show({
                     title: 'REMOTE EXCEPTION',
                     msg: res.message,
-                    icon: Ext.MessageBox.ERROR
+                    icon: Ext.MessageBox.ERROR,
+                    buttons: Ext.Msg.OK
                 });
             }
         }
