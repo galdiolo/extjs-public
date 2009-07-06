@@ -38,8 +38,7 @@ import com.extjs.gxt.ui.client.util.Util;
  * <p/>
  * It is important to note the sorting behavior when working with TreeStore.
  * When a sorter is set, it is applied to all existing models in the cache and
- * the Sort event is fired. At this point, the sorter is enabled and active. All
- * sorter will be applied to all inserts into the store.
+ * the Sort event is fired. At this point, the sorter is enabled and active.
  * 
  * <p/>
  * Remote sorting is not supported with TreeStore.
@@ -292,7 +291,7 @@ public class TreeStore<M extends ModelData> extends Store<M> {
   public List<M> getChildren(M parent) {
     return getChildren(parent, false);
   }
-  
+
   /**
    * Returns the children of the parent.
    * 
@@ -453,6 +452,15 @@ public class TreeStore<M extends ModelData> extends Store<M> {
   }
 
   /**
+   * Returns the current sort state of this store.
+   * 
+   * @return the sort state
+   */
+  public SortInfo getSortState() {
+    return sortInfo;
+  }
+
+  /**
    * Returns the item's index in it's parent including root level items.
    * 
    * @param item the item
@@ -592,17 +600,50 @@ public class TreeStore<M extends ModelData> extends Store<M> {
     super.setStoreSorter(storeSorter);
     applySort(false);
   }
+  
+  /**
+   * Sorts the store.
+   * 
+   * @param field the field to sort by
+   * @param sortDir the sort dir
+   */
+  public void sort(String field, SortDir sortDir) {
+    if (sortDir == null) {
+      if (sortInfo.getSortField() != null && !sortInfo.getSortField().equals(field)) {
+        sortInfo.setSortDir(SortDir.NONE);
+      }
+      switch (sortInfo.getSortDir()) {
+        case ASC:
+          sortDir = SortDir.DESC;
+          break;
+        case DESC:
+        case NONE:
+          sortDir = SortDir.ASC;
+          break;
+      }
+    }
 
-  @SuppressWarnings("unchecked")
+    sortInfo.setSortField(field);
+    sortInfo.setSortDir(sortDir);
+
+    applySort(false);
+    fireEvent(DataChanged, createStoreEvent());
+  }
+
   @Override
+  @SuppressWarnings("unchecked")
   protected void applySort(boolean supressEvent) {
     for (TreeModel wrapper : wrapperMap.keySet()) {
-      List<TreeModel> children = (List) wrapper.getChildren();
+      List<TreeModel> children = (List)rootWrapper.getChildren();
+      if (children.size() > 0) {
+        applySort(children);
+      }
+      children = (List) wrapper.getChildren();
       if (children.size() > 0) {
         applySort(children);
       }
     }
-    if (supressEvent) {
+    if (!supressEvent) {
       fireEvent(Sort, createStoreEvent());
     }
   }

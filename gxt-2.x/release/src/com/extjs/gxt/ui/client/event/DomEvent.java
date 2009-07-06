@@ -54,7 +54,7 @@ public class DomEvent extends BaseEvent {
   public DomEvent(Object source) {
     super(source);
   }
-  
+
   /**
    * Creates a new base event.
    * 
@@ -181,8 +181,8 @@ public class DomEvent extends BaseEvent {
    */
   public boolean hasModifier() {
     if (event != null) {
-      if (DOM.eventGetAltKey(event) || DOM.eventGetCtrlKey(event)
-          || DOM.eventGetShiftKey(event) || DOM.eventGetMetaKey(event)) {
+      if (DOM.eventGetAltKey(event) || DOM.eventGetCtrlKey(event) || DOM.eventGetShiftKey(event)
+          || DOM.eventGetMetaKey(event)) {
         return true;
       }
     }
@@ -204,8 +204,7 @@ public class DomEvent extends BaseEvent {
    * @return the control key state
    */
   public boolean isControlKey() {
-    return event == null ? false
-        : (DOM.eventGetCtrlKey(event) || DOM.eventGetMetaKey(event));
+    return event == null ? false : (DOM.eventGetCtrlKey(event) || DOM.eventGetMetaKey(event));
   }
 
   /**
@@ -215,7 +214,7 @@ public class DomEvent extends BaseEvent {
    */
   public boolean isNavKeyPress() {
     int k = getKeyCode();
-    
+
     return (k >= 33 && k <= 40) || k == KeyCodes.KEY_ESCAPE || k == KeyCodes.KEY_ENTER || k == KeyCodes.KEY_TAB;
   }
 
@@ -226,8 +225,7 @@ public class DomEvent extends BaseEvent {
    */
   public boolean isRightClick() {
     if (event != null) {
-      if (DOM.eventGetButton(event) == Event.BUTTON_RIGHT
-          || (GXT.isMac && DOM.eventGetCtrlKey(event))) {
+      if (DOM.eventGetButton(event) == Event.BUTTON_RIGHT || (GXT.isMac && DOM.eventGetCtrlKey(event))) {
         return true;
       }
     }
@@ -259,9 +257,8 @@ public class DomEvent extends BaseEvent {
    * @return the special state
    */
   public boolean isSpecialKey(int k) {
-    return k == 17 || k == 9 || k == 13 || k == 40 || k == 27 || (k == 16) || (k == 17)
-        || (k >= 18 && k <= 20) || (k >= 33 && k <= 35) || (k >= 36 && k <= 39)
-        || (k >= 44 && k <= 45);
+    return k == 17 || k == 9 || k == 13 || k == 40 || k == 27 || (k == 16) || (k == 17) || (k >= 18 && k <= 20)
+        || (k >= 33 && k <= 35) || (k >= 36 && k <= 39) || (k >= 44 && k <= 45);
   }
 
   /**
@@ -298,7 +295,7 @@ public class DomEvent extends BaseEvent {
    * @return the within state
    */
   public boolean within(Element element) {
-    if (event != null) {
+    if (event != null && getTarget() != null) {
       return DOM.isOrHasChild(element, getTarget());
     }
     return false;
@@ -316,7 +313,8 @@ public class DomEvent extends BaseEvent {
     if (!toElement) {
       return within(element);
     } else {
-      if (event != null) {
+
+      if (event != null && event.getRelatedEventTarget() != null) {
         Element to = event.getRelatedEventTarget().cast();
         return DOM.isOrHasChild(element, to);
       }

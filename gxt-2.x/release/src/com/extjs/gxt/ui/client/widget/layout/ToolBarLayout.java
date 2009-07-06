@@ -161,9 +161,8 @@ public class ToolBarLayout extends Layout {
     }
     int w = t.getClientWidth();
     int lw = lastWidth;
-
+    
     lastWidth = w;
-
     int iw = t.firstChild().getWidth(true);
 
     int clipWidth = w - triggerWidth;
@@ -200,8 +199,7 @@ public class ToolBarLayout extends Layout {
   }
 
   protected int getComponentWidth(Component c) {
-    return (Integer) (c.getData("xtbWidth") != null ? c.getData("xtbWidth")
-        : c.el().getParent().getWidth());
+    return (Integer) (c.getData("xtbWidth") != null ? c.getData("xtbWidth") : c.el().getParent().getWidth());
   }
 
   protected void hideComponent(Component c) {
@@ -309,8 +307,10 @@ public class ToolBarLayout extends Layout {
   }
 
   protected void unhideComponent(Component c) {
-    c.show();
-    c.setData("xtbWidth", null);
-    hiddens.remove(c);
+    if (hiddens.contains(c)) {
+      c.show();
+      c.setData("xtbWidth", null);
+      hiddens.remove(c);
+    }
   }
 }

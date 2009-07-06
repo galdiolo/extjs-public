@@ -109,11 +109,7 @@ public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionMo
   protected void onSelectChange(M model, boolean select) {
     super.onSelectChange(model, select);
     El hd = grid.getView().innerHd.child("div.x-grid3-hd-checker");
-    if (getSelection().size() == grid.getStore().getCount()) {
-      hd.addStyleName("x-grid3-hd-checker-on");
-    } else {
-      hd.removeStyleName("x-grid3-hd-checker-on");
-    }
+    hd.getParent().setStyleName("x-grid3-hd-checker-on", getSelection().size() == grid.getStore().getCount());
   }
 
 }

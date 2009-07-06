@@ -24,7 +24,11 @@ public abstract class SummaryType<N extends Number> {
       if (v == null) {
         v = 0d;
       }
-      return ((Double) v) + ((Number) m.get(field)).doubleValue();
+      Object obj = m.get(field);
+      if (obj != null) {
+        return ((Double) v) + ((Number) obj).doubleValue();
+      }
+      return ((Double) v);
     }
   };
 
@@ -41,13 +45,17 @@ public abstract class SummaryType<N extends Number> {
 
       Double total = (Double) data.get(field + "total");
       if (total == null) total = 0d;
-      total += ((Number) m.get(field)).doubleValue();
+
+      Object obj = m.get(field);
+      if (obj != null) {
+        total += ((Number) obj).doubleValue();
+      }
       data.put(field + "total", total);
 
       return total == 0 ? 0 : total / i;
     }
   };
-  
+
   public static final SummaryType<Double> MAX = new SummaryType<Double>() {
     @Override
     public Double render(Object v, ModelData m, String field, Map<String, Object> data) {
@@ -55,14 +63,16 @@ public abstract class SummaryType<N extends Number> {
       if (max == null) {
         max = new Double(0);
       }
-      
-      Double current = ((Number) m.get(field)).doubleValue();
-      max = Math.max(max, current);
+      Object obj = m.get(field);
+      if (obj != null) {
+        Double current = ((Number) obj).doubleValue();
+        max = Math.max(max, current);
+      }
       data.put(field + "max", max);
       return max;
     }
   };
-  
+
   public static final SummaryType<Double> MIN = new SummaryType<Double>() {
     @Override
     public Double render(Object v, ModelData m, String field, Map<String, Object> data) {
@@ -70,8 +80,12 @@ public abstract class SummaryType<N extends Number> {
       if (min == null) {
         min = new Double(0);
       }
-      Double current = ((Number) m.get(field)).doubleValue();
-      min = Math.min(min, current);
+      Object obj = m.get(field);
+      if (obj != null) {
+        Double current = ((Number) obj).doubleValue();
+        min = Math.min(min, current);
+      }
+
       data.put(field + "min", min);
       return min;
     }

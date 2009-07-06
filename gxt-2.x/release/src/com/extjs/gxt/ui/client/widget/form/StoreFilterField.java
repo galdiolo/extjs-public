@@ -82,11 +82,7 @@ public abstract class StoreFilterField<M extends ModelData> extends TriggerField
   }
 
   protected void applyFilters(Store<? extends M> store) {
-    if (getRawValue().length() > 0) {
-      store.applyFilters(property);
-    } else {
-      store.clearFilters();
-    }
+    store.applyFilters(property);
   }
 
   protected void onFilter() {
@@ -103,8 +99,7 @@ public abstract class StoreFilterField<M extends ModelData> extends TriggerField
     onFilter();
   }
 
-  protected abstract boolean doSelect(Store<M> store, M parent, M record, String property,
-      String filter);
+  protected abstract boolean doSelect(Store<M> store, M parent, M record, String property, String filter);
 
   @Override
   protected boolean validateValue(String value) {

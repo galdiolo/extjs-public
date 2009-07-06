@@ -16,6 +16,7 @@ import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.FastMap;
 import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.data.SortInfo;
 import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.store.TreeStore;
@@ -327,10 +328,19 @@ public class TreeGridView extends BufferView {
     }
     super.onClick(ce);
   }
+  
+  @Override
+  protected SortInfo getSortState() {
+    return treeStore.getSortState();
+  }
 
   @Override
   protected void onHeaderClick(Grid<ModelData> grid, int column) {
-
+    if (headerDisabled || !cm.isSortable(column)) {
+      return;
+    }
+    
+    treeStore.sort(cm.getDataIndex(column), null);
   }
 
 }

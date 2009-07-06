@@ -836,6 +836,11 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
       setExpanded(model, !node.expanded);
     }
   }
+  
+  protected void afterRender(){
+    super.afterRender();
+    update();
+  }
 
   protected Joint calcualteJoint(M model) {
     if (model == null) {
@@ -1334,7 +1339,6 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     List<M> rootItems = store.getRootItems();
     List<M> visible = getChildModel(rootItems, true);
     int[] vr = getVisibleRows(visible, getVisibleRowCount());
-
     for (int i = 0; i < children.size(); i++) {
       int j = visible.indexOf(children.get(i));
       if (j >= vr[0] && j <= vr[1]) {

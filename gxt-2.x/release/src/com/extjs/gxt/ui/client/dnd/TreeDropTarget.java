@@ -135,6 +135,27 @@ public class TreeDropTarget extends DropTarget {
     this.autoExpandDelay = autoExpandDelay;
   }
 
+  @SuppressWarnings("unchecked")
+  protected void appendModel(ModelData p, TreeModel model, int index) {
+    ModelData child = model.get("model");
+    if (p == null) {
+      binder.getTreeStore().insert(child, index, false);
+    } else {
+      binder.getTreeStore().insert(p, child, index, false);
+    }
+    List<TreeModel> children = (List)model.getChildren();
+    for (int i = 0; i < children.size(); i++) {
+      appendModel(child, children.get(i), i);
+    }
+  }
+  
+  protected void clearStyles(DNDEvent event) {
+    Insert.get().hide();
+    event.getStatus().setStatus(false);
+    if (activeItem != null) {
+      activeItem.el().firstChild().removeStyleName("my-tree-drop");
+    }
+  }
   protected void handleAppend(DNDEvent event, final TreeItem item) {
     // clear any active append item
     if (activeItem != null && activeItem != item) {
@@ -164,20 +185,7 @@ public class TreeDropTarget extends DropTarget {
     activeItem = item;
     activeItem.el().firstChild().addStyleName("my-tree-drop");
   }
-  
-  @SuppressWarnings("unchecked")
-  protected void appendModel(ModelData p, TreeModel model, int index) {
-    ModelData child = model.get("model");
-    if (p == null) {
-      binder.getTreeStore().insert(child, index, false);
-    } else {
-      binder.getTreeStore().insert(p, child, index, false);
-    }
-    List<TreeModel> children = (List)model.getChildren();
-    for (int i = 0; i < children.size(); i++) {
-      appendModel(child, children.get(i), i);
-    }
-  }
+
   @SuppressWarnings("unchecked")
   protected void handleAppendDrop(DNDEvent event, TreeItem item) {
     List sel = event.getData();
@@ -293,7 +301,7 @@ public class TreeDropTarget extends DropTarget {
       activeItem = null;
     }
   }
-
+  
   @Override
   protected void onDragMove(DNDEvent event) {
     event.setCancelled(false);
@@ -303,7 +311,7 @@ public class TreeDropTarget extends DropTarget {
   protected void showFeedback(DNDEvent event) {
     final TreeItem item = tree.findItem(event.getTarget());
     if (item == null) {
-      event.getStatus().setStatus(false);
+      clearStyles(event);
       return;
     }
     if (event.getDropTarget().component == event.getDragSource().component) {
@@ -311,7 +319,7 @@ public class TreeDropTarget extends DropTarget {
       TreeItem sel = source.getSelectedItem();
       List<TreeItem> children = sel.getItems(true);
       if (children.contains(item)) {
-        event.getStatus().setStatus(false);
+        clearStyles(event);
         return;
       }
     }

@@ -1,5 +1,5 @@
 Ext GWT - Widget Library
-Copyright (c) 2006-2008, Ext JS, LLC
+Copyright (c) 2006-2009, Ext JS, LLC
 All rights reserved.
 licensing@extjs.com
 

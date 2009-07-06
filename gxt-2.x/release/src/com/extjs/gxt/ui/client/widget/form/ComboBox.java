@@ -140,8 +140,7 @@ import com.google.gwt.user.client.ui.RootPanel;
  * 
  * @param <D> the model data type
  */
-public class ComboBox<D extends ModelData> extends TriggerField<D> implements
-    SelectionProvider<D> {
+public class ComboBox<D extends ModelData> extends TriggerField<D> implements SelectionProvider<D> {
 
   /**
    * ComboBox error messages.
@@ -322,8 +321,6 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements
     restrict();
 
     eventPreview.add();
-
-    selectByValue(getRawValue());
 
     fireEvent(Events.Expand, new FieldEvent(this));
   }
@@ -598,16 +595,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements
    * @param index the index of the item to select
    */
   public void select(int index) {
-    if (listView != null) {
-      D sel = store.getAt(index);
-      if (sel != null) {
-        selectedItem = sel;
-        if (index < listView.getElements().size()) {
-          listView.getSelectionModel().select(sel, false);
-          fly(listView.getElement(index)).scrollIntoView(listView.getElement(), false);
-        }
-      }
-    }
+    select(store.getAt(index));
   }
 
   public void select(D sel) {
@@ -1081,19 +1069,18 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements
     }
 
     String style = listStyle;
-    listView.setStyleAttribute("overflowY", "auto");
+    listView.setStyleAttribute("overflowX", "hidden");
     listView.setStyleName(style + "-inner");
     listView.setStyleAttribute("padding", "0px");
     listView.setItemSelector(itemSelector != null ? itemSelector : "." + style + "-item");
     listView.setSelectOnOver(true);
     listView.setBorders(false);
     listView.setLoadingText(loadingText);
-    listView.getSelectionModel().addListener(Events.SelectionChange,
-        new Listener<SelectionChangedEvent<D>>() {
-          public void handleEvent(SelectionChangedEvent<D> se) {
-            selectedItem = listView.getSelectionModel().getSelectedItem();
-          }
-        });
+    listView.getSelectionModel().addListener(Events.SelectionChange, new Listener<SelectionChangedEvent<D>>() {
+      public void handleEvent(SelectionChangedEvent<D> se) {
+        selectedItem = listView.getSelectionModel().getSelectedItem();
+      }
+    });
 
     listView.addListener(Events.Select, new Listener<ListViewEvent>() {
       public void handleEvent(ListViewEvent le) {
@@ -1101,8 +1088,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements
       }
     });
     if (template == null) {
-      String html = "<tpl for=\".\"><div class=\"" + style + "-item\">{"
-          + getDisplayField() + "}</div></tpl>";
+      String html = "<tpl for=\".\"><div class=\"" + style + "-item\">{" + getDisplayField() + "}</div></tpl>";
       template = XTemplate.create(html);
     }
 
@@ -1116,7 +1102,6 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements
       }
     };
     list.setScrollMode(Scroll.NONE);
-    list.setShim(true);
     list.setShim(true);
     list.setShadow(true);
     list.setBorders(true);
@@ -1198,14 +1183,13 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements
         if (isEditable()) {
           selectAll();
         }
-        if (!selectByValue(getRawValue())) {
-          select(0);
-        }
       } else {
-        selectNext();
         if (typeAhead) {
           taTask.delay(typeAheadDelay);
         }
+      }
+      if (!selectByValue(getRawValue())) {
+        select(0);
       }
     } else {
       onEmptyResults();
@@ -1323,8 +1307,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements
 
   @Override
   protected boolean validateBlur(DomEvent e, Element target) {
-    return list == null
-        || (list != null && !list.isVisible() && !list.getElement().isOrHasChild(target));
+    return list == null || (list != null && !list.isVisible() && !list.getElement().isOrHasChild(target));
   }
 
   @Override

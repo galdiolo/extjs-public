@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.FastMap;
 import com.extjs.gxt.ui.client.core.XDOM;
@@ -142,7 +143,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
     public void storeRemove(StoreEvent<M> se) {
       onRemove((TreeStoreEvent<M>) se);
     }
-
+    
     @Override
     public void storeUpdate(StoreEvent<M> se) {
       onUpdate((TreeStoreEvent<M>) se);
@@ -419,18 +420,26 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
       for (M child : se.getChildren()) {
         register(child);
       }
-      store.insert(se.getChildren(), se.getIndex());
+      if (se.getIndex() > 0) {
+        M prev = treeStore.getChild(se.getIndex() - 1);
+        int index = findLastOpenChildIndex(prev);
+        store.insert(se.getChildren(), index + 1);
+      } else {
+        store.insert(se.getChildren(), se.getIndex());
+      }
     } else {
       TreeNode node = findNode(p);
       if (node != null) {
+        for (M child : se.getChildren()) {
+          register(child);
+        }
         if (!node.expanded) {
+          refresh(p);
           return;
         }
         int index = se.getIndex();
         int pindex = store.indexOf(p);
-        for (M child : se.getChildren()) {
-          register(child);
-        }
+
         if (index == 0) {
           store.insert(se.getChildren(), pindex + 1);
         } else {
@@ -439,6 +448,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
           index = findLastOpenChildIndex(mark.m);
           store.insert(se.getChildren(), index + 1);
         }
+        refresh(p);
       }
     }
   }
@@ -500,6 +510,15 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
 
   protected void onFilter(TreeStoreEvent<M> se) {
     onDataChanged(se);
+  }
+
+  @Override
+  protected void onMouseDown(GridEvent<M> e) {
+    super.onMouseDown(e);
+    // stop text from selection on double click
+    if (GXT.isChrome || GXT.isSafari4) {
+      e.preventDefault();
+    }
   }
 
   protected void onRemove(TreeStoreEvent<M> se) {
@@ -583,6 +602,10 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
       return Joint.NONE;
     }
     TreeNode node = findNode(model);
+    if (node == null) {
+      
+      System.out.println("sdfsdf");
+    }
     Joint joint = Joint.NONE;
 
     if (!node.isLeaf()) {
@@ -638,7 +661,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
       setExpanded(child, expand, true);
     }
   }
-
+  
   @SuppressWarnings("unchecked")
   private void statefulExpand(List<M> children) {
     if (isStateful() && treeStore.getKeyProvider() != null) {

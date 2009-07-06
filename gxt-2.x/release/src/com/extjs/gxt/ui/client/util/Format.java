@@ -20,8 +20,7 @@ public class Format {
   }-*/;
 
   public static String capitalize(String value) {
-    return value == null ? value : value.substring(0, 1).toUpperCase()
-        + value.substring(1).toLowerCase();
+    return value == null ? value : value.substring(0, 1).toUpperCase() + value.substring(1).toLowerCase();
   }
 
   /**
@@ -39,6 +38,10 @@ public class Format {
     return value;
   }
 
+  public static native String escape(String s)/*-{
+    return s.replace(/('|\\)/g, "\\$1");
+  }-*/;
+
   public static String fileSize(int size) {
     if (size < 1024) {
       return size + " bytes";
@@ -51,15 +54,12 @@ public class Format {
 
   public static String htmlDecode(String value) {
     return value == null ? value
-        : value.replace("&amp;", "&").replace("&gt;", ">").replace("&lt;", "<").replace(
-            "&quot;", "\"");
+        : value.replace("&amp;", "&").replace("&gt;", ">").replace("&lt;", "<").replace("&quot;", "\"");
   }
 
   public static String htmlEncode(String value) {
-    return value == null
-        ? value
-        : value.replaceAll("&", "&amp;").replace(">", "&gt;").replace("<", "&lt;").replace(
-            "\"", "&quot;");
+    return value == null ? value
+        : value.replace("&", "&amp;").replace(">", "&gt;").replace("<", "&lt;").replace("\"", "&quot;");
   }
 
   public static native String hyphenize(String name) /*-{
@@ -97,8 +97,7 @@ public class Format {
     Iterator<String> it = params.keySet().iterator();
     while (it.hasNext()) {
       String key = it.next();
-      text = text.replaceAll("\\{" + key + "}",
-          safeRegexReplacement(params.get(key).toString()));
+      text = text.replaceAll("\\{" + key + "}", safeRegexReplacement(params.get(key).toString()));
     }
     return text;
   }
@@ -142,8 +141,7 @@ public class Format {
    */
   public static String substitute(String text, String[] keys, Map<String, Object> params) {
     for (int i = 0; i < keys.length; i++) {
-      text = text.replaceAll("\\{" + keys[i] + "}",
-          safeRegexReplacement((String) params.get(keys[i])));
+      text = text.replaceAll("\\{" + keys[i] + "}", safeRegexReplacement((String) params.get(keys[i])));
     }
     return text;
   }

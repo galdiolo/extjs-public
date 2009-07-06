@@ -15,7 +15,7 @@ import com.extjs.gxt.ui.client.data.ModelData;
 public class CheckChangedListener<M extends ModelData> implements Listener<CheckChangedEvent<M>> {
 
   public void handleEvent(CheckChangedEvent<M> ce) {
-    if (ce.getType() == Events.CheckChange) {
+    if (ce.getType() == Events.CheckChanged) {
       checkChanged(ce);
     }
   }

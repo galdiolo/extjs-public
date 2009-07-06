@@ -47,6 +47,9 @@ public class LineDataProvider extends BarDataProvider {
     for (ModelData m : store.getModels()) {
       Object v = m.get(valueProperty);
       Number n = v instanceof String ? Double.parseDouble((String) v) : (Number) v;
+      if (n == null) {
+        n = 0;
+      }
       chart.addValues(n);      
       minYValue = Math.min(minYValue, n.doubleValue());
       maxYValue = Math.max(maxYValue, n.doubleValue());

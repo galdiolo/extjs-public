@@ -325,7 +325,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
   }
 
   /**
-   * Sort the store.
+   * Sorts the store.
    * 
    * <p/>
    * If remote sorting is used, the sort is performed on the server, and the

@@ -7,10 +7,15 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
+import com.extjs.gxt.ui.client.util.IconHelper;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 
 /**
- * Interface for objects that support icons.
+ * Interface for objects that support icons. To create
+ * <code>AbstractImagePrototypes</code> from image paths and CSS style names,
+ * see @link {@link IconHelper}.
+ * 
+ * @see IconHelper
  */
 public interface IconSupport {
   /**

@@ -61,7 +61,8 @@ public class TreePanelView<M extends ModelData> {
 
   public Element getCheckElement(TreeNode node) {
     if (node.check == null) {
-      node.check = ((NodeList<Element>) getElementContainer(node).getChildNodes().cast()).getItem(2);
+      node.check = getElementContainer(node) != null
+          ? ((NodeList<Element>) getElementContainer(node).getChildNodes().cast()).getItem(2) : null;
     }
     return node.check;
   }
@@ -80,14 +81,15 @@ public class TreePanelView<M extends ModelData> {
 
   public Element getElementContainer(TreeNode node) {
     if (node.elContainer == null) {
-      node.elContainer = (Element) node.getElement().getFirstChild();
+      node.elContainer = node.getElement() != null ? (Element) node.getElement().getFirstChild() : null;
     }
     return node.elContainer;
   }
 
   public Element getIconElement(TreeNode node) {
     if (node.icon == null) {
-      node.icon = ((NodeList<Element>) getElementContainer(node).getChildNodes().cast()).getItem(3);
+      node.icon = getElementContainer(node) != null
+          ? ((NodeList<Element>) getElementContainer(node).getChildNodes().cast()).getItem(3) : null;
     }
     return node.icon;
   }
@@ -103,8 +105,8 @@ public class TreePanelView<M extends ModelData> {
     return scrollDelay;
   }
 
-  public String getTemplate(ModelData m, String id, String text, AbstractImagePrototype icon, boolean checkable, boolean checked,
-      Joint joint, int level, TreeViewRenderMode renderMode) {
+  public String getTemplate(ModelData m, String id, String text, AbstractImagePrototype icon, boolean checkable,
+      boolean checked, Joint joint, int level, TreeViewRenderMode renderMode) {
     if (renderMode == TreeViewRenderMode.CONTAINER) {
       return "<ul class=\"x-tree3-node-ct\"></ul>";
     }
@@ -158,7 +160,8 @@ public class TreePanelView<M extends ModelData> {
 
   public Element getTextElement(TreeNode node) {
     if (node.text == null) {
-      node.text = ((NodeList<Element>) getElementContainer(node).getChildNodes().cast()).getItem(4);
+      node.text = getElementContainer(node) != null
+          ? ((NodeList<Element>) getElementContainer(node).getChildNodes().cast()).getItem(4) : null;
     }
     return node.text;
 
@@ -248,7 +251,7 @@ public class TreePanelView<M extends ModelData> {
 
     }
   }
-  
+
   public void onDropChange(TreeNode node, boolean drop) {
     El.fly(getElementContainer(node)).setStyleName("x-ftree2-node-drop", drop);
   }

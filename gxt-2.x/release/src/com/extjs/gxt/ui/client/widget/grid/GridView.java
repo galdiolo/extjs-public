@@ -62,11 +62,9 @@ import com.google.gwt.user.client.ui.Widget;
  * This class encapsulates the user interface of an {@link Grid}. Methods of
  * this class may be used to access user interface elements to enable special
  * display effects. Do not change the DOM structure of the user interface. </p>
- * <p>
+ * <p />
  * This class does not provide ways to manipulate the underlying data. The data
  * model of a Grid is held in an {@link ListStore}.
- * </p>
- * 
  */
 public class GridView extends BaseObservable {
 
@@ -125,13 +123,13 @@ public class GridView extends BaseObservable {
   protected GridTemplates templates;
   protected boolean userResized;
   protected GridViewConfig viewConfig;
-  protected Map<String,Map<String, Widget>> widgetMap = new FastMap<Map<String, Widget>>();
+  protected Map<String, Map<String, Widget>> widgetMap = new FastMap<Map<String, Widget>>();
+  protected boolean headerDisabled;
 
   private String cellSelector = "td.x-grid3-cell";
   private int cellSelectorDepth = 4;
   private Listener<ColumnModelEvent> columnListener;
   private boolean focusEnabled = true;
-  private boolean headerDisabled;
   private int lastViewWidth;
   private StoreListener<ModelData> listener;
   private Element overRow;
@@ -465,6 +463,15 @@ public class GridView extends BaseObservable {
     return showDirtyCells;
   }
 
+  /**
+   * Returns true if sorting is enabled.
+   * 
+   * @return true for sorting
+   */
+  public boolean isSortingEnabled() {
+    return !headerDisabled;
+  }
+
   public void layout() {
     if (mainBody == null) {
       return;
@@ -533,6 +540,15 @@ public class GridView extends BaseObservable {
     calculateVBar(true);
 
     updateHeaderSortState();
+
+    if (footer != null) {
+      ComponentHelper.doDetach(footer);
+      footer.el().removeFromParent();
+    }
+    if (cm.getAggregationRows().size() > 0) {
+      footer = new ColumnFooter(grid, cm);
+      renderFooter();
+    }
 
     applyEmptyText();
 
@@ -606,6 +622,16 @@ public class GridView extends BaseObservable {
    */
   public void setShowDirtyCells(boolean showDirtyCells) {
     this.showDirtyCells = showDirtyCells;
+  }
+
+  /**
+   * True to allow column sorting when the user clicks a column (defaults to
+   * true).
+   * 
+   * @param sortable true for sortable columns
+   */
+  public void setSortingEnabled(boolean sortable) {
+    this.headerDisabled = !sortable;
   }
 
   /**
@@ -1000,8 +1026,16 @@ public class GridView extends BaseObservable {
     return scroller != null ? (vbar ? scrollOffset : 2) : scrollOffset;
   }
 
+  protected SortInfo getSortState() {
+    return ds.getSortState();
+  }
+
   protected int getTotalWidth() {
     return cm.getTotalWidth();
+  }
+
+  protected Element getWidgetCell(int row, int cell) {
+    return (com.google.gwt.user.client.Element) getCell(row, cell).getFirstChild();
   }
 
   @SuppressWarnings("unchecked")
@@ -1318,7 +1352,7 @@ public class GridView extends BaseObservable {
     refreshFooterData();
 
     if (grid.isStateful() && ds.getLoadConfig() != null && ds.getLoadConfig() instanceof PagingLoadConfig) {
-      PagingLoadConfig config = (PagingLoadConfig)ds.getLoadConfig();
+      PagingLoadConfig config = (PagingLoadConfig) ds.getLoadConfig();
       Map<String, Object> state = grid.getState();
       state.put("offset", config.getOffset());
       state.put("limit", config.getLimit());
@@ -1529,10 +1563,6 @@ public class GridView extends BaseObservable {
     }
   }
 
-  protected Element getWidgetCell(int row, int cell) {
-    return (com.google.gwt.user.client.Element) getCell(row, cell).getFirstChild();
-  }
-
   protected void renderWidgets(int startRow, int endRow) {
     if (endRow == -1) {
       endRow = ds.getCount() - 1;
@@ -1737,7 +1767,7 @@ public class GridView extends BaseObservable {
   }
 
   protected void updateHeaderSortState() {
-    SortInfo state = ds.getSortState();
+    SortInfo state = getSortState();
     if (state == null || state.getSortField() == null) {
       return;
     }

@@ -17,11 +17,11 @@ import com.google.gwt.i18n.client.DateTimeFormat;
  */
 public final class Version {
 
-  private static final String release = "2.0-rc1";
+  private static final String release = "2.0-rc2";
   private static final int major = 2;
   private static final int minor = 0;
   private static final int revision = 0;
-  private static final String buildTime = "06/25/2009 10:17";
+  private static final String buildTime = "07/01/2009 06:12";
 
   Version() {
 

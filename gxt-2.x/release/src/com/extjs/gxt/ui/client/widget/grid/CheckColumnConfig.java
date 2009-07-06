@@ -83,7 +83,7 @@ public class CheckColumnConfig extends ColumnConfig implements ComponentPlugin {
   protected String getCheckState(ModelData model, String property, int rowIndex,
       int colIndex) {
     Boolean v = model.get(property);
-    String on = v ? "-on" : "";
+    String on = (v != null && v) ? "-on" : "";
     return on;
   }
 

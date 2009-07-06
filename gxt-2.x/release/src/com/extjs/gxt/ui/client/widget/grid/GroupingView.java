@@ -338,6 +338,9 @@ public class GroupingView extends GridView {
 
   @SuppressWarnings("unchecked")
   protected NodeList<Element> getGroups() {
+    if (!enableGrouping) {
+      return new JsArray().getJsObject().cast();
+    }
     return (NodeList) mainBody.dom.getChildNodes();
   }
 

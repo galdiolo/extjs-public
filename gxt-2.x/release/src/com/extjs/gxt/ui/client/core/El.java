@@ -1737,8 +1737,31 @@ public class El {
     return isVisible(false);
   }
 
+  /**
+   * Returns whether the element is scrollable (x or y).
+   * 
+   * @return true if scrollable
+   */
   public boolean isScrollable() {
-    return dom.getScrollHeight() > dom.getClientHeight() || dom.getScrollWidth() > dom.getClientWidth();
+    return isScrollableX() || isScrollableY();
+  }
+  
+  /**
+   * Returns whether the element is scrollable on the x-axis.
+   * 
+   * @return true if scrollable on the x-axis
+   */
+  public boolean isScrollableX() {
+    return dom.getScrollWidth() > dom.getClientWidth();
+  }
+  
+  /**
+   * Returns whether the element is scrollable on the y-axis.
+   * 
+   * @return true if scrollable on the y-axis
+   */
+  public boolean isScrollableY() {
+    return dom.getScrollHeight() > dom.getClientHeight();
   }
 
   /**

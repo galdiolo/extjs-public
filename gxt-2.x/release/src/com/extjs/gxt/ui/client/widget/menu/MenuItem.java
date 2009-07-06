@@ -78,8 +78,7 @@ public class MenuItem extends Item implements IconSupport {
    * @param icon the item's icon
    * @param listener the selection listener
    */
-  public MenuItem(String text, AbstractImagePrototype icon,
-      SelectionListener<? extends MenuEvent> listener) {
+  public MenuItem(String text, AbstractImagePrototype icon, SelectionListener<? extends MenuEvent> listener) {
     this(text, icon);
     addSelectionListener(listener);
   }
@@ -137,9 +136,9 @@ public class MenuItem extends Item implements IconSupport {
    */
   public void setIcon(AbstractImagePrototype icon) {
     if (rendered) {
-      
-      if (el().selectNode("img") != null) {
-        el().selectNode("img").remove();
+      El oldIcon = el().selectNode("img.x-menu-item-icon");
+      if (oldIcon != null) {
+        oldIcon.remove();
       }
       if (icon != null) {
         Element e = icon.createElement().cast();

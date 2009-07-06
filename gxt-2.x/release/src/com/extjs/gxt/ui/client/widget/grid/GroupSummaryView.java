@@ -85,6 +85,7 @@ public class GroupSummaryView extends GroupingView {
   }
 
   protected void doAllWidths(List<Integer> ws, int tw) {
+    if (!enableGrouping) return;
     NodeList<Element> gs = getGroups();
     for (int i = 0, len = gs.getLength(); i < len; i++) {
       Element s = gs.getItem(i).getChildNodes().getItem(2).cast();

@@ -23,7 +23,6 @@ import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.layout.FlowData;
@@ -65,21 +64,6 @@ public class CheckBoxTreePanelExample extends LayoutContainer {
 
       }
     });
-
-    ButtonBar buttonBar = new ButtonBar();
-
-    buttonBar.add(new Button("Get Checked", new SelectionListener<ButtonEvent>() {
-      public void componentSelected(ButtonEvent ce) {
-        StringBuffer sb = new StringBuffer();
-        for (ModelData item : tree.getCheckedSelection()) {
-          sb.append(", " + (String) item.get("name"));
-        }
-        String s = sb.toString();
-        if (s.length() > 1) s = s.substring(2);
-        if (s.length() > 100) s = s.substring(0, 100) + "...";
-        Info.display("Checked Items", s, "");
-      }
-    }));
 
     final SimpleComboBox<String> cascade = new SimpleComboBox<String>();
     cascade.setTriggerAction(TriggerAction.ALL);

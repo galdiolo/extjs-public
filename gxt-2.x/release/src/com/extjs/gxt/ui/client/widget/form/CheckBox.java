@@ -152,11 +152,6 @@ public class CheckBox extends Field<Boolean> {
     }
   }
 
-  protected void onAttach() {
-    super.onAttach();
-    alignElements();
-  }
-
   @Override
   protected void onClick(ComponentEvent ce) {
     if (readOnly) {

@@ -243,7 +243,10 @@ public class ToolBar extends Container<Component> {
       addStyleName("x-panel-btns-center");
     } else if (alignment.equals(HorizontalAlignment.RIGHT)) {
       if (getItemCount() == 0 || (getItemCount() > 0 && !(getItem(0) instanceof FillToolItem))) {
+        boolean state = layoutOnChange;
+        layoutOnChange = false;
         insert(new FillToolItem(), 0);
+        layoutOnChange = state;
       }
     }
   }

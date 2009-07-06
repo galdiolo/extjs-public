@@ -74,6 +74,23 @@ public class TreeGridSelectionModel<M extends ModelData> extends GridSelectionMo
     }
   }
   
+  @Override
+  protected void onKeyLeft(GridEvent<M> ce) {
+    ce.preventDefault();
+    if (lastSelected == null) return;
+    if (!tree.isLeaf(lastSelected) && tree.isExpanded(lastSelected)) {
+      tree.setExpanded(lastSelected, false);
+    }
+  }
+
+  @Override
+  protected void onKeyRight(GridEvent<M> ce) {
+    ce.preventDefault();
+    if (!tree.isLeaf(lastSelected) && !tree.isExpanded(lastSelected)) {
+      tree.setExpanded(lastSelected, true);
+    }
+  }
+  
   protected void onRender() {
     if (selectedPreRender != null) {
       for (M item : selectedPreRender) {

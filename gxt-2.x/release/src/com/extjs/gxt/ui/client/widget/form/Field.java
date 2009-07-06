@@ -26,7 +26,7 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.ui.AbstractImagePrototype.ImagePrototypeElement;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 
 /**
  * Base class for form fields that provides default event handling, value
@@ -107,13 +107,13 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype.ImagePrototypeElemen
 public abstract class Field<D> extends BoxComponent {
 
   public class FieldImages {
-    private ImagePrototypeElement invalid = GXT.IMAGES.field_invalid().createElement();
+    private AbstractImagePrototype invalid = GXT.IMAGES.field_invalid();
 
-    public ImagePrototypeElement getInvalid() {
+    public AbstractImagePrototype getInvalid() {
       return invalid;
     }
 
-    public void setInvalid(ImagePrototypeElement invalid) {
+    public void setInvalid(AbstractImagePrototype invalid) {
       this.invalid = invalid;
     }
 
@@ -537,9 +537,9 @@ public abstract class Field<D> extends BoxComponent {
     }
     getInputEl().addStyleName(invalidStyle);
 
-    if (messageTarget.equals("side")) {
+    if ("side".equals(messageTarget)) {
       if (errorIcon == null) {
-        errorIcon = new WidgetComponent(GXT.IMAGES.field_invalid().createImage());
+        errorIcon = new WidgetComponent(getImages().getInvalid().createImage());
         Element p = el().getParent().dom;
         errorIcon.render(p);
         errorIcon.el().makePositionable(true);
@@ -559,12 +559,14 @@ public abstract class Field<D> extends BoxComponent {
       errorIcon.setToolTip(msg);
       errorIcon.getToolTip().addStyleName("x-form-invalid-tip");
       el().repaint();
-    } else if (messageTarget.equals("title")) {
+    } else if ("title".equals(messageTarget)) {
       setTitle(msg);
     } else if ("tooltip".equals(messageTarget)) {
       setToolTip(msg);
       getToolTip().addStyleName("x-form-invalid-tip");
       getToolTip().enable();
+    } else if ("none".equals(messageTarget)) {
+      //do nothing
     } else {
       Element elem = DOM.getElementById(messageTarget);
       if (elem != null) {
@@ -769,6 +771,7 @@ public abstract class Field<D> extends BoxComponent {
    * tooltip       Display a tool tip when the user hovers over the field
    * title         Display a default browser title attribute popup
    * side          Add an error icon to the right of the field with a popup on hover
+   * none          Do not display an error message
    * [element id]  Add the error text directly to the innerHTML of the specified element
    * </pre></code>
    * 

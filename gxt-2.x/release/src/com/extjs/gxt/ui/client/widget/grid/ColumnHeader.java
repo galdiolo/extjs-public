@@ -35,6 +35,7 @@ import com.google.gwt.dom.client.Style;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Widget;
@@ -42,9 +43,9 @@ import com.google.gwt.user.client.ui.FlexTable.FlexCellFormatter;
 import com.google.gwt.user.client.ui.HTMLTable.RowFormatter;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment.HorizontalAlignmentConstant;
 
-class ColumnHeader extends BoxComponent {
+public class ColumnHeader extends BoxComponent {
 
-  class GridSplitBar extends BoxComponent {
+  public class GridSplitBar extends BoxComponent {
 
     private int colIndex;
     private Draggable d;
@@ -168,7 +169,7 @@ class ColumnHeader extends BoxComponent {
     }
   }
 
-  class Group extends BoxComponent {
+  public class Group extends BoxComponent {
 
     private HeaderGroupConfig config;
 
@@ -206,7 +207,7 @@ class ColumnHeader extends BoxComponent {
     }
   }
 
-  class Head extends BoxComponent {
+  public class Head extends BoxComponent {
 
     private ColumnConfig config;
     private AnchorElement btn;
@@ -417,6 +418,14 @@ class ColumnHeader extends BoxComponent {
   public int indexOf(Head head) {
     return heads.indexOf(head);
   }
+  
+  protected Head createNewHead(ColumnConfig config) {
+    return new Head(config);
+  }
+  
+  protected Group createNewGroup(HeaderGroupConfig config) {
+    return new Group(config);
+  }
 
   public void refresh() {
     groups.clear();
@@ -452,7 +461,7 @@ class ColumnHeader extends BoxComponent {
       int rs = config.getRowspan();
       int cs = config.getColspan();
 
-      Group group = new Group(config);
+      Group group = createNewGroup(config);
 
       boolean hide = true;
       if (rows > 1) {
@@ -486,7 +495,7 @@ class ColumnHeader extends BoxComponent {
     }
 
     for (int i = 0; i < cols; i++) {
-      Head h = new Head(cm.getColumn(i));
+      Head h = createNewHead(cm.getColumn(i));
       if (cm.isHidden(i)) {
         continue;
       }
@@ -716,12 +725,27 @@ class ColumnHeader extends BoxComponent {
         El.fly(td).removeFromParent();
       }
     }
+    tds = table.getElement().getElementsByTagName("td").cast();
     for (int i = 0; i < tds.getLength(); i++) {
       Element td = tds.getItem(i);
       if (td.getInnerHTML().equals("") && td.getClassName().equals("")) {
         El.fly(td).removeFromParent();
       }
     }
+    // not all empty tds are being removed without the timer
+    Timer t = new Timer() {
+      @Override
+      public void run() {
+        NodeList<Element> tds = table.getElement().getElementsByTagName("td").cast();
+        for (int i = 0; i < tds.getLength(); i++) {
+          Element td = tds.getItem(i);
+          if (td.getInnerHTML().equals("") && td.getClassName().equals("")) {
+            El.fly(td).removeFromParent();
+          }
+        }
+      }
+    };
+    t.schedule(10);
   }
 
 }

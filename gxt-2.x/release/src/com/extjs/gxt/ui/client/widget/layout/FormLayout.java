@@ -112,10 +112,16 @@ public class FormLayout extends AnchorLayout {
 
   @Override
   @SuppressWarnings("unchecked")
-  public void setContainer(final Container ct) {
+  public void setContainer(Container ct) {
+    if (container != null) {
+      for (LabelAlign a : LabelAlign.values()) {
+        container.removeStyleName("x-form-label-" + a.name().toLowerCase());
+      }
+    }
+    
     super.setContainer(ct);
 
-    if (labelAlign != null) {
+    if (labelAlign != null && ct != null) {
       ct.addStyleName("x-form-label-" + labelAlign.name().toLowerCase());
     }
 
@@ -252,8 +258,7 @@ public class FormLayout extends AnchorLayout {
 
   private void renderField(Field<?> field, int index, El target) {
     if (field != null && !field.isRendered()) {
-      String ls = field.getLabelSeparator() != null ? field.getLabelSeparator()
-          : labelSeparator;
+      String ls = field.getLabelSeparator() != null ? field.getLabelSeparator() : labelSeparator;
       field.setLabelSeparator(ls);
 
       Params p = new Params();

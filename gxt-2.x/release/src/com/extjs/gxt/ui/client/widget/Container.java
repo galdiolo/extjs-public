@@ -483,8 +483,7 @@ public abstract class Container<T extends Component> extends BoxComponent {
     assert (child.getParent() == this);
     if (child.isAttached()) {
       ComponentHelper.doDetach(child);
-      assert !child.isAttached() : "Failure of " + getClass()
-          + " to call super.onDetach()";
+      assert !child.isAttached() : "Failure of " + getClass() + " to call super.onDetach()";
     }
     setParent(null, child);
   }
@@ -554,6 +553,9 @@ public abstract class Container<T extends Component> extends BoxComponent {
    * @param layout the new layout
    */
   protected void setLayout(Layout layout) {
+    if (this.layout != null) {
+      this.layout.setContainer(null);
+    }
     this.layout = layout;
     layoutNeeded = true;
     layout.setContainer(this);

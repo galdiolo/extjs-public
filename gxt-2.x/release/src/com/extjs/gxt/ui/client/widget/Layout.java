@@ -125,7 +125,9 @@ public abstract class Layout extends BaseObservable {
       }
     }
     this.container = ct;
-    this.container.addListener(Events.BeforeRemove, listener);
+    if (ct != null) {
+      this.container.addListener(Events.BeforeRemove, listener);
+    }
   }
 
   /**
@@ -289,15 +291,15 @@ public abstract class Layout extends BaseObservable {
   }
 
   protected native void setLayoutOnChange(Container<?> c, boolean change) /*-{
-     c.@com.extjs.gxt.ui.client.widget.Container::layoutOnChange = change;
-   }-*/;
+    c.@com.extjs.gxt.ui.client.widget.Container::layoutOnChange = change;
+  }-*/;
 
   protected native void setLayoutNeeded(Container<?> c, boolean needed) /*-{
-     c.@com.extjs.gxt.ui.client.widget.Container::layoutNeeded = needed;
-   }-*/;
+    c.@com.extjs.gxt.ui.client.widget.Container::layoutNeeded = needed;
+  }-*/;
 
   protected native boolean isLayoutNeeded(Container<?> c) /*-{
-     return c.@com.extjs.gxt.ui.client.widget.Container::layoutNeeded;
-   }-*/;
+    return c.@com.extjs.gxt.ui.client.widget.Container::layoutNeeded;
+  }-*/;
 
 }

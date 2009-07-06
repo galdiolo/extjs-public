@@ -33,6 +33,7 @@ code {
 <body>
 <h1>Ext GWT Library Release Notes</h1>
 <ul>
+  <li><a href="#Release_2.0.RC2">Release 2.0 RC2</a></li>
   <li><a href="#Release_2.0.RC1">Release 2.0 RC1</a></li>
   <li><a href="#Release_2.0.M3">Release 2.0 M3</a></li>
   <li><a href="#Release_1.2.3">Release 1.2.4</a></li>
@@ -52,6 +53,47 @@ code {
 <ul>
   <li>The <a href="2.0_migration_guide.html">migration guide</a> details changes from 1.x to 2.0.</li>
 </ul>
+<h2><a name="Release_2.0.RC2">Release 2.0 RC2 (Released July 1 2009)</a></h2>
+
+<h2>General Changes &amp; Enhancements</h2>
+<ul>
+  <li>Adding sorting support to TreeGrid.</li>
+  <li>Fixed styles for Gray theme panels and toolbar.</li>
+  <li>Updated Slate theme for new button styles.</li>
+  <li>Updated Slate date picker styles.</li>
+</ul>
+<h2>API Changes</h2>
+<ul>
+  <li>TreeStore added getSortState.</li>
+  <li>TreeStore added sort(String field, SortDir sortDir).</li>
+  <li>GridView added sortingEnabled config (defaults to true).</li>
+</ul>
+
+<h2>Bug Fixes</h2>
+<ul>
+  <li>Grouped columns not rendering properly in IE under certain cases.</li>
+  <li>SummaryType predefined classes not handling null data.</li>
+  <li>Added null check to LineDataProvider.</li>
+  <li>CheckColumnConfig getCheckState not handling null model value.</li>
+  <li>Grid.reconfigure not updating aggregation rows.</li>
+  <li>Grid RowExpander text too big.</li>
+  <li>CheckChangeListener testing type CheckChange, not CheckChanged.</li>
+  <li>Background text selecting with TreeGrid in Chrome on double click.</li>
+  <li>TreeStore sorting not sorting root items.</li>
+  <li>TreeDropTarget not properly clearing append style on active node that becomes inactive.</li>
+  <li>StoreFilterField incorrectly cleared all filters on the store.</li>
+  <li>Fixed issue with replace all in Format htmlEncode and htmlDecode.</li>
+  <li>Container not clearing listeners when changing layouts.</li>
+  <li>CheckBox not displaying properly under certain conditions.</li>
+  <li>GroupingSummaryView throwing exception in web mode when setting summary width.</li>
+  <li>TreePanel setChecked not working pre-render.</li>
+  <li>ComboBox selecting wrong value after selecting a previous value.</li>
+  <li>ListView throwing an exception when add is fired from store before the component is renderered.</li>
+  <li>DomEvent throwing an exception when no target element.</li>
+  <li>Wrong insert location when inserting root item into TreeGrid with expanded nodes.</li>
+  <li>TreeGrid not updating joint and folder icon when inserting.</li>
+</ul>
+
 
 <h2><a name="Release_2.0.RC1">Release 2.0 RC1 (Released June 25 2009)</a></h2>
 <h2>General Changes &amp; Enhancements</h2>
