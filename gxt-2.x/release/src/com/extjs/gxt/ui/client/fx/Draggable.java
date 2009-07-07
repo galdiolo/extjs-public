@@ -103,6 +103,7 @@ public class Draggable extends BaseObservable {
   private BaseEventPreview preview;
   private DragEvent dragEvent;
   private int startDragDistance = 2;
+  private Listener<ComponentEvent> listener;
 
   /**
    * Creates a new draggable instance.
@@ -120,14 +121,15 @@ public class Draggable extends BaseObservable {
    * @param handle the component drags will be initiated from
    */
   public Draggable(final Component dragComponent, final Component handle) {
-    this.dragWidget = dragComponent;
-    this.handle = handle;
-
-    handle.addListener(Events.OnMouseDown, new Listener<ComponentEvent>() {
+    listener = new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent ce) {
         onMouseDown(ce);
       }
-    });
+    };
+    this.dragWidget = dragComponent;
+    this.handle = handle;
+
+    handle.addListener(Events.OnMouseDown, listener);
 
     preview = new BaseEventPreview() {
 
@@ -154,16 +156,7 @@ public class Draggable extends BaseObservable {
     };
     preview.setAutoHide(false);
 
-    if (!handle.isRendered()) {
-      handle.addListener(Events.Render, new Listener<ComponentEvent>() {
-        public void handleEvent(ComponentEvent be) {
-          handle.removeListener(Events.Render, this);
-          handle.el().addEventsSunk(Event.ONMOUSEDOWN);
-        }
-      });
-    } else {
-      handle.el().addEventsSunk(Event.ONMOUSEDOWN);
-    }
+    handle.sinkEvents(Event.ONMOUSEDOWN);
   }
 
   /**
@@ -315,6 +308,13 @@ public class Draggable extends BaseObservable {
    */
   public boolean isUseProxy() {
     return useProxy;
+  }
+
+  /**
+   * Removes the drag handles.
+   */
+  public void release() {
+    handle.removeListener(Events.OnMouseDown, listener);
   }
 
   /**
@@ -489,8 +489,10 @@ public class Draggable extends BaseObservable {
     if (s != null && s.indexOf("x-nodrag") != -1) {
       return;
     }
-
-    
+    // ff, safari, chrome starts a native drag on image
+    if ("IMG".equals(target.getTagName())) {
+      ce.preventDefault();
+    }
 
     startBounds = dragWidget.el().getBounds();
 
@@ -512,7 +514,7 @@ public class Draggable extends BaseObservable {
     if (startDragDistance == 0) {
       startDrag(ce.getEvent());
     }
-    
+
   }
 
   protected void onMouseMove(Event event) {
@@ -524,8 +526,7 @@ public class Draggable extends BaseObservable {
     int x = DOM.eventGetClientX(event);
     int y = DOM.eventGetClientY(event);
 
-    if (!dragging
-        && (Math.abs(dragStartX - x) > startDragDistance || Math.abs(dragStartY - y) > startDragDistance)) {
+    if (!dragging && (Math.abs(dragStartX - x) > startDragDistance || Math.abs(dragStartY - y) > startDragDistance)) {
       startDrag(event);
     }
 
@@ -611,7 +612,7 @@ public class Draggable extends BaseObservable {
     XDOM.getBodyEl().addStyleName("x-unselectable");
     XDOM.getBodyEl().addStyleName("x-dd-cursor");
     dragWidget.el().makePositionable();
-    
+
     event.preventDefault();
 
     Shim.get().cover(true);

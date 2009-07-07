@@ -135,7 +135,9 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
     if (filters == null) {
       filters = new ArrayList<StoreFilter<M>>();
     }
-    filters.add(filter);
+    if (!filters.contains(filter)) {
+      filters.add(filter);
+    }
   }
 
   /**
@@ -419,7 +421,7 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
   /**
    * Returns true if the store is monitoring changes.
    * 
-   * @return the montitro changes state
+   * @return the monitor changes state
    */
   public boolean isMonitorChanges() {
     return monitorChanges;
@@ -459,6 +461,11 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
   public void removeFilter(StoreFilter<M> filter) {
     if (filters != null) {
       filters.remove(filter);
+    }
+    if (filters != null && filters.size() == 0 && filtersEnabled) {
+      clearFilters();
+    } else if (filtersEnabled) {
+      applyFilters(filterProperty);
     }
   }
 

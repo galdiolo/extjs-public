@@ -170,7 +170,16 @@ public class GXT {
   private static boolean forceTheme;
   private static Version version;
   private static boolean ariaEnabled;
-
+  
+  /**
+   * Returns the auto id prefix.
+   * 
+   * @return the auto id prefix
+   */
+  public static String getAutoIdPrefix() {
+    return XDOM.getAutoIdPrefix();
+  }
+  
   /**
    * Returns the current theme id.
    * 
@@ -329,8 +338,6 @@ public class GXT {
       removeBackgroundFlicker();
     }
   }
-  
-  
 
   /**
    * Returns the ARIA enabled state.
@@ -340,6 +347,8 @@ public class GXT {
   public static boolean isAriaEnabled() {
     return ariaEnabled;
   }
+  
+  
 
   /**
    * True to enable ARIA functionality.
@@ -348,6 +357,16 @@ public class GXT {
    */
   public static void setAriaEnabled(boolean enable) {
     ariaEnabled = enable;
+  }
+
+  /**
+   * Sets the auto id prefix which is prepended to the auto id counter when
+   * generating auto ids (defaults to 'x-auto').
+   * 
+   * @param autoIdPrefix the auto id prefix
+   */
+  public static void setAutoIdPrefix(String autoIdPrefix) {
+    XDOM.setAutoIdPrefix(autoIdPrefix);
   }
 
   /**
@@ -382,12 +401,6 @@ public class GXT {
     @com.extjs.gxt.ui.client.core.Ext::load()();
   }-*/;
 
-  private native static void removeBackgroundFlicker() /*-{
-    try{
-      $doc.execCommand("BackgroundImageCache", false, true);
-    }catch(e){}
-  }-*/;
-  
   private native static boolean isIE8compatibility() /*-{
   if(@com.extjs.gxt.ui.client.GXT::isIE7){
     if($doc.documentMode){
@@ -396,5 +409,11 @@ public class GXT {
     
   }return false;
 }-*/;
+  
+  private native static void removeBackgroundFlicker() /*-{
+    try{
+      $doc.execCommand("BackgroundImageCache", false, true);
+    }catch(e){}
+  }-*/;
 
 }

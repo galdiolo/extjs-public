@@ -138,6 +138,8 @@ public interface ExampleImages extends ImageBundle {
   AbstractImagePrototype portal();
 
   AbstractImagePrototype reorderingtree();
+  
+  AbstractImagePrototype reorderingtreegrid();
 
   AbstractImagePrototype resizable();
 

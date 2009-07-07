@@ -283,7 +283,7 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
 
     @Override
     public void storeClear(StoreEvent<M> se) {
-      onDataChanged((TreeStoreEvent<M>) se);
+      onClear((TreeStoreEvent<M>) se);
     }
 
     @Override

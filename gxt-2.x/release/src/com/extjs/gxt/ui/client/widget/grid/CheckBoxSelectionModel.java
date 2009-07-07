@@ -8,6 +8,7 @@
 package com.extjs.gxt.ui.client.widget.grid;
 
 import java.util.Arrays;
+import java.util.List;
 
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.data.ModelData;
@@ -15,6 +16,7 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.store.StoreEvent;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentPlugin;
 import com.google.gwt.user.client.Event;
@@ -96,20 +98,42 @@ public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionMo
       El hd = e.getTargetEl().getParent();
       boolean isChecked = hd.hasStyleName("x-grid3-hd-checker-on");
       if (isChecked) {
-        hd.removeStyleName("x-grid3-hd-checker-on");
+        setChecked(false);
         deselectAll();
       } else {
-        hd.addStyleName("x-grid3-hd-checker-on");
+        setChecked(true);
         selectAll();
       }
     }
   }
 
   @Override
+  protected void onAdd(List<? extends M> models) {
+    super.onAdd(models);
+    setChecked(getSelection().size() == grid.getStore().getCount());
+  }
+
+  @Override
+  protected void onClear(StoreEvent<M> se) {
+    super.onClear(se);
+    setChecked(false);
+  }
+
+  @Override
+  protected void onRemove(M model) {
+    super.onRemove(model);
+    setChecked(getSelection().size() == grid.getStore().getCount());
+  }
+
+  @Override
   protected void onSelectChange(M model, boolean select) {
     super.onSelectChange(model, select);
+    setChecked(getSelection().size() == grid.getStore().getCount());
+  }
+
+  private void setChecked(boolean checked) {
     El hd = grid.getView().innerHd.child("div.x-grid3-hd-checker");
-    hd.getParent().setStyleName("x-grid3-hd-checker-on", getSelection().size() == grid.getStore().getCount());
+    hd.getParent().setStyleName("x-grid3-hd-checker-on", checked);
   }
 
 }

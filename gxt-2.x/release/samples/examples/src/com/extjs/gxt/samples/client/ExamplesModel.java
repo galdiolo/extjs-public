@@ -23,7 +23,9 @@ import com.extjs.gxt.samples.client.examples.dnd.BasicDNDExample;
 import com.extjs.gxt.samples.client.examples.dnd.DualListFieldExample;
 import com.extjs.gxt.samples.client.examples.dnd.GridToGridExample;
 import com.extjs.gxt.samples.client.examples.dnd.ListViewDNDExample;
-import com.extjs.gxt.samples.client.examples.dnd.ReorderingTreePanelDNDExample;
+import com.extjs.gxt.samples.client.examples.dnd.ReorderingGridExample;
+import com.extjs.gxt.samples.client.examples.dnd.ReorderingTreeGridExample;
+import com.extjs.gxt.samples.client.examples.dnd.ReorderingTreePanelExample;
 import com.extjs.gxt.samples.client.examples.dnd.TreeGridToTreeGridExample;
 import com.extjs.gxt.samples.client.examples.dnd.TreePanelToTreePanelExample;
 import com.extjs.gxt.samples.client.examples.forms.AdvancedComboBoxExample;
@@ -161,9 +163,11 @@ public class ExamplesModel extends BaseTreeModel {
     dnd.add("Basic DnD", new BasicDNDExample(), g.basicdnd().getHTML());
     dnd.add("List to List", new ListViewDNDExample(), g.listtolist().getHTML());
     dnd.add("Grid to Grid", new GridToGridExample(), g.gridtogrid().getHTML());
+    dnd.add("Reordering Grid", new ReorderingGridExample(), g.gridtogrid().getHTML());
     dnd.add("Tree to Tree", new TreePanelToTreePanelExample(), g.treetotree().getHTML());
+    dnd.add("Reordering Tree", new ReorderingTreePanelExample(), g.reorderingtree().getHTML());
     dnd.add("TreeGrid to TreeGrid", new TreeGridToTreeGridExample(), g.treegridtotreegrid().getHTML());
-    dnd.add("Reordering Tree", new ReorderingTreePanelDNDExample(), g.reorderingtree().getHTML());
+    dnd.add("Reordering TreeGrid", new ReorderingTreeGridExample(), g.reorderingtreegrid().getHTML());
     dnd.add("Image Organizer", new ImageOrganizerExample(), g.imageorganizer().getHTML());
     add(dnd);
 

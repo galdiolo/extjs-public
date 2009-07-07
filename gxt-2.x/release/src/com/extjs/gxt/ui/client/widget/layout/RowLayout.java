@@ -223,7 +223,7 @@ public class RowLayout extends Layout {
   @Override
   protected void onLayout(Container<?> container, El target) {
     super.onLayout(container, target);
-    target.makePositionable();
+    
 
     if (container instanceof ScrollContainer) {
       ScrollContainer<?> sc = (ScrollContainer<?>) container;
@@ -235,6 +235,7 @@ public class RowLayout extends Layout {
     if (orientation == Orientation.VERTICAL) {
       layoutVertical(target);
     } else {
+      target.makePositionable();
       layoutHorizontal(target);
     }
   }

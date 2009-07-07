@@ -18,10 +18,13 @@ import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FlowData;
+import com.google.gwt.user.client.Element;
 
 public class BasicDNDExample extends LayoutContainer {
 
-  public BasicDNDExample() {
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
     HorizontalPanel hp = new HorizontalPanel();
     hp.setSpacing(10);
 

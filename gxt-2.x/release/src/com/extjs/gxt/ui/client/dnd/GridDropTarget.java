@@ -26,6 +26,8 @@ public class GridDropTarget extends DropTarget {
 
   protected Grid<ModelData> grid;
   protected int insertIndex;
+  protected ModelData activeItem;
+  protected boolean before;
 
   /**
    * Creates a new drop target instance.
@@ -59,10 +61,12 @@ public class GridDropTarget extends DropTarget {
         grid.getStore().add((List) data);
       }
     } else {
+      int idx = grid.getStore().indexOf(activeItem);
+      if (!before) idx++;
       if (data instanceof ModelData) {
-        grid.getStore().insert((ModelData) data, insertIndex);
+        grid.getStore().insert((ModelData) data, idx);
       } else if (data instanceof List) {
-        grid.getStore().insert((List) data, insertIndex);
+        grid.getStore().insert((List) data, idx);
       }
     }
   }
@@ -109,10 +113,11 @@ public class GridDropTarget extends DropTarget {
         int mid = height / 2;
         mid += row.getAbsoluteTop();
         int y = event.getClientY();
-        boolean before = y < mid;
+        before = y < mid;
         int idx = grid.getView().findRowIndex(row);
         insertIndex = before ? idx : (event.getDragSource().component == grid) ? idx
             : idx + 1;
+        activeItem = grid.getStore().getAt(idx);
         if (before) {
           showInsert(event, row, true);
         } else {

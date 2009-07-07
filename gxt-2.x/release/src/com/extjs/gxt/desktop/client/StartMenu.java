@@ -46,6 +46,9 @@ public class StartMenu extends Menu {
    */
   public void addTool(Item item) {
     tools.add(item);
+    if (rendered) {
+      renderTool(item);
+    }
   }
 
   /**
@@ -55,6 +58,10 @@ public class StartMenu extends Menu {
     SeparatorMenuItem sep = new SeparatorMenuItem();
     sep.setStyleName("ux-toolmenu-sep");
     addTool(sep);
+  }
+
+  public El getFocusEl() {
+    return el();
   }
 
   /**
@@ -73,6 +80,11 @@ public class StartMenu extends Menu {
    */
   public String getIconStyle() {
     return iconStyle;
+  }
+
+  @Override
+  public El getLayoutTarget() {
+    return menuPanel.firstChild();
   }
 
   /**
@@ -127,7 +139,9 @@ public class StartMenu extends Menu {
   protected void doAttachChildren() {
     super.doAttachChildren();
     for (Item item : tools) {
-      ComponentHelper.doAttach(item);
+      if (item.isRendered()) {
+        ComponentHelper.doAttach(item);
+      }
     }
   }
 
@@ -135,7 +149,9 @@ public class StartMenu extends Menu {
   protected void doDetachChildren() {
     super.doDetachChildren();
     for (Item item : tools) {
-      ComponentHelper.doDetach(item);
+      if (item.isRendered()) {
+        ComponentHelper.doDetach(item);
+      }
     }
   }
 
@@ -143,12 +159,11 @@ public class StartMenu extends Menu {
   protected void onRender(Element target, int index) {
     setElement(DOM.createDiv(), target, index);
     el().setStyleName("x-menu ux-start-menu");
-    
+
     El tl = el().createChild("<div class='ux-start-menu-tl'></div>");
     El tr = tl.createChild("<div class='ux-start-menu-tr'></div>");
     El tc = tr.createChild("<div class='ux-start-menu-tc'></div>");
-    header = tc.createChild("<div class='x-window-header x-unselectable x-panel-icon "
-        + iconStyle + "'></div>");
+    header = tc.createChild("<div class='x-window-header x-unselectable x-panel-icon " + iconStyle + "'></div>");
     headerText = header.createChild("<span class='x-window-header-text'></span>");
     headerText.setInnerHtml(heading);
 
@@ -168,33 +183,28 @@ public class StartMenu extends Menu {
     toolsPanel = menuBWrap.createChild("<div class='x-panel x-border-panel ux-start-menu-tools-panel' style='padding: 2px'></div>");
 
     ul = menuPanel.createChild("<ul class='x-menu-list'></ul>");
-    El toolsUl = toolsPanel.createChild("<ul class='x-menu-list'></ul>");
+    toolsPanel.createChild("<ul class='x-menu-list'></ul>");
 
-    for (Item item : tools) {
-      Element li = DOM.createElement("li");
-      li.setClassName("x-menu-list-item");
-      toolsUl.dom.appendChild(li);
-      item.render(li);
-      item.addSelectionListener(new SelectionListener<MenuEvent>() {
-
-        @Override
-        public void componentSelected(MenuEvent ce) {
-          hide();
-        }
-      });
+    for (Item tool : tools) {
+      renderTool(tool);
     }
 
     eventPreview.getIgnoreList().add(getElement());
     sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS | Event.KEYEVENTS);
   }
-  
-  public El getFocusEl() {
-    return el();
-  }
-  
-  @Override
-  public El getLayoutTarget() {
-    return menuPanel.firstChild();
+
+  protected void renderTool(Item tool) {
+    Element li = DOM.createElement("li");
+    li.setClassName("x-menu-list-item");
+    toolsPanel.selectNode("ul.x-menu-list").dom.appendChild(li);
+    tool.render(li);
+    tool.addSelectionListener(new SelectionListener<MenuEvent>() {
+
+      @Override
+      public void componentSelected(MenuEvent ce) {
+        hide();
+      }
+    });
   }
 
 }

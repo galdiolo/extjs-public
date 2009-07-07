@@ -11,7 +11,6 @@ import com.extjs.gxt.ui.client.event.DNDEvent;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.widget.treegrid.TreeGrid;
 import com.extjs.gxt.ui.client.widget.treegrid.TreeGrid.TreeNode;
-import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
 
@@ -289,7 +288,7 @@ public class TreeGridDropTarget extends DropTarget {
       return;
     }
     if (event.getDropTarget().component == event.getDragSource().component) {
-      TreePanel source = (TreePanel) event.getDragSource().component;
+      TreeGrid source = (TreeGrid) event.getDragSource().component;
       ModelData sel = source.getSelectionModel().getSelectedItem();
       ModelData overModel = item.getModel();
       if (overModel == sel) {

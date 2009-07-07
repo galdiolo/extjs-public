@@ -1433,7 +1433,7 @@ public class GridView extends BaseObservable {
     if (ds.getCount() < 1) {
       return;
     }
-    skipStripe = !skipStripe || !grid.isStripeRows();
+    skipStripe = skipStripe || !grid.isStripeRows();
     NodeList<Element> rows = getRows();
     String cls = " x-grid3-row-alt ";
     for (int i = 0, len = rows.getLength(); i < len; i++) {

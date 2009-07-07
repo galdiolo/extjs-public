@@ -11,6 +11,7 @@ import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.Component;
+import com.extjs.gxt.ui.client.widget.Container;
 
 /**
  * <code>FillLayout</code> places its components in a single row or column,
@@ -72,6 +73,12 @@ public class FillLayout extends RowLayout {
       int height = (h / count) - c.el().getMargins("tb");
       setSize(c, width, height);
     }
+  }
+
+  @Override
+  protected void onLayout(Container<?> container, El target) {
+    super.onLayout(container, target);
+    target.setStyleAttribute("position", "");
   }
 
 }

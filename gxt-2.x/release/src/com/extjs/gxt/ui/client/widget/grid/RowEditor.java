@@ -675,16 +675,9 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       int h = el().getClientHeight();
       GridView view = grid.getView();
       int scroll = view.getScrollState().x;
-      int width = view.mainBody.getWidth(true);
+      int width = view.getTotalWidth();
       int bw = btns.getWidth(true);
       btns.setPosition((width / 2) - (bw / 2) + scroll, h - 2);
-    }
-  }
-
-  protected void removeToolTip() {
-    if (tooltip != null) {
-      tooltip.disable();
-      tooltip.hide();
     }
   }
 
@@ -730,7 +723,10 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     if (monitorTimer != null) {
       monitorTimer.cancel();
     }
-    removeToolTip();
+    if (tooltip != null) {
+      tooltip.disable();
+      tooltip.hide();
+    }
   }
 
   protected void verifyLayout(boolean force) {

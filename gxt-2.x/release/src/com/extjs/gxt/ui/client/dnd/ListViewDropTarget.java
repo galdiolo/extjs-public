@@ -27,8 +27,10 @@ public class ListViewDropTarget extends DropTarget {
 
   protected ListView<ModelData> listView;
   protected int insertIndex;
+  protected ModelData activeItem;
 
   private boolean autoSelect;
+  private boolean before;
 
   /**
    * Creates a new list view drop target instance.
@@ -76,7 +78,9 @@ public class ListViewDropTarget extends DropTarget {
           if (feedback == Feedback.APPEND) {
             listView.getStore().add(temp);
           } else {
-            listView.getStore().insert(temp, insertIndex);
+            int idx = listView.getStore().indexOf(activeItem);
+            if (!before) idx++;
+            listView.getStore().insert(temp, idx);
           }
           if (autoSelect) {
             listView.getSelectionModel().select(temp, false);
@@ -130,9 +134,10 @@ public class ListViewDropTarget extends DropTarget {
         int mid = height / 2;
         mid += row.getAbsoluteTop();
         int y = event.getClientY();
-        boolean before = y < mid;
+        before = y < mid;
         int idx = listView.indexOf(row);
         insertIndex = before ? idx : idx + 1;
+        activeItem = listView.getStore().getAt(idx);
         if (before) {
           showInsert(event, row, true);
         } else {

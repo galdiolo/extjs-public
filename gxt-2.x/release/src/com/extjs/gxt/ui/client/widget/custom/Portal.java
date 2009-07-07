@@ -119,7 +119,7 @@ public class Portal extends Container<LayoutContainer> {
       LayoutContainer l = new LayoutContainer();
       l.addStyleName("x-portal x-portal-column");
       l.setStyleAttribute("minHeight", "20px");
-      l.setStyleAttribute("padding", spacing + "px 0 0 " + spacing+"px");
+      l.setStyleAttribute("padding", spacing + "px 0 0 " + spacing + "px");
       l.setLayout(new RowLayout());
       l.setLayoutOnChange(true);
       add(l);
@@ -228,7 +228,12 @@ public class Portal extends Container<LayoutContainer> {
    * @param column the column
    */
   public void remove(Portlet portlet, int column) {
+    Draggable d = portlet.getData("gxt.draggable");
+    if (d != null) {
+      d.release();
+    }
     portlet.setData("gxt.draggable", null);
+
     columns.get(column).remove(portlet);
   }
 
@@ -258,8 +263,8 @@ public class Portal extends Container<LayoutContainer> {
    */
   public void setSpacing(int spacing) {
     this.spacing = spacing;
-    for(LayoutContainer l : columns) {
-      l.setStyleAttribute("padding", spacing + "px 0 0 " + spacing+"px");
+    for (LayoutContainer l : columns) {
+      l.setStyleAttribute("padding", spacing + "px 0 0 " + spacing + "px");
     }
   }
 
@@ -275,15 +280,14 @@ public class Portal extends Container<LayoutContainer> {
       columns.get(insertCol).insert(active, insertRow);
       active.addStyleName("x-repaint");
 
-      fireEvent(Events.Drop,
-          new PortalEvent(this, active, startCol, startRow, insertCol, insertRow));
+      fireEvent(Events.Drop, new PortalEvent(this, active, startCol, startRow, insertCol, insertRow));
     }
     active.setVisible(true);
     active = null;
     insertCol = -1;
     insertRow = -1;
   }
-  
+
   protected void onDragMove(DragEvent de) {
     int col = getColumn(de.getClientX());
 
@@ -313,7 +317,7 @@ public class Portal extends Container<LayoutContainer> {
     insertRow = row;
 
     LayoutContainer lc = columns.get(insertCol);
-   
+
     dummy.insertInto(lc.el().dom, row);
   }
 

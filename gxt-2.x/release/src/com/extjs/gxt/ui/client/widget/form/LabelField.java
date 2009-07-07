@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.widget.form;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 
@@ -115,6 +116,14 @@ public class LabelField extends Field<Object> {
     setElement(DOM.createDiv(), parent, index);
     if (text != null) {
       setText(text);
+    }
+  }
+
+  @Override
+  protected void onResize(int width, int height) {
+    super.onResize(width, height);
+    if (GXT.isBorderBox) {
+      el().setWidth(width - el().getFrameWidth("lr"), true);
     }
   }
 

@@ -146,7 +146,7 @@ public class Menu extends Container<Component> {
   private Item activeItem;
   private boolean showing;
   private boolean constrainViewport = true;
-  private El focusEl;
+//  private El focusEl;
   private boolean focusOnShow = true;
   private int maxHeight = Style.DEFAULT;
   private boolean enableScrolling = true;
@@ -163,6 +163,7 @@ public class Menu extends Container<Component> {
     monitorWindowResize = true;
     setShadow(true);
     setLayoutOnChange(true);
+    
 
     enableLayout = true;
     setLayout(new MenuLayout());
@@ -201,9 +202,9 @@ public class Menu extends Container<Component> {
     return defaultAlign;
   }
 
-  public El getFocusEl() {
-    return focusEl;
-  }
+//  public El getFocusEl() {
+//    return focusEl;
+//  }
 
   @Override
   public El getLayoutTarget() {
@@ -671,12 +672,7 @@ public class Menu extends Container<Component> {
       }
     };
 
-    focusEl = new El(DOM.createAnchor());
-    focusEl.addStyleName("x-menu-focus");
-    focusEl.setTabIndex(-1);
-
-    getElement().appendChild(focusEl.dom);
-    swallowEvent(Events.OnClick, focusEl.dom, true);
+    swallowEvent(Events.OnClick, getFocusEl().dom, true);
 
     ul = new El(DOM.createElement("ul"));
     ul.addStyleName(baseStyle + "-list");

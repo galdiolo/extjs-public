@@ -29,7 +29,7 @@ import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.google.gwt.user.client.Element;
 
-public class ReorderingTreePanelDNDExample extends LayoutContainer {
+public class ReorderingTreePanelExample extends LayoutContainer {
 
   @Override
   protected void onRender(Element parent, int index) {

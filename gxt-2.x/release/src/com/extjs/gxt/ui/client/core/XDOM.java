@@ -25,13 +25,11 @@ import com.google.gwt.user.client.ui.RootPanel;
  */
 public final class XDOM {
 
-  /**
-   * Returns true if the browser uses a visible box.
-   */
   private static El bodyEl;
   private static int scrollBarHeight = Style.DEFAULT;
   private static int autoId = 0;
   private static int zIndexId = 1000;
+  private static String autoIdPrefix = "x-auto";
 
   static {
     GXT.init();
@@ -49,6 +47,15 @@ public final class XDOM {
     Element firstChild = DOM.getFirstChild(div);
     // support text node creation
     return (firstChild != null) ? firstChild : div;
+  }
+
+  /**
+   * Returns the auto id prefix.
+   * 
+   * @return the auto id prefix
+   */
+  public static String getAutoIdPrefix() {
+    return autoIdPrefix;
   }
 
   /**
@@ -168,7 +175,7 @@ public final class XDOM {
    * @return the id
    */
   public static String getUniqueId() {
-    return "x-auto-" + autoId++;
+    return autoIdPrefix + "-" + autoId++;
   }
 
   public static int getViewHeight(boolean full) {
@@ -212,6 +219,16 @@ public final class XDOM {
   public native static void reload() /*-{
     $wnd.location.reload();
   }-*/;
+
+  /**
+   * Sets the auto id prefix which is prepended to the auto id counter when
+   * generating auto ids (defaults to 'x-auto').
+   * 
+   * @param autoIdPrefix the auto id prefix
+   */
+  public static void setAutoIdPrefix(String autoIdPrefix) {
+    XDOM.autoIdPrefix = autoIdPrefix;
+  }
 
   private static int getScrollBarWidthInternal() {
     LayoutContainer wc = new LayoutContainer();

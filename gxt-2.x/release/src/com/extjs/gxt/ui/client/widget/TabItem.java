@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
+import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -108,20 +109,25 @@ public class TabItem extends LayoutContainer implements IconSupport {
     }
 
     /**
-     * Sets the item's icon style. The style name should match a CSS style that
-     * specifies a background image using the following format:
-     * 
-     * <pre>
-     * 
-     * &lt;code&gt; .my-icon { background: url(images/icons/my-icon.png) no-repeat
-     * center left !important; } &lt;/code&gt;
-     * 
-     * </pre>
+     * Sets the item's icon.
      * 
      * @param icon the icon
      */
     public void setIcon(AbstractImagePrototype icon) {
       this.icon = icon;
+      if (rendered) {
+        El node = el().selectNode(".x-tab-strip-inner img");
+        if (node != null) {
+          node.remove();
+        }
+        if (icon != null) {
+          Element e = icon.createElement().cast();
+          el().selectNode(".x-tab-strip-inner").insertChild(e, 0);
+          El.fly(e).setStyleAttribute("position", "absolute");
+          El.fly(e).setStyleAttribute("top", "3px");
+        }
+        el().setStyleName("x-tab-with-icon", icon != null);
+      }
     }
 
     public void setIconStyle(String icon) {
@@ -287,12 +293,7 @@ public class TabItem extends LayoutContainer implements IconSupport {
   }
 
   /**
-   * Sets the item's icon style. The style name should match a CSS style that
-   * specifies a background image using the following format:
-   * 
-   * <pre>
-   * .my-icon { background: url(images/icons/my-icon.png) no-repeat center left !important; }
-   * </pre>
+   * Sets the item's icon.
    * 
    * @param icon the icon
    */

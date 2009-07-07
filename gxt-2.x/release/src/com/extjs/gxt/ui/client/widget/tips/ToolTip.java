@@ -97,14 +97,15 @@ public class ToolTip extends Tip {
     lastActive = new Date();
     super.hide();
   }
-  
+
   public void initTarget(final Component target) {
     if (this.target != null) {
-      this.target.addListener(Events.OnMouseOver, listener);
-      this.target.addListener(Events.OnMouseOut, listener);
-      this.target.addListener(Events.OnMouseMove, listener);
-      this.target.addListener(Events.Hide, listener);
-      this.target.addListener(Events.Detach, listener);
+      this.target.removeListener(Events.OnMouseOver, listener);
+      this.target.removeListener(Events.OnMouseOut, listener);
+      this.target.removeListener(Events.OnMouseMove, listener);
+      this.target.removeListener(Events.Hide, listener);
+      this.target.removeListener(Events.Detach, listener);
+      this.target.removeListener(Events.Render, listener);
     }
 
     this.target = target;
@@ -131,13 +132,15 @@ public class ToolTip extends Tip {
         }
       };
     }
-    target.addListener(Events.OnMouseOver, listener);
-    target.addListener(Events.Render, listener);
-    target.addListener(Events.OnMouseOut, listener);
-    target.addListener(Events.OnMouseMove, listener);
-    target.addListener(Events.Hide, listener);
-    target.addListener(Events.Detach, listener);
-    target.sinkEvents(Event.ONMOUSEOVER | Event.ONMOUSEOUT | Event.ONMOUSEMOVE);
+    if (target != null) {
+      target.addListener(Events.OnMouseOver, listener);
+      target.addListener(Events.Render, listener);
+      target.addListener(Events.OnMouseOut, listener);
+      target.addListener(Events.OnMouseMove, listener);
+      target.addListener(Events.Hide, listener);
+      target.addListener(Events.Detach, listener);
+      target.sinkEvents(Event.ONMOUSEOVER | Event.ONMOUSEOUT | Event.ONMOUSEMOVE);
+    }
   }
 
   /**

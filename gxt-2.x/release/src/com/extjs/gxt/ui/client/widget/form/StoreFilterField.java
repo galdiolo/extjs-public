@@ -81,8 +81,14 @@ public abstract class StoreFilterField<M extends ModelData> extends TriggerField
     stores.remove(store);
   }
 
+  @SuppressWarnings("unchecked")
   protected void applyFilters(Store<? extends M> store) {
-    store.applyFilters(property);
+    if (getRawValue().length() > 0) {
+      store.addFilter((StoreFilter) filter);
+      store.applyFilters(property);
+    } else {
+      store.removeFilter((StoreFilter) filter);
+    }
   }
 
   protected void onFilter() {

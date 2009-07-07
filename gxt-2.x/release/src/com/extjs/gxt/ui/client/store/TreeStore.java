@@ -648,8 +648,9 @@ public class TreeStore<M extends ModelData> extends Store<M> {
     }
   }
 
+  @SuppressWarnings("unchecked")
   protected void applySort(List<TreeModel> list) {
-    if (storeSorter != null) {
+    storeSorter = storeSorter == null ? new StoreSorter() : storeSorter;
       Collections.sort(list, new Comparator<TreeModel>() {
         public int compare(TreeModel m1, TreeModel m2) {
           return storeSorter.compare(TreeStore.this, unwrap(m1), unwrap(m2), sortInfo.getSortField());
@@ -658,7 +659,6 @@ public class TreeStore<M extends ModelData> extends Store<M> {
       if (sortInfo.getSortDir() == SortDir.DESC) {
         Collections.reverse(list);
       }
-    }
   }
 
   @Override

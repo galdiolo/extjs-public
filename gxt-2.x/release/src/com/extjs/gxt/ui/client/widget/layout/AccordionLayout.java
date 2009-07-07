@@ -248,7 +248,7 @@ public class AccordionLayout extends FitLayout {
       for (int i = 0, len = count; i < len; i++) {
         ContentPanel cp = (ContentPanel) container.getItem(i);
         if (cp != item) {
-          hh += (cp.getOffsetHeight() - El.fly(cp.getElement("bwrap")).getHeight());
+          hh += (cp.getHeader().getOffsetHeight());
           if (!autoWidth) {
             cp.setWidth(size.width);
           }

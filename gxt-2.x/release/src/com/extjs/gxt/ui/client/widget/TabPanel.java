@@ -759,6 +759,13 @@ public class TabPanel extends Container<TabItem> {
     this.tabWidth = tabWidth;
   }
 
+  protected void close(TabItem item) {
+    TabPanelEvent e = new TabPanelEvent(this, item);
+    if (item.fireEvent(Events.BeforeClose, e) && remove(item)) {
+      item.fireEvent(Events.Close, new TabPanelEvent(this, item));
+    }
+  }
+
   @Override
   protected ComponentEvent createComponentEvent(Event event) {
     return new TabPanelEvent(this);
@@ -825,7 +832,8 @@ public class TabPanel extends Container<TabItem> {
         closeContextMenu.add(new MenuItem(messages.getCloseText(), new SelectionListener<MenuEvent>() {
           @Override
           public void componentSelected(MenuEvent ce) {
-            ((TabItem) ce.getContainer().getData("tab")).close();
+            TabItem item = (TabItem) ce.getContainer().getData("tab");
+            close(item);
           }
         }));
         closeContextMenu.add(new MenuItem(messages.getCloseOtherText(), new SelectionListener<MenuEvent>() {
@@ -837,7 +845,7 @@ public class TabPanel extends Container<TabItem> {
             items.addAll(getItems());
             for (TabItem currentItem : items) {
               if (currentItem != item && currentItem.isClosable()) {
-                currentItem.close();
+                close(currentItem);
               }
             }
           }
@@ -924,7 +932,7 @@ public class TabPanel extends Container<TabItem> {
 
     if (plain) {
       String p = tabPosition == TabPosition.BOTTOM ? "bottom" : "header";
-      bar.addStyleName(baseStyle+"-" + p + "-plain");
+      bar.addStyleName(baseStyle + "-" + p + "-plain");
     }
 
     if (itemTemplate == null) {
@@ -997,11 +1005,7 @@ public class TabPanel extends Container<TabItem> {
     ce.stopEvent();
     Element target = ce.getTarget();
     if (fly(target).getStyleName().equals("x-tab-strip-close")) {
-      TabPanelEvent e = new TabPanelEvent(this, item);
-      if (item.fireEvent(Events.BeforeClose, e) && remove(item)) {
-        item.fireEvent(Events.Close, new TabPanelEvent(this, item));
-      }
-      return;
+      close(item);
     } else if (item != activeItem) {
       setSelection(item);
     }
@@ -1018,9 +1022,6 @@ public class TabPanel extends Container<TabItem> {
     if (!item.header.isEnabled()) {
       style += " x-item-disabled";
     }
-    if (item.getIcon() != null) {
-      style += " x-tab-with-icon";
-    }
     Params p = new Params();
     p.set("id", getId() + "__" + item.getId());
     p.set("text", item.getText());
@@ -1033,10 +1034,7 @@ public class TabPanel extends Container<TabItem> {
     item.header.sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS);
 
     if (item.getIcon() != null) {
-      Element e = item.getIcon().createElement().cast();
-      item.header.el().selectNode(".x-tab-strip-inner").insertChild(e, 0);
-      El.fly(e).setStyleAttribute("position", "absolute");
-      El.fly(e).setStyleAttribute("top", "3px");
+      item.setIcon(item.getIcon());
     }
     DOM.insertChild(target, item.header.getElement(), pos);
 

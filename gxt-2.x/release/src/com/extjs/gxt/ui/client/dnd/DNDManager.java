@@ -47,6 +47,7 @@ class DNDManager {
   }
 
   void handleDragMove(DragSource source, DNDEvent event) {
+
     DropTarget target = getTarget(event.getTarget());
 
     // no target with current
@@ -88,8 +89,7 @@ class DNDManager {
       currentTarget = target;
     }
 
-    if (!currentTarget.isAllowSelfAsSource()
-        && source.getComponent() == currentTarget.getComponent()) {
+    if (!currentTarget.isAllowSelfAsSource() && source.getComponent() == currentTarget.getComponent()) {
       currentTarget = null;
       return;
     }
@@ -131,8 +131,8 @@ class DNDManager {
     for (int i = 0, len = targets.size(); i < len; i++) {
       DropTarget t = targets.get(i);
       if (DOM.isOrHasChild(t.component.getElement(), elem)
-          && (target == null || (target != null && DOM.isOrHasChild(
-              target.getComponent().getElement(), t.component.getElement())))) {
+          && (target == null || (target != null && DOM.isOrHasChild(target.getComponent().getElement(),
+              t.component.getElement())))) {
         target = t;
       }
     }

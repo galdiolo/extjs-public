@@ -809,6 +809,14 @@ public abstract class Component extends Widget implements Observable {
     observable.removeListener(eventType, listener);
   }
 
+  public void removeToolTip() {
+    if (toolTip != null) {
+      toolTip.initTarget(null);
+      toolTip = null;
+      toolTipConfig = null;
+    }
+  }
+
   /**
    * Removes a CSS style name from the component's underlying element.
    * 
@@ -1191,10 +1199,14 @@ public abstract class Component extends Widget implements Observable {
   public void setToolTip(ToolTipConfig config) {
     this.toolTipConfig = config;
     if (rendered) {
-      if (toolTip == null) {
-        toolTip = new ToolTip(this, config);
-      } else {
-        toolTip.update(config);
+      if (config != null) {
+        if (toolTip == null) {
+          toolTip = new ToolTip(this, config);
+        } else {
+          toolTip.update(config);
+        }
+      } else if (config == null) {
+        removeToolTip();
       }
     }
   }

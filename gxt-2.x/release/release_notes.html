@@ -33,6 +33,7 @@ code {
 <body>
 <h1>Ext GWT Library Release Notes</h1>
 <ul>
+  <li><a href="#Release_2.0">Release 2.0</a></li>
   <li><a href="#Release_2.0.RC2">Release 2.0 RC2</a></li>
   <li><a href="#Release_2.0.RC1">Release 2.0 RC1</a></li>
   <li><a href="#Release_2.0.M3">Release 2.0 M3</a></li>
@@ -53,6 +54,42 @@ code {
 <ul>
   <li>The <a href="2.0_migration_guide.html">migration guide</a> details changes from 1.x to 2.0.</li>
 </ul>
+<h2><a name="Release_2.0">Release 2.0 (Released July 6 2009)</a></h2>
+
+<h2>General Changes &amp; Enhancements</h2>
+<ul>
+	<li>Updated French and Portuguese translation files.</li>
+	<li>Added Norwegian translation file</li>
+	<li>Added the ability to remove a tooltip from a component.</li>
+	<li>Added setChecked to CheckBoxListView to be able to check items.</li>
+	<li>Added missing styles for Gray and Slate theme.</li>
+</ul>
+
+<h2>API Changes</h2>
+<ul>
+	<li>Added get/setAutoIdPrefix to GXT.</li>
+	<li>Added release to draggable.</li>
+</ul>
+
+<h2>Bug Fixes</h2>
+<ul>
+	<li>TabPanels closecontextmenu was not firing BeforeClose/Close events on closing a tab.</li>
+	<li>Removing a portal from a portlet was not removing the draggable correctly.</li>
+	<li>AnchorLayout was too height under some circumstances.</li>
+	<li>Fixed issue in FillLayout that lead to wrong positioning of elements.</li>
+	<li>TabItem was not able to change its icon.</li>
+	<li>Fixed LabelField being too wide in IE.</li>
+	<li>Fixed error icon staying on wrong position on fields under certain cases.</li>
+	<li>ImageOrganizer broke in FF, Safari, and Chrome.</li>
+	<li>Fixed ListViewDropTarget bug when dropping on self.</li>
+	<li>GridView not updating row stripes on dynamic adds and removes.</li>
+	<li>TreeGrid not sorting when no store sorter specified.</li>
+	<li>CheckBoxSelectionModel not changing state of header checkbox correctly on clearing the store or adding an item to it.</li>
+	<li>Fixed RowEditor positioning the buttons incorrectly.</li>
+	<li>Removed extra left and right padding from buttons for Safari.</li>
+	<li>Menu keyboard navigation not working on webkit.</li>
+</ul>
+
 <h2><a name="Release_2.0.RC2">Release 2.0 RC2 (Released July 1 2009)</a></h2>
 
 <h2>General Changes &amp; Enhancements</h2>
