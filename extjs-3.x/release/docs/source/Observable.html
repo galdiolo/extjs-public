@@ -13,7 +13,7 @@ var EXTUTIL = Ext.util,
     ISOBJECT = Ext.isObject,
     TRUE = true,
     FALSE = false;
-/**
+<div id="cls-Ext.util.Observable"></div>/**
  * @class Ext.util.Observable
  * Base class that provides a common interface for publishing events. Subclasses are expected to
  * to have a property "events" with all the events defined, and, optionally, a property "listeners"
@@ -55,7 +55,7 @@ EXTUTIL.Observable = function(){
      * object during initialization.  This should be a valid listeners config object as specified in the
      * {@link #addListener} example for attaching multiple handlers at once.</p>
      * <br><p><b><u>DOM events from ExtJs {@link Ext.Component Components}</u></b></p>
-     * <br><p>While <i>some</i> ExtJs Component classes export selected DOM events (eg "click", "mouseover" etc), this
+     * <br><p>While <i>some</i> ExtJs Component classes export selected DOM events (e.g. "click", "mouseover" etc), this
      * is usually only done when extra value can be added. For example the {@link Ext.DataView DataView}'s
      * <b><code>{@link Ext.DataView#click click}</code></b> event passing the node clicked on. To access DOM
      * events directly from a Component's HTMLElement, listeners must be added to the <i>{@link Ext.Component#getEl Element}</i> after the Component

@@ -32,7 +32,7 @@ Ext.Element.addMethods(function(){
         OVERFLOW = 'overflow',
         OVERFLOWX = 'overflow-x',
         OVERFLOWY = 'overflow-y',
-        ORIGINALCLIP = 'originalClip'
+        ORIGINALCLIP = 'originalClip',
         // special markup used throughout Ext when box wrapping elements    
         borders = {l: BORDER + LEFT + WIDTH, r: BORDER + RIGHT + WIDTH, t: BORDER + TOP + WIDTH, b: BORDER + BOTTOM + WIDTH},
         paddings = {l: PADDING + LEFT, r: PADDING + RIGHT, t: PADDING + TOP, b: PADDING + BOTTOM},
@@ -66,22 +66,22 @@ Ext.Element.addMethods(function(){
     return {    
         // private  ==> used by Fx  
         adjustWidth : function(width) {
-            var me = this;      
-            if(typeof width == "number" && me.autoBoxAdjust && !me.isBorderBox()){
+            var me = this;
+            var isNum = (typeof width == "number");
+            if(isNum && me.autoBoxAdjust && !me.isBorderBox()){
                width -= (me.getBorderWidth("lr") + me.getPadding("lr"));
-               width = width < 0 ? 0 : width;
             }
-            return width;
+            return (isNum && width < 0) ? 0 : width;
         },
         
         // private   ==> used by Fx 
         adjustHeight : function(height) {
-            var me = this;      
-            if(typeof height == "number" && me.autoBoxAdjust && !me.isBorderBox()){
-               height -= (me.getBorderWidth("tb") + me.getPadding("tb"));
-               height = height < 0 ? 0 : height;
+            var me = this;
+            var isNum = (typeof height == "number");
+            if(isNum && me.autoBoxAdjust && !me.isBorderBox()){
+               height -= (me.getBorderWidth("tb") + me.getPadding("tb"));               
             }
-            return height;
+            return (isNum && height < 0) ? 0 : height;
         },
     
     

@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 /**
  * @class Ext.chart.Chart
  * @extends Ext.FlashComponent
@@ -78,6 +84,7 @@
             'itemdrag',
             'itemdragend'
         );
+        this.store = Ext.StoreMgr.lookup(this.store);
     },
 
     /**

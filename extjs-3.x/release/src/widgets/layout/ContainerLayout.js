@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 /**
  * @class Ext.layout.ContainerLayout
  * <p>The ContainerLayout class is the default layout manager delegated by {@link Ext.Container} to

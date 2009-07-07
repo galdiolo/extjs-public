@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 /**
  * @class Ext.form.Field
  * @extends Ext.BoxComponent
@@ -1330,23 +1336,6 @@ Ext.form.TriggerField = Ext.extend(Ext.form.TextField,  {
         return true;
     },
 
-    // private
-    onDisable : function(){
-        Ext.form.TriggerField.superclass.onDisable.call(this);
-        if(this.wrap){
-            this.wrap.addClass(this.disabledClass);
-            this.el.removeClass(this.disabledClass);
-        }
-    },
-
-    // private
-    onEnable : function(){
-        Ext.form.TriggerField.superclass.onEnable.call(this);
-        if(this.wrap){
-            this.wrap.removeClass(this.disabledClass);
-        }
-    },
-
     /**
      * The function that should handle the trigger's click event.  This method does nothing by default
      * until overridden by an implementing function.  See Ext.form.ComboBox and Ext.form.DateField for
@@ -2578,8 +2567,8 @@ var combo = new Ext.form.ComboBox({
                 this.mode = 'local';
                 var d = [], opts = s.options;
                 for(var i = 0, len = opts.length;i < len; i++){
-                    var o = opts[i];
-                    var value = (o.hasAttribute ? o.hasAttribute('value') : o.getAttribute('value') !== null) ? o.value : o.text;
+                    var o = opts[i],
+                        value = (o.hasAttribute ? o.hasAttribute('value') : o.getAttributeNode('value').specified) ? o.value : o.text;
                     if(o.selected && Ext.isEmpty(this.value, true)) {
                         this.value = value;
                     }
@@ -2598,8 +2587,8 @@ var combo = new Ext.form.ComboBox({
             if(!this.lazyRender){
                 this.target = true;
                 this.el = Ext.DomHelper.insertBefore(s, this.autoCreate || this.defaultAutoCreate);
+                this.render(this.el.parentNode, s);
                 Ext.removeNode(s); // remove it
-                this.render(this.el.parentNode);
             }else{
                 Ext.removeNode(s); // remove it
             }
@@ -2618,10 +2607,10 @@ var combo = new Ext.form.ComboBox({
 
         this.selectedIndex = -1;
         if(this.mode == 'local'){
-            if(this.initialConfig.queryDelay === undefined){
+            if(!Ext.isDefined(this.initialConfig.queryDelay)){
                 this.queryDelay = 10;
             }
-            if(this.initialConfig.minChars === undefined){
+            if(!Ext.isDefined(this.initialConfig.minChars)){
                 this.minChars = 0;
             }
         }
@@ -2653,8 +2642,8 @@ var combo = new Ext.form.ComboBox({
         Ext.form.ComboBox.superclass.initValue.call(this);
         if(this.hiddenField){
             this.hiddenField.value =
-                this.hiddenValue !== undefined ? this.hiddenValue :
-                this.value !== undefined ? this.value : '';
+                Ext.isDefined(this.hiddenValue) ? this.hiddenValue :
+                Ext.isDefined(this.value) ? this.value : '';
         }
     },
 
@@ -2816,7 +2805,6 @@ var menu = new Ext.menu.Menu({
         if(this.store && !initial){
             this.store.un('beforeload', this.onBeforeLoad, this);
             this.store.un('load', this.onLoad, this);
-            this.store.un('loadexception', this.collapse, this);
             this.store.un('exception', this.collapse, this);
             if(this.store !== store && this.store.autoDestroy){
                 this.store.destroy();
@@ -2841,7 +2829,6 @@ var menu = new Ext.menu.Menu({
                 scope: this,
                 beforeload: this.onBeforeLoad,
                 load: this.onLoad,
-                loadexception: this.collapse,
                 exception: this.collapse
             });
 
@@ -2947,7 +2934,7 @@ var menu = new Ext.menu.Menu({
     // private
     onResize : function(w, h){
         Ext.form.ComboBox.superclass.onResize.apply(this, arguments);
-        if(this.list && this.listWidth === undefined){
+        if(this.list && !Ext.isDefined(this.listWidth)){
             var lw = Math.max(w, this.minListWidth);
             this.list.setWidth(lw);
             this.innerList.setWidth(lw - this.list.getFrameWidth('lr'));
@@ -3076,7 +3063,7 @@ var menu = new Ext.menu.Menu({
             var r = this.findRecord(this.valueField, v);
             if(r){
                 text = r.data[this.displayField];
-            }else if(this.valueNotFoundText !== undefined){
+            }else if(Ext.isDefined(this.valueNotFoundText)){
                 text = this.valueNotFoundText;
             }
         }
@@ -3171,7 +3158,7 @@ var menu = new Ext.menu.Menu({
      * @return {Boolean} True if the value matched an item in the list, else false
      */
     selectByValue : function(v, scrollIntoView){
-        if(v !== undefined && v !== null){
+        if(!Ext.isEmpty(v, true)){
             var r = this.findRecord(this.valueField || this.displayField, v);
             if(r){
                 this.select(this.store.indexOf(r), scrollIntoView);
@@ -3248,7 +3235,7 @@ var menu = new Ext.menu.Menu({
         var val = this.getRawValue();
         if(this.forceSelection){
             if(val.length > 0 && val != this.emptyText){
-               this.el.dom.value = this.lastSelectionText === undefined ? '' : this.lastSelectionText;
+               this.el.dom.value = Ext.isDefined(this.lastSelectionText) ? this.lastSelectionText : '';
                 this.applyEmptyText();
             }else{
                 this.clearValue();
@@ -4231,7 +4218,7 @@ Ext.reg('hidden', Ext.form.Hidden);/**
  */
 Ext.form.BasicForm = function(el, config){
     Ext.apply(this, config);
-    if(typeof this.paramOrder == 'string'){
+    if(Ext.isString(this.paramOrder)){
         this.paramOrder = this.paramOrder.split(/[\s,|]/);
     }
     /*
@@ -4569,7 +4556,7 @@ new Ext.FormPanel({
      * @return {BasicForm} this
      */
     doAction : function(action, options){
-        if(typeof action == 'string'){
+        if(Ext.isString(action)){
             action = new Ext.form.Action.ACTION_TYPES[action](this, options);
         }
         if(this.fireEvent('beforeaction', this, action) !== false){
@@ -5069,7 +5056,7 @@ Ext.FormPanel = Ext.extend(Ext.Panel, {
 
     // private
     createForm : function(){
-        var config = Ext.apply({listeners: {}}, this.initialConfig);
+        var config = Ext.applyIf({listeners: {}}, this.initialConfig);
         return new Ext.form.BasicForm(null, config);
     },
 
@@ -5124,8 +5111,14 @@ Ext.FormPanel = Ext.extend(Ext.Panel, {
     
     // private
     beforeDestroy : function(){
-        Ext.FormPanel.superclass.beforeDestroy.call(this);
         this.stopMonitoring();
+        Ext.FormPanel.superclass.beforeDestroy.call(this);
+        /*
+         * Clear the items here to prevent them being destroyed again.
+         * Don't move this behaviour to BasicForm because it can be used
+         * on it's own.
+         */
+        this.form.items.clear();
         Ext.destroy(this.form);
     },
 
@@ -5757,6 +5750,7 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
                 handler:handler||editor.relayBtnCmd,
                 clickEvent:'mousedown',
                 tooltip: tipsEnabled ? editor.buttonTips[id] || undefined : undefined,
+                overflowText: editor.buttonTips[id].title || undefined,
                 tabIndex:-1
             };
         }

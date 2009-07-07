@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 
 // for old browsers
 window.undefined = window.undefined;
@@ -89,6 +95,12 @@ Ext.apply = function(o, c, defaults){
     }
 
     Ext.apply(Ext, {
+        /**
+         * URL to a blank file used by Ext when in secure mode for iframe src and onReady src to prevent
+         * the IE insecure content warning (defaults to javascript:false).
+         * @type String
+         */
+        SSL_SECURE_URL : 'javascript:false',
         /**
          * True if the browser is in strict (standards-compliant) mode, as opposed to quirks mode
          * @type Boolean

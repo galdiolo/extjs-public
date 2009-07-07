@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 /**
  * @class Ext.layout.ToolbarLayout
  * @extends Ext.layout.ContainerLayout
@@ -882,7 +888,7 @@ Ext.reg('buttongroup', Ext.ButtonGroup);
  * approprate data.</p>
  * <p><b>Ext.PagingToolbar</b> is a specialized toolbar that is bound to a {@link Ext.data.Store}
  * and provides automatic paging control. This Component {@link Ext.data.Store#load load}s blocks
- * of data into the <tt>{@link #store}</tt> by passing {@link #paramNames parameters} used for
+ * of data into the <tt>{@link #store}</tt> by passing {@link Ext.data.Store#paramNames paramNames} used for
  * paging criteria.</p>
  * <p>PagingToolbar is typically used as one of the Grid's toolbars:</p>
  * <pre><code>
@@ -955,7 +961,7 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
      */
     /**
      * @cfg {String} displayMsg
-     * The paging status message to display (defaults to <tt>"Displaying {0} - {1} of {2}"</tt>).
+     * The paging status message to display (defaults to <tt>'Displaying {0} - {1} of {2}'</tt>).
      * Note that this string is formatted using the braced numbers <tt>{0}-{2}</tt> as tokens
      * that are replaced by the values for start, end and total respectively. These tokens should
      * be preserved when overriding this string if showing those values is desired.
@@ -963,59 +969,59 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
     displayMsg : 'Displaying {0} - {1} of {2}',
     /**
      * @cfg {String} emptyMsg
-     * The message to display when no records are found (defaults to "No data to display")
+     * The message to display when no records are found (defaults to 'No data to display')
      */
     emptyMsg : 'No data to display',
     /**
      * @cfg {String} beforePageText
-     * The text displayed before the input item (defaults to <tt>"Page"</tt>).
+     * The text displayed before the input item (defaults to <tt>'Page'</tt>).
      */
-    beforePageText : "Page",
+    beforePageText : 'Page',
     /**
      * @cfg {String} afterPageText
-     * Customizable piece of the default paging text (defaults to <tt>"of {0}"</tt>). Note that
+     * Customizable piece of the default paging text (defaults to <tt>'of {0}'</tt>). Note that
      * this string is formatted using <tt>{0}</tt> as a token that is replaced by the number of
      * total pages. This token should be preserved when overriding this string if showing the
      * total page count is desired.
      */
-    afterPageText : "of {0}",
+    afterPageText : 'of {0}',
     /**
      * @cfg {String} firstText
-     * The quicktip text displayed for the first page button (defaults to <tt>"First Page"</tt>).
+     * The quicktip text displayed for the first page button (defaults to <tt>'First Page'</tt>).
      * <b>Note</b>: quick tips must be initialized for the quicktip to show.
      */
-    firstText : "First Page",
+    firstText : 'First Page',
     /**
      * @cfg {String} prevText
-     * The quicktip text displayed for the previous page button (defaults to <tt>"Previous Page"</tt>).
+     * The quicktip text displayed for the previous page button (defaults to <tt>'Previous Page'</tt>).
      * <b>Note</b>: quick tips must be initialized for the quicktip to show.
      */
-    prevText : "Previous Page",
+    prevText : 'Previous Page',
     /**
      * @cfg {String} nextText
-     * The quicktip text displayed for the next page button (defaults to <tt>"Next Page"</tt>).
+     * The quicktip text displayed for the next page button (defaults to <tt>'Next Page'</tt>).
      * <b>Note</b>: quick tips must be initialized for the quicktip to show.
      */
-    nextText : "Next Page",
+    nextText : 'Next Page',
     /**
      * @cfg {String} lastText
-     * The quicktip text displayed for the last page button (defaults to <tt>"Last Page"</tt>).
+     * The quicktip text displayed for the last page button (defaults to <tt>'Last Page'</tt>).
      * <b>Note</b>: quick tips must be initialized for the quicktip to show.
      */
-    lastText : "Last Page",
+    lastText : 'Last Page',
     /**
      * @cfg {String} refreshText
-     * The quicktip text displayed for the Refresh button (defaults to <tt>"Refresh"</tt>).
+     * The quicktip text displayed for the Refresh button (defaults to <tt>'Refresh'</tt>).
      * <b>Note</b>: quick tips must be initialized for the quicktip to show.
      */
-    refreshText : "Refresh",
+    refreshText : 'Refresh',
 
     /**
-     * Object mapping of parameter names used for load calls.  This property is affected by
-     * See also {@link Ext.data.Store#paramNames}, but is initially set to:
+     * @deprecated
+     * <b>The defaults for these should be set in the data store.</b>
+     * Object mapping of parameter names used for load calls, initially set to:
      * <pre>{start: 'start', limit: 'limit'}</pre>
      */
-    paramNames : {start: 'start', limit: 'limit'},
 
     /**
      * The number of records to display per page.  See also <tt>{@link #cursor}</tt>.
@@ -1037,16 +1043,16 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
         var pagingItems = [this.first = new T.Button({
             tooltip: this.firstText,
             overflowText: this.firstText,
-            iconCls: "x-tbar-page-first",
+            iconCls: 'x-tbar-page-first',
             disabled: true,
-            handler: this.onFirstClick,
+            handler: this.moveFirst,
             scope: this
         }), this.prev = new T.Button({
             tooltip: this.prevText,
             overflowText: this.prevText,
-            iconCls: "x-tbar-page-prev",
+            iconCls: 'x-tbar-page-prev',
             disabled: true,
-            handler: this.onPrevClick,
+            handler: this.movePrevious,
             scope: this
         }), '-', this.beforePageText,
         this.inputItem = new Ext.form.NumberField({
@@ -1054,7 +1060,7 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
             allowDecimals: false,
             allowNegative: false,
             enableKeyEvents: true,
-            selectOnFocus: true, 
+            selectOnFocus: true,
             listeners: {
                 scope: this,
                 keydown: this.onPagingKeyDown,
@@ -1065,22 +1071,22 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
         }), '-', this.next = new T.Button({
             tooltip: this.nextText,
             overflowText: this.nextText,
-            iconCls: "x-tbar-page-next",
+            iconCls: 'x-tbar-page-next',
             disabled: true,
-            handler: this.onNextClick,
+            handler: this.moveNext,
             scope: this
         }), this.last = new T.Button({
             tooltip: this.lastText,
             overflowText: this.lastText,
-            iconCls: "x-tbar-page-last",
+            iconCls: 'x-tbar-page-last',
             disabled: true,
-            handler: this.onLastClick,
+            handler: this.moveLast,
             scope: this
         }), '-', this.refresh = new T.Button({
             tooltip: this.refreshText,
             overflowText: this.refreshText,
-            iconCls: "x-tbar-loading",
-            handler: this.onRefreshClick,
+            iconCls: 'x-tbar-loading',
+            handler: this.refresh,
             scope: this
         })];
 
@@ -1160,7 +1166,8 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
             this.dsLoaded = [store, r, o];
             return;
         }
-        this.cursor = (o.params && o.params[this.paramNames.start]) ? o.params[this.paramNames.start] : 0;
+        var p = this.getParams();
+        this.cursor = (o.params && o.params[p.start]) ? o.params[p.start] : 0;
         var d = this.getPageData(), ap = d.activePage, ps = d.pages;
 
         this.afterTextItem.setText(String.format(this.afterPageText, d.pages));
@@ -1249,6 +1256,12 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
     },
 
     // private
+    getParams : function(){
+        //retain backwards compat, allow params on the toolbar itself, if they exist.
+        return this.paramNames || this.store.paramNames;
+    },
+
+    // private
     beforeLoad : function(){
         if(this.rendered && this.refresh){
             this.refresh.disable();
@@ -1257,36 +1270,50 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
 
     // private
     doLoad : function(start){
-        var o = {}, pn = this.paramNames;
+        var o = {}, pn = this.getParams();
         o[pn.start] = start;
         o[pn.limit] = this.pageSize;
         if(this.fireEvent('beforechange', this, o) !== false){
             this.store.load({params:o});
         }
     },
-    
-    // private
-    onFirstClick: function(){
-        this.doLoad(0);    
+
+    /**
+     * Move to the first page, has the same effect as clicking the 'first' button.
+     */
+    moveFirst : function(){
+        this.doLoad(0);
     },
-    
-    onPrevClick: function(){
+
+    /**
+     * Move to the previous page, has the same effect as clicking the 'previous' button.
+     */
+    movePrevious : function(){
         this.doLoad(Math.max(0, this.cursor-this.pageSize));
     },
-    
-    onNextClick: function(){
+
+    /**
+     * Move to the next page, has the same effect as clicking the 'next' button.
+     */
+    moveNext : function(){
         this.doLoad(this.cursor+this.pageSize);
     },
-    
-    onLastClick: function(){
+
+    /**
+     * Move to the last page, has the same effect as clicking the 'last' button.
+     */
+    moveLast : function(){
         var total = this.store.getTotalCount(),
             extra = total % this.pageSize;
-            
-        this.doLoad(extra ? (total - extra) : total - this.pageSize);    
+
+        this.doLoad(extra ? (total - extra) : total - this.pageSize);
     },
-    
-    onRefreshClick: function(){
-        this.doLoad(this.cursor);    
+
+    /**
+     * Refresh the current page, has the same effect as clicking the 'refresh' button.
+     */
+    refresh : function(){
+        this.doLoad(this.cursor);
     },
 
     /**
@@ -1297,10 +1324,9 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
     bindStore : function(store, initial){
         var doLoad;
         if(!initial && this.store){
-            this.store.un("beforeload", this.beforeLoad, this);
-            this.store.un("load", this.onLoad, this);
-            this.store.un("loadexception", this.onLoadError, this);
-            this.store.un("exception", this.onLoadError, this);
+            this.store.un('beforeload', this.beforeLoad, this);
+            this.store.un('load', this.onLoad, this);
+            this.store.un('exception', this.onLoadError, this);
             if(store !== this.store && this.store.autoDestroy){
                 this.store.destroy();
             }
@@ -1311,12 +1337,8 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
                 scope: this,
                 beforeload: this.beforeLoad,
                 load: this.onLoad,
-                loadexception: this.onLoadError,
                 exception: this.onLoadError
             });
-            this.paramNames.start = store.paramNames.start;
-            this.paramNames.limit = store.paramNames.limit;
-
             doLoad = store.getCount() > 0;
         }
         this.store = store;

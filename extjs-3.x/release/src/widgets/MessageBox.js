@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 /**
  * @class Ext.MessageBox
  * <p>Utility class for generating different styles of message boxes.  The alias Ext.Msg can also be used.<p/>

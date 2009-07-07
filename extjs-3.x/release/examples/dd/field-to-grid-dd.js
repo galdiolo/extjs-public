@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 // A DropZone which cooperates with DragZones whose dragData contains
 // a "field" property representing a form Field. Fields may be dropped onto
 // grid data cells containing a matching data type.

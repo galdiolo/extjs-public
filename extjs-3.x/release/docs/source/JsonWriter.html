@@ -12,7 +12,9 @@
  */
 Ext.data.JsonWriter = function(config) {
     Ext.data.JsonWriter.superclass.constructor.call(this, config);
+
     // careful to respect "returnJson", renamed to "encode"
+    // TODO: remove after v3 final release
     if (this.returnJson != undefined) {
         this.encode = this.returnJson;
     }
@@ -56,7 +58,9 @@ Ext.extend(Ext.data.JsonWriter, Ext.data.DataWriter, {
      * @param {Ext.data.Record} rec
      */
     createRecord : function(rec) {
-        return this.toHash(rec);
+       var data = this.toHash(rec);
+       delete data[this.meta.idProperty];
+       return data;
     },
     <div id="method-Ext.data.JsonWriter-updateRecord"></div>/**
      * updateRecord

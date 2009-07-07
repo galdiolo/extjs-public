@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 /**
  * @class Ext.ComponentMgr
  * <p>Provides a registry of all Components (instances of {@link Ext.Component} or any subclass
@@ -3785,6 +3791,8 @@ layoutConfig: {
      * the frequency it calculates and does a re-layout of components. This is useful for heavy containers or containers
      * with a large quantity of sub-components for which frequent layout calls would be expensive.
      */
+    bufferResize: 100,
+    
     /**
      * @cfg {String/Number} activeItem
      * A string component id or the numeric index of the component that should be initially activated within the
@@ -8694,9 +8702,6 @@ new Ext.Panel({
         }
         Ext.Panel.superclass.afterRender.call(this); // do sizing calcs last
         this.initEvents();
-        if(this.frame && this.bbar && Ext.isIE && !Ext.isIE8){
-            this.el.repaint();
-        }
     },
 
     // private
@@ -10485,7 +10490,6 @@ Ext.LoadMask = function(el, config){
     if(this.store){
         this.store.on('beforeload', this.onBeforeLoad, this);
         this.store.on('load', this.onLoad, this);
-        this.store.on('loadexception', this.onLoad, this);
         this.store.on('exception', this.onLoad, this);
         this.removeMask = Ext.value(this.removeMask, false);
     }else{
@@ -10571,7 +10575,6 @@ Ext.LoadMask.prototype = {
         if(this.store){
             this.store.un('beforeload', this.onBeforeLoad, this);
             this.store.un('load', this.onLoad, this);
-            this.store.un('loadexception', this.onLoad, this);
             this.store.un('exception', this.onLoad, this);
         }else{
             var um = this.el.getUpdater();

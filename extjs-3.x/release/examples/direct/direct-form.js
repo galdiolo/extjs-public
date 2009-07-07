@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 // This example illustrates how to load a FormPanel or BasicForm through Ext.Direct.
 
 Ext.onReady(function(){

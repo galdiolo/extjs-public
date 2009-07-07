@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 /**
  * @class Ext.form.TriggerField
  * @extends Ext.form.TextField
@@ -209,23 +215,6 @@ Ext.form.TriggerField = Ext.extend(Ext.form.TextField,  {
     // This should be overriden by any subclass that needs to check whether or not the field can be blurred.
     validateBlur : function(e){
         return true;
-    },
-
-    // private
-    onDisable : function(){
-        Ext.form.TriggerField.superclass.onDisable.call(this);
-        if(this.wrap){
-            this.wrap.addClass(this.disabledClass);
-            this.el.removeClass(this.disabledClass);
-        }
-    },
-
-    // private
-    onEnable : function(){
-        Ext.form.TriggerField.superclass.onEnable.call(this);
-        if(this.wrap){
-            this.wrap.removeClass(this.disabledClass);
-        }
     },
 
     /**

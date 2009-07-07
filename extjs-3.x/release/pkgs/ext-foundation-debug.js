@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 /**
  * @class Ext.DomHelper
  * <p>The DomHelper class provides a layer of abstraction from DOM and transparently supports creating
@@ -2486,23 +2492,21 @@ Ext.EventManager = function(){
 	     * Note that this may be filtered by using the <tt>delegate</tt> option.</div></li>
 	     * <li>o : Object<div class="sub-desc">The options object from the addListener call.</div></li>
 	     * </ul>
-	     * @param {Object} scope (optional) The scope in which to execute the handler
-	     * function (the handler function's "this" context)
+	     * @param {Object} scope (optional) The scope (<b><code>this</code></b> reference) in which the handler function is executed. <b>Defaults to the Element</b>.
 	     * @param {Object} options (optional) An object containing handler configuration properties.
 	     * This may contain any of the following properties:<ul>
-	     * <li>scope {Object} : The scope in which to execute the handler function. The handler function's "this" context.</li>
-	     * <li>delegate {String} : A simple selector to filter the target or look for a descendant of the target</li>
-	     * <li>stopEvent {Boolean} : True to stop the event. That is stop propagation, and prevent the default action.</li>
-	     * <li>preventDefault {Boolean} : True to prevent the default action</li>
-	     * <li>stopPropagation {Boolean} : True to prevent event propagation</li>
-	     * <li>normalized {Boolean} : False to pass a browser event to the handler function instead of an Ext.EventObject</li>
-	     * <li>delay {Number} : The number of milliseconds to delay the invocation of the handler after te event fires.</li>
-	     * <li>single {Boolean} : True to add a handler to handle just the next firing of the event, and then remove itself.</li>
-	     * <li>buffer {Number} : Causes the handler to be scheduled to run in an {@link Ext.util.DelayedTask} delayed
+	     * <li>scope : Object<div class="sub-desc">The scope (<b><code>this</code></b> reference) in which the handler function is executed. <b>Defaults to the Element</b>.</div></li>
+	     * <li>delegate : String<div class="sub-desc">A simple selector to filter the target or look for a descendant of the target</div></li>
+	     * <li>stopEvent : Boolean<div class="sub-desc">True to stop the event. That is stop propagation, and prevent the default action.</div></li>
+	     * <li>preventDefault : Boolean<div class="sub-desc">True to prevent the default action</div></li>
+	     * <li>stopPropagation : Boolean<div class="sub-desc">True to prevent event propagation</div></li>
+	     * <li>normalized : Boolean<div class="sub-desc">False to pass a browser event to the handler function instead of an Ext.EventObject</div></li>
+	     * <li>delay : Number<div class="sub-desc">The number of milliseconds to delay the invocation of the handler after te event fires.</div></li>
+	     * <li>single : Boolean<div class="sub-desc">True to add a handler to handle just the next firing of the event, and then remove itself.</div></li>
+	     * <li>buffer : Number<div class="sub-desc">Causes the handler to be scheduled to run in an {@link Ext.util.DelayedTask} delayed
 	     * by the specified number of milliseconds. If the event fires again within that time, the original
-	     * handler is <em>not</em> invoked, but the new handler is scheduled in its place.</li>
-	     * <li>target {Element} : Only call the handler if the event was fired on the target Element, <i>not</i>
-	     * if the event was bubbled up from a child node.</li>
+	     * handler is <em>not</em> invoked, but the new handler is scheduled in its place.</div></li>
+	     * <li>target : Element<div class="sub-desc">Only call the handler if the event was fired on the target Element, <i>not</i> if the event was bubbled up from a child node.</div></li>
 	     * </ul><br>
 	     * <p>See {@link Ext.Element#addListener} for examples of how to use these options.</p>
 	     */
@@ -3698,7 +3702,7 @@ El.prototype = {
      * <li><b>preventDefault</b> Boolean: <div class="sub-desc">True to prevent the default action</div></li>
      * <li><b>stopPropagation</b> Boolean: <div class="sub-desc">True to prevent event propagation</div></li>
      * <li><b>normalized</b> Boolean: <div class="sub-desc">False to pass a browser event to the handler function instead of an Ext.EventObject</div></li>
-     * <li><b>target</b> Ext.Element: <div class="sub-desc">The event will be passed to handler only when it has bubbled up to the specified target element</div></li>
+     * <li><b>target</b> Ext.Element: <div class="sub-desc">Only call the handler if the event was fired on the target Element, <i>not</i> if the event was bubbled up from a child node.</div></li>
      * <li><b>delay</b> Number: <div class="sub-desc">The number of milliseconds to delay the invocation of the handler after the event fires.</div></li>
      * <li><b>single</b> Boolean: <div class="sub-desc">True to add a handler to handle just the next firing of the event, and then remove itself.</div></li>
      * <li><b>buffer</b> Number: <div class="sub-desc">Causes the handler to be scheduled to run in an {@link Ext.util.DelayedTask} delayed
@@ -8589,6 +8593,11 @@ Ext.select = Ext.Element.select;(function(){
         });     
         doc.body.appendChild(frame);
         
+        // This is required so that IE doesn't pop the response up in a new window.
+        if(Ext.isIE){
+           document.frames[id].name = id;
+        }
+        
         Ext.apply(form, {
             target: id,
             method: POST,
@@ -8618,18 +8627,18 @@ Ext.select = Ext.Element.select;(function(){
                 doc,
                 firstChild;
 
-            try { 
+            try{ 
                 doc = frame.contentWindow.document || frame.contentDocument || WINDOW.frames[id].document;
-                if (doc) {
-                    if (doc.body) {
-                        if (/textarea/i.test((firstChild = doc.body.firstChild || {}).tagName)) { // json response wrapped in textarea                        
+                if(doc){
+                    if(doc.body){
+                        if(/textarea/i.test((firstChild = doc.body.firstChild || {}).tagName)){ // json response wrapped in textarea                        
                             r.responseText = firstChild.value;
-                        } else {
+                        }else{
                             r.responseText = doc.body.innerHTML;
                         }
-                    } else {
-                        r.responseXML = doc.XMLDocument || doc;
-                       }
+                    }
+                    //in IE the document may still have a body even if returns XML.
+                    r.responseXML = doc.XMLDocument || doc;
                 }
             }
             catch(e) {}
@@ -11500,61 +11509,104 @@ Ext.util.MixedCollection.prototype.get = Ext.util.MixedCollection.prototype.item
  */
 Ext.util.JSON = new (function(){
     var useHasOwn = !!{}.hasOwnProperty,
-        isNative = Ext.USE_NATIVE_JSON && JSON && JSON.toString() == '[object JSON]';
+        isNative = function() {
+            var useNative = null;
 
-    // crashes Safari in some instances
-    //var validRE = /^("(\\.|[^"\\\n\r])*?"|[,:{}\[\]0-9.\-+Eaeflnr-u \n\r\t])+?$/;
-
-    var pad = function(n) {
-        return n < 10 ? "0" + n : n;
-    };
-
-    var m = {
-        "\b": '\\b',
-        "\t": '\\t',
-        "\n": '\\n',
-        "\f": '\\f',
-        "\r": '\\r',
-        '"' : '\\"',
-        "\\": '\\\\'
-    };
-
-    var encodeString = function(s){
-        if (/["\\\x00-\x1f]/.test(s)) {
-            return '"' + s.replace(/([\x00-\x1f\\"])/g, function(a, b) {
-                var c = m[b];
-                if(c){
-                    return c;
+            return function() {
+                if (useNative === null) {
+                    useNative = Ext.USE_NATIVE_JSON && window.JSON && JSON.toString() == '[object JSON]';
                 }
-                c = b.charCodeAt();
-                return "\\u00" +
-                    Math.floor(c / 16).toString(16) +
-                    (c % 16).toString(16);
-            }) + '"';
-        }
-        return '"' + s + '"';
-    };
-
-    var encodeArray = function(o){
-        var a = ["["], b, i, l = o.length, v;
-            for (i = 0; i < l; i += 1) {
-                v = o[i];
-                switch (typeof v) {
-                    case "undefined":
-                    case "function":
-                    case "unknown":
-                        break;
-                    default:
-                        if (b) {
-                            a.push(',');
+        
+                return useNative;
+            };
+        }(),
+        pad = function(n) {
+            return n < 10 ? "0" + n : n;
+        },
+        doDecode = function(json){
+            return eval("(" + json + ')');    
+        },
+        doEncode = function(o){
+            if(typeof o == "undefined" || o === null){
+                return "null";
+            }else if(Ext.isArray(o)){
+                return encodeArray(o);
+            }else if(Object.prototype.toString.apply(o) === '[object Date]'){
+                return Ext.util.JSON.encodeDate(o);
+            }else if(typeof o == "string"){
+                return encodeString(o);
+            }else if(typeof o == "number"){
+                return isFinite(o) ? String(o) : "null";
+            }else if(typeof o == "boolean"){
+                return String(o);
+            }else {
+                var a = ["{"], b, i, v;
+                for (i in o) {
+                    if(!useHasOwn || o.hasOwnProperty(i)) {
+                        v = o[i];
+                        switch (typeof v) {
+                        case "undefined":
+                        case "function":
+                        case "unknown":
+                            break;
+                        default:
+                            if(b){
+                                a.push(',');
+                            }
+                            a.push(doEncode(i), ":",
+                                    v === null ? "null" : doEncode(v));
+                            b = true;
                         }
-                        a.push(v === null ? "null" : Ext.util.JSON.encode(v));
-                        b = true;
+                    }
                 }
+                a.push("}");
+                return a.join("");
+            }    
+        },
+        m = {
+            "\b": '\\b',
+            "\t": '\\t',
+            "\n": '\\n',
+            "\f": '\\f',
+            "\r": '\\r',
+            '"' : '\\"',
+            "\\": '\\\\'
+        },
+        encodeString = function(s){
+            if (/["\\\x00-\x1f]/.test(s)) {
+                return '"' + s.replace(/([\x00-\x1f\\"])/g, function(a, b) {
+                    var c = m[b];
+                    if(c){
+                        return c;
+                    }
+                    c = b.charCodeAt();
+                    return "\\u00" +
+                        Math.floor(c / 16).toString(16) +
+                        (c % 16).toString(16);
+                }) + '"';
             }
-            a.push("]");
-            return a.join("");
-    };
+            return '"' + s + '"';
+        },
+        encodeArray = function(o){
+            var a = ["["], b, i, l = o.length, v;
+                for (i = 0; i < l; i += 1) {
+                    v = o[i];
+                    switch (typeof v) {
+                        case "undefined":
+                        case "function":
+                        case "unknown":
+                            break;
+                        default:
+                            if (b) {
+                                a.push(',');
+                            }
+                            a.push(v === null ? "null" : Ext.util.JSON.encode(v));
+                            b = true;
+                    }
+                }
+                a.push("]");
+                return a.join("");
+        };
 
     this.encodeDate = function(o){
         return '"' + o.getFullYear() + "-" +
@@ -11570,52 +11622,34 @@ Ext.util.JSON = new (function(){
      * @param {Mixed} o The variable to encode
      * @return {String} The JSON string
      */
-    this.encode = isNative ? JSON.stringify : function(o){
-        if(typeof o == "undefined" || o === null){
-            return "null";
-        }else if(Ext.isArray(o)){
-            return encodeArray(o);
-        }else if(Object.prototype.toString.apply(o) === '[object Date]'){
-            return Ext.util.JSON.encodeDate(o);
-        }else if(typeof o == "string"){
-            return encodeString(o);
-        }else if(typeof o == "number"){
-            return isFinite(o) ? String(o) : "null";
-        }else if(typeof o == "boolean"){
-            return String(o);
-        }else {
-            var a = ["{"], b, i, v;
-            for (i in o) {
-                if(!useHasOwn || o.hasOwnProperty(i)) {
-                    v = o[i];
-                    switch (typeof v) {
-                    case "undefined":
-                    case "function":
-                    case "unknown":
-                        break;
-                    default:
-                        if(b){
-                            a.push(',');
-                        }
-                        a.push(this.encode(i), ":",
-                                v === null ? "null" : this.encode(v));
-                        b = true;
-                    }
-                }
+    this.encode = function() {
+        var ec;
+        return function(o) {
+            if (!ec) {
+                // setup encoding function on first access
+                ec = isNative() ? JSON.stringify : doEncode;
             }
-            a.push("}");
-            return a.join("");
-        }
-    };
+            return ec(o);
+        };
+    }();
+
 
     /**
      * Decodes (parses) a JSON string to an object. If the JSON is invalid, this function throws a SyntaxError unless the safe option is set.
      * @param {String} json The JSON string
      * @return {Object} The resulting object
      */
-    this.decode = isNative ? JSON.parse : function(json){
-        return eval("(" + json + ')');    
-    };
+    this.decode = function() {
+        var dc;
+        return function(json) {
+            if (!dc) {
+                // setup decoding function on first access
+                dc = isNative() ? JSON.parse : doDecode;
+            }
+            return dc(json);
+        };
+    }();
+
 })();
 /**
  * Shorthand for {@link Ext.util.JSON#encode}

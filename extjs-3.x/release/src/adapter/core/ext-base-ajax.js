@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 /*
  * Portions of this file are based on pieces of Yahoo User Interface Library
  * Copyright (c) 2007, Yahoo! Inc. All rights reserved.
@@ -287,7 +293,7 @@
 					            if (opt.selected) {
 						            data += String.format("{0}={1}&", 						            					  
 						            					 encoder(name),						            					 
-						            					  (opt.hasAttribute ? opt.hasAttribute('value') : opt.getAttribute('value') !== null) ? opt.value : opt.text);
+						            					  (opt.hasAttribute ? opt.hasAttribute('value') : opt.getAttributeNode('value').specified) ? opt.value : opt.text);
                                 }								
                             });
 		                } else if(!/file|undefined|reset|button/i.test(type)) {

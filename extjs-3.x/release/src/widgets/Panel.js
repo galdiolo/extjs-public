@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 /**
  * @class Ext.Panel
  * @extends Ext.Container
@@ -1283,9 +1289,6 @@ new Ext.Panel({
         }
         Ext.Panel.superclass.afterRender.call(this); // do sizing calcs last
         this.initEvents();
-        if(this.frame && this.bbar && Ext.isIE && !Ext.isIE8){
-            this.el.repaint();
-        }
     },
 
     // private

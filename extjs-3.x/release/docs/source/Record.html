@@ -26,11 +26,11 @@
  * generate a subclass of Ext.data.Record configured with information about its constituent fields.
  * @param {Object} data (Optional) An object, the properties of which provide values for the new Record's
  * fields. If not specified the <code>{@link Ext.data.Field#defaultValue defaultValue}</code>
- * for each field will be assigned. 
+ * for each field will be assigned.
  * @param {Object} id (Optional) The id of the Record. This id should be unique, and is used by the
  * {@link Ext.data.Store} object which owns the Record to index its collection of Records. If
  * an <code>id</code> is not specified a <b><code>{@link #phantom}</code></b> Record will be created
- * with an {@link #Record.id automatically generated id}. 
+ * with an {@link #Record.id automatically generated id}.
  */
 Ext.data.Record = function(data, id){
     // if no id, call the auto id method
@@ -142,14 +142,14 @@ Ext.data.Record.prototype = {
      */
     dirty : false,
     editing : false,
-    error: null,
+    error : null,
     <div id="prop-Ext.data.Record-modified"></div>/**
      * This object contains a key and value storing the original values of all modified
      * fields or is null if no fields have been modified.
      * @property modified
      * @type {Object}
      */
-    modified: null,
+    modified : null,
     <div id="prop-Ext.data.Record-phantom"></div>/**
      * <tt>false</tt> when the record does not yet exist in a server-side database (see
      * {@link #markDirty}).  Any record which has a real database pk set as its id property
@@ -201,7 +201,7 @@ rec.{@link #commit}(); // updates the view
      * event fire.</li>
      * </ul></div>
      * @param {String} name The {@link Ext.data.Field#name name of the field} to set.
-     * @param {Object} value The value to set the field to.
+     * @param {String/Object/Array} value The value to set the field to.
      */
     set : function(name, value){
         var isObj = (typeof value === 'object');
@@ -224,21 +224,21 @@ rec.{@link #commit}(); // updates the view
     },
 
     // private
-    afterEdit: function(){
+    afterEdit : function(){
         if(this.store){
             this.store.afterEdit(this);
         }
     },
 
     // private
-    afterReject: function(){
+    afterReject : function(){
         if(this.store){
             this.store.afterReject(this);
         }
     },
 
     // private
-    afterCommit: function(){
+    afterCommit : function(){
         if(this.store){
             this.store.afterCommit(this);
         }
@@ -254,9 +254,9 @@ rec.{@link #commit}(); // updates the view
     },
 
     <div id="method-Ext.data.Record-beginEdit"></div>/**
-     * Begin an edit. While in edit mode, no events (eg. the <code>update</code> event)
-     * are relayed to the containing store.  
-     * See also: <code>{@link #endEdit}</code> and <code>{@link #cancelEdit}</code>. 
+     * Begin an edit. While in edit mode, no events (e.g.. the <code>update</code> event)
+     * are relayed to the containing store.
+     * See also: <code>{@link #endEdit}</code> and <code>{@link #cancelEdit}</code>.
      */
     beginEdit : function(){
         this.editing = true;
@@ -398,6 +398,7 @@ rec.{@link #commit}(); // updates the view
             this.modified[f.name] = this.data[f.name];
         },this);
     }
-};</pre>    
+};
+</pre>    
 </body>
 </html>

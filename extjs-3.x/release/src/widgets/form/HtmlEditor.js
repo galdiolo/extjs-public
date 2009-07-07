@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 /**
  * @class Ext.form.HtmlEditor
  * @extends Ext.form.Field
@@ -206,6 +212,7 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
                 handler:handler||editor.relayBtnCmd,
                 clickEvent:'mousedown',
                 tooltip: tipsEnabled ? editor.buttonTips[id] || undefined : undefined,
+                overflowText: editor.buttonTips[id].title || undefined,
                 tabIndex:-1
             };
         }

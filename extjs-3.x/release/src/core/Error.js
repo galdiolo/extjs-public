@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 /**
  * Framework-wide error-handler.  Developers can override this method to provide
  * custom exception-handling.  Framework errors will often extend from the base

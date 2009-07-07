@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 (function(){
     var BEFOREREQUEST = "beforerequest",
         REQUESTCOMPLETE = "requestcomplete",
@@ -129,6 +135,11 @@
         });     
         doc.body.appendChild(frame);
         
+        // This is required so that IE doesn't pop the response up in a new window.
+        if(Ext.isIE){
+           document.frames[id].name = id;
+        }
+        
         Ext.apply(form, {
             target: id,
             method: POST,
@@ -158,18 +169,18 @@
                 doc,
                 firstChild;
 
-            try { 
+            try{ 
                 doc = frame.contentWindow.document || frame.contentDocument || WINDOW.frames[id].document;
-                if (doc) {
-                    if (doc.body) {
-                        if (/textarea/i.test((firstChild = doc.body.firstChild || {}).tagName)) { // json response wrapped in textarea                        
+                if(doc){
+                    if(doc.body){
+                        if(/textarea/i.test((firstChild = doc.body.firstChild || {}).tagName)){ // json response wrapped in textarea                        
                             r.responseText = firstChild.value;
-                        } else {
+                        }else{
                             r.responseText = doc.body.innerHTML;
                         }
-                    } else {
-                        r.responseXML = doc.XMLDocument || doc;
-                       }
+                    }
+                    //in IE the document may still have a body even if returns XML.
+                    r.responseXML = doc.XMLDocument || doc;
                 }
             }
             catch(e) {}

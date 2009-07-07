@@ -90,37 +90,14 @@ Ext.data.Store = function(config){
     // temporary removed-records cache
     this.removed = [];
 
-    <div id="prop-Ext.data.Store-paramNames"></div>/**
-     * <p>An object containing properties which specify the names of the paging and
-     * sorting parameters passed to remote servers when loading blocks of data. By default, this
-     * object takes the following form:</p><pre><code>
-{
-    start : 'start',  // The parameter name which specifies the start row
-    limit : 'limit',  // The parameter name which specifies number of rows to return
-    sort : 'sort',    // The parameter name which specifies the column to sort on
-    dir : 'dir'       // The parameter name which specifies the sort direction
-}
-</code></pre>
-     * <p>The server must produce the requested data block upon receipt of these parameter names.
-     * If different parameter names are required, this property can be overriden using a configuration
-     * property.</p>
-     * <p>A {@link Ext.PagingToolbar PagingToolbar} bound to this Store uses this property to determine
-     * the parameter names to use in its {@link #load requests}.
-     * @property
-     */
-    this.paramNames = {
-        'start' : 'start',
-        'limit' : 'limit',
-        'sort' : 'sort',
-        'dir' : 'dir'
-    };
-
     if(config && config.data){
         this.inlineData = config.data;
         delete config.data;
     }
 
     Ext.apply(this, config);
+    
+    this.paramNames = Ext.applyIf(this.paramNames || {}, this.defaultParamNames);
 
     if(this.url && !this.proxy){
         this.proxy = new Ext.data.HttpProxy({url: this.url});
@@ -305,7 +282,7 @@ var grid = new Ext.grid.EditorGridPanel({
          * See {@link Ext.data.DataProxy}.{@link Ext.data.DataProxy#loadexception loadexception}
          * for additional details.
          * @param {misc} misc See {@link Ext.data.DataProxy}.{@link Ext.data.DataProxy#loadexception loadexception}
-         * for description. 
+         * for description.
          */
         'loadexception',
         <div id="event-Ext.data.Store-beforewrite"></div>/**
@@ -519,6 +496,38 @@ sortInfo: {
      * internally be set to <tt>false</tt>.</p>
      */
     restful: false,
+    
+    <div id="cfg-Ext.data.Store-paramNames"></div>/**
+     * @cfg {Object} paramNames
+     * <p>An object containing properties which specify the names of the paging and
+     * sorting parameters passed to remote servers when loading blocks of data. By default, this
+     * object takes the following form:</p><pre><code>
+{
+    start : 'start',  // The parameter name which specifies the start row
+    limit : 'limit',  // The parameter name which specifies number of rows to return
+    sort : 'sort',    // The parameter name which specifies the column to sort on
+    dir : 'dir'       // The parameter name which specifies the sort direction
+}
+</code></pre>
+     * <p>The server must produce the requested data block upon receipt of these parameter names.
+     * If different parameter names are required, this property can be overriden using a configuration
+     * property.</p>
+     * <p>A {@link Ext.PagingToolbar PagingToolbar} bound to this Store uses this property to determine
+     * the parameter names to use in its {@link #load requests}.
+     */
+    paramNames : undefined,
+    
+    <div id="cfg-Ext.data.Store-defaultParamNames"></div>/**
+     * @cfg {Object} defaultParamNames
+     * Provides the default values for the {@link #paramNames} property. To globally modify the parameters
+     * for all stores, this object should be changed on the store prototype.
+     */
+    defaultParamNames : {
+        start : 'start',
+        limit : 'limit',
+        sort : 'sort',
+        dir : 'dir'
+    },
 
     <div id="method-Ext.data.Store-destroy"></div>/**
      * Destroys the store.
@@ -846,7 +855,7 @@ sortInfo: {
      * {@link #getModifiedRecords modified records}  Ext.data.Api.actions.update
      * </pre>
      * @TODO:  Create extensions of Error class and send associated Record with thrown exceptions.
-     * eg:  Ext.data.DataReader.Error or Ext.data.Error or Ext.data.DataProxy.Error, etc.
+     * e.g.:  Ext.data.DataReader.Error or Ext.data.Error or Ext.data.DataProxy.Error, etc.
      */
     save : function() {
         if (!this.writer) {
@@ -922,6 +931,7 @@ sortInfo: {
 
     // Clears records from modified array after an exception event.
     // NOTE:  records are left marked dirty.  Do we want to commit them even though they were not updated/realized?
+    // TODO remove this method?
     clearModified : function(rs) {
         if (Ext.isArray(rs)) {
             for (var n=rs.length-1;n>=0;n--) {
@@ -1422,6 +1432,12 @@ sortInfo: {
         var m = this.modified.slice(0);
         this.modified = [];
         for(var i = 0, len = m.length; i < len; i++){
+            m[i].reject();
+        }
+        var m = this.removed.slice(0).reverse();
+        this.removed = [];
+        for(var i = 0, len = m.length; i < len; i++){
+            this.insert(m[i].lastIndex||0, m[i]);
             m[i].reject();
         }
     },

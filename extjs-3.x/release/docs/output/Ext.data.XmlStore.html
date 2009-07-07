@@ -73,12 +73,14 @@ and sent as one transaction. Only applies when <code><a href="output/Ext.data.St
 to <tt>false</tt>.</p>
 <br><p>If Store is RESTful, the DataProxy is also RESTful, and a unique transaction is
 generated for each record.</p></div></div></td><td class="msource"><a href="output/Ext.data.Store.html#batch" ext:member="#batch" ext:cls="Ext.data.Store">Store</a></td></tr><tr class="config-row  inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.Store-data"></a><b><a href="source/Store.html#cfg-Ext.data.Store-data">data</a></b> : Array<div class="mdesc">An inline data object readable by the <code><a href="output/Ext.data.Store.html#Ext.data.Store-reader" ext:member="reader" ext:cls="Ext.data.Store">reader</a></code>.
-Typically this option, or the <code><a href="output/Ext.data.Store.html#Ext.data.Store-url" ext:member="url" ext:cls="Ext.data.Store">url</a></code> option will be specified.</div></td><td class="msource"><a href="output/Ext.data.Store.html#data" ext:member="#data" ext:cls="Ext.data.Store">Store</a></td></tr><tr class="config-row expandable inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.util.Observable-listeners"></a><b><a href="source/Observable.html#cfg-Ext.util.Observable-listeners">listeners</a></b> : Object<div class="mdesc"><div class="short">A config object containing one or more event handlers to be added to this
+Typically this option, or the <code><a href="output/Ext.data.Store.html#Ext.data.Store-url" ext:member="url" ext:cls="Ext.data.Store">url</a></code> option will be specified.</div></td><td class="msource"><a href="output/Ext.data.Store.html#data" ext:member="#data" ext:cls="Ext.data.Store">Store</a></td></tr><tr class="config-row expandable inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.Store-defaultParamNames"></a><b><a href="source/Store.html#cfg-Ext.data.Store-defaultParamNames">defaultParamNames</a></b> : Object<div class="mdesc"><div class="short">Provides the default values for the paramNames property. To globally modify the parameters
+for all stores, this objec...</div><div class="long">Provides the default values for the <a href="output/Ext.data.Store.html#Ext.data.Store-paramNames" ext:member="paramNames" ext:cls="Ext.data.Store">paramNames</a> property. To globally modify the parameters
+for all stores, this object should be changed on the store prototype.</div></div></td><td class="msource"><a href="output/Ext.data.Store.html#defaultParamNames" ext:member="#defaultParamNames" ext:cls="Ext.data.Store">Store</a></td></tr><tr class="config-row expandable inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.util.Observable-listeners"></a><b><a href="source/Observable.html#cfg-Ext.util.Observable-listeners">listeners</a></b> : Object<div class="mdesc"><div class="short">A config object containing one or more event handlers to be added to this
 object during initialization.  This should ...</div><div class="long"><p>A config object containing one or more event handlers to be added to this
 object during initialization.  This should be a valid listeners config object as specified in the
 <a href="output/Ext.util.Observable.html#Ext.util.Observable-addListener" ext:member="addListener" ext:cls="Ext.util.Observable">addListener</a> example for attaching multiple handlers at once.</p>
 <br><p><b><u>DOM events from ExtJs <a href="output/Ext.Component.html" ext:cls="Ext.Component">Components</a></u></b></p>
-<br><p>While <i>some</i> ExtJs Component classes export selected DOM events (eg "click", "mouseover" etc), this
+<br><p>While <i>some</i> ExtJs Component classes export selected DOM events (e.g. "click", "mouseover" etc), this
 is usually only done when extra value can be added. For example the <a href="output/Ext.DataView.html" ext:cls="Ext.DataView">DataView</a>'s
 <b><code><a href="output/Ext.DataView.html#Ext.DataView-click" ext:member="click" ext:cls="Ext.DataView">click</a></code></b> event passing the node clicked on. To access DOM
 events directly from a Component's HTMLElement, listeners must be added to the <i><a href="output/Ext.Component.html#Ext.Component-getEl" ext:member="getEl" ext:cls="Ext.Component">Element</a></i> after the Component
@@ -128,7 +130,20 @@ Ext.DomObserver = Ext.extend(Object, {
     typeAhead: true,
     mode: <em>'local'</em>,
     triggerAction: <em>'all'</em>
-});</code></pre></p></div></div></td><td class="msource"><a href="output/Ext.util.Observable.html#listeners" ext:member="#listeners" ext:cls="Ext.util.Observable">Observable</a></td></tr><tr class="config-row  inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.Store-proxy"></a><b><a href="source/Store.html#cfg-Ext.data.Store-proxy">proxy</a></b> : Ext.data.DataProxy<div class="mdesc">The <a href="output/Ext.data.DataProxy.html" ext:cls="Ext.data.DataProxy">DataProxy</a> object which provides
+});</code></pre></p></div></div></td><td class="msource"><a href="output/Ext.util.Observable.html#listeners" ext:member="#listeners" ext:cls="Ext.util.Observable">Observable</a></td></tr><tr class="config-row expandable inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.Store-paramNames"></a><b><a href="source/Store.html#cfg-Ext.data.Store-paramNames">paramNames</a></b> : Object<div class="mdesc"><div class="short">An object containing properties which specify the names of the paging and
+sorting parameters passed to remote servers...</div><div class="long"><p>An object containing properties which specify the names of the paging and
+sorting parameters passed to remote servers when loading blocks of data. By default, this
+object takes the following form:</p><pre><code>{
+    start : <em>'start'</em>,  <i>// The parameter name which specifies the start row</i>
+    limit : <em>'limit'</em>,  <i>// The parameter name which specifies number of rows to <b>return</b></i>
+    sort : <em>'sort'</em>,    <i>// The parameter name which specifies the column to sort on</i>
+    dir : <em>'dir'</em>       <i>// The parameter name which specifies the sort direction</i>
+}</code></pre>
+<p>The server must produce the requested data block upon receipt of these parameter names.
+If different parameter names are required, this property can be overriden using a configuration
+property.</p>
+<p>A <a href="output/Ext.PagingToolbar.html" ext:cls="Ext.PagingToolbar">PagingToolbar</a> bound to this Store uses this property to determine
+the parameter names to use in its <a href="output/Ext.data.Store.html#Ext.data.Store-load" ext:member="load" ext:cls="Ext.data.Store">requests</a>.</div></div></td><td class="msource"><a href="output/Ext.data.Store.html#paramNames" ext:member="#paramNames" ext:cls="Ext.data.Store">Store</a></td></tr><tr class="config-row  inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.Store-proxy"></a><b><a href="source/Store.html#cfg-Ext.data.Store-proxy">proxy</a></b> : Ext.data.DataProxy<div class="mdesc">The <a href="output/Ext.data.DataProxy.html" ext:cls="Ext.data.DataProxy">DataProxy</a> object which provides
 access to a data object.  See <code><a href="output/Ext.data.Store.html#Ext.data.Store-url" ext:member="url" ext:cls="Ext.data.Store">url</a></code>.</div></td><td class="msource"><a href="output/Ext.data.Store.html#proxy" ext:member="#proxy" ext:cls="Ext.data.Store">Store</a></td></tr><tr class="config-row expandable inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.Store-pruneModifiedRecords"></a><b><a href="source/Store.html#cfg-Ext.data.Store-pruneModifiedRecords">pruneModifiedRecords</a></b> : Boolean<div class="mdesc"><div class="short">true to clear all modified record information each time
 the store is loaded or when a record is removed (defaults to ...</div><div class="long"><tt>true</tt> to clear all modified record information each time
 the store is loaded or when a record is removed (defaults to <tt>false</tt>). See <a href="output/Ext.data.Store.html#Ext.data.Store-getModifiedRecords" ext:member="getModifiedRecords" ext:cls="Ext.data.Store">getModifiedRecords</a>
@@ -187,28 +202,137 @@ events on the store are monitored in order to remotely <a href="output/Ext.data.
     paramsAsHash: true,
     autoSave: false    <i>// <-- false to delay executing create, update, destroy requests</i>
                         <i>//     until specifically told to <b>do</b> so.</i>
-});</code></pre></p></div></div></td><td class="msource"><a href="output/Ext.data.Store.html#writer" ext:member="#writer" ext:cls="Ext.data.Store">Store</a></td></tr></tbody></table><a id="Ext.data.XmlStore-props"></a><h2>Public Properties</h2><table cellspacing="0" class="member-table"><tbody><tr><th colspan="2" class="sig-header">Property</th><th class="msource-header">Defined By</th></tr><tr class="property-row expandable inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.Store-baseParams"></a><b><a href="source/Store.html#prop-Ext.data.Store-baseParams">baseParams</a></b> : Object<div class="mdesc"><div class="short">See the corresponding configuration option
+});</code></pre></p></div></div></td><td class="msource"><a href="output/Ext.data.Store.html#writer" ext:member="#writer" ext:cls="Ext.data.Store">Store</a></td></tr></tbody></table><a id="Ext.data.XmlStore-props"></a><h2>Public Properties</h2><table cellspacing="0" class="member-table"><tbody><tr><th colspan="2" class="sig-header">Property</th><th class="msource-header">Defined By</th></tr><tr class="property-row  "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-"></a><b><a href="source/ext-lang-vn.html#prop-Ext.data.XmlStore-"></a></b> : Object<div class="mdesc">List compiled by mystix on the extjs.com forums.
+Thank you Mystix!</div></td><td class="msource">XmlStore</td></tr><tr class="property-row  "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-Slovak"></a><b><a href="source/ext-lang-sk.html#prop-Ext.data.XmlStore-Slovak">Slovak</a></b> : Object<div class="mdesc">List compiled by mystix on the extjs.com forums.
+Thank you Mystix!</div></td><td class="msource">XmlStore</td></tr><tr class="property-row expandable inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.Store-baseParams"></a><b><a href="source/Store.html#prop-Ext.data.Store-baseParams">baseParams</a></b> : Object<div class="mdesc"><div class="short">See the corresponding configuration option
 for a description of this property.
 To modify this property see setBasePar...</div><div class="long">See the <code><a href="output/Ext.data.Store.html#Ext.data.Store-baseParams" ext:member="baseParams" ext:cls="Ext.data.Store">corresponding configuration option</a></code>
 for a description of this property.
 To modify this property see <code><a href="output/Ext.data.Store.html#Ext.data.Store-setBaseParam" ext:member="setBaseParam" ext:cls="Ext.data.Store">setBaseParam</a></code>.</div></div></td><td class="msource"><a href="output/Ext.data.Store.html#baseParams" ext:member="#baseParams" ext:cls="Ext.data.Store">Store</a></td></tr><tr class="property-row  inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.Store-fields"></a><b><a href="source/Store.html#prop-Ext.data.Store-fields">fields</a></b> : Ext.util.MixedCollection<div class="mdesc">A <a href="output/Ext.util.MixedCollection.html" ext:cls="Ext.util.MixedCollection">MixedCollection</a> containing the defined <a href="output/Ext.data.Field.html" ext:cls="Ext.data.Field">Field</a>s
-for the <a href="output/Ext.data.Record.html" ext:cls="Ext.data.Record">Records</a> stored in this Store. Read-only.</div></td><td class="msource"><a href="output/Ext.data.Store.html#fields" ext:member="#fields" ext:cls="Ext.data.Store">Store</a></td></tr><tr class="property-row expandable inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.Store-lastOptions"></a><b><a href="source/Store.html#prop-Ext.data.Store-lastOptions">lastOptions</a></b> : Object<div class="mdesc"><div class="short">Contains the last options object used as the parameter to the load method. See load
+for the <a href="output/Ext.data.Record.html" ext:cls="Ext.data.Record">Records</a> stored in this Store. Read-only.</div></td><td class="msource"><a href="output/Ext.data.Store.html#fields" ext:member="#fields" ext:cls="Ext.data.Store">Store</a></td></tr><tr class="property-row  "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-lv.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc">Latvian Translations
+By salix 17 April 2007</div></td><td class="msource">XmlStore</td></tr><tr class="property-row  "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-gr.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc">Greek (Old Version) Translations by Vagelis
+03-June-2007</div></td><td class="msource">XmlStore</td></tr><tr class="property-row  "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-vn.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc">Vietnamese translation
+By bpmtri
+12-April-2007 04:06PM</div></td><td class="msource">XmlStore</td></tr><tr class="property-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-en.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc"><div class="short">List compiled by mystix on the extjs.com forums.
+Thank you Mystix!
+English Translations
+updated to 2.2 by Condor (8 A...</div><div class="long">List compiled by mystix on the extjs.com forums.
+Thank you Mystix!
+English Translations
+updated to 2.2 by Condor (8 Aug 2008)</div></div></td><td class="msource">XmlStore</td></tr><tr class="property-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-sv_SE.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc"><div class="short">Swedish translation (utf8-encoding)
+By Erik Andersson, Monator Technologies
+24 April 2007
+Changed by Cariad, 29 July ...</div><div class="long">Swedish translation (utf8-encoding)
+By Erik Andersson, Monator Technologies
+24 April 2007
+Changed by Cariad, 29 July 2007</div></div></td><td class="msource">XmlStore</td></tr><tr class="property-row  "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-no_NB.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc">Norwegian translation (Bokmål: no-NB)
+By Tore Kjørsvik 21-January-2008</div></td><td class="msource">XmlStore</td></tr><tr class="property-row  "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-no_NN.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc">Norwegian translation (Nynorsk: no-NN)
+By Tore Kjørsvik 21-January-2008</div></td><td class="msource">XmlStore</td></tr><tr class="property-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-el_GR.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc"><div class="short">Greek translation
+By thesilentman (utf8 encoding)
+27 Apr 2008
+Changes since previous (second) Version:
++ added Date.s...</div><div class="long">Greek translation
+By thesilentman (utf8 encoding)
+27 Apr 2008
+Changes since previous (second) Version:
++ added Date.shortMonthNames 
++ added Date.getShortMonthName 
++ added Date.monthNumbers
++ added Ext.grid.GroupingView</div></div></td><td class="msource">XmlStore</td></tr><tr class="property-row  "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-pl.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc">Polish Translations
+By vbert 17-April-2007
+Updated by mmar 16-November-2007
+Encoding: utf-8</div></td><td class="msource">XmlStore</td></tr><tr class="property-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-pt_BR.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc"><div class="short">Portuguese/Brazil Translation by Weber Souza
+08 April 2007
+Updated by Allan Brazute Alves (EthraZa)
+06 September 2007...</div><div class="long">Portuguese/Brazil Translation by Weber Souza
+08 April 2007
+Updated by Allan Brazute Alves (EthraZa)
+06 September 2007
+Updated by Leonardo Lima
+05 March 2008
+Updated by Juliano Tarini (jtarini)
+22 April 2008</div></div></td><td class="msource">XmlStore</td></tr><tr class="property-row  "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-cs.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc">Czech Translations
+Translated by Tomáš Korčák (72)
+2008/02/08 18:02, Ext-2.0.1</div></td><td class="msource">XmlStore</td></tr><tr class="property-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-lt.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc"><div class="short">Lithuanian Translations (UTF-8)
+Vladas Saulis (vladas at prodata dot lt),  03-29-2009
+Vladas Saulis (vladas at prodat...</div><div class="long">Lithuanian Translations (UTF-8)
+Vladas Saulis (vladas at prodata dot lt),  03-29-2009
+Vladas Saulis (vladas at prodata dot lt),  10-18-2007</div></div></td><td class="msource">XmlStore</td></tr><tr class="property-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-id.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc"><div class="short">Pedoman translasi:
+http://id.wikisource.org/wiki/Panduan_Pembakuan_Istilah,_Pelaksanaan_Instruksi_Presiden_Nomor_2_Ta...</div><div class="long">Pedoman translasi:
+http://id.wikisource.org/wiki/Panduan_Pembakuan_Istilah,_Pelaksanaan_Instruksi_Presiden_Nomor_2_Tahun_2001_Tentang_Penggunaan_Komputer_Dengan_Aplikasi_Komputer_Berbahasa_Indonesia
+Original source: http://vlsm.org/etc/baku-0.txt
+by Farid GS
+farid [at] pulen.net
+10:13 04 Desember 2007
+Indonesian Translations</div></div></td><td class="msource">XmlStore</td></tr><tr class="property-row  "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-he.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc">Hebrew Translations
+By spartacus (from forums) 06-12-2007</div></td><td class="msource">XmlStore</td></tr><tr class="property-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-ro.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc"><div class="short">Romanian translations for ExtJS 2.1
+First released by Lucian Lature on 2007-04-24
+Changed locale for Romania (date fo...</div><div class="long">Romanian translations for ExtJS 2.1
+First released by Lucian Lature on 2007-04-24
+Changed locale for Romania (date formats) as suggested by keypoint
+on ExtJS forums: http://www.extjs.com/forum/showthread.php?p=129524#post129524
+Removed some useless parts
+Changed by: Emil Cazamir, 2008-04-24
+Fixed some errors left behind
+Changed by: Emil Cazamir, 2008-09-01</div></div></td><td class="msource">XmlStore</td></tr><tr class="property-row  "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-sl.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc">Slovenian translation by Matjaž (UTF-8 encoding)
+25 April 2007</div></td><td class="msource">XmlStore</td></tr><tr class="property-row  "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-fi.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc">Finnish Translations
+<tuomas.salo (at) iki.fi>
+'ä' should read as lowercase 'a' with two dots on top (&auml;)</div></td><td class="msource">XmlStore</td></tr><tr class="property-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-hu.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc"><div class="short">List compiled by mystix on the extjs.com forums.
+Thank you Mystix!
+Hungarian Translations (utf-8 encoded)
+by Amon  (2...</div><div class="long">List compiled by mystix on the extjs.com forums.
+Thank you Mystix!
+Hungarian Translations (utf-8 encoded)
+by Amon <amon@theba.hu> (27 Apr 2008)
+encoding fixed by Vili (17 Feb 2009)</div></div></td><td class="msource">XmlStore</td></tr><tr class="property-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-en_GB.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc"><div class="short">List compiled by mystix on the extjs.com forums.
+Thank you Mystix!
+English (UK) Translations
+updated to 2.2 by Condor...</div><div class="long">List compiled by mystix on the extjs.com forums.
+Thank you Mystix!
+English (UK) Translations
+updated to 2.2 by Condor (8 Aug 2008)</div></div></td><td class="msource">XmlStore</td></tr><tr class="property-row  "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-ko.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc">Korean Translations By nicetip
+05 September 2007
+Modify by techbug / 25 February 2008</div></td><td class="msource">XmlStore</td></tr><tr class="property-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-bg.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc"><div class="short">Bulgarian Translation
+By Георги Костадинов, Калгари, Канада
+10 October 2007
+By Nedko Penev 
+26 October 2007
+(utf-8 en...</div><div class="long">Bulgarian Translation
+By Георги Костадинов, Калгари, Канада
+10 October 2007
+By Nedko Penev 
+26 October 2007
+(utf-8 encoding)</div></div></td><td class="msource">XmlStore</td></tr><tr class="property-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-ca.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc"><div class="short">Catalonian Translation by halkon_polako 6-12-2007
+December correction halkon_polako 11-12-2007
+Synchronized with 2.2 ...</div><div class="long">Catalonian Translation by halkon_polako 6-12-2007
+December correction halkon_polako 11-12-2007
+Synchronized with 2.2 version of ext-lang-en.js (provided by Condor 8 aug 2008) 
+by halkon_polako 14-aug-2008</div></div></td><td class="msource">XmlStore</td></tr><tr class="property-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-pt_PT.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc"><div class="short">Ext 2.2.0 - Portuguese/Portugal (pt_PT) Translation
+by Nuno Franco da Costa - francodacosta.com
+translated from ext-l...</div><div class="long">Ext 2.2.0 - Portuguese/Portugal (pt_PT) Translation
+by Nuno Franco da Costa - francodacosta.com
+translated from ext-lang-en.js
+11 Nov 2008</div></div></td><td class="msource">XmlStore</td></tr><tr class="property-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-tr.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc"><div class="short">List compiled by mystix on the extjs.com forums.
+Thank you Mystix!
+Turkish translation by Alper YAZGAN
+2008-01-24, 10...</div><div class="long">List compiled by mystix on the extjs.com forums.
+Thank you Mystix!
+Turkish translation by Alper YAZGAN
+2008-01-24, 10:29 AM 
+Updated to 2.2 by YargicX
+2008-10-05, 06:22 PM</div></div></td><td class="msource">XmlStore</td></tr><tr class="property-row  "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-th.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc">List compiled by KillerNay on the extjs.com forums.
+Thank you KillerNay!
+Thailand Translations</div></td><td class="msource">XmlStore</td></tr><tr class="property-row expandable "><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.XmlStore-indicatorText"></a><b><a href="source/ext-lang-nl.html#prop-Ext.data.XmlStore-indicatorText">indicatorText</a></b> : Object<div class="mdesc"><div class="short">List compiled by mystix on the extjs.com forums.
+Thank you Mystix!
+Dutch Translations
+by Ido Sebastiaan Bas van Oostv...</div><div class="long">List compiled by mystix on the extjs.com forums.
+Thank you Mystix!
+Dutch Translations
+by Ido Sebastiaan Bas van Oostveen (12 Oct 2007)
+updated to 2.2 by Condor (8 Aug 2008)</div></div></td><td class="msource">XmlStore</td></tr><tr class="property-row expandable inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.Store-lastOptions"></a><b><a href="source/Store.html#prop-Ext.data.Store-lastOptions">lastOptions</a></b> : Object<div class="mdesc"><div class="short">Contains the last options object used as the parameter to the load method. See load
 for the details of what this may ...</div><div class="long">Contains the last options object used as the parameter to the <a href="output/Ext.data.Store.html#Ext.data.Store-load" ext:member="load" ext:cls="Ext.data.Store">load</a> method. See <a href="output/Ext.data.Store.html#Ext.data.Store-load" ext:member="load" ext:cls="Ext.data.Store">load</a>
 for the details of what this may contain. This may be useful for accessing any params which were used
-to load the current Record cache.</div></div></td><td class="msource"><a href="output/Ext.data.Store.html#lastOptions" ext:member="#lastOptions" ext:cls="Ext.data.Store">Store</a></td></tr><tr class="property-row expandable inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.Store-paramNames"></a><b><a href="source/Store.html#prop-Ext.data.Store-paramNames">paramNames</a></b> : Object<div class="mdesc"><div class="short">An object containing properties which specify the names of the paging and
-sorting parameters passed to remote servers...</div><div class="long"><p>An object containing properties which specify the names of the paging and
-sorting parameters passed to remote servers when loading blocks of data. By default, this
-object takes the following form:</p><pre><code>{
-    start : <em>'start'</em>,  <i>// The parameter name which specifies the start row</i>
-    limit : <em>'limit'</em>,  <i>// The parameter name which specifies number of rows to <b>return</b></i>
-    sort : <em>'sort'</em>,    <i>// The parameter name which specifies the column to sort on</i>
-    dir : <em>'dir'</em>       <i>// The parameter name which specifies the sort direction</i>
-}</code></pre>
-<p>The server must produce the requested data block upon receipt of these parameter names.
-If different parameter names are required, this property can be overriden using a configuration
-property.</p>
-<p>A <a href="output/Ext.PagingToolbar.html" ext:cls="Ext.PagingToolbar">PagingToolbar</a> bound to this Store uses this property to determine
-the parameter names to use in its <a href="output/Ext.data.Store.html#Ext.data.Store-load" ext:member="load" ext:cls="Ext.data.Store">requests</a>.</div></div></td><td class="msource"><a href="output/Ext.data.Store.html#paramNames" ext:member="#paramNames" ext:cls="Ext.data.Store">Store</a></td></tr><tr class="property-row expandable inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.Store-recordType"></a><b><a href="source/Store.html#prop-Ext.data.Store-recordType">recordType</a></b> : Function<div class="mdesc"><div class="short">The Record constructor as supplied to (or created by) the
+to load the current Record cache.</div></div></td><td class="msource"><a href="output/Ext.data.Store.html#lastOptions" ext:member="#lastOptions" ext:cls="Ext.data.Store">Store</a></td></tr><tr class="property-row expandable inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.data.Store-recordType"></a><b><a href="source/Store.html#prop-Ext.data.Store-recordType">recordType</a></b> : Function<div class="mdesc"><div class="short">The Record constructor as supplied to (or created by) the
 Reader. Read-only.
 If the Reader was constructed by passing...</div><div class="long">The <a href="output/Ext.data.Record.html" ext:cls="Ext.data.Record">Record</a> constructor as supplied to (or created by) the
 <a href="output/Ext.data.DataReader.html" ext:cls="Ext.data.DataReader">Reader</a>. Read-only.

@@ -9,7 +9,7 @@
 // for old browsers
 window.undefined = window.undefined;
 
-/**
+<div id="cls-Ext"></div>/**
  * @class Ext
  * Ext core utilities and functions.
  * @singleton
@@ -58,7 +58,8 @@ Ext.apply = function(o, c, defaults){
                 return true;
             }
             //NodeList has an item and length property
-            return (v.item && Ext.isNumber(v.length));
+            //IXMLDOMNodeList has nextNode method, needs to be checked first.
+            return ((v.nextNode || v.item) && Ext.isNumber(v.length));
         },
         ua = navigator.userAgent.toLowerCase(),
         check = function(r){
@@ -95,6 +96,12 @@ Ext.apply = function(o, c, defaults){
     }
 
     Ext.apply(Ext, {
+        <div id="prop-Ext-SSL_SECURE_URL"></div>/**
+         * URL to a blank file used by Ext when in secure mode for iframe src and onReady src to prevent
+         * the IE insecure content warning (defaults to javascript:false).
+         * @type String
+         */
+        SSL_SECURE_URL : 'javascript:false',
         <div id="prop-Ext-isStrict"></div>/**
          * True if the browser is in strict (standards-compliant) mode, as opposed to quirks mode
          * @type Boolean
@@ -697,7 +704,7 @@ Company.data.CustomStore = function(config) { ... }
 Ext.ns("Ext", "Ext.util", "Ext.lib", "Ext.data");
 
 
-/**
+<div id="cls-Function"></div>/**
  * @class Function
  * These functions are available on every Function object (any JavaScript function).
  */
@@ -856,7 +863,7 @@ sayHi.defer(2000, this, ['Fred']);
     }
 });
 
-/**
+<div id="cls-String"></div>/**
  * @class String
  * These functions are available on every String object.
  */

@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 Ext.onReady(function(){
     // basic tabs 1, built from existing content
     var tabs = new Ext.TabPanel({

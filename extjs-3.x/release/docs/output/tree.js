@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 
 		Docs.classData ={"id":"apidocs","iconCls":"icon-docs","text":"API Documentation","singleClickExpand":true,"children":[
                 {"id":"pkg-Ext","text":"Ext","iconCls":"icon-pkg","cls":"package","singleClickExpand":true, children:[

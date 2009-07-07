@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 //
 // Note that these are all defined as panel configs, rather than instantiated
 // as panel objects.  You could just as easily do this instead:

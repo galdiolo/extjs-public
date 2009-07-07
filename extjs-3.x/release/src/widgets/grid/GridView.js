@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 /**
  * @class Ext.grid.GridView
  * @extends Ext.util.Observable
@@ -943,9 +949,12 @@ viewConfig: {
         }
         col = (col !== undefined ? col : 0);
 
-        var rowEl = this.getRow(row), cellEl;
+        var rowEl = this.getRow(row),
+            cm = this.cm,
+            colCount = cm.getColumnCount(),
+            cellEl;
         if(!(hscroll === false && col === 0)){
-            while(this.cm.isHidden(col)){
+            while(col < colCount && cm.isHidden(col)){
                 col++;
             }
             cellEl = this.getCell(row, col);

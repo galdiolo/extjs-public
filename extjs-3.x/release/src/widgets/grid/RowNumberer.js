@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 /**
  * @class Ext.grid.RowNumberer
  * This is a utility class that can be passed into a {@link Ext.grid.ColumnModel} as a column config that provides

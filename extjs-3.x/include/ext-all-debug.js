@@ -1,11 +1,9 @@
 /*!
- * Ext JS Library 3.0 RC3
- * Copyright(c) 2006-2009, Ext JS, LLC.
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
  * licensing@extjs.com
- * 
- * http://extjs.com/license
+ * http://www.extjs.com/license
  */
-
 /**
  * @class Ext.DomHelper
  * <p>The DomHelper class provides a layer of abstraction from DOM and transparently supports creating
@@ -2494,23 +2492,21 @@ Ext.EventManager = function(){
 	     * Note that this may be filtered by using the <tt>delegate</tt> option.</div></li>
 	     * <li>o : Object<div class="sub-desc">The options object from the addListener call.</div></li>
 	     * </ul>
-	     * @param {Object} scope (optional) The scope in which to execute the handler
-	     * function (the handler function's "this" context)
+	     * @param {Object} scope (optional) The scope (<b><code>this</code></b> reference) in which the handler function is executed. <b>Defaults to the Element</b>.
 	     * @param {Object} options (optional) An object containing handler configuration properties.
 	     * This may contain any of the following properties:<ul>
-	     * <li>scope {Object} : The scope in which to execute the handler function. The handler function's "this" context.</li>
-	     * <li>delegate {String} : A simple selector to filter the target or look for a descendant of the target</li>
-	     * <li>stopEvent {Boolean} : True to stop the event. That is stop propagation, and prevent the default action.</li>
-	     * <li>preventDefault {Boolean} : True to prevent the default action</li>
-	     * <li>stopPropagation {Boolean} : True to prevent event propagation</li>
-	     * <li>normalized {Boolean} : False to pass a browser event to the handler function instead of an Ext.EventObject</li>
-	     * <li>delay {Number} : The number of milliseconds to delay the invocation of the handler after te event fires.</li>
-	     * <li>single {Boolean} : True to add a handler to handle just the next firing of the event, and then remove itself.</li>
-	     * <li>buffer {Number} : Causes the handler to be scheduled to run in an {@link Ext.util.DelayedTask} delayed
+	     * <li>scope : Object<div class="sub-desc">The scope (<b><code>this</code></b> reference) in which the handler function is executed. <b>Defaults to the Element</b>.</div></li>
+	     * <li>delegate : String<div class="sub-desc">A simple selector to filter the target or look for a descendant of the target</div></li>
+	     * <li>stopEvent : Boolean<div class="sub-desc">True to stop the event. That is stop propagation, and prevent the default action.</div></li>
+	     * <li>preventDefault : Boolean<div class="sub-desc">True to prevent the default action</div></li>
+	     * <li>stopPropagation : Boolean<div class="sub-desc">True to prevent event propagation</div></li>
+	     * <li>normalized : Boolean<div class="sub-desc">False to pass a browser event to the handler function instead of an Ext.EventObject</div></li>
+	     * <li>delay : Number<div class="sub-desc">The number of milliseconds to delay the invocation of the handler after te event fires.</div></li>
+	     * <li>single : Boolean<div class="sub-desc">True to add a handler to handle just the next firing of the event, and then remove itself.</div></li>
+	     * <li>buffer : Number<div class="sub-desc">Causes the handler to be scheduled to run in an {@link Ext.util.DelayedTask} delayed
 	     * by the specified number of milliseconds. If the event fires again within that time, the original
-	     * handler is <em>not</em> invoked, but the new handler is scheduled in its place.</li>
-	     * <li>target {Element} : Only call the handler if the event was fired on the target Element, <i>not</i>
-	     * if the event was bubbled up from a child node.</li>
+	     * handler is <em>not</em> invoked, but the new handler is scheduled in its place.</div></li>
+	     * <li>target : Element<div class="sub-desc">Only call the handler if the event was fired on the target Element, <i>not</i> if the event was bubbled up from a child node.</div></li>
 	     * </ul><br>
 	     * <p>See {@link Ext.Element#addListener} for examples of how to use these options.</p>
 	     */
@@ -3706,7 +3702,7 @@ El.prototype = {
      * <li><b>preventDefault</b> Boolean: <div class="sub-desc">True to prevent the default action</div></li>
      * <li><b>stopPropagation</b> Boolean: <div class="sub-desc">True to prevent event propagation</div></li>
      * <li><b>normalized</b> Boolean: <div class="sub-desc">False to pass a browser event to the handler function instead of an Ext.EventObject</div></li>
-     * <li><b>target</b> Ext.Element: <div class="sub-desc">The event will be passed to handler only when it has bubbled up to the specified target element</div></li>
+     * <li><b>target</b> Ext.Element: <div class="sub-desc">Only call the handler if the event was fired on the target Element, <i>not</i> if the event was bubbled up from a child node.</div></li>
      * <li><b>delay</b> Number: <div class="sub-desc">The number of milliseconds to delay the invocation of the handler after the event fires.</div></li>
      * <li><b>single</b> Boolean: <div class="sub-desc">True to add a handler to handle just the next firing of the event, and then remove itself.</div></li>
      * <li><b>buffer</b> Number: <div class="sub-desc">Causes the handler to be scheduled to run in an {@link Ext.util.DelayedTask} delayed
@@ -8597,6 +8593,11 @@ Ext.select = Ext.Element.select;(function(){
         });     
         doc.body.appendChild(frame);
         
+        // This is required so that IE doesn't pop the response up in a new window.
+        if(Ext.isIE){
+           document.frames[id].name = id;
+        }
+        
         Ext.apply(form, {
             target: id,
             method: POST,
@@ -8626,18 +8627,18 @@ Ext.select = Ext.Element.select;(function(){
                 doc,
                 firstChild;
 
-            try { 
+            try{ 
                 doc = frame.contentWindow.document || frame.contentDocument || WINDOW.frames[id].document;
-                if (doc) {
-                    if (doc.body) {
-                        if (/textarea/i.test((firstChild = doc.body.firstChild || {}).tagName)) { // json response wrapped in textarea                        
+                if(doc){
+                    if(doc.body){
+                        if(/textarea/i.test((firstChild = doc.body.firstChild || {}).tagName)){ // json response wrapped in textarea                        
                             r.responseText = firstChild.value;
-                        } else {
+                        }else{
                             r.responseText = doc.body.innerHTML;
                         }
-                    } else {
-                        r.responseXML = doc.XMLDocument || doc;
-                       }
+                    }
+                    //in IE the document may still have a body even if returns XML.
+                    r.responseXML = doc.XMLDocument || doc;
                 }
             }
             catch(e) {}
@@ -11508,61 +11509,104 @@ Ext.util.MixedCollection.prototype.get = Ext.util.MixedCollection.prototype.item
  */
 Ext.util.JSON = new (function(){
     var useHasOwn = !!{}.hasOwnProperty,
-        isNative = Ext.USE_NATIVE_JSON && JSON && JSON.toString() == '[object JSON]';
+        isNative = function() {
+            var useNative = null;
 
-    // crashes Safari in some instances
-    //var validRE = /^("(\\.|[^"\\\n\r])*?"|[,:{}\[\]0-9.\-+Eaeflnr-u \n\r\t])+?$/;
-
-    var pad = function(n) {
-        return n < 10 ? "0" + n : n;
-    };
-
-    var m = {
-        "\b": '\\b',
-        "\t": '\\t',
-        "\n": '\\n',
-        "\f": '\\f',
-        "\r": '\\r',
-        '"' : '\\"',
-        "\\": '\\\\'
-    };
-
-    var encodeString = function(s){
-        if (/["\\\x00-\x1f]/.test(s)) {
-            return '"' + s.replace(/([\x00-\x1f\\"])/g, function(a, b) {
-                var c = m[b];
-                if(c){
-                    return c;
+            return function() {
+                if (useNative === null) {
+                    useNative = Ext.USE_NATIVE_JSON && window.JSON && JSON.toString() == '[object JSON]';
                 }
-                c = b.charCodeAt();
-                return "\\u00" +
-                    Math.floor(c / 16).toString(16) +
-                    (c % 16).toString(16);
-            }) + '"';
-        }
-        return '"' + s + '"';
-    };
-
-    var encodeArray = function(o){
-        var a = ["["], b, i, l = o.length, v;
-            for (i = 0; i < l; i += 1) {
-                v = o[i];
-                switch (typeof v) {
-                    case "undefined":
-                    case "function":
-                    case "unknown":
-                        break;
-                    default:
-                        if (b) {
-                            a.push(',');
+        
+                return useNative;
+            };
+        }(),
+        pad = function(n) {
+            return n < 10 ? "0" + n : n;
+        },
+        doDecode = function(json){
+            return eval("(" + json + ')');    
+        },
+        doEncode = function(o){
+            if(typeof o == "undefined" || o === null){
+                return "null";
+            }else if(Ext.isArray(o)){
+                return encodeArray(o);
+            }else if(Object.prototype.toString.apply(o) === '[object Date]'){
+                return Ext.util.JSON.encodeDate(o);
+            }else if(typeof o == "string"){
+                return encodeString(o);
+            }else if(typeof o == "number"){
+                return isFinite(o) ? String(o) : "null";
+            }else if(typeof o == "boolean"){
+                return String(o);
+            }else {
+                var a = ["{"], b, i, v;
+                for (i in o) {
+                    if(!useHasOwn || o.hasOwnProperty(i)) {
+                        v = o[i];
+                        switch (typeof v) {
+                        case "undefined":
+                        case "function":
+                        case "unknown":
+                            break;
+                        default:
+                            if(b){
+                                a.push(',');
+                            }
+                            a.push(doEncode(i), ":",
+                                    v === null ? "null" : doEncode(v));
+                            b = true;
                         }
-                        a.push(v === null ? "null" : Ext.util.JSON.encode(v));
-                        b = true;
+                    }
                 }
+                a.push("}");
+                return a.join("");
+            }    
+        },
+        m = {
+            "\b": '\\b',
+            "\t": '\\t',
+            "\n": '\\n',
+            "\f": '\\f',
+            "\r": '\\r',
+            '"' : '\\"',
+            "\\": '\\\\'
+        },
+        encodeString = function(s){
+            if (/["\\\x00-\x1f]/.test(s)) {
+                return '"' + s.replace(/([\x00-\x1f\\"])/g, function(a, b) {
+                    var c = m[b];
+                    if(c){
+                        return c;
+                    }
+                    c = b.charCodeAt();
+                    return "\\u00" +
+                        Math.floor(c / 16).toString(16) +
+                        (c % 16).toString(16);
+                }) + '"';
             }
-            a.push("]");
-            return a.join("");
-    };
+            return '"' + s + '"';
+        },
+        encodeArray = function(o){
+            var a = ["["], b, i, l = o.length, v;
+                for (i = 0; i < l; i += 1) {
+                    v = o[i];
+                    switch (typeof v) {
+                        case "undefined":
+                        case "function":
+                        case "unknown":
+                            break;
+                        default:
+                            if (b) {
+                                a.push(',');
+                            }
+                            a.push(v === null ? "null" : Ext.util.JSON.encode(v));
+                            b = true;
+                    }
+                }
+                a.push("]");
+                return a.join("");
+        };
 
     this.encodeDate = function(o){
         return '"' + o.getFullYear() + "-" +
@@ -11578,52 +11622,34 @@ Ext.util.JSON = new (function(){
      * @param {Mixed} o The variable to encode
      * @return {String} The JSON string
      */
-    this.encode = isNative ? JSON.stringify : function(o){
-        if(typeof o == "undefined" || o === null){
-            return "null";
-        }else if(Ext.isArray(o)){
-            return encodeArray(o);
-        }else if(Object.prototype.toString.apply(o) === '[object Date]'){
-            return Ext.util.JSON.encodeDate(o);
-        }else if(typeof o == "string"){
-            return encodeString(o);
-        }else if(typeof o == "number"){
-            return isFinite(o) ? String(o) : "null";
-        }else if(typeof o == "boolean"){
-            return String(o);
-        }else {
-            var a = ["{"], b, i, v;
-            for (i in o) {
-                if(!useHasOwn || o.hasOwnProperty(i)) {
-                    v = o[i];
-                    switch (typeof v) {
-                    case "undefined":
-                    case "function":
-                    case "unknown":
-                        break;
-                    default:
-                        if(b){
-                            a.push(',');
-                        }
-                        a.push(this.encode(i), ":",
-                                v === null ? "null" : this.encode(v));
-                        b = true;
-                    }
-                }
+    this.encode = function() {
+        var ec;
+        return function(o) {
+            if (!ec) {
+                // setup encoding function on first access
+                ec = isNative() ? JSON.stringify : doEncode;
             }
-            a.push("}");
-            return a.join("");
-        }
-    };
+            return ec(o);
+        };
+    }();
+
 
     /**
      * Decodes (parses) a JSON string to an object. If the JSON is invalid, this function throws a SyntaxError unless the safe option is set.
      * @param {String} json The JSON string
      * @return {Object} The resulting object
      */
-    this.decode = isNative ? JSON.parse : function(json){
-        return eval("(" + json + ')');    
-    };
+    this.decode = function() {
+        var dc;
+        return function(json) {
+            if (!dc) {
+                // setup decoding function on first access
+                dc = isNative() ? JSON.parse : doDecode;
+            }
+            return dc(json);
+        };
+    }();
+
 })();
 /**
  * Shorthand for {@link Ext.util.JSON#encode}
@@ -17176,6 +17202,8 @@ layoutConfig: {
      * the frequency it calculates and does a re-layout of components. This is useful for heavy containers or containers
      * with a large quantity of sub-components for which frequent layout calls would be expensive.
      */
+    bufferResize: 100,
+    
     /**
      * @cfg {String/Number} activeItem
      * A string component id or the numeric index of the component that should be initially activated within the
@@ -22085,9 +22113,6 @@ new Ext.Panel({
         }
         Ext.Panel.superclass.afterRender.call(this); // do sizing calcs last
         this.initEvents();
-        if(this.frame && this.bbar && Ext.isIE && !Ext.isIE8){
-            this.el.repaint();
-        }
     },
 
     // private
@@ -23876,7 +23901,6 @@ Ext.LoadMask = function(el, config){
     if(this.store){
         this.store.on('beforeload', this.onBeforeLoad, this);
         this.store.on('load', this.onLoad, this);
-        this.store.on('loadexception', this.onLoad, this);
         this.store.on('exception', this.onLoad, this);
         this.removeMask = Ext.value(this.removeMask, false);
     }else{
@@ -23962,7 +23986,6 @@ Ext.LoadMask.prototype = {
         if(this.store){
             this.store.un('beforeload', this.onBeforeLoad, this);
             this.store.un('load', this.onLoad, this);
-            this.store.un('loadexception', this.onLoad, this);
             this.store.un('exception', this.onLoad, this);
         }else{
             var um = this.el.getUpdater();
@@ -30063,37 +30086,14 @@ Ext.data.Store = function(config){
     // temporary removed-records cache
     this.removed = [];
 
-    /**
-     * <p>An object containing properties which specify the names of the paging and
-     * sorting parameters passed to remote servers when loading blocks of data. By default, this
-     * object takes the following form:</p><pre><code>
-{
-    start : 'start',  // The parameter name which specifies the start row
-    limit : 'limit',  // The parameter name which specifies number of rows to return
-    sort : 'sort',    // The parameter name which specifies the column to sort on
-    dir : 'dir'       // The parameter name which specifies the sort direction
-}
-</code></pre>
-     * <p>The server must produce the requested data block upon receipt of these parameter names.
-     * If different parameter names are required, this property can be overriden using a configuration
-     * property.</p>
-     * <p>A {@link Ext.PagingToolbar PagingToolbar} bound to this Store uses this property to determine
-     * the parameter names to use in its {@link #load requests}.
-     * @property
-     */
-    this.paramNames = {
-        'start' : 'start',
-        'limit' : 'limit',
-        'sort' : 'sort',
-        'dir' : 'dir'
-    };
-
     if(config && config.data){
         this.inlineData = config.data;
         delete config.data;
     }
 
     Ext.apply(this, config);
+    
+    this.paramNames = Ext.applyIf(this.paramNames || {}, this.defaultParamNames);
 
     if(this.url && !this.proxy){
         this.proxy = new Ext.data.HttpProxy({url: this.url});
@@ -30492,6 +30492,38 @@ sortInfo: {
      * internally be set to <tt>false</tt>.</p>
      */
     restful: false,
+    
+    /**
+     * @cfg {Object} paramNames
+     * <p>An object containing properties which specify the names of the paging and
+     * sorting parameters passed to remote servers when loading blocks of data. By default, this
+     * object takes the following form:</p><pre><code>
+{
+    start : 'start',  // The parameter name which specifies the start row
+    limit : 'limit',  // The parameter name which specifies number of rows to return
+    sort : 'sort',    // The parameter name which specifies the column to sort on
+    dir : 'dir'       // The parameter name which specifies the sort direction
+}
+</code></pre>
+     * <p>The server must produce the requested data block upon receipt of these parameter names.
+     * If different parameter names are required, this property can be overriden using a configuration
+     * property.</p>
+     * <p>A {@link Ext.PagingToolbar PagingToolbar} bound to this Store uses this property to determine
+     * the parameter names to use in its {@link #load requests}.
+     */
+    paramNames : undefined,
+    
+    /**
+     * @cfg {Object} defaultParamNames
+     * Provides the default values for the {@link #paramNames} property. To globally modify the parameters
+     * for all stores, this object should be changed on the store prototype.
+     */
+    defaultParamNames : {
+        start : 'start',
+        limit : 'limit',
+        sort : 'sort',
+        dir : 'dir'
+    },
 
     /**
      * Destroys the store.
@@ -38144,7 +38176,7 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
     // private
     initComponent : function(){
         Ext.DataView.superclass.initComponent.call(this);
-        if(typeof this.tpl == "string" || Ext.isArray(this.tpl)){
+        if(Ext.isString(this.tpl) || Ext.isArray(this.tpl)){
             this.tpl = new Ext.XTemplate(this.tpl);
         }
 
@@ -38235,6 +38267,7 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
             "beforeselect"
         );
 
+        this.store = Ext.StoreMgr.lookup(this.store);
         this.all = new Ext.CompositeElementLite();
         this.selected = new Ext.CompositeElementLite();
     },
@@ -38695,9 +38728,9 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
      * @return {HTMLElement} The node or null if it wasn't found
      */
     getNode : function(nodeInfo){
-        if(typeof nodeInfo == "string"){
+        if(Ext.isString(nodeInfo)){
             return document.getElementById(nodeInfo);
-        }else if(typeof nodeInfo == "number"){
+        }else if(Ext.isNumber(nodeInfo)){
             return this.all.elements[nodeInfo];
         }
         return nodeInfo;
@@ -38712,7 +38745,7 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
     getNodes : function(start, end){
         var ns = this.all.elements;
         start = start || 0;
-        end = typeof end == "undefined" ? Math.max(ns.length - 1, 0) : end;
+        end = !Ext.isDefined(end) ? Math.max(ns.length - 1, 0) : end;
         var nodes = [], i;
         if(start <= end){
             for(i = start; i <= end && ns[i]; i++){
@@ -38733,7 +38766,7 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
      */
     indexOf : function(node){
         node = this.getNode(node);
-        if(typeof node.viewIndex == "number"){
+        if(Ext.isNumber(node.viewIndex)){
             return node.viewIndex;
         }
         return this.all.indexOf(node);
@@ -38986,11 +39019,11 @@ Ext.ListView = Ext.extend(Ext.DataView, {
             var c = cs[i];
             if(!c.tpl){
                 c.tpl = new Ext.XTemplate('{' + c.dataIndex + '}');
-            }else if(typeof c.tpl == 'string'){
+            }else if(Ext.isString(c.tpl)){
                 c.tpl = new Ext.XTemplate(c.tpl);
             }
             c.align = c.align || 'left';
-            if(typeof c.width == 'number'){
+            if(Ext.isNumber(c.width)){
                 c.width *= 100;
                 allocatedWidth += c.width;
                 colsWithWidth++;
@@ -39003,7 +39036,7 @@ Ext.ListView = Ext.extend(Ext.DataView, {
                 var perCol = ((100-allocatedWidth) / remaining);
                 for(var j = 0; j < len; j++){
                     var c = cs[j];
-                    if(typeof c.width != 'number'){
+                    if(!Ext.isNumber(c.width)){
                         c.width = perCol;
                     }
                 }
@@ -39065,7 +39098,7 @@ Ext.ListView = Ext.extend(Ext.DataView, {
             return;
         }
         var bdp = bd.parentNode;
-        if(typeof w == 'number'){
+        if(Ext.isNumber(w)){
             var sw = w - this.scrollOffset;
             if(this.reserveScrollOffset || ((bdp.offsetWidth - bdp.clientWidth) > 10)){
                 bd.style.width = sw + 'px';
@@ -39081,7 +39114,7 @@ Ext.ListView = Ext.extend(Ext.DataView, {
                 }, 10);
             }
         }
-        if(typeof h == 'number'){
+        if(Ext.isNumber(h == 'number')){
             bdp.style.height = (h - hd.parentNode.offsetHeight) + 'px';
         }
     },
@@ -42319,7 +42352,7 @@ Ext.reg('buttongroup', Ext.ButtonGroup);
  * approprate data.</p>
  * <p><b>Ext.PagingToolbar</b> is a specialized toolbar that is bound to a {@link Ext.data.Store}
  * and provides automatic paging control. This Component {@link Ext.data.Store#load load}s blocks
- * of data into the <tt>{@link #store}</tt> by passing {@link #paramNames parameters} used for
+ * of data into the <tt>{@link #store}</tt> by passing {@link Ext.data.Store#paramNames paramNames} used for
  * paging criteria.</p>
  * <p>PagingToolbar is typically used as one of the Grid's toolbars:</p>
  * <pre><code>
@@ -42392,7 +42425,7 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
      */
     /**
      * @cfg {String} displayMsg
-     * The paging status message to display (defaults to <tt>"Displaying {0} - {1} of {2}"</tt>).
+     * The paging status message to display (defaults to <tt>'Displaying {0} - {1} of {2}'</tt>).
      * Note that this string is formatted using the braced numbers <tt>{0}-{2}</tt> as tokens
      * that are replaced by the values for start, end and total respectively. These tokens should
      * be preserved when overriding this string if showing those values is desired.
@@ -42400,59 +42433,59 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
     displayMsg : 'Displaying {0} - {1} of {2}',
     /**
      * @cfg {String} emptyMsg
-     * The message to display when no records are found (defaults to "No data to display")
+     * The message to display when no records are found (defaults to 'No data to display')
      */
     emptyMsg : 'No data to display',
     /**
      * @cfg {String} beforePageText
-     * The text displayed before the input item (defaults to <tt>"Page"</tt>).
+     * The text displayed before the input item (defaults to <tt>'Page'</tt>).
      */
-    beforePageText : "Page",
+    beforePageText : 'Page',
     /**
      * @cfg {String} afterPageText
-     * Customizable piece of the default paging text (defaults to <tt>"of {0}"</tt>). Note that
+     * Customizable piece of the default paging text (defaults to <tt>'of {0}'</tt>). Note that
      * this string is formatted using <tt>{0}</tt> as a token that is replaced by the number of
      * total pages. This token should be preserved when overriding this string if showing the
      * total page count is desired.
      */
-    afterPageText : "of {0}",
+    afterPageText : 'of {0}',
     /**
      * @cfg {String} firstText
-     * The quicktip text displayed for the first page button (defaults to <tt>"First Page"</tt>).
+     * The quicktip text displayed for the first page button (defaults to <tt>'First Page'</tt>).
      * <b>Note</b>: quick tips must be initialized for the quicktip to show.
      */
-    firstText : "First Page",
+    firstText : 'First Page',
     /**
      * @cfg {String} prevText
-     * The quicktip text displayed for the previous page button (defaults to <tt>"Previous Page"</tt>).
+     * The quicktip text displayed for the previous page button (defaults to <tt>'Previous Page'</tt>).
      * <b>Note</b>: quick tips must be initialized for the quicktip to show.
      */
-    prevText : "Previous Page",
+    prevText : 'Previous Page',
     /**
      * @cfg {String} nextText
-     * The quicktip text displayed for the next page button (defaults to <tt>"Next Page"</tt>).
+     * The quicktip text displayed for the next page button (defaults to <tt>'Next Page'</tt>).
      * <b>Note</b>: quick tips must be initialized for the quicktip to show.
      */
-    nextText : "Next Page",
+    nextText : 'Next Page',
     /**
      * @cfg {String} lastText
-     * The quicktip text displayed for the last page button (defaults to <tt>"Last Page"</tt>).
+     * The quicktip text displayed for the last page button (defaults to <tt>'Last Page'</tt>).
      * <b>Note</b>: quick tips must be initialized for the quicktip to show.
      */
-    lastText : "Last Page",
+    lastText : 'Last Page',
     /**
      * @cfg {String} refreshText
-     * The quicktip text displayed for the Refresh button (defaults to <tt>"Refresh"</tt>).
+     * The quicktip text displayed for the Refresh button (defaults to <tt>'Refresh'</tt>).
      * <b>Note</b>: quick tips must be initialized for the quicktip to show.
      */
-    refreshText : "Refresh",
+    refreshText : 'Refresh',
 
     /**
-     * Object mapping of parameter names used for load calls.  This property is affected by
-     * See also {@link Ext.data.Store#paramNames}, but is initially set to:
+     * @deprecated
+     * <b>The defaults for these should be set in the data store.</b>
+     * Object mapping of parameter names used for load calls, initially set to:
      * <pre>{start: 'start', limit: 'limit'}</pre>
      */
-    paramNames : {start: 'start', limit: 'limit'},
 
     /**
      * The number of records to display per page.  See also <tt>{@link #cursor}</tt>.
@@ -42474,16 +42507,16 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
         var pagingItems = [this.first = new T.Button({
             tooltip: this.firstText,
             overflowText: this.firstText,
-            iconCls: "x-tbar-page-first",
+            iconCls: 'x-tbar-page-first',
             disabled: true,
-            handler: this.onFirstClick,
+            handler: this.moveFirst,
             scope: this
         }), this.prev = new T.Button({
             tooltip: this.prevText,
             overflowText: this.prevText,
-            iconCls: "x-tbar-page-prev",
+            iconCls: 'x-tbar-page-prev',
             disabled: true,
-            handler: this.onPrevClick,
+            handler: this.movePrevious,
             scope: this
         }), '-', this.beforePageText,
         this.inputItem = new Ext.form.NumberField({
@@ -42491,7 +42524,7 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
             allowDecimals: false,
             allowNegative: false,
             enableKeyEvents: true,
-            selectOnFocus: true, 
+            selectOnFocus: true,
             listeners: {
                 scope: this,
                 keydown: this.onPagingKeyDown,
@@ -42502,22 +42535,22 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
         }), '-', this.next = new T.Button({
             tooltip: this.nextText,
             overflowText: this.nextText,
-            iconCls: "x-tbar-page-next",
+            iconCls: 'x-tbar-page-next',
             disabled: true,
-            handler: this.onNextClick,
+            handler: this.moveNext,
             scope: this
         }), this.last = new T.Button({
             tooltip: this.lastText,
             overflowText: this.lastText,
-            iconCls: "x-tbar-page-last",
+            iconCls: 'x-tbar-page-last',
             disabled: true,
-            handler: this.onLastClick,
+            handler: this.moveLast,
             scope: this
         }), '-', this.refresh = new T.Button({
             tooltip: this.refreshText,
             overflowText: this.refreshText,
-            iconCls: "x-tbar-loading",
-            handler: this.onRefreshClick,
+            iconCls: 'x-tbar-loading',
+            handler: this.refresh,
             scope: this
         })];
 
@@ -42597,7 +42630,8 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
             this.dsLoaded = [store, r, o];
             return;
         }
-        this.cursor = (o.params && o.params[this.paramNames.start]) ? o.params[this.paramNames.start] : 0;
+        var p = this.getParams();
+        this.cursor = (o.params && o.params[p.start]) ? o.params[p.start] : 0;
         var d = this.getPageData(), ap = d.activePage, ps = d.pages;
 
         this.afterTextItem.setText(String.format(this.afterPageText, d.pages));
@@ -42686,6 +42720,12 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
     },
 
     // private
+    getParams : function(){
+        //retain backwards compat, allow params on the toolbar itself, if they exist.
+        return this.paramNames || this.store.paramNames;
+    },
+
+    // private
     beforeLoad : function(){
         if(this.rendered && this.refresh){
             this.refresh.disable();
@@ -42694,36 +42734,50 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
 
     // private
     doLoad : function(start){
-        var o = {}, pn = this.paramNames;
+        var o = {}, pn = this.getParams();
         o[pn.start] = start;
         o[pn.limit] = this.pageSize;
         if(this.fireEvent('beforechange', this, o) !== false){
             this.store.load({params:o});
         }
     },
-    
-    // private
-    onFirstClick: function(){
-        this.doLoad(0);    
+
+    /**
+     * Move to the first page, has the same effect as clicking the 'first' button.
+     */
+    moveFirst : function(){
+        this.doLoad(0);
     },
-    
-    onPrevClick: function(){
+
+    /**
+     * Move to the previous page, has the same effect as clicking the 'previous' button.
+     */
+    movePrevious : function(){
         this.doLoad(Math.max(0, this.cursor-this.pageSize));
     },
-    
-    onNextClick: function(){
+
+    /**
+     * Move to the next page, has the same effect as clicking the 'next' button.
+     */
+    moveNext : function(){
         this.doLoad(this.cursor+this.pageSize);
     },
-    
-    onLastClick: function(){
+
+    /**
+     * Move to the last page, has the same effect as clicking the 'last' button.
+     */
+    moveLast : function(){
         var total = this.store.getTotalCount(),
             extra = total % this.pageSize;
-            
-        this.doLoad(extra ? (total - extra) : total - this.pageSize);    
+
+        this.doLoad(extra ? (total - extra) : total - this.pageSize);
     },
-    
-    onRefreshClick: function(){
-        this.doLoad(this.cursor);    
+
+    /**
+     * Refresh the current page, has the same effect as clicking the 'refresh' button.
+     */
+    refresh : function(){
+        this.doLoad(this.cursor);
     },
 
     /**
@@ -42734,10 +42788,9 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
     bindStore : function(store, initial){
         var doLoad;
         if(!initial && this.store){
-            this.store.un("beforeload", this.beforeLoad, this);
-            this.store.un("load", this.onLoad, this);
-            this.store.un("loadexception", this.onLoadError, this);
-            this.store.un("exception", this.onLoadError, this);
+            this.store.un('beforeload', this.beforeLoad, this);
+            this.store.un('load', this.onLoad, this);
+            this.store.un('exception', this.onLoadError, this);
             if(store !== this.store && this.store.autoDestroy){
                 this.store.destroy();
             }
@@ -42748,12 +42801,8 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
                 scope: this,
                 beforeload: this.beforeLoad,
                 load: this.onLoad,
-                loadexception: this.onLoadError,
                 exception: this.onLoadError
             });
-            this.paramNames.start = store.paramNames.start;
-            this.paramNames.limit = store.paramNames.limit;
-
             doLoad = store.getCount() > 0;
         }
         this.store = store;
@@ -49464,6 +49513,7 @@ Ext.FlashEventProxy = {
             'itemdrag',
             'itemdragend'
         );
+        this.store = Ext.StoreMgr.lookup(this.store);
     },
 
     /**
@@ -53050,23 +53100,6 @@ Ext.form.TriggerField = Ext.extend(Ext.form.TextField,  {
         return true;
     },
 
-    // private
-    onDisable : function(){
-        Ext.form.TriggerField.superclass.onDisable.call(this);
-        if(this.wrap){
-            this.wrap.addClass(this.disabledClass);
-            this.el.removeClass(this.disabledClass);
-        }
-    },
-
-    // private
-    onEnable : function(){
-        Ext.form.TriggerField.superclass.onEnable.call(this);
-        if(this.wrap){
-            this.wrap.removeClass(this.disabledClass);
-        }
-    },
-
     /**
      * The function that should handle the trigger's click event.  This method does nothing by default
      * until overridden by an implementing function.  See Ext.form.ComboBox and Ext.form.DateField for
@@ -54298,8 +54331,8 @@ var combo = new Ext.form.ComboBox({
                 this.mode = 'local';
                 var d = [], opts = s.options;
                 for(var i = 0, len = opts.length;i < len; i++){
-                    var o = opts[i];
-                    var value = (o.hasAttribute ? o.hasAttribute('value') : o.getAttribute('value') !== null) ? o.value : o.text;
+                    var o = opts[i],
+                        value = (o.hasAttribute ? o.hasAttribute('value') : o.getAttributeNode('value').specified) ? o.value : o.text;
                     if(o.selected && Ext.isEmpty(this.value, true)) {
                         this.value = value;
                     }
@@ -54318,8 +54351,8 @@ var combo = new Ext.form.ComboBox({
             if(!this.lazyRender){
                 this.target = true;
                 this.el = Ext.DomHelper.insertBefore(s, this.autoCreate || this.defaultAutoCreate);
+                this.render(this.el.parentNode, s);
                 Ext.removeNode(s); // remove it
-                this.render(this.el.parentNode);
             }else{
                 Ext.removeNode(s); // remove it
             }
@@ -54338,10 +54371,10 @@ var combo = new Ext.form.ComboBox({
 
         this.selectedIndex = -1;
         if(this.mode == 'local'){
-            if(this.initialConfig.queryDelay === undefined){
+            if(!Ext.isDefined(this.initialConfig.queryDelay)){
                 this.queryDelay = 10;
             }
-            if(this.initialConfig.minChars === undefined){
+            if(!Ext.isDefined(this.initialConfig.minChars)){
                 this.minChars = 0;
             }
         }
@@ -54373,8 +54406,8 @@ var combo = new Ext.form.ComboBox({
         Ext.form.ComboBox.superclass.initValue.call(this);
         if(this.hiddenField){
             this.hiddenField.value =
-                this.hiddenValue !== undefined ? this.hiddenValue :
-                this.value !== undefined ? this.value : '';
+                Ext.isDefined(this.hiddenValue) ? this.hiddenValue :
+                Ext.isDefined(this.value) ? this.value : '';
         }
     },
 
@@ -54536,7 +54569,6 @@ var menu = new Ext.menu.Menu({
         if(this.store && !initial){
             this.store.un('beforeload', this.onBeforeLoad, this);
             this.store.un('load', this.onLoad, this);
-            this.store.un('loadexception', this.collapse, this);
             this.store.un('exception', this.collapse, this);
             if(this.store !== store && this.store.autoDestroy){
                 this.store.destroy();
@@ -54561,7 +54593,6 @@ var menu = new Ext.menu.Menu({
                 scope: this,
                 beforeload: this.onBeforeLoad,
                 load: this.onLoad,
-                loadexception: this.collapse,
                 exception: this.collapse
             });
 
@@ -54667,7 +54698,7 @@ var menu = new Ext.menu.Menu({
     // private
     onResize : function(w, h){
         Ext.form.ComboBox.superclass.onResize.apply(this, arguments);
-        if(this.list && this.listWidth === undefined){
+        if(this.list && !Ext.isDefined(this.listWidth)){
             var lw = Math.max(w, this.minListWidth);
             this.list.setWidth(lw);
             this.innerList.setWidth(lw - this.list.getFrameWidth('lr'));
@@ -54796,7 +54827,7 @@ var menu = new Ext.menu.Menu({
             var r = this.findRecord(this.valueField, v);
             if(r){
                 text = r.data[this.displayField];
-            }else if(this.valueNotFoundText !== undefined){
+            }else if(Ext.isDefined(this.valueNotFoundText)){
                 text = this.valueNotFoundText;
             }
         }
@@ -54891,7 +54922,7 @@ var menu = new Ext.menu.Menu({
      * @return {Boolean} True if the value matched an item in the list, else false
      */
     selectByValue : function(v, scrollIntoView){
-        if(v !== undefined && v !== null){
+        if(!Ext.isEmpty(v, true)){
             var r = this.findRecord(this.valueField || this.displayField, v);
             if(r){
                 this.select(this.store.indexOf(r), scrollIntoView);
@@ -54968,7 +54999,7 @@ var menu = new Ext.menu.Menu({
         var val = this.getRawValue();
         if(this.forceSelection){
             if(val.length > 0 && val != this.emptyText){
-               this.el.dom.value = this.lastSelectionText === undefined ? '' : this.lastSelectionText;
+               this.el.dom.value = Ext.isDefined(this.lastSelectionText) ? this.lastSelectionText : '';
                 this.applyEmptyText();
             }else{
                 this.clearValue();
@@ -55951,7 +55982,7 @@ Ext.reg('hidden', Ext.form.Hidden);/**
  */
 Ext.form.BasicForm = function(el, config){
     Ext.apply(this, config);
-    if(typeof this.paramOrder == 'string'){
+    if(Ext.isString(this.paramOrder)){
         this.paramOrder = this.paramOrder.split(/[\s,|]/);
     }
     /*
@@ -56289,7 +56320,7 @@ new Ext.FormPanel({
      * @return {BasicForm} this
      */
     doAction : function(action, options){
-        if(typeof action == 'string'){
+        if(Ext.isString(action)){
             action = new Ext.form.Action.ACTION_TYPES[action](this, options);
         }
         if(this.fireEvent('beforeaction', this, action) !== false){
@@ -56789,7 +56820,7 @@ Ext.FormPanel = Ext.extend(Ext.Panel, {
 
     // private
     createForm : function(){
-        var config = Ext.apply({listeners: {}}, this.initialConfig);
+        var config = Ext.applyIf({listeners: {}}, this.initialConfig);
         return new Ext.form.BasicForm(null, config);
     },
 
@@ -56844,8 +56875,14 @@ Ext.FormPanel = Ext.extend(Ext.Panel, {
     
     // private
     beforeDestroy : function(){
-        Ext.FormPanel.superclass.beforeDestroy.call(this);
         this.stopMonitoring();
+        Ext.FormPanel.superclass.beforeDestroy.call(this);
+        /*
+         * Clear the items here to prevent them being destroyed again.
+         * Don't move this behaviour to BasicForm because it can be used
+         * on it's own.
+         */
+        this.form.items.clear();
         Ext.destroy(this.form);
     },
 
@@ -57477,6 +57514,7 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
                 handler:handler||editor.relayBtnCmd,
                 clickEvent:'mousedown',
                 tooltip: tipsEnabled ? editor.buttonTips[id] || undefined : undefined,
+                overflowText: editor.buttonTips[id].title || undefined,
                 tabIndex:-1
             };
         }
@@ -61274,9 +61312,12 @@ viewConfig: {
         }
         col = (col !== undefined ? col : 0);
 
-        var rowEl = this.getRow(row), cellEl;
+        var rowEl = this.getRow(row),
+            cm = this.cm,
+            colCount = cm.getColumnCount(),
+            cellEl;
         if(!(hscroll === false && col === 0)){
-            while(this.cm.isHidden(col)){
+            while(col < colCount && cm.isHidden(col)){
                 col++;
             }
             cellEl = this.getCell(row, col);

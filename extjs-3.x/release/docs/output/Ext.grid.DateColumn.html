@@ -22,7 +22,7 @@ may be used to specify the text with which to prefix the group field value in th
 See also <a href="output/Ext.grid.Column.html#Ext.grid.Column-groupRenderer" ext:member="groupRenderer" ext:cls="Ext.grid.Column">groupRenderer</a> and
 <a href="output/Ext.grid.GroupingView.html" ext:cls="Ext.grid.GroupingView">Ext.grid.GroupingView</a>.<a href="output/Ext.grid.GroupingView.html#Ext.grid.GroupingView-showGroupName" ext:member="showGroupName" ext:cls="Ext.grid.GroupingView">showGroupName</a>.</div></div></td><td class="msource"><a href="output/Ext.grid.Column.html#groupName" ext:member="#groupName" ext:cls="Ext.grid.Column">Column</a></td></tr><tr class="config-row expandable inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.grid.Column-groupRenderer"></a><b><a href="source/Column.html#cfg-Ext.grid.Column-groupRenderer">groupRenderer</a></b> : Function<div class="mdesc"><div class="short">Optional. If the grid is being rendered by an Ext.grid.GroupingView, this option&#13;
 may be used to specify the function...</div><div class="long"><p>Optional. If the grid is being rendered by an <a href="output/Ext.grid.GroupingView.html" ext:cls="Ext.grid.GroupingView">Ext.grid.GroupingView</a>, this option
-may be used to specify the function used to format the grouping field value for display in the group 
+may be used to specify the function used to format the grouping field value for display in the group
 <a href="output/Ext.grid.Column.html#Ext.grid.Column-groupName" ext:member="groupName" ext:cls="Ext.grid.Column">header</a>.  If a <tt><b>groupRenderer</b></tt> is not specified, the configured
 <tt><b><a href="output/Ext.grid.Column.html#Ext.grid.Column-renderer" ext:member="renderer" ext:cls="Ext.grid.Column">renderer</a></b></tt> will be called; if a <tt><b><a href="output/Ext.grid.Column.html#Ext.grid.Column-renderer" ext:member="renderer" ext:cls="Ext.grid.Column">renderer</a></b></tt> is also not specified
 the new value of the group field will be used.</p>
@@ -54,7 +54,7 @@ ordinal position.) The <tt>id</tt> is used to create a CSS <b>class</b> name whi
 table cells (including headers) in that column (in this context the <tt>id</tt> does not need to be
 unique). The class name takes the form of <pre>x-grid3-td-<b>id</b></pre>
 Header cells will also receive this class name, but will also have the class <pre>x-grid3-hd</pre>
-So, to target header cells, use CSS selectors such as:<pre>.x-grid3-hd.x-grid3-td-<b>id</b></pre>
+So, to target header cells, use CSS selectors such as:<pre>.x-grid3-hd-row .x-grid3-td-<b>id</b></pre>
 The <a href="output/Ext.grid.GridPanel.html#Ext.grid.GridPanel-autoExpandColumn" ext:member="autoExpandColumn" ext:cls="Ext.grid.GridPanel">Ext.grid.GridPanel.autoExpandColumn</a> grid config option references the column via this
 unique identifier.</div></div></td><td class="msource"><a href="output/Ext.grid.Column.html#id" ext:member="#id" ext:cls="Ext.grid.Column">Column</a></td></tr><tr class="config-row  inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.grid.Column-menuDisabled"></a><b><a href="source/Column.html#cfg-Ext.grid.Column-menuDisabled">menuDisabled</a></b> : Boolean<div class="mdesc">Optional. <tt>true</tt> to disable the column menu. Defaults to <tt>false</tt>.</div></td><td class="msource"><a href="output/Ext.grid.Column.html#menuDisabled" ext:member="#menuDisabled" ext:cls="Ext.grid.Column">Column</a></td></tr><tr class="config-row expandable inherited"><td class="micon"><a href="#expand" class="exi">&nbsp;</a></td><td class="sig"><a id="Ext.grid.Column-renderer"></a><b><a href="source/Column.html#cfg-Ext.grid.Column-renderer">renderer</a></b> : Mixed<div class="mdesc"><div class="short">For an alternative to specifying a renderer see xtype&#13;
 Optional. A renderer is an 'interceptor' method which can be u...</div><div class="long"><p>For an alternative to specifying a renderer see <code><a href="output/Ext.grid.Column.html#Ext.grid.Column-xtype" ext:member="xtype" ext:cls="Ext.grid.Column">xtype</a></code></p>
@@ -65,7 +65,7 @@ appearance, etc.) before it is rendered). This may be specified in either of thr
 <li>A string which references a property name of the <a href="output/Ext.util.Format.html" ext:cls="Ext.util.Format">Ext.util.Format</a> class which
 provides a renderer function.</li>
 <li>An object specifying both the renderer function, and its execution scope (<tt><b>this</b></tt>
-reference) eg:<pre style="margin-left:1.2em"><code>{
+reference) e.g.:<pre style="margin-left:1.2em"><code>{
     fn: this.gridRenderer,
     scope: this
 }</code></pre></li></ul></div>
@@ -75,14 +75,14 @@ If not specified, the default renderer uses the raw data value.</p>
    header: <em>'Company Name'</em>,
    dataIndex: <em>'company'</em>,
    renderer: <b>function</b>(value, metaData, record, rowIndex, colIndex, store) {
-      <i>// provide the logic depending on business rules </i>
+      <i>// provide the logic depending on business rules</i>
       <i>// name of your own choosing to manipulate the cell depending upon</i>
       <i>// the data <b>in</b> the underlying Record object.</i>
       <b>if</b> (value == <em>'whatever'</em>) {
           <i>//metaData.css : String : A CSS class name to add to the TD element of the cell.</i>
           <i>//metaData.attr : String : An html attribute definition string to apply to</i>
           <i>//                         the data container element within the table</i>
-          <i>//                         cell (e.g. <em>'style=<em>"color:red;"</em>'</em>).      </i>
+          <i>//                         cell (e.g. <em>'style=<em>"color:red;"</em>'</em>).</i>
           metaData.css = <em>'name-of-css-class-you-will-define'</em>;
       }
       <b>return</b> value;
@@ -132,9 +132,9 @@ the Column configuration properties, for example:</p>
         dataIndex: <em>'lastChange'</em>,
         width: 85,
         sortable: true,
-        <i>//renderer: Ext.util.Format.dateRenderer(<em>'m/d/Y'</em>), </i>
+        <i>//renderer: Ext.util.Format.dateRenderer(<em>'m/d/Y'</em>),</i>
         xtype: <em>'datecolumn'</em>, <i>// use xtype instead of renderer</i>
-        format: <em>'M/d/Y'</em> <i>// configuration property <b>for</b> <a href="output/Ext.grid.DateColumn.html" ext:cls="Ext.grid.DateColumn">Ext.grid.DateColumn</a> </i>
+        format: <em>'M/d/Y'</em> <i>// configuration property <b>for</b> <a href="output/Ext.grid.DateColumn.html" ext:cls="Ext.grid.DateColumn">Ext.grid.DateColumn</a></i>
     }, {
         ...
     }]

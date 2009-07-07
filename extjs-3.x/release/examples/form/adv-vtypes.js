@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 // Add the additional 'advanced' VTypes
 Ext.apply(Ext.form.VTypes, {
     daterange : function(val, field) {

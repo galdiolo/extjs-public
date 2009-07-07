@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 /**
  * @class Ext.form.Action
  * <p>The subclasses of this class provide actions to perform upon {@link Ext.form.BasicForm Form}s.</p>

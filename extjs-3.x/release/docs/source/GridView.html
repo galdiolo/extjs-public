@@ -296,7 +296,7 @@ viewConfig: {
 
         for(var k in ts){
             var t = ts[k];
-            if(t && typeof t.compile == 'function' && !t.compiled){
+            if(t && Ext.isFunction(t.compile) && !t.compiled){
                 t.disableFormats = true;
                 t.compile();
             }
@@ -371,12 +371,12 @@ viewConfig: {
         return this.fly(el).findParent(this.cellSelector, this.cellSelectorDepth);
     },
 
-<div id="method-Ext.grid.GridView-findCellIndex"></div>/**
- * <p>Return the index of the grid column which contains the passed element.</p>
- * See also {@link #findRowIndex}
- * @param {Element} el The target element
- * @return The column index, or <b>false</b> if the target element is not within a row of this GridView.
- */
+    <div id="method-Ext.grid.GridView-findCellIndex"></div>/**
+     * <p>Return the index of the grid column which contains the passed HTMLElement.</p>
+     * See also {@link #findRowIndex}
+     * @param {HTMLElement} el The target element
+     * @return The column index, or <b>false</b> if the target element is not within a row of this GridView.
+     */
     findCellIndex : function(el, requiredCls){
         var cell = this.findCell(el);
         if(cell && (!requiredCls || this.fly(cell).hasClass(requiredCls))){
@@ -407,11 +407,11 @@ viewConfig: {
         return this.findCellIndex(el, this.hdCls);
     },
 
-<div id="method-Ext.grid.GridView-findRow"></div>/**
- * Return the HtmlElement representing the grid row which contains the passed element.
- * @param {Element} el The target element
- * @return The row element, or null if the target element is not within a row of this GridView.
- */
+    <div id="method-Ext.grid.GridView-findRow"></div>/**
+     * Return the HtmlElement representing the grid row which contains the passed element.
+     * @param {HTMLElement} el The target HTMLElement
+     * @return The row element, or null if the target element is not within a row of this GridView.
+     */
     findRow : function(el){
         if(!el){
             return false;
@@ -419,12 +419,12 @@ viewConfig: {
         return this.fly(el).findParent(this.rowSelector, this.rowSelectorDepth);
     },
 
-<div id="method-Ext.grid.GridView-findRowIndex"></div>/**
- * <p>Return the index of the grid row which contains the passed element.</p>
- * See also {@link #findCellIndex}
- * @param {Element} el The target element
- * @return The row index, or <b>false</b> if the target element is not within a row of this GridView.
- */
+    <div id="method-Ext.grid.GridView-findRowIndex"></div>/**
+     * <p>Return the index of the grid row which contains the passed HTMLElement.</p>
+     * See also {@link #findCellIndex}
+     * @param {HTMLElement} el The target HTMLElement
+     * @return The row index, or <b>false</b> if the target element is not within a row of this GridView.
+     */
     findRowIndex : function(el){
         var r = this.findRow(el);
         return r ? r.rowIndex : false;
@@ -432,30 +432,30 @@ viewConfig: {
 
     // getter methods for fetching elements dynamically in the grid
 
-<div id="method-Ext.grid.GridView-getRow"></div>/**
- * Return the <tt>&lt;div></tt> HtmlElement which represents a Grid row for the specified index.
- * @param {Number} index The row index
- * @return {HtmlElement} The div element.
- */
+    <div id="method-Ext.grid.GridView-getRow"></div>/**
+     * Return the <tt>&lt;div></tt> HtmlElement which represents a Grid row for the specified index.
+     * @param {Number} index The row index
+     * @return {HtmlElement} The div element.
+     */
     getRow : function(row){
         return this.getRows()[row];
     },
 
-<div id="method-Ext.grid.GridView-getCell"></div>/**
- * Returns the grid's <tt>&lt;td></tt> HtmlElement at the specified coordinates.
- * @param {Number} row The row index in which to find the cell.
- * @param {Number} col The column index of the cell.
- * @return {HtmlElement} The td at the specified coordinates.
- */
+    <div id="method-Ext.grid.GridView-getCell"></div>/**
+     * Returns the grid's <tt>&lt;td></tt> HtmlElement at the specified coordinates.
+     * @param {Number} row The row index in which to find the cell.
+     * @param {Number} col The column index of the cell.
+     * @return {HtmlElement} The td at the specified coordinates.
+     */
     getCell : function(row, col){
         return this.getRow(row).getElementsByTagName('td')[col];
     },
 
-<div id="method-Ext.grid.GridView-getHeaderCell"></div>/**
- * Return the <tt>&lt;td></tt> HtmlElement which represents the Grid's header cell for the specified column index.
- * @param {Number} index The column index
- * @return {HtmlElement} The td element.
- */
+    <div id="method-Ext.grid.GridView-getHeaderCell"></div>/**
+     * Return the <tt>&lt;td></tt> HtmlElement which represents the Grid's header cell for the specified column index.
+     * @param {Number} index The column index
+     * @return {HtmlElement} The td element.
+     */
     getHeaderCell : function(index){
       return this.mainHd.dom.getElementsByTagName('td')[index];
     },
@@ -542,6 +542,7 @@ viewConfig: {
         var tw = this.getTotalWidth(),
             clen = this.cm.getColumnCount(),
             ws = [],
+            len,
             i;
         for(i = 0; i < clen; i++){
             ws[i] = this.getColumnWidth(i);
@@ -638,7 +639,7 @@ viewConfig: {
                 if(Ext.isEmpty(p.value)){
                     p.value = "&#160;";
                 }
-                if(this.markDirty && r.dirty && typeof r.modified[c.name] !== 'undefined'){
+                if(this.markDirty && r.dirty && Ext.isDefined(r.modified[c.name])){
                     p.css += ' x-grid3-dirty-cell';
                 }
                 cb[cb.length] = ct.apply(p);
@@ -938,7 +939,7 @@ viewConfig: {
     },
 
     resolveCell : function(row, col, hscroll){
-        if(typeof row != "number"){
+        if(!Ext.isNumber(row)){
             row = row.rowIndex;
         }
         if(!this.ds){
@@ -949,9 +950,12 @@ viewConfig: {
         }
         col = (col !== undefined ? col : 0);
 
-        var rowEl = this.getRow(row), cellEl;
+        var rowEl = this.getRow(row),
+            cm = this.cm,
+            colCount = cm.getColumnCount(),
+            cellEl;
         if(!(hscroll === false && col === 0)){
-            while(this.cm.isHidden(col)){
+            while(col < colCount && cm.isHidden(col)){
                 col++;
             }
             cellEl = this.getCell(row, col);
@@ -997,7 +1001,7 @@ viewConfig: {
         ctop -= this.mainHd.dom.offsetHeight;
 
         var cbot = ctop + rowEl.offsetHeight,
-            ch = c.clientHeight;
+            ch = c.clientHeight,
             sbot = stop + ch;
             
         stop = parseInt(c.scrollTop, 10);
@@ -1089,7 +1093,7 @@ viewConfig: {
     // private
     getColumnWidth : function(col){
         var w = this.cm.getColumnWidth(col);
-        if(typeof w == 'number'){
+        if(Ext.isNumber(w)){
             return (Ext.isBorderBox ? w : (w-this.borderWidth > 0 ? w-this.borderWidth:0)) + 'px';
         }
         return w;
@@ -1116,7 +1120,7 @@ viewConfig: {
         }
 
         var vc = cm.getColumnCount(true);
-        var ac = vc-(typeof omitColumn == 'number' ? 1 : 0);
+        var ac = vc-(Ext.isNumber(omitColumn) ? 1 : 0);
         if(ac === 0){
             ac = 1;
             omitColumn = undefined;
@@ -1183,7 +1187,7 @@ viewConfig: {
         for(var i = 0; i < colCount; i++){
             var name = cm.getDataIndex(i);
             cs[i] = {
-                name : (typeof name == 'undefined' ? this.ds.fields.get(i).name : name),
+                name : (!Ext.isDefined(name) ? this.ds.fields.get(i).name : name),
                 renderer : cm.getRenderer(i),
                 id : cm.getColumnId(i),
                 style : this.getColumnStyle(i)
@@ -1205,7 +1209,7 @@ viewConfig: {
         var cs = this.getColumnData();
 
         startRow = startRow || 0;
-        endRow = typeof endRow == "undefined"? ds.getCount()-1 : endRow;
+        endRow = !Ext.isDefined(endRow) ? ds.getCount()-1 : endRow;
 
         // records to render
         var rs = ds.getRange(startRow, endRow);
@@ -1222,7 +1226,7 @@ viewConfig: {
     // private
     refreshRow : function(record){
         var ds = this.ds, index;
-        if(typeof record == 'number'){
+        if(Ext.isNumber(record)){
             index = record;
             record = ds.getAt(index);
             if(!record){

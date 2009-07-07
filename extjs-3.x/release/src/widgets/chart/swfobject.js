@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 /*! SWFObject v2.2 <http://code.google.com/p/swfobject/> 
     is released under the MIT License <http://www.opensource.org/licenses/mit-license.php> 
 */

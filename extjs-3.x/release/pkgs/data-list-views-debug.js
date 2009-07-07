@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 /**
  * @class Ext.DataView
  * @extends Ext.BoxComponent
@@ -123,7 +129,7 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
     // private
     initComponent : function(){
         Ext.DataView.superclass.initComponent.call(this);
-        if(typeof this.tpl == "string" || Ext.isArray(this.tpl)){
+        if(Ext.isString(this.tpl) || Ext.isArray(this.tpl)){
             this.tpl = new Ext.XTemplate(this.tpl);
         }
 
@@ -214,6 +220,7 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
             "beforeselect"
         );
 
+        this.store = Ext.StoreMgr.lookup(this.store);
         this.all = new Ext.CompositeElementLite();
         this.selected = new Ext.CompositeElementLite();
     },
@@ -674,9 +681,9 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
      * @return {HTMLElement} The node or null if it wasn't found
      */
     getNode : function(nodeInfo){
-        if(typeof nodeInfo == "string"){
+        if(Ext.isString(nodeInfo)){
             return document.getElementById(nodeInfo);
-        }else if(typeof nodeInfo == "number"){
+        }else if(Ext.isNumber(nodeInfo)){
             return this.all.elements[nodeInfo];
         }
         return nodeInfo;
@@ -691,7 +698,7 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
     getNodes : function(start, end){
         var ns = this.all.elements;
         start = start || 0;
-        end = typeof end == "undefined" ? Math.max(ns.length - 1, 0) : end;
+        end = !Ext.isDefined(end) ? Math.max(ns.length - 1, 0) : end;
         var nodes = [], i;
         if(start <= end){
             for(i = start; i <= end && ns[i]; i++){
@@ -712,7 +719,7 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
      */
     indexOf : function(node){
         node = this.getNode(node);
-        if(typeof node.viewIndex == "number"){
+        if(Ext.isNumber(node.viewIndex)){
             return node.viewIndex;
         }
         return this.all.indexOf(node);
@@ -965,11 +972,11 @@ Ext.ListView = Ext.extend(Ext.DataView, {
             var c = cs[i];
             if(!c.tpl){
                 c.tpl = new Ext.XTemplate('{' + c.dataIndex + '}');
-            }else if(typeof c.tpl == 'string'){
+            }else if(Ext.isString(c.tpl)){
                 c.tpl = new Ext.XTemplate(c.tpl);
             }
             c.align = c.align || 'left';
-            if(typeof c.width == 'number'){
+            if(Ext.isNumber(c.width)){
                 c.width *= 100;
                 allocatedWidth += c.width;
                 colsWithWidth++;
@@ -982,7 +989,7 @@ Ext.ListView = Ext.extend(Ext.DataView, {
                 var perCol = ((100-allocatedWidth) / remaining);
                 for(var j = 0; j < len; j++){
                     var c = cs[j];
-                    if(typeof c.width != 'number'){
+                    if(!Ext.isNumber(c.width)){
                         c.width = perCol;
                     }
                 }
@@ -1044,7 +1051,7 @@ Ext.ListView = Ext.extend(Ext.DataView, {
             return;
         }
         var bdp = bd.parentNode;
-        if(typeof w == 'number'){
+        if(Ext.isNumber(w)){
             var sw = w - this.scrollOffset;
             if(this.reserveScrollOffset || ((bdp.offsetWidth - bdp.clientWidth) > 10)){
                 bd.style.width = sw + 'px';
@@ -1060,7 +1067,7 @@ Ext.ListView = Ext.extend(Ext.DataView, {
                 }, 10);
             }
         }
-        if(typeof h == 'number'){
+        if(Ext.isNumber(h == 'number')){
             bdp.style.height = (h - hd.parentNode.offsetHeight) + 'px';
         }
     },

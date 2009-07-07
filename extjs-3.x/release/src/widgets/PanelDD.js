@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 /**
  * @class Ext.dd.PanelProxy
  * A custom drag proxy implementation specific to {@link Ext.Panel}s. This class is primarily used internally

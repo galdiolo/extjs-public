@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 /**
  * @class Ext.form.FormPanel
  * @extends Ext.Panel
@@ -140,7 +146,7 @@ Ext.FormPanel = Ext.extend(Ext.Panel, {
 
     // private
     createForm : function(){
-        var config = Ext.apply({listeners: {}}, this.initialConfig);
+        var config = Ext.applyIf({listeners: {}}, this.initialConfig);
         return new Ext.form.BasicForm(null, config);
     },
 
@@ -195,8 +201,14 @@ Ext.FormPanel = Ext.extend(Ext.Panel, {
     
     // private
     beforeDestroy : function(){
-        Ext.FormPanel.superclass.beforeDestroy.call(this);
         this.stopMonitoring();
+        Ext.FormPanel.superclass.beforeDestroy.call(this);
+        /*
+         * Clear the items here to prevent them being destroyed again.
+         * Don't move this behaviour to BasicForm because it can be used
+         * on it's own.
+         */
+        this.form.items.clear();
         Ext.destroy(this.form);
     },
 

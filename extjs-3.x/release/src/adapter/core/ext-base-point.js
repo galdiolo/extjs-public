@@ -1,3 +1,9 @@
+/*!
+ * Ext JS Library 3.0.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
 	Ext.lib.Point = function(x, y) {
         if (Ext.isArray(x)) {
             y = x[1];
