@@ -17,10 +17,13 @@ import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
+import com.google.gwt.user.client.Element;
 
 public class HelloWindowExample extends LayoutContainer {
 
-  public HelloWindowExample() {
+  @Override
+  protected void onRender(Element parent, int pos) {
+    super.onRender(parent, pos);
     setLayout(new FlowLayout(10));
 
     final Window window = new Window();
@@ -47,9 +50,8 @@ public class HelloWindowExample extends LayoutContainer {
 
     window.addButton(new Button("Hello"));
     window.addButton(new Button("World"));
-    
-    Button btn = new Button("Hello World");
-    btn.addSelectionListener(new SelectionListener<ButtonEvent>() {
+
+    Button btn = new Button("Hello World", new SelectionListener<ButtonEvent>() {
       @Override
       public void componentSelected(ButtonEvent ce) {
         window.show();

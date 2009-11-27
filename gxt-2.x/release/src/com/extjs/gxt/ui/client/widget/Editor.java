@@ -8,11 +8,13 @@
 package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.Style.AutoSizeMode;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.EditorEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.TriggerField;
@@ -116,27 +118,30 @@ import com.google.gwt.user.client.ui.RootPanel;
 @SuppressWarnings("unchecked")
 public class Editor extends BoxComponent {
 
-  private boolean revertInvalid = true;
   private String alignment = "c-c";
-  private boolean constrain;
-  private boolean swallowKeys = true;
-  private boolean completeOnEnter;
-  private boolean cancelOnEsc;
-  private boolean editing;
-  private boolean updateEl = false;
-  private Field field;
-  private Object startValue;
-  private Listener<FieldEvent> listener;
+  private boolean allowBlur;
+  private AutoSizeMode autoSizeMode = AutoSizeMode.BOTH;
   private El boundEl;
-  private boolean allowBlur = false;
-
+  private boolean cancelOnEsc;
+  private boolean cancelOnInvalid = true;
+  private boolean completeOnEnter;
+  private boolean constrain;
+  private boolean editing;
+  private Field field;
+  private Listener<FieldEvent> listener;
+  private boolean revertInvalid = true;
+  private Object startValue;
+  private boolean swallowKeys = true;
+  private boolean updateEl;
   /**
    * Creates a new editor.
    * 
    * @param field the field
    */
   public Editor(Field field) {
+    field.removeFromParent();
     this.field = field;
+    field.setParent(this);
     setShadow(false);
   }
 
@@ -145,7 +150,7 @@ public class Editor extends BoxComponent {
    * changes. The field value will be reverted to the original starting value.
    */
   public void cancelEdit() {
-    cancelEdit(false);
+    cancelEdit(false, true);
   }
 
   /**
@@ -199,6 +204,10 @@ public class Editor extends BoxComponent {
    */
   public boolean isCancelOnEsc() {
     return cancelOnEsc;
+  }
+
+  public boolean isCancelOnInvalid() {
+    return cancelOnInvalid;
   }
 
   /**
@@ -304,6 +313,10 @@ public class Editor extends BoxComponent {
     this.cancelOnEsc = cancelOnEsc;
   }
 
+  public void setCancelOnInvalid(boolean cancelOnInvalid) {
+    this.cancelOnInvalid = cancelOnInvalid;
+  }
+
   /**
    * True to complete the edit when the enter key is pressed (defaults to
    * false).
@@ -330,14 +343,6 @@ public class Editor extends BoxComponent {
    */
   public void setRevertInvalid(boolean revertInvalid) {
     this.revertInvalid = revertInvalid;
-  }
-
-  @Override
-  public void setSize(int width, int height) {
-    field.setSize(width, height);
-    if (rendered) {
-      el().sync(true);
-    }
   }
 
   /**
@@ -381,11 +386,11 @@ public class Editor extends BoxComponent {
 
     Object v = value != null ? value : boundEl.getInnerHtml();
 
-    if (!rendered) {
+    if (!rendered || !el().isConnected()) {
       RootPanel.get().add(this);
+    } else {
+      ComponentHelper.doAttach(this);
     }
-
-    ComponentHelper.doAttach(this);
 
     EditorEvent e = new EditorEvent(this);
     e.setBoundEl(boundEl);
@@ -404,27 +409,27 @@ public class Editor extends BoxComponent {
 
     editing = true;
 
-    el().setVisible(true);
-    el().makePositionable(true);
+    show();
     doAutoSize();
     el().alignTo(boundEl.dom, alignment, new int[] {0, -1});
 
-    show();
-
     field.focus();
+
+    e.setValue(startValue);
+    fireEvent(Events.StartEdit, e);
   }
 
-  protected void cancelEdit(boolean remainVisible) {
+  protected void cancelEdit(boolean remainVisible, boolean revertInvalid) {
     Object v = field.getValue();
     EditorEvent e = new EditorEvent(this);
     e.setValue(v);
     e.setStartValue(startValue);
     if (editing && fireEvent(Events.BeforeCancelEdit, e)) {
-      setValue(startValue);
-      if (!remainVisible) {
-        hide();
-      }
       editing = false;
+      if (revertInvalid) {
+        setValue(startValue);
+      }
+      hide(remainVisible);
       fireEvent(Events.CancelEdit, e);
     }
   }
@@ -434,22 +439,12 @@ public class Editor extends BoxComponent {
       return;
     }
 
-    if (revertInvalid && !field.isValid(true)) {
-      cancelEdit(true);
-      return;
-    } else if (!field.isValid(false)) {
+    if (!field.isValid() && cancelOnInvalid) {
+      cancelEdit(remainVisible, revertInvalid);
       return;
     }
 
     Object v = getValue();
-    if (v == startValue) {
-      // ignore no change
-      editing = false;
-      hide();
-      return;
-    }
-
-    field.clearInvalid();
 
     EditorEvent e = new EditorEvent(this);
     e.setValue(postProcessValue(v));
@@ -461,9 +456,7 @@ public class Editor extends BoxComponent {
         boundEl.setInnerHtml(v.toString());
       }
 
-      if (!remainVisible) {
-        hide();
-      }
+      hide(remainVisible);
       fireEvent(Events.Complete, e);
     }
 
@@ -476,7 +469,17 @@ public class Editor extends BoxComponent {
   }
 
   protected void doAutoSize() {
-    setSize(boundEl.getWidth(), boundEl.getHeight());
+    switch (autoSizeMode) {
+      case BOTH:
+        setSize(boundEl.getWidth(), boundEl.getHeight());
+        break;
+      case HEIGHT:
+        setHeight(boundEl.getHeight());
+        break;
+      case WIDTH:
+        setWidth(boundEl.getWidth());
+        break;
+    }
   }
 
   @Override
@@ -492,15 +495,26 @@ public class Editor extends BoxComponent {
   }
 
   @Override
-  protected void onHide() {
+  protected void onDisable() {
+    super.onDisable();
+    field.disable();
+  }
 
+  @Override
+  protected void onEnable() {
+    super.onEnable();
+    field.enable();
+  }
+
+  @Override
+  protected void onHide() {
     if (editing) {
       completeEdit();
       return;
     }
     field.blur();
 
-    el().setVisible(false);
+    super.onHide();
 
     if (rendered) {
       ComponentHelper.doDetach(this);
@@ -513,8 +527,7 @@ public class Editor extends BoxComponent {
     setElement(DOM.createDiv(), target, index);
 
     setStyleName("x-editor");
-    el().setVisibility(true);
-
+    el().makePositionable(true);
     setStyleAttribute("overflow", GXT.isGecko ? "auto" : "hidden");
 
     field.setMessageTarget("tooltip");
@@ -532,25 +545,29 @@ public class Editor extends BoxComponent {
           onSpecialKey(fe);
         } else if (fe.getType() == Events.Blur) {
           onBlur(fe);
+        } else if (fe.getType() == KeyNav.getKeyEvent() && swallowKeys) {
+          fe.cancelBubble();
         }
       }
     };
 
-    this.field.addListener(Events.SpecialKey, listener);
-    this.field.addListener(Events.Blur, listener);
+    field.addListener(Events.SpecialKey, listener);
+    field.addListener(Events.Blur, listener);
+    field.addListener(KeyNav.getKeyEvent(), listener);
 
     field.show();
   }
 
   @Override
+  protected void onResize(int width, int height) {
+    super.onResize(width, height);
+    field.setSize(width, height);
+  }
+
+  @Override
   protected void onShow() {
-    el().setVisible(true);
-    el().updateZIndex(100);
-    field.show();
-    EditorEvent e = new EditorEvent(this);
-    e.setBoundEl(boundEl);
-    e.setValue(startValue);
-    fireEvent(Events.StartEdit, e);
+    super.onShow();
+    el().updateZIndex(0);
   }
 
   protected void onSpecialKey(FieldEvent fe) {
@@ -574,5 +591,12 @@ public class Editor extends BoxComponent {
   protected native void triggerBlur(TriggerField field) /*-{
     field.@com.extjs.gxt.ui.client.widget.form.TriggerField::triggerBlur(Lcom/extjs/gxt/ui/client/event/ComponentEvent;)(null);
   }-*/;
+
+  private void hide(boolean remainVisible) {
+    if (!remainVisible) {
+      hide();
+      field.clearInvalid();
+    }
+  }
 
 }

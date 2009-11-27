@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.ui.client.widget.grid;
 
-import java.util.Arrays;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.core.El;
@@ -62,30 +61,43 @@ public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionMo
 
   @SuppressWarnings("unchecked")
   public void init(Component component) {
-    this.grid = (Grid) component;
-    grid.addListener(Events.HeaderClick, new Listener<GridEvent>() {
-      public void handleEvent(GridEvent e) {
-        onHeaderClick(e);
+    this.grid = (Grid<M>) component;
+    Listener<GridEvent<M>> listener = new Listener<GridEvent<M>>() {
+      public void handleEvent(GridEvent<M> e) {
+        if (e.getType() == Events.HeaderClick) {
+          onHeaderClick(e);
+        } else if (e.getType() == Events.ViewReady) {
+          setChecked(getSelection().size() == grid.getStore().getCount());
+        }
       }
-    });
+    };
+    grid.addListener(Events.HeaderClick, listener);
+    grid.addListener(Events.ViewReady, listener);
     this.store = grid.getStore();
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   protected void handleMouseDown(GridEvent<M> e) {
     if (e.getEvent().getButton() == Event.BUTTON_LEFT && e.getTarget().getClassName().equals("x-grid3-row-checker")) {
       M m = listStore.getAt(e.getRowIndex());
       if (m != null) {
         if (isSelected(m)) {
-          doDeselect(Arrays.asList(m), false);
+          deselect(m);
         } else {
-          doSelect(Arrays.asList(m), true, false);
+          select(m, true);
         }
       }
     } else {
       super.handleMouseDown(e);
     }
+  }
+
+  @Override
+  protected void handleMouseClick(GridEvent<M> e) {
+    if (e.getEvent().getButton() == Event.BUTTON_LEFT && e.getTarget().getClassName().equals("x-grid3-row-checker")) {
+      return;
+    }
+    super.handleMouseClick(e);
   }
 
   protected ColumnConfig newColumnConfig() {
@@ -132,8 +144,12 @@ public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionMo
   }
 
   private void setChecked(boolean checked) {
-    El hd = grid.getView().innerHd.child("div.x-grid3-hd-checker");
-    hd.getParent().setStyleName("x-grid3-hd-checker-on", checked);
+    if (grid.isViewReady()) {
+      El hd = grid.getView().innerHd.child("div.x-grid3-hd-checker");
+      if (hd != null) {
+        hd.getParent().setStyleName("x-grid3-hd-checker-on", checked);
+      }
+    }
   }
 
 }

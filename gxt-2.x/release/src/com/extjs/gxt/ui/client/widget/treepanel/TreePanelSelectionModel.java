@@ -2,7 +2,7 @@
  * Ext GWT - Ext for GWT
  * Copyright(c) 2007-2009, Ext JS, LLC.
  * licensing@extjs.com
- * 
+ *
  * http://extjs.com/license
  */
 package com.extjs.gxt.ui.client.widget.treepanel;
@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.data.ModelData;
-import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.TreePanelEvent;
@@ -34,13 +34,9 @@ import com.google.gwt.user.client.Event;
 @SuppressWarnings("unchecked")
 public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreSelectionModel<M> implements
     Listener<TreePanelEvent> {
-
   protected TreePanel tree;
   protected TreeStore<M> treeStore;
-  protected List<M> selectedPreRender;
-
   protected KeyNav<TreePanelEvent<M>> keyNav = new KeyNav<TreePanelEvent<M>>() {
-
     @Override
     public void onDown(TreePanelEvent<M> e) {
       onKeyDown(e);
@@ -60,7 +56,6 @@ public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreS
     public void onUp(TreePanelEvent<M> e) {
       onKeyUp(e);
     }
-
   };
 
   public TreePanelSelectionModel() {
@@ -95,12 +90,15 @@ public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreS
   public void bindTree(TreePanel tree) {
     if (this.tree != null) {
       this.tree.removeListener(Events.OnMouseDown, this);
+      this.tree.removeListener(Events.OnClick, this);
       keyNav.bind(null);
       bind(null);
+      this.treeStore = null;
     }
     this.tree = tree;
     if (tree != null) {
       tree.addListener(Events.OnMouseDown, this);
+      tree.addListener(Events.OnClick, this);
       keyNav.bind(tree);
       bind(tree.getStore());
       this.treeStore = (TreeStore) tree.getStore();
@@ -109,19 +107,20 @@ public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreS
 
   @Override
   public void deselect(int index) {
-
   }
 
   @Override
   public void deselect(int start, int end) {
-
   }
 
-  public void handleEvent(TreePanelEvent be) {
-    int type = be.getEventTypeInt();
+  public void handleEvent(TreePanelEvent tpe) {
+    int type = tpe.getEventTypeInt();
     switch (type) {
       case Event.ONMOUSEDOWN:
-        onMouseDown(be);
+        onMouseDown(tpe);
+        break;
+      case Event.ONCLICK:
+        onMouseClick(tpe);
         break;
     }
   }
@@ -133,7 +132,6 @@ public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreS
 
   @Override
   public void select(int start, int end, boolean keepExisting) {
-
   }
 
   /**
@@ -158,46 +156,29 @@ public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreS
     }
   }
 
-  protected void ensureExpanded(M model) {
-    tree.setExpanded(treeStore.getParent(model), true);
-  }
-
-  protected void hookPreRender(M item, boolean select) {
-    if (selectedPreRender == null) {
-      selectedPreRender = new ArrayList<M>();
-      tree.addListener(Events.Render, new Listener<ComponentEvent>() {
-        public void handleEvent(ComponentEvent be) {
-          tree.removeListener(Events.Render, this);
-          onRender();
-        }
-      });
-    }
-    if (select && !selectedPreRender.contains(item)) {
-      selectedPreRender.add(item);
-    } else if (!select) {
-      selectedPreRender.remove(item);
-    }
-  }
-
   protected M next() {
     M sel = lastSelected;
     if (sel == null) {
       return null;
     }
-    if (treeStore.getFirstChild(sel) != null && tree.isExpanded(sel)) {
-      return treeStore.getFirstChild(sel);
-    } else if (treeStore.getNextSibling(sel) != null) {
-      return treeStore.getNextSibling(sel);
-    } else if (treeStore.getParent(sel) != null) {
-      M p = treeStore.getParent(sel);
-      while (p != null) {
-        if (treeStore.getNextSibling(p) != null) {
-          return treeStore.getNextSibling(p);
+    M first = treeStore.getFirstChild(sel);
+    if (first != null && tree.isExpanded(sel)) {
+      return first;
+    } else {
+      M nextSibling = treeStore.getNextSibling(sel);
+      if (nextSibling != null) {
+        return nextSibling;
+      } else {
+        M p = treeStore.getParent(sel);
+        while (p != null) {
+          nextSibling = treeStore.getNextSibling(p);
+          if (nextSibling != null) {
+            return nextSibling;
+          }
+          p = treeStore.getParent(p);
         }
-        p = treeStore.getParent(p);
       }
     }
-
     return null;
   }
 
@@ -211,9 +192,7 @@ public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreS
   }
 
   protected void onKeyLeft(TreePanelEvent<M> ce) {
-    if (lastSelected == null) {
-      return;
-    }
+    ce.preventDefault();
     if (!tree.isLeaf(lastSelected) && tree.isExpanded(lastSelected)) {
       tree.setExpanded(lastSelected, false);
     } else if (treeStore.getParent(lastSelected) != null) {
@@ -222,13 +201,9 @@ public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreS
   }
 
   protected void onKeyRight(TreePanelEvent<M> ce) {
-    if (lastSelected == null) {
-      return;
-    }
-    if (!tree.isLeaf(lastSelected)) {
-      if (!tree.isExpanded(lastSelected)) {
-        tree.setExpanded(lastSelected, true);
-      }
+    ce.preventDefault();
+    if (!tree.isLeaf(lastSelected) && !tree.isExpanded(lastSelected)) {
+      tree.setExpanded(lastSelected, true);
     }
   }
 
@@ -241,64 +216,15 @@ public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreS
     }
   }
 
-  protected void onRender() {
-    if (selectedPreRender != null) {
-      for (M item : selectedPreRender) {
-        onSelectChange(item, true);
-      }
-      selectedPreRender = null;
-    }
-  }
-
-  @Override
-  protected void onSelectChange(M model, boolean select) {
-    if (locked) return;
-    if (!tree.isRendered()) {
-      hookPreRender(model, select);
-      return;
-    }
-    if (select) {
-      ensureExpanded(model);
-    }
-
-    tree.getView().onSelectChange(model, select);
-  }
-
-  protected M prev() {
-    M sel = lastSelected;
-    if (sel == null) {
-      return sel;
-    }
-    if (treeStore.getPreviousSibling(sel) != null) {
-      M prev = treeStore.getPreviousSibling(sel);
-      if ((!tree.isExpanded(prev) || treeStore.getChildCount(prev) < 1)) {
-        return prev;
-      } else {
-        M lastChild = treeStore.getLastChild(prev);
-        while (lastChild != null && treeStore.getChildCount(lastChild) > 0 && tree.isExpanded(lastChild)) {
-          lastChild = treeStore.getLastChild(lastChild);
-        }
-        return lastChild;
-      }
-    } else if (treeStore.getParent(sel) != null) {
-      return treeStore.getParent(sel);
-    }
-    return null;
-  }
-
-  private void onMouseDown(TreePanelEvent be) {
+  protected void onMouseDown(TreePanelEvent be) {
     if (be.getItem() == null) return;
-
     if (!tree.getView().isSelectableTarget(be.getItem(), be.getTarget())) {
       return;
     }
-
     if (be.isRightClick() && isSelected((M) be.getItem())) {
       return;
     }
-
     M sel = (M) be.getItem();
-
     switch (selectionMode) {
       case SIMPLE:
         if (isSelected(sel)) {
@@ -321,7 +247,6 @@ public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreS
           }
           TreeNode selNode = tree.findNode(lastSelected);
           TreeNode itemNode = tree.findNode(sel);
-
           if (selNode.element != null && itemNode.element != null) {
             if (selNode.element.getAbsoluteTop() < itemNode.element.getAbsoluteTop()) {
               M next = next();
@@ -342,12 +267,56 @@ public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreS
             }
             doSelect(items, true, false);
           }
-        } else if (isSelected(sel) && be.isControlKey()) {
+        } else if (be.isControlKey() && isSelected(sel)) {
           doDeselect(Arrays.asList(sel), false);
         } else {
           doSelect(Arrays.asList(sel), be.isControlKey(), false);
         }
         break;
     }
+  }
+
+  protected void onMouseClick(TreePanelEvent e) {
+    if (isLocked()) {
+      return;
+    }
+    if (!e.isRightClick() && selectionMode == SelectionMode.MULTI) {
+      M sel = (M) e.getItem();
+      if (isSelected(sel) && getSelectedItems().size() > 1) {
+        if (!e.isControlKey() && !e.isShiftKey()) {
+           select(Arrays.asList(sel), false);
+        }
+      }
+    }
+  }
+
+  @Override
+  protected void onSelectChange(M model, boolean select) {
+    tree.getView().onSelectChange(model, select);
+  }
+
+  protected M prev() {
+    M sel = lastSelected;
+    if (sel == null) {
+      return sel;
+    }
+    M prev = treeStore.getPreviousSibling(sel);
+    if (prev != null) {
+      if ((!tree.isExpanded(prev) || treeStore.getChildCount(prev) < 1)) {
+        return prev;
+      } else {
+        M lastChild = treeStore.getLastChild(prev);
+        while (lastChild != null && treeStore.getChildCount(lastChild) > 0 && tree.isExpanded(lastChild)) {
+          lastChild = treeStore.getLastChild(lastChild);
+        }
+        return lastChild;
+      }
+    } else {
+      M parent = treeStore.getParent(sel);
+      if (parent != null) {
+        return parent;
+      }
+    }
+    return null;
   }
 }

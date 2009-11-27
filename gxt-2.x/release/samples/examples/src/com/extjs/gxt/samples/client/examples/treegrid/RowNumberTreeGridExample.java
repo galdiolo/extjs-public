@@ -2,7 +2,7 @@ package com.extjs.gxt.samples.client.examples.treegrid;
 
 import java.util.Arrays;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Folder;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -53,7 +53,7 @@ public class RowNumberTreeGridExample extends LayoutContainer {
     TreeGrid<ModelData> tree = new TreeGrid<ModelData>(store, cm);
     tree.addPlugin(numberer);
     tree.setBorders(true);
-    tree.getStyle().setLeafIcon(Examples.ICONS.music());
+    tree.getStyle().setLeafIcon(Resources.ICONS.music());
     tree.setSize(400, 400);
     tree.setAutoExpandColumn("name");
     tree.setTrackMouseOver(false);

@@ -30,7 +30,7 @@ import com.google.gwt.user.client.Element;
  * appropriate number type.
  * 
  * <code><pre>
- * NumberField&lt;Integer&gt; field = new NumberField&lt;Integer&gt;;
+ * NumberField field = new NumberField();
  * field.setPropertyEdtiorType(Integer.class);
  * </pre></code>
  * 
@@ -355,8 +355,6 @@ public class NumberField extends TextField<Number> {
     try {
       d = getPropertyEditor().convertStringValue(v);
     } catch (Exception e) {
-      //TODO
-      System.out.println(e);
       String error = "";
       if (getMessages().getNanText() == null) {
         error = GXT.MESSAGES.numberField_nanText(v);

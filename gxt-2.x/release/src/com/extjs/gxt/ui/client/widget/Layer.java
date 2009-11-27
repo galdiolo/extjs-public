@@ -11,7 +11,6 @@ import java.util.Stack;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
-import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.util.Markup;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.google.gwt.core.client.GWT;
@@ -61,26 +60,17 @@ public class Layer extends El {
     setShadowPosition(ShadowPosition.SIDES);
   }
 
-  @Override
-  public El alignTo(Element align, String pos, int[] offsets) {
-    super.alignTo(align, pos, offsets);
-    sync(true);
-    return this;
-  }
-
   private El createShadow() {
     El el;
     if (GXT.isIE) {
-
-      el = new El(DOM.createDiv());;
+      el = new El(DOM.createDiv());
       el.setStyleName("x-ie-shadow");
-      if (GXT.isIE) {
-        el.setStyleAttribute("filter", "progid:DXImageTransform.Microsoft.alpha("
-            + "opacity=50) progid:DXImageTransform.Microsoft.Blur(pixelradius=" + shadowOffset + ")");
-      }
+      el.setStyleAttribute("filter", "progid:DXImageTransform.Microsoft.alpha("
+          + "opacity=50) progid:DXImageTransform.Microsoft.Blur(pixelradius=" + shadowOffset + ")");
     } else {
       el = new El(Markup.SHADOW);
     }
+    el.hide();
     return el;
   }
 
@@ -151,27 +141,19 @@ public class Layer extends El {
    * @return the shadow or null
    */
   public El getShadow() {
+    El pn = getParent();
+    if (pn == null || !shadowEnabled) {
+      hideShadow();
+      return null;
+    }
     if (shadow != null) {
       return shadow;
     }
     shadow = shadows.size() > 0 ? shadows.pop() : null;
     if (shadow == null) {
       shadow = createShadow();
-      shadow.setVisible(false);
     }
-    El pn = getParent();
-    if (pn == null) return null;
-    El p = shadow.getParent();
-    if (p != null && p.dom == XDOM.getBody()) {
-      pn.insertChild(shadow.dom, 0);
-    } else if (p == null || pn.dom != p.dom) {
-      try {
-        pn.insertBefore(shadow.dom, dom);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-      
-    }
+    pn.insertBefore(shadow.dom, dom);
     shadow.setZIndex(getZIndex() - 1);
     return shadow;
   }
@@ -200,21 +182,19 @@ public class Layer extends El {
    * @return the shim
    */
   public El getShim() {
+    El pn = getParent();
+    if (pn == null || !shimEnabled) {
+      hideShim();
+      return null;
+    }
     if (shim != null) {
       return shim;
     }
     shim = shims.size() > 0 ? shims.pop() : null;
     if (shim == null) {
       shim = createShim();
-      shim.setVisible(false);
     }
-    El pn = getParent();
-    El p = shim.getParent();
-    if (p != null && p.dom == XDOM.getBody()) {
-      pn.insertChild(shim.dom, 0);
-    } else if (p == null || pn.dom != p.dom) {
-      pn.insertBefore(shim.dom, dom);
-    }
+    pn.insertBefore(shim.dom, dom);
     shim.setZIndex(getZIndex() - 2);
     return shim;
   }
@@ -385,13 +365,6 @@ public class Layer extends El {
   }
 
   @Override
-  public El setXY(int x, int y) {
-    super.setXY(x, y);
-    sync(true);
-    return this;
-  }
-
-  @Override
   public El setZIndex(int zIndex) {
     super.setZIndex(zIndex);
     if (shadow != null) {
@@ -421,7 +394,7 @@ public class Layer extends El {
         if (shadow == null) {
           shadow = getShadow();
         }
-        if (shadow != null && show) {
+        if (show) {
           shadow.show();
         }
         shadow.setLeft(l + shadowAdjusts.x);
@@ -446,7 +419,7 @@ public class Layer extends El {
           shim = getShim();
         }
         if (show) {
-          shim.setVisible(true);
+          shim.show();
         }
         Rectangle a = shadow == null ? new Rectangle(0, 0, 0, 0) : shadowAdjusts;
 

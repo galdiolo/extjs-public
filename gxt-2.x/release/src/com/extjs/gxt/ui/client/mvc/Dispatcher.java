@@ -12,11 +12,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.FastMap;
+import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.extjs.gxt.ui.client.event.EventType;
 import com.extjs.gxt.ui.client.event.MvcEvent;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.History;
@@ -61,7 +64,9 @@ public class Dispatcher extends BaseObservable {
    */
   public static final EventType AfterDispatch = new EventType();
 
-  private static Dispatcher instance = new Dispatcher();
+  private static Dispatcher instance;
+
+  private static boolean historyEnabled = true;
 
   /**
    * Forwards an application event to the dispatcher.
@@ -69,7 +74,7 @@ public class Dispatcher extends BaseObservable {
    * @param event the application event
    */
   public static void forwardEvent(AppEvent event) {
-    instance.dispatch(event);
+    get().dispatch(event);
   }
 
   /**
@@ -78,7 +83,7 @@ public class Dispatcher extends BaseObservable {
    * @param eventType the application event type
    */
   public static void forwardEvent(EventType eventType) {
-    instance.dispatch(eventType);
+    get().dispatch(eventType);
   }
 
   /**
@@ -88,7 +93,7 @@ public class Dispatcher extends BaseObservable {
    * @param data the event data
    */
   public static void forwardEvent(EventType eventType, Object data) {
-    instance.dispatch(new AppEvent(eventType, data));
+    get().dispatch(new AppEvent(eventType, data));
   }
 
   /**
@@ -101,7 +106,7 @@ public class Dispatcher extends BaseObservable {
   public static void forwardEvent(EventType eventType, Object data, boolean historyEvent) {
     AppEvent ae = new AppEvent(eventType, data);
     ae.setHistoryEvent(historyEvent);
-    instance.dispatch(ae);
+    get().dispatch(ae);
   }
 
   /**
@@ -110,27 +115,30 @@ public class Dispatcher extends BaseObservable {
    * @return the dispatcher
    */
   public static Dispatcher get() {
+    if (instance == null) {
+      instance = new Dispatcher();
+    }
     return instance;
   }
 
   private Map<String, AppEvent> history;
 
   private List<Controller> controllers;
+  private Boolean supportsHistory = null;
 
   private Dispatcher() {
     controllers = new ArrayList<Controller>();
     history = new FastMap<AppEvent>();
-    History.addValueChangeHandler(new ValueChangeHandler<String>() {
-
-      public void onValueChange(ValueChangeEvent<String> event) {
-        String historyToken = event.getValue();
-        if (history.containsKey(historyToken)) {
-          dispatch(history.get(historyToken), false);
+    if (supportsHistory()) {
+      History.addValueChangeHandler(new ValueChangeHandler<String>() {
+        public void onValueChange(ValueChangeEvent<String> event) {
+          String historyToken = event.getValue();
+          if (history.containsKey(historyToken)) {
+            dispatch(history.get(historyToken), false);
+          }
         }
-        
-      }
-      
-    });
+      });
+    }
   }
 
   /**
@@ -155,8 +163,8 @@ public class Dispatcher extends BaseObservable {
   }
 
   /**
-   * The dispatcher will query its controllers and pass the application event to any
-   * controllers that can handle the particular event type.
+   * The dispatcher will query its controllers and pass the application event to
+   * any controllers that can handle the particular event type.
    * 
    * @param event the application event
    */
@@ -226,7 +234,8 @@ public class Dispatcher extends BaseObservable {
     MvcEvent e = new MvcEvent(this, event);
     e.setAppEvent(event);
     if (fireEvent(BeforeDispatch, e)) {
-      for (Controller controller : controllers) {
+      List<Controller> copy = new ArrayList<Controller>(controllers);
+      for (Controller controller : copy) {
         if (controller.canHandle(event)) {
           if (!controller.initialized) {
             controller.initialized = true;
@@ -243,8 +252,17 @@ public class Dispatcher extends BaseObservable {
         token = "" + new Date().getTime();
       }
       history.put(token, event);
-      History.newItem(token, false);
+      if (supportsHistory()) {
+        History.newItem(token, false);
+      }
     }
   }
 
+  private boolean supportsHistory() {
+    if (supportsHistory == null) {
+      supportsHistory = historyEnabled && GWT.isClient()
+          && (XDOM.getElementById("__gwt_historyFrame") != null || !(GXT.isIE6 || GXT.isIE7));
+    }
+    return supportsHistory;
+  }
 }

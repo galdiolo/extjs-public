@@ -14,10 +14,12 @@ public interface ScaleProvider {
 
   public static ScaleProvider DEFAULT_SCALE_PROVIDER = new ScaleProvider() {
     public Scale calcScale(double min, double max) {
+      if (min == 0 && max == 0) {
+        return new Scale(-1, 1, 1);
+      }
       min = Math.floor(min * (min > 0 ? .9 : 1.1));
       max = Math.round(max * (max > 0 ? 1.1 : .9));
-      return new Scale(min, max, Math.max(min > 0 ? min : min * -1, max > 0 ? max : max
-          * -1) / 10);
+      return new Scale(min, max, Math.max(min > 0 ? min : min * -1, max > 0 ? max : max * -1) / 10);
     }
   };
 

@@ -3,7 +3,7 @@ package com.extjs.gxt.samples.client.examples.dnd;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Stock;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -60,6 +60,7 @@ public class ReorderingGridExample extends LayoutContainer {
 
     ColumnConfig column = new ColumnConfig();
     column.setId("name");
+    column.setSortable(false);
     column.setHeader("Company");
     column.setWidth(200);
     configs.add(column);
@@ -95,7 +96,7 @@ public class ReorderingGridExample extends LayoutContainer {
 
     ContentPanel cp = new ContentPanel();
     cp.setBodyBorder(false);
-    cp.setIcon(Examples.ICONS.table());
+    cp.setIcon(Resources.ICONS.table());
     cp.setHeading("Reordering Grid");
     cp.setButtonAlign(HorizontalAlignment.CENTER);
     cp.setLayout(new FitLayout());

@@ -16,10 +16,13 @@ import com.extjs.gxt.ui.client.widget.Text;
 import com.extjs.gxt.ui.client.widget.layout.FlowData;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
+import com.google.gwt.user.client.Element;
 
 public class RowLayoutExample extends LayoutContainer {
 
-  public RowLayoutExample() {
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
     setScrollMode(Scroll.AUTOY);
     ContentPanel panel = new ContentPanel();
     panel.setHeading("RowLayout: Orientation set to vertical");

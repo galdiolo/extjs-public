@@ -7,12 +7,19 @@
  */
 package com.extjs.gxt.ui.client.event;
 
+import java.io.Serializable;
+
 import com.google.gwt.user.client.Event;
 
 /**
  * Base class for all events types.
  */
-public class EventType {
+public class EventType implements Serializable {
+
+  private static int count = 0;
+
+  // needed to use FastMap for much better speed
+  final String id;
 
   private int eventCode = -1;
 
@@ -20,7 +27,7 @@ public class EventType {
    * Creates a new event type.
    */
   public EventType() {
-
+    id = String.valueOf(count++);
   }
 
   /**
@@ -29,6 +36,7 @@ public class EventType {
    * @param eventCode additional information about the event
    */
   public EventType(int eventCode) {
+    this();
     this.eventCode = eventCode;
   }
 
@@ -50,5 +58,4 @@ public class EventType {
   public boolean isBrowserEvent() {
     return eventCode != -1;
   }
-
 }

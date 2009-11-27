@@ -17,6 +17,7 @@ import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.util.BaseEventPreview;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.RootPanel;
 
 /**
@@ -82,6 +83,7 @@ public class ModalPanel extends BoxComponent {
     baseStyle = "x-modal";
     shim = true;
     setShadow(false);
+    monitorWindowResize = true;
   }
 
   /**
@@ -139,11 +141,9 @@ public class ModalPanel extends BoxComponent {
 
     super.show();
 
-    if (blink) {
-      eventPreview.getIgnoreList().removeAll();
-      eventPreview.getIgnoreList().add(component.getElement());
-      eventPreview.add();
-    }
+    eventPreview.getIgnoreList().removeAll();
+    eventPreview.getIgnoreList().add(component.getElement());
+    eventPreview.add();
 
     syncModal();
   }
@@ -152,6 +152,7 @@ public class ModalPanel extends BoxComponent {
    * Syncs to the viewport.
    */
   public void syncModal() {
+    setSize(0, 0);
     int w = XDOM.getViewWidth(true);
     int h = XDOM.getViewHeight(true);
     setSize(w, h);
@@ -182,21 +183,34 @@ public class ModalPanel extends BoxComponent {
     setElement(DOM.createDiv(), target, index);
     super.onRender(target, index);
     eventPreview = new BaseEventPreview() {
-
       @Override
-      protected void onClick(PreviewEvent pe) {
-        if (blink && !blinking && DOM.isOrHasChild(getElement(), pe.getTarget())) {
-          blinking = true;
-          component.el().blink(new FxConfig(new Listener<FxEvent>() {
-            public void handleEvent(FxEvent fe) {
-              blinking = false;
-            }
-          }));
+      protected boolean onPreview(PreviewEvent pe) {
+        if (pe.getEventTypeInt() == Event.ONMOUSEDOWN && getElement().isOrHasChild(pe.getTarget())
+            && (fly(pe.getTarget()).findParent(".x-ignore", -1) == null)) {
+          if (blink && !blinking) {
+            blinking = true;
+            component.el().blink(new FxConfig(new Listener<FxEvent>() {
+              public void handleEvent(FxEvent fe) {
+                blinking = false;
+                component.focus();
+              }
+            }));
+          } else if (!blink) {
+            component.focus();
+          }
+
         }
+        return super.onPreview(pe);
       }
 
     };
     eventPreview.setAutoHide(false);
+  }
+
+  @Override
+  protected void onWindowResize(int width, int height) {
+    super.onWindowResize(width, height);
+    syncModal();
   }
 
 }

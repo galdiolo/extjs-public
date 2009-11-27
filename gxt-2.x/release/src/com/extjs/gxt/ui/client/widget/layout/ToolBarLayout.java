@@ -45,15 +45,16 @@ public class ToolBarLayout extends Layout {
   private List<Component> hiddens;
   private boolean lastOverflow = false;
   private int lastWidth = 0;
-  private int spacing = 0;
   private El leftTr;
-  private El rightTr;
-  private int triggerWidth = 18;
   private String noItemsMenuText = "<div class=\"x-toolbar-no-items\">(None)</div>";
+  private El rightTr;
+  private int spacing = 0;
+  private int triggerWidth = 18;
 
   public ToolBarLayout() {
     monitorResize = true;
     hiddens = new ArrayList<Component>();
+    targetStyleName = "x-toolbar-layout-ct";
   }
 
   public String getNoItemsMenuText() {
@@ -144,9 +145,9 @@ public class ToolBarLayout extends Layout {
   protected void cleanup(El row) {
     NodeList<Node> cn = row.dom.getChildNodes();
     for (int i = cn.getLength() - 1; i >= 0; i--) {
-
-      if (cn.getItem(i).getFirstChild() == null) {
-        row.dom.removeChild(cn.getItem(i));
+      Element td = (Element) cn.getItem(i);
+      if (!td.hasChildNodes()) {
+        row.dom.removeChild(td);
       }
     }
   }
@@ -159,9 +160,9 @@ public class ToolBarLayout extends Layout {
     if (!((ToolBar) container).isEnableOverflow()) {
       return;
     }
-    int w = t.getClientWidth();
+    int w = t.getWidth(true);
     int lw = lastWidth;
-    
+
     lastWidth = w;
     int iw = t.firstChild().getWidth(true);
 
@@ -184,7 +185,7 @@ public class ToolBarLayout extends Layout {
         }
       }
     }
-    if (hiddens.size() > 0) {
+    if (hiddens != null && hiddens.size() > 0) {
       initMore();
       if (!lastOverflow) {
         lastOverflow = true;
@@ -204,6 +205,7 @@ public class ToolBarLayout extends Layout {
 
   protected void hideComponent(Component c) {
     c.setData("xtbWidth", c.el().getParent().getWidth());
+    c.setData("xtbIsVisible", c.isVisible(false));
     hiddens.add(c);
     c.hide();
   }
@@ -231,7 +233,7 @@ public class ToolBarLayout extends Layout {
       });
 
       more = new Button();
-      more.setStyleName("x-toolbar-more");
+      more.addStyleName("x-toolbar-more");
       more.setIcon(GXT.IMAGES.toolbar_more());
       more.setMenu(moreMenu);
 
@@ -243,10 +245,6 @@ public class ToolBarLayout extends Layout {
       more.render(td);
     }
     ComponentHelper.doAttach(more);
-  }
-
-  protected boolean isHidden(Component c) {
-    return hiddens.contains(c);
   }
 
   protected Element insertCell(Component c, El side, int pos) {
@@ -262,9 +260,29 @@ public class ToolBarLayout extends Layout {
     return td;
   }
 
+  protected boolean isHidden(Component c) {
+    return hiddens.contains(c);
+  }
+
+  @Override
+  protected void onComponentHide(Component component) {
+    super.onComponentHide(component);
+    if (component.isRendered()) {
+      component.el().getParent().addStyleName(component.getHideMode().value());
+    }
+
+  }
+
+  @Override
+  protected void onComponentShow(Component component) {
+    super.onComponentShow(component);
+    if (component.isRendered()) {
+      component.el().getParent().removeStyleName(component.getHideMode().value());
+    }
+  }
+
   protected void onLayout(Container<?> container, El target) {
     if (leftTr == null) {
-      target.addStyleName("x-toolbar-layout-ct");
       target.insertHtml(
           "beforeEnd",
           "<table cellspacing=\"0\" class=\"x-toolbar-ct\" role=\"presentation\"><tbody><tr><td class=\"x-toolbar-left\" align=\"left\"><table cellspacing=\"0\" role=\"presentation\"><tbody><tr class=\"x-toolbar-left-row\"></tr></tbody></table></td><td class=\"x-toolbar-right\" align=\"right\"><table cellspacing=\"0\" class=\"x-toolbar-right-ct\"><tbody><tr><td><table cellspacing=\"0\"><tbody><tr class=\"x-toolbar-right-row\"></tr></tbody></table></td><td><table cellspacing=\"0\"><tbody><tr class=\"x-toolbar-extras-row\"></tr></tbody></table></td></tr></tbody></td></tr></tbody></table>");
@@ -307,10 +325,12 @@ public class ToolBarLayout extends Layout {
   }
 
   protected void unhideComponent(Component c) {
-    if (hiddens.contains(c)) {
-      c.show();
+    if (hiddens.remove(c)) {
+      if (c.<Boolean> getData("xtbIsVisible")) {
+        c.show();
+      }
       c.setData("xtbWidth", null);
-      hiddens.remove(c);
+      c.setData("xtbIsVisible", null);
     }
   }
 }

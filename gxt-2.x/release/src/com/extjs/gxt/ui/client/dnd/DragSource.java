@@ -116,6 +116,7 @@ public class DragSource extends BaseObservable {
     draggable.setSizeProxyToSource(false);
     draggable.setMoveAfterProxyDrag(false);
     draggable.addDragListener(listener);
+    draggable.setProxy(statusProxy.el());
   }
 
   /**
@@ -133,6 +134,7 @@ public class DragSource extends BaseObservable {
    */
   public void disable() {
     enabled = false;
+    draggable.setEnabled(false);
   }
 
   /**
@@ -140,6 +142,7 @@ public class DragSource extends BaseObservable {
    */
   public void enable() {
     enabled = true;
+    draggable.setEnabled(true);
   }
 
   /**
@@ -193,7 +196,14 @@ public class DragSource extends BaseObservable {
    * @return true for enabled
    */
   public boolean isEnabled() {
-    return enabled;
+    return enabled && draggable.isEnabled();
+  }
+
+  /**
+   * Releases the DragSource from the component.
+   */
+  public void release() {
+    draggable.release();
   }
 
   /**
@@ -248,6 +258,10 @@ public class DragSource extends BaseObservable {
 
   }
 
+  protected void onDragFail(DNDEvent event) {
+
+  }
+
   /**
    * Called when a drag operation begins on the target component. Subclasses or
    * any listeners can cancel the action by calling
@@ -291,10 +305,6 @@ public class DragSource extends BaseObservable {
   }
 
   private void onDraggableDragStart(DragEvent de) {
-    if (!isEnabled() || !component.isEnabled()) {
-      de.setCancelled(true);
-      return;
-    }
     DNDEvent e = new DNDEvent(this, de.getEvent());
     e.setData(data);
     e.setDragEvent(de);

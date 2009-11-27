@@ -40,19 +40,13 @@ public class BeanModelReader implements DataReader<ListLoadResult<ModelData>> {
           List models = new ArrayList(beans.size());
           for (Object o : beans) {
             BeanModelFactory factory = BeanModelLookup.get().getFactory(o.getClass());
-            if (factory == null) {
-              throw new RuntimeException("No BeanModelFactory found for " + o.getClass());
-            }
+            assert factory != null : "No BeanModelFactory found for " + o.getClass();
             models.add(factory.createModel(o));
           }
           return newLoadResult(loadConfig, models);
         } else {
-          BeanModelFactory factory = BeanModelLookup.get().getFactory(
-              beans.get(0).getClass());
-          if (factory == null) {
-            throw new RuntimeException("No BeanModelFactory found for "
-                + beans.get(0).getClass());
-          }
+          BeanModelFactory factory = BeanModelLookup.get().getFactory(beans.get(0).getClass());
+          assert factory != null : "No BeanModelFactory found for " + beans.get(0).getClass();
           return newLoadResult(loadConfig, (List) factory.createModel(beans));
         }
       }
@@ -67,27 +61,22 @@ public class BeanModelReader implements DataReader<ListLoadResult<ModelData>> {
           converted = new ArrayList(beans.size());
           for (Object o : beans) {
             BeanModelFactory factory = BeanModelLookup.get().getFactory(o.getClass());
-            if (factory == null) {
-              throw new RuntimeException("No BeanModelFactory found for " + o.getClass());
-            }
+            assert factory != null : "No BeanModelFactory found for " + o.getClass();
             converted.add(factory.createModel(o));
           }
         } else {
-          BeanModelFactory factory = BeanModelLookup.get().getFactory(
-              beans.get(0).getClass());
-          if (factory == null) {
-            throw new RuntimeException("No BeanModelFactory found for "
-                + beans.get(0).getClass());
-          }
+          BeanModelFactory factory = BeanModelLookup.get().getFactory(beans.get(0).getClass());
+          assert factory != null : "No BeanModelFactory found for " + beans.get(0).getClass();
           converted = factory.createModel(beans);
         }
         beans.clear();
         beans.addAll(converted);
       }
       return (ListLoadResult) data;
-    } else {
-      throw new RuntimeException("Error converting data");
     }
+    assert false : "Error converting data";
+
+    return null;
   }
 
   /**
@@ -106,8 +95,7 @@ public class BeanModelReader implements DataReader<ListLoadResult<ModelData>> {
    * @param models the models
    * @return the load result
    */
-  protected ListLoadResult<ModelData> newLoadResult(Object loadConfig,
-      List<ModelData> models) {
+  protected ListLoadResult<ModelData> newLoadResult(Object loadConfig, List<ModelData> models) {
     return new BaseListLoadResult<ModelData>(models);
   }
 

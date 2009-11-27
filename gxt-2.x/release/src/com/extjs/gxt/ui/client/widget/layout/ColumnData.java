@@ -7,9 +7,11 @@
  */
 package com.extjs.gxt.ui.client.widget.layout;
 
+import com.extjs.gxt.ui.client.Style;
+
 public class ColumnData extends LayoutData {
 
-  private double width;
+  private double width = Style.DEFAULT;
 
   public ColumnData() {
 

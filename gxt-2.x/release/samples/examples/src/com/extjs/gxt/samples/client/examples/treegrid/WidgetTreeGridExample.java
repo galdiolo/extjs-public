@@ -47,7 +47,9 @@ public class WidgetTreeGridExample extends LayoutContainer {
       @Override
       public Widget getWidget(ModelData model, String property, ColumnData config, int rowIndex, int colIndex,
           ListStore<ModelData> store, Grid<ModelData> grid) {
-        return new Button((String)model.get(property));
+        Button b = new Button((String)model.get(property));
+        b.setToolTip("Click for more information");
+        return b;
       }
     });
 
@@ -67,7 +69,6 @@ public class WidgetTreeGridExample extends LayoutContainer {
     tree.setBorders(true);
     tree.setSize(400, 400);
     tree.setAutoExpandColumn("name");
-    tree.getTreeView().setBufferEnabled(false);
     tree.getTreeView().setRowHeight(26);
     tree.getStyle().setLeafIcon(IconHelper.createStyle("icon-music"));
     

@@ -18,10 +18,12 @@ import com.extjs.gxt.ui.client.state.StateManager;
 import com.extjs.gxt.ui.client.util.CSS;
 import com.extjs.gxt.ui.client.util.Theme;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Accessibility;
 
 /**
  * GXT core utilities and functions.
@@ -107,7 +109,7 @@ public class GXT {
    * <code>true</code> if the browser is gecko3.
    */
   public static boolean isGecko3;
-  
+
   /**
    * <code>true</code> if the browser is gecko3.5.
    */
@@ -163,14 +165,14 @@ public class GXT {
    * URL to a 1x1 transparent gif image used by GXT to create inline icons with
    * CSS background images. Default value is '/images/default/shared/clear.gif';
    */
-  public static String BLANK_IMAGE_URL = GWT.getModuleBaseURL() + "clear.gif";
+  public static String BLANK_IMAGE_URL;
 
   private static boolean initialized;
   private static Theme defaultTheme;
   private static boolean forceTheme;
   private static Version version;
   private static boolean ariaEnabled;
-  
+
   /**
    * Returns the auto id prefix.
    * 
@@ -179,7 +181,7 @@ public class GXT {
   public static String getAutoIdPrefix() {
     return XDOM.getAutoIdPrefix();
   }
-  
+
   /**
    * Returns the current theme id.
    * 
@@ -225,7 +227,7 @@ public class GXT {
       Timer t = new Timer() {
         @Override
         public void run() {
-          loading.getStyle().setProperty("display", "none");
+          El.fly(loading).hide();
         }
       };
       t.schedule(500);
@@ -244,16 +246,20 @@ public class GXT {
     String ua = getUserAgent();
 
     isOpera = ua.indexOf("opera") != -1;
-    isChrome = ua.indexOf("chrome") != -1;
-    isWebKit = ua.indexOf("webkit") != -1;
-    isSafari = !isChrome && ua.indexOf("safari") != -1;
-    isSafari3 = isSafari && ua.indexOf("version/3") != -1;
-    isSafari4 = isSafari && ua.indexOf("version/4") != -1;
-    isSafari2 = isSafari && !isSafari3 && !isSafari4;
     isIE = !isOpera && ua.indexOf("msie") != -1;
     isIE7 = !isOpera && ua.indexOf("msie 7") != -1;
     isIE8 = !isOpera && ua.indexOf("msie 8") != -1;
     isIE6 = isIE && !isIE7 && !isIE8;
+    
+    isChrome = !isIE && ua.indexOf("chrome") != -1;
+    
+    isWebKit = ua.indexOf("webkit") != -1;
+    
+    isSafari = !isChrome && ua.indexOf("safari") != -1;
+    isSafari3 = isSafari && ua.indexOf("version/3") != -1;
+    isSafari4 = isSafari && ua.indexOf("version/4") != -1;
+    isSafari2 = isSafari && !isSafari3 && !isSafari4;
+    
     isGecko = !isWebKit && ua.indexOf("gecko") != -1;
     isGecko3 = isGecko && ua.indexOf("rv:1.9.0") != -1;
     isGecko35 = isGecko && ua.indexOf("rv:1.9.1") != -1;
@@ -266,25 +272,31 @@ public class GXT {
 
     useShims = isIE6 || (isMac && isGecko2);
 
-    isStrict = "CSS1Compat".equals(DOM.getElementProperty(XDOM.getDocument(), "compatMode"));
+    isStrict = Document.get().isCSS1Compat();
 
-    isBorderBox = isIE && !isStrict;
+    isBorderBox = El.isBorderBox(DOM.createDiv());
 
-    isSecure = Window.Location.getHref().startsWith("https");
-
-    initInternal();
+    isSecure = Window.Location.getProtocol().toLowerCase().startsWith("https");
+    if (BLANK_IMAGE_URL == null) {
+      if (isIE8 || (isGecko && !isSecure)) {
+        BLANK_IMAGE_URL = "data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==";
+      } else {
+        BLANK_IMAGE_URL = GWT.getModuleBaseURL() + "clear.gif";
+      }
+    }
 
     El bodyEl = XDOM.getBodyEl();
+
+    if (isBorderBox) {
+      bodyEl.addStyleName("ext-border-box");
+    }
 
     if (isIE) {
       bodyEl.addStyleName("ext-ie");
       String cls = (isIE6 ? "ext-ie6" : (isIE7 ? "ext-ie7" : "ext-ie8"));
       bodyEl.addStyleName(cls);
-      if(isIE7 && isIE8compatibility()){
+      if (isIE7 && isIE8compatibility()) {
         bodyEl.addStyleName("ext-ie8-compatibility");
-      }
-      if (isBorderBox) {
-        bodyEl.addStyleName("ext-border-box");
       }
     } else if (isGecko) {
       bodyEl.addStyleName("ext-gecko");
@@ -308,11 +320,11 @@ public class GXT {
       bodyEl.addStyleName("ext-linux");
     }
 
-    CookieProvider provider = new CookieProvider("/", null, null, false);
-    StateManager.get().setProvider(provider);
+    if (StateManager.get().getProvider() == null) {
+      StateManager.get().setProvider(new CookieProvider("/", null, null, false));
+    }
 
-    Map<String, Object> theme = StateManager.get().getMap(
-        GWT.getModuleBaseURL() + "theme");
+    Map<String, Object> theme = StateManager.get().getMap(GWT.getModuleBaseURL() + "theme");
     if ((defaultTheme != null && forceTheme) || (theme == null && defaultTheme != null)) {
       theme = defaultTheme.asMap();
     }
@@ -347,8 +359,6 @@ public class GXT {
   public static boolean isAriaEnabled() {
     return ariaEnabled;
   }
-  
-  
 
   /**
    * True to enable ARIA functionality.
@@ -357,6 +367,7 @@ public class GXT {
    */
   public static void setAriaEnabled(boolean enable) {
     ariaEnabled = enable;
+    Accessibility.setRole(XDOM.getBody(), enable ? "application" : "");
   }
 
   /**
@@ -395,24 +406,18 @@ public class GXT {
     XDOM.reload();
   }
 
-  private static native void initInternal() /*-{
-    $wnd.GXT = {};
-    $wnd.GXT.Ext = {};
-    @com.extjs.gxt.ui.client.core.Ext::load()();
+  private native static boolean isIE8compatibility() /*-{
+    if(@com.extjs.gxt.ui.client.GXT::isIE7){
+    if($doc.documentMode){
+    return true;
+    }
+    }
+    return false;
   }-*/;
 
-  private native static boolean isIE8compatibility() /*-{
-  if(@com.extjs.gxt.ui.client.GXT::isIE7){
-    if($doc.documentMode){
-      return true;
-    }
-    
-  }return false;
-}-*/;
-  
   private native static void removeBackgroundFlicker() /*-{
     try{
-      $doc.execCommand("BackgroundImageCache", false, true);
+    $doc.execCommand("BackgroundImageCache", false, true);
     }catch(e){}
   }-*/;
 

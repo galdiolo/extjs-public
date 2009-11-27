@@ -8,6 +8,7 @@
 package com.extjs.gxt.ui.client.widget.menu;
 
 import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -36,7 +37,7 @@ public class MenuBarItem extends Component {
   public void setText(String text) {
     this.text = text;
     if (rendered) {
-      getElement().setInnerHTML(text);
+      el().update(Util.isEmptyString(text) ? "&#160;" : text);
     }
   }
 

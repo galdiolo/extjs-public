@@ -7,17 +7,25 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.aria.FocusFrame;
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.core.XDOM;
+import com.extjs.gxt.ui.client.data.BaseModelData;
+import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BoxComponentEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.util.Point;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.util.Size;
+import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.Layer.ShadowPosition;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 
 /**
@@ -85,14 +93,16 @@ public class BoxComponent extends Component {
    */
   protected boolean cacheSizes = true;
 
+  protected Size lastSize;
   /**
    * A specialized El that provides support for a shadow and shim. Will be
    * created if either {@link #shadow} or {@link #shim} is set to true.
    */
   protected Layer layer;
 
-  protected Size lastSize;
-  protected String width, height;
+  protected String height;
+
+  protected String width;
 
   private boolean shadow;
   private ShadowPosition shadowPosition = ShadowPosition.SIDES;
@@ -104,6 +114,17 @@ public class BoxComponent extends Component {
   private int left = Style.DEFAULT, top = Style.DEFAULT;
   private int pageX = Style.DEFAULT, pageY = Style.DEFAULT;
   private boolean boxReady;
+
+  /**
+   * Set this to true if you have sizing issues in initial collapsed or hidden
+   * items. It defaults to false for performance reasons. You should not set
+   * this to true for all components. If this is enabled than components are
+   * made visible for the browser during a call to setSize if they were hidden
+   * or collapsed. The user wont see this change. In the end of setSize the
+   * status of the component is reverted again to the normal state. (defaults to
+   * false)
+   */
+  protected boolean ensureVisibilityOnSizing;
 
   /**
    * Gets the current box measurements of the component's underlying element.
@@ -367,8 +388,10 @@ public class BoxComponent extends Component {
       return;
     }
 
-    Point adj = adjustPosition(new Point(left, top));
-    int ax = adj.x, ay = adj.y;
+    Point p = new Point(left, top);
+
+    p = adjustPosition(p);
+    int ax = p.x, ay = p.y;
 
     El pel = getPositionEl();
 
@@ -381,7 +404,10 @@ public class BoxComponent extends Component {
         pel.setTop(ay);
       }
       onPosition(ax, ay);
-      FocusFrame.get().sync(this);
+
+      if (GXT.isAriaEnabled()) {
+        FocusFrame.get().sync(this);
+      }
 
       BoxComponentEvent be = (BoxComponentEvent) createComponentEvent(null);
       be.setX(ax);
@@ -456,6 +482,8 @@ public class BoxComponent extends Component {
       return;
     }
 
+    List<ModelData> list = makeVisible();
+
     lastSize = size;
 
     Size ads = adjustSize(size);
@@ -465,22 +493,29 @@ public class BoxComponent extends Component {
 
     if (autoWidth) {
       setStyleAttribute("width", "auto");
-    } else {
-      el().setWidth(aw, adjustSize);
     }
     if (autoHeight) {
       setStyleAttribute("height", "auto");
-    } else {
-      if (!deferHeight) {
-        el().setHeight(ah, adjustSize);
-      }
+    }
+
+    if (!autoWidth && !autoHeight && !deferHeight) {
+      el().setSize(aw, ah, adjustSize);
+    } else if (!autoWidth) {
+      el().setWidth(aw, adjustSize);
+    } else if (!autoHeight && !deferHeight) {
+      el().setHeight(ah, adjustSize);
+
     }
 
     onResize(aw, ah);
 
     sync(true);
 
-    FocusFrame.get().sync(this);
+    if (GXT.isAriaEnabled()) {
+      FocusFrame.get().sync(this);
+    }
+
+    restoreVisible(list);
 
     BoxComponentEvent ce = (BoxComponentEvent) createComponentEvent(null);
     ce.setWidth(aw);
@@ -505,7 +540,6 @@ public class BoxComponent extends Component {
       }
       return;
     }
-
     if (width == null) {
       width = Style.UNDEFINED;
     }
@@ -519,6 +553,12 @@ public class BoxComponent extends Component {
 
     if (!height.equals(Style.UNDEFINED)) {
       height = El.addUnits(height, "px");
+    }
+
+    if ((height.equals(Style.UNDEFINED) && width.endsWith("px"))
+        || (width.equals(Style.UNDEFINED) && height.endsWith("px")) || (width.endsWith("px") && height.endsWith("px"))) {
+      setSize(Util.parseInt(width, Style.DEFAULT), Util.parseInt(height, Style.DEFAULT));
+      return;
     }
 
     if (autoWidth) {
@@ -537,9 +577,11 @@ public class BoxComponent extends Component {
     int w = -1;
     int h = -1;
 
+    List<ModelData> list = makeVisible();
+
     if (width.indexOf("px") != -1) {
       w = Integer.parseInt(width.substring(0, width.indexOf("px")));
-    } else if (autoWidth || width.equals("auto")) {
+    } else if (autoWidth || "auto".equals(width)) {
       w = -1;
     } else if (!width.equals(Style.UNDEFINED)) {
       w = getOffsetWidth();
@@ -547,7 +589,7 @@ public class BoxComponent extends Component {
 
     if (height.indexOf("px") != -1) {
       h = Integer.parseInt(height.substring(0, height.indexOf("px")));
-    } else if (autoHeight || height.equals("auto")) {
+    } else if (autoHeight || "auto".equals(height)) {
       h = -1;
     } else if (!height.equals(Style.UNDEFINED)) {
       h = getOffsetHeight();
@@ -564,7 +606,11 @@ public class BoxComponent extends Component {
 
     sync(true);
 
-    FocusFrame.get().sync(this);
+    if (GXT.isAriaEnabled()) {
+      FocusFrame.get().sync(this);
+    }
+
+    restoreVisible(list);
 
     BoxComponentEvent evt = (BoxComponentEvent) createComponentEvent(null);
     evt.setWidth(w);
@@ -599,10 +645,14 @@ public class BoxComponent extends Component {
     }
   }
 
+  /**
+   * Clears the size cache and resets to the last known size.
+   */
   public void syncSize() {
+    Size oldSize = lastSize;
     lastSize = null;
-    if (rendered) {
-      setSize(getWidth(), getHeight());
+    if (rendered && oldSize != null) {
+      setSize(oldSize.width, oldSize.height);
     }
   }
 
@@ -614,6 +664,7 @@ public class BoxComponent extends Component {
     return size;
   }
 
+  @Override
   protected void afterRender() {
     super.afterRender();
     boxReady = true;
@@ -689,13 +740,6 @@ public class BoxComponent extends Component {
   }
 
   @Override
-  protected void onDetach() {
-    super.onDetach();
-    if (!hidden) {
-      hideUnders();
-    }
-  }
-
   protected void onHide() {
     super.onHide();
     hideUnders();
@@ -726,8 +770,52 @@ public class BoxComponent extends Component {
     }
   }
 
+  @Override
   protected void onShow() {
     super.onShow();
     sync(true);
+  }
+
+  @Override
+  protected void onUnload() {
+    super.onUnload();
+    if (!hidden) {
+      hideUnders();
+    }
+  }
+
+  private List<ModelData> makeVisible() {
+    if (ensureVisibilityOnSizing) {
+      List<ModelData> list = new ArrayList<ModelData>();
+      Element p = getElement();
+      while (p != null && p != XDOM.getBody()) {
+        if (fly(p).isStyleAttribute("display", "none")) {
+          ModelData b = new BaseModelData();
+          b.set("element", p);
+          b.set("origd", p.getStyle().getProperty("display"));
+          b.set("hasxhideoffset", fly(p).hasStyleName("x-hide-offset"));
+          if (!b.<Boolean> get("hasxhideoffset")) {
+            fly(p).addStyleName("x-hide-offset");
+          }
+          p.getStyle().setProperty("display", "block");
+          list.add(b);
+        }
+        p = (Element) p.getParentElement();
+      }
+      return list;
+    }
+    return null;
+  }
+
+  private void restoreVisible(List<ModelData> list) {
+    if (ensureVisibilityOnSizing && list != null) {
+      for (ModelData m : list) {
+        Element e = m.<Element> get("element");
+        e.getStyle().setProperty("display", m.<String> get("origd"));
+        if (!m.<Boolean> get("hasxhideoffset")) {
+          fly(e).removeStyleName("x-hide-offset");
+        }
+      }
+    }
   }
 }

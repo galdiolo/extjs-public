@@ -7,13 +7,11 @@
  */
 package com.extjs.gxt.ui.client.widget.layout;
 
-import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
-import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.Container;
 
 /**
@@ -97,15 +95,10 @@ public class HBoxLayout extends BoxLayout {
   protected void onLayout(Container<?> container, El target) {
     super.onLayout(container, target);
 
-    Size size = target.getSize(true);
-    if ((GXT.isIE && !GXT.isStrict) && (size.width < 1 || size.height < 1)) {
-      return;
-  } else if (size.width < 1 && size.height < 1) { // display none?
-      return;
-    }
+    Size size = target.getStyleSize();
 
-    int w = size.width - target.getPadding("lr") - getScrollOffset();
-    int h = size.height - target.getPadding("tb");
+    int w = size.width - getScrollOffset();
+    int h = size.height;
 
     int l = getPadding().left;
     int t = getPadding().top;
@@ -118,10 +111,15 @@ public class HBoxLayout extends BoxLayout {
     for (int i = 0; i < container.getItemCount(); i++) {
       BoxComponent c = (BoxComponent) container.getItem(i);
       c.el().setStyleAttribute("margin", "0px");
-      HBoxLayoutData layoutData = (HBoxLayoutData) ComponentHelper.getLayoutData(c);
-      if (layoutData == null) {
+      callLayout(c, false);
+      HBoxLayoutData layoutData = null;
+      LayoutData d = getLayoutData(c);
+      if (d != null && d instanceof HBoxLayoutData) {
+        layoutData = (HBoxLayoutData) d;
+      } else {
         layoutData = new HBoxLayoutData();
       }
+
       Margins cm = layoutData.getMargins();
       totalFlex += layoutData.getFlex();
       totalWidth += c.getWidth() + cm.left + cm.right;
@@ -131,12 +129,11 @@ public class HBoxLayout extends BoxLayout {
     int innerCtHeight = maxHeight + t + getPadding().bottom;
 
     if (hBoxLayoutAlign.equals(HBoxLayoutAlign.STRETCH)) {
-      innerCt.setSize(w, h);
-    } else if (hBoxLayoutAlign.equals(HBoxLayoutAlign.MIDDLE)
-        || hBoxLayoutAlign.equals(HBoxLayoutAlign.BOTTOM)) {
-      innerCt.setSize(w, h = Math.max(h, innerCtHeight));
+      innerCt.setSize(w, h, true);
+    } else if (hBoxLayoutAlign.equals(HBoxLayoutAlign.MIDDLE) || hBoxLayoutAlign.equals(HBoxLayoutAlign.BOTTOM)) {
+      innerCt.setSize(w, h = Math.max(h, innerCtHeight), true);
     } else {
-      innerCt.setSize(w, innerCtHeight);
+      innerCt.setSize(w, innerCtHeight, true);
     }
 
     int extraWidth = w - totalWidth - l - getPadding().right;
@@ -152,8 +149,11 @@ public class HBoxLayout extends BoxLayout {
 
     for (int i = 0; i < container.getItemCount(); i++) {
       BoxComponent c = (BoxComponent) container.getItem(i);
-      HBoxLayoutData layoutData = (HBoxLayoutData) ComponentHelper.getLayoutData(c);
-      if (layoutData == null) {
+      HBoxLayoutData layoutData = null;
+      LayoutData d = getLayoutData(c);
+      if (d != null && d instanceof HBoxLayoutData) {
+        layoutData = (HBoxLayoutData) d;
+      } else {
         layoutData = new HBoxLayoutData();
       }
       Margins cm = layoutData.getMargins();
@@ -176,6 +176,7 @@ public class HBoxLayout extends BoxLayout {
 
       }
 
+      int width = -1;
       c.setPosition(l, ct);
       if (getPack().equals(BoxLayoutPack.START) && layoutData.getFlex() > 0) {
         int add = (int) Math.floor(extraWidth * (layoutData.getFlex() / totalFlex));
@@ -185,14 +186,16 @@ public class HBoxLayout extends BoxLayout {
         }
 
         cw += add;
-        c.setWidth(cw);
+        width = cw;
       }
       if (hBoxLayoutAlign.equals(HBoxLayoutAlign.STRETCH)) {
-        c.setHeight(Util.constrain(strechHeight - cm.top - cm.bottom,
-            layoutData.getMinHeight(), layoutData.getMaxHeight()));
+        c.setSize(width, Util.constrain(strechHeight - cm.top - cm.bottom, layoutData.getMinHeight(),
+            layoutData.getMaxHeight()));
       } else if (hBoxLayoutAlign.equals(HBoxLayoutAlign.STRETCHMAX)) {
-        c.setHeight(Util.constrain(maxHeight - cm.top - cm.bottom,
-            layoutData.getMinHeight(), layoutData.getMaxHeight()));
+        c.setSize(width, Util.constrain(maxHeight - cm.top - cm.bottom, layoutData.getMinHeight(),
+            layoutData.getMaxHeight()));
+      } else if (width > 0) {
+        c.setWidth(width);
       }
       l += cw + cm.right;
     }

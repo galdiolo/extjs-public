@@ -46,6 +46,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * This RowEditor should be used as a plugin to {@link Grid}. It displays an
@@ -138,7 +139,6 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   private boolean editing;
   private int rowIndex;
   private Record record;
-  private M model;
   private Timer monitorTimer;
   private boolean monitorValid = true;
   private boolean bound;
@@ -174,7 +174,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
           verifyLayout(true);
         } else if (be.getType() == Events.BodyScroll) {
           positionButtons();
-        } else if (be.getType() == Events.Detach || be.getType() == Events.Expand || be.getType() == Events.Collapse) {
+        } else if (be.getType() == Events.Detach) {
           stopEditing(false);
         }
 
@@ -187,10 +187,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     grid.addListener(Events.OnKeyDown, listener);
     grid.addListener(Events.ColumnResize, listener);
     grid.addListener(Events.BodyScroll, listener);
-    grid.addListener(Events.Attach, listener);
     grid.addListener(Events.Detach, listener);
-    grid.addListener(Events.Expand, listener);
-    grid.addListener(Events.Collapse, listener);
     grid.getColumnModel().addListener(Events.HiddenChange, new Listener<ColumnModelEvent>() {
       public void handleEvent(ColumnModelEvent be) {
         verifyLayout(true);
@@ -314,21 +311,25 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
    */
   @SuppressWarnings("unchecked")
   public void startEditing(int rowIndex, boolean doFocus) {
-    if (editing && isDirty()) {
-      showTooltip("You need to commit or cancel your changes");
+    if (disabled) {
       return;
     }
-    removeToolTip();
-
+    if (editing && isDirty()) {
+      showTooltip(GXT.MESSAGES.rowEditor_dirtyText());
+      return;
+    }
+    hideTooltip();
+    M model = (M) grid.getView().ds.getAt(rowIndex);
+    record = getRecord(model);
     RowEditorEvent ree = new RowEditorEvent(this, rowIndex);
-    if (!fireEvent(Events.BeforeEdit, ree)) {
+    ree.setRecord(record);
+    if (model == null || !fireEvent(Events.BeforeEdit, ree)) {
+      record = null;
       return;
     }
     editing = true;
     Element row = (Element) grid.getView().getRow(rowIndex);
 
-    model = grid.getStore().getAt(rowIndex);
-    record = getRecord(model);
     this.rowIndex = rowIndex;
 
     if (!isRendered()) {
@@ -351,7 +352,6 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
 
     if (!isVisible()) {
       show();
-      doLayout();
     }
     el().setXY(El.fly(row).getXY());
     verifyLayout(true);
@@ -370,7 +370,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
    */
   public void stopEditing(boolean saveChanges) {
     editing = false;
-    if (!isVisible()) {
+    if (disabled || !isVisible()) {
       return;
     }
     if (!saveChanges || !isValid()) {
@@ -430,7 +430,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
         showTooltip(getErrorText());
       }
     } else if (valid && !lastValid) {
-      removeToolTip();
+      hideTooltip();
       lastValid = true;
     }
 
@@ -439,7 +439,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     if (!isVisible()) {
       monitorTimer.cancel();
       stopEditing(false);
-      removeToolTip();
+      hideTooltip();
     }
   }
 
@@ -505,7 +505,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   }
 
   protected Record getRecord(M model) {
-    return grid.getStore().getRecord(model);
+    return grid.getView().ds.getRecord(model);
   }
 
   protected int getTargetColumnIndex(Point pt) {
@@ -533,7 +533,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
         c.setEditor(ed);
       }
       Field<?> f = ed.getField();
-      if (f instanceof TriggerField) {
+      if (f instanceof TriggerField<?>) {
         ((TriggerField<? extends Object>) f).setMonitorTab(true);
       }
       f.setWidth(cm.getColumnWidth(i));
@@ -546,13 +546,18 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
         ld.setMargins(new Margins(0, 1, 2, 2));
       }
 
-      setNormalWidth(f);
       f.setMessageTarget("tooltip");
+      //needed because we remove it from the celleditor
+      clearParent(f);
       insert(f, i, ld);
     }
     initialized = true;
   }
 
+  private native void clearParent(Widget parent) /*-{
+  parent.@com.google.gwt.user.client.ui.Widget::parent=null;
+}-*/;
+  
   @SuppressWarnings("unchecked")
   protected boolean isDirty() {
     for (Component f : getItems()) {
@@ -590,7 +595,6 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     stopMonitoring();
     grid.getView().focusRow(rowIndex);
     record = null;
-    model = null;
     ComponentHelper.doDetach(this);
   }
 
@@ -675,9 +679,19 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       int h = el().getClientHeight();
       GridView view = grid.getView();
       int scroll = view.getScrollState().x;
-      int width = view.getTotalWidth();
+      int mainBodyWidth = view.scroller.getWidth(true);
+      int columnWidth = view.getTotalWidth();
+      int width = columnWidth < mainBodyWidth ? columnWidth : mainBodyWidth;
       int bw = btns.getWidth(true);
-      btns.setPosition((width / 2) - (bw / 2) + scroll, h - 2);
+      this.btns.setPosition((width / 2) - (bw / 2) + scroll, h - 2);
+    }
+
+  }
+
+  protected void hideTooltip() {
+    if (tooltip != null) {
+      tooltip.hide();
+      tooltip.disable();
     }
   }
 
@@ -687,7 +701,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       ToolTipConfig config = new ToolTipConfig();
       config.setAutoHide(false);
       config.setMouseOffset(new int[] {25, 0});
-      config.setTitle("Errors");
+      config.setTitle(GXT.MESSAGES.rowEditor_tipTitleText());
       config.setAnchor("left");
       tooltip = new ToolTip(this, config);
       tooltip.setMaxWidth(600);
@@ -704,15 +718,11 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       bound = true;
       if (monitorTimer == null) {
         monitorTimer = new Timer() {
-
           @Override
           public void run() {
             RowEditor.this.bindHandler();
-
           }
-
         };
-
       }
       monitorTimer.scheduleRepeating(monitorPoll);
     }
@@ -745,12 +755,8 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
           getItem(i).hide();
         }
       }
-      layout();
+      layout(true);
       positionButtons();
     }
   }
-
-  private native void setNormalWidth(Field<?> f) /*-{
-    f.@com.extjs.gxt.ui.client.widget.form.Field::normalWidth = true;
-  }-*/;
 }

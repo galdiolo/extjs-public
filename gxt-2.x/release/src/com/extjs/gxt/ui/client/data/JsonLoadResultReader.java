@@ -13,8 +13,7 @@ import java.util.List;
  * A <code>JsonReader</code> implementation that reads JSON data using a
  * <code>ModelType</code> definition and returns a list load result.
  * 
- * @param <D> the <code>ListLoadResult</code> type being returned by the
- *            reader
+ * @param <D> the <code>ListLoadResult</code> type being returned by the reader
  */
 public class JsonLoadResultReader<D> extends JsonReader<D> {
 
@@ -35,18 +34,9 @@ public class JsonLoadResultReader<D> extends JsonReader<D> {
    * @param totalCount the total count
    * @return the data to be returned by the reader
    */
-  @SuppressWarnings("unchecked")
-  protected Object createReturnData(Object loadConfig, List<ModelData> records,
-      int totalCount) {
-    ListLoadResult<ModelData> result = newLoadResult(loadConfig, records);
-    if (result instanceof PagingLoadResult) {
-      PagingLoadResult<ModelData> r = (PagingLoadResult) result;
-
-      if (totalCount != -1) {
-        r.setTotalLength(totalCount);
-      }
-    }
-    return (D) result;
+  @Override
+  protected Object createReturnData(Object loadConfig, List<ModelData> records, int totalCount) {
+    return newLoadResult(loadConfig, records);
   }
 
   /**
@@ -55,8 +45,7 @@ public class JsonLoadResultReader<D> extends JsonReader<D> {
    * @param models the models
    * @return the load result
    */
-  protected ListLoadResult<ModelData> newLoadResult(Object loadConfig,
-      List<ModelData> models) {
+  protected ListLoadResult<ModelData> newLoadResult(Object loadConfig, List<ModelData> models) {
     return new BaseListLoadResult<ModelData>(models);
   }
 

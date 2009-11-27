@@ -21,6 +21,11 @@ public final class XTemplate extends JavaScriptObject {
 
   static {
     GXT.init();
+    Ext.loadExt();
+    Ext.loadDomHelper();
+    Ext.loadFormat();
+    Ext.loadTemplate();
+    Ext.loadXTemplate();
   }
 
   /**

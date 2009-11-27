@@ -7,7 +7,7 @@
  */
 package com.extjs.gxt.samples.client.examples.treepanel;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Folder;
 import com.extjs.gxt.ui.client.data.ModelData;
@@ -20,6 +20,7 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.event.TreePanelEvent;
 import com.extjs.gxt.ui.client.store.TreeStore;
+import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -31,6 +32,7 @@ import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel.CheckCascade;
+import com.extjs.gxt.ui.client.widget.treepanel.TreePanel.CheckNodes;
 import com.google.gwt.user.client.Element;
 
 public class CheckBoxTreePanelExample extends LayoutContainer {
@@ -46,7 +48,7 @@ public class CheckBoxTreePanelExample extends LayoutContainer {
 
     final TreePanel<ModelData> tree = new TreePanel<ModelData>(store);
     tree.setDisplayProperty("name");
-    tree.getStyle().setLeafIcon(Examples.ICONS.music());
+    tree.getStyle().setLeafIcon(Resources.ICONS.music());
     tree.setCheckable(true);
     tree.setAutoLoad(true);
 
@@ -78,10 +80,29 @@ public class CheckBoxTreePanelExample extends LayoutContainer {
         if ("Parent".equals(val)) {
           tree.setCheckStyle(CheckCascade.PARENTS);
         } else if ("Children".equals(val)) {
-          System.out.println("chdsfd");
           tree.setCheckStyle(CheckCascade.CHILDREN);
         } else {
           tree.setCheckStyle(CheckCascade.NONE);
+        }
+      }
+    });
+    
+    final SimpleComboBox<String> checkNodes = new SimpleComboBox<String>();
+    checkNodes.setTriggerAction(TriggerAction.ALL);
+    checkNodes.setEditable(false);
+    checkNodes.add("Both");
+    checkNodes.add("Leaf");
+    checkNodes.add("Parent");
+    checkNodes.setSimpleValue("Both");
+    checkNodes.addListener(Events.Change, new Listener<FieldEvent>() {
+      public void handleEvent(FieldEvent be) {
+        String val = checkNodes.getSimpleValue();
+        if ("Parent".equals(val)) {
+          tree.setCheckNodes(CheckNodes.PARENT);
+        } else if ("Leaf".equals(val)) {
+          tree.setCheckNodes(CheckNodes.LEAF);
+        } else {
+          tree.setCheckNodes(CheckNodes.BOTH);
         }
       }
     });
@@ -97,13 +118,17 @@ public class CheckBoxTreePanelExample extends LayoutContainer {
         }
         String s = sb.toString();
         if (s.length() > 1) s = s.substring(2);
-        if (s.length() > 100) s = s.substring(0, 100) + "...";
-        Info.display("Checked Items", s, "");
+        
+       
+        Info.display("Checked Items",  Format.ellipse(s, 100), "");
       }
     }));
     toolBar.add(new SeparatorToolItem());
     toolBar.add(new LabelToolItem("Cascade Behavior: "));
     toolBar.add(cascade);
+    toolBar.add(new SeparatorToolItem());
+    toolBar.add(new LabelToolItem("CheckNode Behavior: "));
+    toolBar.add(checkNodes);
 
     add(toolBar, new FlowData(10));
     add(tree, new FlowData(10));

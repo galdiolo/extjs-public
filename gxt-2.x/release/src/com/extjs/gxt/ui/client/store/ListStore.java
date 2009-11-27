@@ -203,7 +203,11 @@ public class ListStore<M extends ModelData> extends Store<M> {
   public List<M> getRange(int start, int end) {
     List<M> temp = new ArrayList<M>();
     for (int i = start; i <= end; i++) {
-      temp.add(getAt(i));
+      M m = getAt(i);
+      if (m == null) {
+        break;
+      }
+      temp.add(m);
     }
     return temp;
   }
@@ -282,15 +286,15 @@ public class ListStore<M extends ModelData> extends Store<M> {
    */
   public void remove(M model) {
     int index = indexOf(model);
-    if (all.remove(model)) {
+    StoreEvent<M> se = createStoreEvent();
+    se.setModel(model);
+    se.setIndex(index);
+    if (index != -1 && fireEvent(BeforeRemove, se) && all.remove(model)) {
       modified.remove(recordMap.get(model));
       if (isFiltered()) {
         snapshot.remove(model);
       }
       unregisterModel(model);
-      StoreEvent<M> se = createStoreEvent();
-      se.setModel(model);
-      se.setIndex(index);
       fireEvent(Remove, se);
     }
   }
@@ -336,6 +340,9 @@ public class ListStore<M extends ModelData> extends Store<M> {
    * @param sortDir the sort dir
    */
   public void sort(String field, SortDir sortDir) {
+    if (!fireEvent(BeforeSort, createStoreEvent())) {
+      return;
+    }
     SortInfo prev = new SortInfo(sortInfo.getSortField(), sortInfo.getSortDir());
 
     if (sortDir == null) {
@@ -360,7 +367,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
     if (loader != null && loader.isRemoteSort()) {
       Listener<LoadEvent> l = new Listener<LoadEvent>() {
         public void handleEvent(LoadEvent le) {
-          loader.removeListener(Sort, this);
+          loader.removeListener(Loader.Load, this);
           sortInfo = le.<ListLoadConfig> getConfig().getSortInfo();
           fireEvent(Sort, createStoreEvent());
         }
@@ -369,7 +376,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
       loader.setSortDir(sortDir);
       loader.setSortField(field);
       if (!loader.load()) {
-        loader.removeListener(Sort, l);
+        loader.removeListener(Loader.Load, l);
         sortInfo.setSortField(prev.getSortField());
         sortInfo.setSortDir(prev.getSortDir());
       }
@@ -405,6 +412,11 @@ public class ListStore<M extends ModelData> extends Store<M> {
       if (storeSorter != null) {
         boolean defer = index == 0 && getCount() == 0;
         for (M m : items) {
+          StoreEvent evt = createStoreEvent();
+          evt.setModels(Util.createList(m));
+          if (m == null || (!supressEvent && !fireEvent(BeforeAdd, evt))) {
+            continue;
+          }
           if (isFiltered()) {
             snapshot.add(m);
             if (!isFiltered(m, filterProperty)) {
@@ -419,7 +431,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
           int idx = indexOf(m);
           registerModel(m);
           if (!defer && !supressEvent && added.contains(m)) {
-            StoreEvent evt = createStoreEvent();
+            evt = createStoreEvent();
             evt.setModels(Util.createList(m));
             evt.setIndex(idx);
             fireEvent(Add, evt);
@@ -432,19 +444,26 @@ public class ListStore<M extends ModelData> extends Store<M> {
           fireEvent(Add, evt);
         }
       } else {
-        if (!isFiltered()) {
-          all.addAll(index, items);
-          added.addAll(items);
-        } else {
-          snapshot.addAll(index, items);
-        }
-
-        for (M m : items) {
-          registerModel(m);
-          if (isFiltered() && !isFiltered(m, filterProperty)) {
-            all.add(index, m);
+        for (int i = 0; i < items.size(); i++) {
+          M m = items.get(i);
+          StoreEvent evt = createStoreEvent();
+          evt.setModels(Util.createList(m));
+          evt.setIndex(index + i);
+          if (m == null || (!supressEvent && !fireEvent(BeforeAdd, evt))) {
+            continue;
+          }
+          if (isFiltered()) {
+            snapshot.add(index + i, m);
+            if (!isFiltered(m, filterProperty)) {
+              all.add(index + i, m);
+              added.add(m);
+            }
+          } else {
+            all.add(index + i, m);
             added.add(m);
           }
+          registerModel(m);
+
         }
         if (!supressEvent && added.size() > 0) {
           StoreEvent evt = createStoreEvent();
@@ -471,11 +490,10 @@ public class ListStore<M extends ModelData> extends Store<M> {
     removeAll();
 
     if (data instanceof List) {
-      List<M> list = (List) le.getData();
-      all = list;
-
+      List<M> list = (List) data;
+      all = new ArrayList(list);
     } else if (data instanceof ListLoadResult) {
-      all = ((ListLoadResult) data).getData();
+      all = new ArrayList(((ListLoadResult) data).getData());
     }
 
     for (M m : all) {
@@ -484,7 +502,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
 
     if (le.<Object> getConfig() instanceof ListLoadConfig) {
       ListLoadConfig config = le.getConfig();
-      if (config.getSortInfo().getSortField() != null) {
+      if (!Util.isEmptyString(config.getSortInfo().getSortField())) {
         sortInfo = config.getSortInfo();
       } else {
         sortInfo = new SortInfo();

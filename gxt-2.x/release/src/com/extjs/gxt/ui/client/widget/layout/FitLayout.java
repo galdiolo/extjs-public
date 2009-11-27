@@ -61,7 +61,7 @@ public class FitLayout extends Layout {
   }
 
   protected void setItemSize(Component item, Size size) {
-    if (item != null && item.isRendered() && size.height > 0) {
+    if (item != null && item.isRendered()) {
       size.width -= getSideMargins(item);
       size.height -= item.el().getMargins("tb");
       setSize(item, size.width, size.height);

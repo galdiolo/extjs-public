@@ -25,7 +25,7 @@ public class HeaderGroupConfig {
   private int rowspan = 1;
   private int colspan = 1;
   private HorizontalAlignment horizontalAlignment = HorizontalAlignment.CENTER;
-  Group group;
+  protected Group group;
 
   /**
    * Creates a new header group without rowspan and colspan.

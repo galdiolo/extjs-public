@@ -376,6 +376,7 @@ public class ToolTip extends Tip {
     anchorEl.alignTo(el().dom, anchorPos + "-" + targetPos, offset);
   }
 
+  @Override
   protected void updateContent() {
     String title = this.title;
     getHeader().setText(title == null ? "" : title);
@@ -459,7 +460,8 @@ public class ToolTip extends Tip {
       clearTimers();
       hide();
     }
-
+    setMinWidth(config.getMinWidth());
+    setMaxWidth(config.getMaxWidth());
     text = config.getText();
     title = config.getTitle();
   }

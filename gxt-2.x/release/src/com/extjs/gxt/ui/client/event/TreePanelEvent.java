@@ -75,10 +75,7 @@ public class TreePanelEvent<M extends ModelData> extends BoxComponentEvent {
    */
   public TreeNode getNode() {
     if (node == null) {
-      TreeNode n = treePanel.findNode((Element) event.getEventTarget().cast());
-      if (n != null) {
-        node = n;
-      }
+      node = treePanel.findNode((Element) event.getEventTarget().cast());
     }
     return node;
   }

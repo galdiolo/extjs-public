@@ -140,7 +140,7 @@ public final class XDOM {
    * @return the element, or null if no match
    */
   public static Element getElementById(String id) {
-    return DOM.getElementById(id);
+    return DomQuery.selectNode("#" + id);
   }
 
   /**
@@ -237,7 +237,7 @@ public final class XDOM {
     wc.setScrollMode(Scroll.AUTO);
     wc.setSize(300, 300);
 
-    Html html = new Html("sdff");
+    Html html = new Html("test");
     html.setHeight("284");
     html.setWidth("500");
 

@@ -31,9 +31,6 @@ import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
-import com.extjs.gxt.ui.client.store.Store;
-import com.extjs.gxt.ui.client.store.StoreEvent;
-import com.extjs.gxt.ui.client.store.StoreListener;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -66,11 +63,6 @@ public class AdvancedChartExample extends LayoutContainer {
 
     final ListStore<TeamSales> store = new ListStore<TeamSales>();
     store.add(TestData.getTeamSales());
-    store.addListener(Store.DataChanged, new StoreListener<TeamSales>() {
-      public void storeDataChanged(StoreEvent<TeamSales> se) {
-        se.getModel().setAvgSales();
-      }
-    });
 
     // chart
     String url = !Examples.isExplorer() ? "../../" : "";

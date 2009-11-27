@@ -70,7 +70,7 @@ public class XmlReader<D> implements DataReader<D> {
         String name = field.getName();
         String map = field.getMap() != null ? field.getMap() : field.getName();
         String v = getValue(elem, map);
-
+        if (v == null) continue;
         if (type != null) {
           if (type.equals(Integer.class)) {
             model.set(name, Integer.parseInt(v));
@@ -81,7 +81,7 @@ public class XmlReader<D> implements DataReader<D> {
           } else if (type.equals(Double.class)) {
             model.set(name, Double.parseDouble(v));
           } else if (type.equals(Date.class)) {
-            if (field.getFormat().equals("timestamp")) {
+            if ("timestamp".equals(field.getFormat())) {
               Date d = new Date(Long.parseLong(v) * 1000);
               model.set(name, d);
             } else {
@@ -101,7 +101,7 @@ public class XmlReader<D> implements DataReader<D> {
     int totalCount = records.size();
     Node root = doc.getElementsByTagName(modelType.getRoot()).item(0);
     if (root != null && modelType.getTotalName() != null) {
-      String tot = getValue((Element)root, modelType.getTotalName());
+      String tot = getValue((Element) root, modelType.getTotalName());
       if (tot != null) {
         totalCount = Integer.parseInt(tot);
       }
@@ -119,14 +119,13 @@ public class XmlReader<D> implements DataReader<D> {
    * @return the data to be returned by the reader
    */
   @SuppressWarnings("unchecked")
-  protected Object createReturnData(Object loadConfig, List<ModelData> records,
-      int totalCount) {
+  protected Object createReturnData(Object loadConfig, List<ModelData> records, int totalCount) {
     return (D) records;
   }
 
   protected native JavaScriptObject getJsObject(Element elem) /*-{
-         return elem.@com.google.gwt.xml.client.impl.DOMItem::getJsObject()();
-       }-*/;
+    return elem.@com.google.gwt.xml.client.impl.DOMItem::getJsObject()();
+  }-*/;
 
   protected String getValue(Element elem, String name) {
     return DomQuery.selectValue(name, getJsObject(elem));

@@ -7,12 +7,15 @@
  */
 package com.extjs.gxt.ui.client.util;
 
-public class Padding extends Margins {
+/**
+ * Represents 4-side padding.
+ */
+public class Padding extends Region {
   /**
    * Creates a new padding instance with 0 values for all sides.
    */
   public Padding() {
-
+    this(0);
   }
 
   /**

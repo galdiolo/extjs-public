@@ -45,8 +45,10 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
       this.grid.removeListener(Events.CellMouseDown, this);
       this.grid.removeListener(Events.BeforeEdit, this);
       this.grid.getView().removeListener(Events.Refresh, this);
+      this.grid.getView().removeListener(Events.RowUpdated, this);
       keyNav.bind(null);
       bind(null);
+      this.listStore = null;
     }
     this.grid = grid;
     if (grid != null) {
@@ -54,11 +56,11 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
       grid.addListener(Events.BeforeEdit, this);
       grid.addListener(Events.CellMouseDown, this);
       grid.getView().addListener(Events.Refresh, this);
+      grid.getView().addListener(Events.RowUpdated, this);
       keyNav.bind(grid);
       bind(grid.getStore());
-      this.listStore = (ListStore)grid.getStore();
+      this.listStore = (ListStore) grid.getStore();
     }
-    bind(grid != null ? grid.getStore() : null);
   }
 
   @Override
@@ -91,6 +93,8 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
     } else if (e.getType() == Events.BeforeEdit) {
       GridEvent ge = (GridEvent) e;
       selectCell(ge.getRowIndex(), ge.getColIndex());
+    }else if (e.getType() == Events.RowUpdated) {
+      onRowUpdated((GridEvent) e);
     }
   }
 
@@ -106,6 +110,13 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
     selection = new CellSelection(m, row, cell);
     grid.getView().onCellSelect(row, cell);
     grid.getView().focusCell(row, cell, true);
+  }
+  @Override
+  protected void onRowUpdated(GridEvent<M> ge) {
+    if (selection != null && selection.model == ge.getModel()) {
+      grid.getView().onCellSelect(selection.row, selection.cell);
+      grid.getView().focusCell(selection.row, selection.cell, true);
+    }
   }
 
   @Override

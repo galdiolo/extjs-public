@@ -114,8 +114,9 @@ public class Popup extends LayoutContainer {
     protected boolean onAutoHide(PreviewEvent ce) {
       if (Popup.this.onAutoHide(ce.getEvent())) {
         hide();
+        return true;
       }
-      return true;
+      return false;
     }
 
   };
@@ -301,8 +302,7 @@ public class Popup extends LayoutContainer {
    */
   public void show() {
     if (!fireEvent(Events.BeforeShow, new ComponentEvent(this))) return;
-    Point p = new Point((int) Window.getClientWidth() / 2,
-        (int) Window.getClientHeight() / 2);
+    Point p = new Point((int) Window.getClientWidth() / 2, (int) Window.getClientHeight() / 2);
     showAt(p.x, p.y);
   }
 
@@ -367,9 +367,7 @@ public class Popup extends LayoutContainer {
   protected void afterHide() {
     RootPanel.get().remove(this);
     hidden = true;
-    if (layer != null) {
-      layer.hideShadow();
-    }
+    hideShadow();
     el().setVisible(false);
     fireEvent(Events.Hide, new ComponentEvent(this));
   }
@@ -383,9 +381,9 @@ public class Popup extends LayoutContainer {
     if (isAutoFocus()) {
       focus();
     }
-    
+
     el().setZIndex(XDOM.getTopZIndex());
-    
+
     fireEvent(Events.Open, new ComponentEvent(this));
   }
 
@@ -421,6 +419,7 @@ public class Popup extends LayoutContainer {
 
   }
 
+  @Override
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
     el().makePositionable(true);

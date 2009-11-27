@@ -42,8 +42,8 @@ import com.google.gwt.user.client.ui.Accessibility;
  * <dt><b>Events:</b></dt>
  * 
  * <dd><b>BeforeAdd</b> : TreeEvent(item, child, index)<br>
- * <div>Fires before a item is added or inserted. Listeners can cancel the action by
- * calling {@link BaseEvent#setCancelled(boolean)}.</div>
+ * <div>Fires before a item is added or inserted. Listeners can cancel the
+ * action by calling {@link BaseEvent#setCancelled(boolean)}.</div>
  * <ul>
  * <li>item : this</li>
  * <li>child : the item being added</li>
@@ -197,13 +197,13 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
    */
   public enum Joint {
     NONE(0), COLLAPSED(1), EXPANDED(2);
-    
+
     private int value;
-    
+
     private Joint(int value) {
       this.value = value;
     }
-    
+
     public int value() {
       return value;
     }
@@ -543,17 +543,19 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
     if (te.getItem() != null) {
       te.getItem().onComponentEvent(te);
     }
-    
+
     int type = ce.getEventTypeInt();
     switch (type) {
       case Event.ONFOCUS:
         onFocus(ce);
-        break; 
+        break;
     }
   }
 
   protected void onFocus(ComponentEvent ce) {
-    FocusFrame.get().frame(this);
+    if (GXT.isAriaEnabled()) {
+      FocusFrame.get().frame(this);
+    }
   }
 
   public void onSelectChange(TreeItem item, boolean select) {
@@ -727,7 +729,7 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
   protected void onRender(Element target, int index) {
     setElement(DOM.createDiv(), target, index);
     super.onRender(target, index);
-    
+
     root.render(getElement());
 
     if (!root.childrenRendered) {
@@ -736,9 +738,8 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
 
     addStyleName("x-ftree-no-lines x-ftree-arrows");
 
- 
     disableTextSelection(true);
-    
+
     if (GXT.isAriaEnabled()) {
       new KeyNav<ComponentEvent>(this) {
         @Override
@@ -750,12 +751,12 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
       };
       setAnimate(false);
     }
-    
+
     el().setTabIndex(0);
     el().setElementAttribute("hideFocus", "true");
 
     Accessibility.setRole(getElement(), Accessibility.ROLE_TREE);
-    
+
     sinkEvents(Event.ONCLICK | Event.ONDBLCLICK | Event.KEYEVENTS | Event.MOUSEEVENTS | Event.FOCUSEVENTS);
   }
 

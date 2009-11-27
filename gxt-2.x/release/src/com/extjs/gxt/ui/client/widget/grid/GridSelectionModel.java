@@ -97,23 +97,25 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
   public void bindGrid(Grid grid) {
     if (this.grid != null) {
       this.grid.removeListener(Events.RowMouseDown, this);
+      this.grid.removeListener(Events.RowClick, this);
       this.grid.removeListener(Events.ContextMenu, this);
       this.grid.getView().removeListener(Events.RowUpdated, this);
       this.grid.getView().removeListener(Events.Refresh, this);
       keyNav.bind(null);
       bind(null);
+      this.listStore = null;
     }
     this.grid = grid;
     if (grid != null) {
       grid.addListener(Events.RowMouseDown, this);
+      grid.addListener(Events.RowClick, this);
       grid.addListener(Events.ContextMenu, this);
       grid.getView().addListener(Events.RowUpdated, this);
       grid.getView().addListener(Events.Refresh, this);
       keyNav.bind(grid);
       bind(grid.getStore());
-      this.listStore = (ListStore) grid.getStore();
+      this.listStore = grid.getStore();
     }
-    bind(grid != null ? grid.getStore() : null);
   }
 
   @SuppressWarnings("unchecked")
@@ -121,15 +123,13 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
     EventType type = e.getType();
     if (type == Events.RowMouseDown) {
       handleMouseDown((GridEvent) e);
+    } else if (type == Events.RowClick) {
+      handleMouseClick((GridEvent) e);
     } else if (type == Events.RowUpdated) {
       onRowUpdated((GridEvent) e);
     } else if (type == Events.Refresh) {
       refresh();
     }
-  }
-
-  public boolean isLocked() {
-    return false;
   }
 
   /**
@@ -149,7 +149,9 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
       case KeyCodes.KEY_ENTER:
       case KeyCodes.KEY_TAB:
         e.stopEvent();
-        editor.completeEdit();
+        if (editor != null) {
+          editor.completeEdit();
+        }
         if ((k == KeyCodes.KEY_ENTER && moveEditorOnEnter) || k == KeyCodes.KEY_TAB) {
           if (e.isShiftKey()) {
             newCell = grid.walkCells(editor.row, editor.col - 1, -1, callback, true);
@@ -159,7 +161,9 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
         }
         break;
       case KeyCodes.KEY_ESCAPE:
-        editor.cancelEdit();
+        if (editor != null) {
+          editor.cancelEdit();
+        }
         break;
     }
     if (newCell != null) {
@@ -213,13 +217,34 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
   }
 
   @SuppressWarnings("unchecked")
+  protected void handleMouseClick(GridEvent<M> e) {
+    if (isLocked()) {
+      return;
+    }
+    if (!e.isRightClick() && selectionMode == SelectionMode.MULTI) {
+      GridView view = grid.getView();
+      M sel = listStore.getAt(e.getRowIndex());
+      if (e.isControlKey() && isSelected(sel)) {
+        doDeselect(Arrays.asList(sel), false);
+      } else if (e.isControlKey()) {
+        doSelect(Arrays.asList(sel), true, false);
+        view.focusCell(e.getRowIndex(), e.getColIndex(), true);
+      } else if(isSelected(sel) && !e.isShiftKey()){
+        doSelect(Arrays.asList(sel), false, false);
+        view.focusCell(e.getRowIndex(), e.getColIndex(), true);
+      }
+    }
+
+  }
+
+  @SuppressWarnings("unchecked")
   protected void handleMouseDown(GridEvent<M> e) {
     if (isLocked()) {
       return;
     }
     if (e.isRightClick()) {
       if (e.getRowIndex() != -1) {
-        if (isSelected(listStore.getAt(e.getRowIndex())) && selectionMode != SelectionMode.SINGLE) {
+        if (selectionMode != SelectionMode.SINGLE && isSelected(listStore.getAt(e.getRowIndex()))) {
           return;
         }
         select(e.getRowIndex(), false);
@@ -229,13 +254,13 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
       M sel = listStore.getAt(e.getRowIndex());
 
       if (selectionMode == SelectionMode.SINGLE) {
-        if (isSelected(sel) && e.isControlKey()) {
+        if (e.isControlKey() && isSelected(sel)) {
           deselect(sel);
         } else if (!isSelected(sel)) {
           select(sel, false);
           view.focusCell(e.getRowIndex(), e.getColIndex(), true);
         }
-      } else {
+      } else if (!e.isControlKey()) {
         if (e.isShiftKey() && lastSelected != null) {
           int last = listStore.indexOf(lastSelected);
           int index = e.getRowIndex();
@@ -244,13 +269,8 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
           select(a, b, e.isControlKey());
           lastSelected = listStore.getAt(last);
           view.focusCell(index, e.getColIndex(), true);
-        } else if (isSelected(sel) && e.isControlKey()) {
-          doDeselect(Arrays.asList(sel), false);
-        } else {
-          if (isSelected(sel) && !e.isControlKey()) {
-            return;
-          }
-          doSelect(Arrays.asList(sel), e.isControlKey(), false);
+        } else if(!isSelected(sel)){
+          doSelect(Arrays.asList(sel), false, false);
           view.focusCell(e.getRowIndex(), e.getColIndex(), true);
         }
       }
@@ -304,13 +324,12 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
   @Override
   protected void onSelectChange(M model, boolean select) {
     int idx = listStore.indexOf(model);
-    if (idx == -1) {
-      return;
-    }
-    if (select) {
-      grid.getView().onRowSelect(listStore.indexOf(model));
-    } else {
-      grid.getView().onRowDeselect(listStore.indexOf(model));
+    if (idx != -1) {
+      if (select) {
+        grid.getView().onRowSelect(idx);
+      } else {
+        grid.getView().onRowDeselect(idx);
+      }
     }
   }
 }

@@ -13,6 +13,7 @@ import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.ContainerEvent;
+import com.extjs.gxt.ui.client.event.EventType;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.LayoutEvent;
 import com.extjs.gxt.ui.client.event.Listener;
@@ -36,30 +37,35 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public abstract class Layout extends BaseObservable {
 
-  protected Container<Component> container;
-  protected El target;
   protected Component activeItem;
-  protected boolean renderHidden;
+  protected String componentStyleName;
+  protected Container<?> container;
   protected boolean monitorResize;
+  protected boolean renderHidden;
+  protected El target;
+  protected String targetStyleName;
+  private Listener<ComponentEvent> componentListener = new Listener<ComponentEvent>() {
 
+    public void handleEvent(ComponentEvent be) {
+      EventType type = be.getType();
+      if (type == Events.Render) {
+        onComponentRender(be.getComponent());
+      } else if (type == Events.Show) {
+        onComponentShow(be.getComponent());
+      } else if (type == Events.Hide) {
+        onComponentHide(be.getComponent());
+      }
+
+    }
+
+  };
+  private Listener<ComponentEvent> containerListener;
   private String extraStyle;
-  @SuppressWarnings("unchecked")
-  private Listener<ContainerEvent> listener;
   private int resizeDelay = 0;
 
-  private Listener<ComponentEvent> resizeListener = new Listener<ComponentEvent>() {
-    public void handleEvent(ComponentEvent ce) {
-      onResize(ce);
-    }
-  };
+  private DelayedTask resizeTask;
 
-  private DelayedTask task = new DelayedTask(new Listener<BaseEvent>() {
-    public void handleEvent(BaseEvent be) {
-      if (container != null) {
-        layout();
-      }
-    }
-  });
+  private boolean running;
 
   /**
    * Returns the extra style name.
@@ -89,12 +95,28 @@ public abstract class Layout extends BaseObservable {
   }
 
   /**
+   * Returns true if the layout is currently running.
+   * 
+   * @return true if the layout is currently running
+   */
+  public boolean isRunning() {
+    return running;
+  }
+
+  /**
    * Layouts the container, by executing it's layout.
    */
   public void layout() {
-    El target = container.getLayoutTarget();
-    onLayout(container, target);
-    fireEvent(Events.AfterLayout, new LayoutEvent(container, this));
+    if (container != null && container.isRendered() && !running) {
+      if (fireEvent(Events.BeforeLayout, new LayoutEvent(container, this))) {
+        running = true;
+        initTarget();
+        onLayout(container, target);
+        running = false;
+        fireEvent(Events.AfterLayout, new LayoutEvent(container, this));
+      }
+
+    }
   }
 
   /**
@@ -102,31 +124,59 @@ public abstract class Layout extends BaseObservable {
    * 
    * @param ct the container
    */
-  @SuppressWarnings("unchecked")
-  public void setContainer(Container ct) {
-    if (listener == null) {
-      listener = new Listener<ContainerEvent>() {
-        public void handleEvent(ContainerEvent be) {
-          onRemove(be.getItem());
+  public void setContainer(Container<?> ct) {
+    if (containerListener == null) {
+      containerListener = new Listener<ComponentEvent>() {
+        public void handleEvent(ComponentEvent be) {
+          if (be.getType() == Events.Remove) {
+            onRemove(((ContainerEvent<?, ?>) be).getItem());
+          } else if (be.getType() == Events.Resize) {
+            if (monitorResize) {
+              onResize(be);
+            }
+          } else if (be.getType() == Events.Add) {
+            onAdd(((ContainerEvent<?, ?>) be).getItem());
+          }
         }
+
       };
     }
 
-    if (this.container != null) {
-      this.container.removeListener(Events.BeforeRemove, listener);
-    }
-
-    if (monitorResize && container != ct) {
+    if (container != ct) {
       if (container != null) {
-        container.removeListener(Events.Resize, resizeListener);
+        if (target != null) {
+          target.removeStyleName(targetStyleName);
+          target = null;
+        }
+        container.removeListener(Events.Remove, containerListener);
+        container.removeListener(Events.Add, containerListener);
+        container.removeListener(Events.Resize, containerListener);
+        if (resizeTask != null) {
+          resizeTask.cancel();
+        }
+        for (Component c : container.getItems()) {
+          onRemove(c);
+        }
       }
+
+      container = (Container<?>) ct;
       if (ct != null) {
-        ct.addListener(Events.Resize, resizeListener);
+        ct.addListener(Events.Remove, containerListener);
+        ct.addListener(Events.Add, containerListener);
+        if (resizeTask == null) {
+          resizeTask = new DelayedTask(new Listener<BaseEvent>() {
+            public void handleEvent(BaseEvent be) {
+              if (container != null) {
+                layout();
+              }
+            }
+          });
+        }
+        ct.addListener(Events.Resize, containerListener);
+        for (Component c : container.getItems()) {
+          onAdd(c);
+        }
       }
-    }
-    this.container = ct;
-    if (ct != null) {
-      this.container.addListener(Events.BeforeRemove, listener);
     }
   }
 
@@ -161,19 +211,30 @@ public abstract class Layout extends BaseObservable {
   }
 
   protected void applyMargins(El target, Margins margins) {
-    if (margins == null) return;
-    target.setStyleAttribute("marginLeft", margins.left + "px");
-    target.setStyleAttribute("marginTop", margins.top + "px");
-    target.setStyleAttribute("marginRight", margins.right + "px");
-    target.setStyleAttribute("marginBottom", margins.bottom + "px");
+    target.setMargins(margins);
   }
 
   protected void applyPadding(El target, Padding paddings) {
-    if (paddings == null) return;
-    target.setStyleAttribute("paddingLeft", paddings.left + "px");
-    target.setStyleAttribute("paddingTop", paddings.top + "px");
-    target.setStyleAttribute("paddingRight", paddings.right + "px");
-    target.setStyleAttribute("paddingBottom", paddings.bottom + "px");
+    target.setPadding(paddings);
+  }
+
+  protected void callLayout(Component c, boolean force) {
+    if (c instanceof WidgetComponent) {
+      if (!c.isAttached()) {
+        ComponentHelper.doAttach(c);
+        ComponentHelper.doDetach(c);
+      }
+    } else {
+      if (c instanceof Composite) {
+        c = ((Composite) c).getComponent();
+      }
+      if (c instanceof Container<?>) {
+        Container<?> container = (Container<?>) c;
+        if (isLayoutNeeded(container)) {
+          doLayout(container);
+        }
+      }
+    }
   }
 
   protected El fly(com.google.gwt.dom.client.Element elem) {
@@ -190,54 +251,97 @@ public abstract class Layout extends BaseObservable {
 
   protected int getSideMargins(Component c) {
     if (GXT.isWebKit) {
-      try {
-        Object data = getLayoutData(c);
-        if (data != null && data instanceof MarginData) {
-          MarginData m = (MarginData) data;
-          Margins margins = m.getMargins();
-          if (margins == null) {
-            return 0;
-          }
-          int tot = 0;
-          if (margins.left != -1) {
-            tot += margins.left;
-          }
-          if (margins.right != -1) {
-            tot += margins.right;
-          }
-          return tot;
+      LayoutData data = getLayoutData(c);
+      if (data != null && data instanceof MarginData) {
+        MarginData m = (MarginData) data;
+        Margins margins = m.getMargins();
+        if (margins == null) {
+          return 0;
         }
-      } catch (Exception e) {
-        e.printStackTrace();
+        int tot = 0;
+        if (margins.left != -1) {
+          tot += margins.left;
+        }
+        if (margins.right != -1) {
+          tot += margins.right;
+        }
+        return tot;
       }
-
     } else {
       return c.el().getMargins("lr");
     }
     return 0;
   }
 
+  protected void initTarget() {
+    if (target == null) {
+      target = container.getLayoutTarget();
+      target.addStyleName(targetStyleName);
+    }
+  }
+
+  protected native boolean isLayoutExecuted(Container<?> c) /*-{
+    return c.@com.extjs.gxt.ui.client.widget.Container::layoutExecuted;
+  }-*/;
+
+  protected native boolean isLayoutNeeded(Container<?> c) /*-{
+    return c.@com.extjs.gxt.ui.client.widget.Container::layoutNeeded;
+  }-*/;
+
   protected boolean isValidParent(Element elem, Element parent) {
-    return elem.getParentElement() != null && elem.getParentElement() == parent;
+    return parent != null && parent.isOrHasChild(elem);
   }
 
   protected void layoutContainer() {
     container.layout();
   }
 
+  protected void onAdd(Component component) {
+    if (component.isRendered()) {
+      onComponentRender(component);
+    } else {
+      component.addListener(Events.Render, componentListener);
+    }
+    component.addListener(Events.Show, componentListener);
+    component.addListener(Events.Hide, componentListener);
+  }
+
+  protected void onComponentHide(Component component) {
+
+  }
+
+  protected void onComponentShow(Component component) {
+
+  }
+
   protected void onLayout(Container<?> container, El target) {
-    this.target = target;
     renderAll(container, target);
+    for (Component component : container.getItems()) {
+      LayoutData data = getLayoutData(component);
+      if (data != null && data instanceof MarginData) {
+        MarginData ld = (MarginData) data;
+        applyMargins(component.el(), ld.getMargins());
+      }
+    }
   }
 
   protected void onRemove(Component component) {
     if (activeItem == component) {
       activeItem = null;
     }
+    if (extraStyle != null) {
+      component.removeStyleName(extraStyle);
+    }
+    if (componentStyleName != null) {
+      component.removeStyleName(componentStyleName);
+    }
+    component.removeListener(Events.Render, componentListener);
+    component.removeListener(Events.Show, componentListener);
+    component.removeListener(Events.Hide, componentListener);
   }
 
   protected void onResize(ComponentEvent ce) {
-    task.delay(resizeDelay);
+    resizeTask.delay(resizeDelay);
   }
 
   @SuppressWarnings("unchecked")
@@ -257,16 +361,8 @@ public abstract class Layout extends BaseObservable {
     } else {
       component.render(target.dom, index);
     }
-    if (extraStyle != null) {
-      component.addStyleName(extraStyle);
-    }
     if (renderHidden && component != activeItem) {
-      component.setVisible(false);
-    }
-    LayoutData data = component.getLayoutData();
-    if (data != null && data instanceof MarginData) {
-      MarginData ld = (MarginData) data;
-      applyMargins(component.el(), ld.getMargins());
+      component.hide();
     }
   }
 
@@ -282,6 +378,22 @@ public abstract class Layout extends BaseObservable {
     ComponentHelper.setLayoutData(c, data);
   }
 
+  protected native void setLayoutNeeded(Container<?> c, boolean needed) /*-{
+    c.@com.extjs.gxt.ui.client.widget.Container::layoutNeeded = needed;
+  }-*/;
+
+  protected native void setLayoutOnChange(Container<?> c, boolean change) /*-{
+    c.@com.extjs.gxt.ui.client.widget.Container::layoutOnChange = change;
+  }-*/;
+
+  protected void setPosition(Component c, int left, int top) {
+    if (c instanceof BoxComponent) {
+      ((BoxComponent) c).setPosition(left, top);
+    } else if (c.isRendered()) {
+      fly(c.getElement()).setLeftTop(left, top);
+    }
+  }
+
   protected void setSize(Component c, int width, int height) {
     if (c instanceof BoxComponent) {
       ((BoxComponent) c).setSize(width, height);
@@ -290,16 +402,17 @@ public abstract class Layout extends BaseObservable {
     }
   }
 
-  protected native void setLayoutOnChange(Container<?> c, boolean change) /*-{
-    c.@com.extjs.gxt.ui.client.widget.Container::layoutOnChange = change;
-  }-*/;
+  private void onComponentRender(Component component) {
+    if (extraStyle != null) {
+      component.addStyleName(extraStyle);
+    }
+    if (componentStyleName != null) {
+      component.addStyleName(componentStyleName);
+    }
+  }
 
-  protected native void setLayoutNeeded(Container<?> c, boolean needed) /*-{
-    c.@com.extjs.gxt.ui.client.widget.Container::layoutNeeded = needed;
-  }-*/;
-
-  protected native boolean isLayoutNeeded(Container<?> c) /*-{
-    return c.@com.extjs.gxt.ui.client.widget.Container::layoutNeeded;
+  private native void doLayout(Container<?> c) /*-{
+    c.@com.extjs.gxt.ui.client.widget.Container::layout()();
   }-*/;
 
 }

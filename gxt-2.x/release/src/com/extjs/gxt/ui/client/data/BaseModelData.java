@@ -9,6 +9,7 @@ package com.extjs.gxt.ui.client.data;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,7 +45,26 @@ public class BaseModelData implements ModelData, Serializable {
     if (allowNestedValues && NestedModelUtil.isNestedProperty(property)) {
       return (X) NestedModelUtil.getNestedValue(this, property);
     }
-    return map == null ? null : (X) map.get(property);
+    if (map == null) {
+      return null;
+    }
+    int start = property.indexOf("[");
+    int end = property.indexOf("]");
+    X obj = null;
+    if (start > -1 && end > -1) {
+      Object o = map.get(property.substring(0, start));
+      String p = property.substring(start + 1, end);
+      if (o instanceof Object[]) {
+        obj = (X) ((Object[]) o)[Integer.valueOf(p)];
+      } else if (o instanceof List) {
+        obj = (X) ((List) o).get(Integer.valueOf(p));
+      } else if (o instanceof Map) {
+        obj = (X) ((Map) o).get(p);
+      }
+    } else {
+      obj = (X) map.get(property);
+    }
+    return obj;
   }
 
   /**
@@ -98,13 +118,40 @@ public class BaseModelData implements ModelData, Serializable {
    */
   @SuppressWarnings("unchecked")
   public <X> X set(String property, X value) {
+    if (allowNestedValues && NestedModelUtil.isNestedProperty(property)) {
+      return (X) NestedModelUtil.setNestedValue(this, property, value);
+    }
     if (map == null) {
       map = new RpcMap();
     }
-    if (allowNestedValues && NestedModelUtil.isNestedProperty(property)) {
-      NestedModelUtil.setNestedValue(this, property, value);
+
+    int start = property.indexOf("[");
+    int end = property.indexOf("]");
+
+    if (start > -1 && end > -1) {
+      Object o = get(property.substring(0, start));
+      String p = property.substring(start + 1, end);
+      if (o instanceof Object[]) {
+        int i = Integer.valueOf(p);
+        Object[] oa = (Object[]) o;
+        X old = (X) oa[i];
+        oa[i] = value;
+        return old;
+      } else if (o instanceof List) {
+        int i = Integer.valueOf(p);
+        List list = (List) o;
+        return (X) list.set(i, value);
+      } else if (o instanceof Map) {
+        Map map = (Map) o;
+        return (X) map.put(p, value);
+      } else {
+        // not supported
+        return null;
+      }
+    } else {
+      return (X) map.put(property, value);
     }
-    return (X) map.put(property, value);
+
   }
 
   /**

@@ -7,11 +7,15 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
+import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.aria.FocusFrame;
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.LayoutData;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -210,7 +214,7 @@ public class LayoutContainer extends ScrollContainer<Component> {
   public boolean insert(Widget widget, int index, LayoutData layoutData) {
     Component component = wrapWidget(widget);
     if (layoutData != null) {
-      component.setLayoutData(layoutData);
+      ComponentHelper.setLayoutData(component, layoutData);
     }
     boolean added = super.insert(component, index);
     return added;
@@ -230,7 +234,7 @@ public class LayoutContainer extends ScrollContainer<Component> {
   public boolean isMonitorWindowResize() {
     return super.isMonitorWindowResize();
   }
-  
+
   @Override
   public boolean layout() {
     return super.layout();
@@ -284,6 +288,7 @@ public class LayoutContainer extends ScrollContainer<Component> {
    * @param layoutData the layout data
    */
   public void setLayoutData(Component component, LayoutData layoutData) {
+    layoutNeeded = true;
     ComponentHelper.setLayoutData(component, layoutData);
   }
 
@@ -307,10 +312,42 @@ public class LayoutContainer extends ScrollContainer<Component> {
     super.setWindowResizeDelay(delay);
   }
 
+  @Override
+  public void onComponentEvent(ComponentEvent ce) {
+    super.onComponentEvent(ce);
+    int type = ce.getEventTypeInt();
+    switch (type) {
+      case Event.ONFOCUS:
+        onFocus(ce);
+        break;
+      case Event.ONBLUR:
+        onBlur(ce);
+        break;
+    }
+  }
+  
+  protected void onFocus(ComponentEvent ce) {
+    if (getData("aria-ignore") != null && getItemCount() > 0){
+      getItem(0).focus();
+    } else {
+      FocusFrame.get().frame(this);
+    }
+  }
+  
+  protected void onBlur(ComponentEvent ce) {
+
+  }
+  
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
     if (el() == null) {
       setElement(DOM.createDiv(), parent, index);
+    }
+
+    if (GXT.isAriaEnabled()) {
+      el().setTabIndex(0);
+      el().setElementAttribute("hideFocus", "true");
+      sinkEvents(Event.FOCUSEVENTS);
     }
   }
 

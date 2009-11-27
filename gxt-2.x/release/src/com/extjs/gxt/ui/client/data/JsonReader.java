@@ -90,7 +90,7 @@ public class JsonReader<D> implements DataReader<D> {
           String s = value.isString().stringValue();
           if (type != null) {
             if (type.equals(Date.class)) {
-              if (field.getFormat().equals("timestamp")) {
+              if ("timestamp".equals(field.getFormat())) {
                 Date d = new Date(Long.parseLong(s) * 1000);
                 model.set(name, d);
               } else {

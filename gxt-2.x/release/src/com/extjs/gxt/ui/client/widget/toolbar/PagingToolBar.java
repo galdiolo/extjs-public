@@ -487,13 +487,13 @@ public class PagingToolBar extends ToolBar {
           }
 
           public void loaderLoad(LoadEvent le) {
-            refresh.setIcon(IconHelper.createStyle("x-tbar-refresh"));
+            refresh.setIcon(getImages().getRefresh());
             setEnabled(savedEnableState);
             onLoad(le);
           }
 
           public void loaderLoadException(LoadEvent le) {
-            refresh.setIcon(IconHelper.createStyle("x-tbar-refresh"));
+            refresh.setIcon(getImages().getRefresh());
             setEnabled(savedEnableState);
           }
         };

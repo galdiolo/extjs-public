@@ -10,7 +10,7 @@ package com.extjs.gxt.samples.client.examples.grid;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.data.BaseListLoader;
 import com.extjs.gxt.ui.client.data.HttpProxy;
@@ -31,10 +31,13 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.user.client.Element;
 
 public class JsonGridExample extends LayoutContainer {
 
-  public JsonGridExample() {
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
     setLayout(new FlowLayout(10));
 
     List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
@@ -57,16 +60,14 @@ public class JsonGridExample extends LayoutContainer {
     type.addField("Zip", "zip");
 
     // use a http proxy to get the data
-    RequestBuilder builder = new RequestBuilder(RequestBuilder.GET,
-        GWT.getHostPageBaseURL() + "data/data.json");
+    RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, GWT.getHostPageBaseURL() + "data/data.json");
     HttpProxy<String> proxy = new HttpProxy<String>(builder);
 
     // need a loader, proxy, and reader
-    JsonLoadResultReader<ListLoadResult<ModelData>> reader = new JsonLoadResultReader<ListLoadResult<ModelData>>(
-        type);
+    JsonLoadResultReader<ListLoadResult<ModelData>> reader = new JsonLoadResultReader<ListLoadResult<ModelData>>(type);
 
-    final BaseListLoader<ListLoadResult<ModelData>> loader = new BaseListLoader<ListLoadResult<ModelData>>(
-        proxy, reader);
+    final BaseListLoader<ListLoadResult<ModelData>> loader = new BaseListLoader<ListLoadResult<ModelData>>(proxy,
+        reader);
 
     ListStore<ModelData> store = new ListStore<ModelData>(loader);
     final Grid<ModelData> grid = new Grid<ModelData>(store, cm);
@@ -80,7 +81,7 @@ public class JsonGridExample extends LayoutContainer {
     panel.setCollapsible(true);
     panel.setAnimCollapse(false);
     panel.setButtonAlign(HorizontalAlignment.CENTER);
-    panel.setIcon(Examples.ICONS.table());
+    panel.setIcon(Resources.ICONS.table());
     panel.setHeading("JSON Table Demo");
     panel.setLayout(new FitLayout());
     panel.add(grid);

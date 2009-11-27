@@ -101,52 +101,59 @@ public class RowLayout extends Layout {
       Component c = container.getItem(i);
       c.el().makePositionable(true);
       c.el().setStyleAttribute("margin", "0px");
-      RowData data = (RowData) getLayoutData(c);
-      if (data == null) {
+
+      RowData data = null;
+      LayoutData d = getLayoutData(c);
+      if (d != null && d instanceof RowData) {
+        data = (RowData) d;
+      } else {
         data = new RowData();
-        setLayoutData(c, data);
       }
+
       if (data.getWidth() > 1) {
         pw -= data.getWidth();
       } else if (data.getWidth() == -1) {
-        pw -= c.getOffsetWidth();
-      }
+        callLayout(c, false);
 
-      Margins m = data.getMargins();
-      if (m != null) {
-        pw -= m.left + m.right;
+        pw -= c.getOffsetWidth();
+        if (data.getMargins() != null) {
+          pw -= data.getMargins().left;
+          pw -= data.getMargins().right;
+        }
       }
     }
 
     pw = pw < 0 ? 0 : pw;
 
-    int x = 0;
+    int x = target.getFrameWidth("l");
+    int sTop = target.getFrameWidth("t");
 
     for (int i = 0; i < count; i++) {
       Component c = container.getItem(i);
-      RowData data = (RowData) getLayoutData(c);
-
+      RowData data = null;
+      LayoutData d = getLayoutData(c);
+      if (d != null && d instanceof RowData) {
+        data = (RowData) d;
+      } else {
+        data = new RowData();
+      }
       double height = data.getHeight();
 
       if (height > 0 && height <= 1) {
         height = height * h;
-      } else
-
-      if (height == -1) {
-        height = c.el().getHeight(true);
+      } else if (height == -1) {
+        height = c.getOffsetHeight();
       }
 
       double width = data.getWidth();
-      double fw = width;
       if (width > 0 && width <= 1) {
         width = width * pw;
-        fw = width;
       } else if (width == -1) {
-        fw = c.getOffsetWidth();
+        width = c.getOffsetWidth();
       }
 
       int tx = x;
-      int ty = 0;
+      int ty = sTop;
       int tw = (int) width;
       int th = (int) height;
 
@@ -154,16 +161,19 @@ public class RowLayout extends Layout {
       if (m != null) {
         tx += m.left;
         ty += m.top;
-        th -= m.top;
-        th -= m.bottom;
+        if (data.getHeight() != -1) {
+          th -= m.top;
+          th -= m.bottom;
+        }
+        if (data.getWidth() != -1) {
+          tw -= m.left;
+          tw -= m.right;
+        }
       }
 
-      c.el().setLeftTop(tx, ty);
+      setPosition(c, tx, ty);
       setSize(c, tw, th);
-      x += fw;
-      if (m != null) {
-        x += m.left + m.right;
-      }
+      x += tw + (m != null ? m.right + m.left : 0);
     }
   }
 
@@ -180,26 +190,36 @@ public class RowLayout extends Layout {
     // so we need to make 2 passes
     for (int i = 0; i < count; i++) {
       Component c = container.getItem(i);
-      RowData data = (RowData) getLayoutData(c);
-      if (data == null) {
+      RowData data = null;
+      LayoutData d = getLayoutData(c);
+      if (d != null && d instanceof RowData) {
+        data = (RowData) d;
+      } else {
         data = new RowData();
-        setLayoutData(c, data);
       }
 
       if (data.getHeight() > 1) {
         ph -= data.getHeight();
       } else if (data.getHeight() == -1) {
+        callLayout(c, false);
+
         ph -= c.getOffsetHeight();
+        ph -= c.el().getMargins("tb");
       }
 
-      ph -= c.el().getMargins("tb");
     }
 
     ph = ph < 0 ? 0 : ph;
 
     for (int i = 0; i < count; i++) {
       Component c = container.getItem(i);
-      RowData data = (RowData) getLayoutData(c);
+      RowData data = null;
+      LayoutData d = getLayoutData(c);
+      if (d != null && d instanceof RowData) {
+        data = (RowData) d;
+      } else {
+        data = new RowData();
+      }
 
       double width = data.getWidth();
 
@@ -223,9 +243,8 @@ public class RowLayout extends Layout {
   @Override
   protected void onLayout(Container<?> container, El target) {
     super.onLayout(container, target);
-    
 
-    if (container instanceof ScrollContainer) {
+    if (container instanceof ScrollContainer<?>) {
       ScrollContainer<?> sc = (ScrollContainer<?>) container;
       sc.setScrollMode(sc.getScrollMode());
     } else {

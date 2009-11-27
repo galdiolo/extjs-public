@@ -7,9 +7,9 @@
  */
 package com.extjs.gxt.ui.client.event;
 
-import java.util.HashMap;
 import java.util.Map;
 
+import com.extjs.gxt.ui.client.core.FastMap;
 import com.google.gwt.user.client.Event;
 
 /**
@@ -17,146 +17,20 @@ import com.google.gwt.user.client.Event;
  */
 public class Events {
 
-  protected Events() {
-
-  }
-
-  /**
-   * DOM ONBLUR event type.
-   */
-  public static final EventType OnBlur = new EventType(Event.ONBLUR);
-
-  /**
-   * DOM ONCHANGE event type.
-   */
-  public static final EventType OnChange = new EventType(Event.ONCHANGE);
-
-  /**
-   * DOM ONCLICK event type.
-   */
-  public static final EventType OnClick = new EventType(Event.ONCLICK);
-
-  /**
-   * DOM ONDBLCLICK event type.
-   */
-  public static final EventType OnDoubleClick = new EventType(Event.ONDBLCLICK);
-
-  /**
-   * DOM ONERROR event type.
-   */
-  public static final EventType OnError = new EventType(Event.ONERROR);
-
-  /**
-   * DOM ONFOCUS event type.
-   */
-  public static final EventType OnFocus = new EventType(Event.ONFOCUS);
-
-  /**
-   * DOM ONKEYDOWN event type.
-   */
-  public static final EventType OnKeyDown = new EventType(Event.ONKEYDOWN);
-
-  /**
-   * DOM ONKEYDOWN event type.
-   */
-  public static final EventType OnKeyPress = new EventType(Event.ONKEYPRESS);
-
-  /**
-   * DOM ONKEYUP event type.
-   */
-  public static final EventType OnKeyUp = new EventType(Event.ONKEYUP);
-
-  /**
-   * DOM ONLOAD event type.
-   */
-  public static final EventType OnLoad = new EventType(Event.ONLOAD);
-
-  /**
-   * DOM ONLOSECAPTURE event type.
-   */
-  public static final EventType OnLoseCapture = new EventType(Event.ONLOSECAPTURE);
-
-  /**
-   * DOM ONMOUSEDOWN event type.
-   */
-  public static final EventType OnMouseDown = new EventType(Event.ONMOUSEDOWN);
-
-  /**
-   * DOM ONMOUSEUP event type.
-   */
-  public static final EventType OnMouseUp = new EventType(Event.ONMOUSEUP);
-
-  /**
-   * DOM ONMOUSEWHEEL event type.
-   */
-  public static final EventType OnMouseWheel = new EventType(Event.ONMOUSEWHEEL);
-
-  /**
-   * DOM ONSCROLL event type.
-   */
-  public static final EventType OnScroll = new EventType(Event.ONSCROLL);
-
-  /**
-   * DOM ONCONTEXTMENU event type.
-   */
-  public static final EventType OnContextMenu = new EventType(Event.ONCONTEXTMENU);
-
-  /**
-   * DOM ONMOUSEOVER event type.
-   */
-  public static final EventType OnMouseOver = new EventType(Event.ONMOUSEOVER);
-
-  /**
-   * DOM ONMOUSEOUT event type.
-   */
-  public static final EventType OnMouseOut = new EventType(Event.ONMOUSEOUT);
-
-  /**
-   * DOM ONMOUSEMOVE event type.
-   */
-  public static final EventType OnMouseMove = new EventType(Event.ONMOUSEMOVE);
-
-  private static Map<Integer, EventType> browserEvents = new HashMap<Integer, EventType>();
-
-  static {
-    browserEvents.put(Event.ONBLUR, OnBlur);
-    browserEvents.put(Event.ONCHANGE, OnChange);
-    browserEvents.put(Event.ONCLICK, OnClick);
-    browserEvents.put(Event.ONCONTEXTMENU, OnContextMenu);
-    browserEvents.put(Event.ONDBLCLICK, OnDoubleClick);
-    browserEvents.put(Event.ONERROR, OnError);
-    browserEvents.put(Event.ONFOCUS, OnFocus);
-    browserEvents.put(Event.ONKEYDOWN, OnKeyDown);
-    browserEvents.put(Event.ONKEYPRESS, OnKeyPress);
-    browserEvents.put(Event.ONKEYUP, OnKeyUp);
-    browserEvents.put(Event.ONLOAD, OnLoad);
-    browserEvents.put(Event.ONLOSECAPTURE, OnLoseCapture);
-    browserEvents.put(Event.ONMOUSEDOWN, OnMouseDown);
-    browserEvents.put(Event.ONMOUSEUP, OnMouseUp);
-    browserEvents.put(Event.ONMOUSEOVER, OnMouseOver);
-    browserEvents.put(Event.ONMOUSEOUT, OnMouseOut);
-    browserEvents.put(Event.ONMOUSEMOVE, OnMouseMove);
-    browserEvents.put(Event.ONMOUSEWHEEL, OnMouseWheel);
-    browserEvents.put(Event.ONSCROLL, OnScroll);
-
-  }
-
-  /**
-   * Finds the GXT EventType based on GWT int event type.
-   * 
-   * @param browserEventType the GWT event type
-   * @return the GXT event type
-   */
-  public static EventType lookupBrowserEvent(int browserEventType) {
-    EventType type = browserEvents.get(browserEventType);
-    assert type != null;
-    return type;
-  }
-
   /**
    * Activate event type.
    */
   public static final EventType Activate = new EventType();
+
+  /**
+   * Add event type.
+   */
+  public static final EventType Add = new EventType();
+
+  /**
+   * Adopt event type.
+   */
+  public static final EventType Adopt = new EventType();
 
   /**
    * AfterEdit event type.
@@ -169,11 +43,6 @@ public class Events {
   public static final EventType AfterLayout = new EventType();
 
   /**
-   * Add event type.
-   */
-  public static final EventType Add = new EventType();
-
-  /**
    * ArrowClick event type.
    */
   public static final EventType ArrowClick = new EventType();
@@ -184,20 +53,30 @@ public class Events {
   public static final EventType Attach = new EventType();
 
   /**
+   * AutoHide event type.
+   */
+  public static final EventType AutoHide = new EventType();
+
+  /**
    * BeforeAdd event type.
    */
   public static final EventType BeforeAdd = new EventType();
-  
+
+  /**
+   * BeforeAdopt event type.
+   */
+  public static final EventType BeforeAdopt = new EventType();
+
   /**
    * Bind event type.
    */
   public static final EventType BeforeBind = new EventType();
-  
+
   /**
    * BeforeCancelEdit event type.
    */
   public static final EventType BeforeCancelEdit = new EventType();
-  
+
   /**
    * BeforeChange event type.
    */
@@ -239,9 +118,24 @@ public class Events {
   public static final EventType BeforeHide = new EventType();
 
   /**
+   * BeforeLayout event type.
+   */
+  public static final EventType BeforeLayout = new EventType();
+
+  /**
    * BeforeOpen event type.
    */
   public static final EventType BeforeOpen = new EventType();
+
+  /**
+   * BeforeOrphan event type.
+   */
+  public static final EventType BeforeOrphan = new EventType();
+
+  /**
+   * BeforeQuery event type.
+   */
+  public static final EventType BeforeQuery = new EventType();
 
   /**
    * BeforeRemove event type.
@@ -254,24 +148,9 @@ public class Events {
   public static final EventType BeforeRender = new EventType();
 
   /**
-   * BeforeStateRestore event type.
-   */
-  public static final EventType BeforeStateRestore = new EventType();
-
-  /**
    * BeforeSelect event type.
    */
   public static final EventType BeforeSelect = new EventType();
-
-  /**
-   * BeforeStateSave event type.
-   */
-  public static final EventType BeforeStateSave = new EventType();
-
-  /**
-   * BeforeSubmit event type.
-   */
-  public static final EventType BeforeSubmit = new EventType();
 
   /**
    * BeforeShow event type.
@@ -284,10 +163,25 @@ public class Events {
   public static final EventType BeforeStartEdit = new EventType();
 
   /**
+   * BeforeStateRestore event type.
+   */
+  public static final EventType BeforeStateRestore = new EventType();
+
+  /**
+   * BeforeStateSave event type.
+   */
+  public static final EventType BeforeStateSave = new EventType();
+
+  /**
+   * BeforeSubmit event type.
+   */
+  public static final EventType BeforeSubmit = new EventType();
+
+  /**
    * Bind event type.
    */
   public static final EventType Bind = new EventType();
-  
+
   /**
    * Blur event type.
    */
@@ -307,7 +201,7 @@ public class Events {
    * CancelEdit event type.
    */
   public static final EventType CancelEdit = new EventType();
-  
+
   /**
    * CellClick event type.
    */
@@ -324,6 +218,11 @@ public class Events {
   public static final EventType CellMouseDown = new EventType();
 
   /**
+   * CellMouseUp event type.
+   */
+  public static final EventType CellMouseUp = new EventType();
+
+  /**
    * Change event type.
    */
   public static final EventType Change = new EventType();
@@ -332,7 +231,7 @@ public class Events {
    * CheckChange event type.
    */
   public static final EventType CheckChange = new EventType();
-  
+
   /**
    * CheckChange event type.
    */
@@ -382,16 +281,16 @@ public class Events {
    * Detach event type.
    */
   public static final EventType Detach = new EventType();
-  
-  /**
-   * DoubleClick event type.
-   */
-  public static final EventType DoubleClick = new EventType();
 
   /**
    * Disable event type.
    */
   public static final EventType Disable = new EventType();
+
+  /**
+   * DoubleClick event type.
+   */
+  public static final EventType DoubleClick = new EventType();
 
   /**
    * DragCancel event type.
@@ -407,6 +306,11 @@ public class Events {
    * DragEnter event type.
    */
   public static final EventType DragEnter = new EventType();
+
+  /**
+   * DragFail event type.
+   */
+  public static final EventType DragFail = null;
 
   /**
    * DragLeave event type.
@@ -447,7 +351,7 @@ public class Events {
    * Enable event type.
    */
   public static final EventType Enable = new EventType();
-  
+
   /**
    * Exception event type.
    */
@@ -504,6 +408,11 @@ public class Events {
   public static final EventType Invalid = new EventType();
 
   /**
+   * KeyDown event type.
+   */
+  public static final EventType KeyDown = new EventType();
+
+  /**
    * KeyPress event type.
    */
   public static final EventType KeyPress = new EventType();
@@ -514,9 +423,9 @@ public class Events {
   public static final EventType KeyUp = new EventType();
 
   /**
-   * KeyDown event type.
+   * LiveGridViewUpdate event type.
    */
-  public static final EventType KeyDown = new EventType();
+  public static final EventType LiveGridViewUpdate = new EventType();;
 
   /**
    * Minimize event type.
@@ -544,10 +453,110 @@ public class Events {
   public static final EventType Move = new EventType();
 
   /**
+   * DOM ONBLUR event type.
+   */
+  public static final EventType OnBlur = new EventType(Event.ONBLUR);
+
+  /**
+   * DOM ONCHANGE event type.
+   */
+  public static final EventType OnChange = new EventType(Event.ONCHANGE);
+
+  /**
+   * DOM ONCLICK event type.
+   */
+  public static final EventType OnClick = new EventType(Event.ONCLICK);
+
+  /**
+   * DOM ONCONTEXTMENU event type.
+   */
+  public static final EventType OnContextMenu = new EventType(Event.ONCONTEXTMENU);
+
+  /**
+   * DOM ONDBLCLICK event type.
+   */
+  public static final EventType OnDoubleClick = new EventType(Event.ONDBLCLICK);
+
+  /**
+   * DOM ONERROR event type.
+   */
+  public static final EventType OnError = new EventType(Event.ONERROR);
+
+  /**
+   * DOM ONFOCUS event type.
+   */
+  public static final EventType OnFocus = new EventType(Event.ONFOCUS);
+
+  /**
+   * DOM ONKEYDOWN event type.
+   */
+  public static final EventType OnKeyDown = new EventType(Event.ONKEYDOWN);
+
+  /**
+   * DOM ONKEYDOWN event type.
+   */
+  public static final EventType OnKeyPress = new EventType(Event.ONKEYPRESS);
+
+  /**
+   * DOM ONKEYUP event type.
+   */
+  public static final EventType OnKeyUp = new EventType(Event.ONKEYUP);
+
+  /**
+   * DOM ONLOAD event type.
+   */
+  public static final EventType OnLoad = new EventType(Event.ONLOAD);
+
+  /**
+   * DOM ONLOSECAPTURE event type.
+   */
+  public static final EventType OnLoseCapture = new EventType(Event.ONLOSECAPTURE);
+
+  /**
+   * DOM ONMOUSEDOWN event type.
+   */
+  public static final EventType OnMouseDown = new EventType(Event.ONMOUSEDOWN);
+
+  /**
+   * DOM ONMOUSEMOVE event type.
+   */
+  public static final EventType OnMouseMove = new EventType(Event.ONMOUSEMOVE);
+
+  /**
+   * DOM ONMOUSEOUT event type.
+   */
+  public static final EventType OnMouseOut = new EventType(Event.ONMOUSEOUT);
+
+  /**
+   * DOM ONMOUSEOVER event type.
+   */
+  public static final EventType OnMouseOver = new EventType(Event.ONMOUSEOVER);
+
+  /**
+   * DOM ONMOUSEUP event type.
+   */
+  public static final EventType OnMouseUp = new EventType(Event.ONMOUSEUP);
+
+  /**
+   * DOM ONMOUSEWHEEL event type.
+   */
+  public static final EventType OnMouseWheel = new EventType(Event.ONMOUSEWHEEL);
+
+  /**
+   * DOM ONSCROLL event type.
+   */
+  public static final EventType OnScroll = new EventType(Event.ONSCROLL);
+
+  /**
    * Open event type.
    */
   public static final EventType Open = new EventType();
-  
+
+  /**
+   * Orphan event type.
+   */
+  public static final EventType Orphan = new EventType();
+
   /**
    * Ready event type.
    */
@@ -609,6 +618,11 @@ public class Events {
   public static final EventType RowMouseDown = new EventType();
 
   /**
+   * RowMouseUp event type.
+   */
+  public static final EventType RowMouseUp = new EventType();
+
+  /**
    * RowUpdated event type.
    */
   public static final EventType RowUpdated = new EventType();
@@ -654,14 +668,14 @@ public class Events {
   public static final EventType StateChange = new EventType();
 
   /**
-   * StateSave event type.
-   */
-  public static final EventType StateSave = new EventType();
-
-  /**
    * StateRestore event type.
    */
   public static final EventType StateRestore = new EventType();
+
+  /**
+   * StateSave event type.
+   */
+  public static final EventType StateSave = new EventType();
 
   /**
    * Submit event type.
@@ -684,19 +698,19 @@ public class Events {
   public static final EventType TwinTriggerClick = new EventType();
 
   /**
-   * Change event type.
-   */
-  public static final EventType Update = new EventType();
-
-  /**
    * UnBind event type.
    */
   public static final EventType UnBind = new EventType();
-  
+
   /**
    * Unregister event type.
    */
   public static final EventType Unregister = new EventType();
+
+  /**
+   * Change event type.
+   */
+  public static final EventType Update = new EventType();
 
   /**
    * Valid event type.
@@ -714,38 +728,54 @@ public class Events {
   public static final EventType ValidateEdit = new EventType();
 
   /**
+   * ViewReady event type.
+   */
+  public static final EventType ViewReady = new EventType();
+
+  /**
    * WidthChange event type.
    */
   public static final EventType WidthChange = new EventType();
 
-  /**
-   * BeforeAdopt event type.
-   */
-  public static final EventType BeforeAdopt = new EventType();
+  private static Map<String, EventType> browserEvents = new FastMap<EventType>();
+
+  static {
+    browserEvents.put(String.valueOf(Event.ONBLUR), OnBlur);
+    browserEvents.put(String.valueOf(Event.ONCHANGE), OnChange);
+    browserEvents.put(String.valueOf(Event.ONCLICK), OnClick);
+    browserEvents.put(String.valueOf(Event.ONCONTEXTMENU), OnContextMenu);
+    browserEvents.put(String.valueOf(Event.ONDBLCLICK), OnDoubleClick);
+    browserEvents.put(String.valueOf(Event.ONERROR), OnError);
+    browserEvents.put(String.valueOf(Event.ONFOCUS), OnFocus);
+    browserEvents.put(String.valueOf(Event.ONKEYDOWN), OnKeyDown);
+    browserEvents.put(String.valueOf(Event.ONKEYPRESS), OnKeyPress);
+    browserEvents.put(String.valueOf(Event.ONKEYUP), OnKeyUp);
+    browserEvents.put(String.valueOf(Event.ONLOAD), OnLoad);
+    browserEvents.put(String.valueOf(Event.ONLOSECAPTURE), OnLoseCapture);
+    browserEvents.put(String.valueOf(Event.ONMOUSEDOWN), OnMouseDown);
+    browserEvents.put(String.valueOf(Event.ONMOUSEUP), OnMouseUp);
+    browserEvents.put(String.valueOf(Event.ONMOUSEOVER), OnMouseOver);
+    browserEvents.put(String.valueOf(Event.ONMOUSEOUT), OnMouseOut);
+    browserEvents.put(String.valueOf(Event.ONMOUSEMOVE), OnMouseMove);
+    browserEvents.put(String.valueOf(Event.ONMOUSEWHEEL), OnMouseWheel);
+    browserEvents.put(String.valueOf(Event.ONSCROLL), OnScroll);
+
+  }
 
   /**
-   * Adopt event type.
+   * Finds the GXT EventType based on GWT int event type.
+   * 
+   * @param browserEventType the GWT event type
+   * @return the GXT event type
    */
-  public static final EventType Adopt = new EventType();
-  
-  /**
-   * AutoHide event type.
-   */
-  public static final EventType AutoHide = new EventType();
+  public static EventType lookupBrowserEvent(int browserEventType) {
+    EventType type = browserEvents.get(String.valueOf(browserEventType));
+    assert type != null;
+    return type;
+  }
 
-  /**
-   * BeforeOrphan event type.
-   */
-  public static final EventType BeforeOrphan = new EventType();
+  protected Events() {
 
-  /**
-   * BeforeQuery event type.
-   */
-  public static final EventType BeforeQuery = new EventType();
-
-  /**
-   * Orphan event type.
-   */
-  public static final EventType Orphan = new EventType();
+  }
 
 }

@@ -10,7 +10,7 @@ package com.extjs.gxt.samples.client.examples.grid;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Stock;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -20,6 +20,7 @@ import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -55,7 +56,10 @@ public class WidgetRenderingExample extends LayoutContainer {
 
             public void handleEvent(GridEvent<Stock> be) {
               for (int i = 0; i < be.getGrid().getStore().getCount(); i++) {
-                ((Button) be.getGrid().getView().getWidget(i, be.getColIndex())).setWidth(be.getWidth() - 10);
+                if (be.getGrid().getView().getWidget(i, be.getColIndex()) != null
+                    && be.getGrid().getView().getWidget(i, be.getColIndex()) instanceof BoxComponent) {
+                  ((BoxComponent) be.getGrid().getView().getWidget(i, be.getColIndex())).setWidth(be.getWidth() - 10);
+                }
               }
             }
           });
@@ -68,7 +72,7 @@ public class WidgetRenderingExample extends LayoutContainer {
           }
         });
         b.setWidth(grid.getColumnModel().getColumnWidth(colIndex) - 10);
-        b.setToolTip("Click for more Informations");
+        b.setToolTip("Click for more information");
 
         return b;
       }
@@ -134,7 +138,7 @@ public class WidgetRenderingExample extends LayoutContainer {
 
     ContentPanel cp = new ContentPanel();
     cp.setBodyBorder(false);
-    cp.setIcon(Examples.ICONS.table());
+    cp.setIcon(Resources.ICONS.table());
     cp.setHeading("Widget Renderer Grid");
     cp.setButtonAlign(HorizontalAlignment.CENTER);
     cp.setLayout(new FitLayout());

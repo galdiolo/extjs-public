@@ -387,7 +387,7 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
       store.removeAll(item.<M>getModel());
       item.setData("loaded", null);
       item.setLeaf(false);
-      markChildrenRendered(item, false);
+      item.setChildrenRendered(true);
     }
   }
 
@@ -541,9 +541,5 @@ public class TreeBinder<M extends ModelData> extends StoreBinder<TreeStore<M>, T
     }
     return false;
   }
-
-  private native void markChildrenRendered(TreeItem item, boolean rendered) /*-{
-     item.@com.extjs.gxt.ui.client.widget.tree.TreeItem::childrenRendered = rendered;
-   }-*/;
 
 }

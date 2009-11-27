@@ -10,7 +10,6 @@ package com.extjs.gxt.ui.client.widget.flash;
 import java.util.Date;
 
 import com.extjs.gxt.ui.client.GXT;
-import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.flash.SwfObject.SwfConfig;
@@ -187,7 +186,7 @@ public class FlashComponent extends BoxComponent {
 
   @Override
   protected void onDetach() {
-    El.fly(swfElement).removeFromParent();
+    SwfObject.removeSWF(getSwfId());
     swfElement = null;
     super.onDetach();
   }

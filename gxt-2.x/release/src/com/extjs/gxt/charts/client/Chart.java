@@ -236,7 +236,9 @@ public class Chart extends FlashComponent {
       if (global || config.isEnableEvents()) {
         for (int j = 0; j < config.getValues().size(); j++) {
           DataConfig data = config.getValues().get(j);
-          data.set("on-click", "ofc_onclick('" + getSwfId() + "'," + i + "," + j + ")");
+          if (data != null) {
+            data.set("on-click", "ofc_onclick('" + getSwfId() + "'," + i + "," + j + ")");
+          }
         }
       }
     }

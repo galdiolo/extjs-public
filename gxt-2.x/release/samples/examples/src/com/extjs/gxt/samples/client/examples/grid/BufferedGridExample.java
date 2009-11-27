@@ -11,20 +11,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.extjs.gxt.samples.client.Examples;
 import com.extjs.gxt.samples.client.examples.model.Post;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.data.BasePagingLoadConfig;
-import com.extjs.gxt.ui.client.data.BasePagingLoadResult;
 import com.extjs.gxt.ui.client.data.BasePagingLoader;
 import com.extjs.gxt.ui.client.data.DataField;
-import com.extjs.gxt.ui.client.data.JsonLoadResultReader;
-import com.extjs.gxt.ui.client.data.ListLoadResult;
+import com.extjs.gxt.ui.client.data.JsonPagingLoadResultReader;
 import com.extjs.gxt.ui.client.data.LoadEvent;
 import com.extjs.gxt.ui.client.data.Loader;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.ModelType;
-import com.extjs.gxt.ui.client.data.PagingLoadConfig;
 import com.extjs.gxt.ui.client.data.PagingLoadResult;
 import com.extjs.gxt.ui.client.data.PagingLoader;
 import com.extjs.gxt.ui.client.data.ScriptTagProxy;
@@ -55,9 +52,8 @@ public class BufferedGridExample extends LayoutContainer {
     FlowLayout layout = new FlowLayout(10);
     setLayout(layout);
 
-    String url = "http://extjs.com/forum/topics-browse-remote.php";
-    ScriptTagProxy<PagingLoadResult<ModelData>> proxy = new ScriptTagProxy<PagingLoadResult<ModelData>>(
-        url);
+    String url = "http://www.extjs.com/forum/topics-browse-remote.php";
+    ScriptTagProxy<PagingLoadResult<ModelData>> proxy = new ScriptTagProxy<PagingLoadResult<ModelData>>(url);
 
     ModelType type = new ModelType();
     type.setRoot("topics");
@@ -77,20 +73,11 @@ public class BufferedGridExample extends LayoutContainer {
     datefield.setFormat("timestamp");
     type.addField(datefield);
 
-    JsonLoadResultReader<PagingLoadResult<ModelData>> reader = new JsonLoadResultReader<PagingLoadResult<ModelData>>(
-        type) {
-      @Override
-      protected ListLoadResult<ModelData> newLoadResult(Object loadConfig,
-          List<ModelData> models) {
-        PagingLoadConfig pagingConfig = (PagingLoadConfig) loadConfig;
-        PagingLoadResult<ModelData> result = new BasePagingLoadResult<ModelData>(models,
-            pagingConfig.getOffset(), pagingConfig.getLimit());
-        return result;
-      }
-    };
+    JsonPagingLoadResultReader<PagingLoadResult<ModelData>> reader = new JsonPagingLoadResultReader<PagingLoadResult<ModelData>>(
+        type);
 
-    final PagingLoader<PagingLoadResult<ModelData>> loader = new BasePagingLoader<PagingLoadResult<ModelData>>(
-        proxy, reader);
+    final PagingLoader<PagingLoadResult<ModelData>> loader = new BasePagingLoader<PagingLoadResult<ModelData>>(proxy,
+        reader);
 
     loader.addListener(Loader.BeforeLoad, new Listener<LoadEvent>() {
       public void handleEvent(LoadEvent be) {
@@ -99,9 +86,8 @@ public class BufferedGridExample extends LayoutContainer {
         m.set("ext", "js");
         m.set("lightWeight", true);
         m.set("sort", (m.get("sortField") == null) ? "" : m.get("sortField"));
-        m.set("dir",
-            (m.get("sortDir") == null || (m.get("sortDir") != null && m.<SortDir> get(
-                "sortDir").equals(SortDir.NONE))) ? "" : m.get("sortDir"));
+        m.set("dir", (m.get("sortDir") == null || (m.get("sortDir") != null && m.<SortDir> get("sortDir").equals(
+            SortDir.NONE))) ? "" : m.get("sortDir"));
 
       }
     });
@@ -124,17 +110,14 @@ public class BufferedGridExample extends LayoutContainer {
     ColumnConfig title = new ColumnConfig("title", "Topic", 100);
     title.setRenderer(new GridCellRenderer<ModelData>() {
 
-      public Object render(ModelData model, String property, ColumnData config,
-          int rowIndex, int colIndex, ListStore<ModelData> store, Grid<ModelData> grid) {
+      public Object render(ModelData model, String property, ColumnData config, int rowIndex, int colIndex,
+          ListStore<ModelData> store, Grid<ModelData> grid) {
         return "<b><a style=\"color: #385F95; text-decoration: none;\" href=\"http://extjs.com/forum/showthread.php?t="
             + model.get("threadid")
             + "\" target=\"_blank\">"
             + model.get("title")
             + "</a></b><br /><a style=\"color: #385F95; text-decoration: none;\" href=\"http://extjs.com/forum/forumdisplay.php?f="
-            + model.get("forumid")
-            + "\" target=\"_blank\">"
-            + model.get("forumtitle")
-            + " Forum</a>";
+            + model.get("forumid") + "\" target=\"_blank\">" + model.get("forumtitle") + " Forum</a>";
       }
 
     });
@@ -144,8 +127,8 @@ public class BufferedGridExample extends LayoutContainer {
     ColumnConfig last = new ColumnConfig("lastpost", "Last Post", 200);
     last.setRenderer(new GridCellRenderer<ModelData>() {
 
-      public Object render(ModelData model, String property, ColumnData config,
-          int rowIndex, int colIndex, ListStore<ModelData> store, Grid<ModelData> grid) {
+      public Object render(ModelData model, String property, ColumnData config, int rowIndex, int colIndex,
+          ListStore<ModelData> store, Grid<ModelData> grid) {
         return model.get("lastpost") + "<br/>by " + model.get("lastposter");
       }
 
@@ -167,8 +150,7 @@ public class BufferedGridExample extends LayoutContainer {
     grid.setAutoExpandColumn("title");
 
     BufferView view = new BufferView();
-    view.setScrollDelay(0);
-    view.setRowHeight(34);
+    view.setRowHeight(32);
 
     grid.setView(view);
 
@@ -176,7 +158,7 @@ public class BufferedGridExample extends LayoutContainer {
     panel.setFrame(true);
     panel.setCollapsible(true);
     panel.setAnimCollapse(false);
-    panel.setIcon(Examples.ICONS.table());
+    panel.setIcon(Resources.ICONS.table());
     panel.setHeading("Buffered Grid");
     panel.setLayout(new FitLayout());
     panel.add(grid);

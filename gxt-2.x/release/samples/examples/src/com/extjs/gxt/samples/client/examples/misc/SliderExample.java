@@ -17,16 +17,13 @@ import com.extjs.gxt.ui.client.widget.layout.FillData;
 import com.google.gwt.user.client.Element;
 
 public class SliderExample extends LayoutContainer {
-  public SliderExample() {
-    setScrollMode(Scroll.AUTO);
-  }
 
   private int margins = 30;
 
   @Override
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
-
+    setScrollMode(Scroll.AUTO);
     final Slider slider = new Slider();
     slider.setWidth(200);
     slider.setIncrement(1);

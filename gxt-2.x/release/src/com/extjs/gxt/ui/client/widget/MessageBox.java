@@ -10,7 +10,6 @@ package com.extjs.gxt.ui.client.widget;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -105,7 +104,7 @@ public class MessageBox {
     box.show();
     return box;
   }
-  
+
   /**
    * Displays a confirmation message box with Yes and No buttons (comparable to
    * JavaScript's confirm).
@@ -179,7 +178,7 @@ public class MessageBox {
   public static MessageBox prompt(String title, String msg) {
     return prompt(title, msg, false, null);
   }
-  
+
   /**
    * Displays a message box with OK and Cancel buttons prompting the user to
    * enter some text (comparable to JavaScript's prompt).
@@ -215,7 +214,7 @@ public class MessageBox {
     box.show();
     return box;
   }
-  
+
   /**
    * Displays a message box with OK and Cancel buttons prompting the user to
    * enter some text (comparable to JavaScript's prompt).
@@ -338,10 +337,10 @@ public class MessageBox {
   public Dialog getDialog() {
     if (dialog == null) {
       dialog = new Dialog() {
-        
+
         @Override
-        protected void afterRender() {
-          super.afterRender();
+        protected void onRender(Element element, int index) {
+          super.onRender(element, index);
           addStyleName("x-window-dlg");
 
           El body = new El(dialog.getElement("body"));
@@ -358,19 +357,13 @@ public class MessageBox {
             textBox = new TextField<String>();
             dialog.setFocusWidget(textBox);
             textBox.render(contentEl, 2);
-            textBox.el().setWidth(GXT.isIE ? "100%" : "90%");
             icon = null;
-          }
-
-          if (type == MessageBoxType.MULTIPROMPT) {
+          } else if (type == MessageBoxType.MULTIPROMPT) {
             textArea = new TextArea();
-            textArea.render(contentEl, 2);
-            textArea.el().setWidth(GXT.isIE ? "100%" : "90%");
             dialog.setFocusWidget(textArea);
+            textArea.render(contentEl, 2);
             icon = null;
-          }
-
-          if (type == MessageBoxType.PROGRESSS || type == MessageBoxType.WAIT) {
+          } else if (type == MessageBoxType.PROGRESSS || type == MessageBoxType.WAIT) {
             progressBar = new ProgressBar();
             progressBar.render(body.dom);
             if (type == MessageBoxType.WAIT) {
@@ -384,31 +377,34 @@ public class MessageBox {
 
           MessageBox.this.setIcon(icon);
         }
-        
+
         @Override
-        protected void doAttachChildren(){
+        protected void onResize(int width, int height) {
+          super.onResize(width, height);
+          if (textBox != null) {
+            textBox.setWidth(getLayoutTarget().getWidth(true));
+          } else if (textArea != null) {
+            textArea.setWidth(getLayoutTarget().getWidth(true));
+          }
+        }
+
+        @Override
+        protected void doAttachChildren() {
           super.doAttachChildren();
-          if (type == MessageBoxType.PROMPT) {
-            ComponentHelper.doAttach(textBox);
-          } else if (type == MessageBoxType.MULTIPROMPT) {
-            ComponentHelper.doAttach(textArea);
-          } else if(type == MessageBoxType.PROGRESSS || type == MessageBoxType.WAIT) {
-            ComponentHelper.doAttach(progressBar);
-          }
+          ComponentHelper.doAttach(textBox);
+          ComponentHelper.doAttach(textArea);
+          ComponentHelper.doAttach(progressBar);
+
         }
-        
+
         @Override
-        protected void doDetachChildren(){
+        protected void doDetachChildren() {
           super.doDetachChildren();
-          if (type == MessageBoxType.PROMPT) {
-            ComponentHelper.doDetach(textBox);
-          } else if (type == MessageBoxType.MULTIPROMPT) {
-            ComponentHelper.doDetach(textArea);
-          } else if(type == MessageBoxType.PROGRESSS || type == MessageBoxType.WAIT) {
-            ComponentHelper.doDetach(progressBar);
-          }
+          ComponentHelper.doDetach(textBox);
+          ComponentHelper.doDetach(textArea);
+          ComponentHelper.doDetach(progressBar);
         }
-        
+
         @Override
         protected void initTools() {
           setClosable(closable);

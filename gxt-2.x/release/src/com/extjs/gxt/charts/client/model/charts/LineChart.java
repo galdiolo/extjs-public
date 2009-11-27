@@ -78,7 +78,12 @@ public class LineChart extends ChartConfig {
    */
   public void addValues(List<Number> values) {
     for (Number n : values) {
-      getValues().add(new Dot(n));
+      BaseDot d = new Dot(n);
+      d.setSize(getDotStyle().getSize());
+      d.setColour(getDotStyle().getColour());
+      d.setTooltip(getDotStyle().getTooltip());
+      d.setHaloSize(getDotStyle().getHaloSize());
+      getValues().add(d);
     }
   }
 

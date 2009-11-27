@@ -12,6 +12,8 @@ import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.util.IconHelper;
+import com.extjs.gxt.ui.client.util.Util;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
@@ -116,15 +118,14 @@ public class TabItem extends LayoutContainer implements IconSupport {
     public void setIcon(AbstractImagePrototype icon) {
       this.icon = icon;
       if (rendered) {
-        El node = el().selectNode(".x-tab-strip-inner img");
+        El node = el().selectNode(".x-tab-image");
         if (node != null) {
           node.remove();
         }
         if (icon != null) {
           Element e = icon.createElement().cast();
-          el().selectNode(".x-tab-strip-inner").insertChild(e, 0);
-          El.fly(e).setStyleAttribute("position", "absolute");
-          El.fly(e).setStyleAttribute("top", "3px");
+          e.setClassName("x-tab-image");
+          el().appendChild(e);
         }
         el().setStyleName("x-tab-with-icon", icon != null);
       }
@@ -142,7 +143,8 @@ public class TabItem extends LayoutContainer implements IconSupport {
     public void setText(String text) {
       this.text = text;
       if (rendered) {
-        el().child(".x-tab-strip-text").dom.setInnerHTML(text);
+        el().child(".x-tab-strip-text").dom.setInnerHTML(Util.isEmptyString(text) ? "&#160;" : text);
+        tabPanel.onItemTextChange(TabItem.this, this.text, text);
       }
     }
 
@@ -189,6 +191,7 @@ public class TabItem extends LayoutContainer implements IconSupport {
    */
   public TabItem() {
     header = new HeaderItem();
+    header.setParent(this);
   }
 
   /**
@@ -205,7 +208,7 @@ public class TabItem extends LayoutContainer implements IconSupport {
    * Closes the tab item.
    */
   public void close() {
-    tabPanel.remove(this);
+    tabPanel.close(this);
   }
 
   @Override
@@ -332,9 +335,10 @@ public class TabItem extends LayoutContainer implements IconSupport {
   public Frame setUrl(String url) {
     Frame f = new Frame(url);
     f.getElement().setPropertyInt("frameBorder", 0);
-    f.setSize("100%", "100%");
     removeAll();
-    add(new WidgetComponent(f));
+    setLayout(new FitLayout());
+    add(f);
+    layout();
     return f;
   }
 

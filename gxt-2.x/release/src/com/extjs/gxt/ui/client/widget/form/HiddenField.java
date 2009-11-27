@@ -19,14 +19,6 @@ import com.google.gwt.user.client.Element;
 public class HiddenField<D> extends Field<D> {
 
   @Override
-  protected void onRender(Element parent, int index) {
-    if (el() == null) {
-      setElement((Element) Document.get().createHiddenInputElement().cast(), parent, index);
-    }
-    super.onRender(parent, index);
-  }
-
-  @Override
   public void clearInvalid() {
   }
 
@@ -35,12 +27,20 @@ public class HiddenField<D> extends Field<D> {
   }
 
   @Override
-  protected boolean validateValue(String value) {
+  public boolean validate(boolean silent) {
     return true;
   }
 
   @Override
-  public boolean validate(boolean silent) {
+  protected void onRender(Element parent, int index) {
+    if (el() == null) {
+      setElement((Element) Document.get().createHiddenInputElement().cast(), parent, index);
+    }
+    super.onRender(parent, index);
+  }
+
+  @Override
+  protected boolean validateValue(String value) {
     return true;
   }
 

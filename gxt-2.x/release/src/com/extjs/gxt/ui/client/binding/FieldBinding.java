@@ -37,7 +37,7 @@ public class FieldBinding {
 
   private Listener<FieldEvent> changeListener;
   private ChangeListener modelListener;
-  private Converter convertor;
+  private Converter converter;
 
   /**
    * Creates a new binding instance.
@@ -85,8 +85,8 @@ public class FieldBinding {
    * 
    * @return the converter
    */
-  public Converter getConvertor() {
-    return convertor;
+  public Converter getConverter() {
+    return converter;
   }
 
   /**
@@ -129,10 +129,10 @@ public class FieldBinding {
    * Sets the converter which is used to translate data types when updating
    * either the field or model.
    * 
-   * @param convertor the converter
+   * @param converter the converter
    */
-  public void setConvertor(Converter convertor) {
-    this.convertor = convertor;
+  public void setConverter(Converter converter) {
+    this.converter = converter;
   }
 
   /**
@@ -156,6 +156,7 @@ public class FieldBinding {
       model = null;
     }
     field.removeListener(Events.Change, changeListener);
+    field.clear();
   }
 
   /**
@@ -184,15 +185,15 @@ public class FieldBinding {
   }
   
   protected Object onConvertFieldValue(Object value) {
-    if (convertor != null) {
-      return convertor.convertFieldValue(value);
+    if (converter != null) {
+      return converter.convertFieldValue(value);
     }
     return value;
   }
 
   protected Object onConvertModelValue(Object value) {
-    if (convertor != null) {
-      return convertor.convertModelValue(value);
+    if (converter != null) {
+      return converter.convertModelValue(value);
     }
     return value;
   }

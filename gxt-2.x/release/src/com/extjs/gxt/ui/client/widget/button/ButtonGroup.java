@@ -9,6 +9,7 @@ package com.extjs.gxt.ui.client.widget.button;
 
 import com.extjs.gxt.ui.client.util.TextMetrics;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
+import com.extjs.gxt.ui.client.widget.Layout;
 import com.extjs.gxt.ui.client.widget.layout.TableLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.user.client.Element;
@@ -34,16 +35,18 @@ public class ButtonGroup extends ContentPanel {
   }
 
   @Override
-  protected void onAfterLayout() {
-    TextMetrics.get().bind(head.el().selectNode("span"));
-    int tw = TextMetrics.get().getWidth(getHeading()) + getFrameWidth();
+  protected void onLayoutExcecuted(Layout layout) {
+    super.onLayoutExcecuted(layout);
     int bodyWidth = body.getFrameWidth("lr") + body.firstChild().getWidth();
     if (bodyWidth > 0) { // display none
+      TextMetrics.get().bind(head.el().selectNode("span"));
+      int frameWidth = getFrameWidth();
+      int tw = TextMetrics.get().getWidth(getHeading()) + frameWidth;
       if (tw > bodyWidth) {
         bodyWidth = tw;
       }
-      body.setWidth(bodyWidth);
-      el().setWidth(bodyWidth + getFrameWidth());
+      body.setWidth(bodyWidth, true);
+      el().setWidth(bodyWidth + frameWidth, true);
     }
   }
 

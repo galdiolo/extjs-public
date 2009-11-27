@@ -14,9 +14,12 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.Rectangle;
+import com.extjs.gxt.ui.client.util.Size;
+import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.button.ToolButton;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
-import com.extjs.gxt.ui.client.widget.layout.FillLayout;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 
@@ -91,6 +94,19 @@ public class CollapsePanel extends ContentPanel {
     return panel;
   }
 
+  public int getFrameWidth() {
+    return 0;
+  }
+
+  public int getFrameHeight() {
+    return 0;
+  }
+
+  @Override
+  public El getLayoutTarget() {
+    return el();
+  }
+
   @Override
   public void onComponentEvent(ComponentEvent ce) {
     super.onComponentEvent(ce);
@@ -127,7 +143,7 @@ public class CollapsePanel extends ContentPanel {
   @Override
   protected void doAttachChildren() {
     super.doAttachChildren();
-    collapseBtn.onAttach();
+    ComponentHelper.doAttach(collapseBtn);
   }
 
   @Override
@@ -162,18 +178,23 @@ public class CollapsePanel extends ContentPanel {
   }
 
   @Override
+  protected Size getFrameSize() {
+    return new Size(0, 0);
+  }
+
+  @Override
   protected void onRender(Element target, int index) {
-    super.onRender(target, index);
-    el().removeChildren();
-    String txt = "";
+    setElement(DOM.createDiv(), target, index);
+    String text = null;
 
     LayoutRegion r = parentData.getRegion();
 
     if (r == LayoutRegion.NORTH || r == LayoutRegion.SOUTH) {
-      txt = panel.getHeader().getText();
+      text = panel.getHeader().getText();
     }
     headerEl = el().createChild(
-        "<div class=x-panel-header><span class=x-pnael-header-text>" + txt + "</span></div>");
+        "<div class=\"x-panel-header\"><span class=\"x-panel-header-text\">"
+            + (Util.isEmptyString(text) ? "&#160;" : text) + "</span></div>");
 
     String icon = null;
     adj = new int[] {0, 0};
@@ -181,12 +202,12 @@ public class CollapsePanel extends ContentPanel {
       case WEST:
         icon = "right";
         align = "tl-tr";
-        adj = new int[] {0, 24};
+        adj = new int[] {0, 25};
         break;
       case EAST:
         icon = "left";
         align = "tr-tl";
-        adj = new int[] {0, 24};
+        adj = new int[] {0, 25};
         break;
       case NORTH:
         icon = "down";
@@ -200,6 +221,8 @@ public class CollapsePanel extends ContentPanel {
 
     if (r == LayoutRegion.NORTH || region == LayoutRegion.SOUTH) {
       headerEl.setStyleAttribute("background", "none");
+    } else {
+      el().selectNode("span").hide();
     }
 
     headerEl.setStyleAttribute("cursor", "default");
@@ -218,7 +241,7 @@ public class CollapsePanel extends ContentPanel {
     });
 
     if (parentData.isFloatable()) {
-      el().addEventsSunk(Event.MOUSEEVENTS | Event.ONCLICK);
+      sinkEvents(Event.ONCLICK);
     }
     el().setVisibility(true);
 
@@ -233,24 +256,22 @@ public class CollapsePanel extends ContentPanel {
     if (bar != null) {
       bar.disable();
     }
+    if (popup == null) {
+      popup = new Popup() {
+        protected boolean onAutoHide(Event event) {
+          setExpanded(false);
+          return false;
+        }
+      };
 
-    popup = new Popup() {
-      protected boolean onAutoHide(Event event) {
-        setExpanded(false);
-        return false;
-      }
-    };
-
-    popup.getIgnoreList().add(collapseBtn.getElement());
-    popup.getIgnoreList().add(getElement());
-    popup.getIgnoreList().add(panel.getElement());
-    popup.setStyleName("x-layout-popup");
-    popup.setLayout(new FillLayout());
-    popup.setShadow(true);
-
-    int hh = fly(el().firstChild().dom).getHeight();
-
-    panel.el().setLeftTop(0, 0);
+      popup.getIgnoreList().add(collapseBtn.getElement());
+      popup.getIgnoreList().add(getElement());
+      popup.getIgnoreList().add(panel.getElement());
+      popup.setStyleName("x-layout-popup");
+      popup.setLayout(new FitLayout());
+      popup.setShadow(true);
+    }
+    panel.setPosition(0, 0);
     panel.setBorders(false);
     panel.getHeader().hide();
     panel.body.addStyleName("x-panel-popup-body");
@@ -264,7 +285,7 @@ public class CollapsePanel extends ContentPanel {
       case WEST:
       case EAST:
         w = (int) parentData.getSize();
-        h = box.height - hh;
+        h = box.height - 25;
         break;
       case NORTH:
       case SOUTH:
@@ -272,10 +293,10 @@ public class CollapsePanel extends ContentPanel {
         h = (int) parentData.getSize();
     }
 
-    popup.setSize(w, h);
     popup.show(getElement(), align, adj);
+    popup.setSize(w, h);
     popup.layout();
-
+    
     afterShowPanel(panel);
   }
 }

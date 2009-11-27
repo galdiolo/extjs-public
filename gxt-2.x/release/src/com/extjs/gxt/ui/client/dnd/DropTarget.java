@@ -7,6 +7,10 @@
  */
 package com.extjs.gxt.ui.client.dnd;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.dnd.DND.Feedback;
 import com.extjs.gxt.ui.client.dnd.DND.Operation;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -14,6 +18,7 @@ import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.extjs.gxt.ui.client.event.DNDEvent;
 import com.extjs.gxt.ui.client.event.DNDListener;
 import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.store.TreeStoreModel;
 import com.extjs.gxt.ui.client.widget.Component;
 
 /**
@@ -206,7 +211,7 @@ public class DropTarget extends BaseObservable {
    * @return true for enabled
    */
   public boolean isEnabled() {
-    return enabled;
+    return enabled && component.isEnabled();
   }
 
   /**
@@ -331,6 +336,29 @@ public class DropTarget extends BaseObservable {
 
   }
 
+  @SuppressWarnings("unchecked")
+  protected List<ModelData> prepareDropData(Object data, boolean convertTreeStoreModel) {
+    List<ModelData> models = new ArrayList<ModelData>();
+    if (data instanceof ModelData) {
+      if (convertTreeStoreModel && data instanceof TreeStoreModel) {
+        models.add(((TreeStoreModel) data).getModel());
+      } else {
+        models.add((ModelData) data);
+      }
+    } else if (data instanceof List) {
+      for (Object obj : (List) data) {
+        if (obj instanceof ModelData) {
+          if (convertTreeStoreModel && obj instanceof TreeStoreModel) {
+            models.add(((TreeStoreModel) obj).getModel());
+          } else {
+            models.add((ModelData) obj);
+          }
+        }
+      }
+    }
+    return models;
+  }
+
   /**
    * Called as the mouse is moved over the target component. The default
    * implementation does nothing.
@@ -362,6 +390,7 @@ public class DropTarget extends BaseObservable {
     event.getStatus().setStatus(false);
     Insert.get().hide();
     onDragLeave(event);
+    fireEvent(Events.DragLeave, event);
   }
 
   void handleDragMove(DNDEvent event) {

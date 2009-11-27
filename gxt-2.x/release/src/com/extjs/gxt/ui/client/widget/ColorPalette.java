@@ -46,11 +46,10 @@ public class ColorPalette extends Component {
 
   private boolean allowReselect;
   private String[] colors = new String[] {
-      "000000", "993300", "333300", "003300", "003366", "000080", "333399", "333333",
-      "800000", "FF6600", "808000", "008000", "008080", "0000FF", "666699", "808080",
-      "FF0000", "FF9900", "99CC00", "339966", "33CCCC", "3366FF", "800080", "969696",
-      "FF00FF", "FFCC00", "FFFF00", "00FF00", "00FFFF", "00CCFF", "993366", "C0C0C0",
-      "FF99CC", "FFCC99", "FFFF99", "CCFFCC", "CCFFFF", "99CCFF", "CC99FF", "FFFFFF"};
+      "000000", "993300", "333300", "003300", "003366", "000080", "333399", "333333", "800000", "FF6600", "808000",
+      "008000", "008080", "0000FF", "666699", "808080", "FF0000", "FF9900", "99CC00", "339966", "33CCCC", "3366FF",
+      "800080", "969696", "FF00FF", "FFCC00", "FFFF00", "00FF00", "00FFFF", "00CCFF", "993366", "C0C0C0", "FF99CC",
+      "FFCC99", "FFFF99", "CCFFCC", "CCFFFF", "99CCFF", "CC99FF", "FFFFFF"};
   private XTemplate template;
 
   private String value;
@@ -111,20 +110,6 @@ public class ColorPalette extends Component {
       case Event.ONMOUSEOUT:
         onMouseOut(ce);
         break;
-    }
-  }
-
-  protected void onMouseOut(ComponentEvent ce) {
-    El target = ce.getTarget("a", 3);
-    if(target != null){
-      target.removeStyleName("x-color-palette-hover");
-    }
-  }
-
-  protected void onMouseOver(ComponentEvent ce) {
-    El target = ce.getTarget("a", 3);
-    if(target != null){
-      target.addStyleName("x-color-palette-hover");
     }
   }
 
@@ -213,9 +198,22 @@ public class ColorPalette extends Component {
       El aElement = ce.getTarget("a", 3);
       String className = aElement.getStyleName();
       if (className.indexOf("color-") != -1) {
-        select(className.substring(className.indexOf("color-") + 6,
-            className.indexOf("color-") + 12));
+        select(className.substring(className.indexOf("color-") + 6, className.indexOf("color-") + 12));
       }
+    }
+  }
+
+  protected void onMouseOut(ComponentEvent ce) {
+    El target = ce.getTarget("a", 3);
+    if (target != null) {
+      target.removeStyleName("x-color-palette-hover");
+    }
+  }
+
+  protected void onMouseOver(ComponentEvent ce) {
+    El target = ce.getTarget("a", 3);
+    if (target != null) {
+      target.addStyleName("x-color-palette-hover");
     }
   }
 
@@ -231,7 +229,7 @@ public class ColorPalette extends Component {
 
     JavaScriptObject toJavaScriptArray = JsUtil.toJavaScriptArray(getColors());
     getTemplate().overwrite(el().dom, toJavaScriptArray);
-    sinkEvents(Event.ONCLICK|Event.ONMOUSEOVER|Event.ONMOUSEOUT);
+    sinkEvents(Event.ONCLICK | Event.ONMOUSEOVER | Event.ONMOUSEOUT);
   }
 
 }

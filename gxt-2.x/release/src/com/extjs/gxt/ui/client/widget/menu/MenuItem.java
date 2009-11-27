@@ -13,6 +13,7 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.IconHelper;
+import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.IconSupport;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -136,7 +137,7 @@ public class MenuItem extends Item implements IconSupport {
    */
   public void setIcon(AbstractImagePrototype icon) {
     if (rendered) {
-      El oldIcon = el().selectNode("img.x-menu-item-icon");
+      El oldIcon = el().selectNode(".x-menu-item-icon");
       if (oldIcon != null) {
         oldIcon.remove();
       }
@@ -172,8 +173,7 @@ public class MenuItem extends Item implements IconSupport {
   public void setText(String text) {
     this.text = text;
     if (rendered) {
-      el().removeChildren();
-      el().update(text == null || (text != null && text.equals("")) ? "&#160;" : text);
+      el().update(Util.isEmptyString(text) ? "&#160;" : text);
       setIcon(icon);
     }
   }
@@ -211,12 +211,6 @@ public class MenuItem extends Item implements IconSupport {
   }
 
   @Override
-  protected void onHide() {
-    super.onHide();
-    el().getParent().setVisible(false);
-  }
-
-  @Override
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
     setElement(DOM.createAnchor(), target, index);
@@ -228,7 +222,7 @@ public class MenuItem extends Item implements IconSupport {
     }
 
     String s = itemStyle + (subMenu != null ? " x-menu-item-arrow" : "");
-    setStyleName(s);
+    addStyleName(s);
 
     setText(text);
 
@@ -236,12 +230,6 @@ public class MenuItem extends Item implements IconSupport {
       Accessibility.setState(getElement(), "aria-haspopup", "true");
     }
 
-  }
-
-  @Override
-  protected void onShow() {
-    super.onShow();
-    el().getParent().setVisible(true);
   }
 
   @Override

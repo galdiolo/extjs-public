@@ -33,7 +33,7 @@ public class PartFactory {
         return (X) part;
       }
     }
-    throw new RuntimeException("part not found: " + partId);
+    return null;
   }
 
   /**

@@ -21,6 +21,7 @@ import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.toolbar.FillToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.LabelToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
+import com.google.gwt.user.client.Element;
 
 public class StatusToolBarExample extends LayoutContainer {
   private DelayedTask task = new DelayedTask(new Listener<BaseEvent>() {
@@ -35,7 +36,9 @@ public class StatusToolBarExample extends LayoutContainer {
   private Status wordCount;
   private Status status;
 
-  public StatusToolBarExample() {
+  @Override
+  protected void onRender(Element parent, int pos) {
+    super.onRender(parent, pos);
     setLayout(new FlowLayout(10));
 
     ToolBar toolBar = new ToolBar();
@@ -88,11 +91,11 @@ public class StatusToolBarExample extends LayoutContainer {
   }
 
   public native int getWordCount(String v) /*-{
-      if(v) {
-        var wc = v.match(/\b/g);
-        return wc ? wc.length/2:0;
-      }
-      return 0; 
-   }-*/;
+    if(v) {
+    var wc = v.match(/\b/g);
+    return wc ? wc.length/2:0;
+    }
+    return 0;
+  }-*/;
 
 }

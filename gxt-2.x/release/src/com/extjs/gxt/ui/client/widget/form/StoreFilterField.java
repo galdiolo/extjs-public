@@ -49,7 +49,6 @@ public abstract class StoreFilterField<M extends ModelData> extends TriggerField
    * @param store the store to add
    */
   public void bind(Store<M> store) {
-    store.addFilter(filter);
     stores.add(store);
   }
 
@@ -81,18 +80,17 @@ public abstract class StoreFilterField<M extends ModelData> extends TriggerField
     stores.remove(store);
   }
 
-  @SuppressWarnings("unchecked")
-  protected void applyFilters(Store<? extends M> store) {
+  protected void applyFilters(Store<M> store) {
     if (getRawValue().length() > 0) {
-      store.addFilter((StoreFilter) filter);
+      store.addFilter(filter);
       store.applyFilters(property);
     } else {
-      store.removeFilter((StoreFilter) filter);
+      store.removeFilter(filter);
     }
   }
 
   protected void onFilter() {
-    for (Store<? extends M> s : stores) {
+    for (Store<M> s : stores) {
       applyFilters(s);
     }
     focus();

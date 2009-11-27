@@ -31,6 +31,7 @@ import com.extjs.gxt.ui.client.widget.layout.VBoxLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.BoxLayout.BoxLayoutPack;
 import com.extjs.gxt.ui.client.widget.layout.HBoxLayout.HBoxLayoutAlign;
 import com.extjs.gxt.ui.client.widget.layout.VBoxLayout.VBoxLayoutAlign;
+import com.google.gwt.user.client.Element;
 
 public class HBoxLayoutExample extends LayoutContainer {
   private ContentPanel lcwest;
@@ -41,7 +42,9 @@ public class HBoxLayoutExample extends LayoutContainer {
   private String button3Text = "Button 3";
   private String button4Text = "Button 4";
 
-  public HBoxLayoutExample() {
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
     setScrollMode(Scroll.AUTO);
     ContentPanel panel = new ContentPanel();
     panel.setHeading("HorizontalBox Example");

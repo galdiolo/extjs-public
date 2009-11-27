@@ -85,6 +85,8 @@ public class DomQuery {
 
   static {
     GXT.init();
+    Ext.loadExt();
+    Ext.loadDomQuery();
   }
 
   /**

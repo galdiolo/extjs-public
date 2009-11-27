@@ -364,9 +364,6 @@ body.x-body-masked .x-window-mc, body.x-body-masked .x-window-plain .x-window-mc
 .x-html-editor-wrap {
     border-color:#abc;
 }
-.x-html-editor-tb .x-btn-text {
-	background:transparent url(../images/slate/editor/tb-sprite.gif) no-repeat scroll 0%;
-}
 /* Borders go last for specificity */
 .x-panel-noborder .x-panel-body-noborder {
     border-width:0;
@@ -534,9 +531,6 @@ td.x-grid3-hd-over, td.sort-desc, td.sort-asc, td.x-grid3-hd-menu-open {
 .x-tbar-page-prev{
 	background-image:url(../images/slate/grid/page-prev.gif)!important;
 }
-.x-tbar-loading{
-	background-image:url(../images/slate/grid/refresh.gif)!important;
-}
 .x-paging-info {
 	color:#FFFFFF;
 }
@@ -683,6 +677,9 @@ td.x-date-mp-sel a{
 .x-tree-node .x-tree-selected a span {
 	background-color:#f2daa9;
 	color:black;
+}
+.x-ftree2-selected {
+    background-color:#FBF0D2 !important;
 }
 .x-tree-arrows .x-tree-elbow-plus{
 	background:transparent url(../images/slate/tree/arrows.gif) no-repeat 0 0;

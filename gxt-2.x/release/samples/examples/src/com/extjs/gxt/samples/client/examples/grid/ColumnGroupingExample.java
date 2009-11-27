@@ -10,10 +10,13 @@ package com.extjs.gxt.samples.client.examples.grid;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Stock;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -37,8 +40,7 @@ public class ColumnGroupingExample extends LayoutContainer {
 
   private NumberFormat currency = NumberFormat.getCurrencyFormat();
   private NumberFormat number = NumberFormat.getFormat("0.00");
-  private NumberCellRenderer<Grid<Stock>> numberRenderer = new NumberCellRenderer<Grid<Stock>>(
-      currency);
+  private NumberCellRenderer<Grid<Stock>> numberRenderer;
   private GridCellRenderer<Stock> change;
   private GridCellRenderer<Stock> gridNumber;
   private VerticalPanel vp;
@@ -46,10 +48,10 @@ public class ColumnGroupingExample extends LayoutContainer {
   @Override
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
-
+    numberRenderer = new NumberCellRenderer<Grid<Stock>>(currency);
     change = new GridCellRenderer<Stock>() {
-      public String render(Stock model, String property, ColumnData config, int rowIndex,
-          int colIndex, ListStore<Stock> store, Grid<Stock> grid) {
+      public String render(Stock model, String property, ColumnData config, int rowIndex, int colIndex,
+          ListStore<Stock> store, Grid<Stock> grid) {
         double val = (Double) model.get(property);
         String style = val < 0 ? "red" : "green";
         return "<span style='color:" + style + "'>" + number.format(val) + "</span>";
@@ -57,8 +59,8 @@ public class ColumnGroupingExample extends LayoutContainer {
     };
 
     gridNumber = new GridCellRenderer<Stock>() {
-      public String render(Stock model, String property, ColumnData config, int rowIndex,
-          int colIndex, ListStore<Stock> store, Grid<Stock> grid) {
+      public String render(Stock model, String property, ColumnData config, int rowIndex, int colIndex,
+          ListStore<Stock> store, Grid<Stock> grid) {
         return numberRenderer.render(null, property, model.get(property));
       }
     };
@@ -103,14 +105,19 @@ public class ColumnGroupingExample extends LayoutContainer {
     column = new ColumnConfig("date", 125);
     if (widget) {
       Button btn = new Button("Updated");
+      btn.addListener(Events.OnClick, new Listener<ButtonEvent>() {
+        public void handleEvent(ButtonEvent be) {
+          // stop column from getting click and causing sort
+          be.cancelBubble();
+        }
+      });
       btn.setStyleAttribute("float", "left");
       column.setWidget(btn, "Last Updated");
     } else {
       column.setAlignment(HorizontalAlignment.RIGHT);
       column.setHeader("Last Updated");
     }
-    
-    
+
     column.setDateTimeFormat(DateTimeFormat.getShortDateFormat());
     configs.add(column);
 
@@ -118,20 +125,19 @@ public class ColumnGroupingExample extends LayoutContainer {
     store.add(TestData.getStocks());
 
     ColumnModel cm = new ColumnModel(configs);
-   
+
     cm.addHeaderGroup(0, 0, new HeaderGroupConfig("Header Grouping Example", 1, 5));
     cm.addHeaderGroup(1, 2, new HeaderGroupConfig("Stock Performance", 1, 2));
-    
+
     if (widget) {
       Slider s = new Slider();
       s.setWidth(100);
-      
+
       // ugly, but centers slider
       FlexTable tbl = new FlexTable();
       tbl.setWidth("100%");
       tbl.setHTML(0, 0, "&nbsp;");
-      tbl.setHTML(0, 1,
-          "<span style='white-space: nowrap;font-size: 11px'>Slide Me: &nbsp;</span>");
+      tbl.setHTML(0, 1, "<span style='white-space: nowrap;font-size: 11px'>Slide Me: &nbsp;</span>");
       tbl.setWidget(0, 2, s);
       tbl.setHTML(0, 3, "&nbsp;");
       tbl.getCellFormatter().setWidth(0, 0, "50%");
@@ -143,7 +149,7 @@ public class ColumnGroupingExample extends LayoutContainer {
 
     ContentPanel cp = new ContentPanel();
     cp.setBodyBorder(false);
-    cp.setIcon(Examples.ICONS.table());
+    cp.setIcon(Resources.ICONS.table());
     cp.setHeading(widget ? "Column Grouping with Widget" : "Column Grouping");
     cp.setButtonAlign(HorizontalAlignment.CENTER);
     cp.setLayout(new FitLayout());

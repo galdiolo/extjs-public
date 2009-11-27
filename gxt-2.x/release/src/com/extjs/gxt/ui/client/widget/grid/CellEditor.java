@@ -20,7 +20,7 @@ public class CellEditor extends Editor {
    * The current row.
    */
   public int row;
-  
+
   /**
    * The current column.
    */
@@ -37,7 +37,7 @@ public class CellEditor extends Editor {
     addStyleName("x-small-editor x-grid-editor");
     shim = false;
     setShadow(false);
-    if (field instanceof TriggerField) {
+    if (field instanceof TriggerField<?>) {
       ((TriggerField<? extends Object>) field).setMonitorTab(false);
     }
   }

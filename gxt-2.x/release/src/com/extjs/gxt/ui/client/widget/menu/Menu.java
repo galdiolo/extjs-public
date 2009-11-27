@@ -26,6 +26,7 @@ import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.util.Point;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
+import com.extjs.gxt.ui.client.widget.Layout;
 import com.extjs.gxt.ui.client.widget.layout.MenuLayout;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -146,7 +147,7 @@ public class Menu extends Container<Component> {
   private Item activeItem;
   private boolean showing;
   private boolean constrainViewport = true;
-//  private El focusEl;
+
   private boolean focusOnShow = true;
   private int maxHeight = Style.DEFAULT;
   private boolean enableScrolling = true;
@@ -163,7 +164,6 @@ public class Menu extends Container<Component> {
     monitorWindowResize = true;
     setShadow(true);
     setLayoutOnChange(true);
-    
 
     enableLayout = true;
     setLayout(new MenuLayout());
@@ -201,10 +201,6 @@ public class Menu extends Container<Component> {
   public String getDefaultAlign() {
     return defaultAlign;
   }
-
-//  public El getFocusEl() {
-//    return focusEl;
-//  }
 
   @Override
   public El getLayoutTarget() {
@@ -435,8 +431,9 @@ public class Menu extends Container<Component> {
 
       onShow();
       el().updateZIndex(0);
-      // autoSizing when visible
-      layout();
+
+      doAutoSize();
+
       el().alignTo(elem, pos, offsets);
 
       if (enableScrolling) {
@@ -478,8 +475,8 @@ public class Menu extends Container<Component> {
 
       onShow();
       el().updateZIndex(0);
-      // autoSizing when visible
-      layout();
+
+      doAutoSize();
 
       if (constrainViewport) {
         Point p = el().adjustForConstraints(new Point(x, y));
@@ -499,6 +496,19 @@ public class Menu extends Container<Component> {
       }
 
       fireEvent(Events.Show, me);
+    }
+  }
+
+  @Override
+  protected void onLayoutExcecuted(Layout layout) {
+    super.onLayoutExcecuted(layout);
+    doAutoSize();
+  }
+
+  protected void doAutoSize() {
+    if (showing && width == null) {
+      int width = getLayoutTarget().getWidth() + el().getFrameWidth("lr");
+      el().setWidth(Math.max(width, minWidth), true);
     }
   }
 
@@ -531,7 +541,6 @@ public class Menu extends Container<Component> {
   }
 
   protected void createScrollers() {
-
     if (el().select(".x-menu-scroller").getLength() == 0) {
       Listener<ClickRepeaterEvent> listener = new Listener<ClickRepeaterEvent>() {
         public void handleEvent(ClickRepeaterEvent be) {
@@ -568,23 +577,26 @@ public class Menu extends Container<Component> {
       activeItem.deactivate();
       activeItem = null;
     }
+    if (GXT.isAriaEnabled()) {
+      FocusFrame.get().unframe();
+      Accessibility.setState(getElement(), "aria-activedescendant", "");
+    }
   }
 
   protected boolean onAutoHide(PreviewEvent pe) {
-    if (pe.within(getElement()) || pe.getTarget(".x-menu", 20) != null) {
-      return false;
-    }
-    MenuEvent me = new MenuEvent(this);
-    me.setEvent(pe.getEvent());
-    if (fireEvent(Events.AutoHide, me)) {
-      hide(true);
-      return true;
+    if (pe.getEventTypeInt() == Event.ONMOUSEDOWN
+        && !(pe.within(getElement()) || (fly(pe.getTarget()).findParent(".x-ignore", -1) != null))) {
+      MenuEvent me = new MenuEvent(this);
+      me.setEvent(pe.getEvent());
+      if (fireEvent(Events.AutoHide, me)) {
+        hide(true);
+        return true;
+      }
     }
     return false;
   }
 
   protected void onClick(ComponentEvent ce) {
-    ce.stopEvent();
     Component item = findItem(ce.getTarget());
     if (item != null && item instanceof Item) {
       ((Item) item).onClick(ce);
@@ -599,6 +611,7 @@ public class Menu extends Container<Component> {
     }
   }
 
+  @Override
   protected void onHide() {
     super.onHide();
     deactiveActiveItem();
@@ -619,16 +632,20 @@ public class Menu extends Container<Component> {
 
   protected void onMouseOver(ComponentEvent ce) {
     Component c = findItem(ce.getTarget());
-    if (c != null) {
-      if (c instanceof Item) {
-        Item item = (Item) c;
-        if (item.canActivate && item.isEnabled()) {
-          setActiveItem(item, true);
-        }
+    if (c != null && c instanceof Item) {
+      Item item = (Item) c;
+      if (item.canActivate && item.isEnabled()) {
+        setActiveItem(item, true);
+      }
+    }
+    if (c == null) {
+      if (activeItem != null && activeItem.shouldDeactivate(ce)) {
+        deactiveActiveItem();
       }
     }
   }
 
+  @Override
   protected void onRender(Element target, int index) {
     setElement(DOM.createDiv(), target, index);
     el().makePositionable(true);
@@ -672,9 +689,7 @@ public class Menu extends Container<Component> {
       }
     };
 
-    swallowEvent(Events.OnClick, getFocusEl().dom, true);
-
-    ul = new El(DOM.createElement("ul"));
+    ul = new El(DOM.createDiv());
     ul.addStyleName(baseStyle + "-list");
 
     getElement().appendChild(ul.dom);
@@ -684,7 +699,7 @@ public class Menu extends Container<Component> {
 
     el().setTabIndex(0);
     el().setElementAttribute("hideFocus", "true");
-
+    el().addStyleName("x-ignore");
     if (GXT.isAriaEnabled()) {
       Accessibility.setRole(getElement(), "menu");
       Accessibility.setRole(ul.dom, "presentation");
@@ -711,19 +726,18 @@ public class Menu extends Container<Component> {
 
   }
 
-  // private
   protected void onScrollerIn(El t) {
     boolean top = t.is(".x-menu-scroller-top");
-    if (top ? ul.getScrollTop() > 0 : ul.getScrollTop() + this.activeMax < ul.dom.getPropertyInt("scrollHeight")) {
+    if (top ? ul.getScrollTop() > 0 : ul.getScrollTop() + activeMax < ul.dom.getPropertyInt("scrollHeight")) {
       t.addStyleName("x-menu-item-active", "x-menu-scroller-active");
     }
   }
 
-  // private
   protected void onScrollerOut(El t) {
     t.removeStyleName("x-menu-item-active", "x-menu-scroller-active");
   }
 
+  @Override
   protected void onWindowResize(int width, int height) {
     hide(true);
   }
@@ -733,7 +747,7 @@ public class Menu extends Container<Component> {
 
   }
 
-  protected void setActiveItem(Component c, boolean autoExpand) {
+  public void setActiveItem(Component c, boolean autoExpand) {
     if (c instanceof Item) {
       Item item = (Item) c;
       if (item != activeItem) {

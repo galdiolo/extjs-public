@@ -67,10 +67,10 @@ public class FormBinding extends Bindings {
 
   @Override
   public void bind(ModelData model) {
-    super.bind(model);
     for (FieldBinding b : getBindings()) {
       b.setStore(store);
     }
+    super.bind(model);
   }
 
   /**
@@ -90,12 +90,6 @@ public class FormBinding extends Bindings {
    */
   public void setStore(Store store) {
     this.store = store;
-  }
-
-  @Override
-  public void unbind() {
-    super.unbind();
-    panel.clear();
   }
 
 }

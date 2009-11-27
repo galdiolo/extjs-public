@@ -21,13 +21,20 @@ import com.google.gwt.user.client.Element;
  * A <code>DropTarget</code> implementation for Grids. Supports both inserts and
  * appends, specified using
  * {@link #setOperation(com.extjs.gxt.ui.client.dnd.DND.Operation)}.
+ * <p />
+ * Supported drag data:
+ * <ul>
+ * <li>A single ModelData instance.</li>
+ * <li>A List of ModelData instances.</li>
+ * <li>A List of TreeStoreModel instances (children are ignored).
+ * </ul>
  */
 public class GridDropTarget extends DropTarget {
 
   protected Grid<ModelData> grid;
   protected int insertIndex;
   protected ModelData activeItem;
-  protected boolean before;
+  boolean before;
 
   /**
    * Creates a new drop target instance.
@@ -50,25 +57,19 @@ public class GridDropTarget extends DropTarget {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   protected void onDragDrop(DNDEvent e) {
     super.onDragDrop(e);
     Object data = e.getData();
-    if (feedback == Feedback.APPEND) {
-      if (data instanceof ModelData) {
-        grid.getStore().add((ModelData) data);
-      } else if (data instanceof List) {
-        grid.getStore().add((List) data);
-      }
-    } else {
-      int idx = grid.getStore().indexOf(activeItem);
-      if (!before) idx++;
-      if (data instanceof ModelData) {
-        grid.getStore().insert((ModelData) data, idx);
-      } else if (data instanceof List) {
-        grid.getStore().insert((List) data, idx);
+    List<ModelData> models = prepareDropData(data, true);
+    if (models.size() > 0) {
+      if (feedback == Feedback.APPEND) {
+        grid.getStore().add(models);
+      } else {
+        grid.getStore().insert(models, insertIndex);
       }
     }
+    insertIndex = -1;
+    activeItem = null;
   }
 
   @Override
@@ -91,17 +92,14 @@ public class GridDropTarget extends DropTarget {
       return;
     }
 
-    if (feedback == Feedback.APPEND) {
-      event.setCancelled(false);
-    } else {
-      event.setCancelled(false);
-    }
+    event.setCancelled(false);
+    event.getStatus().setStatus(true);
   }
 
   @Override
   protected void showFeedback(DNDEvent event) {
+    event.getStatus().setStatus(true);
     if (feedback == Feedback.INSERT) {
-      event.getStatus().setStatus(true);
       Element row = grid.getView().findRow(event.getTarget()).cast();
 
       if (row == null && grid.getStore().getCount() > 0) {
@@ -115,23 +113,32 @@ public class GridDropTarget extends DropTarget {
         int y = event.getClientY();
         before = y < mid;
         int idx = grid.getView().findRowIndex(row);
-        insertIndex = before ? idx : (event.getDragSource().component == grid) ? idx
-            : idx + 1;
+
         activeItem = grid.getStore().getAt(idx);
-        if (before) {
-          showInsert(event, row, true);
-        } else {
-          showInsert(event, row, false);
-        }
+        insertIndex = adjustIndex(event, idx);
+
+        showInsert(event, row);
       } else {
         insertIndex = 0;
       }
     }
   }
 
-  private void showInsert(DNDEvent event, Element row, boolean before) {
+  private int adjustIndex(DNDEvent event, int index) {
+    Object data = event.getData();
+    List<ModelData> models = prepareDropData(data, true);
+    for (ModelData m : models) {
+      int idx = grid.getStore().indexOf(m);
+      if (idx > -1 && (before ? idx < index : idx <= index)) {
+        index--;
+      }
+    }
+    return before ? index : index + 1;
+  }
+
+  private void showInsert(DNDEvent event, Element row) {
     Insert insert = Insert.get();
-    insert.setVisible(true);
+    insert.show(row);
     Rectangle rect = El.fly(row).getBounds();
     int y = !before ? (rect.y + rect.height - 4) : rect.y - 2;
     insert.el().setBounds(rect.x, y, rect.width, 6);

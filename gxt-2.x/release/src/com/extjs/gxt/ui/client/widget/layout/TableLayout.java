@@ -264,7 +264,7 @@ public class TableLayout extends Layout {
     int[] cell = getNextNonSpan(currentColumn, currentRow);
     int curCol = currentColumn = cell[0];
     int curRow = currentRow = cell[1];
-    setupList(curRow);
+
     for (int rowIndex = curRow; rowIndex < curRow
         + (data.getRowspan() != -1 ? data.getRowspan() : 1); rowIndex++) {
       setupList(rowIndex);
@@ -395,12 +395,20 @@ public class TableLayout extends Layout {
   }
 
   @Override
-  protected void renderComponent(Component c, int index, El target) {
-    Element td = getNextCell(c);
-    if (c.isRendered()) {
-      td.appendChild(c.getElement());
+  protected void renderComponent(Component component, int index, El target) {
+    Element td = getNextCell(component);
+    if (component.isRendered()) {
+      td.appendChild(component.getElement());
     } else {
-      c.render(td);
+      component.render(td);
+    }
+    if (renderHidden && component != activeItem) {
+      component.hide();
+    }
+    LayoutData data = getLayoutData(component);
+    if (data != null && data instanceof MarginData) {
+      MarginData ld = (MarginData) data;
+      applyMargins(component.el(), ld.getMargins());
     }
 
   }

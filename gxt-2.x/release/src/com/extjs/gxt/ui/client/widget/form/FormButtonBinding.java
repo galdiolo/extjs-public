@@ -47,7 +47,7 @@ public class FormButtonBinding {
       }
     };
     panel.addListener(Events.Attach, listener);
-    timer.scheduleRepeating(interval);
+    panel.addListener(Events.Detach, listener);
 
     if (panel.isAttached()) {
       startMonitoring();
@@ -72,8 +72,10 @@ public class FormButtonBinding {
   }
 
   public void startMonitoring() {
-    timer.run();
-    timer.scheduleRepeating(interval);
+    if (panel.isAttached()) {
+      timer.run();
+      timer.scheduleRepeating(interval);
+    }
   }
 
   public void stopMonitoring() {
@@ -81,9 +83,11 @@ public class FormButtonBinding {
   }
 
   protected boolean checkPanel() {
-    boolean v = panel.isValid(true);
+    boolean v =  panel.isValid(true);
     for (Button button : buttons) {
-      button.setEnabled(v);
+     if (v != button.isEnabled()) {
+        button.setEnabled(v);
+      }
     }
     return v;
 

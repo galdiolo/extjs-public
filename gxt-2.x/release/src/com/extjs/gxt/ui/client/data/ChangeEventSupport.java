@@ -27,6 +27,10 @@ public class ChangeEventSupport implements ChangeEventSource {
     }
   }
 
+  public boolean isSilent() {
+    return silent;
+  }
+
   public void notify(ChangeEvent event) {
     if (!silent && listeners != null) {
       for (ChangeListener listener : listeners) {
@@ -48,7 +52,9 @@ public class ChangeEventSupport implements ChangeEventSource {
   }
 
   public void removeChangeListeners() {
-    listeners.clear();
+    if (listeners != null) {
+      listeners.clear();
+    }
   }
 
 }

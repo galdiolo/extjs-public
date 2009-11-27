@@ -16,10 +16,13 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
+import com.google.gwt.user.client.Element;
 
 public class ComboBoxExample extends LayoutContainer {
 
-  public ComboBoxExample() {
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
     VerticalPanel vp = new VerticalPanel();
     vp.setSpacing(10);
 

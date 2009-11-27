@@ -7,7 +7,7 @@
  */
 package com.extjs.gxt.ui.client.widget.form;
 
-import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.util.Util;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 
@@ -80,6 +80,11 @@ public class LabelField extends Field<Object> {
   }
 
   @Override
+  public boolean isDirty() {
+    return false;
+  }
+
+  @Override
   public boolean isValid(boolean silent) {
     return true;
   }
@@ -97,7 +102,7 @@ public class LabelField extends Field<Object> {
   public void setText(String text) {
     this.text = text;
     if (rendered) {
-      getElement().setInnerHTML(text != null ? text : "&nbsp;");
+      el().update(Util.isEmptyString(text) ? "&#160;" : text);
     }
   }
 
@@ -115,15 +120,8 @@ public class LabelField extends Field<Object> {
   protected void onRender(Element parent, int index) {
     setElement(DOM.createDiv(), parent, index);
     if (text != null) {
+      originalValue = text;
       setText(text);
-    }
-  }
-
-  @Override
-  protected void onResize(int width, int height) {
-    super.onResize(width, height);
-    if (GXT.isBorderBox) {
-      el().setWidth(width - el().getFrameWidth("lr"), true);
     }
   }
 

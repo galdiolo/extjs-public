@@ -171,7 +171,7 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
   public DualListField() {
     fromField = new ListField<D>();
     toField = new ListField<D>();
-
+    setSize(200, 125);
     messages = new DualListFieldMessages();
 
     buttonBar = new VerticalPanel();
@@ -407,14 +407,8 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
     }
   }
 
-  protected void initLists() {
-    fromField.setHeight(125);
-    toField.setHeight(125);
-  }
-
   @Override
   protected void onRender(Element target, int index) {
-    initLists();
     initButtons();
 
     super.onRender(target, index);
@@ -430,8 +424,8 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
     if (orientation == Orientation.HORIZONTAL) {
       int w = (width - buttonAdapter.el().getParent().getWidth()) / 2;
       w -= (fields.size() * spacing);
-      fromField.setWidth(w);
-      toField.setWidth(w);
+      fromField.setSize(w, height);
+      toField.setSize(w, height);
     } else {
       for (Field<?> f : fields) {
         f.setWidth(width);

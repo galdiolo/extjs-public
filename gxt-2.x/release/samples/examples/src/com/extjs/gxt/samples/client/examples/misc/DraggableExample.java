@@ -7,7 +7,7 @@
  */
 package com.extjs.gxt.samples.client.examples.misc;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
@@ -15,9 +15,7 @@ import com.extjs.gxt.ui.client.fx.Draggable;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.ui.Widget;
 
 public class DraggableExample extends LayoutContainer {
 
@@ -31,7 +29,7 @@ public class DraggableExample extends LayoutContainer {
 
     ContentPanel cp = new ContentPanel();
     cp.setCollapsible(true);
-    cp.setIcon(Examples.ICONS.text());
+    cp.setIcon(Resources.ICONS.text());
     cp.setBodyStyleName("pad-text");
     cp.setHeading("Proxy Drag");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
@@ -45,7 +43,7 @@ public class DraggableExample extends LayoutContainer {
     cp.setCollapsible(true);
     cp.setBodyStyle("padding: 4 8px;fontSize: 12px");
     cp.setHeading("Direct Drag");
-    cp.setIcon(Examples.ICONS.text());
+    cp.setIcon(Resources.ICONS.text());
     cp.addText("Drags can only be started from the header.");
     cp.setWidth(200);
     vp.add(cp);
@@ -57,7 +55,7 @@ public class DraggableExample extends LayoutContainer {
     cp = new ContentPanel();
     cp.setBodyStyle("padding: 4 8px;fontSize: 12px");
     cp.setHeading("Constrain");
-    cp.setIcon(Examples.ICONS.text());
+    cp.setIcon(Resources.ICONS.text());
     cp.addText("Can only be dragged vertically.");
     cp.setWidth(200);
     vp.add(cp);
@@ -68,13 +66,6 @@ public class DraggableExample extends LayoutContainer {
 
     add(vp);
     setScrollMode(Scroll.AUTO);
-
-    Widget p = getParent();
-    if (p instanceof LayoutContainer) {
-      LayoutContainer ct = (LayoutContainer) p;
-      ct.setLayout(new FitLayout());
-      ct.layout();
-    }
   }
 
 }

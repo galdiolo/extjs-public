@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.widget.treegrid;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.GridEvent;
+import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.widget.grid.CellEditor;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
@@ -104,6 +105,12 @@ public class EditorTreeGrid<M extends ModelData> extends TreeGrid<M> {
    */
   public boolean isEditing() {
     return editSupport.isEditing();
+  }
+
+  @Override
+  public void reconfigure(ListStore<M> store, ColumnModel cm) {
+    super.reconfigure(store, cm);
+    editSupport.bind(this);
   }
 
   /**

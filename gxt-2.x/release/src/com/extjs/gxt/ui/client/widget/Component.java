@@ -17,6 +17,7 @@ import com.extjs.gxt.ui.client.Style.HideMode;
 import com.extjs.gxt.ui.client.aria.FocusFrame;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.FastMap;
+import com.extjs.gxt.ui.client.core.FastSet;
 import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -30,10 +31,10 @@ import com.extjs.gxt.ui.client.event.WidgetListener;
 import com.extjs.gxt.ui.client.state.StateManager;
 import com.extjs.gxt.ui.client.util.DelayedTask;
 import com.extjs.gxt.ui.client.util.SwallowEvent;
-import com.extjs.gxt.ui.client.widget.layout.LayoutData;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.tips.ToolTip;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.DomEvent;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
@@ -233,9 +234,9 @@ public abstract class Component extends Widget implements Observable {
    * True if this component has been rendered. Read-only.
    */
   protected boolean rendered;
+  protected boolean afterRender;
 
   protected Element dummy;
-  protected boolean hideParent;
   protected String stateId;
   protected List<SwallowEvent> swallowEvents;
   protected ToolTip toolTip;
@@ -243,7 +244,9 @@ public abstract class Component extends Widget implements Observable {
   protected String maskMessage;
   protected String maskMessageStyleName;
   protected List<ComponentAttachable> attachables;
-  private boolean afterRender;
+  protected boolean setElementRender;
+  protected boolean monitorWindowResize;
+  protected int windowResizeDelay = !GWT.isScript() || GXT.isGecko || GXT.isSafari2 ? 100 : 0;
 
   private boolean stateful;
   private int borders = Style.DEFAULT;
@@ -259,23 +262,21 @@ public abstract class Component extends Widget implements Observable {
   private El focusEl;
   private HideMode hideMode = HideMode.DISPLAY;
   private String id, itemId, cls, title;
-  private LayoutData layoutData;
+  private FastSet styleNames;
   private ModelData model;
   private Observable observable;
   private Map<String, String> overElements;
   private List<ComponentPlugin> plugins;
-  private boolean setElementRender;
   private Map<String, Object> state;
   private String styles = "";
   private ToolTipConfig toolTipConfig;
-  protected boolean monitorWindowResize;
-  protected int windowResizeDelay = 100;
+  private String ariaLabelledBy;
 
   protected DelayedTask windowResizeTask;
   protected HandlerRegistration resizeHandler;
 
   /**
-   * Creates a new component..
+   * Creates a new component.
    */
   public Component() {
     observable = createObservable();
@@ -329,7 +330,10 @@ public abstract class Component extends Widget implements Observable {
     if (rendered) {
       fly(getStyleElement()).addStyleName(style);
     } else {
-      cls = cls == null ? style : cls + " " + style;
+      if (styleNames == null) {
+        styleNames = new FastSet();
+      }
+      styleNames.add(style);
     }
   }
 
@@ -421,14 +425,14 @@ public abstract class Component extends Widget implements Observable {
    * @return <code>false</code> if any listeners return <code>false</code>
    */
   public boolean fireEvent(EventType type) {
-    if (disableEvents || !hasListeners(type)) return true;
+    if (disableEvents) return true;
     ComponentEvent be = createComponentEvent(null);
     be.setType(type);
     return fireEvent(type, be);
   }
 
   public boolean fireEvent(EventType eventType, BaseEvent be) {
-    if (disableEvents || !hasListeners(eventType)) return true;
+    if (disableEvents) return true;
     return observable.fireEvent(eventType, be);
   }
 
@@ -440,7 +444,7 @@ public abstract class Component extends Widget implements Observable {
    * @return <code>false</code> if any listeners return <code>false</code>
    */
   public boolean fireEvent(EventType type, ComponentEvent ce) {
-    if (disableEvents || !hasListeners(type)) return true;
+    if (disableEvents) return true;
     return observable.fireEvent(type, previewEvent(type, ce));
   }
 
@@ -458,11 +462,20 @@ public abstract class Component extends Widget implements Observable {
    * Try to focus this component. Fires the <i>Focus</i> event.
    */
   public void focus() {
-    this.focused = true;
+    focused = true;
     if (rendered) {
       getFocusEl().focus();
     }
     fireEvent(Events.Focus);
+  }
+
+  /**
+   * Returns the ARIA labelled by id.
+   * 
+   * @return the ARIA labelled by id.
+   */
+  public String getAriaLabelledBy() {
+    return ariaLabelledBy;
   }
 
   /**
@@ -588,6 +601,14 @@ public abstract class Component extends Widget implements Observable {
     return stateId;
   }
 
+  @Override
+  public String getTitle() {
+    if (!afterRender) {
+      return title == null ? "" : title;
+    }
+    return super.getTitle();
+  }
+
   /**
    * Returns the component's tool tip.
    * 
@@ -617,6 +638,7 @@ public abstract class Component extends Widget implements Observable {
       hidden = true;
       if (rendered) {
         onHide();
+        notifyHide();
       }
       fireEvent(Events.Hide);
     }
@@ -649,6 +671,10 @@ public abstract class Component extends Widget implements Observable {
     return !disabled;
   }
 
+  public boolean isMasked() {
+    return mask;
+  }
+
   /**
    * Returns <code>true</code> if the component is rendered.
    * 
@@ -659,10 +685,36 @@ public abstract class Component extends Widget implements Observable {
   }
 
   /**
+   * Returns true if the component is saving and restore it's state.
+   * 
+   * @return true if stateful
+   */
+  public boolean isStateful() {
+    return stateful;
+  }
+
+  /**
    * Returns <code>true</code> if the component is visible.
    */
   public boolean isVisible() {
-    return rendered && !hidden && el().isVisible(true);
+    return isVisible(true);
+  }
+
+  /**
+   * Returns <code>true</code> if the component is visible.
+   */
+  public boolean isVisible(boolean deep) {
+    Widget w = getParent();
+    if (w != null) {
+      if (w instanceof Component) {
+        Component c = (Component) w;
+        return rendered && !hidden && c.isVisible(false) && el().isVisible(deep);
+      } else {
+        return rendered && !hidden && w.isVisible() && el().isVisible(deep);
+      }
+    } else {
+      return rendered && !hidden && el().isVisible(deep);
+    }
   }
 
   /**
@@ -714,8 +766,11 @@ public abstract class Component extends Widget implements Observable {
 
     int type = DOM.eventGetType(event);
 
-    Element eventTarget = (Element) event.getEventTarget().cast();
+    Element eventTarget = null;
     if (swallowEvents != null) {
+      if (eventTarget == null) {
+        eventTarget = (Element) event.getEventTarget().cast();
+      }
       for (SwallowEvent e : swallowEvents) {
         if (e.getEventType().getEventCode() == type && e.getElement().isOrHasChild(eventTarget)) {
           event.stopPropagation();
@@ -727,22 +782,25 @@ public abstract class Component extends Widget implements Observable {
     }
 
     // hack to receive keyboard events in safari
-    if (GXT.isWebKit && type == Event.ONCLICK && focusable) {
-      if (getElement().getTagName().equals("input") || eventTarget.getPropertyString("__eventBits") == null) {
+    if (GXT.isWebKit && focusable && type == Event.ONCLICK) {
+      if (eventTarget == null) {
+        eventTarget = (Element) event.getEventTarget().cast();
+      }
+      if ("input".equalsIgnoreCase(getElement().getTagName()) || eventTarget.getPropertyString("__eventBits") == null) {
         focus();
       }
     }
 
-    EventType eventType = Events.lookupBrowserEvent(type);
-
     ComponentEvent ce = createComponentEvent(event);
     ce.setEvent(event);
-    ce.setType(eventType);
 
     // browser event listeners can cancel event
     if (!fireEvent(Events.BrowserEvent, ce)) {
       return;
     }
+
+    EventType eventType = Events.lookupBrowserEvent(type);
+    ce.setType(eventType);
 
     if (type == (GXT.isSafari && GXT.isMac ? Event.ONMOUSEDOWN : Event.ONMOUSEUP) && ce.isRightClick()) {
       onRightClick(ce);
@@ -750,10 +808,12 @@ public abstract class Component extends Widget implements Observable {
 
     // specialized support for mouse overs
     if (overElements != null && (type == Event.ONMOUSEOVER || type == Event.ONMOUSEOUT)) {
-      El target = ce.getTargetEl();
-      String style = overElements.get(target.getId());
-      if (style != null) {
-        target.setStyleName(style, type == Event.ONMOUSEOVER);
+      Element target = ce.getTarget();
+      if (target != null) {
+        String style = overElements.get(target.getId());
+        if (style != null) {
+          fly(target).setStyleName(style, type == Event.ONMOUSEOVER);
+        }
       }
     }
 
@@ -792,6 +852,15 @@ public abstract class Component extends Widget implements Observable {
   @SuppressWarnings("unchecked")
   @Override
   public void removeFromParent() {
+    if (getParent() instanceof ContentPanel) {
+      ContentPanel cp = (ContentPanel) getParent();
+      if (cp.getTopComponent() == this) {
+        cp.setTopComponent(null);
+      } else if (cp.getBottomComponent() == this) {
+        cp.setBottomComponent(null);
+      }
+      return;
+    }
     if (getParent() instanceof Container) {
       ((Container) getParent()).remove(this);
       return;
@@ -809,14 +878,6 @@ public abstract class Component extends Widget implements Observable {
     observable.removeListener(eventType, listener);
   }
 
-  public void removeToolTip() {
-    if (toolTip != null) {
-      toolTip.initTarget(null);
-      toolTip = null;
-      toolTipConfig = null;
-    }
-  }
-
   /**
    * Removes a CSS style name from the component's underlying element.
    * 
@@ -826,12 +887,8 @@ public abstract class Component extends Widget implements Observable {
     if (rendered) {
       fly(getStyleElement()).removeStyleName(style);
     } else if (style != null && cls != null) {
-      String[] s = cls.split(" ");
-      cls = "";
-      for (int i = 0; i < s.length; i++) {
-        if (!s[i].equals(style)) {
-          cls += " " + s[i];
-        }
+      if (styleNames != null) {
+        styleNames.remove(style);
       }
     }
   }
@@ -843,6 +900,14 @@ public abstract class Component extends Widget implements Observable {
    */
   public void removeSwallow(SwallowEvent e) {
     swallowEvents.remove(e);
+  }
+
+  public void removeToolTip() {
+    if (toolTip != null) {
+      toolTip.initTarget(null);
+      toolTip = null;
+      toolTipConfig = null;
+    }
   }
 
   /**
@@ -906,25 +971,34 @@ public abstract class Component extends Widget implements Observable {
       onRender(target, index);
     }
 
-    if (el == null) throw new RuntimeException(getClass().getName() + " must call setElement in onRender");
+    assert el != null : getClass().getName() + " must call setElement in onRender";
 
     if (events != 0) {
-      el().addEventsSunk(events);
+      sinkEvents(events);
+    }
+
+    if (ariaLabelledBy != null) {
+      getElement().setAttribute("aria-labelledby", ariaLabelledBy);
     }
 
     if (id == null) {
       id = el.getId();
-      if (id == null || id.equals("")) {
-        id = XDOM.getUniqueId();
-      }
+    } else {
+      getElement().setId(id);
     }
-    getElement().setId(id);
 
-    addStyleName(baseStyle);
-
+    if (baseStyle != null) {
+      fly(getStyleElement()).addStyleName(baseStyle);
+    }
     if (cls != null) {
-      addStyleName(cls);
+      setStyleName(cls);
       cls = null;
+    }
+    if (styleNames != null) {
+      for (String s : styleNames) {
+        fly(getStyleElement()).addStyleName(s);
+      }
+      styleNames = null;
     }
 
     if (title != null) {
@@ -934,10 +1008,6 @@ public abstract class Component extends Widget implements Observable {
     if (styles != null && !styles.equals("")) {
       el.applyStyles(styles);
       styles = null;
-    }
-
-    if (toolTipConfig != null) {
-      setToolTip(toolTipConfig);
     }
 
     if (focused) {
@@ -995,6 +1065,15 @@ public abstract class Component extends Widget implements Observable {
         fireEvent(Events.StateSave, ce);
       }
     }
+  }
+
+  /**
+   * Sets the ARIA labelled by attribute on the component.
+   * 
+   * @param id the id of the element with the label.
+   */
+  public void setAriaLabelledBy(String id) {
+    ariaLabelledBy = id;
   }
 
   /**
@@ -1056,29 +1135,6 @@ public abstract class Component extends Widget implements Observable {
   }
 
   /**
-   * A flag which causes the Component to attempt to restore the state of
-   * internal properties from a saved state on startup (defaults to false). The
-   * component must have either a {@link #stateId} or {@link #id} assigned for
-   * state to be managed. Auto-generated ids are not guaranteed to be stable
-   * across page loads and cannot be relied upon to save and restore the same
-   * state for a component.
-   * 
-   * @param stateful true to enable state
-   */
-  public void setStateful(boolean stateful) {
-    this.stateful = stateful;
-  }
-
-  /**
-   * Returns true if the component is saving and restore it's state.
-   * 
-   * @return true if stateful
-   */
-  public boolean isStateful() {
-    return stateful;
-  }
-
-  /**
    * Overrides UIObject and does nothing.
    */
   public void setHeight(String height) {
@@ -1137,6 +1193,20 @@ public abstract class Component extends Widget implements Observable {
   }
 
   /**
+   * A flag which causes the Component to attempt to restore the state of
+   * internal properties from a saved state on startup (defaults to false). The
+   * component must have either a {@link #stateId} or {@link #id} assigned for
+   * state to be managed. Auto-generated ids are not guaranteed to be stable
+   * across page loads and cannot be relied upon to save and restore the same
+   * state for a component.
+   * 
+   * @param stateful true to enable state
+   */
+  public void setStateful(boolean stateful) {
+    this.stateful = stateful;
+  }
+
+  /**
    * Sets the component's state id which is a unique id for this component to
    * use for state management purposes (defaults to the component id if one was
    * set, otherwise null if the component is using a generated id).
@@ -1167,6 +1237,7 @@ public abstract class Component extends Widget implements Observable {
       super.setStyleName(style);
     } else {
       cls = style;
+      styleNames = null;
     }
   }
 
@@ -1198,16 +1269,14 @@ public abstract class Component extends Widget implements Observable {
    */
   public void setToolTip(ToolTipConfig config) {
     this.toolTipConfig = config;
-    if (rendered) {
-      if (config != null) {
-        if (toolTip == null) {
-          toolTip = new ToolTip(this, config);
-        } else {
-          toolTip.update(config);
-        }
-      } else if (config == null) {
-        removeToolTip();
+    if (config != null) {
+      if (toolTip == null) {
+        toolTip = new ToolTip(this, config);
+      } else {
+        toolTip.update(config);
       }
+    } else if (config == null) {
+      removeToolTip();
     }
   }
 
@@ -1232,7 +1301,9 @@ public abstract class Component extends Widget implements Observable {
 
   public void setZIndex(int zIndex) {
     el().setZIndex(zIndex);
-    FocusFrame.get().sync(this);
+    if (GXT.isAriaEnabled()) {
+      FocusFrame.get().sync(this);
+    }
   }
 
   /**
@@ -1245,6 +1316,7 @@ public abstract class Component extends Widget implements Observable {
       hidden = false;
       if (rendered) {
         onShow();
+        notifyShow();
       }
       fireEvent(Events.Show);
     }
@@ -1253,7 +1325,7 @@ public abstract class Component extends Widget implements Observable {
   @Override
   public void sinkEvents(int eventBitsToAdd) {
     if (!rendered) {
-      this.events = this.events | eventBitsToAdd;
+      this.events |= eventBitsToAdd;
     } else {
       super.sinkEvents(eventBitsToAdd);
     }
@@ -1356,6 +1428,7 @@ public abstract class Component extends Widget implements Observable {
    * Tries to remove focus from the component. Fires the <i>Blur</i> event.
    */
   protected void blur() {
+    focused = false;
     if (rendered) {
       getFocusEl().blur();
     }
@@ -1407,15 +1480,13 @@ public abstract class Component extends Widget implements Observable {
   }
 
   protected void frame() {
-    FocusFrame.get().frame(this);
+    if (GXT.isAriaEnabled()) {
+      FocusFrame.get().frame(this);
+    }
   }
 
   protected El getFocusEl() {
     return focusEl == null ? el : focusEl;
-  }
-
-  protected LayoutData getLayoutData() {
-    return layoutData;
   }
 
   protected Observable getObservable() {
@@ -1432,15 +1503,17 @@ public abstract class Component extends Widget implements Observable {
   }
 
   protected void initState() {
-    String sid = stateId != null ? stateId : getId();
-    Map<String, Object> st = StateManager.get().getMap(sid);
-    if (st != null) {
-      state = st;
-      ComponentEvent ce = createComponentEvent(null);
-      ce.setState(state);
-      if (fireEvent(Events.BeforeStateRestore, ce)) {
-        applyState(state);
-        fireEvent(Events.StateRestore, ce);
+    if (stateful) {
+      String sid = stateId != null ? stateId : getId();
+      Map<String, Object> st = StateManager.get().getMap(sid);
+      if (st != null) {
+        state = st;
+        ComponentEvent ce = createComponentEvent(null);
+        ce.setState(state);
+        if (fireEvent(Events.BeforeStateRestore, ce)) {
+          applyState(state);
+          fireEvent(Events.StateRestore, ce);
+        }
       }
     }
   }
@@ -1454,28 +1527,92 @@ public abstract class Component extends Widget implements Observable {
     return monitorWindowResize;
   }
 
+  protected void notifyHide() {
+  }
+
+  protected void notifyShow() {
+  }
+
   @Override
   protected void onAttach() {
     // added to a gwt panel, not rendered
     if (!rendered) {
       // render and swap the proxy element
-      String widgetIndex = dummy.getPropertyString("__widgetID");
+      String widgetIndex = dummy.getPropertyString("__uiObjectID");
       Element parent = DOM.getParent(dummy);
       int index = DOM.getChildIndex(parent, dummy);
       parent.removeChild(dummy);
       render(parent, index);
       if (widgetIndex != null) {
-        getElement().setPropertyInt("__widgetID", Integer.parseInt(widgetIndex));
+        getElement().setPropertyInt("__uiObjectID", Integer.parseInt(widgetIndex));
       }
     }
+    super.onAttach();
+  }
+
+  @Override
+  protected void onDetach() {
+    super.onDetach();
+    onDetachHelper();
+  }
+
+  protected void onDetachHelper() {
+    hideToolTip();
+    if (GXT.isAriaEnabled()) {
+      FocusFrame.get().hide(this);
+    }
+    if (disableTextSelection > 0) {
+      el.disableTextSelection(false);
+    }
+    if (disableContextMenu > 0) {
+      el.disableContextMenu(false);
+    }
+
+    if (resizeHandler != null) {
+      resizeHandler.removeHandler();
+      resizeHandler = null;
+    }
+
+    fireEvent(Events.Detach);
+    ComponentManager.get().unregister(this);
+  }
+
+  protected void onDisable() {
+    addStyleName(disabledStyle);
+  }
+
+  protected void onEnable() {
+    removeStyleName(disabledStyle);
+    // needed for IE issue when using alpha filters
+    el().clearOpacity();
+  }
+
+  @Override
+  protected void onEnsureDebugId(String baseID) {
+    setId(DEBUG_ID_PREFIX + baseID);
+  }
+
+  protected void onHide() {
+    addStyleName(hideMode.value());
+    hideToolTip();
+    if (GXT.isAriaEnabled()) {
+      FocusFrame.get().hide(this);
+    }
+  }
+
+  protected void onHideContextMenu() {
+
+  }
+
+  @Override
+  protected void onLoad() {
+    super.onLoad();
     if (disableTextSelection > 0) {
       el.disableTextSelection(disableTextSelection == 1);
     }
     if (disableContextMenu > 0) {
       el.disableContextMenu(disableContextMenu == 1);
     }
-
-    super.onAttach();
 
     if (monitorWindowResize) {
       if (windowResizeTask == null) {
@@ -1491,63 +1628,6 @@ public abstract class Component extends Widget implements Observable {
         }
       });
     }
-
-  }
-
-  @Override
-  protected void onDetach() {
-    hideToolTip();
-
-    FocusFrame.get().hide(this);
-
-    if (disableTextSelection > 0) {
-      el.disableTextSelection(false);
-    }
-    if (disableContextMenu > 0) {
-      el.disableContextMenu(false);
-    }
-
-    if (resizeHandler != null) {
-      resizeHandler.removeHandler();
-      resizeHandler = null;
-    }
-
-    super.onDetach();
-
-    fireEvent(Events.Detach);
-    ComponentManager.get().unregister(this);
-  }
-
-  protected void onDisable() {
-    addStyleName(disabledStyle);
-  }
-
-  protected void onEnable() {
-    removeStyleName(disabledStyle);
-  }
-
-  @Override
-  protected void onEnsureDebugId(String baseID) {
-    setId(DEBUG_ID_PREFIX + baseID);
-  }
-
-  protected void onHide() {
-    if (hideParent) {
-      el().getParent().addStyleName("x-hide-" + hideMode.name().toLowerCase());
-    } else {
-      addStyleName("x-hide-" + hideMode.name().toLowerCase());
-    }
-    hideToolTip();
-    FocusFrame.get().hide(this);
-  }
-
-  protected void onHideContextMenu() {
-
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
     fireEvent(Events.Attach);
     ComponentManager.get().register(this);
   }
@@ -1562,7 +1642,7 @@ public abstract class Component extends Widget implements Observable {
   protected void onRender(Element target, int index) {
   }
 
-  protected void onRightClick(final ComponentEvent ce) {
+  protected void onRightClick(ComponentEvent ce) {
     if (contextMenu != null) {
       ce.stopEvent();
       final int x = ce.getClientX();
@@ -1578,13 +1658,10 @@ public abstract class Component extends Widget implements Observable {
   }
 
   protected void onShow() {
-    if (hideParent) {
-      el().getParent().removeStyleName("x-hide-" + hideMode.name().toLowerCase());
-    } else {
-      removeStyleName("x-hide-" + hideMode.name().toLowerCase());
+    removeStyleName(hideMode.value());
+    if (GXT.isAriaEnabled()) {
+      FocusFrame.get().show(this);
     }
-
-    FocusFrame.get().show(this);
   }
 
   protected void onShowContextMenu(int x, int y) {
@@ -1633,10 +1710,6 @@ public abstract class Component extends Widget implements Observable {
     }
   }
 
-  protected void setLayoutData(LayoutData data) {
-    this.layoutData = data;
-  }
-
   protected void setModel(ModelData model) {
     this.model = model;
   }
@@ -1664,7 +1737,9 @@ public abstract class Component extends Widget implements Observable {
   }
 
   protected void unframe() {
-    FocusFrame.get().unframe(this);
+    if (GXT.isAriaEnabled()) {
+      FocusFrame.get().unframe(this);
+    }
   }
 
   private Element createHiddenInput() {
@@ -1680,4 +1755,8 @@ public abstract class Component extends Widget implements Observable {
     style.setPropertyPx("width", 0);
     return input;
   }
+
+  protected native void setParent(Widget parent) /*-{
+    this.@com.google.gwt.user.client.ui.Widget::parent=parent;
+  }-*/;
 }

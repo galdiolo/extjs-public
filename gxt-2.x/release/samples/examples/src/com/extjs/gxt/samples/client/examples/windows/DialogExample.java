@@ -7,7 +7,7 @@
  */
 package com.extjs.gxt.samples.client.examples.windows;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
 import com.extjs.gxt.ui.client.Style.Scroll;
@@ -39,7 +39,7 @@ public class DialogExample extends LayoutContainer {
 
     final Dialog complex = new Dialog();
     complex.setBodyBorder(false);
-    complex.setIcon(Examples.ICONS.side_list());
+    complex.setIcon(Resources.ICONS.side_list());
     complex.setHeading("BorderLayout Dialog");
     complex.setWidth(400);
     complex.setHeight(225);

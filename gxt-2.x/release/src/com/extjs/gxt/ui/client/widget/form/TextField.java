@@ -8,12 +8,14 @@
 package com.extjs.gxt.ui.client.widget.form;
 
 import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.DelayedTask;
 import com.extjs.gxt.ui.client.util.Format;
+import com.extjs.gxt.ui.client.util.Size;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -155,6 +157,7 @@ public class TextField<D> extends Field<D> {
 
   protected String emptyStyle = "x-form-empty-field";
   protected Validator validator;
+  protected El input;
 
   private boolean password;
   private boolean allowBlank = true;
@@ -169,6 +172,7 @@ public class TextField<D> extends Field<D> {
    */
   public TextField() {
     messages = new TextFieldMessages();
+    setWidth(150);
   }
 
   /**
@@ -228,6 +232,9 @@ public class TextField<D> extends Field<D> {
    */
   public String getSelectedText() {
     int start = getCursorPos(), length = getSelectionLength();
+    if(start == -1){
+      return "";
+    }
     return getRawValue().substring(start, start + length);
   }
 
@@ -288,7 +295,7 @@ public class TextField<D> extends Field<D> {
   }
 
   /**
-   * Sets whether a field is value when its value length = 0 (default to true).
+   * Sets whether a field is valid when its value length = 0 (default to true).
    * 
    * @param allowBlank true to allow blanks, false otherwise
    */
@@ -388,16 +395,35 @@ public class TextField<D> extends Field<D> {
 
   @Override
   public void setValue(D value) {
-    removeEmptyText();
     super.setValue(value);
+    removeEmptyText();
     applyEmptyText();
   }
 
+  protected Size adjustInputSize() {
+    return new Size(0, 0);
+  }
+
   protected void applyEmptyText() {
-    if (rendered && !password && emptyText != null && getRawValue().length() < 1) {
+    if (rendered && !hasFocus && !password && emptyText != null && getRawValue().length() < 1) {
       setRawValue(emptyText);
       getInputEl().addStyleName(emptyStyle);
     }
+  }
+
+  @Override
+  protected El getFocusEl() {
+    return input != null ? input : el();
+  }
+
+  @Override
+  protected El getInputEl() {
+    return input != null ? input: el();
+  }
+
+  @Override
+  protected El getStyleEl() {
+    return input != null ? input : el();
   }
 
   @Override
@@ -439,16 +465,18 @@ public class TextField<D> extends Field<D> {
   @Override
   protected void onRender(Element target, int index) {
     if (el() == null) {
-      if (password) {
-        setElement(DOM.createInputPassword());
-      } else {
-        setElement(DOM.createInputText());
-      }
-
-      el().insertInto(target, index);
+      setElement(DOM.createDiv(), target, index);
+      getElement().appendChild(password ? DOM.createInputPassword() : DOM.createInputText());
+      input = el().firstChild();
     }
 
+    addStyleName("x-form-field-wrap");
+    getInputEl().addStyleName(fieldStyle);
+   
+    getInputEl().setId(getId() + "-input");
+
     super.onRender(target, index);
+    removeStyleName(fieldStyle);
 
     if (autoValidate) {
       validationTask = new DelayedTask(new Listener<BaseEvent>() {
@@ -461,10 +489,17 @@ public class TextField<D> extends Field<D> {
     applyEmptyText();
   }
 
+  @Override
+  protected void onResize(int width, int height) {
+    super.onResize(width, height);
+    Size asize = adjustInputSize();
+    getInputEl().setSize(width - asize.width, height - asize.height, true);
+  }
+
   protected void removeEmptyText() {
     if (rendered) {
       getInputEl().removeStyleName(emptyStyle);
-      if (getRawValue() == "") {
+      if ("".equals(getRawValue())) {
         setRawValue("");
       }
     }

@@ -13,9 +13,9 @@ import com.extjs.gxt.charts.client.model.charts.LineChart;
 import com.extjs.gxt.ui.client.data.ModelData;
 
 /**
- * <code>DataProvider</code> implementation for bar charts.
+ * <code>DataProvider</code> implementation for line charts.
  */
-public class LineDataProvider extends BarDataProvider {
+public class LineDataProvider extends PieDataProvider {
 
   public LineDataProvider(String valueProperty) {
     super(valueProperty);
@@ -35,7 +35,7 @@ public class LineDataProvider extends BarDataProvider {
     chart.getValues().clear();
 
     XAxis xAxis = null;
-    if (labelProperty != null) {
+    if (labelProperty != null || labelProvider != null) {
       xAxis = chart.getModel().getXAxis();
       if (xAxis == null) {
         xAxis = new XAxis();
@@ -45,15 +45,17 @@ public class LineDataProvider extends BarDataProvider {
     }
 
     for (ModelData m : store.getModels()) {
-      Object v = m.get(valueProperty);
-      Number n = v instanceof String ? Double.parseDouble((String) v) : (Number) v;
+      Number n = getValue(m);
       if (n == null) {
-        n = 0;
+        chart.addNullValue();
+      } else {
+        chart.addValues(n);
+        maxYValue = maxYValue == null ? n.doubleValue() : Math.max(maxYValue, n.doubleValue());
+        minYValue = minYValue == null ? n.doubleValue() : Math.min(minYValue, n.doubleValue());
+        if (xAxis != null) {
+          xAxis.addLabels(getLabel(m));
+        }
       }
-      chart.addValues(n);      
-      minYValue = Math.min(minYValue, n.doubleValue());
-      maxYValue = Math.max(maxYValue, n.doubleValue());
-      if (xAxis != null) xAxis.addLabels(getLabel(m, valueProperty));
     }
   }
 }

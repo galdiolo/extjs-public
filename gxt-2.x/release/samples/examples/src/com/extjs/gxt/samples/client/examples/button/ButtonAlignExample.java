@@ -16,9 +16,12 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowData;
+import com.google.gwt.user.client.Element;
 
 public class ButtonAlignExample extends LayoutContainer {
-  public ButtonAlignExample() {
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
     SelectionListener<ButtonEvent> l = new SelectionListener<ButtonEvent>() {
 
       @Override

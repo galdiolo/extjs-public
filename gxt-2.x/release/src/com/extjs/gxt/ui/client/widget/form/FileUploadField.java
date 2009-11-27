@@ -56,13 +56,12 @@ public class FileUploadField extends TextField<String> {
 
   }
 
+  private String accept;
   private Button button;
   private AbstractImagePrototype buttonIcon;
   private int buttonOffset = 3;
   private El file;
   private BaseEventPreview focusPreview;
-  private El input;
-  private El wrap;
 
   /**
    * Creates a new file upload field.
@@ -71,6 +70,20 @@ public class FileUploadField extends TextField<String> {
     focusPreview = new BaseEventPreview();
     focusPreview.setAutoHide(false);
     messages = new FileUploadFieldMessages();
+    ensureVisibilityOnSizing = true;
+    setWidth(150);
+  }
+
+  /**
+   * A comma-separated list of content types that a server processing this form
+   * will handle correctly.
+   * 
+   */
+  public String getAccept() {
+    if (rendered) {
+      return ((InputElement) file.dom.cast()).getAccept();
+    }
+    return accept;
   }
 
   /**
@@ -88,7 +101,8 @@ public class FileUploadField extends TextField<String> {
   }
 
   /**
-   * Returns the file input element.
+   * Returns the file input element. You should not store a reference to this.
+   * When resetting this field the file input will change.
    */
   public InputElement getFileInput() {
     return (InputElement) file.dom.cast();
@@ -110,6 +124,13 @@ public class FileUploadField extends TextField<String> {
     return super.getName();
   }
 
+  public void onBrowserEvent(Event event) {
+    super.onBrowserEvent(event);
+    if ((event.getTypeInt() != Event.ONCLICK) && ((Element) event.getEventTarget().cast()).isOrHasChild(file.dom)) {
+      button.onBrowserEvent(event);
+    }
+  }
+
   @Override
   public void onComponentEvent(ComponentEvent ce) {
     super.onComponentEvent(ce);
@@ -123,7 +144,19 @@ public class FileUploadField extends TextField<String> {
   @Override
   public void reset() {
     super.reset();
-    getFileInput().setValue(null);
+    createFileInput();
+  }
+
+  /**
+   * A comma-separated list of content types that a server processing this form
+   * will handle correctly.
+   * 
+   */
+  public void setAccept(String accept) {
+    this.accept = accept;
+    if (rendered) {
+      ((InputElement) file.dom.cast()).setAccept(accept);
+    }
   }
 
   /**
@@ -145,12 +178,11 @@ public class FileUploadField extends TextField<String> {
 
   @Override
   public void setName(String name) {
-    super.setName(name);
+    this.name = name;
     if (rendered) {
       file.dom.removeAttribute("name");
-      getInputEl().dom.removeAttribute("name");
       if (name != null) {
-        file.setElementAttribute("name", name);
+        ((InputElement) file.dom.cast()).setName(name);
       }
     }
   }
@@ -169,7 +201,22 @@ public class FileUploadField extends TextField<String> {
   @Override
   protected void afterRender() {
     super.afterRender();
-    wrap.removeStyleName(fieldStyle);
+    el().removeStyleName(fieldStyle);
+  }
+
+  protected void createFileInput() {
+    if (file != null) {
+      el().removeChild(file.dom);
+    }
+    file = new El((Element) Document.get().createFileInputElement().cast());
+    file.addEventsSunk(Event.ONCHANGE | Event.FOCUSEVENTS);
+    file.setId(XDOM.getUniqueId());
+    file.addStyleName("x-form-file");
+    file.setTabIndex(-1);
+    ((InputElement) file.dom.cast()).setName(name);
+    ((InputElement) file.dom.cast()).setAccept(accept);
+    setReadOnly(readOnly);
+    file.insertInto(getElement(), 1);
   }
 
   @Override
@@ -230,7 +277,7 @@ public class FileUploadField extends TextField<String> {
 
   @Override
   protected void onRender(Element target, int index) {
-    wrap = new El(DOM.createDiv());
+    El wrap = new El(DOM.createDiv());
     wrap.addStyleName("x-form-field-wrap");
     wrap.addStyleName("x-form-file-wrap");
 
@@ -243,13 +290,7 @@ public class FileUploadField extends TextField<String> {
       input.setStyleAttribute("position", "static");
     }
 
-    file = new El((Element) Document.get().createFileInputElement().cast());
-    file.addEventsSunk(Event.ONCHANGE | Event.FOCUSEVENTS);
-    file.setId(XDOM.getUniqueId());
-    file.addStyleName("x-form-file");
-    
     wrap.appendChild(input.dom);
-    wrap.appendChild(file.dom);
 
     setElement(wrap.dom, target, index);
 
@@ -258,18 +299,15 @@ public class FileUploadField extends TextField<String> {
     button.setIcon(buttonIcon);
     button.render(wrap.dom);
 
+    createFileInput();
+
     super.onRender(target, index);
     super.setReadOnly(true);
-    setName(getName());
-
-    if (width == null) {
-      setWidth(150);
-    }
   }
 
   @Override
   protected void onResize(int width, int height) {
     super.onResize(width, height);
-    input.setWidth(adjustWidth("input", width - button.el().getWidth() - buttonOffset), true);
+    input.setWidth(width - button.getWidth() - buttonOffset, true);
   }
 }

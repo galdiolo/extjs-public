@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.widget.toolbar;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -20,6 +21,7 @@ import com.extjs.gxt.ui.client.widget.layout.ToolBarLayout;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.ui.Accessibility;
 
 /**
  * A standard tool bar.
@@ -102,7 +104,7 @@ public class ToolBar extends Container<Component> {
   public ToolBar() {
     setLayoutOnChange(true);
     enableLayout = true;
-    addStyleName("x-toolbar");
+                      baseStyle = "x-toolbar";
     setLayout(new ToolBarLayout());
   }
 
@@ -206,7 +208,7 @@ public class ToolBar extends Container<Component> {
 
   /**
    * True to show a drop down icon when the available width is less than the
-   * required width (defaults to false).
+   * required width (defaults to true).
    * 
    * @param enableOverflow true to enable overflow support
    */
@@ -248,6 +250,31 @@ public class ToolBar extends Container<Component> {
         insert(new FillToolItem(), 0);
         layoutOnChange = state;
       }
+    }
+
+    el().setTabIndex(0);
+    el().setElementAttribute("hideFocus", "true");
+
+    if (GXT.isAriaEnabled()) {
+      Accessibility.setRole(getElement(), "toolbar");
+
+      if (!getTitle().equals("")) {
+        Accessibility.setState(getElement(), "aria-label", getTitle());
+      }
+    }
+
+    sinkEvents(Event.FOCUSEVENTS);
+  }
+
+  @Override
+  public void onComponentEvent(ComponentEvent ce) {
+    super.onComponentEvent(ce);
+    switch (ce.getEventTypeInt()) {
+      case Event.ONFOCUS:
+        if (getItemCount() > 0) {
+          getItem(0).focus();
+        }
+        break;
     }
   }
 

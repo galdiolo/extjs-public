@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.SortDir;
+import com.extjs.gxt.ui.client.core.DomQuery;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -35,7 +36,6 @@ import com.google.gwt.dom.client.Style;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Widget;
@@ -47,10 +47,10 @@ public class ColumnHeader extends BoxComponent {
 
   public class GridSplitBar extends BoxComponent {
 
-    private int colIndex;
-    private Draggable d;
-    private boolean dragging;
-    private DragListener listener = new DragListener() {
+    protected int colIndex;
+    protected Draggable d;
+    protected boolean dragging;
+    protected DragListener listener = new DragListener() {
 
       @Override
       public void dragEnd(DragEvent de) {
@@ -63,7 +63,7 @@ public class ColumnHeader extends BoxComponent {
       }
 
     };
-    private int startX;
+    protected int startX;
 
     protected void onDragEnd(DragEvent e) {
       dragging = false;
@@ -73,7 +73,7 @@ public class ColumnHeader extends BoxComponent {
       el().setWidth(splitterWidth);
       bar.el().setVisibility(false);
 
-      int endX = e.getEvent().getClientX();
+      int endX = e.getX();
       int diff = endX - startX;
       onColumnSplitterMoved(colIndex, cm.getColumnWidth(colIndex) + diff);
     }
@@ -153,7 +153,12 @@ public class ColumnHeader extends BoxComponent {
       super.onRender(target, index);
       setElement(DOM.createDiv(), target, index);
 
-      el().setStyleAttribute("cursor", "col-resize");
+      
+      if(GXT.isOpera){
+        el().setStyleAttribute("cursor", "w-resize");
+      }else{
+        el().setStyleAttribute("cursor", "col-resize");
+      }
       setStyleAttribute("position", "absolute");
       setWidth(5);
 
@@ -200,7 +205,6 @@ public class ColumnHeader extends BoxComponent {
 
       if (config.getWidget() != null) {
         el().appendChild(config.getWidget().getElement());
-        ComponentHelper.doAttach(config.getWidget());
       } else {
         el().setInnerHtml(config.getHtml());
       }
@@ -209,12 +213,12 @@ public class ColumnHeader extends BoxComponent {
 
   public class Head extends BoxComponent {
 
-    private ColumnConfig config;
     private AnchorElement btn;
-    private ImageElement img;
-    private Widget widget;
-    private Html text;
     private int column;
+    private ImageElement img;
+    private Html text;
+    private Widget widget;
+    protected ColumnConfig config;
 
     public Head(ColumnConfig column) {
       this.config = column;
@@ -266,15 +270,48 @@ public class ColumnHeader extends BoxComponent {
     }
 
     public void updateWidth(int width) {
+
       if (!cm.isHidden(cm.indexOf(config))) {
         El td = el().findParent("td", 3);
-        if (indexOf(this) == (heads.size() - 1)) {
-          width++;
-        }
-        td.dom.getStyle().setProperty("width", width + "px");
-        if (rows > 1) {
-          if (GXT.isBorderBox) width -= 2;
-          el().setWidth(width, true);
+        td.setWidth(width);
+        el().setWidth(width-td.getFrameWidth("lr"), true);
+      }
+    }
+
+    private void onClick(ComponentEvent ce) {
+      ce.preventDefault();
+      if (ce.getTarget() == (Element) btn.cast()) {
+        onDropDownClick(ce, column);
+      } else {
+        onHeaderClick(ce, column);
+      }
+    }
+
+    private void onDoubleClick(ComponentEvent ce) {
+      onHeaderDoubleClick(ce, column);
+    }
+
+    private void onMouseMove(ComponentEvent ce) {
+      if (bar != null) bar.onMouseMove(this, ce);
+    }
+
+    private void onMouseOut(ComponentEvent ce) {
+      if (!ce.within(getElement(), true)) {
+        el().findParent("td", 3).removeStyleName("x-grid3-hd-over");
+      }
+    }
+
+    private void onMouseOver(ComponentEvent ce) {
+      if (headerDisabled) {
+        return;
+      }
+      if (!cm.isMenuDisabled(indexOf(this))) {
+        El td = el().findParent("td", 3);
+        td.addStyleName("x-grid3-hd-over");
+        int h = td.getHeight(true);
+        el().setHeight(h, true);
+        if (btn != null) {
+          El.fly(btn).setHeight(h, true);
         }
       }
     }
@@ -298,7 +335,6 @@ public class ColumnHeader extends BoxComponent {
       btn = Document.get().createAnchorElement();
       btn.setHref("#");
       btn.setClassName("x-grid3-hd-btn");
-      btn.setAttribute("onclick", "return false");
 
       img = Document.get().createImageElement();
       img.setSrc(GXT.BLANK_IMAGE_URL);
@@ -339,57 +375,20 @@ public class ColumnHeader extends BoxComponent {
 
       sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS);
     }
-
-    private void onClick(ComponentEvent ce) {
-      ce.preventDefault();
-      if (ce.getTarget() == (Element) btn.cast()) {
-        onDropDownClick(ce, column);
-      } else {
-        onHeaderClick(ce, column);
-      }
-    }
-
-    private void onDoubleClick(ComponentEvent ce) {
-      onHeaderDoubleClick(ce, column);
-    }
-
-    private void onMouseMove(ComponentEvent ce) {
-      if (bar != null) bar.onMouseMove(this, ce);
-    }
-
-    private void onMouseOut(ComponentEvent ce) {
-      if (!ce.within(getElement(), true)) {
-        el().findParent("td", 3).removeStyleName("x-grid3-hd-over");
-      }
-    }
-
-    private void onMouseOver(ComponentEvent ce) {
-      if (headerDisabled) {
-        return;
-      }
-      if (!cm.isMenuDisabled(indexOf(this))) {
-        El td = el().findParent("td", 3);
-        td.addStyleName("x-grid3-hd-over");
-        el().setHeight(td.getHeight(true), true);
-        if (btn != null) {
-          El.fly(btn).setHeight(td.getHeight(), true);
-        }
-      }
-    }
   }
 
-  protected BoxComponent container;
-  protected ColumnModel cm;
-  protected FlexTable table;
-
-  private int minColumnWidth = 10;
-  private boolean headerDisabled;
-  private GridSplitBar bar;
-  private int splitterWidth = 5;
-  private List<Head> heads = new ArrayList<Head>();
-  private List<Group> groups = new ArrayList<Group>();
   private Menu menu;
-  private int rows;
+  protected GridSplitBar bar;
+  protected ColumnModel cm;
+
+  protected BoxComponent container;
+  protected List<Group> groups = new ArrayList<Group>();
+  protected boolean headerDisabled;
+  protected List<Head> heads = new ArrayList<Head>();
+  protected int minColumnWidth = 10;
+  protected int rows;
+  protected int splitterWidth = 5;
+  protected FlexTable table;
 
   public ColumnHeader(BoxComponent container, ColumnModel cm) {
     this.container = container;
@@ -399,12 +398,19 @@ public class ColumnHeader extends BoxComponent {
   public void enableColumnResizing() {
     if (bar != null) {
       ComponentHelper.doDetach(bar);
+      bar.el().remove();
     }
     bar = new GridSplitBar();
     bar.render(container.getElement());
     if (isAttached()) {
       ComponentHelper.doAttach(bar);
     }
+  }
+
+  @Override
+  public Element getElement() {
+    // we need this because of lazy rendering
+    return table.getElement();
   }
 
   public int getMinColumnWidth() {
@@ -418,13 +424,21 @@ public class ColumnHeader extends BoxComponent {
   public int indexOf(Head head) {
     return heads.indexOf(head);
   }
-  
-  protected Head createNewHead(ColumnConfig config) {
-    return new Head(config);
+
+  @Override
+  public boolean isAttached() {
+    if (table != null) {
+      return table.isAttached();
+    }
+    return false;
   }
-  
-  protected Group createNewGroup(HeaderGroupConfig config) {
-    return new Group(config);
+
+  @Override
+  public void onBrowserEvent(Event event) {
+    super.onBrowserEvent(event);
+
+    // Delegate events to the widget.
+    table.onBrowserEvent(event);
   }
 
   public void refresh() {
@@ -436,7 +450,7 @@ public class ColumnHeader extends BoxComponent {
       table.removeRow(0);
     }
 
-    table.setWidth(cm.getTotalWidth() + "");
+    table.setWidth(cm.getTotalWidth() + "px");
 
     List<HeaderGroupConfig> configs = cm.getHeaderGroups();
 
@@ -462,6 +476,7 @@ public class ColumnHeader extends BoxComponent {
       int cs = config.getColspan();
 
       Group group = createNewGroup(config);
+      group.render(DOM.createDiv());
 
       boolean hide = true;
       if (rows > 1) {
@@ -508,27 +523,30 @@ public class ColumnHeader extends BoxComponent {
         }
       }
 
-      int tw = cm.getColumnWidth(i);
-      if (i == (cols - 1)) tw++;
-      if (!GXT.isBorderBox) tw -= 2;
-
       h.render(DOM.createDiv());
 
       if (rowspan > 1) {
         int r = (rows - 1) - (rowspan - 1);
         table.setWidget(r, i, h);
         table.getFlexCellFormatter().setRowSpan(r, i, rowspan);
-        cf.setStyleName(r, i, "x-grid3-header x-grid3-hd x-grid3-cell");
-        cf.getElement(r, i).getStyle().setPropertyPx("width", tw);
+        cf.setStyleName(r, i, "x-grid3-header x-grid3-hd x-grid3-cell x-grid3-td-" + cm.getColumnId(i));
       } else {
         table.setWidget(rows - 1, i, h);
-        cf.setStyleName(rows - 1, i, "x-grid3-header x-grid3-hd x-grid3-cell");
-        cf.getElement(rows - 1, i).getStyle().setPropertyPx("width", tw);
+        cf.setStyleName(rows - 1, i, "x-grid3-header x-grid3-hd x-grid3-cell x-grid3-td-" + cm.getColumnId(i));
       }
+      updateColumnWidth(i, cm.getColumnWidth(i));
     }
     cleanCells();
+    if (isAttached()) {
+      adjustHeights();
+    }
+  }
 
-    adjustHeights();
+  public void release() {
+    ComponentHelper.doDetach(this);
+    if (bar != null && bar.isRendered()) {
+      bar.el().remove();
+    }
   }
 
   public void setHeader(int column, String header) {
@@ -543,19 +561,12 @@ public class ColumnHeader extends BoxComponent {
     this.minColumnWidth = minColumnWidth;
   }
 
-  @Override
-  protected void onAttach() {
-    super.onAttach();
-    adjustHeights();
-  }
-
   public void setSplitterWidth(int splitterWidth) {
     this.splitterWidth = splitterWidth;
   }
 
   public void updateColumnHidden(int index, boolean hidden) {
     refresh();
-    updateGroupWidths();
     cleanCells();
   }
 
@@ -564,32 +575,47 @@ public class ColumnHeader extends BoxComponent {
     if (h != null) {
       h.updateWidth(width);
     }
-    updateGroupWidths();
   }
 
   public void updateSortIcon(int colIndex, SortDir dir) {
-    for (Head h : heads) {
+    for (int i = 0; i < heads.size(); i++) {
+      Head h = heads.get(i);
       if (h.isRendered()) {
-        h.el().findParent("td", 3).removeStyleName("sort-asc", "sort-desc");
+        if (i == colIndex) {
+          El parent = h.el().findParent("td", 3);
+          parent.addStyleName(dir == SortDir.DESC ? "sort-desc" : "sort-asc");
+          parent.removeStyleName(dir != SortDir.DESC ? "sort-desc" : "sort-asc");
+          // fixes issue with IE initially hiding sort icon on change
+          h.el().repaint();
+        } else {
+          h.el().findParent("td", 3).removeStyleName("sort-asc", "sort-desc");
+        }
       }
     }
-    String s = dir == SortDir.DESC ? "sort-desc" : "sort-asc";
-    Head h = heads.get(colIndex);
-    h.el().findParent("td", 3).addStyleName(s);
-    // fixes issue with IE initially hiding sort icon on change
-    h.el().repaint();
   }
 
   public void updateTotalWidth(int offset, int width) {
-    if (offset != -1) table.getElement().getParentElement().getStyle().setPropertyPx("width", offset);
-    table.getElement().getStyle().setProperty("width", width + "px");
+    if (offset != -1) table.getElement().getParentElement().getStyle().setPropertyPx("width",++offset);
+    table.getElement().getStyle().setProperty("width", (++width) + "px");
   }
 
   protected void adjustHeights() {
     for (Head head : heads) {
       if (head.isRendered()) {
         int h = head.el().getParent().getHeight();
-        head.el().setHeight(h, true);
+        if (h > 0) {
+          head.setHeight(h);
+        }
+      }
+    }
+  }
+
+  protected void cleanCells() {
+    NodeList<Element> tds = DomQuery.select("tr.x-grid3-hd-row > td", table.getElement());
+    for (int i = 0; i < tds.getLength(); i++) {
+      Element td = tds.getItem(i);
+      if (!td.hasChildNodes()) {
+        El.fly(td).removeFromParent();
       }
     }
   }
@@ -598,17 +624,23 @@ public class ColumnHeader extends BoxComponent {
     return new ComponentEvent(header);
   }
 
+  protected Group createNewGroup(HeaderGroupConfig config) {
+    return new Group(config);
+  }
+
+  protected Head createNewHead(ColumnConfig config) {
+    return new Head(config);
+  }
+
   @Override
   protected void doAttachChildren() {
     super.doAttachChildren();
-    ComponentHelper.doAttach(table);
     ComponentHelper.doAttach(bar);
   }
 
   @Override
   protected void doDetachChildren() {
     super.doDetachChildren();
-    ComponentHelper.doDetach(table);
     ComponentHelper.doDetach(bar);
   }
 
@@ -630,8 +662,28 @@ public class ColumnHeader extends BoxComponent {
     return column < heads.size() ? heads.get(column) : null;
   }
 
+  @Override
+  protected void onAttach() {
+    ComponentHelper.doAttach(table);
+    DOM.setEventListener(getElement(), this);
+    doAttachChildren();
+    onLoad();
+    adjustHeights();
+  }
+
   protected void onColumnSplitterMoved(int colIndex, int width) {
 
+  }
+
+  @Override
+  protected void onDetach() {
+    try {
+      onUnload();
+    } finally {
+      ComponentHelper.doDetach(table);
+      doDetachChildren();
+    }
+    onDetachHelper();
   }
 
   protected void onDropDownClick(ComponentEvent ce, int column) {
@@ -681,7 +733,6 @@ public class ColumnHeader extends BoxComponent {
     table = new FlexTable();
     table.setCellPadding(0);
     table.setCellSpacing(0);
-    ComponentHelper.doAttach(table);
     setElement(table.getElement(), target, index);
 
     List<HeaderGroupConfig> configs = cm.getHeaderGroups();
@@ -689,63 +740,11 @@ public class ColumnHeader extends BoxComponent {
     for (HeaderGroupConfig config : configs) {
       rows = Math.max(rows, config.getRow() + 1);
     }
-    rows += 1;
-    // cannot use fixed layout with rows with colspan as widths
-    // of child cells are evenly distributed, ignoring actual widths
-    if (rows == 1) {
-      table.getElement().getStyle().setProperty("tableLayout", "fixed");
-    }
-
+    rows++;
+    
     new QuickTip(this);
 
     refresh();
-    ComponentHelper.doDetach(table);
     sinkEvents(Event.ONMOUSEMOVE | Event.ONMOUSEDOWN | Event.ONCLICK);
   }
-
-  protected void updateGroupWidths() {
-    for (Group group : groups) {
-      if (!group.isRendered()) {
-        continue;
-      }
-      // the group must be sized as table layout is auto and we need
-      // content to clip if needed
-      int col = group.config.getColumn();
-      int w = getColumnWidths(col, col + group.config.getColspan());
-      w -= (2 * group.config.getColspan());
-      group.el().setWidth(w, true);
-    }
-  }
-
-  private void cleanCells() {
-    NodeList<Element> tds = table.getElement().getElementsByTagName("td").cast();
-    for (int i = 0; i < tds.getLength(); i++) {
-      Element td = tds.getItem(i);
-      if (td.getInnerHTML().equals("") && td.getClassName().equals("")) {
-        El.fly(td).removeFromParent();
-      }
-    }
-    tds = table.getElement().getElementsByTagName("td").cast();
-    for (int i = 0; i < tds.getLength(); i++) {
-      Element td = tds.getItem(i);
-      if (td.getInnerHTML().equals("") && td.getClassName().equals("")) {
-        El.fly(td).removeFromParent();
-      }
-    }
-    // not all empty tds are being removed without the timer
-    Timer t = new Timer() {
-      @Override
-      public void run() {
-        NodeList<Element> tds = table.getElement().getElementsByTagName("td").cast();
-        for (int i = 0; i < tds.getLength(); i++) {
-          Element td = tds.getItem(i);
-          if (td.getInnerHTML().equals("") && td.getClassName().equals("")) {
-            El.fly(td).removeFromParent();
-          }
-        }
-      }
-    };
-    t.schedule(10);
-  }
-
 }

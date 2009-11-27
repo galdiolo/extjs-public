@@ -7,7 +7,7 @@
  */
 package com.extjs.gxt.samples.client.examples.layouts;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.data.ModelData;
@@ -20,11 +20,14 @@ import com.extjs.gxt.ui.client.widget.layout.AccordionLayout;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 
 public class AccordionLayoutExample extends LayoutContainer {
 
-  public AccordionLayoutExample() {
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
     setLayout(new FlowLayout(10));
 
     ContentPanel panel = new ContentPanel();
@@ -32,9 +35,10 @@ public class AccordionLayoutExample extends LayoutContainer {
     panel.setBodyBorder(false);
 
     panel.setLayout(new AccordionLayout());
-    panel.setIcon(Examples.ICONS.accordion());
+    panel.setIcon(Resources.ICONS.accordion());
 
     ContentPanel cp = new ContentPanel();
+    cp.setAnimCollapse(false);
     cp.setHeading("Online Users");
     cp.setLayout(new FitLayout());
     panel.add(cp);
@@ -77,18 +81,21 @@ public class AccordionLayoutExample extends LayoutContainer {
     cp.add(tree);
 
     cp = new ContentPanel();
+    cp.setAnimCollapse(false);
     cp.setBodyStyleName("pad-text");
     cp.setHeading("Settings");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     panel.add(cp);
 
     cp = new ContentPanel();
+    cp.setAnimCollapse(false);
     cp.setBodyStyleName("pad-text");
     cp.setHeading("Stuff");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     panel.add(cp);
 
     cp = new ContentPanel();
+    cp.setAnimCollapse(false);
     cp.setBodyStyleName("pad-text");
     cp.setHeading("More Stuff");
     cp.addText(TestData.DUMMY_TEXT_SHORT);

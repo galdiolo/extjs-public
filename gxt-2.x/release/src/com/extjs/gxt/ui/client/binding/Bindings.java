@@ -101,7 +101,7 @@ public class Bindings extends BaseObservable {
    */
   public void clear() {
     for (FieldBinding fieldBinding : getBindings()) {
-      fieldBinding.getField().setValue(null);
+      fieldBinding.getField().clear();
     }
   }
 
@@ -136,7 +136,7 @@ public class Bindings extends BaseObservable {
   /**
    * Removes a field binding.
    * 
-   * @param binding the binding instance to add
+   * @param binding the binding instance to remove
    */
   public void removeFieldBinding(FieldBinding binding) {
     bindings.remove(binding.getField().getId());

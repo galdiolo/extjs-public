@@ -7,6 +7,8 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
+import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.aria.FocusFrame;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -24,6 +26,7 @@ import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.ui.Accessibility;
 
 /**
  * Slider component.
@@ -59,12 +62,17 @@ public class Slider extends BoxComponent {
     }
 
     @Override
+    protected void afterRender() {
+      super.afterRender();
+      addStyleOnOver(getElement(), "x-slider-thumb-over");
+    }
+
+    @Override
     protected void onRender(Element target, int index) {
       setElement(DOM.createDiv(), target, index);
 
       super.onRender(target, index);
 
-      addStyleOnOver(getElement(), "x-slider-thumb-over");
       sinkEvents(Event.ONMOUSEOVER | Event.ONMOUSEOUT);
     }
 
@@ -76,7 +84,7 @@ public class Slider extends BoxComponent {
   private El endEl;
   private int halfThumb;
   private int increment = 10;
-  private El innerEl;
+  protected El innerEl;
   private int maxValue = 100;
   private String message = "{0}";
   private int minValue = 0;
@@ -84,18 +92,19 @@ public class Slider extends BoxComponent {
   private Tip tip;
   private boolean useTip = true;
   private int value = 0;
-  private boolean vertical;
+  protected boolean vertical;
+  protected El targetEl;
 
   /**
    * Creates a new slider.
    */
   public Slider() {
-    baseStyle = "x-slider";
+
   }
 
   @Override
   public El getFocusEl() {
-    return innerEl.lastChild();
+    return super.getFocusEl();
   }
 
   /**
@@ -185,6 +194,12 @@ public class Slider extends BoxComponent {
       case Event.ONCLICK:
         onClick(ce);
         break;
+      case Event.ONFOCUS:
+        onFocus(ce);
+        break;
+      case Event.ONBLUR:
+        onBlur(ce);
+        break;
     }
   }
 
@@ -218,12 +233,15 @@ public class Slider extends BoxComponent {
   }
 
   /**
-   * Sets the max value (default to 100).
+   * Sets the max value (defaults to 100).
    * 
    * @param maxValue the max value
    */
   public void setMaxValue(int maxValue) {
     this.maxValue = maxValue;
+    if (rendered) {
+      targetEl.dom.setAttribute("aria-valuemax", "" + maxValue);
+    }
   }
 
   /**
@@ -243,6 +261,9 @@ public class Slider extends BoxComponent {
    */
   public void setMinValue(int minValue) {
     this.minValue = minValue;
+    if (rendered) {
+      targetEl.dom.setAttribute("aria-valuemin", "" + minValue);
+    }
   }
 
   /**
@@ -271,7 +292,7 @@ public class Slider extends BoxComponent {
    */
   public void setValue(int value, boolean supressEvent) {
     value = normalizeValue(value);
-    if (this.value != value) {
+    if (supressEvent || this.value != value) {
       SliderEvent se = new SliderEvent(this);
       se.setOldValue(this.value);
       se.setNewValue(value);
@@ -282,6 +303,9 @@ public class Slider extends BoxComponent {
           if (useTip) {
             thumb.setToolTip(getToolTipConfig(value));
           }
+          onValueChange(value);
+          Accessibility.setState(targetEl.dom, "aria-valuenow", "" + value);
+          Accessibility.setState(targetEl.dom, "aria-valuetext", useTip ? onFormatValue(value) : "" + value);
         }
         if (!supressEvent) {
           fireEvent(Events.Change, se);
@@ -302,7 +326,11 @@ public class Slider extends BoxComponent {
   @Override
   protected void afterRender() {
     super.afterRender();
-    
+
+    if (getAriaLabelledBy() != null) {
+      targetEl.dom.setAttribute("aria-labelledby", getAriaLabelledBy());
+    }
+
     if (isDraggable()) {
       drag = new Draggable(thumb);
       drag.setConstrainVertical(!vertical);
@@ -334,7 +362,6 @@ public class Slider extends BoxComponent {
     }
 
     int value = this.value;
-    this.value = value == Integer.MAX_VALUE ? value - 1 : value + 1;
     setValue(value, true);
   }
 
@@ -350,13 +377,21 @@ public class Slider extends BoxComponent {
   @Override
   protected void doAttachChildren() {
     super.doAttachChildren();
-    thumb.onAttach();
+    ComponentHelper.doAttach(thumb);
+
+    if (getElement() != targetEl.dom) {
+      DOM.setEventListener(targetEl.dom, this);
+    }
   }
 
   @Override
   protected void doDetachChildren() {
     super.doDetachChildren();
-    thumb.onDetach();
+    ComponentHelper.doDetach(thumb);
+
+    if (getElement() != targetEl.dom) {
+      DOM.setEventListener(targetEl.dom, null);
+    }
   }
 
   protected int doSnap(int v) {
@@ -386,6 +421,14 @@ public class Slider extends BoxComponent {
     }
   }
 
+  protected ToolTipConfig getToolTipConfig(int value) {
+    ToolTipConfig t = new ToolTipConfig();
+    t.setDismissDelay(0);
+    t.setText(onFormatValue(value));
+    t.setMinWidth(0);
+    return t;
+  }
+
   protected void moveThumb(int v) {
     if (vertical) {
       thumb.el().setStyleAttribute("bottom", v + "px");
@@ -399,10 +442,16 @@ public class Slider extends BoxComponent {
     value = constrain(value);
     return value;
   }
-  
+
   protected void onAttach() {
     super.onAttach();
     el().repaint();
+  }
+
+  protected void onBlur(ComponentEvent ce) {
+    if (GXT.isAriaEnabled()) {
+      FocusFrame.get().unframe();
+    }
   }
 
   protected void onClick(ComponentEvent ce) {
@@ -413,8 +462,10 @@ public class Slider extends BoxComponent {
         setValue(reverseValue(ce.getClientX() - innerEl.getLeft(false)));
       }
     }
+    if (!ce.getTarget().getTagName().equals("INPUT")) {
+      focus();
+    }
 
-    focus();
   }
 
   protected void onDragCancel(DragEvent de) {
@@ -446,11 +497,22 @@ public class Slider extends BoxComponent {
     }
   }
 
+  protected void onFocus(ComponentEvent ce) {
+    if (GXT.isAriaEnabled()) {
+      FocusFrame.get().frame(this, targetEl.dom);
+    }
+  }
+
+  protected String onFormatValue(int value) {
+    return Format.substitute(getMessage(), value);
+  }
+
   protected void onKeyDown(ComponentEvent ce) {
     int keyCode = ce.getKeyCode();
     switch (keyCode) {
       case KeyCodes.KEY_LEFT:
       case KeyCodes.KEY_DOWN:
+      case KeyCodes.KEY_PAGEDOWN:
         ce.stopEvent();
         if (ce.isControlKey()) {
           setValue(minValue);
@@ -460,6 +522,7 @@ public class Slider extends BoxComponent {
         break;
       case KeyCodes.KEY_RIGHT:
       case KeyCodes.KEY_UP:
+      case KeyCodes.KEY_PAGEUP:
         ce.stopEvent();
         if (ce.isControlKey()) {
           setValue(maxValue);
@@ -467,17 +530,39 @@ public class Slider extends BoxComponent {
           setValue(value + increment);
         }
         break;
-      default:
-        ce.preventDefault();
+      case KeyCodes.KEY_TAB:
+        // do nothing
+        break;
+      case KeyCodes.KEY_HOME:
+        setValue(minValue);
+        break;
+      case KeyCodes.KEY_END:
+        setValue(maxValue);
+        break;
     }
   }
 
   @Override
   protected void onRender(Element target, int index) {
-    setElement(DOM.createDiv(), target, index);
+    Element div = DOM.createDiv();
+    if (el() == null) {
+      setElement(div, target, index);
+      div = getElement();
+    } else {
+      target.appendChild(div);
+    }
+
     super.onRender(target, index);
 
-    addStyleName(vertical ? "x-slider-vert" : "x-slider-horz");
+    targetEl = new El(div);
+
+    // handle wrapped slider
+    if (getElement() != targetEl.dom) {
+      DOM.sinkEvents(targetEl.dom, Event.FOCUSEVENTS);
+    }
+
+    targetEl.addStyleName("x-slider");
+    targetEl.addStyleName(vertical ? "x-slider-vert" : "x-slider-horz");
 
     endEl = new El(DOM.createDiv());
     endEl.addStyleName("x-slider-end");
@@ -486,39 +571,48 @@ public class Slider extends BoxComponent {
     innerEl.addStyleName("x-slider-inner");
     endEl.appendChild(innerEl.dom);
 
-    El focusEl = new El(DOM.createAnchor());
-    focusEl.addStyleName("x-slider-focus");
-    focusEl.setElementAttribute("href", "#");
-    focusEl.setElementAttribute("hidefocus", "on");
-    focusEl.setElementAttribute("tabIndex", "-1");
-    innerEl.appendChild(focusEl.dom);
-    swallowEvent(Events.OnClick, focusEl.dom, true);
-    el().appendChild(endEl.dom);
+    targetEl.appendChild(endEl.dom);
 
     thumb = new Thumb();
     thumb.render(innerEl.dom, 0);
 
     halfThumb = (vertical ? thumb.el().getHeight() : thumb.el().getWidth()) / 2;
 
-    sinkEvents(Event.ONKEYDOWN | Event.ONCLICK);
+    targetEl.setTabIndex(0);
+    targetEl.setElementAttribute("hideFocus", "true");
+
+    if (GXT.isAriaEnabled()) {
+      Accessibility.setRole(targetEl.dom, "slider");
+
+      if (!getTitle().equals("")) {
+        Accessibility.setState(targetEl.dom, "aria-label", getTitle());
+      }
+
+      setMinValue(minValue);
+      setMaxValue(maxValue);
+    }
+
+    sinkEvents(Event.ONKEYDOWN | Event.ONCLICK | Event.FOCUSEVENTS);
 
     if (useTip) {
       tip = new Tip();
       tip.setHeading("");
-      tip.setMinWidth(20);
+      tip.setMinWidth(0);
     }
   }
 
   @Override
   protected void onResize(int width, int height) {
     if (vertical) {
-      el().setHeight(width - el().getPadding("t"));
       innerEl.setHeight(height - el().getPadding("t") - endEl.getPadding("b"));
     } else {
-      el().setWidth(width - el().getPadding("l"));
       innerEl.setWidth(width - el().getPadding("l") - endEl.getPadding("r"));
     }
     syncThumb();
+  }
+
+  protected void onValueChange(int value) {
+
   }
 
   protected int reverseValue(int pos) {
@@ -551,17 +645,6 @@ public class Slider extends BoxComponent {
           vertical ? new int[] {-5, 0} : new int[] {0, -5});
       tip.showAt(p.x, p.y);
     }
-  }
-
-  protected ToolTipConfig getToolTipConfig(int value) {
-    ToolTipConfig t = new ToolTipConfig();
-    t.setDismissDelay(0);
-    t.setText( onFormatValue(value));
-    return t;
-  }
-  
-  protected String onFormatValue(int value) {
-    return Format.substitute(getMessage(), value);
   }
 
 }

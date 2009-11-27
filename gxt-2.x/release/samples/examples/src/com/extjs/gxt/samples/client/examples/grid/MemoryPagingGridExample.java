@@ -10,7 +10,7 @@ package com.extjs.gxt.samples.client.examples.grid;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Stock;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -47,8 +47,7 @@ public class MemoryPagingGridExample extends LayoutContainer {
     PagingModelMemoryProxy proxy = new PagingModelMemoryProxy(TestData.getStocks());
 
     // loader
-    PagingLoader<PagingLoadResult<ModelData>> loader = new BasePagingLoader<PagingLoadResult<ModelData>>(
-        proxy);
+    PagingLoader<PagingLoadResult<ModelData>> loader = new BasePagingLoader<PagingLoadResult<ModelData>>(proxy);
     loader.setRemoteSort(true);
 
     ListStore<Stock> store = new ListStore<Stock>(loader);
@@ -60,12 +59,11 @@ public class MemoryPagingGridExample extends LayoutContainer {
 
     final NumberFormat currency = NumberFormat.getCurrencyFormat();
     final NumberFormat number = NumberFormat.getFormat("0.00");
-    final NumberCellRenderer<Grid<Stock>> numberRenderer = new NumberCellRenderer<Grid<Stock>>(
-        currency);
+    final NumberCellRenderer<Grid<Stock>> numberRenderer = new NumberCellRenderer<Grid<Stock>>(currency);
 
     GridCellRenderer<Stock> change = new GridCellRenderer<Stock>() {
-      public String render(Stock model, String property, ColumnData config, int rowIndex,
-          int colIndex, ListStore<Stock> store, Grid<Stock> grid) {
+      public String render(Stock model, String property, ColumnData config, int rowIndex, int colIndex,
+          ListStore<Stock> store, Grid<Stock> grid) {
         double val = (Double) model.get(property);
         String style = val < 0 ? "red" : "green";
         return "<span style='color:" + style + "'>" + number.format(val) + "</span>";
@@ -73,8 +71,8 @@ public class MemoryPagingGridExample extends LayoutContainer {
     };
 
     GridCellRenderer<Stock> gridNumber = new GridCellRenderer<Stock>() {
-      public String render(Stock model, String property, ColumnData config, int rowIndex,
-          int colIndex, ListStore<Stock> store, Grid<Stock> grid) {
+      public String render(Stock model, String property, ColumnData config, int rowIndex, int colIndex,
+          ListStore<Stock> store, Grid<Stock> grid) {
         return numberRenderer.render(null, property, model.get(property));
       }
     };
@@ -116,7 +114,7 @@ public class MemoryPagingGridExample extends LayoutContainer {
     ContentPanel cp = new ContentPanel();
     cp.setFrame(true);
     cp.setHeading("Local Paging Grid");
-    cp.setIcon(Examples.ICONS.table());
+    cp.setIcon(Resources.ICONS.table());
     cp.setButtonAlign(HorizontalAlignment.CENTER);
     cp.setLayout(new FitLayout());
     cp.setBottomComponent(toolBar);

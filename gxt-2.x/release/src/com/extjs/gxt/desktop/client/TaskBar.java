@@ -11,20 +11,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.Style.IconAlign;
-import com.extjs.gxt.ui.client.Style.LayoutRegion;
+import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.util.IconHelper;
 import com.extjs.gxt.ui.client.util.Padding;
+import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.WindowManager;
 import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
-import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
+import com.extjs.gxt.ui.client.widget.layout.RowData;
+import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -40,22 +41,12 @@ public class TaskBar extends LayoutContainer {
 
   public TaskBar() {
     setId("ux-taskbar");
-    setLayout(new BorderLayout());
-
+    setLayout(new RowLayout(Orientation.HORIZONTAL));
     startBox = new StartBox();
     tbPanel = new TasksButtonsPanel();
 
-    add(startBox, new BorderLayoutData(LayoutRegion.WEST, 90));
-    add(tbPanel, new BorderLayoutData(LayoutRegion.CENTER));
-  }
-
-  /**
-   * Returns the bar's buttons.
-   * 
-   * @return the buttons
-   */
-  public List<TaskButton> getButtons() {
-    return tbPanel.getItems();
+    add(startBox, new RowData(90, 1));
+    add(tbPanel, new RowData(1, 1));
   }
 
   /**
@@ -68,10 +59,13 @@ public class TaskBar extends LayoutContainer {
     return tbPanel.addButton(win);
   }
 
-  @Override
-  protected void onRender(Element parent, int index) {
-    super.onRender(parent, index);
-    setStyleAttribute("zIndex", "10");
+  /**
+   * Returns the bar's buttons.
+   * 
+   * @return the buttons
+   */
+  public List<TaskButton> getButtons() {
+    return tbPanel.getItems();
   }
 
   /**
@@ -101,6 +95,12 @@ public class TaskBar extends LayoutContainer {
     tbPanel.setActiveButton(btn);
   }
 
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
+    setStyleAttribute("zIndex", "10");
+  }
+
 }
 
 class StartBox extends BoxComponent {
@@ -124,11 +124,30 @@ class StartBox extends BoxComponent {
   }
 
   @Override
+  protected void onDisable() {
+    super.onDisable();
+    startBtn.disable();
+  }
+
+  @Override
+  protected void onEnable() {
+    super.onEnable();
+    startBtn.enable();
+  }
+
+  @Override
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
     setElement(DOM.createDiv(), target, index);
 
     startBtn.render(getElement());
+  }
+
+  @Override
+  protected void onResize(int width, int height) {
+    super.onResize(width, height);
+    Size frameSize = el().getFrameSize();
+    startBtn.setSize(width - frameSize.width, height - frameSize.height);
   }
 
 }
@@ -147,11 +166,6 @@ class StartButton extends Button {
     setMenu(startMenu);
 
     template = new Template(getButtonTemplate());
-  }
-
-  @Override
-  protected void autoWidth() {
-
   }
 
   @Override
@@ -181,6 +195,17 @@ class StartButton extends Button {
     }
   }
 
+  @Override
+  protected void autoWidth() {
+
+  }
+
+  @Override
+  protected void onResize(int width, int height) {
+    super.onResize(width, height);
+    buttonEl.setSize(width - 20, height, true);
+  }
+
   private native String getButtonTemplate() /*-{
     return [
     '<table border="0" cellpadding="0" cellspacing="0" class="x-btn-wrap"><tbody><tr>',
@@ -204,15 +229,22 @@ class TaskButton extends Button {
   }
 
   @Override
+  protected void autoWidth() {
+
+  }
+
+  @Override
   public void setIcon(AbstractImagePrototype icon) {
-    super.setIcon(icon);
     if (rendered) {
-      if (buttonEl.selectNode("img") != null) {
-        buttonEl.selectNode("img").remove();
+      El oldIcon = buttonEl.selectNode(".x-taskbutton-icon");
+      if (oldIcon != null) {
+        oldIcon.remove();
+        buttonEl.setPadding(new Padding(7, 0, 7, 0));
       }
       if (icon != null) {
         buttonEl.setPadding(new Padding(7, 0, 7, 20));
         Element e = (Element) icon.createElement().cast();
+        e.setClassName("x-taskbutton-icon");
         buttonEl.insertFirst(e);
         El.fly(e).makePositionable(true);
         String align = "b-b";
@@ -228,6 +260,7 @@ class TaskButton extends Button {
         El.fly(e).alignTo(buttonEl.dom, align, null);
       }
     }
+    this.icon = icon;
   }
 
   @Override
@@ -242,6 +275,12 @@ class TaskButton extends Button {
     }
   }
 
+  @Override
+  protected void onResize(int width, int height) {
+    super.onResize(width, height);
+    buttonEl.setSize(width - 8, height, true);
+  }
+
   private native String getButtonTemplate() /*-{
     return [
     '<table border="0" cellpadding="0" cellspacing="0" class="x-btn-wrap"><tbody><tr>',
@@ -249,32 +288,27 @@ class TaskButton extends Button {
     '</tr></tbody></table>'
     ].join("");
   }-*/;
-
 }
 
 class TasksButtonsPanel extends BoxComponent {
 
-  // private TaskButton activeButton;
-  private El stripWrap, strip, edge;
+  private int buttonMargin = 2;
+  private int buttonWidth = 168;
+  private boolean buttonWidthSet = false;
+  private boolean enableScroll = true;
   // private El scrollLeft, scrollRight;
   private List<TaskButton> items;
-  private boolean buttonWidthSet = false;
   private int lastButtonWidth;
-  private boolean resizeButtons = true;
-  private boolean enableScroll = true;
-  private int buttonWidth = 168;
   private int minButtonWidth = 118;
-  private int buttonMargin = 2;
+  private boolean resizeButtons = true;
   // private boolean scrolling;
   private int scrollIncrement = -1;
+  // private TaskButton activeButton;
+  private El stripWrap, strip, edge;
 
   TasksButtonsPanel() {
     setId("ux-taskbuttons-panel");
     items = new ArrayList<TaskButton>();
-  }
-
-  public List<TaskButton> getItems() {
-    return items;
   }
 
   public TaskButton addButton(Window win) {
@@ -286,14 +320,24 @@ class TasksButtonsPanel extends BoxComponent {
     }
     setActiveButton(btn);
     win.setData("taskButton", btn);
-
-    ComponentHelper.doAttach(btn);
+    if (isAttached()) {
+      ComponentHelper.doAttach(btn);
+    }
+    if (!isEnabled()) {
+      btn.disable();
+    }
     return btn;
   }
 
+  public List<TaskButton> getItems() {
+    return items;
+  }
+
   public void removeButton(TaskButton btn) {
-    Element li = btn.getElement().getParentElement().cast();
-    li.getParentElement().removeChild(li);
+    Element li = (Element) btn.getElement().getParentElement();
+    if (li != null && li.getParentElement() != null) {
+      li.getParentElement().removeChild(li);
+    }
 
     items.remove(btn);
 
@@ -304,6 +348,42 @@ class TasksButtonsPanel extends BoxComponent {
   public void setActiveButton(TaskButton btn) {
     // this.activeButton = btn;
     delegateUpdates();
+  }
+
+  @Override
+  protected void doAttachChildren() {
+    super.doAttachChildren();
+    for (TaskButton btn : items) {
+      ComponentHelper.doAttach(btn);
+    }
+  }
+
+  @Override
+  protected void doDetachChildren() {
+    super.doDetachChildren();
+    for (TaskButton btn : items) {
+      ComponentHelper.doDetach(btn);
+    }
+  }
+
+  protected int getScrollIncrement() {
+    return scrollIncrement != -1 ? scrollIncrement : lastButtonWidth + 2;
+  }
+
+  @Override
+  protected void onDisable() {
+    super.onDisable();
+    for (TaskButton btn : items) {
+      btn.disable();
+    }
+  }
+
+  @Override
+  protected void onEnable() {
+    super.onEnable();
+    for (TaskButton btn : items) {
+      btn.enable();
+    }
   }
 
   @Override
@@ -325,15 +405,8 @@ class TasksButtonsPanel extends BoxComponent {
     delegateUpdates();
   }
 
-  int getScrollIncrement() {
-    return scrollIncrement != -1 ? scrollIncrement : lastButtonWidth + 2;
-  }
-
   private void autoScroll() {
     // auto scroll not functional
-    if (true) {
-      return;
-    }
   }
 
   private void autoSize() {

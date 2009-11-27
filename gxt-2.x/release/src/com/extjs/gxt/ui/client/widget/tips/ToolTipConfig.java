@@ -16,22 +16,23 @@ import com.google.gwt.user.client.Element;
  */
 public class ToolTipConfig {
 
-  private String text;
-  private int showDelay = 500;
-  private int hideDelay = 200;
-  private int dismissDelay = 5000;
-  private int[] mouseOffset = new int[] {15, 18};
-  private boolean trackMouse;
-  private Template template;
-  private Params params;
-  private String title;
   private String anchor;
-  private boolean autoHide = true;
-  private Element target;
-  private boolean enabled = true;
-  
-  private boolean anchorToTarget = true;
   private int anchorOffset = 0;
+  private boolean anchorToTarget = true;
+  private boolean autoHide = true;
+  private int dismissDelay = 5000;
+  private boolean enabled = true;
+  private int hideDelay = 200;
+  private int maxWidth = 300;
+  private int minWidth = 40;
+  private int[] mouseOffset = new int[] {15, 18};
+  private Params params;
+  private int showDelay = 500;
+  private Element target;
+  private Template template;
+  private String text;
+  private String title;
+  private boolean trackMouse;
 
 
   /**
@@ -61,6 +62,14 @@ public class ToolTipConfig {
     this.setText(text);
   }
 
+  public String getAnchor() {
+    return anchor;
+  }
+
+  public int getAnchorOffset() {
+    return anchorOffset;
+  }
+
   /**
    * Returns the dismiss delay.
    * 
@@ -77,6 +86,14 @@ public class ToolTipConfig {
    */
   public int getHideDelay() {
     return hideDelay;
+  }
+
+  public int getMaxWidth() {
+    return maxWidth;
+  }
+
+  public int getMinWidth() {
+    return minWidth;
   }
 
   /**
@@ -142,6 +159,10 @@ public class ToolTipConfig {
     return title;
   }
 
+  public boolean isAnchorToTarget() {
+    return anchorToTarget;
+  }
+
   /**
    * Returns true if auto hide is enabled.
    * 
@@ -167,6 +188,18 @@ public class ToolTipConfig {
    */
   public boolean isTrackMouse() {
     return trackMouse;
+  }
+
+  public void setAnchor(String anchor) {
+    this.anchor = anchor;
+  }
+
+  public void setAnchorOffset(int anchorOffset) {
+    this.anchorOffset = anchorOffset;
+  }
+
+  public void setAnchorToTarget(boolean anchorToTarget) {
+    this.anchorToTarget = anchorToTarget;
   }
 
   /**
@@ -208,6 +241,14 @@ public class ToolTipConfig {
    */
   public void setHideDelay(int hideDelay) {
     this.hideDelay = hideDelay;
+  }
+
+  public void setMaxWidth(int maxWidth) {
+    this.maxWidth = maxWidth;
+  }
+
+  public void setMinWidth(int minWidth) {
+    this.minWidth = minWidth;
   }
 
   /**
@@ -286,30 +327,6 @@ public class ToolTipConfig {
    */
   public void setTrackMouse(boolean trackMouse) {
     this.trackMouse = trackMouse;
-  }
-
-  public void setAnchor(String anchor) {
-    this.anchor = anchor;
-  }
-
-  public String getAnchor() {
-    return anchor;
-  }
-
-  public void setAnchorToTarget(boolean anchorToTarget) {
-    this.anchorToTarget = anchorToTarget;
-  }
-
-  public boolean isAnchorToTarget() {
-    return anchorToTarget;
-  }
-
-  public void setAnchorOffset(int anchorOffset) {
-    this.anchorOffset = anchorOffset;
-  }
-
-  public int getAnchorOffset() {
-    return anchorOffset;
   }
 
 }

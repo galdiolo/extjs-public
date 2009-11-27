@@ -49,6 +49,6 @@ public class PngImage extends Image {
    * Should not be used. Throws a RuntimeException.
    */
   public void setUrl(String url) {
-    throw new RuntimeException("Not allowed to set url for a PNG image");
+    assert false : "Not allowed to set url for a PNG image";
   }
 }

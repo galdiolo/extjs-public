@@ -7,11 +7,13 @@
  */
 package com.extjs.gxt.ui.client.widget.grid;
 
+import java.util.List;
 import java.util.Map;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.data.ModelProcessor;
 import com.extjs.gxt.ui.client.data.ModelStringProvider;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -229,6 +231,13 @@ import com.google.gwt.user.client.Timer;
  * <li>sortInfo : the sort field and direction</li>
  * </ul>
  * </dd>
+ * 
+ * <dd><b>ViewReady</b> : GridEvent(grid)<br>
+ * <div>Fires when the grid's view is ready.</div>
+ * <ul>
+ * <li>grid : this</li>
+ * </ul>
+ * </dd>
  * </dl>
  * 
  * <dl>
@@ -257,17 +266,13 @@ import com.google.gwt.user.client.Timer;
 public class Grid<M extends ModelData> extends BoxComponent {
 
   protected ColumnModel cm;
+  protected EditorSupport<M> editSupport;
   protected GridSelectionModel<M> sm;
   protected ListStore<M> store;
+  protected ModelStringProvider<M> stringProvider;
   protected GridView view;
   protected boolean viewReady;
-  protected ModelStringProvider<M> stringProvider;
-  protected EditorSupport<M> editSupport;
 
-  // config
-  private int minColumnWidth = 25;
-  private boolean trackMouseOver = true;
-  private boolean stripeRows;
   private String autoExpandColumn;
   private int autoExpandMax = 500;
   private int autoExpandMin = 25;
@@ -275,6 +280,10 @@ public class Grid<M extends ModelData> extends BoxComponent {
   private boolean hideHeaders;
   private int lazyRowRender = 10;
   private boolean loadMask;
+  private int minColumnWidth = 25;
+  private ModelProcessor<M> modelProcessor;
+  private boolean stripeRows;
+  private boolean trackMouseOver = true;
 
   /**
    * Creates a new grid.
@@ -287,6 +296,7 @@ public class Grid<M extends ModelData> extends BoxComponent {
     this.cm = cm;
     this.view = new GridView();
     focusable = true;
+    disabledStyle = null;
     baseStyle = "x-grid-panel";
     setSelectionModel(new GridSelectionModel<M>());
   }
@@ -314,7 +324,7 @@ public class Grid<M extends ModelData> extends BoxComponent {
   }
 
   /**
-   * Returns the auto expand miniumum width.
+   * Returns the auto expand minimum width.
    * 
    * @return the minimum width in pixels
    */
@@ -325,7 +335,7 @@ public class Grid<M extends ModelData> extends BoxComponent {
   /**
    * Returns the column model.
    * 
-   * @return the colum model
+   * @return the column model
    */
   public ColumnModel getColumnModel() {
     return cm;
@@ -347,6 +357,15 @@ public class Grid<M extends ModelData> extends BoxComponent {
    */
   public int getMinColumnWidth() {
     return minColumnWidth;
+  }
+
+  /**
+   * Returns the model processor.
+   * 
+   * @return the model processor
+   */
+  public ModelProcessor<M> getModelProcessor() {
+    return modelProcessor;
   }
 
   /**
@@ -445,6 +464,9 @@ public class Grid<M extends ModelData> extends BoxComponent {
       case Event.ONMOUSEDOWN:
         onMouseDown(ge);
         break;
+      case Event.ONMOUSEUP:
+        onMouseUp(ge);
+        break;
     }
     view.handleComponentEvent(ge);
   }
@@ -467,6 +489,9 @@ public class Grid<M extends ModelData> extends BoxComponent {
     setSelectionModel(sm);
     if (rendered) {
       view.refresh(true);
+    }
+    if (loadMask && rendered) {
+      unmask();
     }
   }
 
@@ -547,6 +572,16 @@ public class Grid<M extends ModelData> extends BoxComponent {
   }
 
   /**
+   * Sets the grid's model processor.
+   * 
+   * @see ModelProcessor
+   * @param modelProcessor
+   */
+  public void setModelProcessor(ModelProcessor<M> modelProcessor) {
+    this.modelProcessor = modelProcessor;
+  }
+
+  /**
    * Sets the grid selection model.
    * 
    * @param sm the selection model
@@ -616,8 +651,15 @@ public class Grid<M extends ModelData> extends BoxComponent {
   }
 
   protected void afterRenderView() {
-    view.afterRender();
     viewReady = true;
+    view.afterRender();
+    onAfterRenderView();
+    List<M> list = sm.getSelectedItems();
+    for (M m : list) {
+      view.onRowSelect(store.indexOf(m));
+    }
+
+    fireEvent(Events.ViewReady);
   }
 
   @Override
@@ -664,6 +706,21 @@ public class Grid<M extends ModelData> extends BoxComponent {
     return new EditorSupport<M>();
   }
 
+  @Override
+  protected void notifyHide() {
+    super.notifyHide();
+    view.notifyHide();
+  }
+
+  @Override
+  protected void notifyShow() {
+    super.notifyShow();
+    view.notifyShow();
+  }
+
+  protected void onAfterRenderView() {
+  }
+
   protected void onClick(GridEvent<M> e) {
     if (e.getRowIndex() != -1) {
       fireEvent(Events.RowClick, e);
@@ -671,6 +728,12 @@ public class Grid<M extends ModelData> extends BoxComponent {
         fireEvent(Events.CellClick, e);
       }
     }
+  }
+
+  @Override
+  protected void onDisable() {
+    super.onDisable();
+    mask();
   }
 
   protected void onDoubleClick(GridEvent<M> e) {
@@ -682,15 +745,32 @@ public class Grid<M extends ModelData> extends BoxComponent {
     }
   }
 
+  @Override
+  protected void onEnable() {
+    super.onEnable();
+    unmask();
+  }
+
   protected void onMouseDown(GridEvent<M> e) {
-    int row = e.getRowIndex();
-    int cell = e.getColIndex();
-    if (row != -1) {
-      e.setRowIndex(row);
-      e.setColIndex(cell);
+    if (GXT.isChrome || GXT.isSafari4) {
+      String tagName = e.getEvent().getEventTarget().<Element> cast().getTagName();
+      if (!"input".equalsIgnoreCase(tagName) && !"textarea".equalsIgnoreCase(tagName)) {
+        e.preventDefault();
+      }
+    }
+    if (e.getRowIndex() != -1) {
       fireEvent(Events.RowMouseDown, e);
-      if (cell != -1) {
+      if (e.getColIndex() != -1) {
         fireEvent(Events.CellMouseDown, e);
+      }
+    }
+  }
+
+  protected void onMouseUp(GridEvent<M> e) {
+    if (e.getRowIndex() != -1) {
+      fireEvent(Events.RowMouseUp, e);
+      if (e.getColIndex() != -1) {
+        fireEvent(Events.CellMouseUp, e);
       }
     }
   }

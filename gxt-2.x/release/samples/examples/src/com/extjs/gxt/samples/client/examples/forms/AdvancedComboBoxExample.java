@@ -8,18 +8,14 @@
 package com.extjs.gxt.samples.client.examples.forms;
 
 import java.util.Date;
-import java.util.List;
 
-import com.extjs.gxt.ui.client.data.BasePagingLoadResult;
 import com.extjs.gxt.ui.client.data.BasePagingLoader;
 import com.extjs.gxt.ui.client.data.DataField;
-import com.extjs.gxt.ui.client.data.JsonLoadResultReader;
-import com.extjs.gxt.ui.client.data.ListLoadResult;
+import com.extjs.gxt.ui.client.data.JsonPagingLoadResultReader;
 import com.extjs.gxt.ui.client.data.LoadEvent;
 import com.extjs.gxt.ui.client.data.Loader;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.ModelType;
-import com.extjs.gxt.ui.client.data.PagingLoadConfig;
 import com.extjs.gxt.ui.client.data.PagingLoadResult;
 import com.extjs.gxt.ui.client.data.PagingLoader;
 import com.extjs.gxt.ui.client.data.ScriptTagProxy;
@@ -28,13 +24,15 @@ import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
+import com.google.gwt.user.client.Element;
 
 public class AdvancedComboBoxExample extends LayoutContainer {
 
-  public AdvancedComboBoxExample() {
-    String url = "http://extjs.com/forum/topics-remote.php";
-    ScriptTagProxy<PagingLoadResult<ModelData>> proxy = new ScriptTagProxy<PagingLoadResult<ModelData>>(
-        url);
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
+    String url = "http://www.extjs.com/forum/topics-remote.php";
+    ScriptTagProxy<PagingLoadResult<ModelData>> proxy = new ScriptTagProxy<PagingLoadResult<ModelData>>(url);
 
     ModelType type = new ModelType();
     type.setRoot("topics");
@@ -49,27 +47,17 @@ public class AdvancedComboBoxExample extends LayoutContainer {
     date.setFormat("timestamp");
     type.addField(date);
 
-    JsonLoadResultReader<PagingLoadResult<ModelData>> reader = new JsonLoadResultReader<PagingLoadResult<ModelData>>(
-        type) {
-      @Override
-      protected ListLoadResult<ModelData> newLoadResult(Object loadConfig,
-          List<ModelData> models) {
-        PagingLoadConfig pagingConfig = (PagingLoadConfig) loadConfig;
-        PagingLoadResult<ModelData> result = new BasePagingLoadResult<ModelData>(models,
-            pagingConfig.getOffset(), pagingConfig.getLimit());
-        return result;
-      }
-    };
+    JsonPagingLoadResultReader<PagingLoadResult<ModelData>> reader = new JsonPagingLoadResultReader<PagingLoadResult<ModelData>>(
+        type);
 
-    PagingLoader<PagingLoadResult<ModelData>> loader = new BasePagingLoader<PagingLoadResult<ModelData>>(
-        proxy, reader);
+    PagingLoader<PagingLoadResult<ModelData>> loader = new BasePagingLoader<PagingLoadResult<ModelData>>(proxy, reader);
 
     loader.addListener(Loader.BeforeLoad, new Listener<LoadEvent>() {
       public void handleEvent(LoadEvent be) {
         be.<ModelData> getConfig().set("start", be.<ModelData> getConfig().get("offset"));
       }
     });
-    
+
     ListStore<ModelData> store = new ListStore<ModelData>(loader);
 
     ComboBox<ModelData> combo = new ComboBox<ModelData>();
@@ -91,11 +79,11 @@ public class AdvancedComboBoxExample extends LayoutContainer {
   }
 
   private native String getTemplate() /*-{
-     return [
-       '<tpl for="."><div class="search-item">',
-       '<h3><span>{lastPost:date("MM/dd/y")}<br />by {author}</span>{title}</h3>',
-       '{excerpt}',
-       '</div></tpl>'
-     ].join("");
-     }-*/;
+    return [
+    '<tpl for="."><div class="search-item">',
+    '<h3><span>{lastPost:date("MM/dd/y")}<br />by {author}</span>{title}</h3>',
+    '{excerpt}',
+    '</div></tpl>'
+    ].join("");
+  }-*/;
 }

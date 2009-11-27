@@ -45,9 +45,7 @@ public class TemplatesBase implements Templates {
 
       @SuppressWarnings("unchecked")
       public T next() {
-        if (!hasNext) {
-          throw new IllegalStateException("End of iterator reached.");
-        }
+        assert hasNext :"End of iterator reached.";
 
         T retVal = current;
 

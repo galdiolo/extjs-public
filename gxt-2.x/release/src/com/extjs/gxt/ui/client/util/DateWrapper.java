@@ -9,17 +9,13 @@ package com.extjs.gxt.ui.client.util;
 
 import java.util.Date;
 
-import com.extjs.gxt.ui.client.GXT;
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.i18n.client.DateTimeFormat;
 
 /**
- * Provides a useful set of date related functions without using any deprecated
- * APIs.
- * 
  * Instances of this class are immutable and as such any mutation methods return
  * new DateWrapper instances.
  */
+@SuppressWarnings("deprecation")
 public class DateWrapper {
 
   /**
@@ -27,16 +23,7 @@ public class DateWrapper {
    * {@link DateWrapper#add(Unit, int)} method takes
    */
   public enum Unit {
-    MILLI("ms"), SECOND("s"), MINUTE("mi"), HOUR("h"), DAY("d"), MONTH("mo"), YEAR("y");
-    private final String jsCode;
-
-    private Unit(String jsCode) {
-      this.jsCode = jsCode;
-    }
-  }
-
-  static {
-    GXT.init();
+    DAY, HOUR, MILLI, MINUTE, MONTH, SECOND, YEAR;
   }
 
   protected static String format(float date, String format) {
@@ -44,24 +31,7 @@ public class DateWrapper {
     return DateTimeFormat.getFormat(format).format(new Date(d));
   }
 
-  /**
-   * GWT introduced long emulation to support true 64 bit longs, however this
-   * means that long can't be used over jsni.. must use double
-   */
-  private static native JavaScriptObject createDate(double time) /*-{
-       return new Date(time);
-     }-*/;
-
-  /**
-   * GWT introduced long emulation to support true 64 bit longs, however this
-   * means that long can't be used over jsni.. must use double
-   */
-  private static native JavaScriptObject createDate(int year, int month, int day) /*-{
-     return new Date(year, month, day);
-   }-*/;
-
-  // the wrapped javascript Date instance
-  final JavaScriptObject jsDate;
+  private Date date;
 
   /**
    * Creates a new instance with the current time.
@@ -76,7 +46,7 @@ public class DateWrapper {
    * @param date the date
    */
   public DateWrapper(Date date) {
-    this(date.getTime());
+    this.date = date;
   }
 
   /**
@@ -87,7 +57,7 @@ public class DateWrapper {
    * @param day the day
    */
   public DateWrapper(int year, int month, int day) {
-    this(createDate(year, month, day));
+    this(new Date(year - 1900, month, day));
   }
 
   /**
@@ -96,11 +66,7 @@ public class DateWrapper {
    * @param time the time in milliseconds
    */
   public DateWrapper(long time) {
-    this(createDate(time));
-  }
-
-  private DateWrapper(JavaScriptObject jso) {
-    jsDate = jso;
+    this(new Date(time));
   }
 
   /**
@@ -122,7 +88,36 @@ public class DateWrapper {
    * @return the new DateWrapper
    */
   public DateWrapper add(Unit unit, int quantity) {
-    return new DateWrapper(addInternal(unit.jsCode, quantity));
+    Date d = null;
+    switch (unit) {
+      case MILLI:
+        return new DateWrapper(date.getTime() + quantity);
+      case SECOND:
+        d = (Date) date.clone();
+        d.setSeconds(d.getSeconds() + quantity);
+        return new DateWrapper(d);
+      case MINUTE:
+        d = (Date) date.clone();
+        d.setMinutes(d.getMinutes() + quantity);
+        return new DateWrapper(d);
+      case HOUR:
+        d = (Date) date.clone();
+        d.setHours(d.getHours() + quantity);
+        return new DateWrapper(d);
+      case DAY:
+        d = (Date) date.clone();
+        d.setHours(d.getHours() + (quantity * 24));
+        return new DateWrapper(d);
+      case MONTH:
+        d = (Date) date.clone();
+        d.setMonth(d.getMonth() + quantity);
+        return new DateWrapper(d);
+      case YEAR:
+        d = (Date) date.clone();
+        d.setYear(d.getYear() + quantity);
+        return new DateWrapper(d);
+    }
+    return null;
   }
 
   /**
@@ -216,7 +211,7 @@ public class DateWrapper {
    *         (hours/minutes/seconds/milliseconds) cleared.
    */
   public DateWrapper clearTime() {
-    return new DateWrapper(clearTimeInternal());
+    return new DateWrapper(getFullYear(), getMonth(), getDate());
   }
 
   public DateWrapper clone() {
@@ -229,7 +224,8 @@ public class DateWrapper {
    * @return the day of the month
    */
   public int getDate() {
-    return (int) call("getDate");
+
+    return date.getDate();
   }
 
   /**
@@ -238,7 +234,7 @@ public class DateWrapper {
    * @return the day of the week
    */
   public int getDay() {
-    return (int) call("getDay");
+    return date.getDay();
   }
 
   /**
@@ -247,7 +243,7 @@ public class DateWrapper {
    * @return the day of the week
    */
   public int getDayInWeek() {
-    return (int) call("getDay");
+    return date.getDay();
   }
 
   /**
@@ -256,7 +252,11 @@ public class DateWrapper {
    * @return the day of the year
    */
   public int getDayOfYear() {
-    return (int) call("getDayOfYear");
+    int num = 0;
+    for (int i = 0; i < getMonth(); i++) {
+      num += new DateWrapper(1, i, 1).getDaysInMonth();
+    }
+    return getDate() + num;
   }
 
   /**
@@ -265,7 +265,19 @@ public class DateWrapper {
    * @return the number of days in the month.
    */
   public int getDaysInMonth() {
-    return (int) call("getDaysInMonth");
+    switch (getMonth()) {
+      case 1:
+        return (((getFullYear() % 4) == 0 && (getFullYear() % 100) != 0) || (getFullYear() % 400) == 0) ? 29 : 28;
+
+      case 3:
+      case 5:
+      case 8:
+      case 10:
+        return 30;
+
+      default:
+        return 31;
+    }
   }
 
   /**
@@ -274,7 +286,7 @@ public class DateWrapper {
    * @return the first date of the month.
    */
   public DateWrapper getFirstDayOfMonth() {
-    return callAndWrap("getFirstDateOfMonth");
+    return new DateWrapper(getFullYear(), getMonth(), 1);
   }
 
   /**
@@ -283,7 +295,7 @@ public class DateWrapper {
    * @return the full year
    */
   public int getFullYear() {
-    return (int) call("getFullYear");
+    return date.getYear() + 1900;
   }
 
   /**
@@ -292,7 +304,7 @@ public class DateWrapper {
    * @return the hour
    */
   public int getHours() {
-    return (int) call("getHours");
+    return date.getHours();
   }
 
   /**
@@ -301,7 +313,7 @@ public class DateWrapper {
    * @return the last date of the month.
    */
   public DateWrapper getLastDateOfMonth() {
-    return callAndWrap("getLastDateOfMonth");
+    return new DateWrapper(getFullYear(), getMonth(), getDaysInMonth());
   }
 
   /**
@@ -309,8 +321,8 @@ public class DateWrapper {
    * 
    * @return the milliseconds
    */
-  public int getMilliseconds() {
-    return (int) call("getMilliseconds");
+  public long getMilliseconds() {
+    return date.getTime() - clearTime().getTime();
   }
 
   /**
@@ -319,7 +331,7 @@ public class DateWrapper {
    * @return the minutes
    */
   public int getMinutes() {
-    return (int) call("getMinutes");
+    return date.getMinutes();
   }
 
   /**
@@ -328,7 +340,7 @@ public class DateWrapper {
    * @return the month
    */
   public int getMonth() {
-    return (int) call("getMonth");
+    return date.getMonth();
   }
 
   /**
@@ -337,7 +349,7 @@ public class DateWrapper {
    * @return the seconds
    */
   public int getSeconds() {
-    return (int) call("getSeconds");
+    return date.getSeconds();
   }
 
   /**
@@ -346,50 +358,12 @@ public class DateWrapper {
    * @return the time in milliseconds
    */
   public long getTime() {
-    return (long) call("getTime");
+    return date.getTime();
   }
 
   @Override
   public String toString() {
     return asDate().toString();
   }
-
-  /**
-   * GWT introduced long emulation to support true 64 bit longs, however this
-   * means that long can't be used over jsni.. must use double
-   */
-  private native JavaScriptObject addInternal(String interval, double value) /*-{
-     return this.@com.extjs.gxt.ui.client.util.DateWrapper::jsDate.add(interval, value);
-   }-*/;
-
-  /**
-   * GWT introduced long emulation to support true 64 bit longs, however this
-   * means that long can't be used over jsni.. must use double
-   */
-  private native double call(String method) /*-{
-     var d = this.@com.extjs.gxt.ui.client.util.DateWrapper::jsDate;
-     return d[method]();
-   }-*/;
-
-  private DateWrapper callAndWrap(String method) {
-    return new DateWrapper((long) callGetTime(method));
-  }
-
-  /**
-   * GWT introduced long emulation to support true 64 bit longs, however this
-   * means that long can't be used over jsni.. must use double
-   */
-  private native double callGetTime(String method) /*-{
-     var d = this.@com.extjs.gxt.ui.client.util.DateWrapper::jsDate;
-     return d[method]().getTime();
-   }-*/;
-
-  /**
-   * GWT introduced long emulation to support true 64 bit longs, however this
-   * means that long can't be used over jsni.. must use double
-   */
-  private native JavaScriptObject clearTimeInternal() /*-{
-     return this.@com.extjs.gxt.ui.client.util.DateWrapper::jsDate.clearTime(true);
-   }-*/;
 
 }

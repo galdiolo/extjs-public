@@ -20,21 +20,23 @@ import com.extjs.gxt.ui.client.widget.grid.CellSelectionModel;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
 
 @SuppressWarnings("unchecked")
-public class CellTreeGridSelectionModel<M extends ModelData> extends CellSelectionModel<M>{
+public class CellTreeGridSelectionModel<M extends ModelData> extends CellSelectionModel<M> {
 
   protected TreeGrid tree;
   protected TreeStore<M> treeStore;
   protected List<M> selectedPreRender;
-  
+
   @Override
   public void bindGrid(Grid grid) {
+    tree = null;
+    treeStore = null;
     super.bindGrid(grid);
     if (grid != null) {
       tree = (TreeGrid) grid;
       treeStore = tree.getTreeStore();
     }
   }
-  
+
   protected void ensureExpanded(M model) {
     List<M> stack = new ArrayList<M>();
     model = treeStore.getParent(model);
@@ -48,7 +50,7 @@ public class CellTreeGridSelectionModel<M extends ModelData> extends CellSelecti
       tree.setExpanded(m, true);
     }
   }
-  
+
   @Override
   protected void handleMouseDown(GridEvent<M> e) {
     if (!tree.getTreeView().isSelectableTarget(e.getModel(), e.getTarget())) {
@@ -56,7 +58,7 @@ public class CellTreeGridSelectionModel<M extends ModelData> extends CellSelecti
     }
     super.handleMouseDown(e);
   }
-  
+
   protected void hookPreRender(M item, boolean select) {
     if (selectedPreRender == null) {
       selectedPreRender = new ArrayList<M>();
@@ -78,7 +80,7 @@ public class CellTreeGridSelectionModel<M extends ModelData> extends CellSelecti
   protected void onAdd(List<? extends M> models) {
 
   }
-  
+
   @Override
   protected void onKeyLeft(GridEvent<M> ce) {
     if (lastSelected == null) {
@@ -90,7 +92,7 @@ public class CellTreeGridSelectionModel<M extends ModelData> extends CellSelecti
       doSingleSelect(treeStore.getParent(lastSelected), false);
     }
   }
-  
+
   @Override
   protected void onKeyRight(GridEvent<M> e) {
     if (lastSelected == null) {
@@ -102,7 +104,7 @@ public class CellTreeGridSelectionModel<M extends ModelData> extends CellSelecti
       }
     }
   }
-  
+
   protected void onRender() {
     if (selectedPreRender != null) {
       for (M item : selectedPreRender) {

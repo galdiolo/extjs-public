@@ -18,13 +18,16 @@ import com.extjs.gxt.ui.client.widget.TabPanel;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.ToggleButton;
+import com.google.gwt.user.client.Element;
 
 public class AdvancedTabExample extends LayoutContainer {
 
   private int index = 0;
   private TabPanel advanced;
 
-  public AdvancedTabExample() {
+  @Override
+  protected void onRender(Element parent, int pos) {
+    super.onRender(parent, pos);
     VerticalPanel vp = new VerticalPanel();
     vp.setSpacing(10);
 
@@ -62,9 +65,9 @@ public class AdvancedTabExample extends LayoutContainer {
     while (index < 7) {
       addTab();
     }
-    
+
     advanced.setSelection(advanced.getItem(6));
-    
+
     vp.add(advanced);
     add(vp);
   }

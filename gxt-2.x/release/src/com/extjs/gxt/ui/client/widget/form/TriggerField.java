@@ -17,9 +17,7 @@ import com.extjs.gxt.ui.client.event.PreviewEvent;
 import com.extjs.gxt.ui.client.util.BaseEventPreview;
 import com.extjs.gxt.ui.client.util.Size;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 
@@ -53,10 +51,8 @@ import com.google.gwt.user.client.Event;
 public class TriggerField<D> extends TextField<D> {
 
   protected BaseEventPreview focusEventPreview;
-  protected El input;
   protected El trigger;
   protected String triggerStyle = "x-form-trigger-arrow";
-  protected El wrap;
 
   protected boolean mimicing;
 
@@ -66,7 +62,7 @@ public class TriggerField<D> extends TextField<D> {
 
   public TriggerField() {
     super();
-    setDeferHeight(true);
+    ensureVisibilityOnSizing = true;
   }
 
   /**
@@ -104,7 +100,7 @@ public class TriggerField<D> extends TextField<D> {
   public void onComponentEvent(ComponentEvent ce) {
     super.onComponentEvent(ce);
     int type = ce.getEventTypeInt();
-    if (ce.getTarget() == trigger.dom && type == Event.ONCLICK) {
+    if (ce.getTarget() == trigger.dom && type == Event.ONCLICK && !readOnly) {
       onTriggerClick(ce);
     }
   }
@@ -114,22 +110,16 @@ public class TriggerField<D> extends TextField<D> {
    * passed, the user will only be able to select from the items defined in the
    * dropdown list.
    * 
-   * @param value true to allow the user to directly edit the field text
+   * @param editable true to allow the user to directly edit the field text
    */
-  public void setEditable(boolean value) {
-    if (value == this.editable) {
-      return;
-    }
-    this.editable = value;
+  public void setEditable(boolean editable) {
+    this.editable = editable;
     if (rendered) {
       El fromEl = getInputEl();
-      if (!value) {
-        fromEl.dom.setPropertyBoolean("readOnly", true);
-        fromEl.addStyleName("x-triggerfield-noedit");
-      } else {
-        fromEl.dom.setPropertyBoolean("readOnly", false);
-        fromEl.removeStyleName("x-triggerfield-noedit");
+      if (!readOnly) {
+        fromEl.dom.setPropertyBoolean("readOnly", !editable);
       }
+      fromEl.setStyleName("x-triggerfield-noedit", !editable);
     }
   }
 
@@ -155,38 +145,39 @@ public class TriggerField<D> extends TextField<D> {
     this.triggerStyle = triggerStyle;
   }
 
-  protected void onAttach() {
-    super.onAttach();
-    
-  }
-
   @Override
-  protected void afterRender() {
-    super.afterRender();
-    wrap.removeStyleName(fieldStyle);
-    if (GXT.isIE && !hideTrigger) {
-      int y;
-      if ((y = input.getY()) != trigger.getY()) {
-        trigger.setY(y);
+  public void setReadOnly(boolean readOnly) {
+    this.readOnly = readOnly;
+    if (rendered) {
+      el().setStyleName(readOnlyFieldStyle, readOnly);
+      if (editable || (readOnly && !editable)) {
+        getInputEl().dom.setPropertyBoolean("readOnly", readOnly);
       }
     }
   }
 
   @Override
-  protected El getFocusEl() {
-    return input;
+  protected Size adjustInputSize() {
+    return new Size(trigger.getWidth(), 0);
   }
 
   @Override
-  protected El getInputEl() {
-    return input;
+  protected void afterRender() {
+    super.afterRender();
+    addStyleOnOver(trigger.dom, "x-form-trigger-over");
+    removeStyleName(fieldStyle);
+  }
+
+  protected void beforeBlur() {
+  }
+
+  protected void mimicBlur(PreviewEvent e, Element target) {
+    if (!el().dom.isOrHasChild(target) && validateBlur(e, target)) {
+      triggerBlur(null);
+    }
   }
 
   @Override
-  protected El getStyleEl() {
-    return input;
-  }
-
   protected void onKeyDown(FieldEvent fe) {
     super.onKeyDown(fe);
     if (monitorTab && fe.getKeyCode() == KeyCodes.KEY_TAB) {
@@ -200,7 +191,7 @@ public class TriggerField<D> extends TextField<D> {
 
   @Override
   protected void onClick(ComponentEvent ce) {
-    if (!editable && ce.getTarget() == getInputEl().dom) {
+    if (!readOnly && !editable && getInputEl().dom.isOrHasChild(ce.getTarget())) {
       onTriggerClick(ce);
       return;
     }
@@ -210,13 +201,13 @@ public class TriggerField<D> extends TextField<D> {
   @Override
   protected void onDisable() {
     super.onDisable();
-    wrap.addStyleName("x-item-disabled");
+    addStyleName("x-item-disabled");
   }
 
   @Override
   protected void onEnable() {
     super.onEnable();
-    wrap.removeStyleName("x-item-disabled");
+    removeStyleName("x-item-disabled");
   }
 
   @Override
@@ -229,10 +220,61 @@ public class TriggerField<D> extends TextField<D> {
     }
   }
 
-  protected void mimicBlur(PreviewEvent e, Element target) {
-    if (!el().dom.isOrHasChild(target) && validateBlur(e, target)) {
-      triggerBlur(null);
+  @Override
+  protected void onRender(Element target, int index) {
+
+    focusEventPreview = new BaseEventPreview() {
+      protected boolean onAutoHide(final PreviewEvent ce) {
+        if (ce.getEventTypeInt() == Event.ONMOUSEDOWN) {
+          mimicBlur(ce, ce.getTarget());
+        }
+        return false;
+      }
+    };
+
+    if (el() != null) {
+      super.onRender(target, index);
+      return;
     }
+
+    setElement(DOM.createDiv(), target, index);
+
+    input = new El(DOM.createInputText());
+
+    addStyleName("x-form-field-wrap");
+
+    input.addStyleName(fieldStyle);
+
+    trigger = new El(DOM.createImg());
+    trigger.dom.setClassName("x-form-trigger " + triggerStyle);
+    trigger.dom.setPropertyString("src", GXT.BLANK_IMAGE_URL);
+    el().appendChild(input.dom);
+    el().appendChild(trigger.dom);
+
+    if (hideTrigger) {
+      trigger.setVisible(false);
+    }
+
+    super.onRender(target, index);
+
+    if (!editable) {
+      setEditable(false);
+    }
+  }
+
+  @Override
+  protected void onResize(int width, int height) {
+    super.onResize(width, height);
+    if (GXT.isIE && !hideTrigger) {
+      int y;
+      if ((y = input.getY()) != trigger.getY()) {
+        trigger.setY(y);
+      }
+    }
+  }
+
+  protected void onTriggerClick(ComponentEvent ce) {
+    fireEvent(Events.TriggerClick, ce);
   }
 
   protected void triggerBlur(ComponentEvent ce) {
@@ -243,81 +285,8 @@ public class TriggerField<D> extends TextField<D> {
     super.onBlur(ce);
   }
 
-  protected void onTriggerClick(ComponentEvent ce) {
-    fireEvent(Events.TriggerClick, ce);
-  }
-
   protected boolean validateBlur(DomEvent ce, Element target) {
     return true;
-  }
-
-  protected void beforeBlur() {
-  }
-
-  @Override
-  protected void onRender(Element target, int index) {
-    if (el() != null) {
-      super.onRender(target, index);
-      return;
-    }
-    input = new El(DOM.createInputText());
-    wrap = new El(DOM.createDiv());
-    wrap.dom.setClassName("x-form-field-wrap");
-
-    input.addStyleName(fieldStyle);
-
-    trigger = new El(DOM.createImg());
-    trigger.dom.setClassName("x-form-trigger " + triggerStyle);
-    trigger.dom.setPropertyString("src", GXT.BLANK_IMAGE_URL);
-    wrap.dom.appendChild(input.dom);
-    wrap.dom.appendChild(trigger.dom);
-    setElement(wrap.dom, target, index);
-
-    if (hideTrigger) {
-      trigger.setVisible(false);
-    }
-
-    addStyleOnOver(trigger.dom, "x-form-trigger-over");
-
-    super.onRender(target, index);
-
-    if (!editable) {
-      editable = true;
-      setEditable(false);
-    }
-
-    DOM.sinkEvents(wrap.dom, Event.FOCUSEVENTS);
-    DOM.sinkEvents(trigger.dom, Event.ONCLICK | Event.MOUSEEVENTS);
-
-    if (width == null) {
-      setWidth(150);
-    }
-
-    focusEventPreview = new BaseEventPreview() {
-      protected boolean onAutoHide(final PreviewEvent ce) {
-        if (ce.getEventTypeInt() == Event.ONMOUSEDOWN) {
-          final Element target = ce.getTarget();
-          DeferredCommand.addCommand(new Command() {
-            public void execute() {
-              mimicBlur(ce, target);
-            }
-          });
-        }
-        return false;
-      }
-    };
-
-  }
-
-  @Override
-  protected void onResize(int width, int height) {
-    super.onResize(width, height);
-    getInputEl().setWidth(adjustWidth("input", width - trigger.getWidth()), true);
-    el().setWidth(getInputEl().getWidth() + trigger.getWidth(), true);
-  }
-
-  protected Size adjustSize(Size size) {
-    return size;
   }
 
 }

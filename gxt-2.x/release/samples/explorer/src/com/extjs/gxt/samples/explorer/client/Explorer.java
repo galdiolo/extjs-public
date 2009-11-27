@@ -14,13 +14,11 @@ import com.extjs.gxt.samples.client.FileService;
 import com.extjs.gxt.samples.client.FileServiceAsync;
 import com.extjs.gxt.samples.client.examples.model.Entry;
 import com.extjs.gxt.samples.explorer.client.mvc.AppController;
-import com.extjs.gxt.samples.explorer.client.mvc.AppView;
 import com.extjs.gxt.samples.explorer.client.mvc.ContentController;
 import com.extjs.gxt.samples.explorer.client.mvc.NavigationController;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.mvc.AppEvent;
 import com.extjs.gxt.ui.client.mvc.Dispatcher;
-import com.extjs.gxt.ui.client.widget.Viewport;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.GWT.UncaughtExceptionHandler;
@@ -66,9 +64,6 @@ public class Explorer implements EntryPoint {
     String hash = Window.Location.getHash();
 
     showPage(model.findEntry("overview"));
-
-    Viewport v = Registry.get(AppView.VIEWPORT);
-    v.layout(true);
 
     if (!"".equals(hash)) {
       hash = hash.substring(1);

@@ -15,6 +15,7 @@ import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.TreeModel;
 import com.extjs.gxt.ui.client.dnd.DND.Feedback;
 import com.extjs.gxt.ui.client.event.DNDEvent;
+import com.extjs.gxt.ui.client.store.TreeStoreModel;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel.TreeNode;
@@ -96,27 +97,24 @@ public class TreePanelDropTarget extends DropTarget {
 
   protected void appendModel(ModelData p, List<ModelData> models, int index) {
     if (models.size() == 0) return;
-    if (models.get(0) instanceof TreeModel) {
-      TreeModel test = (TreeModel) models.get(0);
+    if (models.get(0) instanceof TreeStoreModel) {
       // drop is in form from tree store
-      if (test.getPropertyNames().contains("model")) {
-        List<ModelData> children = new ArrayList<ModelData>();
 
-        for (ModelData tm : models) {
-          ModelData child = tm.get("model");
-          children.add(child);
-        }
-        if (p == null) {
-          tree.getStore().insert(children, index, false);
-        } else {
-          tree.getStore().insert(p, children, index, false);
-        }
-        for (ModelData tm : models) {
-          ModelData child = tm.get("model");
-          List sub = (List) ((TreeModel) tm).getChildren();
-          appendModel(child, sub, 0);
-        }
+      List<ModelData> children = new ArrayList<ModelData>();
 
+      for (ModelData tm : models) {
+        ModelData child = tm.get("model");
+        children.add(child);
+      }
+      if (p == null) {
+        tree.getStore().insert(children, index, false);
+      } else {
+        tree.getStore().insert(p, children, index, false);
+      }
+      for (ModelData tm : models) {
+        ModelData child = tm.get("model");
+        List sub = (List) ((TreeModel) tm).getChildren();
+        appendModel(child, sub, 0);
       }
       return;
     }
@@ -140,7 +138,7 @@ public class TreePanelDropTarget extends DropTarget {
       tree.getView().onDropChange(activeItem, false);
     }
 
-    if (item != appendItem && autoExpand && !item.isExpanded()) {
+    if (item != null && item != appendItem && autoExpand && !item.isExpanded()) {
       Timer t = new Timer() {
         @Override
         public void run() {
@@ -155,14 +153,21 @@ public class TreePanelDropTarget extends DropTarget {
     }
     appendItem = item;
     activeItem = item;
-    tree.getView().onDropChange(activeItem, true);
+    if (activeItem != null) {
+      tree.getView().onDropChange(activeItem, true);
+    }
   }
 
   protected void handleAppendDrop(DNDEvent event, TreeNode item) {
-    List sel = event.getData();
+    List sel = prepareDropData(event.getData(), false);
     if (sel.size() > 0) {
-      ModelData p = item.getModel();
-      appendModel(p, sel, tree.getStore().getChildCount(item.getModel()));
+      ModelData p = null;
+      if (item != null) {
+        p = item.getModel();
+        appendModel(p, sel, tree.getStore().getChildCount(item.getModel()));
+      } else {
+        appendModel(p, sel, 0);
+      }
     }
   }
 
@@ -185,16 +190,6 @@ public class TreePanelDropTarget extends DropTarget {
         return;
       }
     }
-    
-    if (event.getDropTarget().component == event.getDragSource().component) {
-      TreePanel source = (TreePanel) event.getDragSource().component;
-      ModelData sel = source.getSelectionModel().getSelectedItem();
-      ModelData overModel = item.getModel();
-      if (before && overModel == tree.getStore().getNextSibling(sel)) {
-        clearStyles(event);
-        return;
-      }
-    }
 
     appendItem = null;
 
@@ -211,7 +206,7 @@ public class TreePanelDropTarget extends DropTarget {
     String status = "x-tree-drop-ok-between";
     if (before && idx == 0) {
       status = "x-tree-drop-ok-above";
-    } else if (idx > 1 && !before && idx == item.getParent().getItemCount() - 1) {
+    } else if (idx > 1 && !before && item.getParent() != null && idx == item.getParent().getItemCount() - 1) {
       status = "x-tree-drop-ok-below";
     }
     event.getStatus().setStatus(true, status);
@@ -236,20 +231,22 @@ public class TreePanelDropTarget extends DropTarget {
   @Override
   protected void onDragDrop(DNDEvent event) {
     super.onDragDrop(event);
+    if (event.getData() == null) return;
 
-    if (activeItem != null && status == -1) {
+    if (activeItem == null && status == -1) {
+      handleAppendDrop(event, activeItem);
+    } else if (activeItem != null && status == -1) {
       tree.getView().onDropChange(activeItem, false);
-      if (event.getData() != null) {
-        handleAppendDrop(event, activeItem);
-      }
+      handleAppendDrop(event, activeItem);
     } else if (activeItem != null && status != -1) {
-      if (event.getData() != null) {
-        handleInsertDrop(event, activeItem, status);
-      }
+      handleInsertDrop(event, activeItem, status);
     } else {
       event.setCancelled(true);
     }
     tree.setTrackMouseOver(restoreTrackMouse);
+    status = -1;
+    activeItem = null;
+    appendItem = null;
   }
 
   @Override
@@ -274,7 +271,7 @@ public class TreePanelDropTarget extends DropTarget {
   protected void onDragMove(DNDEvent event) {
     event.setCancelled(false);
   }
-  
+
   protected void clearStyles(DNDEvent event) {
     Insert.get().hide();
     event.getStatus().setStatus(false);
@@ -288,28 +285,34 @@ public class TreePanelDropTarget extends DropTarget {
     final TreeNode overItem = tree.findNode(event.getTarget());
     if (overItem == null) {
       clearStyles(event);
-      return;
     }
 
-    if (event.getDropTarget().component == event.getDragSource().component) {
+    if (overItem != null && event.getDropTarget().component == event.getDragSource().component) {
       TreePanel source = (TreePanel) event.getDragSource().component;
-      ModelData sel = source.getSelectionModel().getSelectedItem();
+
+      List<ModelData> list = source.getSelectionModel().getSelection();
       ModelData overModel = overItem.getModel();
-      if (overModel == sel) {
-        clearStyles(event);
-        return;
-      }
-      List<ModelData> children = tree.getStore().getChildren(sel, true);
-      if (children.contains(overItem.getModel())) {
-        clearStyles(event);
-        return;
+      for (int i = 0; i < list.size(); i++) {
+        ModelData sel = list.get(i);
+        if (overModel == sel) {
+          clearStyles(event);
+          return;
+        }
+
+        List<ModelData> children = tree.getStore().getChildren(sel, true);
+        if (children.contains(overItem.getModel())) {
+          clearStyles(event);
+          return;
+        }
       }
     }
 
     boolean append = feedback == Feedback.APPEND || feedback == Feedback.BOTH;
     boolean insert = feedback == Feedback.INSERT || feedback == Feedback.BOTH;
 
-    if (insert) {
+    if (overItem == null) {
+      handleAppend(event, overItem);
+    } else if (insert) {
       handleInsert(event, overItem);
     } else if ((!overItem.isLeaf() || allowDropOnLeaf) && append) {
       handleAppend(event, overItem);
@@ -327,7 +330,7 @@ public class TreePanelDropTarget extends DropTarget {
 
   private void showInsert(DNDEvent event, Element elem, boolean before) {
     Insert insert = Insert.get();
-    insert.show();
+    insert.show(elem);
     Rectangle rect = El.fly(elem).getBounds();
     int y = before ? rect.y - 2 : (rect.y + rect.height - 4);
     insert.setBounds(rect.x, y, rect.width, 6);

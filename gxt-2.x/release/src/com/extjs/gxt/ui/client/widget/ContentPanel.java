@@ -20,9 +20,11 @@ import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.util.IconHelper;
 import com.extjs.gxt.ui.client.util.Markup;
+import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.extjs.gxt.ui.client.widget.button.ToolButton;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -166,12 +168,13 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
    * Creates a new panel instance.
    */
   public ContentPanel() {
-    super();
     baseStyle = "x-panel";
     fbar = new ButtonBar();
+    fbar.setParent(this);
     fbar.setMinButtonWidth(minButtonWidth);
     fbar.setAlignment(buttonAlign);
     head = new Header();
+    head.setParent(this);
     disabledStyle = null;
     setDeferHeight(true);
   }
@@ -202,11 +205,9 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
    */
   public void collapse() {
     if (rendered) {
-      if (!collapsed && !animating) {
-        if (fireEvent(Events.BeforeCollapse)) {
-          hideShadow();
-          onCollapse();
-        }
+      if (!collapsed && !animating && fireEvent(Events.BeforeCollapse)) {
+        hideShadow();
+        onCollapse();
       }
     } else {
       collapsed = true;
@@ -219,11 +220,13 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
    * expanding.
    */
   public void expand() {
-    if (rendered && collapsed) {
-      if (fireEvent(Events.BeforeExpand)) {
+    if (rendered ) {
+      if (collapsed && !animating  && fireEvent(Events.BeforeExpand)) {
         hideShadow();
         onExpand();
       }
+    } else {
+      collapsed = false;
     }
   }
 
@@ -348,7 +351,7 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
   public int getFrameHeight() {
     int h = el().getFrameWidth("tb") + bwrap.getFrameWidth("tb");
     if (frame) {
-      Element hd = el().firstChild().dom;
+      Element hd = el().dom.getFirstChildElement().cast();
       Element ft = bwrap.dom.getLastChild().cast();
       h += (fly(hd).getHeight() + fly(ft).getHeight());
       Element mc = bwrap.subChild(3).dom;
@@ -375,7 +378,7 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
   public int getFrameWidth() {
     int w = el().getFrameWidth("lr") + bwrap.getFrameWidth("lr");
     if (frame) {
-      Element l = bwrap.firstChild().dom;
+      Element l = bwrap.dom.getFirstChildElement().cast();
       w += (fly(l).getFrameWidth("l") + fly(l).firstChild().getFrameWidth("r"));
       Element mc = bwrap.subChild(3).dom;
       w += fly(mc).getFrameWidth("lr");
@@ -417,7 +420,7 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
    * @return the inner height
    */
   public int getInnerHeight() {
-    return getSize().height - getFrameHeight();
+    return getHeight() - getFrameHeight();
   }
 
   /**
@@ -427,7 +430,7 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
    * @return the body width
    */
   public int getInnerWidth() {
-    return this.getSize().width - this.getFrameWidth();
+    return getWidth() - getFrameWidth();
   }
 
   @Override
@@ -569,7 +572,14 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
    */
   public void setBottomComponent(Component bottomComponent) {
     assertPreRender();
+    if(this.bottomComponent != null){
+      this.bottomComponent.removeFromParent();
+      this.bottomComponent.setParent(null);
+    }
     this.bottomComponent = bottomComponent;
+    if(this.bottomComponent != null){
+      this.bottomComponent.setParent(this);
+    }
   }
 
   /**
@@ -725,7 +735,14 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
    */
   public void setTopComponent(Component topComponent) {
     assertPreRender();
+    if(this.topComponent != null){
+      this.topComponent.removeFromParent();
+      this.topComponent.setParent(null);
+    }
     this.topComponent = topComponent;
+    if(this.topComponent != null){
+      this.topComponent.setParent(this);
+    }
   }
 
   /**
@@ -737,14 +754,20 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
   public Frame setUrl(String url) {
     Frame f = new Frame(url);
     f.getElement().setPropertyInt("frameBorder", 0);
-    f.setSize("100%", "100%");
     removeAll();
-    add(new WidgetComponent(f));
+    setLayout(new FitLayout());
+    add(f);
+    layout();
     return f;
+  }
+
+  protected Size adjustBodySize() {
+    return new Size(0, 0);
   }
 
   protected void afterCollapse() {
     addStyleName(collapseStyle);
+    removeStyleName(baseStyle + "-animated");
     collapsed = true;
     animating = false;
     sync(true);
@@ -754,6 +777,7 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
 
   protected void afterExpand() {
     removeStyleName(collapseStyle);
+    removeStyleName(baseStyle + "-animated");
     collapsed = false;
     animating = false;
     sync(true);
@@ -775,7 +799,9 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
   @Override
   protected void doAttachChildren() {
     super.doAttachChildren();
-    ComponentHelper.doAttach(head);
+    if (head.isRendered()) {
+      ComponentHelper.doAttach(head);
+    }
     if (fbar.isRendered()) {
       ComponentHelper.doAttach(fbar);
     }
@@ -786,10 +812,49 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
   @Override
   protected void doDetachChildren() {
     super.doDetachChildren();
-    ComponentHelper.doDetach(head);
+    if (head.isRendered()) {
+      ComponentHelper.doDetach(head);
+    }
     ComponentHelper.doDetach(fbar);
     ComponentHelper.doDetach(topComponent);
     ComponentHelper.doDetach(bottomComponent);
+  }
+
+  // internal, used for performance reasons
+  protected Size getFrameSize() {
+    Size elFrameSize = el().getFrameSize();
+    Size bwrapFrameSize = bwrap.getFrameSize();
+
+    Size mcFrameSize = null;
+    if (frame) {
+      Element mc = bwrap.subChild(3).dom;
+      mcFrameSize = fly(mc).getFrameSize();
+    }
+
+    int w = elFrameSize.width + bwrapFrameSize.width;
+    if (frame) {
+      Element l = bwrap.dom.getFirstChildElement().cast();
+      w += (fly(l).getFrameWidth("l") + fly(l).firstChild().getFrameWidth("r"));
+      w += mcFrameSize.width;
+    }
+
+    int h = elFrameSize.height + bwrapFrameSize.height;
+    if (frame) {
+      Element hd = el().dom.getFirstChildElement().cast();
+      Element ft = bwrap.dom.getLastChild().cast();
+      h += (fly(hd).getHeight() + fly(ft).getHeight());
+      h += mcFrameSize.height;
+    } else {
+      if (head != null) {
+        h += head.getOffsetHeight();
+      }
+      if (foot != null) {
+        h += foot.getHeight();
+      }
+    }
+    h += (tbar != null ? tbar.getHeight() : 0) + (bbar != null ? bbar.getHeight() : 0);
+
+    return new Size(w, h);
   }
 
   protected void initTools() {
@@ -806,14 +871,14 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
   }
 
   protected void layoutBars() {
-    if (footer && fbar.getItemCount() > 0) {
-      fbar.layout(true);
+    if (footer && !fbar.layoutExecuted) {
+      fbar.layout(false);
     }
-    if (topComponent instanceof Container) {
-      ((Container<?>) topComponent).layout(true);
+    if (topComponent instanceof Container<?> && !((Container<?>) topComponent).layoutExecuted) {
+      ((Container<?>) topComponent).layout(false);
     }
-    if (bottomComponent instanceof Container) {
-      ((Container<?>) bottomComponent).layout(true);
+    if (bottomComponent instanceof Container<?> && !((Container<?>) bottomComponent).layoutExecuted) {
+      ((Container<?>) bottomComponent).layout(false);
     }
   }
 
@@ -824,8 +889,9 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
   }
 
   protected void onCollapse() {
-    if (animCollapse && !animating) {
+    if (animCollapse) {
       animating = true;
+      addStyleName(baseStyle + "-animated");
       bwrap.slideOut(Direction.UP, new FxConfig(300, new Listener<FxEvent>() {
         public void handleEvent(FxEvent fe) {
           afterCollapse();
@@ -848,8 +914,9 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
   }
 
   protected void onExpand() {
-    if (animCollapse && !animating) {
+    if (animCollapse) {
       animating = true;
+      addStyleName(baseStyle + "-animated");
       bwrap.slideIn(Direction.DOWN, new FxConfig(300, new Listener<FxEvent>() {
         public void handleEvent(FxEvent fe) {
           afterExpand();
@@ -981,16 +1048,19 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
       setAnimCollapse(anim);
     }
 
+    // early render
+    layoutBars();
   }
 
   @Override
   protected void onResize(int width, int height) {
-    layoutBars();
     super.onResize(width, height);
+    Size frameSize = getFrameSize();
+    Size adjustBodySize = adjustBodySize();
     if (isAutoWidth()) {
       getLayoutTarget().setWidth("auto");
     } else if (width != -1) {
-      width -= getFrameWidth();
+      width -= frameSize.width;
       if (tbar != null) {
         tbar.setWidth(width, true);
         if (topComponent instanceof BoxComponent) {
@@ -1006,18 +1076,16 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
       if (fbar.isRendered()) {
         fbar.setWidth(width - fbar.el().getParent().getFrameWidth("lr"));
       }
-      getLayoutTarget().setWidth(width, true);
+      getLayoutTarget().setWidth(width - adjustBodySize.width, true);
     }
-    if (!collapsed) {
-      if (isAutoHeight()) {
-        getLayoutTarget().setHeight("auto");
-      } else if (height != -1) {
-        height -= getFrameHeight();
-        getLayoutTarget().setHeight(height, true);
-      }
-      if (mask) {
-        mask(maskMessage, maskMessageStyleName);
-      }
+    if (isAutoHeight()) {
+      getLayoutTarget().setHeight("auto");
+    } else if (height != -1) {
+      height -= frameSize.height;
+      getLayoutTarget().setHeight(height - adjustBodySize.height, true);
+    }
+    if (mask) {
+      mask(maskMessage, maskMessageStyleName);
     }
   }
 

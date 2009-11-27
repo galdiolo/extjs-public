@@ -455,19 +455,19 @@ public class ChartModel extends BaseModel {
 
   public void updateYScale() {
     if (scaleProvider != null) {
-  
-      double max = 0;
-      double min = 0;
+
+      Double max = null;
+      Double min = null;
       for (ChartConfig config : getChartConfigs()) {
         DataProvider provider = config.getDataProvider();
         if (provider != null) {
-          max = Math.max(max, provider.getMaxYValue());
-          min = Math.min(min, provider.getMinYValue());
+          max = max == null ? provider.getMaxYValue() : Math.max(max, provider.getMaxYValue());
+          min = min == null ? provider.getMinYValue() : Math.min(min, provider.getMinYValue());
+          provider.maxYValue = null;
+          provider.minYValue = null;
         }
-        provider.maxYValue = 0;
-        provider.minYValue = 0;
       }
-  
+
       Scale scale = scaleProvider.calcScale(min, max);
       YAxis yAxis = getYAxis();
       if (yAxis == null) {

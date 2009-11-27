@@ -242,7 +242,7 @@ public class Portal extends Container<LayoutContainer> {
    * 
    * @param adjust true to adjust
    */
-  public void setAjustForScroll(boolean adjust) {
+  public void setAdjustForScroll(boolean adjust) {
     cl.setAdjustForScroll(adjust);
   }
 

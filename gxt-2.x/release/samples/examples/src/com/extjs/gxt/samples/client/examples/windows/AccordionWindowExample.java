@@ -7,7 +7,7 @@
  */
 package com.extjs.gxt.samples.client.examples.windows;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.data.ModelData;
@@ -27,11 +27,14 @@ import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 
 public class AccordionWindowExample extends LayoutContainer {
 
-  public AccordionWindowExample() {
+  @Override
+  protected void onRender(Element parent, int pos) {
+    super.onRender(parent, pos);
     setLayout(new FlowLayout(10));
 
     final Window complex = new Window();
@@ -42,24 +45,25 @@ public class AccordionWindowExample extends LayoutContainer {
 
     ToolBar toolBar = new ToolBar();
     Button item = new Button();
-    item.setIcon(Examples.ICONS.connect());
+    item.setIcon(Resources.ICONS.connect());
     toolBar.add(item);
 
     toolBar.add(new SeparatorToolItem());
     complex.setTopComponent(toolBar);
 
     item = new Button();
-    item.setIcon(Examples.ICONS.user_add());
+    item.setIcon(Resources.ICONS.user_add());
     toolBar.add(item);
 
     item = new Button();
-    item.setIcon(Examples.ICONS.user_delete());
+    item.setIcon(Resources.ICONS.user_delete());
     toolBar.add(item);
 
-    complex.setIcon(Examples.ICONS.accordion());
+    complex.setIcon(Resources.ICONS.accordion());
     complex.setLayout(new AccordionLayout());
 
     ContentPanel cp = new ContentPanel();
+    cp.setAnimCollapse(false);
     cp.setHeading("Online Users");
     cp.setLayout(new FitLayout());
     cp.getHeader().addTool(new ToolButton("x-tool-refresh"));
@@ -102,18 +106,21 @@ public class AccordionWindowExample extends LayoutContainer {
     cp.add(tree);
 
     cp = new ContentPanel();
+    cp.setAnimCollapse(false);
     cp.setHeading("Settings");
     cp.setBodyStyleName("pad-text");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     complex.add(cp);
 
     cp = new ContentPanel();
+    cp.setAnimCollapse(false);
     cp.setHeading("Stuff");
     cp.setBodyStyleName("pad-text");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     complex.add(cp);
 
     cp = new ContentPanel();
+    cp.setAnimCollapse(false);
     cp.setHeading("More Stuff");
     cp.setBodyStyleName("pad-text");
     cp.addText(TestData.DUMMY_TEXT_SHORT);

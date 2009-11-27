@@ -15,6 +15,8 @@ import com.extjs.gxt.ui.client.event.DomEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.PreviewEvent;
+import com.extjs.gxt.ui.client.util.BaseEventPreview;
 import com.extjs.gxt.ui.client.util.DateWrapper;
 import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.util.KeyNav;
@@ -22,6 +24,7 @@ import com.extjs.gxt.ui.client.widget.DatePicker;
 import com.extjs.gxt.ui.client.widget.menu.DateMenu;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Event;
 
 /**
  * Provides a date input field with a {@link DatePicker} dropdown and automatic
@@ -116,11 +119,13 @@ public class DateField extends TriggerField<Date> {
   private Date maxValue;
   private DateMenu menu;
   private boolean formatValue;
+  private BaseEventPreview eventPreview;
 
   /**
    * Creates a new date field.
    */
   public DateField() {
+    super();
     autoValidate = false;
     propertyEditor = new DateTimePropertyEditor();
     messages = new DateFieldMessages();
@@ -146,6 +151,7 @@ public class DateField extends TriggerField<Date> {
       });
       menu.addListener(Events.Hide, new Listener<ComponentEvent>() {
         public void handleEvent(ComponentEvent be) {
+          eventPreview.remove();
           focus();
         }
       });
@@ -175,7 +181,7 @@ public class DateField extends TriggerField<Date> {
   public Date getMinValue() {
     return minValue;
   }
-  
+
   @Override
   public DateTimePropertyEditor getPropertyEditor() {
     return (DateTimePropertyEditor) propertyEditor;
@@ -224,11 +230,6 @@ public class DateField extends TriggerField<Date> {
     }
     this.minValue = minValue;
   }
-  
-  @Override
-  public void setRawValue(String value) {
-    super.setRawValue(value);
-  }
 
   protected void expand() {
     DatePicker picker = getDatePicker();
@@ -240,11 +241,14 @@ public class DateField extends TriggerField<Date> {
     } else {
       d = new Date();
     }
-    picker.setValue(d, true);
+
     picker.setMinDate(minValue);
     picker.setMaxDate(maxValue);
+    picker.setValue(d, true);
 
-    menu.show(wrap.dom, "tl-bl?");
+    eventPreview.add();
+
+    menu.show(el().dom, "tl-bl?");
     menu.focus();
   }
 
@@ -255,14 +259,17 @@ public class DateField extends TriggerField<Date> {
     }
   }
 
+  protected void collapseIf(PreviewEvent pe) {
+    if (!menu.el().isOrHasChild(pe.getTarget()) && !el().isOrHasChild(pe.getTarget())) {
+      menu.hide();
+    }
+  }
+
   @Override
-  protected void onKeyPress(FieldEvent fe) {
-    super.onKeyPress(fe);
-    int code = fe.getKeyCode();
-    if (code == 8 || code == 9) {
-      if (menu != null && menu.isAttached()) {
-        menu.hide();
-      }
+  protected void onDetach() {
+    super.onDetach();
+    if (eventPreview != null) {
+      eventPreview.remove();
     }
   }
 
@@ -270,9 +277,31 @@ public class DateField extends TriggerField<Date> {
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
 
+    eventPreview = new BaseEventPreview() {
+      @Override
+      protected boolean onPreview(PreviewEvent pe) {
+        switch (pe.getType().getEventCode()) {
+          case Event.ONSCROLL:
+          case Event.ONMOUSEWHEEL:
+          case Event.ONMOUSEDOWN:
+            collapseIf(pe);
+        }
+        return true;
+      }
+    };
+    eventPreview.setAutoHide(false);
+
     new KeyNav<FieldEvent>(this) {
+      @Override
       public void onDown(FieldEvent fe) {
         DateField.this.onDown(fe);
+      }
+
+      @Override
+      public void onEsc(FieldEvent fe) {
+        if (menu != null && menu.isAttached()) {
+          menu.hide();
+        }
       }
     };
   }
@@ -280,17 +309,14 @@ public class DateField extends TriggerField<Date> {
   @Override
   protected void onTriggerClick(ComponentEvent ce) {
     super.onTriggerClick(ce);
-    if (isReadOnly()) {
-      return;
-    }
-
     expand();
-    
+
     getInputEl().focus();
   }
 
-  protected boolean validateBlur(DomEvent e,Element target){
-      return menu == null|| (menu != null && !menu.isVisible());
+  @Override
+  protected boolean validateBlur(DomEvent e, Element target) {
+    return menu == null || (menu != null && !menu.isVisible());
   }
 
   @Override
@@ -316,7 +342,7 @@ public class DateField extends TriggerField<Date> {
     if (date == null) {
       String error = null;
       if (getMessages().getInvalidText() != null) {
-        error = Format.substitute(getMessages().getInvalidText(), 0);
+        error = Format.substitute(getMessages().getInvalidText(), value, format.getPattern().toUpperCase());
       } else {
         error = GXT.MESSAGES.dateField_invalidText(value, format.getPattern().toUpperCase());
       }
@@ -346,7 +372,7 @@ public class DateField extends TriggerField<Date> {
     }
 
     if (formatValue && getPropertyEditor().getFormat() != null) {
-      setRawValue(getPropertyEditor().getFormat().format(date));
+      setRawValue(getPropertyEditor().getStringValue(date));
     }
 
     return true;

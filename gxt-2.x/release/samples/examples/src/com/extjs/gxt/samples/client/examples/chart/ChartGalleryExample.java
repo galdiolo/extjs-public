@@ -90,13 +90,10 @@ public class ChartGalleryExample extends LayoutContainer {
     vLayout.setVBoxLayoutAlign(VBoxLayoutAlign.STRETCH);
     lc.setLayout(vLayout);
 
-    VBoxLayoutData vFlex = new VBoxLayoutData();
-    vFlex.setFlex(1);
-
     FieldSet controls = new FieldSet();
     controls.setHeading("Controls");
     FormLayout fl = new FormLayout();
-    fl.setLabelWidth(120);
+    fl.setLabelWidth(125);
     controls.setLayout(fl);
 
     Slider segments = new Slider();
@@ -135,7 +132,7 @@ public class ChartGalleryExample extends LayoutContainer {
     updFld.setFieldLabel("Update Interval (ms)");
     controls.add(updFld);
 
-    lc.add(controls, vFlex);
+    lc.add(controls);
 
     FieldSet gallery = new FieldSet();
     gallery.setHeading("Gallery");
@@ -177,8 +174,8 @@ public class ChartGalleryExample extends LayoutContainer {
         });
     gallery.add(view, new FitData(0, 0, 20, 0));
 
-    vFlex = new VBoxLayoutData();
-    vFlex.setFlex(4);
+    VBoxLayoutData vFlex = new VBoxLayoutData();
+    vFlex.setFlex(1);
     lc.add(gallery, vFlex);
     return lc;
   }

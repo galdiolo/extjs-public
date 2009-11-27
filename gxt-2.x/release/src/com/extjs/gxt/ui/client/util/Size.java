@@ -37,11 +37,14 @@ public class Size {
   }
 
   public boolean equals(Object obj) {
-    Size s = (Size) obj;
-    if (width == s.width && height == s.height) {
-      return true;
+    if (obj instanceof Size) {
+      Size s = (Size) obj;
+      if (width == s.width && height == s.height) {
+        return true;
+      }
+      return false;
     }
-    return false;
+    return super.equals(obj);
   }
 
 }

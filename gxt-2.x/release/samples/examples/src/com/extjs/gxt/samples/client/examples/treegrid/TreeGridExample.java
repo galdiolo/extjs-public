@@ -9,7 +9,7 @@ package com.extjs.gxt.samples.client.examples.treegrid;
 
 import java.util.Arrays;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Folder;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -30,19 +30,20 @@ public class TreeGridExample extends LayoutContainer {
   @Override
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
-    
+
     setLayout(new FlowLayout(10));
-    
+
     Folder model = TestData.getTreeModel();
 
     TreeStore<ModelData> store = new TreeStore<ModelData>();
+
     store.add(model.getChildren(), true);
 
     ColumnConfig name = new ColumnConfig("name", "Name", 100);
     name.setRenderer(new TreeGridCellRenderer<ModelData>());
-    
+
     ColumnConfig date = new ColumnConfig("author", "Author", 100);
-    
+
     ColumnConfig size = new ColumnConfig("genre", "Genre", 100);
 
     ColumnModel cm = new ColumnModel(Arrays.asList(name, date, size));
@@ -57,8 +58,7 @@ public class TreeGridExample extends LayoutContainer {
 
     TreeGrid<ModelData> tree = new TreeGrid<ModelData>(store, cm);
     tree.setBorders(true);
-    tree.getStyle().setLeafIcon(Examples.ICONS.music());
-    tree.setSize(400, 400);
+    tree.getStyle().setLeafIcon(Resources.ICONS.music());
     tree.setAutoExpandColumn("name");
     tree.setTrackMouseOver(false);
 

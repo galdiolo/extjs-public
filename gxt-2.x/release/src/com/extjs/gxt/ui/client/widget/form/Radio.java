@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.widget.form;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FieldEvent;
+import com.extjs.gxt.ui.client.util.Util;
 
 /**
  * Single radio field. Same as Checkbox, but provided as a convenience for
@@ -55,7 +56,7 @@ public class Radio extends CheckBox {
   @Override
   protected void fireChangeEvent(Object oldValue, Object value) {
     super.fireChangeEvent(oldValue, value);
-    if ((Boolean) value && oldValue != value && group != null) {
+    if (!Util.equalWithNull(oldValue, value) && group != null) {
       FieldEvent e = new FieldEvent(group);
       e.setOldValue(oldValue);
       e.setValue(value);

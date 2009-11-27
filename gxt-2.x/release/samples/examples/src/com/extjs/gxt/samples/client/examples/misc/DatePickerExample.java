@@ -16,10 +16,13 @@ import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.user.client.Element;
 
 public class DatePickerExample extends LayoutContainer {
 
-  public DatePickerExample() {
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
     setLayout(new FlowLayout(10));
     final DatePicker picker = new DatePicker();
     picker.addListener(Events.Select, new Listener<ComponentEvent>() {

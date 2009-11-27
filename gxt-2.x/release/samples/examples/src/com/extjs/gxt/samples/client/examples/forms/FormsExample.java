@@ -42,16 +42,14 @@ public class FormsExample extends LayoutContainer {
 
   private VerticalPanel vp;
 
-  private FormData formData = new FormData("-20");
-
-  public FormsExample() {
-    vp = new VerticalPanel();
-    vp.setSpacing(10);
-  }
+  private FormData formData;
 
   @Override
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
+    formData = new FormData("-20");
+    vp = new VerticalPanel();
+    vp.setSpacing(10);
     createForm1();
     createForm2();
     add(vp);
@@ -126,19 +124,30 @@ public class FormsExample extends LayoutContainer {
     simple.add(checkGroup, formData);
 
     Radio radio = new Radio();
-    radio.setName("radio");
     radio.setBoxLabel("Red");
     radio.setValue(true);
 
     Radio radio2 = new Radio();
-    radio2.setName("radio");
     radio2.setBoxLabel("Blue");
 
-    RadioGroup radioGroup = new RadioGroup("test");
+    RadioGroup radioGroup = new RadioGroup();
     radioGroup.setFieldLabel("Favorite Color");
     radioGroup.add(radio);
     radioGroup.add(radio2);
     simple.add(radioGroup, formData);
+
+    Radio radio3 = new Radio();
+    radio3.setBoxLabel("Apple");
+    radio3.setValue(true);
+
+    Radio radio4 = new Radio();
+    radio4.setBoxLabel("Banana");
+
+    RadioGroup radioGroup2 = new RadioGroup();
+    radioGroup2.setFieldLabel("Favorite Fruit");
+    radioGroup2.add(radio3);
+    radioGroup2.add(radio4);
+    simple.add(radioGroup2, formData);
 
     TextArea description = new TextArea();
     description.setPreventScrollbars(true);

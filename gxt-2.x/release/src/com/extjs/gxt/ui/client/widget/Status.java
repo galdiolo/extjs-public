@@ -96,18 +96,20 @@ public class Status extends BoxComponent {
    * @param iconStyle the CSS style name
    */
   public void setIconStyle(String iconStyle) {
-    if (rendered) {
-      if (this.iconStyle != null) {
-        textEl.removeStyleName("x-status-icon");
-        textEl.removeStyleName(this.iconStyle);
+    if (this.iconStyle != iconStyle) {
+      if (rendered) {
+        if (this.iconStyle != null) {
+          textEl.removeStyleName("x-status-icon");
+          textEl.removeStyleName(this.iconStyle);
+        }
+        if (iconStyle != null) {
+          textEl.addStyleName("x-status-icon");
+          textEl.addStyleName(iconStyle);
+        }
+        autoWidth();
       }
-      if (iconStyle != null) {
-        textEl.addStyleName("x-status-icon");
-        textEl.addStyleName(iconStyle);
-      }
-      autoWidth();
+      this.iconStyle = iconStyle;
     }
-    this.iconStyle = iconStyle;
   }
 
   /**
@@ -127,10 +129,12 @@ public class Status extends BoxComponent {
    * @param text the text
    */
   public void setText(String text) {
-    this.text = text;
-    if (rendered) {
-      textEl.update((text == null || text.length() == 0) ? "&nbsp;" : text);
-      autoWidth();
+    if (this.text != text) {
+      this.text = text;
+      if (rendered) {
+        textEl.update((text == null || text.length() == 0) ? "&nbsp;" : text);
+        autoWidth();
+      }
     }
   }
 
@@ -142,7 +146,7 @@ public class Status extends BoxComponent {
           textEl.clip();
           TextMetrics.get().bind(textEl.dom);
           int adj = iconStyle != null ? 25 : 0;
-          int w = TextMetrics.get().getWidth(text) + adj;
+          int w = TextMetrics.get().getWidth(text) + adj + 5;
           textEl.setWidth(w, true);
         }
       }
@@ -157,6 +161,11 @@ public class Status extends BoxComponent {
     super.onRender(target, index);
     disableTextSelection(true);
     setBox(box);
+    
+    String text = this.text;
+    String iconStyle = this.iconStyle;
+    this.text = null;
+    this.iconStyle = null;
     setStatus(text, iconStyle);
   }
 }

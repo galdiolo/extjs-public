@@ -61,7 +61,7 @@ public class RadioGroup extends MultiField<Radio> {
     messages = new RadioGroupMessages();
     setSpacing(5);
   }
-  
+
   public void add(Radio radio) {
     super.add(radio);
     radio.group = this;
@@ -79,7 +79,7 @@ public class RadioGroup extends MultiField<Radio> {
   @Override
   public Radio getValue() {
     for (int i = 0; i < getAll().size(); i++) {
-      Radio r = (Radio)getAll().get(i);
+      Radio r = (Radio) getAll().get(i);
       if (r.getValue()) {
         return r;
       }
@@ -101,7 +101,7 @@ public class RadioGroup extends MultiField<Radio> {
     if (selectionRequired) {
       boolean sel = false;
       for (int i = 0; i < getAll().size(); i++) {
-        Radio r = (Radio)getAll().get(i);
+        Radio r = (Radio) getAll().get(i);
         if (r.getValue()) {
           sel = true;
         }
@@ -116,7 +116,7 @@ public class RadioGroup extends MultiField<Radio> {
       }
     }
     for (int i = 0; i < getAll().size(); i++) {
-      Radio radio = (Radio)getAll().get(i);
+      Radio radio = (Radio) getAll().get(i);
       if (!radio.isValid(preventMark)) {
         return false;
       }
@@ -137,7 +137,7 @@ public class RadioGroup extends MultiField<Radio> {
   @Override
   public void setValue(Radio value) {
     for (int i = 0; i < getAll().size(); i++) {
-      Radio r = (Radio)getAll().get(i);
+      Radio r = (Radio) getAll().get(i);
       if (r.equals(value)) {
         r.setValue(true);
       }
@@ -146,7 +146,7 @@ public class RadioGroup extends MultiField<Radio> {
 
   protected void onRadioClick(Radio radio) {
     for (int i = 0; i < getAll().size(); i++) {
-      Radio r = (Radio)getAll().get(i);
+      Radio r = (Radio) getAll().get(i);
       if (r == radio) {
         r.setValue(true);
       } else {
@@ -157,7 +157,7 @@ public class RadioGroup extends MultiField<Radio> {
 
   protected void onRadioSelected(Radio radio) {
     for (int i = 0; i < getAll().size(); i++) {
-      Radio r = (Radio)getAll().get(i);
+      Radio r = (Radio) getAll().get(i);
       if (r != radio && r.getValue()) {
         r.setValue(false);
       }

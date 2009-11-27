@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.widget.form;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -56,6 +57,7 @@ public class CheckBox extends Field<Boolean> {
     setFireChangeEventOnSetValue(true);
     value = false;
     propertyEditor = new BooleanPropertyEditor();
+    ensureVisibilityOnSizing = true;
   }
 
   @Override
@@ -73,6 +75,14 @@ public class CheckBox extends Field<Boolean> {
       return value.toString();
     }
     return String.valueOf(((InputElement) getInputEl().dom.cast()).isChecked());
+  }
+
+  @Override
+  public Boolean getValue() {
+    if (!isAttached() && rendered) {
+      return ((InputElement) input.dom.cast()).isDefaultChecked();
+    }
+    return super.getValue();
   }
 
   /**
@@ -109,6 +119,18 @@ public class CheckBox extends Field<Boolean> {
     ((InputElement) getInputEl().dom.cast()).setChecked(b);
   }
 
+  @Override
+  public void setValue(Boolean value) {
+    if (value == null) {
+      value = false;
+    }
+    focusValue = value;
+    super.setValue(value);
+    if (rendered) {
+      ((InputElement) input.dom.cast()).setDefaultChecked(value);
+    }
+  }
+
   /**
    * Sets a new value attribute to the input element
    * 
@@ -121,12 +143,28 @@ public class CheckBox extends Field<Boolean> {
     }
   }
 
+  @Override
+  protected void afterRender() {
+    super.afterRender();
+    alignElements();
+  }
+
   protected void alignElements() {
     if (boxLabel == null) {
       input.alignTo(getElement(), "c-c", null);
+      if (GXT.isIE || GXT.isOpera) {
+        input.alignTo(getElement(), "c-c", null);
+      }
     } else {
       input.alignTo(getElement(), "l-l", new int[] {0, 0});
-      boxLabelEl.alignTo(input.dom, "l-r", new int[] {5, 0});
+      if (GXT.isIE || GXT.isOpera) {
+        input.alignTo(getElement(), "l-l", new int[] {0, 0});
+      }
+
+      boxLabelEl.alignTo(input.dom, "l-r", new int[] {5, GXT.isIE ? -1 : 0});
+      if (GXT.isIE || GXT.isOpera) {
+        boxLabelEl.alignTo(input.dom, "l-r", new int[] {5, GXT.isIE ? -1 : 0});
+      }
     }
   }
 
@@ -146,18 +184,13 @@ public class CheckBox extends Field<Boolean> {
   }
 
   @Override
-  protected void initValue() {
-    if (value != null) {
-      setRawValue(value.toString());
-    }
-  }
-
-  @Override
   protected void onClick(ComponentEvent ce) {
+    super.onClick(ce);
     if (readOnly) {
       ce.stopEvent();
       return;
     }
+
     boolean v = getInputEl().dom.getPropertyBoolean("checked");
     setValue(v);
   }
@@ -171,6 +204,7 @@ public class CheckBox extends Field<Boolean> {
     }
 
     input.setId(XDOM.getUniqueId());
+    input.makePositionable();
 
     wrap = new El(DOM.createDiv());
     wrap.dom.setPropertyString("hideFocus", "hideFocus");
@@ -178,13 +212,13 @@ public class CheckBox extends Field<Boolean> {
     wrap.dom.appendChild(input.dom);
 
     setElement(wrap.dom, target, index);
-
+    wrap.makePositionable();
     if (boxLabel != null) {
       boxLabelEl = new El(DOM.createLabel());
-      boxLabelEl.setStyleAttribute("position", "static");
       boxLabelEl.setElementAttribute("for", input.getId());
       boxLabelEl.setElementAttribute("htmlFor", input.getId());
       boxLabelEl.dom.setClassName("x-form-cb-label");
+      boxLabelEl.makePositionable();
       wrap.dom.appendChild(boxLabelEl.dom);
       setBoxLabel(boxLabel);
     }
@@ -196,8 +230,12 @@ public class CheckBox extends Field<Boolean> {
     focusStyle = null;
   }
 
+  @Override
   protected void onResize(int width, int height) {
     super.onResize(width, height);
-    alignElements();
+    if (boxLabel == null) {
+      // center it again
+      alignElements();
+    }
   }
 }

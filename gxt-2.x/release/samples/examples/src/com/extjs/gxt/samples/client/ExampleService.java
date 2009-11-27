@@ -13,6 +13,7 @@ import com.extjs.gxt.samples.client.examples.model.BeanPost;
 import com.extjs.gxt.samples.client.examples.model.Photo;
 import com.extjs.gxt.samples.client.examples.model.Post;
 import com.extjs.gxt.samples.resources.client.model.Customer;
+import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.PagingLoadConfig;
 import com.extjs.gxt.ui.client.data.PagingLoadResult;
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -26,5 +27,7 @@ public interface ExampleService extends RemoteService {
   public List<Customer> getCustomers();
 
   public List<Photo> getPhotos();
+
+  public PagingLoadResult<ModelData> getLiveGridModels(PagingLoadConfig config);
 
 }

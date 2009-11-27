@@ -33,9 +33,7 @@ public class TreeGridCellRenderer<M extends ModelData> implements GridCellRender
     AbstractImagePrototype iconStyle = tree.calculateIconStyle(model);
     int level = ts.getDepth(model);
     
-    
-    
-    String text = model.get(property);
+    String text = String.valueOf(model.get(property));
     String id = tree.findNode(model).id;
     return tree.getTreeView().getTemplate(model, id, text, iconStyle, false, j, level - 1);
   }

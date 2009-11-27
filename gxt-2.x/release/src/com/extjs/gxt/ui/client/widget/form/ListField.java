@@ -19,6 +19,7 @@ import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.event.SelectionProvider;
 import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.ListView;
 import com.google.gwt.user.client.DOM;
@@ -62,8 +63,6 @@ public class ListField<D extends ModelData> extends Field<D> implements Selectio
 
   protected ListView<D> listView;
   protected ListStore<D> store;
-  protected int listHeight = 100;
-  protected int listWidth = 200;
 
   private XTemplate template;
   private String listStyle = "x-combo-list";
@@ -74,11 +73,12 @@ public class ListField<D extends ModelData> extends Field<D> implements Selectio
 
   public ListField() {
     listView = new ListView<D>();
+    setSize(200, 100);
     setPropertyEditor(new ListModelPropertyEditor<D>());
   }
 
   public void addSelectionChangedListener(SelectionChangedListener<D> listener) {
-    addListener(Events.SelectionChange, listener);
+    listView.getSelectionModel().addListener(Events.SelectionChange, listener);
   }
 
   @Override
@@ -166,7 +166,7 @@ public class ListField<D extends ModelData> extends Field<D> implements Selectio
   }
 
   public void removeSelectionListener(SelectionChangedListener<D> listener) {
-    removeListener(Events.SelectionChange, listener);
+    listView.getSelectionModel().removeListener(Events.SelectionChange, listener);
   }
 
   /**
@@ -189,7 +189,7 @@ public class ListField<D extends ModelData> extends Field<D> implements Selectio
 
   @Override
   public void setPropertyEditor(PropertyEditor<D> propertyEditor) {
-    assert propertyEditor instanceof ListModelPropertyEditor : "PropertyEditor must be a ModelPropertyEditor instance";
+    assert propertyEditor instanceof ListModelPropertyEditor<?> : "PropertyEditor must be a ModelPropertyEditor instance";
     super.setPropertyEditor(propertyEditor);
   }
 
@@ -265,70 +265,57 @@ public class ListField<D extends ModelData> extends Field<D> implements Selectio
   @Override
   protected void onClick(ComponentEvent ce) {
     super.onClick(ce);
-    input.focus();
   }
 
   @Override
   protected void onFocus(ComponentEvent ce) {
     super.onFocus(ce);
+    listView.focus();
   }
 
   @Override
   protected void onRender(Element parent, int index) {
     setElement(DOM.createDiv(), parent, index);
-    setStyleName("x-form-list");
-
-    if (width != null) {
-      setWidth(width);
-    } else {
-      setWidth(listWidth);
-    }
+    addStyleName("x-form-list");
 
     input = new El(DOM.createInputText());
     input.dom.getStyle().setProperty("left", "-500");
     input.dom.getStyle().setProperty("position", "absolute");
     getElement().appendChild(input.dom);
     if (template == null) {
-      String html = "<tpl for=\".\"><div class='x-combo-list-item'>{" + getDisplayField()
-          + "}</div></tpl>";
+      String html = "<tpl for=\".\"><div class='x-combo-list-item'>{" + getDisplayField() + "}</div></tpl>";
       template = XTemplate.create(html);
     }
     listView.setBorders(false);
     listView.setTemplate(template);
-    listView.setStyleName(listStyle);
+    listView.addStyleName(listStyle);
     listView.setItemSelector(itemSelector != null ? itemSelector : ".x-combo-list-item");
     listView.setStore(store);
 
     listView.setSelectStyle(selectedStyle);
     listView.setOverStyle("x-combo-over");
 
-    listView.getSelectionModel().addListener(Events.SelectionChange,
-        new Listener<SelectionChangedEvent<D>>() {
-          public void handleEvent(SelectionChangedEvent<D> se) {
-            onSelectionChange(se.getSelection());
-          }
-        });
-
-    if (height != null) {
-      listView.setHeight(height);
-    } else {
-      listView.setHeight(listHeight);
-    }
+    listView.getSelectionModel().addListener(Events.SelectionChange, new Listener<SelectionChangedEvent<D>>() {
+      public void handleEvent(SelectionChangedEvent<D> se) {
+        onSelectionChange(se.getSelection());
+      }
+    });
 
     listView.render(getElement());
     disableTextSelection(true);
     DOM.sinkEvents(input.dom, Event.FOCUSEVENTS);
     sinkEvents(Event.ONCLICK);
-    
+
     super.onRender(parent, index);
   }
 
   @Override
   protected void onResize(int width, int height) {
     super.onResize(width, height);
-    if (height != -1) {
-      listView.setHeight(height);
-    }
+    Size frameWidth = el().getFrameSize();
+    width -= frameWidth.width;
+    height -= frameWidth.height;
+    listView.setSize(width, height);
   }
 
   protected void onSelectionChange(List<D> sel) {

@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import com.extjs.gxt.ui.client.util.Util;
+
 /**
  * <code>Models</code> are generic data structures that notify listeners when
  * changed. The structure allows a form of 'introspection' as all property names
@@ -99,6 +101,10 @@ public class BaseModel extends BaseModelData implements Model, Serializable {
     }
   }
 
+  public boolean isSilent() {
+    return changeEventSupport.isSilent();
+  }
+
   public void notify(ChangeEvent evt) {
     changeEventSupport.notify(evt);
   }
@@ -147,9 +153,9 @@ public class BaseModel extends BaseModelData implements Model, Serializable {
   }
 
   protected void notifyPropertyChanged(String name, Object value, Object oldValue) {
-    if (value == oldValue) return;
-    if (value != null && value.equals(oldValue)) return;
-    notify(new PropertyChangeEvent(Update, this, name, oldValue, value));
+    if (!Util.equalWithNull(value, oldValue)) {
+      notify(new PropertyChangeEvent(Update, this, name, oldValue, value));
+    }
   }
 
 }

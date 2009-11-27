@@ -116,14 +116,12 @@ import com.google.gwt.user.client.Event;
  * 
  * @deprecated see {@link ListView}
  */
-public class DataView extends ScrollContainer<DataViewItem> implements
-    Selectable<DataViewItem> {
+public class DataView extends ScrollContainer<DataViewItem> implements Selectable<DataViewItem> {
 
   /**
    * Data view selection model.
    */
-  public class DataViewSelectionModel extends
-      AbstractSelectionModel<DataView, DataViewItem> {
+  public class DataViewSelectionModel extends AbstractSelectionModel<DataView, DataViewItem> {
 
     public DataViewSelectionModel() {
       super();
@@ -428,8 +426,7 @@ public class DataView extends ScrollContainer<DataViewItem> implements
 
   @Override
   protected ComponentEvent createComponentEvent(Event event) {
-    return new DataViewEvent(this, (event == null) ? null
-        : findItem(DOM.eventGetTarget(event)));
+    return new DataViewEvent(this, (event == null) ? null : findItem(DOM.eventGetTarget(event)));
   }
 
   @SuppressWarnings("unchecked")
@@ -458,8 +455,7 @@ public class DataView extends ScrollContainer<DataViewItem> implements
 
     renderAll();
 
-    el().addEventsSunk(
-        Event.ONCLICK | Event.ONDBLCLICK | Event.MOUSEEVENTS | Event.KEYEVENTS);
+    sinkEvents(Event.ONCLICK | Event.ONDBLCLICK | Event.MOUSEEVENTS | Event.KEYEVENTS);
   }
 
   protected void renderAll() {

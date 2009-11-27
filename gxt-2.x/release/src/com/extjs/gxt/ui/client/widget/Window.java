@@ -8,7 +8,6 @@
 package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.GXT;
-import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -37,6 +36,7 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Accessibility;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -173,8 +173,6 @@ public class Window extends ContentPanel {
   private boolean onEsc = true;
   private boolean plain;
   private boolean resizable = true;
-  private int height = Style.DEFAULT;
-  private int width = Style.DEFAULT;
   private Layer ghost;
   private ToolButton maxBtn, minBtn;
   private boolean maximized;
@@ -185,7 +183,6 @@ public class Window extends ContentPanel {
   private Size restoreSize;
   private boolean draggable = true;
   private boolean positioned;
-  private El focusEl;
   private boolean autoHide;
   private BaseEventPreview eventPreview;
   private boolean resizing;
@@ -203,6 +200,7 @@ public class Window extends ContentPanel {
     shim = true;
     hidden = true;
     setDraggable(true);
+    setResizable(true);
   }
 
   /**
@@ -258,17 +256,21 @@ public class Window extends ContentPanel {
    * the window itself will receive focus.
    */
   public void focus() {
-    DeferredCommand.addCommand(new Command() {
-      public void execute() {
-        if (focusWidget != null) {
-          if (focusWidget instanceof Component) {
-            ((Component) focusWidget).focus();
-          } else {
-            fly(focusWidget.getElement()).focus();
-          }
-        } else {
-          Window.super.focus();
+    if (GXT.isAriaEnabled()) {
+      Timer t = new Timer() {
+        @Override
+        public void run() {
+          doFocus();
         }
+      };
+      t.schedule(1500);
+      getFocusEl().focus();
+      return;
+    }
+    DeferredCommand.addCommand(new Command() {
+
+      public void execute() {
+        doFocus();
       }
     });
   }
@@ -297,6 +299,24 @@ public class Window extends ContentPanel {
    * @return the draggable instance
    */
   public Draggable getDraggable() {
+    if(dragger == null && draggable){
+      dragger = new Draggable(this, head);
+      dragger.setConstrainClient(getConstrain());
+      dragger.setSizeProxyToSource(false);
+      dragger.addDragListener(new DragListener() {
+        public void dragEnd(DragEvent de) {
+          endDrag(de);
+        }
+
+        public void dragMove(DragEvent de) {
+          moveDrag(de);
+        }
+
+        public void dragStart(DragEvent de) {
+          startDrag(de);
+        }
+      });
+    }
     return dragger;
   }
 
@@ -342,8 +362,28 @@ public class Window extends ContentPanel {
    * @return the resizable
    */
   public Resizable getResizable() {
-    if (resizer == null) {
+    if (resizer == null && resizable) {
       resizer = new Resizable(this);
+      resizer.setMinWidth(getMinWidth());
+      resizer.setMinHeight(getMinHeight());
+      resizer.addResizeListener(new ResizeListener() {
+
+        @Override
+        public void resizeEnd(final ResizeEvent re) {
+          // end resize after event preview
+          DeferredCommand.addCommand(new Command() {
+            public void execute() {
+              onEndResize(re);
+            }
+          });
+        }
+
+        @Override
+        public void resizeStart(ResizeEvent re) {
+          onStartResize(re);
+        }
+
+      });
     }
     return resizer;
   }
@@ -377,7 +417,7 @@ public class Window extends ContentPanel {
     }
 
     eventPreview.remove();
-
+    notifyHide();
     fireEvent(Events.Hide, new WindowEvent(this, buttonPressed));
   }
 
@@ -418,7 +458,7 @@ public class Window extends ContentPanel {
   }
 
   /**
-   * Returns true if window miximizing is enabled.
+   * Returns true if window maximizing is enabled.
    * 
    * @return the maximizable state
    */
@@ -427,11 +467,11 @@ public class Window extends ContentPanel {
   }
 
   /**
-   * Returns true if window is maximized.
+   * Returns true if the window is maximized.
    * 
-   * @return the maximize state
+   * @return the plain style state
    */
-  public boolean isMaximzed() {
+  public boolean isMaximized() {
     return maximized;
   }
 
@@ -472,29 +512,12 @@ public class Window extends ContentPanel {
   }
 
   /**
-   * Returns true if the window is maximized.
-   * 
-   * @return the plain style state
-   */
-  public boolean isMaximized() {
-    return maximized;
-  }
-
-  /**
    * Returns true if window resizing is enabled.
    * 
    * @return the resizable state
    */
   public boolean isResizable() {
     return resizable;
-  }
-
-  @Override
-  public boolean layout() {
-    if (hidden) {
-      return false;
-    }
-    return super.layout();
   }
 
   /**
@@ -510,10 +533,16 @@ public class Window extends ContentPanel {
       head.removeStyleName("x-window-draggable");
 
       fitContainer();
-
       maxBtn.setVisible(false);
       restoreBtn.setVisible(true);
-      dragger.setEnabled(false);
+
+      if (draggable) {
+        dragger.setEnabled(false);
+      }
+      if (resizable) {
+        resizer.setEnabled(false);
+      }
+
       fireEvent(Events.Maximize, new WindowEvent(this));
     } else {
       fitContainer();
@@ -528,6 +557,20 @@ public class Window extends ContentPanel {
    */
   public void minimize() {
     fireEvent(Events.Minimize, new WindowEvent(this));
+  }
+
+  @Override
+  public void onComponentEvent(ComponentEvent ce) {
+    super.onComponentEvent(ce);
+    if (ce.getEventTypeInt() == Event.ONMOUSEDOWN) {
+
+      // dont bring to front on clicks where active is model as active window
+      // may have just been opened from this click event
+      Window active = manager.getActive();
+      if (active != null && active != this && !active.isModal()) {
+        manager.bringToFront(this);
+      }
+    }
   }
 
   /**
@@ -555,7 +598,12 @@ public class Window extends ContentPanel {
       el().removeStyleName("x-window-maximized");
       restoreBtn.setVisible(false);
       maxBtn.setVisible(true);
-      dragger.setEnabled(true);
+      if (draggable) {
+        dragger.setEnabled(true);
+      }
+      if (resizable) {
+        resizer.setEnabled(true);
+      }
       head.addStyleName("x-window-draggable");
       if (restorePos != null) {
         setPosition(restorePos.x, restorePos.y);
@@ -584,9 +632,7 @@ public class Window extends ContentPanel {
       }
       fireEvent(Events.Activate, new WindowEvent(this));
     } else {
-      if (rendered && layer != null) {
-        layer.hideShadow();
-      }
+      hideShadow();
       fireEvent(Events.Deactivate, new WindowEvent(this));
     }
   }
@@ -630,6 +676,9 @@ public class Window extends ContentPanel {
    */
   public void setConstrain(boolean constrain) {
     this.constrain = constrain;
+    if(dragger != null){
+      dragger.setConstrainClient(constrain);
+    }
   }
 
   /**
@@ -649,6 +698,14 @@ public class Window extends ContentPanel {
    */
   public void setDraggable(boolean draggable) {
     this.draggable = draggable;
+    if (draggable) {
+      head.addStyleName("x-window-draggable");
+      getDraggable();
+    } else if (dragger != null){
+      dragger.release();
+      dragger = null;
+      head.removeStyleName("x-window-draggable");
+    }
   }
 
   /**
@@ -691,6 +748,9 @@ public class Window extends ContentPanel {
    */
   public void setMinHeight(int minHeight) {
     this.minHeight = minHeight;
+    if(resizer != null){
+      resizer.setMinHeight(minHeight);
+    }
   }
 
   /**
@@ -715,6 +775,9 @@ public class Window extends ContentPanel {
    */
   public void setMinWidth(int minWidth) {
     this.minWidth = minWidth;
+    if(resizer != null){
+      resizer.setMinWidth(minWidth);
+    }
   }
 
   /**
@@ -770,6 +833,12 @@ public class Window extends ContentPanel {
    */
   public void setResizable(boolean resizable) {
     this.resizable = resizable;
+    if (resizable) {
+      getResizable();
+    } else if (resizer != null) {
+      resizer.release();
+      resizer = null;
+    }
   }
 
   @Override
@@ -793,10 +862,12 @@ public class Window extends ContentPanel {
     }
 
     RootPanel.get().add(this);
+    el().setVisibility(false);
     el().makePositionable(true);
     onShow();
 
     afterShow();
+    notifyShow();
   }
 
   /**
@@ -814,11 +885,6 @@ public class Window extends ContentPanel {
     manager.bringToFront(this);
   }
 
-  protected void afterRender() {
-    super.afterRender();
-    setVisible(false);
-  }
-
   protected void afterShow() {
     hidden = false;
 
@@ -832,19 +898,15 @@ public class Window extends ContentPanel {
       if (restoreSize != null) {
         setSize(restoreSize.width, restoreSize.height);
       }
-    } else {
-      // no width set
-      if (isAutoWidth() || super.width == null) {
-        setWidth(initialWidth);
-      }
     }
 
     int h = getHeight();
     int w = getWidth();
-    if (h < minHeight) {
+    if (h < minHeight && w < minWidth) {
+      setSize(minWidth, minHeight);
+    } else if (h < minHeight) {
       setHeight(minHeight);
-    }
-    if (w < minWidth) {
+    } else if (w < minWidth) {
       setWidth(minWidth);
     }
 
@@ -858,7 +920,6 @@ public class Window extends ContentPanel {
       modalPanel = ModalPanel.pop();
       modalPanel.setBlink(blinkModal);
       modalPanel.show(this);
-      el().makePositionable(true);
     }
 
     // missing cursor workaround
@@ -875,21 +936,10 @@ public class Window extends ContentPanel {
     if (maximized) {
       maximize();
     }
-
-    if (GXT.isSafari) {
-      DeferredCommand.addCommand(new Command() {
-        public void execute() {
-          layout();
-        }
-      });
-    } else {
-      layout();
-    }
+    el().setVisibility(true);
 
     fireEvent(Events.Show, new WindowEvent(this));
-
     toFront();
-
   }
 
   @Override
@@ -911,6 +961,19 @@ public class Window extends ContentPanel {
     return l;
   }
 
+  protected void doFocus() {
+    getFocusEl().focus();
+    if (focusWidget != null) {
+      if (focusWidget instanceof Component) {
+        ((Component) focusWidget).focus();
+      } else {
+        fly(focusWidget.getElement()).focus();
+      }
+    } else {
+      Window.super.focus();
+    }
+  }
+
   protected void endDrag(DragEvent de) {
     unghost(de);
     restorePos = getPosition(true);
@@ -919,6 +982,13 @@ public class Window extends ContentPanel {
       layer.enableShadow();
     }
     focus();
+    DeferredCommand.addCommand(new Command() {
+      public void execute() {
+        if (Window.this.eventPreview != null && Window.this.ghost != null) {
+          Window.this.eventPreview.getIgnoreList().remove(Window.this.ghost.dom);
+        }
+      }
+    });
   }
 
   protected void fitContainer() {
@@ -928,13 +998,8 @@ public class Window extends ContentPanel {
       setSize(bounds.width, bounds.height);
     } else {
       setPosition(0, 0);
-      setSize(XDOM.getViewportSize().width, XDOM.getViewportSize().height);
+      setSize(XDOM.getViewportWidth(), XDOM.getViewportHeight());
     }
-  }
-
-  @Override
-  protected El getFocusEl() {
-    return focusEl;
   }
 
   protected ModalPanel getModalPanel() {
@@ -993,15 +1058,8 @@ public class Window extends ContentPanel {
     }
   }
 
-  @Override
-  protected void onClick(ComponentEvent ce) {
-    super.onClick(ce);
-    // dont bring to front on clicks where active is model as active window
-    // may have just been opened from this click event
-    Window active = manager.getActive();
-    if (active != null && active != this && !active.isModal()) {
-      manager.bringToFront(this);
-    }
+  protected void moveDrag(DragEvent de) {
+
   }
 
   @Override
@@ -1016,13 +1074,10 @@ public class Window extends ContentPanel {
     resizing = false;
   }
 
-  protected void moveDrag(DragEvent de) {
-
-  }
-
   protected void onKeyPress(WindowEvent we) {
     int keyCode = we.getKeyCode();
-    if (closable && onEsc && keyCode == KeyCodes.KEY_ESCAPE && getElement().isOrHasChild((com.google.gwt.dom.client.Element) we.getEvent().getEventTarget().cast())) {
+    if (closable && onEsc && keyCode == KeyCodes.KEY_ESCAPE
+        && getElement().isOrHasChild((com.google.gwt.dom.client.Element) we.getEvent().getEventTarget().cast())) {
       hide();
     }
   }
@@ -1031,9 +1086,6 @@ public class Window extends ContentPanel {
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
 
-    focusEl = new El(XDOM.create("<a class='x-dlg-focus' tabIndex='-1'>&#160</a>"));
-    swallowEvent(Events.OnClick, focusEl.dom, true);
-    getElement().appendChild(focusEl.dom);
     el().makePositionable(true);
 
     if (manager == null) {
@@ -1044,66 +1096,8 @@ public class Window extends ContentPanel {
       addStyleName("x-window-plain");
     }
 
-    if (resizable) {
-      resizer = getResizable();
-      resizer.setMinWidth(getMinWidth());
-      resizer.setMinHeight(getMinHeight());
-      resizer.addResizeListener(new ResizeListener() {
-
-        @Override
-        public void resizeEnd(final ResizeEvent re) {
-          // end resize after event preview
-          DeferredCommand.addCommand(new Command() {
-            public void execute() {
-              onEndResize(re);
-            }
-          });
-        }
-
-        @Override
-        public void resizeStart(ResizeEvent re) {
-          onStartResize(re);
-        }
-
-      });
-    }
-
-    if (draggable) {
-      head.addStyleName("x-window-draggable");
-      dragger = new Draggable(this, head) {
-        @Override
-        protected void onMouseDown(ComponentEvent ce) {
-          // make sure current window is active before starting drag
-          // happens when dragging non-active window
-          Window.this.onClick(ce);
-          super.onMouseDown(ce);
-        }
-      };
-      dragger.setConstrainClient(getConstrain());
-      dragger.setSizeProxyToSource(false);
-      dragger.addDragListener(new DragListener() {
-        public void dragEnd(DragEvent de) {
-          endDrag(de);
-        }
-
-        public void dragMove(DragEvent de) {
-          moveDrag(de);
-        }
-
-        public void dragStart(DragEvent de) {
-          startDrag(de);
-        }
-      });
-    }
-
-    if (width != -1) {
-      setWidth(Math.max(minWidth, width));
-    }
-    if (height != -1) {
-      setHeight(Math.max(minHeight, height));
-    }
-
     eventPreview = new BaseEventPreview() {
+
       @Override
       protected boolean onAutoHide(PreviewEvent ce) {
         if (autoHide) {
@@ -1125,13 +1119,29 @@ public class Window extends ContentPanel {
     };
     eventPreview.getIgnoreList().add(getElement());
 
-    el().addEventsSunk(Event.ONCLICK | Event.ONKEYPRESS);
+    sinkEvents(Event.ONMOUSEDOWN | Event.ONKEYPRESS);
 
-    Accessibility.setRole(getElement(), "dialog");
-    Accessibility.setState(getElement(), "aria-labelledby", head.getId() + "-label");
+    if (GXT.isAriaEnabled()) {
+      el().setTabIndex(0);
+      el().setElementAttribute("hideFocus", "true");
 
+      Accessibility.setRole(getElement(), "alertdialog");
+      Accessibility.setState(getElement(), "aria-labelledby", head.getId() + "-label");
+    }
+    
     if (modal || maximizable || constrain) {
       monitorWindowResize = true;
+    }
+
+    if (super.width == null) {
+      setWidth(Math.max(initialWidth, minWidth));
+    }
+  }
+
+  protected void onResize(int width, int height) {
+    super.onResize(width, height);
+    if (resizer != null) {
+      resizer.syncHandleHeight();
     }
   }
 
@@ -1165,10 +1175,11 @@ public class Window extends ContentPanel {
 
   protected void startDrag(DragEvent de) {
     WindowManager.get().bringToFront(this);
-    if (layer != null) {
-      layer.hideShadow();
-    }
+    hideShadow();
     ghost = ghost();
+    if (eventPreview != null && ghost != null) {
+      eventPreview.getIgnoreList().add(ghost.dom);
+    }
     showWindow(false);
     Draggable d = de.getDraggable();
     d.setProxy(ghost);

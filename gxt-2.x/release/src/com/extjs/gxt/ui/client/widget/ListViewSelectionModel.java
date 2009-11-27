@@ -29,8 +29,8 @@ import com.extjs.gxt.ui.client.widget.selection.AbstractStoreSelectionModel;
  * <dd>AbstractStoreSelectionModel SelectionChange</dd>
  * </dl>
  */
-public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSelectionModel<M>
-    implements Listener<ListViewEvent<M>> {
+public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSelectionModel<M> implements
+    Listener<ListViewEvent<M>> {
 
   protected ListView<M> listView;
   protected ListStore<M> listStore;
@@ -58,31 +58,34 @@ public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSe
    * 
    * @param listView the list view
    */
-  @SuppressWarnings("unchecked")
   public void bindList(ListView<M> listView) {
     if (this.listView != null) {
-      this.listView.removeListener(Events.Select, this);
+      this.listView.removeListener(Events.OnMouseDown, this);
+      this.listView.removeListener(Events.OnClick, this);
       this.listView.removeListener(Events.RowUpdated, this);
       this.listView.removeListener(Events.Refresh, this);
       keyNav.bind(null);
+      this.listStore = null;
       bind(null);
     }
     this.listView = listView;
     if (listView != null) {
-      listView.addListener(Events.Select, this);
+      listView.addListener(Events.OnMouseDown, this);
+      listView.addListener(Events.OnClick, this);
       listView.addListener(Events.Refresh, this);
       listView.addListener(Events.RowUpdated, this);
       keyNav.bind(listView);
       bind(listView.getStore());
-      this.listStore = (ListStore)listView.getStore();
+      this.listStore = listView.getStore();
     }
-    bind(listView != null ? listView.getStore() : null);
   }
 
   public void handleEvent(ListViewEvent<M> e) {
     EventType type = e.getType();
-    if (type == Events.Select) {
-      onSelect(e);
+    if (type == Events.OnMouseDown) {
+      handleMouseDown(e);
+    } else if (type == Events.OnClick) {
+      handleMouseClick(e);
     } else if (type == Events.RowUpdated) {
       onRowUpdated(e);
     } else if (type == Events.Refresh) {
@@ -91,36 +94,59 @@ public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSe
   }
 
   @SuppressWarnings("unchecked")
-  protected void handleMouseDown(ListViewEvent<M> e) {
-    if (locked) return;
-    M sel = listStore.getAt(e.getIndex());
-    
-    if (isSelected(sel) && !e.isControlKey()) {
+  protected void handleMouseClick(ListViewEvent<M> e) {
+    if (isLocked() || e.getIndex() == -1) {
       return;
     }
-
-    if (selectionMode == SelectionMode.SINGLE) {
-      if (isSelected(sel) && e.isControlKey()) {
-        deselect(sel);
-      } else if (!isSelected(sel)) {
-        select(sel, false);
-      }
-    } else {
-      if (e.isShiftKey() && lastSelected != null) {
-        int last = listStore.indexOf(lastSelected);
-        int index = e.getIndex();
-        int a = (last > index) ? index : last;
-        int b = (last < index) ? index : last;
-        select(a, b, e.isControlKey());
-        lastSelected = listStore.getAt(last);
-        listView.focusItem(index);
-        // view.focusRow(index);
-      } else if (isSelected(sel) && e.isControlKey()) {
+    if (!e.isRightClick() && selectionMode == SelectionMode.MULTI) {
+      M sel = listStore.getAt(e.getIndex());
+      if (e.isControlKey() && isSelected(sel)) {
         doDeselect(Arrays.asList(sel), false);
-      } else {
-        doSelect(Arrays.asList(sel), e.isControlKey(), false);
+      } else if (e.isControlKey()) {
+        doSelect(Arrays.asList(sel), true, false);
         listView.focusItem(e.getIndex());
-        // view.focusRow(e.rowIndex);
+      } else if (isSelected(sel) && !e.isShiftKey()) {
+        doSelect(Arrays.asList(sel), false, false);
+        listView.focusItem(e.getIndex());
+      }
+    }
+
+  }
+
+  @SuppressWarnings("unchecked")
+  protected void handleMouseDown(ListViewEvent<M> e) {
+    if (isLocked() || e.getIndex() == -1) {
+      return;
+    }
+    if (e.isRightClick()) {
+      if (selectionMode != SelectionMode.SINGLE && isSelected(listStore.getAt(e.getIndex()))) {
+        return;
+      }
+      select(e.getIndex(), false);
+
+    } else {
+      M sel = listStore.getAt(e.getIndex());
+
+      if (selectionMode == SelectionMode.SINGLE) {
+        if (e.isControlKey() && isSelected(sel)) {
+          deselect(sel);
+        } else if (!isSelected(sel)) {
+          select(sel, false);
+          listView.focusItem(e.getIndex());
+        }
+      } else if (!e.isControlKey()) {
+        if (e.isShiftKey() && lastSelected != null) {
+          int last = listStore.indexOf(lastSelected);
+          int index = e.getIndex();
+          int a = (last > index) ? index : last;
+          int b = (last < index) ? index : last;
+          select(a, b, e.isControlKey());
+          lastSelected = listStore.getAt(last);
+          listView.focusItem(index);
+        } else if (!isSelected(sel)) {
+          doSelect(Arrays.asList(sel), false, false);
+          listView.focusItem(e.getIndex());
+        }
       }
     }
   }
@@ -151,10 +177,6 @@ public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSe
     if (isSelected(ge.getModel())) {
       onSelectChange(ge.getModel(), true);
     }
-  }
-
-  protected void onSelect(ListViewEvent<M> e) {
-    handleMouseDown(e);
   }
 
   @Override

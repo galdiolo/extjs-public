@@ -24,6 +24,7 @@ import com.extjs.gxt.ui.client.widget.treegrid.TreeGrid.TreeNode;
  * <code>DragSource</code> implementation for TreeGrid.
  */
 public class TreeGridDragSource extends DragSource {
+  
   protected TreeGrid<ModelData> treeGrid;
   protected TreeSource treeGridSource = TreeSource.BOTH;
 
@@ -67,6 +68,10 @@ public class TreeGridDragSource extends DragSource {
   @SuppressWarnings("unchecked")
   protected void onDragStart(DNDEvent e) {
     TreeNode n = treeGrid.findNode(e.getTarget());
+    if (n == null) {
+      e.setCancelled(true);
+      return;
+    }
     ModelData m = n.getModel();
     if (!treeGrid.getTreeView().isSelectableTarget(m, e.getTarget())) {
       e.setCancelled(true);

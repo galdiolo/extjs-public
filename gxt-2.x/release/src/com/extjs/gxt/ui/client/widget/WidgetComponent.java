@@ -9,6 +9,7 @@ package com.extjs.gxt.ui.client.widget;
 
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -50,7 +51,15 @@ public class WidgetComponent extends BoxComponent {
    */
   public WidgetComponent(Widget widget) {
     assert widget != null : "widget must not be null";
+    widget.removeFromParent();
     this.widget = widget;
+    setParent(this, widget);
+  }
+
+  @Override
+  public Element getElement() {
+    // we need this because of lazy rendering
+    return widget.getElement();
   }
 
   /**
@@ -63,15 +72,37 @@ public class WidgetComponent extends BoxComponent {
   }
 
   @Override
-  protected void doAttachChildren() {
-    super.doAttachChildren();
-    ComponentHelper.doAttach(widget);
+  public boolean isAttached() {
+    if (widget != null) {
+      return widget.isAttached();
+    }
+    return false;
   }
 
   @Override
-  protected void doDetachChildren() {
-    super.doDetachChildren();
-    ComponentHelper.doDetach(widget);
+  public void onBrowserEvent(Event event) {
+    // Fire any handler added to the WidgetComponent itself.
+    super.onBrowserEvent(event);
+
+    // Delegate events to the widget.
+    widget.onBrowserEvent(event);
+  }
+
+  @Override
+  protected void onAttach() {
+    ComponentHelper.doAttach(widget);
+    DOM.setEventListener(getElement(), this);
+    onLoad();
+  }
+
+  @Override
+  protected void onDetach() {
+    try {
+      onUnload();
+    } finally {
+      ComponentHelper.doDetach(widget);
+    }
+    onDetachHelper();
   }
 
   @Override
@@ -88,15 +119,12 @@ public class WidgetComponent extends BoxComponent {
 
   @Override
   protected void onRender(Element target, int index) {
-    // we need this to have component listener to work
-    setElement(DOM.createDiv(), target, index);
-    getElement().appendChild(widget.getElement());
+    setElement(widget.getElement(), target, index);
     super.onRender(target, index);
   }
 
-  protected void onResize(int width, int height) {
-    super.onResize(width, height);
-    el().firstChild().setSize(width, height, true);
-  }
 
+  private native void setParent(Widget parent, Widget child) /*-{
+    child.@com.google.gwt.user.client.ui.Widget::parent = parent;
+  }-*/;
 }

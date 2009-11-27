@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.widget.toolbar;
 
+import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -51,7 +52,7 @@ public class LabelToolItem extends BoxComponent {
   public void setLabel(String label) {
     this.label = label;
     if (rendered) {
-      getElement().setInnerHTML(label);
+      el().update(Util.isEmptyString(label) ? "&#160;" : label);
     }
   }
 

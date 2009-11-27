@@ -27,7 +27,7 @@ public class Style {
   public enum VerticalAlignment {
     TOP, MIDDLE, BOTTOM;
   }
-  
+
   /**
    * Anchor enumeration.
    */
@@ -42,6 +42,13 @@ public class Style {
     public String value() {
       return value;
     }
+  }
+
+  /**
+   * Autosize enumeration.
+   */
+  public enum AutoSizeMode {
+    BOTH, HEIGHT, WIDTH
   }
 
   /**
@@ -63,10 +70,10 @@ public class Style {
   /**
    * Sort direction enum.
    */
+  @SuppressWarnings("unchecked")
   public enum SortDir {
 
     NONE {
-      @SuppressWarnings("unchecked")
       @Override
       public Comparator comparator(Comparator c) {
         return c;
@@ -94,13 +101,13 @@ public class Style {
         };
       }
     };
-    
+
     public static SortDir findDir(String sortDir) {
       if ("ASC".equals(sortDir)) {
         return SortDir.ASC;
       } else if ("DESC".equals(sortDir)) {
         return SortDir.DESC;
-      } 
+      }
       return null;
     }
 
@@ -159,7 +166,17 @@ public class Style {
    * HideMode enum.
    */
   public enum HideMode {
-    OFFSETS, VISIBILITY, DISPLAY
+    OFFSETS("x-hide-offsets"), VISIBILITY("x-hide-visibility"), DISPLAY("x-hide-display");
+    
+    private final String value;
+
+    private HideMode(String value) {
+      this.value = value;
+    }
+
+    public String value() {
+      return value;
+    }
   }
 
   /**

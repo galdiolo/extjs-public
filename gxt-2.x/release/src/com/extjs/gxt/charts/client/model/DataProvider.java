@@ -22,10 +22,10 @@ import com.extjs.gxt.ui.client.store.StoreListener;
 public abstract class DataProvider {
 
   protected ChartConfig chartConfig;
-  protected String labelProperty, textProperty;
+  protected String labelProperty, textProperty, valueProperty;
   protected ModelStringProvider<ModelData> labelProvider, textProvider;
   protected ListStore<ModelData> store;
-  protected double maxYValue, minYValue;
+  protected Double maxYValue, minYValue;
 
   private String chartId;
   private StoreListener<ModelData> storeListener;
@@ -40,6 +40,51 @@ public abstract class DataProvider {
         onStoreChange(e);
       }
     };
+  }
+
+  /**
+   * Returns the label property.
+   * 
+   * @return the label property
+   */
+  public String getLabelProperty() {
+    return labelProperty;
+  }
+  
+  /**
+   * Returns the model label provider.
+   * 
+   * @return the label provider
+   */
+  public ModelStringProvider<ModelData> getLabelProvider() {
+    return labelProvider;
+  }
+
+  /**
+   * Returns the text property.
+   * 
+   * @return the text property
+   */
+  public String getTextProperty() {
+    return textProperty;
+  }
+
+  /**
+   * Returns the model text provider.
+   * 
+   * @return the model text provider
+   */
+  public ModelStringProvider<ModelData> getTextProvider() {
+    return textProvider;
+  }
+
+  /**
+   * Returns the value property.
+   * 
+   * @return the value property
+   */
+  public String getValueProperty() {
+    return valueProperty;
   }
 
   /**
@@ -58,13 +103,56 @@ public abstract class DataProvider {
 
   public abstract void populateData(ChartConfig config);
 
-  protected String getLabel(ModelData model, String valueProperty) {
+  /**
+   * Sets the label property. Works when models contains a property with the
+   * label value, an alternative is to use a label provider (
+   * {@link #setLabelProvider(ModelStringProvider)}.
+   * 
+   * @param labelProperty the label property
+   */
+  public void setLabelProperty(String labelProperty) {
+    this.labelProperty = labelProperty;
+  }
+
+  /**
+   * Sets the label provider.
+   * 
+   * @param labelProvider the label provider
+   */
+  public void setLabelProvider(ModelStringProvider<ModelData> labelProvider) {
+    this.labelProvider = labelProvider;
+  }
+
+  /**
+   * Sets the text property.
+   **/
+  public void setTextProperty(String textProperty) {
+    this.textProperty = textProperty;
+  }
+
+  /**
+   * Sets the test provider.
+   * 
+   * @param textProvider the text provider
+   */
+  public void setTextProvider(ModelStringProvider<ModelData> textProvider) {
+    this.textProvider = textProvider;
+  }
+
+  /**
+   * Sets the value property.
+   **/
+  public void setValueProperty(String valueProperty) {
+    this.valueProperty = valueProperty;
+  }
+
+  protected String getLabel(ModelData model) {
     String label = null;
-    if (labelProperty != null) {
+    if (labelProvider != null) {
+      label = labelProvider.getStringValue(model, labelProperty);
+    } else if (labelProperty != null) {
       Object o = model.<Object> get(labelProperty);
       label = o != null ? o.toString() : null;
-    } else if (labelProvider != null) {
-      label = labelProvider.getStringValue(model, valueProperty);
     }
     return label == null ? "" : label;
   }
@@ -77,15 +165,30 @@ public abstract class DataProvider {
     return minYValue;
   }
 
-  protected String getText(ModelData model, String valueProperty) {
+  protected String getText(ModelData model) {
     String text = null;
-    if (textProperty != null) {
+    if (textProvider != null) {
+      text = textProvider.getStringValue(model, textProperty);
+    } else if (textProperty != null) {
       Object o = model.<Object> get(textProperty);
       text = o != null ? o.toString() : null;
-    } else if (textProvider != null) {
-      text = textProvider.getStringValue(model, valueProperty);
     }
     return text == null ? "" : text;
+  }
+
+  protected Number getValue(ModelData model) {
+    Number value = null;
+    if (valueProperty != null) {
+      Object o = model.<Object> get(valueProperty);
+      if (o != null) {
+        if (o instanceof String) {
+          value = Double.parseDouble((String) o);
+        } else if (o instanceof Number) {
+          value = (Number) o;
+        }
+      }
+    }
+    return value;
   }
 
   protected void onStoreChange(StoreEvent<ModelData> se) {

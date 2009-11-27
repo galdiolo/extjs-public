@@ -111,9 +111,11 @@ public abstract class Item extends Component {
     if (disabled) {
       return;
     }
-    
+
     El li = el().getParent();
-    li.addStyleName(activeStyle);
+    if (li != null) {
+      li.addStyleName(activeStyle);
+    }
     MenuEvent me = new MenuEvent(parentMenu);
     me.setItem(this);
     fireEvent(Events.Activate, me);
@@ -121,7 +123,9 @@ public abstract class Item extends Component {
 
   protected void deactivate() {
     El li = el().getParent();
-    li.removeStyleName(activeStyle);
+    if (li != null) {
+      li.removeStyleName(activeStyle);
+    }
     MenuEvent me = new MenuEvent(parentMenu);
     me.setItem(this);
     fireEvent(Events.Deactivate, me);
@@ -138,8 +142,10 @@ public abstract class Item extends Component {
   }
 
   protected void onClick(ComponentEvent be) {
+    be.stopEvent();
     MenuEvent me = new MenuEvent(parentMenu);
     me.setItem(this);
+    me.setEvent(be.getEvent());
     if (!disabled && fireEvent(Events.Select, me)) {
       handleClick(be);
     }

@@ -17,13 +17,16 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.FlexTable;
 
 public class BorderLayoutExample extends LayoutContainer {
 
-  public BorderLayoutExample() {
+  protected void onRender(Element target, int index) {
+    super.onRender(target, index);
     final BorderLayout layout = new BorderLayout();
     setLayout(layout);
+    setStyleAttribute("padding", "10px");
 
     ContentPanel north = new ContentPanel();
     ContentPanel west = new ContentPanel();
@@ -74,26 +77,26 @@ public class BorderLayoutExample extends LayoutContainer {
     northData.setFloatable(true);
     northData.setHideCollapseTool(true);
     northData.setSplit(true);
-    northData.setMargins(new Margins(5, 5, 0, 5));
+    northData.setMargins(new Margins(0, 0, 5, 0));
 
     BorderLayoutData westData = new BorderLayoutData(LayoutRegion.WEST, 150);
     westData.setSplit(true);
     westData.setCollapsible(true);
-    westData.setMargins(new Margins(5));
+    westData.setMargins(new Margins(0,5,0,0));
 
     BorderLayoutData centerData = new BorderLayoutData(LayoutRegion.CENTER);
-    centerData.setMargins(new Margins(5, 0, 5, 0));
+    centerData.setMargins(new Margins(0));
 
     BorderLayoutData eastData = new BorderLayoutData(LayoutRegion.EAST, 150);
     eastData.setSplit(true);
     eastData.setCollapsible(true);
-    eastData.setMargins(new Margins(5));
+    eastData.setMargins(new Margins(0,0,0,5));
 
     BorderLayoutData southData = new BorderLayoutData(LayoutRegion.SOUTH, 100);
     southData.setSplit(true);
     southData.setCollapsible(true);
     southData.setFloatable(true);
-    southData.setMargins(new Margins(0, 5, 5, 5));
+    southData.setMargins(new Margins(5, 0, 0, 0));
 
     add(north, northData);
     add(west, westData);
@@ -101,5 +104,4 @@ public class BorderLayoutExample extends LayoutContainer {
     add(east, eastData);
     add(south, southData);
   }
-
 }

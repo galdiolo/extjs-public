@@ -53,8 +53,8 @@ public class TableView {
   }
 
   protected static native void markRendered(TableItem item) /*-{
-        item.@com.extjs.gxt.ui.client.widget.Component::rendered = true;
-      }-*/;
+    item.@com.extjs.gxt.ui.client.widget.Component::rendered = true;
+  }-*/;
 
   // styles
   protected String baseStyle = "my-tbl-item";
@@ -255,8 +255,7 @@ public class TableView {
     String[] align = new String[cols];
     for (int i = 0; i < columns.length; i++) {
       columns[i] = cm.getColumn(i);
-      widths[i] = cm.getWidthInPixels(i)
-          - (table.getVerticalLines() && !GXT.isBorderBox ? 1 : 0);
+      widths[i] = cm.getWidthInPixels(i) - (table.getVerticalLines() && !GXT.isBorderBox ? 1 : 0);
       columns[i].lastWidth = widths[i];
       HorizontalAlignment ha = columns[i].getAlignment();
       switch (ha) {
@@ -388,8 +387,8 @@ public class TableView {
   }
 
   protected native Element getTextCellInternal(Element elem, int column) /*-{
-      return elem.firstChild.firstChild.firstChild.childNodes[column].firstChild.firstChild;
-    }-*/;
+    return elem.firstChild.firstChild.firstChild.childNodes[column].firstChild.firstChild;
+  }-*/;
 
   protected void init(final Table table) {
     this.table = table;
@@ -467,8 +466,7 @@ public class TableView {
       table.disableTextSelection(true);
     }
 
-    table.el().addEventsSunk(
-        Event.ONCLICK | Event.ONDBLCLICK | Event.MOUSEEVENTS | Event.KEYEVENTS);
+    table.sinkEvents(Event.ONCLICK | Event.ONDBLCLICK | Event.MOUSEEVENTS | Event.KEYEVENTS);
   }
 
   protected void renderItem(TableItem item, int index) {
@@ -483,10 +481,7 @@ public class TableView {
     for (int i = 0; i < cols; i++) {
       if (!item.hasWidgets && values[i] instanceof Widget) {
         item.hasWidgets = true;
-        if (table.bulkRender) {
-          throw new RuntimeException(
-              "Bulk rendering must be disabled when adding widgets to table items");
-        }
+        assert !table.bulkRender : "Bulk rendering must be disabled when adding widgets to table items";
       }
       svalues[i] = table.getRenderedValue(item, i, values[i]);
     }
@@ -508,10 +503,9 @@ public class TableView {
         salign = "right";
       }
       String tip = tips == null ? "" : "qtip='" + tips[i] + "'";
-      sb.append("<td class=" + cellStyle + " style='display: " + display + ";width: " + w
-          + "px' index=" + i + "><div class=" + cellOverflowStyle + " style='width:" + w
-          + "'><div class='" + textStyle + (styles == null ? "" : " " + styles[i])
-          + "' style='text-align:" + salign + "' " + tip + ">" + svalues[i]
+      sb.append("<td class=" + cellStyle + " style='display: " + display + ";width: " + w + "px' index=" + i
+          + "><div class=" + cellOverflowStyle + " style='width:" + w + "'><div class='" + textStyle
+          + (styles == null ? "" : " " + styles[i]) + "' style='text-align:" + salign + "' " + tip + ">" + svalues[i]
           + "</div></div></td>");
     }
     sb.append("</tr></table>");
@@ -621,10 +615,10 @@ public class TableView {
   }
 
   protected native void showColumn(Element elem, boolean show, int index) /*-{
-        var tbl = elem.firstChild;
-        var cell = tbl.firstChild.firstChild.childNodes[index]
-        cell.style.display = show ? '' : 'none';
-      }-*/;
+    var tbl = elem.firstChild;
+    var cell = tbl.firstChild.firstChild.childNodes[index]
+    cell.style.display = show ? '' : 'none';
+  }-*/;
 
   protected void showColumn(int index, boolean show) {
     int count = table.getItemCount();
@@ -634,11 +628,11 @@ public class TableView {
   }
 
   protected native void sizeCell(Element elem, int index, int width) /*-{
-        var tbl = elem.firstChild;
-        var cell = tbl.firstChild.firstChild.childNodes[index];
-        cell.style.width = width;
-        cell.firstChild.style.width = width;
-      }-*/;
+    var tbl = elem.firstChild;
+    var cell = tbl.firstChild.firstChild.childNodes[index];
+    cell.style.width = width;
+    cell.firstChild.style.width = width;
+  }-*/;
 
   protected void processRows(int startIndex) {
     if (table.getItemCount() == 0) {

@@ -36,7 +36,7 @@ public class OverviewPage extends LayoutContainer {
 
     StringBuffer sb = new StringBuffer();
     sb.append("<tpl for=\".\">");
-    sb.append("<div class='sample-box'>");
+    sb.append("<div class='sample-box' style='padding-top: 4px'>");
     sb.append("<div class='thumbd'>{image}</div>");
     sb.append("<div>{name}</div>");
     sb.append("</div></tpl>");

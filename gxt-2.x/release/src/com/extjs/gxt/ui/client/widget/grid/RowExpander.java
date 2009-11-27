@@ -119,7 +119,7 @@ public class RowExpander extends ColumnConfig implements ComponentPlugin {
   protected void expandRow(El row) {
     int idx = row.dom.getPropertyInt("rowIndex");
     ModelData model = grid.getStore().getAt(idx);
-    Element body = DomQuery.selectNode("tr:nth(2) div.x-grid3-row-body", row.dom);
+    Element body = DomQuery.selectNode("div.x-grid3-row-body", row.dom);
     if (beforeExpand(model, body, row, idx)) {
       row.replaceStyleName("x-grid3-row-collapsed", "x-grid3-row-expanded");
       fireEvent(Events.Expand);

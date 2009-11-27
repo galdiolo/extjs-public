@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.widget.layout;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.util.Params;
@@ -17,7 +18,6 @@ import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.HiddenField;
 import com.extjs.gxt.ui.client.widget.form.LabelField;
 import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
-import com.google.gwt.user.client.Element;
 
 /**
  * Layout for form fields and their labels. FormLayout will only render Field
@@ -29,16 +29,16 @@ import com.google.gwt.user.client.Element;
  */
 public class FormLayout extends AnchorLayout {
 
-  private LabelAlign labelAlign = LabelAlign.LEFT;
-  private boolean hideLabels;
-  private String labelSeparator = ":";
-  private int labelWidth = 100;
   private int defaultWidth = 200;
-  private Template fieldTemplate;
-  private String labelStyle;
   private String elementStyle;
-  private int labelPad = 5;
+  private Template fieldTemplate;
+  private boolean hideLabels;
   private int labelAdjust;
+  private LabelAlign labelAlign = LabelAlign.LEFT;
+  private int labelPad = 5;
+  private String labelSeparator = ":";
+  private String labelStyle;
+  private int labelWidth = 100;
 
   /**
    * Creates a new form layout.
@@ -111,47 +111,11 @@ public class FormLayout extends AnchorLayout {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public void setContainer(Container ct) {
-    if (container != null) {
-      for (LabelAlign a : LabelAlign.values()) {
-        container.removeStyleName("x-form-label-" + a.name().toLowerCase());
-      }
+  public void setContainer(Container<?> ct) {
+    if (labelAlign != null && target != null) {
+      target.removeStyleName("x-form-label-" + labelAlign.name().toLowerCase());
     }
-    
     super.setContainer(ct);
-
-    if (labelAlign != null && ct != null) {
-      ct.addStyleName("x-form-label-" + labelAlign.name().toLowerCase());
-    }
-
-    if (hideLabels) {
-      labelStyle = "display:none";
-      elementStyle = "padding-left:0;";
-      labelAdjust = 0;
-    } else {
-      int pad = labelPad != 0 ? labelPad : 5;
-      labelAdjust = labelWidth + pad;
-      labelStyle = "width:" + (labelWidth) + "px";
-      elementStyle = "padding-left:" + (labelWidth + pad) + "px";
-      if (labelAlign == LabelAlign.TOP) {
-        labelStyle = "width:auto;";
-        elementStyle = "padding-left:0;";
-        labelAdjust = 0;
-      }
-    }
-
-    if (fieldTemplate == null) {
-      StringBuffer sb = new StringBuffer();
-      sb.append("<div class='x-form-item {5}' tabIndex='-1'>");
-      sb.append("<label for={0} style='{2};{7}' class=x-form-item-label>{1}{4}</label>");
-      sb.append("<div class='x-form-element' id='x-form-el-{0}' style='{3}'>");
-      sb.append("</div><div class='{6}'></div>");
-      sb.append("</div>");
-      fieldTemplate = new Template(sb.toString());
-      fieldTemplate.compile();
-    }
-
   }
 
   /**
@@ -178,7 +142,15 @@ public class FormLayout extends AnchorLayout {
    * @param labelAlign the label align
    */
   public void setLabelAlign(LabelAlign labelAlign) {
-    this.labelAlign = labelAlign;
+    if (this.labelAlign != labelAlign) {
+      if (this.labelAlign != null && target != null) {
+        target.removeStyleName("x-form-label-" + this.labelAlign.name().toLowerCase());
+      }
+      this.labelAlign = labelAlign;
+      if (labelAlign != null && target != null) {
+        target.addStyleName("x-form-label-" + labelAlign.name().toLowerCase());
+      }
+    }
   }
 
   /**
@@ -210,72 +182,186 @@ public class FormLayout extends AnchorLayout {
   }
 
   @Override
-  protected int adjustWidthAnchor(int width, Component comp) {
-    if (comp instanceof Field) {
+  protected int adjustHeightAnchor(int height, Component comp) {
+    if (comp instanceof Field<?>) {
       Field<?> f = (Field<?>) comp;
-      width = width - (f.isHideLabel() ? 0 : labelAdjust);
+      if (!f.isHideLabel() && labelAlign.equals(LabelAlign.TOP)) {
+        El elem = findLabelElement(comp);
+        if (elem != null) {
+          height -= elem.getHeight();
+        }
+      }
     }
+    return super.adjustHeightAnchor(height, comp);
+  }
+
+  @Override
+  protected int adjustWidthAnchor(int width, Component comp) {
+    if (comp instanceof Field<?>) {
+      Field<?> f = (Field<?>) comp;
+      width -= (f.isHideLabel() ? 0 : labelAdjust);
+
+      // offset due to the label element
+      if (((GXT.isIE && !GXT.isStrict) || GXT.isIE6) && !labelAlign.equals(LabelAlign.TOP) && !f.isHideLabel()) {
+        width -= 3;
+      }
+    }
+
     return super.adjustWidthAnchor(width, comp);
   }
 
   @Override
-  protected boolean isValidParent(Element elem, Element parent) {
-    return true;
+  protected void initTarget() {
+    super.initTarget();
+    if (labelAlign != null && target != null) {
+      target.addStyleName("x-form-label-" + labelAlign.name().toLowerCase());
+    }
   }
 
-  protected void onRemove(Component field) {
-    if (field.isRendered()) {
-      El elem = field.el().findParent(".x-form-item", 5);
-      if (elem != null) {
-        elem.removeFromParent();
+  @Override
+  protected void onComponentHide(Component component) {
+    super.onComponentHide(component);
+    El e = findItemElement(component);
+    if (e != null) {
+      e.addStyleName(component.getHideMode().value());
+    }
+
+  }
+
+  @Override
+  protected void onComponentShow(Component component) {
+    super.onComponentShow(component);
+    El e = findItemElement(component);
+    if (e != null) {
+      e.removeStyleName(component.getHideMode().value());
+    }
+  }
+
+  @Override
+  protected void onLayout(Container<?> container, El target) {
+    if (hideLabels) {
+      labelStyle = "display:none";
+      elementStyle = "padding-left:0;";
+      labelAdjust = 0;
+    } else {
+      int pad = labelPad != 0 ? labelPad : 5;
+      labelAdjust = labelWidth + pad;
+      labelStyle = "width:" + (labelWidth) + "px";
+      elementStyle = "padding-left:" + (labelWidth + pad) + "px";
+      if (labelAlign == LabelAlign.TOP) {
+        labelStyle = "width:auto;";
+        elementStyle = "padding-left:0;";
+        labelAdjust = 0;
       }
+    }
+    if (fieldTemplate == null) {
+      StringBuffer sb = new StringBuffer();
+      sb.append("<div class='x-form-item {5}' tabIndex='-1'>");
+      sb.append("<label for={8} style='{2};{7}' class=x-form-item-label>{1}{4}</label>");
+      sb.append("<div class='x-form-element' id='x-form-el-{0}' style='{3}'>");
+      sb.append("</div><div class='{6}'></div>");
+      sb.append("</div>");
+      fieldTemplate = new Template(sb.toString());
+      fieldTemplate.compile();
+    }
+    super.onLayout(container, target);
+  }
+
+  @Override
+  protected void onRemove(Component component) {
+    super.onRemove(component);
+    El elem = findItemElement(component);
+    if (elem != null) {
+      elem.removeFromParent();
     }
   }
 
   @Override
   protected void renderComponent(Component component, int index, El target) {
-    if (component instanceof Field && !(component instanceof HiddenField)) {
+    if (component instanceof Field<?> && !(component instanceof HiddenField<?>)) {
       Field<?> f = (Field<?>) component;
-      renderField((Field<?>) component, index, target);
-      FormData formData = (FormData) getLayoutData(f);
-      if (formData == null) {
-        formData = f.getData("formData");
+
+      FormData layoutData = null;
+      LayoutData d = getLayoutData(f);
+      if (d != null && d instanceof FormData) {
+        layoutData = (FormData) d;
+      } else {
+        layoutData = f.getData("formData");
+      }
+      if (layoutData == null) {
+        layoutData = new FormData();
       }
 
-      f.setWidth(defaultWidth);
-      if (formData != null) {
-        if (formData.getWidth() > 0) {
-          f.setWidth(formData.getWidth());
+      if (layoutData != null) {
+        if (layoutData.getWidth() > 0) {
+          f.setWidth(layoutData.getWidth());
+        } else if (layoutData.getAnchorSpec() == null) {
+          f.setWidth(defaultWidth);
         }
-        if (formData.getHeight() > 0) {
-          f.setHeight(formData.getHeight());
+        if (layoutData.getHeight() > 0) {
+          f.setHeight(layoutData.getHeight());
         }
+      } else {
+        f.setWidth(defaultWidth);
       }
+      renderField(f, index, target);
+
     } else {
       super.renderComponent(component, index, target);
     }
   }
 
-  private void renderField(Field<?> field, int index, El target) {
-    if (field != null && !field.isRendered()) {
-      String ls = field.getLabelSeparator() != null ? field.getLabelSeparator() : labelSeparator;
-      field.setLabelSeparator(ls);
+  protected void renderField(Field<?> field, int index, El target) {
+    String ls = field.getLabelSeparator() != null ? field.getLabelSeparator() : labelSeparator;
+    field.setLabelSeparator(ls);
+    Params p = new Params();
+    if (hideLabels) {
+      field.setHideLabel(true);
+    }
 
-      Params p = new Params();
-      p.add(field.getId());
-      p.add(field.getFieldLabel());
-      p.add(labelStyle);
-      p.add(elementStyle);
-      p.add(ls);
-      p.add(field.isHideLabel() ? "x-hide-label" : "");
-      p.add("x-form-clear-left");
-      p.add(field.getLabelStyle());
+    p.add(field.getId());
+    p.add(field.getFieldLabel());
+    p.add(labelStyle);
+    p.add(elementStyle);
+    p.add(ls);
+    p.add(field.isHideLabel() ? "x-hide-label" : "");
+    p.add("x-form-clear-left");
+    p.add(field.getLabelStyle());
 
-      fieldTemplate.insert(target.dom, index, p);
-      field.render(target.selectNode("#x-form-el-" + field.getId()).dom);
+    String inputId = field.getId();
+    p.add(inputId);
+
+    fieldTemplate.insert(target.dom, index, p);
+    if (field.isRendered()) {
+      target.selectNode("#x-form-el-" + field.getId()).appendChild(field.getElement());
     } else {
-      super.renderComponent(field, index, target);
+      field.render(target.selectNode("#x-form-el-" + field.getId()).dom);
+    }
+
+    if (field.getStyleName().contains("-wrap")) {
+      inputId += "-input";
+      target.selectNode("#x-form-el-" + field.getId()).previousSibling().setAttribute("for", inputId);
     }
   }
 
+  private El findItemElement(Component c) {
+    if (c != null && c instanceof Field<?> && c.isRendered()) {
+      El elem = target.selectNode("#x-form-el-" + c.getId());
+      if (elem != null) {
+        return elem.findParent(".x-form-item", 5);
+      }
+      return null;
+    }
+    return null;
+  }
+
+  private El findLabelElement(Component c) {
+    if (c != null && c instanceof Field<?> && c.isRendered()) {
+      El elem = c.el().findParent(".x-form-item", 5);
+      if (elem != null) {
+        return elem.firstChild();
+      }
+    }
+    return null;
+  }
 }

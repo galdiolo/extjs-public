@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.core;
 
+import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Collection;
@@ -16,10 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.extjs.gxt.ui.client.util.Util;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 
-public class FastMap<V> extends AbstractMap<String, V> {
+public class FastMap<V> extends AbstractMap<String, V> implements Serializable {
   private static class FastMapEntry<V> implements Map.Entry<String, V> {
 
     private String key;
@@ -33,10 +35,9 @@ public class FastMap<V> extends AbstractMap<String, V> {
 
     @Override
     public boolean equals(Object a) {
-      if (a instanceof Map.Entry) {
+      if (a instanceof Map.Entry<?, ?>) {
         Map.Entry<?, ?> s = (Map.Entry<?, ?>) a;
-        if (equalsWithNullCheck(key, s.getKey())
-            && equalsWithNullCheck(value, s.getValue())) {
+        if (equalsWithNullCheck(key, s.getKey()) && equalsWithNullCheck(value, s.getValue())) {
           return true;
         }
       }
@@ -70,14 +71,8 @@ public class FastMap<V> extends AbstractMap<String, V> {
       return old;
     }
 
-    private boolean equalsWithNullCheck(Object a, Object b) {
-      if (a == b) {
-        return true;
-      } else if (a == null) {
-        return false;
-      } else {
-        return a.equals(b);
-      }
+    private boolean equalsWithNullCheck(Object obj1, Object obj2) {
+      return Util.equalWithNull(obj1, obj2);
     }
   }
 
@@ -87,6 +82,7 @@ public class FastMap<V> extends AbstractMap<String, V> {
       return JavaScriptObject.createObject().cast();
     }
 
+    @SuppressWarnings("unused")
     protected JsMap() {
     }
 
@@ -101,8 +97,8 @@ public class FastMap<V> extends AbstractMap<String, V> {
     public final native List<String> keySet() /*-{
       var s = @java.util.ArrayList::new()();
       for(var key in this) {
-        if (!this.hasOwnProperty(key)) continue;
-        s.@java.util.ArrayList::add(Ljava/lang/Object;)(key);
+      if (!this.hasOwnProperty(key)) continue;
+      s.@java.util.ArrayList::add(Ljava/lang/Object;)(key);
       }
       return s;
     }-*/;
@@ -122,7 +118,7 @@ public class FastMap<V> extends AbstractMap<String, V> {
     public final native int size() /*-{
       var count = 0;
       for(var key in this) {
-        if (this.hasOwnProperty(key)) ++count;
+      if (this.hasOwnProperty(key)) ++count;
       }
       return count;
     }-*/;
@@ -130,15 +126,15 @@ public class FastMap<V> extends AbstractMap<String, V> {
     public final native List<V> values() /*-{
       var s = @java.util.ArrayList::new()();
       for(var key in this) {
-        if (!this.hasOwnProperty(key)) continue;
-        s.@java.util.ArrayList::add(Ljava/lang/Object;)(this[key]);
+      if (!this.hasOwnProperty(key)) continue;
+      s.@java.util.ArrayList::add(Ljava/lang/Object;)(this[key]);
       }
       return s;
     }-*/;
   }
 
-  private HashMap<String, V> javaMap;
-  private FastMap.JsMap<V> map;
+  private transient HashMap<String, V> javaMap;
+  private transient FastMap.JsMap<V> map;
 
   public FastMap() {
     if (GWT.isScript()) {
@@ -156,7 +152,7 @@ public class FastMap<V> extends AbstractMap<String, V> {
       javaMap.clear();
     }
   }
-  
+
   @Override
   public boolean containsKey(Object key) {
     if (GWT.isScript()) {

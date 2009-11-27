@@ -15,12 +15,14 @@ import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.util.Size;
+import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.ColorPalette;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
+import com.extjs.gxt.ui.client.widget.WidgetComponent;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.ToggleButton;
 import com.extjs.gxt.ui.client.widget.menu.ColorMenu;
@@ -30,6 +32,8 @@ import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.FocusEvent;
@@ -40,6 +44,7 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RichTextArea.BasicFormatter;
 import com.google.gwt.user.client.ui.RichTextArea.ExtendedFormatter;
 import com.google.gwt.user.client.ui.RichTextArea.FontSize;
@@ -222,8 +227,7 @@ public class HtmlEditor extends Field<String> {
     }
   }
 
-  protected class EventHandler implements ClickHandler, KeyUpHandler, FocusHandler,
-      BlurHandler {
+  protected class EventHandler implements ClickHandler, KeyUpHandler, FocusHandler, BlurHandler {
 
     public void onClick(ClickEvent event) {
       updateStatus();
@@ -244,7 +248,7 @@ public class HtmlEditor extends Field<String> {
     }
   }
 
-  protected class rte extends Component {
+  protected class rte extends BoxComponent {
     protected void onRender(Element target, int index) {
       Element e = impl.getElement();
       e.setPropertyInt("frameBorder", 0);
@@ -582,9 +586,8 @@ public class HtmlEditor extends Field<String> {
     fontSizesConstants.add(FontSize.X_LARGE);
     fontSizesConstants.add(FontSize.XX_LARGE);
     setSize(500, 300);
-    if (GXT.isWebKit) {
-      setValue("&#8203;");
-    }
+
+    setValue("&#8203;");
 
     messages = new HtmlEditorMessages();
 
@@ -606,7 +609,7 @@ public class HtmlEditor extends Field<String> {
    * @return <code>null</code> if basic formatting is not supported
    */
   public BasicFormatter getBasicFormatter() {
-    if ((impl instanceof BasicFormatter) && (impl.isBasicEditingSupported())) {
+    if (impl instanceof BasicFormatter) {
       return (BasicFormatter) impl;
     }
     return null;
@@ -618,7 +621,7 @@ public class HtmlEditor extends Field<String> {
    * @return <code>null</code> if full formatting is not supported
    */
   public ExtendedFormatter getExtendedFormatter() {
-    if ((impl instanceof ExtendedFormatter) && (impl.isExtendedEditingSupported())) {
+    if (impl instanceof ExtendedFormatter) {
       return (ExtendedFormatter) impl;
     }
     return null;
@@ -631,14 +634,18 @@ public class HtmlEditor extends Field<String> {
 
   @Override
   public String getRawValue() {
-    syncValue();
-    return super.getRawValue();
-  }
+    if (sourceEdit != null && sourceEdit.isPressed()) {
+      pushValue();
+    } else {
+      syncValue();
+    }
 
-  @Override
-  public String getValue() {
-    syncValue();
-    return super.getValue();
+    String value = super.getRawValue();
+    if ("&#8203;".equals(value)) {
+      return "";
+    } else {
+      return value;
+    }
   }
 
   @Override
@@ -747,8 +754,8 @@ public class HtmlEditor extends Field<String> {
     return true;
   }
 
-  protected Button createColorButton(AbstractImagePrototype icon, String toolTip,
-      String toolTipTitle, Listener<ComponentEvent> listener) {
+  protected Button createColorButton(AbstractImagePrototype icon, String toolTip, String toolTipTitle,
+      Listener<ComponentEvent> listener) {
     Button item = new Button();
     item.setIcon(icon);
     item.setTabIndex(-1);
@@ -762,8 +769,7 @@ public class HtmlEditor extends Field<String> {
     return item;
   }
 
-  protected ToggleButton createToggleButton(AbstractImagePrototype icon, String toolTip,
-      String toolTipTitle) {
+  protected ToggleButton createToggleButton(AbstractImagePrototype icon, String toolTip, String toolTipTitle) {
     ToggleButton item = new ToggleButton();
     item.setTabIndex(-1);
 
@@ -775,8 +781,7 @@ public class HtmlEditor extends Field<String> {
     return item;
   }
 
-  protected Button createButton(AbstractImagePrototype icon, String toolTip,
-      String toolTipTitle) {
+  protected Button createButton(AbstractImagePrototype icon, String toolTip, String toolTipTitle) {
     Button item = new Button();
     item.setIcon(icon);
     item.setTabIndex(-1);
@@ -836,10 +841,8 @@ public class HtmlEditor extends Field<String> {
   @Override
   protected void onRender(Element target, int index) {
     setElement(DOM.createDiv(), target, index);
-    el().setStyleName("x-html-editor-wrap");
+    addStyleName("x-html-editor-wrap");
     rte = new rte();
-
-    rte.render(el().dom);
 
     textarea = new El(DOM.createTextArea());
     textarea.addStyleName("x-hidden");
@@ -847,7 +850,7 @@ public class HtmlEditor extends Field<String> {
     textarea.addStyleName("x-form-field");
     textarea.setStyleAttribute("border", "0 none");
     el().appendChild(textarea.dom);
-
+    rte.render(el().dom);
     setupToolbar();
 
     super.onRender(target, index);
@@ -856,17 +859,22 @@ public class HtmlEditor extends Field<String> {
   @Override
   protected void onResize(int width, int height) {
     super.onResize(width, height);
-    int aw = width - el().getFrameWidth("lr");
-    int ah = height - el().getFrameWidth("tb");
+
+    int aw = width;
+    int ah = height;
+
+    Size frameWidth = el().getFrameSize();
+    aw -= frameWidth.width;
+    ah -= frameWidth.height;
 
     if (showToolbar) {
-      el().down(".x-html-editor-tb").setWidth(aw);
+      el().down(".x-html-editor-tb").setWidth(aw, true);
       toolbar.setWidth(aw);
       ah -= toolbar.getHeight();
     }
-    rte.el().setSize(aw, ah);
+    rte.setSize(aw, ah);
 
-    textarea.setSize(adjustWidth("textarea", aw), adjustWidth("textarea", ah));
+    textarea.setSize(aw, ah, true);
   }
 
   protected void setupToolbar() {
@@ -928,90 +936,82 @@ public class HtmlEditor extends Field<String> {
 
       toolbar = new ToolBar();
       if (sourceEditMode) {
-        toolbar.add(sourceEdit = createToggleButton(getImages().getSource(),
-            getMessages().getSourceEditTipText(), getMessages().getSourceEditTipTitle()));
+        toolbar.add(sourceEdit = createToggleButton(getImages().getSource(), getMessages().getSourceEditTipText(),
+            getMessages().getSourceEditTipTitle()));
         toolbar.add(new SeparatorToolItem());
       }
 
-      if (impl.isBasicEditingSupported()) {
+      if (getBasicFormatter() != null) {
         if (enableFont) {
-          SimpleComboBox<String> scbf = new SimpleComboBox<String>();
-          scbf.setTabIndex(-1);
-          scbf.add("Arial");
-          scbf.add("Times New Roman");
-          scbf.add("Verdana");
-          scbf.setEditable(false);
-          scbf.addListener(Events.Select, new Listener<FieldEvent>() {
-            @SuppressWarnings("unchecked")
-            public void handleEvent(FieldEvent be) {
-              SimpleComboBox<String> field = (SimpleComboBox<String>) be.getField();
-              getBasicFormatter().setFontName(field.getSimpleValue());
+
+          final ListBox listBox = new ListBox();
+          listBox.addChangeHandler(new ChangeHandler() {
+            public void onChange(ChangeEvent event) {
+              ListBox listBox = (ListBox) event.getSource();
+              getBasicFormatter().setFontName(listBox.getValue(listBox.getSelectedIndex()));
             }
           });
-          toolbar.add(scbf);
+          listBox.addItem("Arial");
+
+          listBox.addItem("Times New Roman");
+          listBox.addItem("Verdana");
+
+          toolbar.add(new WidgetComponent(listBox));
           toolbar.add(new SeparatorToolItem());
         }
         if (enableFontSize) {
           toolbar.add(increasefontsize = createButton(getImages().getFontIncrease(),
-              getMessages().getIncreaseFontSizeTipText(),
-              getMessages().getIncreaseFontSizeTipTitle()));
+              getMessages().getIncreaseFontSizeTipText(), getMessages().getIncreaseFontSizeTipTitle()));
           toolbar.add(decreasefontsize = createButton(getImages().getFontDecrease(),
-              getMessages().getDecreaseFontSizeTipText(),
-              getMessages().getDecreaseFontSizeTipTitle()));
+              getMessages().getDecreaseFontSizeTipText(), getMessages().getDecreaseFontSizeTipTitle()));
 
           toolbar.add(new SeparatorToolItem());
         }
         if (enableFormat) {
-          toolbar.add(bold = createToggleButton(getImages().getBold(),
-              getMessages().getBoldTipText(), getMessages().getBackColorTipTitle()));
-          toolbar.add(italic = createToggleButton(getImages().getItalic(),
-              getMessages().getItalicTipText(), getMessages().getItalicTipTitle()));
-          toolbar.add(underline = createToggleButton(getImages().getUnderline(),
-              getMessages().getUnderlineTipText(), getMessages().getUnderlineTipTitle()));
+          toolbar.add(bold = createToggleButton(getImages().getBold(), getMessages().getBoldTipText(),
+              getMessages().getBackColorTipTitle()));
+          toolbar.add(italic = createToggleButton(getImages().getItalic(), getMessages().getItalicTipText(),
+              getMessages().getItalicTipTitle()));
+          toolbar.add(underline = createToggleButton(getImages().getUnderline(), getMessages().getUnderlineTipText(),
+              getMessages().getUnderlineTipTitle()));
           toolbar.add(new SeparatorToolItem());
         }
         if (enableAlignments) {
-          toolbar.add(justifyLeft = createButton(getImages().getJustifyLeft(),
-              getMessages().getJustifyLeftTipText(),
+          toolbar.add(justifyLeft = createButton(getImages().getJustifyLeft(), getMessages().getJustifyLeftTipText(),
               getMessages().getJustifyLeftTipTitle()));
           toolbar.add(justifyCenter = createButton(getImages().getJustifyCenter(),
-              getMessages().getJustifyCenterTipText(),
-              getMessages().getJustifyCenterTipTitle()));
+              getMessages().getJustifyCenterTipText(), getMessages().getJustifyCenterTipTitle()));
           toolbar.add(justifyRight = createButton(getImages().getJustifyRight(),
-              getMessages().getJustifyRightTipText(),
-              getMessages().getJustifyRightTipTitle()));
+              getMessages().getJustifyRightTipText(), getMessages().getJustifyRightTipTitle()));
+          toolbar.add(new SeparatorToolItem());
         }
       }
 
-      if (impl.isExtendedEditingSupported()) {
+      if (getExtendedFormatter() != null) {
         if (enableLists) {
-          toolbar.add(new SeparatorToolItem());
-          toolbar.add(ol = createButton(getImages().getOl(),
-              getMessages().getOlTipText(), getMessages().getOlTipTitle()));
-          toolbar.add(ul = createButton(getImages().getUl(),
-              getMessages().getUlTipText(), getMessages().getUlTipTitle()));
+          toolbar.add(ol = createButton(getImages().getOl(), getMessages().getOlTipText(),
+              getMessages().getOlTipTitle()));
+          toolbar.add(ul = createButton(getImages().getUl(), getMessages().getUlTipText(),
+              getMessages().getUlTipTitle()));
           toolbar.add(new SeparatorToolItem());
         }
         if (enableLinks) {
-          toolbar.add(link = createButton(getImages().getLink(),
-              getMessages().getLinkTipText(), getMessages().getLinkTipTitle()));
+          toolbar.add(link = createButton(getImages().getLink(), getMessages().getLinkTipText(),
+              getMessages().getLinkTipTitle()));
           toolbar.add(new SeparatorToolItem());
         }
         if (enableColors) {
-          toolbar.add(forecolor = createColorButton(getImages().getFontColor(),
-              getMessages().getForeColorTipText(), getMessages().getForColorTipTitle(),
-              new Listener<ComponentEvent>() {
+          toolbar.add(forecolor = createColorButton(getImages().getFontColor(), getMessages().getForeColorTipText(),
+              getMessages().getForColorTipTitle(), new Listener<ComponentEvent>() {
                 public void handleEvent(ComponentEvent be) {
-                  getBasicFormatter().setForeColor(
-                      ((ColorPalette) be.getComponent()).getValue());
+                  getBasicFormatter().setForeColor(((ColorPalette) be.getComponent()).getValue());
                 }
               }));
           toolbar.add(backcolor = createColorButton(getImages().getFontHighlight(),
               getMessages().getBackColorTipText(), getMessages().getBackColorTipTitle(),
               new Listener<ComponentEvent>() {
                 public void handleEvent(ComponentEvent be) {
-                  getBasicFormatter().setBackColor(
-                      ((ColorPalette) be.getComponent()).getValue());
+                  getBasicFormatter().setBackColor(((ColorPalette) be.getComponent()).getValue());
                 }
               }));
         }
@@ -1042,14 +1042,11 @@ public class HtmlEditor extends Field<String> {
 
   protected void updateStatus() {
     if (showToolbar && rendered) {
-      if (impl.isBasicEditingSupported()) {
-        BasicFormatter basic = getBasicFormatter();
+      BasicFormatter basic = getBasicFormatter();
+      if (basic != null) {
         bold.toggle(basic.isBold());
         underline.toggle(basic.isUnderlined());
         italic.toggle(basic.isItalic());
-      }
-      if (impl.isExtendedEditingSupported()) {
-        // ExtendedFormatter extended = getExtendedFormatter();
       }
     }
   }

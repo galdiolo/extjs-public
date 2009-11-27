@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.data.ModelKeyProvider;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.TreePanelEvent;
@@ -24,10 +25,11 @@ import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.google.gwt.user.client.Element;
 
 public class FastTreePanelExample extends LayoutContainer {
+  private int counter = 0;
 
   @Override
   protected void onRender(Element parent, int index) {
-
+    super.onRender(parent, index);
     setLayout(new FlowLayout(12));
 
     final Html html = new Html("This tree is handling 1 child. Expand to get more!");
@@ -42,7 +44,13 @@ public class FastTreePanelExample extends LayoutContainer {
     final TreePanel<ModelData> tree = new TreePanel<ModelData>(store);
     tree.setTrackMouseOver(false);
     tree.setDisplayProperty("name");
+    store.setKeyProvider(new ModelKeyProvider<ModelData>() {
 
+      public String getKey(ModelData model) {
+        return model.get("id");
+      }
+
+    });
     ModelData m = createModel("Fast Tree");
     store.add(m, false);
 
@@ -70,8 +78,7 @@ public class FastTreePanelExample extends LayoutContainer {
     tree.addListener(Events.Expand, new Listener<TreePanelEvent<ModelData>>() {
 
       public void handleEvent(TreePanelEvent<ModelData> be) {
-        html.setHtml("<span>This tree is handling "
-            + tree.getStore().getAllItems().size()
+        html.setHtml("<span>This tree is handling " + tree.getStore().getAllItems().size()
             + " children. Expand to get more!</span>");
 
       }
@@ -81,17 +88,13 @@ public class FastTreePanelExample extends LayoutContainer {
     add(html);
     container.add(tree);
     add(container);
-    super.onRender(parent, index);
-  }
-
-  protected void afterRender() {
-    super.afterRender();
-    layout(true);
+    
   }
 
   private ModelData createModel(String n) {
     ModelData m = new BaseModelData();
     m.set("name", n);
+    m.set("id", String.valueOf(counter++));
     return m;
   }
 

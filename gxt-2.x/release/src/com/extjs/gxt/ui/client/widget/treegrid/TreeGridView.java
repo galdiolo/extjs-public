@@ -9,17 +9,18 @@ package com.extjs.gxt.ui.client.widget.treegrid;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.core.El;
-import com.extjs.gxt.ui.client.core.FastMap;
 import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.SortInfo;
 import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.store.TreeStore;
+import com.extjs.gxt.ui.client.util.IconHelper;
+import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.grid.BufferView;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnData;
@@ -41,15 +42,13 @@ public class TreeGridView extends BufferView {
   protected TreeGrid tree;
   protected TreeStore treeStore;
 
-  private String collapseHtml = GXT.IMAGES.tree_collapsed().getHTML();
-  private String expandHtml = GXT.IMAGES.tree_expanded().getHTML();
   private int treeColumn = -1;
 
   public TreeGridView() {
     setRowSelectorDepth(20);
     setCellSelectorDepth(10);
   }
-  
+
   public void collapse(TreeNode node) {
     ModelData p = node.m;
     ModelData lc = treeStore.getLastChild(p);
@@ -62,7 +61,7 @@ public class TreeGridView extends BufferView {
     }
     tree.refresh(node.m);
   }
-  
+
   public void expand(TreeNode node) {
     ModelData p = node.m;
     List<ModelData> children = treeStore.getChildren(p);
@@ -78,12 +77,12 @@ public class TreeGridView extends BufferView {
     }
     tree.refresh(node.m);
   }
-  
+
   public Element getJointElement(TreeNode node) {
     Element row = getRowElement(node);
     if (row != null) {
       El jointEl = fly(row).selectNode(".x-tree3-el");
-      if (jointEl != null && widgetMap.size() > 0) {
+      if (jointEl != null && widgetList.size() > 0) {
         El j = jointEl.selectNode(".x-tree3-el-jnt");
         if (j != null) {
           return j.dom.getFirstChild().cast();
@@ -93,24 +92,24 @@ public class TreeGridView extends BufferView {
     }
     return null;
   }
-  
+
   public String getTemplate(ModelData m, String id, String text, AbstractImagePrototype icon, boolean checkable,
       Joint joint, int level) {
 
     StringBuffer sb = new StringBuffer();
-    sb.append("<div id=\"");
+    sb.append("<div unselectable=\"on\" id=\"");
     sb.append(id);
     sb.append("\" class=\"x-tree3-node\">");
 
-    sb.append("<div class=\"x-tree3-el\">");
+    sb.append("<div unselectable=\"on\" class=\"x-tree3-el\">");
 
     String h = "";
     switch (joint) {
       case COLLAPSED:
-        h = collapseHtml;
+        h = tree.getStyle().getJointCollapsedIcon().getHTML();
         break;
       case EXPANDED:
-        h = expandHtml;
+        h = tree.getStyle().getJointExpandedIcon().getHTML();
         break;
       default:
         h = "<img src=\"" + GXT.BLANK_IMAGE_URL + "\" style='width: 16px'>";
@@ -132,7 +131,7 @@ public class TreeGridView extends BufferView {
     } else {
       sb.append("<span></span>");
     }
-    sb.append("<span class=\"x-tree3-node-text\">");
+    sb.append("<span unselectable=\"on\" class=\"x-tree3-node-text\">");
     sb.append(text);
     sb.append("</span>");
 
@@ -146,21 +145,22 @@ public class TreeGridView extends BufferView {
       Joint joint, int level) {
 
     StringBuffer sb = new StringBuffer();
-    sb.append("<div id=\"");
+    sb.append("<div unselectable=\"on\" id=\"");
     sb.append(id);
     sb.append("\" class=\"x-tree3-node\">");
-    // jumping content when inserting in column with cell widget the column extra width fixes
-    sb.append("<div class=\"x-tree3-el\" style=\"width: 1000px;height: auto;\">");
-    
+    // jumping content when inserting in column with cell widget the column
+    // extra width fixes
+    sb.append("<div unselectable=\"on\" class=\"x-tree3-el\" style=\"width: 1000px;height: auto;\">");
+
     sb.append("<table cellpadding=0 cellspacing=0><tr><td>");
 
     String h = "";
     switch (joint) {
       case COLLAPSED:
-        h = collapseHtml;
+        h = tree.getStyle().getJointCollapsedIcon().getHTML();
         break;
       case EXPANDED:
-        h = expandHtml;
+        h = tree.getStyle().getJointExpandedIcon().getHTML();
         break;
       default:
         h = "<img src=\"" + GXT.BLANK_IMAGE_URL + "\" style='width: 16px'>";
@@ -184,7 +184,7 @@ public class TreeGridView extends BufferView {
       sb.append("<span></span>");
     }
     sb.append("</td><td>");
-    sb.append("<span class=\"x-tree3-node-text\">");
+    sb.append("<span unselectable=\"on\" class=\"x-tree3-node-text\">");
     sb.append(text);
     sb.append("</span>");
     sb.append("</td></tr></table>");
@@ -194,11 +194,13 @@ public class TreeGridView extends BufferView {
 
     return sb.toString();
   }
-  
+
   public boolean isSelectableTarget(ModelData model, Element target) {
     TreeNode node = tree.findNode(model);
     if (node != null) {
-      if (DOM.isOrHasChild(getJointElement(node), target)) {
+
+      Element j = getJointElement(node);
+      if (j != null && DOM.isOrHasChild(j, target)) {
         return false;
       }
     }
@@ -206,16 +208,19 @@ public class TreeGridView extends BufferView {
   }
 
   public void onIconStyleChange(TreeNode node, AbstractImagePrototype icon) {
-    El nodeEl = fly(getRowElement(node)).selectNode(".x-tree3-el");
-    if (nodeEl != null) {
-      Element iconEl = nodeEl.dom.getChildNodes().getItem(3).cast();
-      if (iconEl != null) {
-        if (icon != null) {
-          iconEl.getParentElement().insertBefore(icon.createElement(), iconEl);
-        } else {
-          iconEl.getParentElement().insertBefore(DOM.createSpan(), iconEl);
+    Element rowEl = getRowElement(node);
+    if (rowEl != null) {
+      El nodeEl = fly(rowEl).selectNode(".x-tree3-el");
+      if (nodeEl != null) {
+        Element iconEl = nodeEl.dom.getChildNodes().getItem(3).cast();
+        if (iconEl != null) {
+          if (icon != null) {
+            iconEl.getParentElement().insertBefore(icon.createElement(), iconEl);
+          } else {
+            iconEl.getParentElement().insertBefore(DOM.createSpan(), iconEl);
+          }
+          El.fly(iconEl).remove();
         }
-        El.fly(iconEl).remove();
       }
     }
   }
@@ -225,10 +230,10 @@ public class TreeGridView extends BufferView {
     if (jointEl != null) {
       switch (joint) {
         case EXPANDED:
-          jointEl.getParentElement().insertBefore(GXT.IMAGES.tree_expanded().createElement(), jointEl);
+          jointEl.getParentElement().insertBefore(tree.getStyle().getJointExpandedIcon().createElement(), jointEl);
           break;
         case COLLAPSED:
-          jointEl.getParentElement().insertBefore(GXT.IMAGES.tree_collapsed().createElement(), jointEl);
+          jointEl.getParentElement().insertBefore(tree.getStyle().getJointCollapsedIcon().createElement(), jointEl);
           break;
         default:
           jointEl.getParentElement().insertBefore(
@@ -238,9 +243,20 @@ public class TreeGridView extends BufferView {
     }
   }
 
+  public void onLoading(TreeNode node) {
+    onIconStyleChange(node, IconHelper.createStyle("x-tree3-loading"));
+  }
+
+  @Override
+  protected void doSort(int colIndex, SortDir sortDir) {
+    treeStore.sort(cm.getDataIndex(colIndex), sortDir);
+  }
+
   @Override
   protected String getRenderedValue(ColumnData data, int rowIndex, int colIndex, ModelData m, String property) {
     GridCellRenderer<ModelData> r = cm.getRenderer(colIndex);
+    List<Widget> rowMap = widgetList.get(rowIndex);
+    rowMap.add(colIndex, null);
     if (r != null) {
       Object o = r.render(ds.getAt(rowIndex), property, data, rowIndex, colIndex, ds, grid);
       if (o instanceof Widget || r instanceof WidgetTreeGridCellRenderer) {
@@ -252,14 +268,7 @@ public class TreeGridView extends BufferView {
               grid);
         }
 
-        Map<String, Widget> rowMap = null;
-        if (widgetMap.containsKey(String.valueOf(rowIndex))) {
-          rowMap = widgetMap.get(String.valueOf(rowIndex));
-        } else {
-          rowMap = new FastMap<Widget>();
-          widgetMap.put(String.valueOf(rowIndex), rowMap);
-        }
-        rowMap.put(String.valueOf(colIndex), w);
+        rowMap.set(colIndex, w);
         if (colIndex == treeColumn) {
           return o.toString();
         }
@@ -281,14 +290,20 @@ public class TreeGridView extends BufferView {
       val = dtf.format((Date) val);
     }
 
+    String text = null;
     if (val != null) {
-      return val.toString();
+      text = val.toString();
     }
-    return "";
+    return Util.isEmptyString(text) ? "&#160;" : text;
   }
 
   protected Element getRowElement(TreeNode node) {
-    return getRow(ds.indexOf(node.m)).cast();
+    return (Element) getRow(ds.indexOf(node.m));
+  }
+
+  @Override
+  protected SortInfo getSortState() {
+    return treeStore.getSortState();
   }
 
   protected Element getWidgetCell(int row, int col) {
@@ -322,25 +337,18 @@ public class TreeGridView extends BufferView {
     assert treeColumn != -1 : "No TreeGridCellRenderer specified";
   }
 
+  @Override
   protected void onClick(GridEvent<ModelData> ce) {
     if (ce.getModel() != null && !isSelectableTarget(ce.getModel(), ce.getTarget())) {
       return;
     }
     super.onClick(ce);
   }
-  
-  @Override
-  protected SortInfo getSortState() {
-    return treeStore.getSortState();
-  }
 
   @Override
-  protected void onHeaderClick(Grid<ModelData> grid, int column) {
-    if (headerDisabled || !cm.isSortable(column)) {
-      return;
-    }
-    
-    treeStore.sort(cm.getDataIndex(column), null);
+  protected void onRowSelect(int rowIndex) {
+    super.onRowSelect(rowIndex);
+    tree.setExpanded(treeStore.getParent(tree.getStore().getAt(rowIndex)), true);
   }
 
 }

@@ -8,13 +8,13 @@
 package com.extjs.gxt.ui.client.widget.layout;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.BaseEvent;
+import com.extjs.gxt.ui.client.event.BorderLayoutEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.EventType;
 import com.extjs.gxt.ui.client.event.Events;
@@ -22,6 +22,7 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SplitBarEvent;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.util.Rectangle;
+import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.CollapsePanel;
 import com.extjs.gxt.ui.client.widget.Component;
@@ -83,20 +84,19 @@ import com.extjs.gxt.ui.client.widget.button.ToolButton;
  */
 public class BorderLayout extends Layout {
 
-  protected Map<LayoutRegion, SplitBar> splitBars;
+  protected Map<String, SplitBar> splitBars;
 
-  private boolean enableState = true;
   private Listener<ComponentEvent> collapseListener;
+  private boolean enableState = true;
+  private Rectangle lastCenter;
+  private LayoutContainer layoutContainer;
   private BoxComponent north, south;
   private BoxComponent west, east, center;
-  private boolean rendered;
-  private LayoutContainer layoutContainer;
-  private String containerStyle = "x-border-layout-ct";
-  private Rectangle lastCenter;
 
   public BorderLayout() {
+    targetStyleName = "x-border-layout-ct";
+    componentStyleName = "x-border-panel";
     monitorResize = true;
-    splitBars = new HashMap<LayoutRegion, SplitBar>();
     collapseListener = new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent e) {
         EventType type = e.getType();
@@ -145,13 +145,22 @@ public class BorderLayout extends Layout {
     return enableState;
   }
 
+  /**
+   * Hides the component in the given region.
+   * 
+   * @param region the layout region
+   */
   public void hide(LayoutRegion region) {
     Component c = getRegionWidget(region);
     if (c != null) {
-      BorderLayoutData data = (BorderLayoutData) getLayoutData(c);
-      data.setHidden(true);
-      layout();
+      c.hide();
     }
+  }
+
+  public void setContainer(Container<?> ct) {
+    super.setContainer(ct);
+    assert ct instanceof LayoutContainer : "BorderLayout needs a LayoutContainer";
+    layoutContainer = (LayoutContainer) ct;
   }
 
   /**
@@ -161,7 +170,7 @@ public class BorderLayout extends Layout {
    * @param style the style name
    */
   public void setContainerStyle(String style) {
-    this.containerStyle = style;
+    this.targetStyleName = style;
   }
 
   /**
@@ -174,12 +183,15 @@ public class BorderLayout extends Layout {
     this.enableState = enableState;
   }
 
+  /**
+   * Shows the component in the given region.
+   * 
+   * @param region the layout region
+   */
   public void show(LayoutRegion region) {
     Component c = getRegionWidget(region);
     if (c != null) {
-      BorderLayoutData data = (BorderLayoutData) getLayoutData(c);
-      data.setHidden(false);
-      layout();
+      c.show();
     }
   }
 
@@ -188,36 +200,48 @@ public class BorderLayout extends Layout {
   }
 
   @Override
+  protected void onComponentHide(Component component) {
+    super.onComponentHide(component);
+    if (component != null && component.isRendered()) {
+      BorderLayoutData data = (BorderLayoutData) getLayoutData(component);
+      data.setHidden(true);
+      layout();
+    }
+  }
+
+  @Override
+  protected void onComponentShow(Component component) {
+    super.onComponentShow(component);
+    if (component != null && component.isRendered()) {
+      BorderLayoutData data = (BorderLayoutData) getLayoutData(component);
+      data.setHidden(false);
+      layout();
+    }
+  }
+
+  @Override
   protected void onLayout(Container<?> container, El target) {
     super.onLayout(container, target);
-    layoutContainer = (LayoutContainer) container;
-    if (!rendered) {
-      target.makePositionable();
-      target.addStyleName(containerStyle);
+
+    if (enableState) {
       List<Component> list = new ArrayList<Component>(container.getItems());
-      for (int i = 0; i < list.size(); i++) {
-        Component c = list.get(i);
-        if (!c.isRendered()) {
-          c.addStyleName("x-border-panel");
-          c.render(target.dom, i);
-        }
-        if (enableState) {
-          BorderLayoutData data = (BorderLayoutData) getLayoutData(c);
-          Map<String, Object> st = c.getState();
-          if (st.containsKey("collapsed") && (c instanceof ContentPanel)) {
-            switchPanels((ContentPanel) c);
-          } else if (st.containsKey("size") && (c instanceof BoxComponent)
-              && (!(c instanceof CollapsePanel))) {
-            data.setSize((Float) st.get("size"));
-          }
+      for (Component c : list) {
+        BorderLayoutData data = (BorderLayoutData) getLayoutData(c);
+        Map<String, Object> st = c.getState();
+        if (st.containsKey("collapsed") && (c instanceof ContentPanel)) {
+          switchPanels((ContentPanel) c);
+        } else if (st.containsKey("size") && (c instanceof BoxComponent) && (!(c instanceof CollapsePanel))) {
+          data.setSize((Float) st.get("size"));
         }
       }
-      rendered = true;
     }
 
-    Rectangle rect = target.getBounds();
-    int w = rect.width - target.getBorderWidth("lr");
-    int h = rect.height - target.getBorderWidth("tb");
+    Size size = target.getStyleSize();
+    int w = size.width;
+    int h = size.height;
+
+    int sLeft = target.getFrameWidth("l");
+    int sTop = target.getFrameWidth("t");
     int centerW = w, centerH = h, centerY = 0, centerX = 0;
 
     north = getRegionWidget(LayoutRegion.NORTH);
@@ -236,18 +260,22 @@ public class BorderLayout extends Layout {
         if (data.isSplit()) {
           initSplitBar(LayoutRegion.SOUTH, north, data);
         } else {
-          removeSplitBar(LayoutRegion.SOUTH);
+          removeSplitBar(north);
         }
         Rectangle b = new Rectangle();
         Margins m = data.getMargins();
-        float s = data.getSize() < 1 ? data.getSize() * rect.height : data.getSize();
+        float s = data.getSize() < 1 ? data.getSize() * size.height : data.getSize();
         b.height = (int) s;
         b.width = w - (m.left + m.right);
         b.x = m.left;
         b.y = m.top;
         centerY = b.height + b.y + m.bottom;
         centerH -= centerY;
+        b.x += sLeft;
+        b.y += sTop;
         applyLayout(north, b);
+      } else {
+        removeSplitBar(north);
       }
 
     }
@@ -261,18 +289,22 @@ public class BorderLayout extends Layout {
         if (data.isSplit()) {
           initSplitBar(LayoutRegion.NORTH, south, data);
         } else {
-          removeSplitBar(LayoutRegion.NORTH);
+          removeSplitBar(south);
         }
         Rectangle b = south.getBounds(false);
         Margins m = data.getMargins();
-        float s = data.getSize() < 1 ? data.getSize() * rect.height : data.getSize();
+        float s = data.getSize() < 1 ? data.getSize() * size.height : data.getSize();
         b.height = (int) s;
         b.width = w - (m.left + m.right);
         b.x = m.left;
         int totalHeight = (b.height + m.top + m.bottom);
         b.y = h - totalHeight + m.top;
         centerH -= totalHeight;
+        b.x += sLeft;
+        b.y += sTop;
         applyLayout(south, b);
+      } else {
+        removeSplitBar(south);
       }
     }
 
@@ -287,12 +319,12 @@ public class BorderLayout extends Layout {
         if (data.isSplit()) {
           initSplitBar(LayoutRegion.EAST, west, data);
         } else {
-          removeSplitBar(LayoutRegion.EAST);
+          removeSplitBar(west);
         }
 
         Rectangle box = new Rectangle();
         Margins m = data.getMargins();
-        float s = data.getSize() < 1 ? data.getSize() * rect.width : data.getSize();
+        float s = data.getSize() < 1 ? data.getSize() * size.width : data.getSize();
         box.width = (int) s;
         box.height = centerH - (m.top + m.bottom);
         box.x = m.left;
@@ -300,8 +332,12 @@ public class BorderLayout extends Layout {
         int totalWidth = (box.width + m.left + m.right);
         centerX += totalWidth;
         centerW -= totalWidth;
+        box.x += sLeft;
+        box.y += sTop;
         applyLayout(west, box);
 
+      } else {
+        removeSplitBar(west);
       }
 
     }
@@ -316,18 +352,22 @@ public class BorderLayout extends Layout {
         if (data.isSplit()) {
           initSplitBar(LayoutRegion.WEST, east, data);
         } else {
-          removeSplitBar(LayoutRegion.WEST);
+          removeSplitBar(east);
         }
         Rectangle b = east.getBounds(false);
         Margins m = data.getMargins();
-        float s = data.getSize() < 1 ? data.getSize() * rect.width : data.getSize();
+        float s = data.getSize() < 1 ? data.getSize() * size.width : data.getSize();
         b.width = (int) s;
         b.height = centerH - (m.top + m.bottom);
         int totalWidth = (b.width + m.left + m.right);
         b.x = w - totalWidth + m.left;
         b.y = centerY + m.top;
         centerW -= totalWidth;
+        b.x += sLeft;
+        b.y += sTop;
         applyLayout(east, b);
+      } else {
+        removeSplitBar(east);
       }
     }
 
@@ -340,6 +380,8 @@ public class BorderLayout extends Layout {
       lastCenter.y = centerY + m.top;
       lastCenter.width = centerW - (m.left + m.right);
       lastCenter.height = centerH - (m.top + m.bottom);
+      lastCenter.x += sLeft;
+      lastCenter.y += sTop;
       applyLayout(center, lastCenter);
     }
   }
@@ -369,9 +411,19 @@ public class BorderLayout extends Layout {
   }
 
   private void applyLayout(BoxComponent component, Rectangle box) {
-    component.el().makePositionable(true);
-    component.el().setLeftTop(box.x, box.y);
+    component.setPosition(box.x, box.y);
     component.setSize(box.width, box.height);
+  }
+
+  private BorderLayoutEvent createBorderLaoutEvent(ContentPanel panel) {
+    BorderLayoutEvent event = new BorderLayoutEvent(container, this);
+    event.setPanel(panel);
+    LayoutData data = ComponentHelper.getLayoutData(panel);
+    if (data != null && data instanceof BorderLayoutData) {
+      event.setRegion(((BorderLayoutData) data).getRegion());
+    }
+
+    return event;
   }
 
   private CollapsePanel createCollapsePanel(ContentPanel panel, BorderLayoutData data) {
@@ -395,10 +447,10 @@ public class BorderLayout extends Layout {
   private BoxComponent getRegionWidget(LayoutRegion region) {
     for (int i = 0; i < container.getItemCount(); i++) {
       BoxComponent w = (BoxComponent) container.getItem(i);
-      if (getLayoutData(w) != null && getLayoutData(w) instanceof BorderLayoutData) {
-        BorderLayoutData data = (BorderLayoutData) getLayoutData(w);
+      LayoutData d = getLayoutData(w);
+      if (d != null && d instanceof BorderLayoutData) {
+        BorderLayoutData data = (BorderLayoutData) d;
         if (data.getRegion() == region) {
-          w.el().makePositionable(true);
           return w;
         }
       }
@@ -446,8 +498,7 @@ public class BorderLayout extends Layout {
 
   }
 
-  private void initSplitBar(final LayoutRegion region, final BoxComponent component,
-      final BorderLayoutData data) {
+  private void initSplitBar(final LayoutRegion region, final BoxComponent component, final BorderLayoutData data) {
     SplitBar bar = (SplitBar) component.getData("splitBar");
     if (bar == null || bar.getResizeWidget() != component) {
       bar = createSplitBar(region, component);
@@ -468,7 +519,7 @@ public class BorderLayout extends Layout {
       bar.setMinSize(data.getMinSize());
       bar.setMaxSize(data.getMaxSize() == 0 ? bar.getMaxSize() : data.getMaxSize());
       bar.setAutoSize(false);
-      bar.addListener(Events.Resize, new Listener<SplitBarEvent>() {
+      bar.addListener(Events.DragEnd, new Listener<SplitBarEvent>() {
         public void handleEvent(SplitBarEvent sbe) {
           if (sbe.getSize() < 1) {
             return;
@@ -486,34 +537,53 @@ public class BorderLayout extends Layout {
   }
 
   private void onCollapse(ContentPanel panel) {
-    if (!layoutContainer.getItems().contains(panel)) {
-      return;
-    }
+    if (layoutContainer.getItems().contains(panel) && fireEvent(Events.BeforeCollapse, createBorderLaoutEvent(panel))) {
 
-    BorderLayoutData data = (BorderLayoutData) getLayoutData(panel);
-    layoutContainer.remove(panel);
-    Map<String, Object> st = panel.getState();
-    st.put("collapsed", true);
-    panel.saveState();
-    setCollapsed(panel, true);
+      BorderLayoutData data = (BorderLayoutData) getLayoutData(panel);
 
-    CollapsePanel cp = (CollapsePanel) panel.getData("collapse");
-    if (cp == null) {
-      cp = createCollapsePanel(panel, data);
+      boolean layoutOnChange = layoutContainer.isLayoutOnChange();
+      setLayoutOnChange(layoutContainer, false);
+
+      layoutContainer.remove(panel);
+      Map<String, Object> st = panel.getState();
+      st.put("collapsed", true);
+      panel.saveState();
+      setCollapsed(panel, true);
+
+      CollapsePanel cp = (CollapsePanel) panel.getData("collapse");
+      if (cp == null) {
+        cp = createCollapsePanel(panel, data);
+      }
+      layoutContainer.add(cp);
+      layout();
+
+      setLayoutOnChange(layoutContainer, layoutOnChange);
+
+      fireEvent(Events.Collapse, createBorderLaoutEvent(panel));
     }
-    layoutContainer.add(cp);
-    layoutContainer.layout();
   }
 
   private void onExpand(ContentPanel panel) {
-    setCollapsed(panel, false);
     CollapsePanel cp = panel.getData("collapse");
-    Map<String, Object> st = panel.getState();
-    st.remove("collapsed");
-    panel.saveState();
-    layoutContainer.remove(cp);
-    layoutContainer.add(panel);
-    layoutContainer.layout();
+    if (cp != null && layoutContainer.getItems().contains(cp)
+        && fireEvent(Events.BeforeExpand, createBorderLaoutEvent(panel))) {
+      boolean layoutOnChange = layoutContainer.isLayoutOnChange();
+      setLayoutOnChange(layoutContainer, false);
+
+      setCollapsed(panel, false);
+
+      Map<String, Object> st = panel.getState();
+      st.remove("collapsed");
+      panel.saveState();
+
+      layoutContainer.remove(cp);
+      layoutContainer.add(panel);
+      layout();
+
+      setLayoutOnChange(layoutContainer, layoutOnChange);
+
+      fireEvent(Events.Expand, createBorderLaoutEvent(panel));
+    }
   }
 
   private void onExpandClick(CollapsePanel cp) {
@@ -521,13 +591,17 @@ public class BorderLayout extends Layout {
     onExpand(panel);
   }
 
-  private void removeSplitBar(LayoutRegion region) {
-    splitBars.put(region, null);
+  private void removeSplitBar(Component c) {
+    SplitBar splitBar = c.getData("splitBar");
+    if (splitBar != null) {
+      splitBar.release();
+      c.setData("splitBar", null);
+    }
   }
 
   private native void setCollapsed(ContentPanel panel, boolean collapse) /*-{
-    panel.@com.extjs.gxt.ui.client.widget.ContentPanel::collapsed = collapse;
-  }-*/;
+                                                                         panel.@com.extjs.gxt.ui.client.widget.ContentPanel::collapsed = collapse;
+                                                                         }-*/;
 
   private void switchPanels(ContentPanel panel) {
     BorderLayoutData data = (BorderLayoutData) getLayoutData(panel);
@@ -538,8 +612,13 @@ public class BorderLayout extends Layout {
     }
     initPanel(panel);
     setCollapsed(panel, true);
+    boolean layoutOnChange = layoutContainer.isLayoutOnChange();
+    setLayoutOnChange(layoutContainer, false);
     layoutContainer.add(cp);
     renderComponent(cp, 0, layoutContainer.getLayoutTarget());
+    if (layoutOnChange) {
+      setLayoutOnChange(layoutContainer, true);
+    }
   }
 
 }

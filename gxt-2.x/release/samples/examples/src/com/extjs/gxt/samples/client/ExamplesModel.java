@@ -23,6 +23,7 @@ import com.extjs.gxt.samples.client.examples.dnd.BasicDNDExample;
 import com.extjs.gxt.samples.client.examples.dnd.DualListFieldExample;
 import com.extjs.gxt.samples.client.examples.dnd.GridToGridExample;
 import com.extjs.gxt.samples.client.examples.dnd.ListViewDNDExample;
+import com.extjs.gxt.samples.client.examples.dnd.MultiComponentExample;
 import com.extjs.gxt.samples.client.examples.dnd.ReorderingGridExample;
 import com.extjs.gxt.samples.client.examples.dnd.ReorderingTreeGridExample;
 import com.extjs.gxt.samples.client.examples.dnd.ReorderingTreePanelExample;
@@ -34,6 +35,7 @@ import com.extjs.gxt.samples.client.examples.forms.ComboBoxExample;
 import com.extjs.gxt.samples.client.examples.forms.FileUploadExample;
 import com.extjs.gxt.samples.client.examples.forms.FormsExample;
 import com.extjs.gxt.samples.client.examples.grid.AggregationGridExample;
+import com.extjs.gxt.samples.client.examples.grid.AutoHeightGridExample;
 import com.extjs.gxt.samples.client.examples.grid.BeanModelGridExample;
 import com.extjs.gxt.samples.client.examples.grid.BufferedGridExample;
 import com.extjs.gxt.samples.client.examples.grid.ColumnGroupingExample;
@@ -43,6 +45,7 @@ import com.extjs.gxt.samples.client.examples.grid.GridExample;
 import com.extjs.gxt.samples.client.examples.grid.GridPluginsExample;
 import com.extjs.gxt.samples.client.examples.grid.GroupingGridExample;
 import com.extjs.gxt.samples.client.examples.grid.JsonGridExample;
+import com.extjs.gxt.samples.client.examples.grid.LiveGridExample;
 import com.extjs.gxt.samples.client.examples.grid.MemoryPagingGridExample;
 import com.extjs.gxt.samples.client.examples.grid.PagingBeanModelGridExample;
 import com.extjs.gxt.samples.client.examples.grid.PagingGridExample;
@@ -78,6 +81,7 @@ import com.extjs.gxt.samples.client.examples.toolbar.ToolBarExample;
 import com.extjs.gxt.samples.client.examples.toolbar.ToolBarOverflowExample;
 import com.extjs.gxt.samples.client.examples.treegrid.AsyncTreeGridExample;
 import com.extjs.gxt.samples.client.examples.treegrid.EditorTreeGridExample;
+import com.extjs.gxt.samples.client.examples.treegrid.RemoteSortTreeGridExample;
 import com.extjs.gxt.samples.client.examples.treegrid.RowEditorTreeGridExample;
 import com.extjs.gxt.samples.client.examples.treegrid.RowNumberTreeGridExample;
 import com.extjs.gxt.samples.client.examples.treegrid.TreeGridExample;
@@ -96,7 +100,8 @@ import com.extjs.gxt.samples.client.examples.windows.AccordionWindowExample;
 import com.extjs.gxt.samples.client.examples.windows.DialogExample;
 import com.extjs.gxt.samples.client.examples.windows.HelloWindowExample;
 import com.extjs.gxt.samples.client.examples.windows.MessageBoxExample;
-import com.extjs.gxt.samples.client.images.ExampleImages;
+import com.extjs.gxt.samples.resources.client.Resources;
+import com.extjs.gxt.samples.resources.client.images.ExampleImages;
 import com.extjs.gxt.ui.client.Style.HideMode;
 import com.extjs.gxt.ui.client.data.BaseTreeModel;
 import com.extjs.gxt.ui.client.data.ModelData;
@@ -107,10 +112,11 @@ public class ExamplesModel extends BaseTreeModel {
   protected List<Entry> entries = new ArrayList<Entry>();
 
   public ExamplesModel() {
-    ExampleImages g = Examples.IMAGES;
-    
+    ExampleImages g = Resources.IMAGES;
+
     Category grids = new Category("Grids");
     grids.add("Basic Grid", new GridExample(), g.basicgrid().getHTML());
+    grids.add("Auto Height Grid", new AutoHeightGridExample(), g.basicgrid().getHTML());
     grids.add("Column Grouping", new ColumnGroupingExample(), g.columngrouping().getHTML());
     grids.add("Aggregation Row Grid", new AggregationGridExample(), g.aggregationrowgrid().getHTML());
     grids.add("Grid Plugins", new GridPluginsExample(), g.gridplugins().getHTML());
@@ -127,13 +133,15 @@ public class ExamplesModel extends BaseTreeModel {
     grids.add("Buffered Grid", new BufferedGridExample(), g.bufferedgrid().getHTML());
     grids.add("Editable Buffered Grid", new EditableBufferedGridExample(), g.editablebufferedgrid().getHTML());
     grids.add("Widget Renderer Grid", new WidgetRenderingExample(), g.widgetrenderergrid().getHTML());
+    grids.add("Live Grid", new LiveGridExample(), g.livegrid().getHTML());
     add(grids);
 
     Category treeGrids = new Category("TreeGrid");
-    treeGrids.add("Basic TreeGrid", new TreeGridExample(), Examples.IMAGES.basictreegrid().getHTML());
-    treeGrids.add("Async TreeGrid", new AsyncTreeGridExample(), Examples.IMAGES.asynctreegrid().getHTML());
+    treeGrids.add("Basic TreeGrid", new TreeGridExample(), Resources.IMAGES.basictreegrid().getHTML());
+    treeGrids.add("Async TreeGrid", new AsyncTreeGridExample(), Resources.IMAGES.asynctreegrid().getHTML());
+    treeGrids.add("Remote Sort TreeGrid", new RemoteSortTreeGridExample(), Resources.IMAGES.asynctreegrid().getHTML());
     treeGrids.add("RowNumber TreeGrid", new RowNumberTreeGridExample(), g.rownumbertreegrid().getHTML());
-    treeGrids.add("EditorTreeGrid", new EditorTreeGridExample(), Examples.IMAGES.editortreegrid().getHTML());
+    treeGrids.add("EditorTreeGrid", new EditorTreeGridExample(), Resources.IMAGES.editortreegrid().getHTML());
     treeGrids.add("RowEditor TreeGrid", new RowEditorTreeGridExample(), g.roweditortreegrid().getHTML());
     treeGrids.add("Widget Renderer TreeGrid", new WidgetTreeGridExample(), g.widgetrenderertreegrid().getHTML());
     add(treeGrids);
@@ -169,25 +177,26 @@ public class ExamplesModel extends BaseTreeModel {
     dnd.add("TreeGrid to TreeGrid", new TreeGridToTreeGridExample(), g.treegridtotreegrid().getHTML());
     dnd.add("Reordering TreeGrid", new ReorderingTreeGridExample(), g.reorderingtreegrid().getHTML());
     dnd.add("Image Organizer", new ImageOrganizerExample(), g.imageorganizer().getHTML());
+    dnd.add("Multiple Components", new MultiComponentExample(), g.multicomponent().getHTML());
     add(dnd);
 
     Category windows = new Category("Windows");
     windows.add("Hello World", new HelloWindowExample(), g.helloworld().getHTML());
     windows.add("Accordion Window", new AccordionWindowExample(), g.accordionwindow().getHTML());
-    windows.add("Dialog", new DialogExample(), Examples.IMAGES.dialog().getHTML());
+    windows.add("Dialog", new DialogExample(), Resources.IMAGES.dialog().getHTML());
     windows.add("MessageBox", new MessageBoxExample(), g.messagebox().getHTML());
     add(windows);
 
     Category layouts = new Category("Layouts");
-    layouts.add("AccordionLayout", new AccordionLayoutExample(), Examples.IMAGES.accordionlayout().getHTML());
-    layouts.add("AnchorLayout", new AnchorLayoutExample(), Examples.IMAGES.anchorlayout().getHTML());
-    layouts.add("BorderLayout", new BorderLayoutExample(), Examples.IMAGES.borderlayout().getHTML(), true);
-    layouts.add("CardLayout", new CardLayoutExample(), Examples.IMAGES.cardlayout().getHTML());
-    layouts.add("CenterLayout", new CenterLayoutExample(), Examples.IMAGES.centerlayout().getHTML(), true);
-    layouts.add("RowLayout", new RowLayoutExample(), Examples.IMAGES.rowlayout().getHTML(), true);
-    layouts.add("Portal", new PortalExample(), Examples.IMAGES.portal().getHTML(), true);
-    layouts.add("VBoxLayout", new VBoxLayoutExample(), Examples.IMAGES.vboxlayout().getHTML(), true);
-    layouts.add("HBoxLayout", new HBoxLayoutExample(), Examples.IMAGES.hboxlayout().getHTML(), true);
+    layouts.add("AccordionLayout", new AccordionLayoutExample(), Resources.IMAGES.accordionlayout().getHTML());
+    layouts.add("AnchorLayout", new AnchorLayoutExample(), Resources.IMAGES.anchorlayout().getHTML());
+    layouts.add("BorderLayout", new BorderLayoutExample(), Resources.IMAGES.borderlayout().getHTML(), true);
+    layouts.add("CardLayout", new CardLayoutExample(), Resources.IMAGES.cardlayout().getHTML());
+    layouts.add("CenterLayout", new CenterLayoutExample(), Resources.IMAGES.centerlayout().getHTML(), true);
+    layouts.add("RowLayout", new RowLayoutExample(), Resources.IMAGES.rowlayout().getHTML(), true);
+    layouts.add("Portal", new PortalExample(), Resources.IMAGES.portal().getHTML(), true);
+    layouts.add("VBoxLayout", new VBoxLayoutExample(), Resources.IMAGES.vboxlayout().getHTML(), true);
+    layouts.add("HBoxLayout", new HBoxLayoutExample(), Resources.IMAGES.hboxlayout().getHTML(), true);
     add(layouts);
 
     Category combos = new Category("Combos");

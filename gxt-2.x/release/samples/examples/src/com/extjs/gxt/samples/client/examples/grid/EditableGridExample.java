@@ -10,7 +10,7 @@ package com.extjs.gxt.samples.client.examples.grid;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Plant;
 import com.extjs.gxt.samples.resources.client.model.Stock;
@@ -137,7 +137,7 @@ public class EditableGridExample extends LayoutContainer {
     ContentPanel cp = new ContentPanel();
     cp.setHeading("Edit Plants");
     cp.setFrame(true);
-    cp.setIcon(Examples.ICONS.table());
+    cp.setIcon(Resources.ICONS.table());
     cp.setSize(600, 300);
     cp.setLayout(new FitLayout());
 

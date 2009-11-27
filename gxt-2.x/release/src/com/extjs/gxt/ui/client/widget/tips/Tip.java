@@ -120,16 +120,15 @@ public class Tip extends ContentPanel {
     super.show();
 
     updateContent();
-    el().setVisibility(true);
+    
 
     doAutoWidth();
     Point p = new Point(x, y);
     if (constrainPosition) {
       p = el().adjustForConstraints(p);
     }
-    p.x += XDOM.getBody().getScrollLeft();
-    p.y += XDOM.getBody().getScrollTop();
-    setPagePosition(p.x, p.y);
+    setPagePosition(p.x + XDOM.getBodyScrollLeft(), p.y + XDOM.getBodyScrollTop());
+    el().setVisibility(true);
   }
 
   /**

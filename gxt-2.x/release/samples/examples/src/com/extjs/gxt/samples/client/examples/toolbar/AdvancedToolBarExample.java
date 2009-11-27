@@ -7,11 +7,11 @@
  */
 package com.extjs.gxt.samples.client.examples.toolbar;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.ui.client.Style.ButtonArrowAlign;
-import com.extjs.gxt.ui.client.Style.IconAlign;
 import com.extjs.gxt.ui.client.Style.ButtonScale;
+import com.extjs.gxt.ui.client.Style.IconAlign;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.util.IconHelper;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
@@ -25,6 +25,7 @@ import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
+import com.google.gwt.user.client.Element;
 
 public class AdvancedToolBarExample extends LayoutContainer {
 
@@ -38,7 +39,9 @@ public class AdvancedToolBarExample extends LayoutContainer {
     }
   }
 
-  public AdvancedToolBarExample() {
+  @Override
+  protected void onRender(Element parent, int pos) {
+    super.onRender(parent, pos);
     VerticalPanel vp = new VerticalPanel();
     vp.setSpacing(10);
 
@@ -196,7 +199,7 @@ public class AdvancedToolBarExample extends LayoutContainer {
     group.setHeading("Clipboard");
     toolBar.add(group);
 
-    Button btn = new Button("Paste", Examples.ICONS.add32());
+    Button btn = new Button("Paste", Resources.ICONS.add32());
     btn.addStyleName("x-btn-as-arrow");
     btn.setScale(ButtonScale.LARGE);
     btn.setIconAlign(IconAlign.TOP);
@@ -206,7 +209,7 @@ public class AdvancedToolBarExample extends LayoutContainer {
 
     group.add(btn, data);
 
-    btn = new Button("Format", Examples.ICONS.add32());
+    btn = new Button("Format", Resources.ICONS.add32());
     btn.setScale(ButtonScale.LARGE);
     btn.setIconAlign(IconAlign.TOP);
     btn.setArrowAlign(ButtonArrowAlign.BOTTOM);
@@ -231,7 +234,7 @@ public class AdvancedToolBarExample extends LayoutContainer {
     group.setHeading("Clipboard");
     toolBar.add(group);
 
-    btn = new Button("Paste", Examples.ICONS.add32());
+    btn = new Button("Paste", Resources.ICONS.add32());
     btn.addStyleName("x-btn-as-arrow");
     btn.setScale(ButtonScale.LARGE);
     btn.setIconAlign(IconAlign.TOP);
@@ -241,7 +244,7 @@ public class AdvancedToolBarExample extends LayoutContainer {
 
     group.add(btn, data);
 
-    btn = new Button("Format", Examples.ICONS.add32());
+    btn = new Button("Format", Resources.ICONS.add32());
     btn.setScale(ButtonScale.LARGE);
     btn.setIconAlign(IconAlign.TOP);
     btn.setArrowAlign(ButtonArrowAlign.BOTTOM);

@@ -65,8 +65,7 @@ public class GroupingStore<M extends ModelData> extends ListStore<M> {
    * @return the state
    */
   public String getGroupState() {
-    return groupOnSort && groupField != null ? sortInfo != null ? sortInfo.getSortField() : null
-        : groupField;
+    return groupOnSort && groupField != null ? sortInfo != null ? sortInfo.getSortField() : null : groupField;
   }
 
   /**
@@ -92,13 +91,10 @@ public class GroupingStore<M extends ModelData> extends ListStore<M> {
     }
     groupField = field;
     if (remoteGroup) {
-      if (config != null && config instanceof GroupingLoadConfig) {
-        ((GroupingLoadConfig) config).setGroupBy("");
-      } else {
-        BaseGroupingLoadConfig c = new BaseGroupingLoadConfig();
-        c.setGroupBy(field);
-        config = c;
+      if (config == null || !(config instanceof GroupingLoadConfig)) {
+        config = new BaseGroupingLoadConfig();
       }
+      ((GroupingLoadConfig) config).setGroupBy(field);
     }
 
     if (groupOnSort) {

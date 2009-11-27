@@ -61,7 +61,6 @@ public class Portlet extends ContentPanel {
     super(layout);
     setFrame(true);
     getHeader().setStyleAttribute("cursor", "move");
-    setBodyStyle("backgroundColor: white;");
   }
 
   /**

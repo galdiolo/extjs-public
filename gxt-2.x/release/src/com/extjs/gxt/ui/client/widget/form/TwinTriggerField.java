@@ -8,10 +8,10 @@
 package com.extjs.gxt.ui.client.widget.form;
 
 import com.extjs.gxt.ui.client.GXT;
-import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.util.Size;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -47,7 +47,7 @@ public class TwinTriggerField<D> extends TriggerField<D> {
 
   protected El twinTrigger;
 
-  private String twinTriggerStyle;
+  private String twinTriggerStyle = "x-form-trigger-arrow";
   private El span;
 
   /**
@@ -78,10 +78,20 @@ public class TwinTriggerField<D> extends TriggerField<D> {
   }
 
   @Override
+  protected Size adjustInputSize() {
+    return new Size(span.getWidth(), 0);
+  }
+
+  protected void afterRender() {
+    super.afterRender();
+    addStyleOnOver(twinTrigger.dom, "x-form-trigger-over");
+  }
+
+  @Override
   protected void onRender(Element target, int index) {
     input = new El(DOM.createInputText());
-    wrap = new El(DOM.createDiv());
-    wrap.dom.setClassName("x-form-field-wrap");
+    setElement(DOM.createDiv(), target, index);
+    addStyleName("x-form-field-wrap");
 
     trigger = new El(DOM.createImg());
     trigger.dom.setClassName("x-form-trigger " + triggerStyle);
@@ -93,15 +103,12 @@ public class TwinTriggerField<D> extends TriggerField<D> {
 
     span = new El(DOM.createSpan());
     span.dom.setClassName("x-form-twin-triggers");
-    DOM.appendChild(span.dom, twinTrigger.dom);
-    DOM.appendChild(span.dom, trigger.dom);
 
-    DOM.appendChild(wrap.dom, input.dom);
-    DOM.appendChild(wrap.dom, span.dom);
+    span.appendChild(trigger.dom);
+    span.appendChild(twinTrigger.dom);
 
-    setElement(wrap.dom, target, index);
-
-    addStyleOnOver(twinTrigger.dom, "x-form-trigger-over");
+    el().appendChild(input.dom);
+    el().appendChild(span.dom);
 
     if (isHideTrigger()) {
       span.setVisible(false);
@@ -109,16 +116,8 @@ public class TwinTriggerField<D> extends TriggerField<D> {
 
     super.onRender(target, index);
 
-    DOM.sinkEvents(twinTrigger.dom, Event.ONCLICK | Event.MOUSEEVENTS);
-
-  }
-
-  @Override
-  protected void onResize(int width, int height) {
-    super.onResize(width, height);
-    int tw = span.getWidth();
-    if (width != Style.DEFAULT) {
-      getInputEl().setWidth(width - tw);
+    if (!isEditable()) {
+      setEditable(false);
     }
   }
 

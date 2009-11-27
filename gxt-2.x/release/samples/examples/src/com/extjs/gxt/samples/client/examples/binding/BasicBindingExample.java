@@ -23,6 +23,7 @@ import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.NumberField;
 import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
 import com.extjs.gxt.ui.client.widget.form.TextField;
+import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.HTML;
@@ -94,7 +95,10 @@ public class BasicBindingExample extends LayoutContainer {
       scb.add(s.getName());
     }
     scb.setFieldLabel("Name");
+    scb.setForceSelection(true);
+    scb.setTypeAhead(true);
     scb.setName("company");
+    scb.setTriggerAction(TriggerAction.ALL);
     panel.add(scb);
     
     hp.add(panel);

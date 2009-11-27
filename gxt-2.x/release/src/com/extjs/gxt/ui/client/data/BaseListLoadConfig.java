@@ -24,7 +24,7 @@ public class BaseListLoadConfig extends BaseModelData implements ListLoadConfig,
   private SortDir sortDir;
 
   public BaseListLoadConfig() {
-    this("", SortDir.NONE);
+    this(null, SortDir.NONE);
   }
 
   public BaseListLoadConfig(SortInfo info) {

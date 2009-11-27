@@ -7,7 +7,10 @@
  */
 package com.extjs.gxt.ui.client.util;
 
+import java.util.Map;
+
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.core.FastMap;
 import com.extjs.gxt.ui.client.core.XDOM;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
@@ -19,7 +22,6 @@ import com.google.gwt.user.client.ui.impl.ClippedImagePrototype;
  */
 public class IconHelper {
 
-  private static boolean initialized;
   private static El el;
 
   /**
@@ -64,21 +66,29 @@ public class IconHelper {
    * @return the image
    */
   public static AbstractImagePrototype createStyle(String styleName, int width, int height) {
-    if (!initialized) {
+    if (cacheMap == null) {
       el = new El(DOM.createDiv());
       DOM.appendChild(XDOM.getBody(), el.dom);
       el.makePositionable(true);
       el.setLeftTop(-10000, -10000);
       el.setVisibility(false);
-      initialized = true;
+      cacheMap = new FastMap<String>();
     }
 
-    el.addStyleName(styleName);
-    String s = el.getStyleAttribute("backgroundImage").replace("\")", "").replace(")", "").replace("url(\"", "").replace(
-        "url(", "");
-    el.removeStyleName(styleName);
+    String url = cacheMap.get(styleName);
+    if (url == null) {
+      el.addStyleName(styleName);
+      url = el.getStyleAttribute("backgroundImage").replace("\")", "").replace(")", "").replace("url(\"", "").replace(
+          "url(", "");
+      el.removeStyleName(styleName);
+      if ("none".equals(url)) {
+        return null;
+      }
+      cacheMap.put(styleName, url);
 
-    return createPath(s, width, height);
+    }
+
+    return createPath(url, width, height);
   }
 
   /**
@@ -106,5 +116,7 @@ public class IconHelper {
   public static AbstractImagePrototype create(String s, int width, int height) {
     return Util.isImagePath(s) ? createPath(s, width, height) : createStyle(s, width, height);
   }
+
+  private static Map<String, String> cacheMap;
 
 }

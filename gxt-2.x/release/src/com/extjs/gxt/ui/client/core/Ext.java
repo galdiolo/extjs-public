@@ -20,18 +20,16 @@ class Ext {
   /**
    * Loads the native exj javascript.
    */
-  static void load() {
-    loadExt();
-    loadFormat();
-    loadDomQuery();
-    loadDomHelper();
-    loadTemplate();
-    loadDate();
-  }
 
-  private native static void loadExt() /*-{
+
+  native static void loadExt() /*-{
      var document = $doc;
      var window = $wnd;
+     if(!!$wnd.GXT){
+       return;
+     }
+     $wnd.GXT = {};
+     $wnd.GXT.Ext = {};
      var Ext = $wnd.GXT.Ext;
      window["undefined"] = window["undefined"];
      Ext.apply = function(o, c, defaults){
@@ -62,15 +60,6 @@ class Ext {
          isArray : function(v){
              return v && typeof v.pop == 'function';
          },
-         
-         
-         
-         id : function(el, prefix){
-           prefix = prefix || "ext-gen";
-           el = Ext.getDom(el);
-              var id = prefix + (++idSeed);
-              return el ? (el.id ? el.id : (el.id = id)) : id;
-          },
           extend : function(){
               // inline overrides
               var io = function(o){
@@ -108,29 +97,6 @@ class Ext {
                   }
               }
           },
-          namespace : function(){
-              var a=arguments, o=null, i, j, d, rt;
-              for (i=0; i<a.length; ++i) {
-                  d=a[i].split(".");
-                  rt = d[0];
-                  eval('if (typeof ' + rt + ' == "undefined"){' + rt + ' = {};} o = ' + rt + ';');
-                  for (j=1; j<d.length; ++j) {
-                      o[d[j]]=o[d[j]] || {};
-                      o=o[d[j]];
-                  }
-              }
-          },
-          each : function(array, fn, scope){
-              if(typeof array.length == "undefined" || typeof array == "string"){
-                  array = [array];
-              }
-              for(var i = 0, len = array.length; i < len; i++){
-                  if(fn.call(scope || array[i], array[i], i, array) === false){ return i; };
-              }
-          },
-          escapeRe : function(s) {
-              return s.replace(/([.*+?^${}()|[\]\/\\])/g, "\\$1");
-          },
           getDom : function(el){
               if(!el || !document){
                   return null;
@@ -144,8 +110,11 @@ class Ext {
    }-*/;
 
 
-  private native static void loadFormat() /*-{
+  native static void loadFormat() /*-{
       var Ext = $wnd.GXT.Ext;
+      if(!!Ext.util){
+        return;
+      }
       Ext.util = {};
       Ext.util.Format = function(){
        var trimRe = /^\s+|\s+$/g;
@@ -218,14 +187,7 @@ class Ext {
                if(!(v instanceof Date)){
                    v = new Date(Date.parse(v));
                }
-               return v.dateFormat(format || "m/d/Y");
-           },
-
-
-           dateRenderer : function(format){
-               return function(v){
-                   return Ext.util.Format.date(v, format);
-               };
+               return @com.extjs.gxt.ui.client.util.DateWrapper::format(FLjava/lang/String;)(v.getTime(), format || "m/d/Y");
            },
 
            // private
@@ -267,8 +229,12 @@ class Ext {
       }();
     }-*/;
 
-  private native static void loadDomQuery() /*-{
-     var Ext = $wnd.GXT.Ext;
+  native static void loadDomQuery() /*-{
+    var Ext = $wnd.GXT.Ext;
+    if(!!Ext.DomQuery){
+    return;
+    }
+     
      Ext.DomQuery = function() {
        var cache      = {
        }, simpleCache = {
@@ -906,8 +872,11 @@ class Ext {
      }();
     }-*/;
 
-  private native static void loadDomHelper() /*-{
+  native static void loadDomHelper() /*-{
         var Ext = $wnd.GXT.Ext;
+        if(!!Ext.DomHelper){
+        return;
+        }
         Ext.DomHelper = function(){
            var tempTableEl = null;
            var emptyTags = /^(?:br|frame|hr|img|input|link|meta|range|spacer|wbr|area|param|col)$/i;
@@ -1232,8 +1201,11 @@ class Ext {
         
     }-*/;
 
-  private native static void loadTemplate() /*-{
+  native static void loadTemplate() /*-{
      var Ext = $wnd.GXT.Ext;
+     if(!!Ext.Template){
+     return;
+     }
      Ext.Template = function(html){
          var a = arguments;
          if(Ext.isArray(html)){
@@ -1372,18 +1344,18 @@ class Ext {
          return returnElement ? Ext.get(el.firstChild, true) : el.firstChild;
      }
      };
-      
-     Ext.Template.prototype.apply = Ext.Template.prototype.applyTemplate;
-      
+            
      // backwards compat
      Ext.DomHelper.Template = Ext.Template;
-      
-     Ext.Template.from = function(el, config){
-       el = Ext.getDom(el);
-       return new Ext.Template(el.value || el.innerHTML, config || '');
-     };
-     
-  Ext.XTemplate = function(){
+    
+    }-*/;
+  
+  static native void loadXTemplate() /*-{
+    var Ext = $wnd.GXT.Ext;
+    if(!!Ext.XTemplate){
+    return;
+    }
+    Ext.XTemplate = function(){
      Ext.XTemplate.superclass.constructor.apply(this, arguments);
      var s = this.html;
 
@@ -1532,136 +1504,5 @@ class Ext {
   });
      
   Ext.XTemplate.prototype.apply = Ext.XTemplate.prototype.applyTemplate; 
-     
-  Ext.XTemplate.from = function(el){
-     el = Ext.getDom(el);
-     return new Ext.XTemplate(el.value || el.innerHTML);
-  };  
-    }-*/;
-
-
-  private static native void loadDate() /*-{
-   
-  var Ext = $wnd.GXT.Ext;  
-
-  Date.prototype.dateFormat = function(format) {
-   var s = @com.extjs.gxt.ui.client.util.DateWrapper::format(FLjava/lang/String;)(this.getTime(), format);
-   return s;
-  };
-
-
-  Date.prototype.getFirstDateOfMonth = function() {
-     return new Date(this.getFullYear(), this.getMonth(), 1);
-  };
-  Date.prototype.getLastDateOfMonth = function() {
-     return new Date(this.getFullYear(), this.getMonth(), this.getDaysInMonth());
-  };
-  Date.prototype.getDaysInMonth = function() {
-     Date.daysInMonth[1] = this.isLeapYear() ? 29 : 28;
-     return Date.daysInMonth[this.getMonth()];
-  };
-  Date.prototype.isLeapYear = function() {
-     var year = this.getFullYear();
-     return ((year & 3) == 0 && (year % 100 || (year % 400 == 0 && year)));
-  };
-  Date.prototype.getWeekOfYear = function() {
-     // adapted from http://www.merlyn.demon.co.uk/weekcalc.htm
-     var ms1d = 864e5; // milliseconds in a day
-     var ms7d = 7 * ms1d; // milliseconds in a week
-     var DC3 = Date.UTC(this.getFullYear(), this.getMonth(), this.getDate() + 3) / ms1d; // an Absolute Day Number
-     var AWN = Math.floor(DC3 / 7); // an Absolute Week Number
-     var Wyr = new Date(AWN * ms7d).getUTCFullYear();
-     return AWN - Math.floor(Date.UTC(Wyr, 0, 7) / ms7d) + 1;
-  };
-  Date.prototype.getDayOfYear = function() {
-     var num = 0;
-     Date.daysInMonth[1] = this.isLeapYear() ? 29 : 28;
-     for (var i = 0; i < this.getMonth(); ++i) {
-         num += Date.daysInMonth[i];
-     }
-     return num + this.getDate() - 1;
-  };
-
-  Date.daysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31];
-
-  Date.prototype.clone = function() {
-   return new Date(this.getTime());
-  };
-
-  Date.prototype.clearTime = function(clone){
-     if(clone){
-         return this.clone().clearTime();
-     }
-     this.setHours(0);
-     this.setMinutes(0);
-     this.setSeconds(0);
-     this.setMilliseconds(0);
-     return this;
-  };
-
-  if(@com.extjs.gxt.ui.client.GXT::isSafari){
-     Date.brokenSetMonth = Date.prototype.setMonth;
-     Date.prototype.setMonth = function(num){
-     if(num <= -1){
-       var n = Math.ceil(-num);
-       var back_year = Math.ceil(n/12);
-       var month = (n % 12) ? 12 - n % 12 : 0 ;
-       this.setFullYear(this.getFullYear() - back_year);
-       return Date.brokenSetMonth.call(this, month);
-     } else {
-       return Date.brokenSetMonth.apply(this, arguments);
-     }
-   };
-  }
-
-
-  Date.MILLI = "ms";
-
-  Date.SECOND = "s";
-
-  Date.MINUTE = "mi";
-
-  Date.HOUR = "h";
-
-  Date.DAY = "d";
-
-  Date.MONTH = "mo";
-
-  Date.YEAR = "y";
-  Date.prototype.add = function(interval, value){
-   var d = this.clone();
-   if (!interval || value === 0) return d;
-   switch(interval.toLowerCase()){
-     case Date.MILLI:
-       d.setMilliseconds(this.getMilliseconds() + value);
-       break;
-     case Date.SECOND:
-       d.setSeconds(this.getSeconds() + value);
-       break;
-     case Date.MINUTE:
-       d.setMinutes(this.getMinutes() + value);
-       break;
-     case Date.HOUR:
-       d.setHours(this.getHours() + value);
-       break;
-     case Date.DAY:
-       d.setDate(this.getDate() + value);
-       break;
-     case Date.MONTH:
-       var day = this.getDate();
-       if(day > 28){
-           day = Math.min(day, this.getFirstDateOfMonth().add('mo', value).getLastDateOfMonth().getDate());
-       }
-       d.setDate(day);
-       d.setMonth(this.getMonth() + value);
-       break;
-     case Date.YEAR:
-       d.setFullYear(this.getFullYear() + value);
-       break;
-   }
-   return d;
-  };
-
-  $wnd.Date = Date;
-   }-*/;
+  }-*/;
 }

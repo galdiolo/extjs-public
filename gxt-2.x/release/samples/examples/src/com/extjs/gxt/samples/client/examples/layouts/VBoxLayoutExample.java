@@ -28,6 +28,7 @@ import com.extjs.gxt.ui.client.widget.layout.VBoxLayout;
 import com.extjs.gxt.ui.client.widget.layout.VBoxLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.BoxLayout.BoxLayoutPack;
 import com.extjs.gxt.ui.client.widget.layout.VBoxLayout.VBoxLayoutAlign;
+import com.google.gwt.user.client.Element;
 
 public class VBoxLayoutExample extends LayoutContainer {
   private ContentPanel lcwest;
@@ -38,7 +39,9 @@ public class VBoxLayoutExample extends LayoutContainer {
   private String button3Text = "Button 3";
   private String button4Text = "Button Long 4";
 
-  public VBoxLayoutExample() {
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
     setScrollMode(Scroll.AUTO);
     ContentPanel panel = new ContentPanel();
     panel.setHeading("VerticalBox Example");

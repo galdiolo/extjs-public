@@ -7,7 +7,11 @@
  */
 package com.extjs.gxt.ui.client.core;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
@@ -19,6 +23,7 @@ import com.extjs.gxt.ui.client.fx.Fx;
 import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.fx.Move;
 import com.extjs.gxt.ui.client.util.Format;
+import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.util.Markup;
 import com.extjs.gxt.ui.client.util.Padding;
 import com.extjs.gxt.ui.client.util.Point;
@@ -29,14 +34,14 @@ import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.util.TextMetrics;
 import com.extjs.gxt.ui.client.util.Util;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 
 /**
@@ -53,12 +58,21 @@ public class El {
     DISPLAY, VISIBILITY
   }
 
+  private static Map<String, Boolean> borderBoxMap = new FastMap<Boolean>();
+
   /**
    * The globally shared El instance.
    */
   private static Map<String, El> flyweights = new FastMap<El>();
 
   private static ComputedStyleImpl computedStyle = GWT.create(ComputedStyleImpl.class);
+
+  @SuppressWarnings("unused")
+  private static JavaScriptObject leftRightTest;
+  
+  @SuppressWarnings("unused")
+  private static JavaScriptObject removeStyleNameReCache;
+
 
   static {
     GXT.init();
@@ -87,10 +101,6 @@ public class El {
     return fly(element, "_global");
   }
 
-  public static El fly(Element element) {
-    return fly(element, "_global");
-  }
-
   /**
    * Gets the globally shared flyweight El, with the passed node as the active
    * element. Do not store a reference to this element - the dom node can be
@@ -107,6 +117,10 @@ public class El {
     }
     g.dom = (Element) element;
     return g;
+  }
+
+  public static El fly(Element element) {
+    return fly(element, "_global");
   }
 
   /**
@@ -127,35 +141,59 @@ public class El {
     return g;
   }
 
+  /**
+   * Returns true if the passed element has a border box.
+   * 
+   * @param element the element to test
+   * @return true if the passed element has a border box
+   */
+  public static boolean isBorderBox(Element element) {
+    assert element != null : "Element may not be null";
+    String tag = element.getTagName().toLowerCase();
+    Boolean r = borderBoxMap.get(tag);
+    if (r == null) {
+      Element testElement = (Element) Document.get().createElement(tag);
+      testElement.getStyle().setPropertyPx("padding", 1);
+      testElement.getStyle().setPropertyPx("width", 100);
+      testElement.getStyle().setProperty("visibility", "hidden");
+      testElement.getStyle().setProperty("position", "absolute");
+      XDOM.getBody().appendChild(testElement);
+      r = testElement.getOffsetWidth() == 100;
+      XDOM.getBody().removeChild(testElement);
+      borderBoxMap.put(tag, r);
+    }
+    return r;
+  }
+
   private native static void disableTextSelectInternal(Element e, boolean disable)/*-{
     if (disable) {
-      e.ondrag = function (evt) {
-       var targ;
-       if (!e) var e = $wnd.event;
-       if (e.target) targ = e.target;
-       else if (e.srcElement) targ = e.srcElement;
-       if (targ.nodeType == 3) // defeat Safari bug
-       targ = targ.parentNode;
-       if (targ.tagName == 'INPUT') {
-         return true;
-       }
-       return false; 
-      };
-      e.onselectstart = function (e) { 
-       var targ;
-       if (!e) var e = $wnd.event;
-       if (e.target) targ = e.target;
-       else if (e.srcElement) targ = e.srcElement;
-       if (targ.nodeType == 3) // defeat Safari bug
-       targ = targ.parentNode;
-       if (targ.tagName == 'INPUT') {
-         return true;
-       }
-       return false; 
-      };
+    e.ondrag = function (evt) {
+    var targ;
+    if (!evt) evt = $wnd.event;
+    if (evt.target) targ = evt.target;
+    else if (evt.srcElement) targ = evt.srcElement;
+    if (targ.nodeType == 3) // defeat Safari bug
+    targ = targ.parentNode;
+    if (targ.tagName == 'INPUT' || targ.tagName == 'TEXTAREA') {
+    return true;
+    }
+    return false; 
+    };
+    e.onselectstart = function (evt) { 
+    var targ;
+    if (!evt) evt = $wnd.event;
+    if (evt.target) targ = evt.target;
+    else if (evt.srcElement) targ = evt.srcElement;
+    if (targ.nodeType == 3) // defeat Safari bug
+    targ = targ.parentNode;
+    if (targ.tagName == 'INPUT' || targ.tagName == 'TEXTAREA') {
+    return true;
+    }
+    return false; 
+    };
     } else {
-      e.ondrag = null;
-      e.onselectstart = null;
+    e.ondrag = null;
+    e.onselectstart = null;
     }
   }-*/;
 
@@ -165,6 +203,7 @@ public class El {
   public Element dom;
 
   private VisMode visiblityMode = VisMode.DISPLAY;
+
   private String originalDisplay = "block";
   private El _mask;
   private El _maskMsg;
@@ -210,9 +249,11 @@ public class El {
    * @return this
    */
   public El addStyleName(String... styleNames) {
-    for (String styleName : styleNames) {
-      if (styleName != null && !hasStyleName(styleName)) {
-        dom.setClassName(dom.getClassName() + " " + styleName);
+    if (styleNames != null) {
+      for (String styleName : styleNames) {
+        if (styleName != null && !hasStyleName(styleName)) {
+          dom.setClassName(dom.getClassName() + " " + styleName);
+        }
       }
     }
     return this;
@@ -296,7 +337,7 @@ public class El {
     var re = /\s?([a-z\-]*)\:\s?([^;]*);?/gi;
     var matches;
     while ((matches = re.exec(styles)) != null){
-      this.@com.extjs.gxt.ui.client.core.El::setStyleAttribute(Ljava/lang/String;Ljava/lang/Object;)(matches[1], matches[2]);
+    this.@com.extjs.gxt.ui.client.core.El::setStyleAttribute(Ljava/lang/String;Ljava/lang/Object;)(matches[1], matches[2]);
     }
     return this;
   }-*/;
@@ -403,6 +444,22 @@ public class El {
   }
 
   /**
+   * Clears the set opacity correctly. This is mostly needed only on IE.
+   * 
+   * @return this
+   */
+  public native El clearOpacity() /*-{
+    var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
+    var style = dom.style;
+    if(@com.extjs.gxt.ui.client.GXT::isIE){
+      dom.style.filter = (dom.style.filter || '').replace(/alpha\([^\)]*\)/gi,"");
+    }else{
+      style.opacity = style['-moz-opacity'] = style['-khtml-opacity'] = '';
+    }
+    return this;
+  }-*/;
+
+  /**
    * Generators a native dom click on the element.
    * 
    * @return this
@@ -410,12 +467,12 @@ public class El {
   public native El click() /*-{
     var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
     if (dom.click) {
-      dom.click();
+    dom.click();
     }
     else {
-      var event = $doc.createEvent("MouseEvents");
-      event.initEvent('click', true, true, $wnd, 0, 0, 0, 0, 0, false, false, false, false, 1, dom);
-      dom.dispatchEvent(event);    
+    var event = $doc.createEvent("MouseEvents");
+    event.initEvent('click', true, true, $wnd, 0, 0, 0, 0, 0, false, false, false, false, 1, dom);
+    dom.dispatchEvent(event);    
     }
     return this;
   }-*/;
@@ -553,6 +610,14 @@ public class El {
     return this;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof El) {
+      return getId().equals(((El) obj).getId());
+    }
+    return super.equals(obj);
+  }
+
   /**
    * Fades in the element.
    * 
@@ -617,7 +682,7 @@ public class El {
     Element p = dom;
     Element b = XDOM.getBody();
     int depth = 0;
-    while (p != null && p.getNodeType() == 1 && depth < maxDepth && p != b) {
+    while (p != null && p.getNodeType() == 1 && (maxDepth == -1 || depth < maxDepth) && p != b) {
       if (DomQuery.is(p, selector)) {
         return p;
       }
@@ -736,6 +801,9 @@ public class El {
    * @return the position
    */
   public Point getAnchorXY(String anchor, boolean local) {
+    if (anchor == null) {
+      return null;
+    }
     boolean vp = false;
     int w;
     int h;
@@ -749,35 +817,39 @@ public class El {
     }
 
     int x = 0, y = 0;
-    anchor = anchor.toLowerCase();
-    if (anchor.equals("c")) {
-      x = (int) Math.round(w * .5);
-      y = (int) Math.round(h * .5);
-    } else if (anchor.equals("t")) {
-      x = (int) Math.round(w * .5);
-      y = 0;
-    } else if (anchor.equals("l")) {
-      x = 0;
-      y = (int) Math.round(h * .5);
-    } else if (anchor.equals("r")) {
-      x = w;
-      y = (int) Math.round(h * .5);
-    } else if (anchor.equals("b")) {
-      x = (int) Math.round(w * .5);
-      y = h;
-    } else if (anchor.equals("tl")) {
-      x = 0;
-      y = 0;
-    } else if (anchor.equals("bl")) {
-      x = 0;
-      y = h;
-    } else if (anchor.equals("br")) {
-      x = w;
-      y = h;
-    } else if (anchor.equals("tr")) {
-      x = w;
-      y = 0;
+    if (anchor.length() == 1) {
+      if ("c".equalsIgnoreCase(anchor)) {
+        x = (int) Math.round(w * .5);
+        y = (int) Math.round(h * .5);
+      } else if ("t".equalsIgnoreCase(anchor)) {
+        x = (int) Math.round(w * .5);
+        y = 0;
+      } else if ("l".equalsIgnoreCase(anchor)) {
+        x = 0;
+        y = (int) Math.round(h * .5);
+      } else if ("r".equalsIgnoreCase(anchor)) {
+        x = w;
+        y = (int) Math.round(h * .5);
+      } else if ("b".equalsIgnoreCase(anchor)) {
+        x = (int) Math.round(w * .5);
+        y = h;
+      }
+    } else {
+      if ("tl".equalsIgnoreCase(anchor)) {
+        x = 0;
+        y = 0;
+      } else if ("bl".equalsIgnoreCase(anchor)) {
+        x = 0;
+        y = h;
+      } else if ("br".equalsIgnoreCase(anchor)) {
+        x = w;
+        y = h;
+      } else if ("tr".equalsIgnoreCase(anchor)) {
+        x = w;
+        y = 0;
+      }
     }
+
     if (local) {
       return new Point(x, y);
     }
@@ -801,22 +873,22 @@ public class El {
    */
   public int getBorderWidth(String sides) {
     int borderWidth = 0;
-    for (int i = 0; i < sides.length(); i++) {
-      int b = 0;
-      switch (sides.charAt(i)) {
-        case 'l':
-          b = Util.parseInt(getStyleAttribute("borderLeftWidth"), 0);
-          break;
-        case 'r':
-          b = Util.parseInt(getStyleAttribute("borderRightWidth"), 0);
-          break;
-        case 't':
-          b = Util.parseInt(getStyleAttribute("borderTopWidth"), 0);
-          break;
-        case 'b':
-          b = Util.parseInt(getStyleAttribute("borderBottomWidth"), 0);
-      }
-      borderWidth += b >= 0 ? b : -1 * b;
+    List<String> list = new ArrayList<String>();
+    if (sides.contains("l")) {
+      list.add("borderLeftWidth");
+    }
+    if (sides.contains("r")) {
+      list.add("borderRightWidth");
+    }
+    if (sides.contains("t")) {
+      list.add("borderTopWidth");
+    }
+    if (sides.contains("b")) {
+      list.add("borderBottomWidth");
+    }
+    FastMap<String> map = getStyleAttribute(list);
+    for (String s : map.keySet()) {
+      borderWidth += Util.parseInt(map.get(s), 0);
     }
     return borderWidth;
   }
@@ -885,10 +957,10 @@ public class El {
    * @return the child
    */
   public El getChild(int index) {
-    Element child = DOM.getChild(dom, index);
-    return new El(child);
+    Element child = getChildElement(index);
+    return child == null ? null : new El(child);
   }
-  
+
   /**
    * Returns a child element.
    * 
@@ -955,6 +1027,39 @@ public class El {
   }
 
   /**
+   * Returns the sum width of the padding and borders for all "sides". See
+   * #getBorderWidth() for more information about the sides.
+   * 
+   * @return the frame size
+   */
+  public Size getFrameSize() {
+    int width = 0;
+    int height = 0;
+    List<String> list = new ArrayList<String>();
+    list.add("paddingLeft");
+    list.add("borderLeftWidth");
+
+    list.add("paddingRight");
+    list.add("borderRightWidth");
+
+    list.add("paddingTop");
+    list.add("borderTopWidth");
+
+    list.add("paddingBottom");
+    list.add("borderBottomWidth");
+
+    FastMap<String> map = getStyleAttribute(list);
+    for (String s : map.keySet()) {
+      if (isLeftorRight(s)) {
+        width += Util.parseInt(map.get(s), 0);
+      } else {
+        height += Util.parseInt(map.get(s), 0);
+      }
+    }
+    return new Size(width, height);
+  }
+
+  /**
    * Returns the sum width of the padding and borders for the passed "sides".
    * See #getBorderWidth() for more information about the sides.
    * 
@@ -962,7 +1067,29 @@ public class El {
    * @return the width
    */
   public int getFrameWidth(String sides) {
-    return getPadding(sides) + getBorderWidth(sides);
+    int frameWidth = 0;
+    List<String> list = new ArrayList<String>();
+    if (sides.contains("l")) {
+      list.add("paddingLeft");
+      list.add("borderLeftWidth");
+    }
+    if (sides.contains("r")) {
+      list.add("paddingRight");
+      list.add("borderRightWidth");
+    }
+    if (sides.contains("t")) {
+      list.add("paddingTop");
+      list.add("borderTopWidth");
+    }
+    if (sides.contains("b")) {
+      list.add("paddingBottom");
+      list.add("borderBottomWidth");
+    }
+    FastMap<String> map = getStyleAttribute(list);
+    for (String s : map.keySet()) {
+      frameWidth += Util.parseInt(map.get(s), 0);
+    }
+    return frameWidth;
   }
 
   /**
@@ -981,7 +1108,7 @@ public class El {
    * @return the element's height
    */
   public int getHeight(boolean content) {
-    int h = dom.getOffsetHeight();
+    int h = getHeight();
     if (content) {
       h -= getFrameWidth("tb");
     }
@@ -1066,22 +1193,22 @@ public class El {
    */
   public int getMargins(String sides) {
     int margin = 0;
-    for (int i = 0; i < sides.length(); i++) {
-      int m = 0;
-      switch (sides.charAt(i)) {
-        case 'l':
-          m = Util.parseInt(getStyleAttribute("marginLeft"), 0);
-          break;
-        case 'r':
-          m = Util.parseInt(getStyleAttribute("marginRight"), 0);
-          break;
-        case 't':
-          m = Util.parseInt(getStyleAttribute("marginTop"), 0);
-          break;
-        case 'b':
-          m = Util.parseInt(getStyleAttribute("marginBottom"), 0);
-      }
-      margin += m >= 0 ? m : -1 * m;
+    List<String> list = new ArrayList<String>();
+    if (sides.contains("l")) {
+      list.add("marginLeft");
+    }
+    if (sides.contains("r")) {
+      list.add("marginRight");
+    }
+    if (sides.contains("t")) {
+      list.add("marginTop");
+    }
+    if (sides.contains("b")) {
+      list.add("marginBottom");
+    }
+    FastMap<String> map = getStyleAttribute(list);
+    for (String s : map.keySet()) {
+      margin += Util.parseInt(map.get(s), 0);
     }
     return margin;
   }
@@ -1118,22 +1245,22 @@ public class El {
    */
   public int getPadding(String sides) {
     int padding = 0;
-    for (int i = 0; i < sides.length(); i++) {
-      int p = 0;
-      switch (sides.charAt(i)) {
-        case 'l':
-          p = Util.parseInt(getStyleAttribute("paddingLeft"), 0);
-          break;
-        case 'r':
-          p = Util.parseInt(getStyleAttribute("paddingRight"), 0);
-          break;
-        case 't':
-          p = Util.parseInt(getStyleAttribute("paddingTop"), 0);
-          break;
-        case 'b':
-          p = Util.parseInt(getStyleAttribute("paddingBottom"), 0);
-      }
-      padding += p >= 0 ? p : -1 * p;
+    List<String> list = new ArrayList<String>();
+    if (sides.contains("l")) {
+      list.add("paddingLeft");
+    }
+    if (sides.contains("r")) {
+      list.add("paddingRight");
+    }
+    if (sides.contains("t")) {
+      list.add("paddingTop");
+    }
+    if (sides.contains("b")) {
+      list.add("paddingBottom");
+    }
+    FastMap<String> map = getStyleAttribute(list);
+    for (String s : map.keySet()) {
+      padding += Util.parseInt(map.get(s), 0);
     }
     return padding;
   }
@@ -1223,7 +1350,18 @@ public class El {
    * @return the size
    */
   public Size getSize(boolean content) {
-    return new Size(getWidth(content), getHeight(content));
+    int w = getWidth();
+    int h = getHeight();
+    if (content) {
+      Size frameWidth = getFrameSize();
+      w -= frameWidth.width;
+      h -= frameWidth.height;
+    }
+    return new Size(w, h);
+  }
+
+  public FastMap<String> getStyleAttribute(List<String> attr) {
+    return computedStyle.getStyleAttribute(dom, attr);
   }
 
   /**
@@ -1233,7 +1371,7 @@ public class El {
    * @return the current value of the style attribute for this element.
    */
   public String getStyleAttribute(String attr) {
-    return computedStyle.getStyleAttribute(dom, attr);
+    return getStyleAttribute(Arrays.asList(attr)).get(attr);
   }
 
   /**
@@ -1265,20 +1403,32 @@ public class El {
    * @return the size
    */
   public Size getStyleSize() {
+    Size frameWidth = null;
+    boolean isBorderBox = isBorderBox();
+    if (isBorderBox) {
+      frameWidth = getFrameSize();
+    }
+    List<String> l = new ArrayList<String>();
+    l.add("width");
+    l.add("height");
+    Map<String, String> map = getStyleAttribute(l);
     int w = Style.DEFAULT, h = Style.DEFAULT;
-    String width = dom.getStyle().getProperty("width");
-    if (!width.equals("") && !width.equals("auto")) {
+    String width = map.get("width");
+    if (!"".equals(width) && !"auto".equals(width)) {
       w = Util.parseInt(width, 10);
-      if (isBorderBox()) {
-        w -= getFrameWidth("lr");
+      if (isBorderBox) {
+        w -= frameWidth.width;
       }
     }
-    String height = dom.getStyle().getProperty("height");
-    if (!height.equals("") && !height.equals("auto")) {
+    String height = map.get("height");
+    if (!"".equals(height) && !"auto".equals(height)) {
       h = Util.parseInt(height, 10);
-      if (isBorderBox()) {
-        h -= getFrameWidth("tb");
+      if (isBorderBox) {
+        h -= frameWidth.height;
       }
+    }
+    if (w == Style.DEFAULT && h == Style.DEFAULT) {
+      return getSize(true);
     }
     return new Size(w != Style.DEFAULT ? w : getWidth(true), h != Style.DEFAULT ? h : getHeight(true));
   }
@@ -1382,7 +1532,7 @@ public class El {
    * @return the x position of the element
    */
   public int getX() {
-    return getXY().x;
+    return dom.getAbsoluteLeft();
   }
 
   /**
@@ -1391,64 +1541,9 @@ public class El {
    * 
    * @return the location
    */
-  public native Point getXY() /*-{
-    var p, pe, b, scroll, bd = ($doc.body || $doc.documentElement);
-    p = this.@com.extjs.gxt.ui.client.core.El::dom;
-    if(p == bd){
-      return @com.extjs.gxt.ui.client.util.Point::new(II)(0,0)
-    }
-    if (p.getBoundingClientRect) {
-      b = p.getBoundingClientRect();
-      var docEl = @com.extjs.gxt.ui.client.core.El::fly(Lcom/google/gwt/user/client/Element;Ljava/lang/String;)($doc,"_internal");
-      scroll = docEl.@com.extjs.gxt.ui.client.core.El::getScroll()();
-      return @com.extjs.gxt.ui.client.util.Point::new(II)(b.left + scroll.@com.extjs.gxt.ui.client.util.Scroll::scrollLeft,b.top + scroll.@com.extjs.gxt.ui.client.util.Scroll::scrollTop)
-    }
-    var x = 0, y = 0;
-
-    var hasAbsolute = this.@com.extjs.gxt.ui.client.core.El::dom.style.position == "absolute";
-    while (p) {
-      x += p.offsetLeft;
-      y += p.offsetTop;
-
-      if (!hasAbsolute && this.@com.extjs.gxt.ui.client.core.El::getStyleAttribute(Ljava/lang/String;)("position") == "absolute") {
-        hasAbsolute = true;
-      }
-      if (@com.extjs.gxt.ui.client.GXT::isGecko) {
-        var bt = parseInt(this.@com.extjs.gxt.ui.client.core.El::getStyleAttribute(Ljava/lang/String;)("borderTopWidth"), 10) || 0;
-        var bl = parseInt(this.@com.extjs.gxt.ui.client.core.El::getStyleAttribute(Ljava/lang/String;)("borderLeftWidth"), 10) || 0;
-
-        x += bl;
-        y += bt;
-
-        if (p != this.@com.extjs.gxt.ui.client.core.El::dom && this.@com.extjs.gxt.ui.client.core.El::getStyleAttribute(Ljava/lang/String;)("overflow") != "visible") {
-          x += bl;
-          y += bt;
-        }
-      }
-      p = p.offsetParent;
-    }
-
-    if (@com.extjs.gxt.ui.client.GXT::isWebKit && hasAbsolute) {
-      x -= bd.offsetLeft;
-      y -= bd.offsetTop;
-    }
-
-    if (@com.extjs.gxt.ui.client.GXT::isGecko && !hasAbsolute) {
-      var dbd = @com.extjs.gxt.ui.client.core.El::fly(Lcom/google/gwt/user/client/Element;Ljava/lang/String;)(bd,"_internal");
-      x += parseInt(dbd.@com.extjs.gxt.ui.client.core.El::getStyleAttribute(Ljava/lang/String;)("borderLeftWidth"), 10) || 0;
-      y += parseInt(dbd.@com.extjs.gxt.ui.client.core.El::getStyleAttribute(Ljava/lang/String;)("borderTopWidth"), 10) || 0;
-    }
-
-    p = this.@com.extjs.gxt.ui.client.core.El::dom.parentNode;
-    while (p && p != bd) {
-      if (!@com.extjs.gxt.ui.client.GXT::isOpera || (p.tagName != "TR" && this.@com.extjs.gxt.ui.client.core.El::getStyleAttribute(Ljava/lang/String;)("display") != "inline")) {
-        x -= p.scrollLeft;
-        y -= p.scrollTop;
-      }
-      p = p.parentNode;
-    }
-     return @com.extjs.gxt.ui.client.util.Point::new(II)(x,y)
-  }-*/;
+  public Point getXY() {
+    return new Point(getX(), getY());
+  }
 
   /**
    * Gets the current Y position of the element based on page coordinates.
@@ -1456,7 +1551,7 @@ public class El {
    * @return the y position of the element
    */
   public int getY() {
-    return getXY().y;
+    return dom.getAbsoluteTop();
   }
 
   /**
@@ -1680,7 +1775,7 @@ public class El {
    * @return true for border box
    */
   public boolean isBorderBox() {
-    return noBoxAdjust(dom.getTagName()) || GXT.isBorderBox;
+    return isBorderBox(dom);
   }
 
   /**
@@ -1689,14 +1784,7 @@ public class El {
    * @return the dom state
    */
   public boolean isConnected() {
-    Element p = dom;
-    while (p != null) {
-      if (p == XDOM.getBody()) {
-        return true;
-      }
-      p = (Element) p.getParentNode();
-    }
-    return false;
+    return Document.get().getBody().isOrHasChild(dom);
   }
 
   /**
@@ -1719,6 +1807,55 @@ public class El {
   }
 
   /**
+   * Returns whether the element is scrollable (x or y).
+   * 
+   * @return true if scrollable
+   */
+  public boolean isScrollable() {
+    return isScrollableX() || isScrollableY();
+  }
+
+  /**
+   * Returns whether the element is scrollable on the x-axis.
+   * 
+   * @return true if scrollable on the x-axis
+   */
+  public boolean isScrollableX() {
+    return dom.getScrollWidth() > dom.getClientWidth();
+  }
+
+  /**
+   * Returns whether the element is scrollable on the y-axis.
+   * 
+   * @return true if scrollable on the y-axis
+   */
+  public boolean isScrollableY() {
+    return dom.getScrollHeight() > dom.getClientHeight();
+  }
+
+  public boolean isStyleAttribute(Map<String, String> map, boolean matchAll) {
+    Set<String> collection = map.keySet();
+    FastMap<String> a = getStyleAttribute(new ArrayList<String>(collection));
+    for (String s : collection) {
+      if (map.get(s).equals(a.get(s))) {
+        if (!matchAll) {
+          return true;
+        }
+      } else {
+        if (matchAll) {
+          return false;
+        }
+      }
+    }
+    return false;
+  }
+
+  public boolean isStyleAttribute(String attr, String value) {
+    String a = getStyleAttribute(attr);
+    return a != null && a.equals(value);
+  }
+
+  /**
    * Returns <code>true</code> if the element is visible using the css
    * 'visibiliy' attribute.
    * 
@@ -1738,33 +1875,6 @@ public class El {
   }
 
   /**
-   * Returns whether the element is scrollable (x or y).
-   * 
-   * @return true if scrollable
-   */
-  public boolean isScrollable() {
-    return isScrollableX() || isScrollableY();
-  }
-  
-  /**
-   * Returns whether the element is scrollable on the x-axis.
-   * 
-   * @return true if scrollable on the x-axis
-   */
-  public boolean isScrollableX() {
-    return dom.getScrollWidth() > dom.getClientWidth();
-  }
-  
-  /**
-   * Returns whether the element is scrollable on the y-axis.
-   * 
-   * @return true if scrollable on the y-axis
-   */
-  public boolean isScrollableY() {
-    return dom.getScrollHeight() > dom.getClientHeight();
-  }
-
-  /**
    * Returns whether the element is currently visible.
    * 
    * @param deep true to deep test
@@ -1772,13 +1882,19 @@ public class El {
    * @return true if visible
    */
   public boolean isVisible(boolean deep) {
-    boolean vis = !(isStyleAttribute("visibility", "hidden") || isStyleAttribute("display", "none"));
+    Map<String, String> map = new FastMap<String>();
+    map.put("visibility", "hidden");
+    map.put("display", "none");
+    boolean vis = !isStyleAttribute(map, false);
     El parent = getParent();
     Element p = parent != null ? parent.dom : null;
+    if (p == null) {
+      return false;
+    }
     if (!deep || !vis) {
       return vis;
     }
-    while (p != null && !p.getTagName().equalsIgnoreCase("body")) {
+    while (p != null && p != XDOM.getBody()) {
       if (!fly(p, "_isVisible").isVisible()) {
         return false;
       }
@@ -1787,11 +1903,6 @@ public class El {
 
     return true;
 
-  }
-
-  public boolean isStyleAttribute(String attr, String value) {
-    String a = getStyleAttribute(attr);
-    return a != null && a.equals(value);
   }
 
   /**
@@ -1836,8 +1947,7 @@ public class El {
    * Makes an element positionable.
    */
   public El makePositionable() {
-    makePositionable(false);
-    return this;
+    return makePositionable(false);
   }
 
   /**
@@ -1849,11 +1959,8 @@ public class El {
   public El makePositionable(boolean absolute) {
     if (absolute) {
       setStyleAttribute("position", "absolute");
-    } else {
-      String position = getStyleAttribute("position");
-      if (position != null && position.equals("static")) {
-        setStyleAttribute("position", "relative");
-      }
+    } else if ("static".equals(getStyleAttribute("position"))) {
+      setStyleAttribute("position", "relative");
     }
     return this;
   }
@@ -1885,7 +1992,7 @@ public class El {
    * @return the mask element
    */
   public El mask(String message, String messageStyleName) {
-    if (getStyleAttribute("position") == "static") {
+    if ("static".equals(getStyleAttribute("position"))) {
       addStyleName("x-masked-relative");
     }
     if (_maskMsg != null) {
@@ -1926,6 +2033,15 @@ public class El {
    */
   public Element nextSibling() {
     return DOM.getNextSibling(dom);
+  }
+
+  /**
+   * Returns the elements previous sibling.
+   * 
+   * @return the previous sibling
+   */
+  public Element previousSibling() {
+    return dom.getPreviousSibling().cast();
   }
 
   /**
@@ -1981,7 +2097,7 @@ public class El {
     }
     return this;
   }
-
+  
   /**
    * Removes a style name.
    * 
@@ -1990,12 +2106,12 @@ public class El {
    */
   public native El removeStyleName(String styleName) /*-{
     var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
-    if(!$wnd.GXT.__removeStyleNameReCache){
-      $wnd.GXT.__removeStyleNameReCache = {};
+    if(!@com.extjs.gxt.ui.client.core.El::removeStyleNameReCache){
+      @com.extjs.gxt.ui.client.core.El::removeStyleNameReCache = {};
     }
     if(styleName && dom.className){
-     var s = $wnd.GXT.__removeStyleNameReCache[styleName] = $wnd.GXT.__removeStyleNameReCache[styleName] || new RegExp('(?:^|\\s+)' + styleName + '(?:\\s+|$)', "g"); 
-       dom.className = dom.className.replace(s," ");
+      var s = @com.extjs.gxt.ui.client.core.El::removeStyleNameReCache[styleName] = @com.extjs.gxt.ui.client.core.El::removeStyleNameReCache[styleName] || new RegExp('(?:^|\\s+)' + styleName + '(?:\\s+|$)', "g"); 
+      dom.className = dom.className.replace(s," ");
     }
     return this;
   }-*/;
@@ -2007,11 +2123,7 @@ public class El {
    */
   public El repaint() {
     addStyleName("x-repaint");
-    DeferredCommand.addCommand(new Command() {
-      public void execute() {
-        removeStyleName("x-repaint");
-      }
-    });
+    removeStyleName("x-repaint");
     return this;
   }
 
@@ -2143,6 +2255,7 @@ public class El {
       addStyleName("x-border");
       setStyleAttribute("borderWidth", "1px");
     } else {
+      removeStyleName("x-border");
       setStyleAttribute("borderWidth", "0px");
     }
     return this;
@@ -2279,11 +2392,11 @@ public class El {
   public native El setFocus(boolean focus) /*-{
     var dom = this.@com.extjs.gxt.ui.client.core.El::dom;
     try {
-      if (focus) {
-        dom.focus();
-      } else {
-        dom.blur();
-      }
+    if (focus) {
+    dom.focus();
+    } else {
+    dom.blur();
+    }
     } 
     catch(err) {
     }
@@ -2308,13 +2421,12 @@ public class El {
    * @return this
    */
   public El setHeight(int height, boolean adjust) {
-    if (height == Style.DEFAULT || height < 1) {
-      return this;
-    }
     if (adjust && !isBorderBox()) {
       height -= getFrameWidth("tb");
     }
-    dom.getStyle().setPropertyPx("height", height);
+    if (height >= 0) {
+      dom.getStyle().setPropertyPx("height", height);
+    }
     return this;
   }
 
@@ -2406,16 +2518,34 @@ public class El {
   }
 
   /**
+   * Sets the elements's margin.
+   * 
+   * @param margin the margin
+   * @return this
+   */
+  public El setMargins(Margins margin) {
+    if (margin != null) {
+      setStyleAttribute("marginLeft", margin.left + "px");
+      setStyleAttribute("marginTop", margin.top + "px");
+      setStyleAttribute("marginRight", margin.right + "px");
+      setStyleAttribute("marginBottom", margin.bottom + "px");
+    }
+    return this;
+  }
+
+  /**
    * Sets the elements's padding.
    * 
    * @param padding the padding
    * @return this
    */
   public El setPadding(Padding padding) {
-    setStyleAttribute("paddingLeft", padding.left + "px");
-    setStyleAttribute("paddingTop", padding.top + "px");
-    setStyleAttribute("paddingRight", padding.right + "px");
-    setStyleAttribute("paddingBottom", padding.bottom + "px");
+    if (padding != null) {
+      setStyleAttribute("paddingLeft", padding.left + "px");
+      setStyleAttribute("paddingTop", padding.top + "px");
+      setStyleAttribute("paddingRight", padding.right + "px");
+      setStyleAttribute("paddingBottom", padding.bottom + "px");
+    }
     return this;
   }
 
@@ -2475,11 +2605,16 @@ public class El {
    * @return this
    */
   public El setSize(int width, int height, boolean adjust) {
-    if (width != Style.DEFAULT) {
-      setWidth(width, adjust);
+    if (adjust && !isBorderBox()) {
+      Size frameWidth = getFrameSize();
+      width -= frameWidth.width;
+      height -= frameWidth.height;
     }
-    if (height != Style.DEFAULT) {
-      setHeight(height, adjust);
+    if (width >= 0) {
+      dom.getStyle().setPropertyPx("width", width);
+    }
+    if (height >= 0) {
+      dom.getStyle().setPropertyPx("height", height);
     }
     return this;
   }
@@ -2663,13 +2798,12 @@ public class El {
    * @return this
    */
   public El setWidth(int width, boolean adjust) {
-    if (width == Style.DEFAULT || width < 1) {
-      return this;
-    }
     if (adjust && !isBorderBox()) {
       width -= getFrameWidth("lr");
     }
-    DOM.setStyleAttribute(dom, "width", width + "px");
+    if (width >= 0) {
+      dom.getStyle().setPropertyPx("width", width);
+    }
     return this;
   }
 
@@ -2819,20 +2953,26 @@ public class El {
     return this;
   }
 
+  public String toString() {
+    return getOuterHtml();
+  }
+
   public Point translatePoints(Point p) {
-    boolean relative = isStyleAttribute("position", "relative");
-    Point o = getXY();
-    int l = Util.parseInt(getStyleAttribute("left"), -11234);
-    int t = Util.parseInt(getStyleAttribute("top"), -11234);
+    List<String> list = new ArrayList<String>(3);
+    list.add("position");
+    list.add("left");
+    list.add("top");
+
+    Map<String, String> map = getStyleAttribute(list);
+    boolean relative = "relative".equals(map.get("position"));
+    int l = Util.parseInt(map.get("left"), -11234);
+    int t = Util.parseInt(map.get("top"), -11234);
 
     l = l != -11234 ? l : (relative ? 0 : dom.getOffsetLeft());
     t = t != -11234 ? t : (relative ? 0 : dom.getOffsetTop());
 
+    Point o = getXY();
     return new Point(p.x - o.x + l, p.y - o.y + t);
-  }
-
-  public String toString() {
-    return getOuterHtml();
   }
 
   /**
@@ -2988,21 +3128,10 @@ public class El {
     return new Point(x, y);
   }
 
-  protected boolean noBoxAdjust(String tag) {
-    tag = tag == null ? "" : tag;
-
-    if ((GXT.isIE || GXT.isGecko) && tag.equalsIgnoreCase("button")) {
-      return true;
+  private native boolean isLeftorRight(String s) /*-{
+    if(@com.extjs.gxt.ui.client.core.El::leftRightTest == null){
+    @com.extjs.gxt.ui.client.core.El::leftRightTest = new RegExp("Left|Right");
     }
-
-    if (tag.equalsIgnoreCase("select")) {
-      return true;
-    }
-
-    if ((tag.equalsIgnoreCase("textarea") || tag.equalsIgnoreCase("input")) && !GXT.isStrict) {
-      return true;
-    }
-
-    return false;
-  }
+    return @com.extjs.gxt.ui.client.core.El::leftRightTest.test(s);
+  }-*/;
 }

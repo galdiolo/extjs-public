@@ -18,10 +18,13 @@ import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
+import com.google.gwt.user.client.Element;
 
 public class AnchorLayoutExample extends LayoutContainer {
 
-  public AnchorLayoutExample() {
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
     setLayout(new FlowLayout(10));
 
     final Window w = new Window();

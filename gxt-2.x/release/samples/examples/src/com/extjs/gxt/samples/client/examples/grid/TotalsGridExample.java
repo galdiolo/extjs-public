@@ -11,9 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Task;
+import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.store.GroupingStore;
 import com.extjs.gxt.ui.client.store.ListStore;
@@ -50,8 +51,7 @@ public class TotalsGridExample extends LayoutContainer {
 
     List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
 
-    SummaryColumnConfig<Integer> desc = new SummaryColumnConfig<Integer>("description",
-        "Task", 65);
+    SummaryColumnConfig<Integer> desc = new SummaryColumnConfig<Integer>("description", "Task", 65);
     desc.setSummaryType(SummaryType.COUNT);
     desc.setSummaryRenderer(new SummaryRenderer() {
       public String render(Number value, Map<String, Number> data) {
@@ -59,16 +59,13 @@ public class TotalsGridExample extends LayoutContainer {
       }
     });
 
-    SummaryColumnConfig<Double> project = new SummaryColumnConfig<Double>("project",
-        "Project", 55);
-    SummaryColumnConfig<Double> due = new SummaryColumnConfig<Double>("due", "Due Date",
-        20);
+    SummaryColumnConfig<Double> project = new SummaryColumnConfig<Double>("project", "Project", 55);
+    SummaryColumnConfig<Double> due = new SummaryColumnConfig<Double>("due", "Due Date", 20);
 
-    SummaryColumnConfig<Double> estimate = new SummaryColumnConfig<Double>("estimate",
-        "Estimate", 20);
+    SummaryColumnConfig<Double> estimate = new SummaryColumnConfig<Double>("estimate", "Estimate", 20);
     estimate.setRenderer(new GridCellRenderer<Task>() {
-      public String render(Task model, String property, ColumnData config, int rowIndex,
-          int colIndex, ListStore<Task> store, Grid<Task> grid) {
+      public String render(Task model, String property, ColumnData config, int rowIndex, int colIndex,
+          ListStore<Task> store, Grid<Task> grid) {
         return model.get(property) + " hours";
       }
     });
@@ -84,6 +81,7 @@ public class TotalsGridExample extends LayoutContainer {
     rate.setNumberFormat(NumberFormat.getCurrencyFormat());
     rate.setSummaryFormat(NumberFormat.getCurrencyFormat());
     rate.setSummaryType(SummaryType.AVG);
+    rate.setAlignment(HorizontalAlignment.RIGHT);
 
     NumberField nf = new NumberField();
     nf.setAutoValidate(true);
@@ -104,12 +102,12 @@ public class TotalsGridExample extends LayoutContainer {
       }
 
     });
+    cost.setAlignment(HorizontalAlignment.RIGHT);
     cost.setRenderer(new GridCellRenderer<Task>() {
-      public String render(Task model, String property, ColumnData config, int rowIndex,
-          int colIndex, ListStore<Task> store, Grid<Task> grid) {
+      public String render(Task model, String property, ColumnData config, int rowIndex, int colIndex,
+          ListStore<Task> store, Grid<Task> grid) {
         Task task = (Task) model;
-        return NumberFormat.getCurrencyFormat().format(
-            task.getRate() * task.getEstimate());
+        return NumberFormat.getCurrencyFormat().format(task.getRate() * task.getEstimate());
       }
     });
 
@@ -132,7 +130,7 @@ public class TotalsGridExample extends LayoutContainer {
 
     ContentPanel panel = new ContentPanel();
     panel.setHeading("Sponsored Projects");
-    panel.setIcon(Examples.ICONS.table());
+    panel.setIcon(Resources.ICONS.table());
     panel.setCollapsible(true);
     panel.setFrame(true);
     panel.setSize(800, 450);

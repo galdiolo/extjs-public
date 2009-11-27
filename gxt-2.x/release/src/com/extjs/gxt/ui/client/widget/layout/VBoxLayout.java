@@ -12,7 +12,6 @@ import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
-import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.Container;
 
 /**
@@ -97,14 +96,10 @@ public class VBoxLayout extends BoxLayout {
   protected void onLayout(Container<?> container, El target) {
     super.onLayout(container, target);
 
-    Size size = target.getSize();
-
-    if (size.width < 1 && size.height < 1) { // display none?
-      return;
-    }
-
-    int w = size.width - target.getPadding("lr") - getScrollOffset();
-    int h = size.height - target.getPadding("tb");
+    Size size = target.getStyleSize();
+    
+    int w = size.width - getScrollOffset();
+    int h = size.height;
 
     int l = getPadding().left;
     int t = getPadding().top;
@@ -116,8 +111,12 @@ public class VBoxLayout extends BoxLayout {
     for (int i = 0; i < container.getItemCount(); i++) {
       BoxComponent c = (BoxComponent) container.getItem(i);
       c.el().setStyleAttribute("margin", "0px");
-      VBoxLayoutData layoutData = (VBoxLayoutData) ComponentHelper.getLayoutData(c);
-      if (layoutData == null) {
+      callLayout(c, false);
+      VBoxLayoutData layoutData = null;
+      LayoutData d = getLayoutData(c);
+      if (d != null && d instanceof VBoxLayoutData) {
+        layoutData = (VBoxLayoutData) d;
+      } else {
         layoutData = new VBoxLayoutData();
       }
       Margins cm = layoutData.getMargins();
@@ -129,9 +128,9 @@ public class VBoxLayout extends BoxLayout {
     int innerCtWidth = maxWidth + l + getPadding().right;
 
     if (vBoxLayoutAlign.equals(VBoxLayoutAlign.STRETCH)) {
-      innerCt.setSize(w, h);
+      innerCt.setSize(w, h, true);
     } else {
-      innerCt.setSize(w = Math.max(w, innerCtWidth), h);
+      innerCt.setSize(w = Math.max(w, innerCtWidth), h, true);
     }
 
     int extraHeight = h - totalHeight - t - getPadding().bottom;
@@ -147,8 +146,11 @@ public class VBoxLayout extends BoxLayout {
 
     for (int i = 0; i < container.getItemCount(); i++) {
       BoxComponent c = (BoxComponent) container.getItem(i);
-      VBoxLayoutData layoutData = (VBoxLayoutData) ComponentHelper.getLayoutData(c);
-      if (layoutData == null) {
+      VBoxLayoutData layoutData = null;
+      LayoutData d = getLayoutData(c);
+      if (d != null && d instanceof VBoxLayoutData) {
+        layoutData = (VBoxLayoutData) d;
+      } else {
         layoutData = new VBoxLayoutData();
       }
       Margins cm = layoutData.getMargins();
@@ -170,6 +172,7 @@ public class VBoxLayout extends BoxLayout {
         }
       }
 
+      int height = -1;
       c.setPosition(cl, t);
       if (getPack().equals(BoxLayoutPack.START) && layoutData.getFlex() > 0) {
         int add = (int) Math.floor(extraHeight * (layoutData.getFlex() / totalFlex));
@@ -178,14 +181,16 @@ public class VBoxLayout extends BoxLayout {
           add += extraHeight - allocated;
         }
         ch += add;
-        c.setHeight(ch);
+        height = ch;
       }
       if (vBoxLayoutAlign.equals(VBoxLayoutAlign.STRETCH)) {
-        c.setWidth(Util.constrain(strechWidth - cm.left - cm.right,
-            layoutData.getMinWidth(), layoutData.getMaxWidth()));
+        c.setSize(Util.constrain(strechWidth - cm.left - cm.right, layoutData.getMinWidth(), layoutData.getMaxWidth()),
+            height);
       } else if (vBoxLayoutAlign.equals(VBoxLayoutAlign.STRETCHMAX)) {
-        c.setWidth(Util.constrain(maxWidth - cm.left - cm.right,
-            layoutData.getMinWidth(), layoutData.getMaxWidth()));
+        c.setSize(Util.constrain(maxWidth - cm.left - cm.right, layoutData.getMinWidth(), layoutData.getMaxWidth()),
+            height);
+      } else if (height > 0) {
+        c.setHeight(height);
       }
       t += ch + cm.bottom;
     }

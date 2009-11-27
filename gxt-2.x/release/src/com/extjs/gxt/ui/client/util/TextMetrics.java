@@ -7,6 +7,10 @@
  */
 package com.extjs.gxt.ui.client.util;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XDOM;
 import com.google.gwt.user.client.DOM;
@@ -21,16 +25,15 @@ public class TextMetrics {
 
   private static TextMetrics instance;
 
-  static {
-    instance = new TextMetrics();
-  }
-
   /**
    * Returns the singleton instance.
    * 
    * @return the text metrics instance
    */
   public static TextMetrics get() {
+    if (instance == null) {
+      instance = new TextMetrics();
+    }
     return instance;
   }
 
@@ -60,14 +63,23 @@ public class TextMetrics {
    * 
    * @param el the element
    */
-  public void bind(El el) {
-    this.el.setStyleAttribute("fontSize", el.getStyleAttribute("fontSize"));
-    this.el.setStyleAttribute("fontWeight", el.getStyleAttribute("fontWeight"));
-    this.el.setStyleAttribute("fontStyle", el.getStyleAttribute("fontStyle"));
-    this.el.setStyleAttribute("fontFamily", el.getStyleAttribute("fontFamily"));
-    this.el.setStyleAttribute("lineHeight", el.getStyleAttribute("lineHeight"));
-    this.el.setStyleAttribute("textTransform", el.getStyleAttribute("textTransform"));
-    this.el.setStyleAttribute("letterSpacing", el.getStyleAttribute("letterSpacing"));
+  public void bind(El el) {   
+    //needed sometimes to force a refresh
+    el.repaint();
+    List<String> l = new ArrayList<String>();
+    l.add("fontSize");
+    l.add("fontWeight");
+    l.add("fontStyle");
+    l.add("fontFamily");
+    l.add("lineHeight");
+    l.add("textTransform");
+    l.add("letterSpacing");
+
+   
+    Map<String, String> map = el.getStyleAttribute(l);
+    for (String key : map.keySet()) {
+      this.el.setStyleAttribute(key, map.get(key));
+    }
   }
 
   /**
@@ -89,9 +101,9 @@ public class TextMetrics {
    * @return the size
    */
   public Size getSize(String text) {
-    el.dom.setInnerHTML(text);
+    el.update(text);
     Size size = el.getSize();
-    el.dom.setInnerHTML("");
+    el.update("");
     return size;
   }
 

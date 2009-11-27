@@ -7,7 +7,7 @@
  */
 package com.extjs.gxt.samples.client.examples.forms;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.TabItem;
@@ -32,14 +32,11 @@ public class AdvancedFormsExample extends LayoutContainer {
 
   private VerticalPanel vp;
 
-  public AdvancedFormsExample() {
-    vp = new VerticalPanel();
-    vp.setSpacing(10);
-  }
-
   @Override
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
+    vp = new VerticalPanel();
+    vp.setSpacing(10);
     createColumnForm();
     createTabForm();
     add(vp);
@@ -116,10 +113,10 @@ public class AdvancedFormsExample extends LayoutContainer {
   }
 
   private void createColumnForm() {
-    FormData formData = new FormData("95%");
+    FormData formData = new FormData("100%");
     FormPanel panel = new FormPanel();
     panel.setFrame(true);
-    panel.setIcon(Examples.ICONS.form());
+    panel.setIcon(Resources.ICONS.form());
     panel.setHeading("FormPanel");
     panel.setSize(600, -1);
     panel.setLabelAlign(LabelAlign.TOP);
@@ -175,7 +172,7 @@ public class AdvancedFormsExample extends LayoutContainer {
     main.add(left, new ColumnData(.5));
     main.add(right, new ColumnData(.5));
 
-    panel.add(main);
+    panel.add(main, new FormData("100%"));
 
     HtmlEditor a = new HtmlEditor();
     a.setFieldLabel("Comment");

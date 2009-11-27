@@ -25,9 +25,10 @@ public class ModelReader implements DataReader<ListLoadResult<? extends ModelDat
       return newLoadResult(loadConfig, (List) data);
     } else if (data instanceof ListLoadResult) {
       return (ListLoadResult) data;
-    } else {
-      throw new RuntimeException("Error converting data");
     }
+    assert false : "Error converting data";
+
+    return null;
   }
 
   /**
@@ -36,8 +37,7 @@ public class ModelReader implements DataReader<ListLoadResult<? extends ModelDat
    * @param models the models
    * @return the load result
    */
-  protected ListLoadResult<ModelData> newLoadResult(Object loadConfig,
-      List<ModelData> models) {
+  protected ListLoadResult<ModelData> newLoadResult(Object loadConfig, List<ModelData> models) {
     return new BaseListLoadResult<ModelData>(models);
   }
 

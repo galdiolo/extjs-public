@@ -250,8 +250,8 @@ public class EditorSupport<M extends ModelData> {
       ge.setColIndex(ed.col);
 
       if (grid.fireEvent(Events.ValidateEdit, ge)) {
-        r.set(ge.getProperty(), ge.getValue());
         r.setValid(ge.getProperty(), ed.getField().isValid(true));
+        r.set(ge.getProperty(), ge.getValue());
         grid.fireEvent(Events.AfterEdit, ge);
       }
     }

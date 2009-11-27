@@ -10,10 +10,13 @@ package com.extjs.gxt.samples.client.examples.layouts;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
+import com.google.gwt.user.client.Element;
 
 public class CenterLayoutExample extends LayoutContainer {
 
-  public CenterLayoutExample() {
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
     setLayout(new CenterLayout());
 
     ContentPanel panel = new ContentPanel();

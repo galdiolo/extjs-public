@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.samples.explorer.client.mvc;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -81,8 +80,8 @@ public class NavigationView extends View {
     filter = new StoreFilterField<ModelData>() {
 
       @Override
-      protected boolean doSelect(Store<ModelData> store, ModelData parent,
-          ModelData child, String property, String filter) {
+      protected boolean doSelect(Store<ModelData> store, ModelData parent, ModelData child, String property,
+          String filter) {
         if (child instanceof Folder) {
           return false;
         }
@@ -137,7 +136,7 @@ public class NavigationView extends View {
       public boolean hasChildren(ModelData parent) {
         return parent instanceof Category;
       }
-      
+
     };
     treeStore = new TreeStore<ModelData>(loader);
 
@@ -166,7 +165,7 @@ public class NavigationView extends View {
     list.setDisplayProperty("name");
     list.setBorders(false);
     list.getSelectionModel().addSelectionChangedListener(new SelectionChangedListener<Entry>() {
-    
+
       @Override
       public void selectionChanged(SelectionChangedEvent<Entry> se) {
         Entry e = se.getSelection().get(0);
@@ -185,7 +184,7 @@ public class NavigationView extends View {
 
     }));
     store.add(model.getEntries());
-    
+
     list.setStore(store);
 
     filter.bind((Store) store);
@@ -196,12 +195,12 @@ public class NavigationView extends View {
   protected void handleEvent(AppEvent event) {
     EventType type = event.getType();
     if (type == AppEvents.HidePage) {
-      tree.getSelectionModel().setSelection(new ArrayList<ModelData>());
+      tree.getSelectionModel().deselectAll();
     } else if (type == AppEvents.TabChange) {
       if (((Entry) event.getData()).getName() == "Overview") {
-        tree.getSelectionModel().setSelection(new ArrayList<ModelData>());
+        tree.getSelectionModel().deselectAll();
       } else {
-        tree.getSelectionModel().setSelection((List)Arrays.asList((Entry) event.getData()));
+        tree.getSelectionModel().setSelection((List) Arrays.asList((Entry) event.getData()));
       }
     }
   }

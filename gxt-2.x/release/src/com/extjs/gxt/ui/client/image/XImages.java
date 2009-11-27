@@ -101,7 +101,7 @@ public interface XImages extends ImageBundle {
   @Resource("page-last-disabled.gif")
   AbstractImagePrototype paging_toolbar_last_disabled();
 
-  @Resource("refresh.gif")
+  @Resource("refresh.png")
   AbstractImagePrototype paging_toolbar_refresh();
 
   @Resource("more.gif")

@@ -123,9 +123,9 @@ public class SplitBar extends BoxComponent {
           if (!disabled) {
             removeSplitBar();
           }
-        } else if (type == Events.Resize) {
+        } else if (type == Events.Resize || type == Events.Move) {
           delay.delay(400);
-        }
+        } 
       }
     };
 
@@ -138,6 +138,7 @@ public class SplitBar extends BoxComponent {
     resizeWidget.addListener(Events.Attach, listener);
     resizeWidget.addListener(Events.Detach, listener);
     resizeWidget.addListener(Events.Resize, listener);
+    resizeWidget.addListener(Events.Move, listener);
 
     draggable = new Draggable(this);
     draggable.setUpdateZIndex(false);
@@ -276,6 +277,7 @@ public class SplitBar extends BoxComponent {
     resizeWidget.removeListener(Events.Detach, listener);
     resizeWidget.removeListener(Events.Resize, listener);
     removeSplitBar();
+    draggable.release();
   }
 
   /**
@@ -447,12 +449,7 @@ public class SplitBar extends BoxComponent {
         break;
       }
     }
-    be.setType(Events.DragEnd);
-    be.setComponent(this);
     fireEvent(Events.DragEnd, be);
-
-    fireEvent(Events.Resize, be);
-    sync();
   }
 
   private void onStartDrag(DragEvent de) {

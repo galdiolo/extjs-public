@@ -76,7 +76,8 @@ public class ScriptTagProxy<D> implements DataProxy<D> {
   }
 
   protected void destroyTrans(String id) {
-    head.removeChild(DOM.getElementById(id));
+    head.removeChild(XDOM.getElementById(id));
+    removeCallback(id);
   }
 
   protected String generateUrl(Object loadConfig) {
@@ -107,10 +108,13 @@ public class ScriptTagProxy<D> implements DataProxy<D> {
   }
 
   private native void createCallback(ScriptTagProxy<D> proxy, String transId) /*-{
-      cb = function( j ){
+    var cb = function(j) {
       proxy.@com.extjs.gxt.ui.client.data.ScriptTagProxy::onReceivedData(Ljava/lang/String;Lcom/google/gwt/core/client/JavaScriptObject;)(transId, j);
-      };
-      $wnd[transId]=cb;
-      }-*/;
+    };
+    $wnd[transId]=cb;
+  }-*/;
 
+  private native void removeCallback(String transId) /*-{
+    $wnd[transId]=null;
+  }-*/;
 }

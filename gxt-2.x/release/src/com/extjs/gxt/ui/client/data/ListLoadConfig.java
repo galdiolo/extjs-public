@@ -14,8 +14,18 @@ import com.extjs.gxt.ui.client.Style.SortDir;
  */
 public interface ListLoadConfig extends LoadConfig {
 
+  /**
+   * Returns the current sort direction.
+   * 
+   * @return the sort direction
+   */
   public SortDir getSortDir();
 
+  /**
+   * Returns the current sort field.
+   * 
+   * @return the sort field
+   */
   public String getSortField();
 
   /**
@@ -23,8 +33,18 @@ public interface ListLoadConfig extends LoadConfig {
    */
   public SortInfo getSortInfo();
 
+  /**
+   * Sets the sort direction.
+   * 
+   * @param sortDir the sort direction
+   */
   public void setSortDir(SortDir sortDir);
 
+  /**
+   * Sets the sort field.
+   * 
+   * @param sortField the sort field
+   */
   public void setSortField(String sortField);
 
   /**

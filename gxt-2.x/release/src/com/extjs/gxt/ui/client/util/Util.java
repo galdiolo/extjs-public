@@ -100,6 +100,16 @@ public class Util {
     return list;
   }
 
+  public static boolean equalWithNull(Object obj1, Object obj2) {
+    if (obj1 == obj2) {
+      return true;
+    } else if (obj1 == null) {
+      return false;
+    } else {
+      return obj1.equals(obj2);
+    }
+  }
+
   /**
    * Populates a list with an array of elements.
    * 
@@ -199,7 +209,7 @@ public class Util {
    * @param maxDepth the maximum number of sub models to process
    * @return the javascript array object
    */
-  public static JavaScriptObject getJsObjects(List<ModelData> models, int maxDepth) {
+  public static JavaScriptObject getJsObjects(List<? extends ModelData> models, int maxDepth) {
     JsArray js = new JsArray();
     for (ModelData m : models) {
       js.add(getJsObject(m, maxDepth));
@@ -224,13 +234,23 @@ public class Util {
   }
 
   /**
+   * Returns true if the string is null or equals to the empty string.
+   * 
+   * @param string the string to test
+   * @return true if the string is empty
+   */
+  public static boolean isEmptyString(String string) {
+    return string == null || "".equals(string);
+  }
+
+  /**
    * Returns true if the style ends with .jpg, .gif, or .png.
    * 
    * @param style the style
    * @return true for an image path
    */
   public static boolean isImagePath(String style) {
-    return style.matches(".*(jpg$|gif$|png$)");
+    return style != null && style.toLowerCase().matches(".*(jpg$|gif$|png$)");
   }
 
   /**

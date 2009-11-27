@@ -13,6 +13,7 @@ import java.util.List;
 import com.extjs.gxt.samples.client.ExampleServiceAsync;
 import com.extjs.gxt.samples.client.Examples;
 import com.extjs.gxt.samples.client.examples.model.BeanPost;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.data.BasePagingLoader;
@@ -101,7 +102,7 @@ public class PagingBeanModelGridExample extends LayoutContainer {
     panel.setCollapsible(true);
     panel.setAnimCollapse(false);
     panel.setButtonAlign(HorizontalAlignment.CENTER);
-    panel.setIcon(Examples.ICONS.table());
+    panel.setIcon(Resources.ICONS.table());
     panel.setHeading("Paging Grid");
     panel.setLayout(new FitLayout());
     panel.add(grid);

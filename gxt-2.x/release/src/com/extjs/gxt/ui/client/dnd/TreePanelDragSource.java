@@ -15,6 +15,7 @@ import com.extjs.gxt.ui.client.data.TreeModel;
 import com.extjs.gxt.ui.client.dnd.DND.Operation;
 import com.extjs.gxt.ui.client.dnd.DND.TreeSource;
 import com.extjs.gxt.ui.client.event.DNDEvent;
+import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel.TreeNode;
@@ -26,6 +27,7 @@ public class TreePanelDragSource extends DragSource {
 
   protected TreePanel<ModelData> tree;
   protected TreeSource treeSource = TreeSource.BOTH;
+  protected boolean treeStoreState = true;
 
   @SuppressWarnings("unchecked")
   public TreePanelDragSource(TreePanel tree) {
@@ -42,6 +44,15 @@ public class TreePanelDragSource extends DragSource {
   public TreeSource getTreeSource() {
     return treeSource;
   }
+  
+  /**
+   * Returns true if tree store state is enabled.
+   * 
+   * @return the tree store state
+   */
+  public boolean isTreeStoreState() {
+    return treeStoreState;
+  }
 
   /**
    * Sets which tree items can be dragged (defaults to BOTH).
@@ -50,6 +61,17 @@ public class TreePanelDragSource extends DragSource {
    */
   public void setTreeSource(TreeSource treeSource) {
     this.treeSource = treeSource;
+  }
+
+  /**
+   * True to use {@link TreeStore#getModelState(ModelData)} when setting the
+   * drag data (defaults to true). False to return a flat list of the selected
+   * models in the tree.
+   * 
+   * @param treeStoreState true to use model state
+   */
+  public void setTreeStoreState(boolean treeStoreState) {
+    this.treeStoreState = treeStoreState;
   }
 
   @Override
@@ -67,6 +89,10 @@ public class TreePanelDragSource extends DragSource {
   @SuppressWarnings("unchecked")
   protected void onDragStart(DNDEvent e) {
     TreeNode n = tree.findNode(e.getTarget());
+    if (n == null) {
+      e.setCancelled(true);
+      return;
+    }
     ModelData m = n.getModel();
     if (!tree.getView().isSelectableTarget(m, e.getTarget())) {
       e.setCancelled(true);
@@ -89,7 +115,7 @@ public class TreePanelDragSource extends DragSource {
       if (ok) {
         List models = new ArrayList();
         for (ModelData mi : sel) {
-          models.add(tree.getStore().getModelState(mi));
+          models.add(treeStoreState ? tree.getStore().getModelState(mi) : mi);
         }
         e.setData(models);
         e.setCancelled(false);

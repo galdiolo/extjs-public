@@ -9,7 +9,7 @@ package com.extjs.gxt.samples.client.examples.treepanel;
 
 import java.util.List;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Folder;
 import com.extjs.gxt.ui.client.data.BaseTreeLoader;
@@ -46,7 +46,7 @@ public class FilterTreePanelExample extends LayoutContainer {
     tree.setIconProvider(new ModelIconProvider<ModelData>() {
       public AbstractImagePrototype getIcon(ModelData model) {
         if (((TreeModel) model).isLeaf()) {
-          return Examples.ICONS.music();
+          return Resources.ICONS.music();
         }
         return null;
       }

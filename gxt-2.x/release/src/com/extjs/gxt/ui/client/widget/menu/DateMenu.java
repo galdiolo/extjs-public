@@ -9,7 +9,6 @@ package com.extjs.gxt.ui.client.widget.menu;
 
 import java.util.Date;
 
-import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.widget.DatePicker;
 
 /**
@@ -23,7 +22,6 @@ public class DateMenu extends Menu {
   protected DatePicker picker;
 
   public DateMenu() {
-    super();
     picker = new DatePicker();
     add(picker);
     addStyleName("x-date-menu");
@@ -50,9 +48,4 @@ public class DateMenu extends Menu {
   public DatePicker getDatePicker() {
     return picker;
   }
-
-  protected void onClick(ComponentEvent ce) {
-    hide(true);
-  }
-
 }

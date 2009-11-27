@@ -7,7 +7,7 @@
  */
 package com.extjs.gxt.samples.client.examples.treepanel;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Folder;
 import com.extjs.gxt.ui.client.data.ModelData;
@@ -33,9 +33,9 @@ public class BasicTreePanelExample extends LayoutContainer {
     store.add(model.getChildren(), true);
 
     final TreePanel<ModelData> tree = new TreePanel<ModelData>(store);
+    tree.setWidth(300);
     tree.setDisplayProperty("name");
-    tree.getStyle().setLeafIcon(Examples.ICONS.music());
-    tree.setWidth(250);
+    tree.getStyle().setLeafIcon(Resources.ICONS.music());
 
     ButtonBar buttonBar = new ButtonBar();
 

@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.extjs.gxt.ui.client.event.DNDEvent;
 import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.util.Util;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 
@@ -47,14 +48,12 @@ class DNDManager {
   }
 
   void handleDragMove(DragSource source, DNDEvent event) {
-
-    DropTarget target = getTarget(event.getTarget());
+    DropTarget target = getTarget(source, event.getTarget());
 
     // no target with current
     if (target == null) {
       if (currentTarget != null) {
         currentTarget.handleDragLeave(event);
-        currentTarget.fireEvent(Events.DragLeave, event);
         currentTarget = null;
       }
       return;
@@ -66,26 +65,20 @@ class DNDManager {
       event.setDropTarget(currentTarget);
       currentTarget.onDragMove(event);
       currentTarget.fireEvent(Events.DragMove, event);
-      if (!event.isCancelled()) {
-        currentTarget.showFeedback(event);
-      } else {
+      if (event.isCancelled()) {
         Insert.get().hide();
+      } else {
+        currentTarget.showFeedback(event);
       }
       return;
     }
 
     if (target != currentTarget) {
-      if (!source.getGroup().equals(target.getGroup())) {
-        return;
-      }
-
       if (currentTarget != null) {
         currentTarget.handleDragLeave(event);
         currentTarget = null;
       }
-      if (!target.isEnabled() || !target.component.isEnabled()) {
-        return;
-      }
+
       currentTarget = target;
     }
 
@@ -98,40 +91,52 @@ class DNDManager {
     event.setCancelled(true);
     event.setDropTarget(currentTarget);
     currentTarget.handleDragEnter(event);
+    if (event.isCancelled()) {
+      Insert.get().hide();
+      currentTarget = null;
+    } else {
+      currentTarget.showFeedback(event);
+    }
   }
 
   void handleDragStart(DragSource source, DNDEvent event) {
     source.onDragStart(event);
-    if (!source.fireEvent(Events.DragStart, event) || event.getData() == null) {
+    if (event.getData() == null || !source.fireEvent(Events.DragStart, event)) {
       event.setCancelled(true);
       event.getDragEvent().setCancelled(true);
       return;
     }
     source.setData(event.getData());
-    source.draggable.setProxy(source.statusProxy.el());
     source.statusProxy.setStatus(false);
   }
 
   void handleDragEnd(DragSource source, DNDEvent event) {
-    if (currentTarget != null && event.getStatus().getStatus()) {
+    if (currentTarget != null) {
       event.setDropTarget(currentTarget);
       event.setOperation(currentTarget.getOperation());
+    }
+    if (currentTarget != null && event.getStatus().getStatus()) {
       source.onDragDrop(event);
       source.fireEvent(Events.Drop, event);
 
       currentTarget.handleDrop(event);
       currentTarget.fireEvent(Events.Drop, event);
+    } else {
+      source.onDragFail(event);
+      source.fireEvent(Events.DragFail, event);
     }
-    Insert.get().hide();
     currentTarget = null;
+    Insert.get().hide();
+
   }
 
-  protected DropTarget getTarget(Element elem) {
+  protected DropTarget getTarget(DragSource source, Element elem) {
     DropTarget target = null;
-    for (int i = 0, len = targets.size(); i < len; i++) {
-      DropTarget t = targets.get(i);
-      if (DOM.isOrHasChild(t.component.getElement(), elem)
-          && (target == null || (target != null && DOM.isOrHasChild(target.getComponent().getElement(),
+    for (DropTarget t : targets) {
+      if (t.isEnabled()
+          && Util.equalWithNull(t.getGroup(), source.getGroup())
+          && DOM.isOrHasChild(t.component.getElement(), elem)
+          && (target == null || (target != null && DOM.isOrHasChild(target.component.getElement(),
               t.component.getElement())))) {
         target = t;
       }

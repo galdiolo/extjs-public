@@ -41,13 +41,13 @@ public class Shim {
    */
   public void cover(boolean shimIframes) {
     if (shimIframes) {
-      NodeList<Element> elements = XDOM.getBodyEl().select("iframe");
+      NodeList<Element> elements = XDOM.getBodyEl().select("iframe:not(.x-noshim)");
       shim(elements);
-      elements = XDOM.getBodyEl().select("object");
+      elements = XDOM.getBodyEl().select("object:not(.x-noshim)");
       shim(elements);
-      elements = XDOM.getBodyEl().select("applet");
+      elements = XDOM.getBodyEl().select("applet:not(.x-noshim)");
       shim(elements);
-      elements = XDOM.getBodyEl().select("embed");
+      elements = XDOM.getBodyEl().select("embed:not(.x-noshim)");
       shim(elements);
     } else {
       shims.add(createShim(null, 0, 0, Window.getClientWidth(), Window.getClientHeight()));
@@ -77,7 +77,7 @@ public class Shim {
     }
   }
 
-  protected El createShim(El el, int left, int top, int width, int height) {
+  protected El createShim(Element element, int left, int top, int width, int height) {
     Layer shim = new Layer();
     shim.hide();
     shim.enableShim();
@@ -85,10 +85,20 @@ public class Shim {
     shim.setSize(width, height);
     shim.setLeftTop(left, top);
     shim.update("&#160;");
-    XDOM.getBody().appendChild(shim.dom);
+    El parent = null;
+    if (element != null) {
+      parent = El.fly(element).getParent();
+    }
+    if (parent != null) {
+      parent.appendChild(shim.dom);
+    } else {
+      XDOM.getBody().appendChild(shim.dom);
+    }
     shim.show();
-    if (el != null) {
-      shim.setZIndex(el.getZIndex() + 10);
+    if (element != null) {
+      shim.setZIndex(El.fly(element).getZIndex() + 1);
+    } else {
+      shim.setZIndex(XDOM.getTopZIndex());
     }
 
     return shim;
@@ -97,12 +107,10 @@ public class Shim {
   protected void shim(NodeList<Element> elements) {
     for (int i = 0; i < elements.getLength(); i++) {
       Element e = elements.getItem(i);
-      El f = new El(e);
-      if ((f.dom.getAttribute("src").length() > 0)
-          || !e.getTagName().toLowerCase().equals("iframe")) {
-        Rectangle bounds = f.getBounds();
-        if (bounds.height > 0 && bounds.width > 0 && f.isVisible()) {
-          shims.add(createShim(f, bounds.x, bounds.y, bounds.width, bounds.height));
+      if ((e.getAttribute("src").length() > 0) || !e.getTagName().toLowerCase().equals("iframe")) {
+        Rectangle bounds = El.fly(e).getBounds(true);
+        if (bounds.height > 0 && bounds.width > 0 && El.fly(e).isVisible()) {
+          shims.add(createShim(e, bounds.x, bounds.y, bounds.width, bounds.height));
         }
       }
     }

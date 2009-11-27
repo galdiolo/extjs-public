@@ -122,6 +122,12 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
   public boolean isEditing() {
     return editSupport.isEditing();
   }
+  
+  @Override
+  public void reconfigure(ListStore<M> store, ColumnModel cm) {
+    super.reconfigure(store, cm);
+    editSupport.bind(this);
+  }
 
   /**
    * Sets the number of clicks to edit (defaults to ONE).

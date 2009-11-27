@@ -95,22 +95,6 @@ public class MultiField<D> extends Field<D> {
     fields.add(field);
   }
 
-  @Override
-  public void disable() {
-    super.disable();
-    for (Field<?> field : fields) {
-      field.disable();
-    }
-  }
-
-  @Override
-  public void enable() {
-    super.enable();
-    for (Field<?> field : fields) {
-      field.enable();
-    }
-  }
-
   /**
    * Returns the field at the index.
    * 
@@ -256,6 +240,18 @@ public class MultiField<D> extends Field<D> {
     }
     return super.getInputEl();
   }
+  
+  @Override
+  protected void onDisable() {
+    super.onDisable();
+    lc.disable();
+  }
+
+  @Override
+  protected void onEnable() {
+    super.onEnable();
+    lc.enable();
+  }
 
   @Override
   protected void onRender(Element target, int index) {
@@ -265,8 +261,8 @@ public class MultiField<D> extends Field<D> {
     } else {
       lc = new HorizontalPanel();
     }
-    
-    if(GXT.isIE) {
+
+    if (GXT.isIE) {
       lc.setStyleAttribute("position", "relative");
     }
 
@@ -281,7 +277,7 @@ public class MultiField<D> extends Field<D> {
 
       if (vertical && !last && spacing > 0) {
         style += "paddingBottom:" + spacing + "px;";
-      } else if (!vertical && spacing > 0) {
+      } else if (!vertical && !last && spacing > 0) {
         style += "paddingRight:" + spacing + "px;";
       }
       data.setStyle(style);
@@ -298,8 +294,10 @@ public class MultiField<D> extends Field<D> {
     super.onResize(width, height);
     if (resizeFields) {
       if (orientation == Orientation.HORIZONTAL) {
+        if(!GXT.isBorderBox){
+          width -= ((fields.size() - 1) * spacing);
+        }
         int w = width / fields.size();
-        w -= (fields.size() * spacing);
         for (Field<?> f : fields) {
           f.setWidth(w);
         }
@@ -309,7 +307,7 @@ public class MultiField<D> extends Field<D> {
         }
       }
     }
-    if(GXT.isIE){
+    if (GXT.isIE) {
       el().repaint();
     }
   }

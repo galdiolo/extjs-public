@@ -16,6 +16,8 @@ import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.LayoutEvent;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -111,17 +113,19 @@ public abstract class Container<T extends Component> extends BoxComponent {
    */
   protected boolean enableLayout;
 
+  protected boolean layoutExecuted;
+
+  protected boolean layoutNeeded = true;
+  protected boolean layoutOnAttach = true;
   /**
    * True to execute the container's layout when children are inserted and
    * removed (defaults to false).
    */
   protected boolean layoutOnChange;
 
-  protected boolean layoutExecuted;
-  protected boolean layoutNeeded = true;
-  protected boolean layoutOnAttach = true;
-
+  Listener<LayoutEvent> layoutListener;
   private List<T> items;
+
   private Layout layout;
 
   /**
@@ -265,7 +269,7 @@ public abstract class Container<T extends Component> extends BoxComponent {
    * @param item the item
    */
   public void scrollIntoView(T item) {
-    if (rendered) {
+    if (rendered && item.isRendered()) {
       item.el().scrollIntoView(el().dom, false);
     }
   }
@@ -282,8 +286,8 @@ public abstract class Container<T extends Component> extends BoxComponent {
   }
 
   protected int adjustIndex(T child, int beforeIndex) {
-    if (child.getParent() == this) {
-      int idx = indexOf(child);
+    int idx = indexOf(child);
+    if (idx != -1) {
       if (idx < beforeIndex) {
         beforeIndex--;
       }
@@ -299,7 +303,7 @@ public abstract class Container<T extends Component> extends BoxComponent {
    * @param child the child widget
    */
   protected void adopt(T child) {
-    setParent(this, child);
+    child.setParent(this);
   }
 
   @SuppressWarnings("unchecked")
@@ -309,21 +313,17 @@ public abstract class Container<T extends Component> extends BoxComponent {
 
   @Override
   protected void doAttachChildren() {
-    if (attachChildren) {
-      for (T item : items) {
-        if (item.isRendered() && !item.isAttached()) {
-          item.onAttach();
-        }
-      }
-    }
+    super.doAttachChildren();
+    attachChildren();
   }
 
   @Override
   protected void doDetachChildren() {
+    super.doDetachChildren();
     if (attachChildren) {
       for (T item : items) {
-        if (item.isRendered() && item.isAttached()) {
-          item.onDetach();
+        if (item.isRendered()) {
+          ComponentHelper.doDetach(item);
         }
       }
     }
@@ -334,35 +334,31 @@ public abstract class Container<T extends Component> extends BoxComponent {
   }
 
   protected boolean doLayout(boolean force) {
-    if (!enableLayout) {
+    if (!enableLayout || (!force && !fireEvent(Events.BeforeLayout, createContainerEvent(null)))) {
       return false;
     }
-
     if (layout == null) {
       setLayout(new FlowLayout());
+    }
+    for (Component c : items) {
+      if (c instanceof ContentPanel) {
+        ((ContentPanel) c).layoutBars();
+      }
     }
 
     // execute the layout
     if (force || layoutNeeded) {
-      layoutExecuted = true;
       layout.layout();
-      if (isVisible()) {
-        layoutNeeded = false;
-      }
     }
 
     for (Component c : items) {
-      if (attachChildren && c.isRendered()) {
-        ComponentHelper.doAttach(c);
-      }
-
       if (c instanceof Composite) {
         c = ((Composite) c).getComponent();
       }
 
       if (c instanceof LayoutContainer) {
         ((LayoutContainer) c).layout(force);
-      } else if (c instanceof Container) {
+      } else if (c instanceof Container<?>) {
         Container<?> con = (Container<?>) c;
         if (con.layout != null) {
           con.layout(force);
@@ -398,6 +394,10 @@ public abstract class Container<T extends Component> extends BoxComponent {
       if (item.fireEvent(Events.BeforeAdopt, componentEvent)) {
         index = adjustIndex(item, index);
         item.removeFromParent();
+        if (item.isRendered()) {
+          // make sure to detach it from the dom first
+          item.el().remove();
+        }
         items.add(index, item);
         onInsert(item, index);
         adopt(item);
@@ -444,16 +444,46 @@ public abstract class Container<T extends Component> extends BoxComponent {
     return doLayout(force);
   }
 
+  protected void notifyHide() {
+    super.notifyHide();
+    for (Component c : items) {
+      if (!c.hidden && c.isRendered()) {
+        c.notifyHide();
+      }
+    }
+  }
+
+  protected void notifyShow() {
+    super.notifyShow();
+    for (Component c : items) {
+      if (!c.hidden && c.isRendered()) {
+        c.notifyShow();
+      }
+    }
+  }
+
   protected void onAfterLayout() {
-    sync(true);
+
   }
 
   @Override
   protected void onAttach() {
     super.onAttach();
-    if (!layoutExecuted && layoutOnAttach && !(getParent() instanceof Container)) {
-      layout();
+    if (!layoutExecuted && layoutOnAttach) {
+      boolean parentIsContainer = getParent() != null && getParent() instanceof Container<?>;
+      if (parentIsContainer) {
+        Container<?> parent = (Container<?>) getParent();
+        if (parent.getLayout() == null || getLayout() == null || !getLayout().monitorResize || !getLayout().isRunning()) {
+          layout();
+        }
+      } else {
+        layout();
+      }
     }
+  }
+
+  protected void onBeforeLayoutExcecuted(Layout layout) {
+
   }
 
   protected void onInsert(T item, int index) {
@@ -462,20 +492,16 @@ public abstract class Container<T extends Component> extends BoxComponent {
     }
   }
 
+  protected void onLayoutExcecuted(Layout layout) {
+    layoutExecuted = true;
+    layoutNeeded = false;
+    attachChildren();
+    sync(true);
+  }
+
   protected void onRemove(T item) {
     if (isAutoHeight() || isAutoWidth()) {
       sync(true);
-    }
-  }
-
-  @Override
-  protected void onResize(int width, int height) {
-    super.onResize(width, height);
-    layoutNeeded = true;
-    for (Component c : items) {
-      if (c instanceof Container) {
-        ((Container<?>) c).layoutNeeded = true;
-      }
     }
   }
 
@@ -485,7 +511,7 @@ public abstract class Container<T extends Component> extends BoxComponent {
       ComponentHelper.doDetach(child);
       assert !child.isAttached() : "Failure of " + getClass() + " to call super.onDetach()";
     }
-    setParent(null, child);
+    child.setParent(null);
   }
 
   /**
@@ -511,9 +537,7 @@ public abstract class Container<T extends Component> extends BoxComponent {
         onRemove(component);
 
         if (attachChildren) {
-          if (component.getParent() != this) {
-            throw new RuntimeException("component is not a child of this container");
-          }
+          assert component.getParent() == this :"component is not a child of this container";
           orphan(component);
         }
 
@@ -553,10 +577,28 @@ public abstract class Container<T extends Component> extends BoxComponent {
    * @param layout the new layout
    */
   protected void setLayout(Layout layout) {
+    if (layoutListener == null) {
+      layoutListener = new Listener<LayoutEvent>() {
+
+        public void handleEvent(LayoutEvent be) {
+          if (be.getType() == Events.BeforeLayout) {
+            onBeforeLayoutExcecuted(be.getLayout());
+          } else if (be.getType() == Events.AfterLayout) {
+            onLayoutExcecuted(be.getLayout());
+          }
+
+        }
+
+      };
+    }
     if (this.layout != null) {
+      this.layout.removeListener(Events.BeforeLayout, layoutListener);
+      this.layout.removeListener(Events.AfterLayout, layoutListener);
       this.layout.setContainer(null);
     }
     this.layout = layout;
+    this.layout.addListener(Events.BeforeLayout, layoutListener);
+    this.layout.addListener(Events.AfterLayout, layoutListener);
     layoutNeeded = true;
     layout.setContainer(this);
   }
@@ -587,7 +629,13 @@ public abstract class Container<T extends Component> extends BoxComponent {
     }
   }
 
-  private native void setParent(Widget parent, Widget child) /*-{
-    child.@com.google.gwt.user.client.ui.Widget::parent = parent;
-  }-*/;
+  private void attachChildren() {
+    if (attachChildren && isAttached()) {
+      for (T item : items) {
+        if (item.isRendered()) {
+          ComponentHelper.doAttach(item);
+        }
+      }
+    }
+  }
 }

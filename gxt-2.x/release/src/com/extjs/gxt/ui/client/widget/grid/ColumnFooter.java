@@ -8,12 +8,12 @@
 package com.extjs.gxt.ui.client.widget.grid;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.core.FastMap;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.store.ListStore;
@@ -34,7 +34,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 class ColumnFooter extends BoxComponent {
 
-  class Foot extends SimplePanel {
+  public class Foot extends SimplePanel {
 
     public Foot(AggregationRowConfig<?> config, String id) {
       setStyleName("x-grid3-cell-inner");
@@ -49,10 +49,10 @@ class ColumnFooter extends BoxComponent {
     }
   }
 
-  class FooterRow extends BoxComponent {
+  public class FooterRow extends BoxComponent {
 
-    private FlexTable table;
-    private AggregationRowConfig<?> config;
+    protected FlexTable table;
+    protected AggregationRowConfig<?> config;
 
     public FooterRow(AggregationRowConfig<?> config) {
       this.config = config;
@@ -66,7 +66,7 @@ class ColumnFooter extends BoxComponent {
 
     public void setWidget(int column, Widget widget) {
       Foot f = (Foot) table.getWidget(0, column);
-      f.setWidget(f);
+      f.setWidget(widget);
     }
 
     @Override
@@ -96,10 +96,23 @@ class ColumnFooter extends BoxComponent {
       for (int i = 0; i < cols; i++) {
         Foot f = new Foot(config, cm.getDataIndex(i));
         table.setWidget(0, i, f);
-        table.getCellFormatter().setWidth(0, i, cm.getColumnWidth(i) + "");
-
-        if (cm.getColumnAlignment(i) == HorizontalAlignment.RIGHT) {
-          table.getCellFormatter().setHorizontalAlignment(0, i, HasHorizontalAlignment.ALIGN_RIGHT);
+        table.getCellFormatter().setStyleName(0, i, "x-grid3-footer-cell");
+        HorizontalAlignment align = cm.getColumnAlignment(i);
+        if (align != null) {
+          switch (align) {
+            case RIGHT:
+              table.getCellFormatter().setHorizontalAlignment(0, i, HasHorizontalAlignment.ALIGN_RIGHT);
+              break;
+            case CENTER:
+              table.getCellFormatter().setHorizontalAlignment(0, i, HasHorizontalAlignment.ALIGN_CENTER);
+              break;
+            default:
+              table.getCellFormatter().setHorizontalAlignment(0, i, HasHorizontalAlignment.ALIGN_LEFT);
+              break;
+          }
+        }
+        if (cm.isHidden(i)) {
+          updateColumnHidden(i, true);
         }
       }
       el().appendChild(table.getElement());
@@ -142,9 +155,9 @@ class ColumnFooter extends BoxComponent {
     if (!cm.isHidden(column)) {
       for (int i = 0; i < rows.size(); i++) {
         FooterRow row = rows.get(i);
-        row.table.getCellFormatter().setWidth(0, column, width + "");
+        row.table.getCellFormatter().setWidth(0, column, width + "px");
         Widget w = row.table.getWidget(0, column);
-        El.fly(w.getElement()).setWidth(width, true);
+        El.fly(w.getElement()).setWidth(width - 2, true);
       }
     }
   }
@@ -174,6 +187,22 @@ class ColumnFooter extends BoxComponent {
     sinkEvents(Event.MOUSEEVENTS);
   }
 
+  @Override
+  protected void doAttachChildren() {
+    super.doAttachChildren();
+    for (FooterRow row : rows) {
+      ComponentHelper.doAttach(row);
+    }
+  }
+
+  @Override
+  protected void doDetachChildren() {
+    super.doAttachChildren();
+    for (FooterRow row : rows) {
+      ComponentHelper.doDetach(row);
+    }
+  }
+
   @SuppressWarnings("unchecked")
   protected void refresh() {
     ListStore<ModelData> store = grid.getStore();
@@ -187,7 +216,7 @@ class ColumnFooter extends BoxComponent {
 
       for (int j = 0; j < cols; j++) {
         String name = cm.getDataIndex(j);
-
+        updateColumnWidth(j, cm.getColumnWidth(j));
         if (config.getHtml(name) != null) {
           footer.setHtml(j, config.getHtml(name));
           continue;
@@ -200,19 +229,24 @@ class ColumnFooter extends BoxComponent {
 
         SummaryType<?> type = config.getSummaryType(name);
         if (type != null) {
-          Map<String, Object> data = new HashMap<String, Object>();
+          Map<String, Object> data = new FastMap<Object>();
           for (int k = 0; k < models; k++) {
             value = type.render(value, store.getAt(k), name, data);
           }
         }
 
         if (config.getModel() != null) {
-          Object obj = config.getModel().get(cm.getDataIndex(i));
-          if (obj != null && obj instanceof Number) {
-            value = (Number) obj;
-          } else if (obj != null) {
-            footer.setHtml(j, obj.toString());
-            continue;
+          Object obj = config.getModel().get(name);
+          if (obj != null) {
+            if (obj instanceof Number) {
+              value = (Number) obj;
+            } else if (obj instanceof Widget) {
+              footer.setWidget(j, (Widget) obj);
+              continue;
+            } else {
+              footer.setHtml(j, obj.toString());
+              continue;
+            }
           }
         }
 
@@ -232,6 +266,7 @@ class ColumnFooter extends BoxComponent {
             footer.setHtml(j, obj.toString());
           }
         }
+
       }
     }
   }

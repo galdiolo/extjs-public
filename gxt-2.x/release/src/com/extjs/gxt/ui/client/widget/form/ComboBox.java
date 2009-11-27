@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.widget.form;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XDOM;
@@ -35,6 +36,7 @@ import com.extjs.gxt.ui.client.store.StoreListener;
 import com.extjs.gxt.ui.client.util.BaseEventPreview;
 import com.extjs.gxt.ui.client.util.DelayedTask;
 import com.extjs.gxt.ui.client.util.KeyNav;
+import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.ListView;
@@ -147,7 +149,17 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
    */
   public class ComboBoxMessages extends TextFieldMessages {
 
+    private String loadingText = GXT.MESSAGES.loadMask_msg();
     private String valueNoutFoundText;
+
+    /**
+     * Returns the loading text.
+     * 
+     * @return the loading text
+     */
+    public String getLoadingText() {
+      return loadingText;
+    }
 
     /**
      * Returns the value not found error text.
@@ -156,6 +168,15 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
      */
     public String getValueNoutFoundText() {
       return valueNoutFoundText;
+    }
+
+    /**
+     * Sets the loading text.
+     * 
+     * @param loadingText the loading text
+     */
+    public void setLoadingText(String loadingText) {
+      this.loadingText = loadingText;
     }
 
     /**
@@ -175,43 +196,45 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
    * TriggerAction enum.
    */
   public enum TriggerAction {
-    QUERY, ALL;
+    ALL, QUERY;
   }
 
-  protected ListStore<D> store;
   protected boolean autoComplete = false;
+  protected boolean delayedCheck;
+  protected String lastQuery;
 
-  private String listStyle = "x-combo-list";
-  private String selectedStyle = "x-combo-selected";
-  private boolean forceSelection;
-  private String listAlign = "tl-bl?";
-  private int maxHeight = 300;
-  private int minListWidth = 70;
+  protected ListStore<D> store;
+  private String allQuery = "";
   private BaseEventPreview eventPreview;
   private boolean expanded;
-  private D selectedItem;
-  private StoreListener<D> storeListener;
-  private XTemplate template;
-  private ListView<D> listView;
-  private String lastSelectionText;
-  private LayoutContainer list;
-  private boolean typeAhead;
-  private int queryDelay = 500;
-  private int typeAheadDelay = 250;
-  private int minChars = 4;
-  private String lastQuery, allQuery = "";
-  private DelayedTask taTask, dqTask;
-  private TriggerAction triggerAction = TriggerAction.QUERY;
-  private String mode = "remote";
-  private String itemSelector;
-  private String loadingText = "Loading...";
-  private int pageSize;
-  private int assetHeight;
   private El footer;
-  private PagingToolBar pageTb;
-  private boolean lazyRender, initialized;
-  private String valueField;
+  private boolean forceSelection;
   private InputElement hiddenInput;
+  private String itemSelector;
+  private String lastSelectionText;
+  private boolean lazyRender = true, initialized;
+  private LayoutContainer list;
+  private String listAlign = "tl-bl?";
+  private String listStyle = "x-combo-list";
+  private ListView<D> listView;
+  private int maxHeight = 300;
+  private int minChars = 4;
+  private int minListWidth = 70;
+  private String mode = "remote";
+  private int pageSize;
+  private PagingToolBar pageTb;
+  private int queryDelay = 500;
+  private D selectedItem;
+  private String selectedStyle = "x-combo-selected";
+  private StoreListener<D> storeListener;
+  private DelayedTask taTask, dqTask;
+  private XTemplate template;
+  private TriggerAction triggerAction = TriggerAction.QUERY;
+  private boolean typeAhead;
+  private int typeAheadDelay = 250;
+  private boolean useQueryCache = true;
+
+  private String valueField;
 
   /**
    * Creates a combo box.
@@ -227,6 +250,15 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
 
   public void addSelectionChangedListener(SelectionChangedListener<D> listener) {
     addListener(Events.SelectionChange, listener);
+  }
+
+  @Override
+  public void clear() {
+    getStore().clearFilters();
+    boolean f = forceSelection;
+    forceSelection = false;
+    super.clear();
+    forceSelection = f;
   }
 
   /**
@@ -278,19 +310,15 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     }
 
     if (forceAll || q.length() >= minChars) {
-      if (lastQuery == null || !lastQuery.equals(q)) {
+      if (!useQueryCache || !q.equals(lastQuery)) {
         lastQuery = q;
         if (mode.equals("local")) {
           selectedItem = null;
-          if (forceAll) {
-            store.clearFilters();
-          } else {
-            store.filter(getDisplayField(), q);
-          }
+          store.filter(getDisplayField(), q);
           onLoad(null);
         } else {
-          store.getLoader().load(getParams(q));
           expand();
+          store.getLoader().load(getParams(q));
         }
       } else {
         selectedItem = null;
@@ -395,7 +423,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
    * @return the loading text
    */
   public String getLoadingText() {
-    return loadingText;
+    return getMessages().getLoadingText();
   }
 
   /**
@@ -526,15 +554,6 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     }
 
     doForce();
-
-    D v = super.getValue();
-    // a value was set directly and there is not a
-    // matching value in the drop down list
-    String rv = getRawValue();
-    boolean empty = rv == null || rv.equals("");
-    if (!rendered && !empty && v == null && value != null && !forceSelection) {
-      return value;
-    }
     return super.getValue();
   }
 
@@ -583,8 +602,37 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     return typeAhead;
   }
 
+  /**
+   * Returns the state if the query cache is used or not.
+   * 
+   * @return the useQueryCache state
+   */
+  public boolean isUseQueryCache() {
+    return useQueryCache;
+  }
+
   public void removeSelectionListener(SelectionChangedListener<D> listener) {
     removeListener(Events.SelectionChange, listener);
+  }
+
+  @Override
+  public void reset() {
+    getStore().clearFilters();
+    boolean f = forceSelection;
+    forceSelection = false;
+    super.reset();
+    forceSelection = f;
+  }
+
+  public void select(D sel) {
+    if (listView != null && sel != null) {
+      int index = store.indexOf(sel);
+      selectedItem = sel;
+      if (index < listView.getElements().size()) {
+        listView.getSelectionModel().select(sel, false);
+        fly(listView.getElement(index)).scrollIntoView(listView.getElement(), false);
+      }
+    }
   }
 
   /**
@@ -596,19 +644,6 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
    */
   public void select(int index) {
     select(store.getAt(index));
-  }
-
-  public void select(D sel) {
-    if (listView != null) {
-      if (sel != null) {
-        int index = store.indexOf(sel);
-        selectedItem = sel;
-        if (index < listView.getElements().size()) {
-          listView.getSelectionModel().select(sel, false);
-          fly(listView.getElement(index)).scrollIntoView(listView.getElement(), false);
-        }
-      }
-    }
   }
 
   /**
@@ -668,7 +703,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
   }
 
   /**
-   * True to lazily render the combo's drop down list (default to false,
+   * True to lazily render the combo's drop down list (default to true,
    * pre-render).
    * 
    * @param lazyRender true to lazy render the drop down list
@@ -702,7 +737,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
    * @param loadingText the loading text
    */
   public void setLoadingText(String loadingText) {
-    this.loadingText = loadingText;
+    getMessages().setLoadingText(loadingText);
   }
 
   /**
@@ -741,12 +776,22 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
    * @param pageSize the page size
    */
   public void setPageSize(int pageSize) {
+    assertPreRender();
     this.pageSize = pageSize;
+    if (pageSize > 0) {
+      if (pageTb != null) {
+        pageTb.setPageSize(pageSize);
+      } else {
+        pageTb = new PagingToolBar(pageSize);
+      }
+    } else {
+      pageTb = null;
+    }
   }
 
   @Override
   public void setPropertyEditor(PropertyEditor<D> propertyEditor) {
-    assert propertyEditor instanceof ListModelPropertyEditor : "PropertyEditor must be a ListModelPropertyEditor instance";
+    assert propertyEditor instanceof ListModelPropertyEditor<?> : "PropertyEditor must be a ListModelPropertyEditor instance";
     super.setPropertyEditor(propertyEditor);
   }
 
@@ -859,6 +904,18 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
    */
   public void setTypeAhead(boolean typeAhead) {
     this.typeAhead = typeAhead;
+    if (rendered) {
+      if (typeAhead && taTask == null) {
+        taTask = new DelayedTask(new Listener<BaseEvent>() {
+          public void handleEvent(BaseEvent be) {
+            onTypeAhead();
+          }
+        });
+      } else if (!typeAhead && taTask != null) {
+        taTask.cancel();
+        taTask = null;
+      }
+    }
   }
 
   /**
@@ -871,13 +928,32 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     this.typeAheadDelay = typeAheadDelay;
   }
 
+  /**
+   * Set this to false to disable the last query cache (defaults to true).
+   * 
+   * When set to false the store gets queried on each expand for the data that
+   * should get displayed in the list. If you use a loader, than each time the
+   * ComboBox gets expanded, the server gets asked for the data.
+   * 
+   * You want to do this for example, if you filter the content of this ComboBox
+   * against some selection in another field.
+   * 
+   * @param useQueryCache the useQueryCache to set
+   */
+  public void setUseQueryCache(boolean useQueryCache) {
+    this.useQueryCache = useQueryCache;
+  }
+
   @Override
   public void setValue(D value) {
+    D oldValue = this.value;
     super.setValue(value);
     updateHiddenValue();
     this.lastSelectionText = getRawValue();
-    SelectionChangedEvent<D> se = new SelectionChangedEvent<D>(this, getSelection());
-    fireEvent(Events.SelectionChange, se);
+    if (!Util.equalWithNull(oldValue, value)) {
+      SelectionChangedEvent<D> se = new SelectionChangedEvent<D>(this, getSelection());
+      fireEvent(Events.SelectionChange, se);
+    }
   }
 
   /**
@@ -901,27 +977,8 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
   }
 
   protected void collapseIf(PreviewEvent pe) {
-    if (!list.el().isOrHasChild(pe.getTarget()) && !wrap.isOrHasChild(pe.getTarget())) {
+    if (!list.el().isOrHasChild(pe.getTarget()) && !el().isOrHasChild(pe.getTarget())) {
       collapse();
-    }
-  }
-
-  @Override
-  protected void doAttachChildren() {
-    super.doAttachChildren();
-    if (pageTb != null && pageTb.isRendered()) {
-      ComponentHelper.doAttach(pageTb);
-    }
-  }
-
-  @Override
-  protected void doDetachChildren() {
-    super.doDetachChildren();
-    if (list.isRendered()) {
-      RootPanel.get().remove(list);
-    }
-    if (pageTb != null && pageTb.isRendered()) {
-      ComponentHelper.doDetach(pageTb);
     }
   }
 
@@ -931,11 +988,19 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
       forceSelection = false;
       String rv = getRawValue();
       if (getAllowBlank() && (rv == null || rv.equals(""))) {
+        forceSelection = f;
         return;
       }
 
       if (getValue() == null) {
-        setRawValue(lastSelectionText != null ? lastSelectionText : "");
+        if (lastSelectionText != null && !"".equals(lastSelectionText)) {
+          setRawValue(lastSelectionText);
+          if (mode.equals("local")) {
+            store.filter(getDisplayField(), getRawValue());
+          }
+        } else {
+          applyEmptyText();
+        }
       }
       forceSelection = f;
     }
@@ -949,19 +1014,6 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
       }
     }
     return null;
-  }
-
-  protected boolean delayedCheck;
-
-  protected void unsetDelayCheck() {
-    DeferredCommand.addCommand(new Command() {
-
-      public void execute() {
-        delayedCheck = false;
-
-      }
-
-    });
   }
 
   protected void fireKey(FieldEvent fe) {
@@ -1008,6 +1060,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
       protected boolean onPreview(PreviewEvent pe) {
         switch (pe.getType().getEventCode()) {
           case Event.ONSCROLL:
+          case Event.ONMOUSEWHEEL:
           case Event.ONMOUSEDOWN:
             collapseIf(pe);
         }
@@ -1070,20 +1123,20 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
 
     String style = listStyle;
     listView.setStyleAttribute("overflowX", "hidden");
-    listView.setStyleName(style + "-inner");
+    listView.addStyleName(style + "-inner");
     listView.setStyleAttribute("padding", "0px");
     listView.setItemSelector(itemSelector != null ? itemSelector : "." + style + "-item");
     listView.setSelectOnOver(true);
     listView.setBorders(false);
-    listView.setLoadingText(loadingText);
+    listView.setLoadingText(getMessages().getLoadingText());
     listView.getSelectionModel().addListener(Events.SelectionChange, new Listener<SelectionChangedEvent<D>>() {
       public void handleEvent(SelectionChangedEvent<D> se) {
         selectedItem = listView.getSelectionModel().getSelectedItem();
       }
     });
 
-    listView.addListener(Events.Select, new Listener<ListViewEvent>() {
-      public void handleEvent(ListViewEvent le) {
+    listView.addListener(Events.Select, new Listener<ListViewEvent<D>>() {
+      public void handleEvent(ListViewEvent<D> le) {
         onViewClick(le, true);
       }
     });
@@ -1092,13 +1145,34 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
       template = XTemplate.create(html);
     }
 
-    assetHeight = 0;
+    if (pageTb != null) {
+      pageTb.bind((PagingLoader) store.getLoader());
+    }
 
     list = new LayoutContainer() {
+      @Override
+      protected void doAttachChildren() {
+        super.doAttachChildren();
+        ComponentHelper.doAttach(ComboBox.this.pageTb);
+
+      }
+
+      @Override
+      protected void doDetachChildren() {
+        super.doDetachChildren();
+        ComponentHelper.doDetach(ComboBox.this.pageTb);
+      }
+
       @Override
       protected void onRender(Element parent, int index) {
         super.onRender(parent, index);
         eventPreview.getIgnoreList().add(getElement());
+
+        if (pageTb != null) {
+          footer = list.el().createChild("<div class='" + listStyle + "-ft'></div>");
+          pageTb.setBorders(false);
+          pageTb.render(footer.dom);
+        }
       }
     };
     list.setScrollMode(Scroll.NONE);
@@ -1107,15 +1181,11 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     list.setBorders(true);
     list.setStyleName(style);
     list.hide();
+    list.addStyleName("x-ignore");
 
     assert store != null : "ComboBox needs a store";
 
     list.add(listView);
-
-    if (pageSize > 0) {
-      pageTb = new PagingToolBar(pageSize);
-      pageTb.bind((PagingLoader) store.getLoader());
-    }
 
     if (!lazyRender) {
       createList(true);
@@ -1139,6 +1209,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
 
   @Override
   protected void onDetach() {
+    collapse();
     super.onDetach();
     if (eventPreview != null) {
       eventPreview.remove();
@@ -1162,7 +1233,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
   @Override
   protected void onKeyUp(FieldEvent fe) {
     super.onKeyUp(fe);
-    if (isEditable() && !fe.isSpecialKey()) {
+    if (isEditable() && (!fe.isSpecialKey() || fe.getKeyCode() == KeyCodes.KEY_BACKSPACE || fe.getKeyCode() == 46)) {
       // last key
       dqTask.delay(queryDelay);
     }
@@ -1198,7 +1269,6 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
 
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
-    el().addEventsSunk(Event.KEYEVENTS);
     initList();
 
     if (!autoComplete) {
@@ -1228,7 +1298,6 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
         }
       });
     }
-
     eventPreview.getIgnoreList().add(getElement());
   }
 
@@ -1243,9 +1312,6 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
 
   protected void onTriggerClick(ComponentEvent ce) {
     super.onTriggerClick(ce);
-    if (isReadOnly()) {
-      return;
-    }
     if (expanded) {
       collapse();
     } else {
@@ -1263,8 +1329,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
   protected void onTypeAhead() {
     if (store.getCount() > 0) {
       D m = store.getAt(0);
-      Object obj = m.get(getDisplayField());
-      String newValue = obj.toString();
+      String newValue = propertyEditor.getStringValue(m);
       int len = newValue.length();
       int selStart = getRawValue().length();
       if (selStart != len) {
@@ -1306,20 +1371,41 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
   }
 
   @Override
+  protected void triggerBlur(ComponentEvent ce) {
+    doForce();
+    super.triggerBlur(ce);
+  }
+
+  protected void unsetDelayCheck() {
+    DeferredCommand.addCommand(new Command() {
+      public void execute() {
+        delayedCheck = false;
+      }
+    });
+  }
+
+  @Override
   protected boolean validateBlur(DomEvent e, Element target) {
     return list == null || (list != null && !list.isVisible() && !list.getElement().isOrHasChild(target));
   }
 
   @Override
   protected boolean validateValue(String value) {
-    doForce();
+    if (forceSelection) {
+      boolean f = forceSelection;
+      forceSelection = false;
+      if (getValue() == null) {
+        forceSelection = f;
+        String rv = getRawValue();
+        if (getAllowBlank() && (rv == null || rv.equals(""))) {
+          return true;
+        }
+        markInvalid(getMessages().getBlankText());
+        return false;
+      }
+      forceSelection = f;
+    }
     return super.validateValue(value);
-  }
-
-  @Override
-  protected void triggerBlur(ComponentEvent ce) {
-    doForce();
-    super.triggerBlur(ce);
   }
 
   private void bindStore(ListStore<D> store, boolean initial) {
@@ -1346,16 +1432,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
 
   private void createList(boolean remove) {
     RootPanel.get().add(list);
-
     initialized = true;
-
-    if (pageTb != null) {
-      footer = list.el().createChild("<div class='" + listStyle + "-ft'></div>");
-      pageTb.setBorders(false);
-      pageTb.render(footer.dom);
-      assetHeight += footer.getHeight();
-    }
-
     if (remove) {
       RootPanel.get().remove(list);
     }
@@ -1382,8 +1459,14 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     list.el().alignTo(getElement(), listAlign, null);
 
     h -= fh;
+
+    int width = w - list.el().getFrameWidth("lr");
     listView.syncSize();
-    listView.setSize(w - list.el().getFrameWidth("lr"), h - list.el().getFrameWidth("tb"));
+    listView.setSize(width, h - list.el().getFrameWidth("tb"));
+
+    if (pageTb != null) {
+      pageTb.setWidth(width);
+    }
 
     int y = list.el().getY();
     int b = y + h;

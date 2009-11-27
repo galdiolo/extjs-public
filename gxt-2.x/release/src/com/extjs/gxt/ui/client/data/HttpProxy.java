@@ -65,8 +65,7 @@ public class HttpProxy<D> implements DataProxy<D> {
         @SuppressWarnings("unchecked")
         public void onResponseReceived(Request request, Response response) {
           if (response.getStatusCode() != Response.SC_OK) {
-            callback.onFailure(new RuntimeException("HttpProxy: Invalid status code "
-                + response.getStatusCode()));
+            callback.onFailure(new RuntimeException("HttpProxy: Invalid status code " + response.getStatusCode()));
             return;
           }
           String text = response.getText();
@@ -104,6 +103,6 @@ public class HttpProxy<D> implements DataProxy<D> {
   }
 
   private native void setUrl(RequestBuilder rb, String url) /*-{
-      rb.@com.google.gwt.http.client.RequestBuilder::url = url;
-    }-*/;
+    rb.@com.google.gwt.http.client.RequestBuilder::url = url;
+  }-*/;
 }

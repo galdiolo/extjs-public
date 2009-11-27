@@ -7,7 +7,7 @@
  */
 package com.extjs.gxt.samples.client.examples.button;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.ui.client.Style.ButtonArrowAlign;
 import com.extjs.gxt.ui.client.Style.ButtonScale;
 import com.extjs.gxt.ui.client.Style.IconAlign;
@@ -20,12 +20,12 @@ import com.extjs.gxt.ui.client.widget.button.SplitButton;
 import com.extjs.gxt.ui.client.widget.button.ToggleButton;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
+import com.google.gwt.user.client.Element;
 
 public class ButtonsExample extends LayoutContainer {
 
   enum Category {
-    MENU("Menu Buttons"), MENUBOTTOM("Menu Buttons (Arrow on bottom)"), NORMAL(
-        "Normal Buttons"), SPLIT("Split Buttons"), SPLITBOTTOM(
+    MENU("Menu Buttons"), MENUBOTTOM("Menu Buttons (Arrow on bottom)"), NORMAL("Normal Buttons"), SPLIT("Split Buttons"), SPLITBOTTOM(
         "Split Buttons (Arrow on bottom)"), TOGGLE("Toggle Buttons");
 
     private String text;
@@ -42,8 +42,8 @@ public class ButtonsExample extends LayoutContainer {
 
   enum Type {
 
-    BOTTOM("Icon and Text(bottom)"), ICON("Icon Only"), LEFT("Icon and Text (left)"), RIGHT(
-        "Icon and Text (right)"), TEXT("Text Only"), TOP("Icon and Text (top)");
+    BOTTOM("Icon and Text(bottom)"), ICON("Icon Only"), LEFT("Icon and Text (left)"), RIGHT("Icon and Text (right)"), TEXT(
+        "Text Only"), TOP("Icon and Text (top)");
 
     private String text;
 
@@ -58,7 +58,9 @@ public class ButtonsExample extends LayoutContainer {
 
   private VerticalPanel vp;
 
-  public ButtonsExample() {
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
     vp = new VerticalPanel();
     vp.setSpacing(10);
 
@@ -111,6 +113,9 @@ public class ButtonsExample extends LayoutContainer {
       case ICON:
         setIcon(btn, scale);
         break;
+      case TEXT:
+        btn.setText("Add User");
+        break;
       default: {
         setIcon(btn, scale);
         btn.setText("Add User");
@@ -162,21 +167,20 @@ public class ButtonsExample extends LayoutContainer {
   }
 
   private Html formatHeader(String text) {
-    return new Html(
-        "<div class='text' style='width: 400px; background-color: #ddd;padding: 4px'><b>"
-            + text + "</b></div>");
+    return new Html("<div class='text' style='width: 400px; background-color: #ddd;padding: 4px'><b>" + text
+        + "</b></div>");
   }
 
   private void setIcon(Button btn, ButtonScale scale) {
     switch (scale) {
       case SMALL:
-        btn.setIcon(Examples.ICONS.add16());
+        btn.setIcon(Resources.ICONS.add16());
         break;
       case MEDIUM:
-        btn.setIcon(Examples.ICONS.add24());
+        btn.setIcon(Resources.ICONS.add24());
         break;
       case LARGE:
-        btn.setIcon(Examples.ICONS.add32());
+        btn.setIcon(Resources.ICONS.add32());
         break;
     }
 

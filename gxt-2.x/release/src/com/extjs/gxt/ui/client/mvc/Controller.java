@@ -8,9 +8,7 @@
 package com.extjs.gxt.ui.client.mvc;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.extjs.gxt.ui.client.event.EventType;
 
@@ -23,7 +21,7 @@ public abstract class Controller {
   protected List<Controller> children;
   protected boolean initialized;
 
-  private Set<EventType> supportedEvents;
+  private List<EventType> supportedEvents;
 
   /**
    * Add a child controller.
@@ -46,8 +44,7 @@ public abstract class Controller {
    *         otherwise
    */
   public boolean canHandle(AppEvent event) {
-    if (supportedEvents != null && supportedEvents.contains(event.getType()))
-      return true;
+    if (supportedEvents != null && supportedEvents.contains(event.getType())) return true;
     if (children != null) {
       for (Controller c : children) {
         if (c.canHandle(event)) return true;
@@ -124,11 +121,13 @@ public abstract class Controller {
    */
   protected void registerEventTypes(EventType... types) {
     if (supportedEvents == null) {
-      supportedEvents = new HashSet<EventType>();
+      supportedEvents = new ArrayList<EventType>();
     }
     if (types != null) {
       for (EventType type : types) {
-        supportedEvents.add(type);
+        if (!supportedEvents.contains(type)) {
+          supportedEvents.add(type);
+        }
       }
     }
   }

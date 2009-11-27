@@ -18,7 +18,7 @@ public class DefaultModelComparer<M extends ModelData> implements ModelComparer<
    * Global instance.
    */
   @SuppressWarnings("unchecked")
-  public static final DefaultModelComparer DFFAULT = new DefaultModelComparer();
+  public static final DefaultModelComparer DEFAULT = new DefaultModelComparer();
 
   public boolean equals(M a, M b) {
     return (a == b || (a != null && a.equals(b)));

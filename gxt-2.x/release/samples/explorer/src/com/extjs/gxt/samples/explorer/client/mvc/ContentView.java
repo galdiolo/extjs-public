@@ -61,6 +61,7 @@ public class ContentView extends View {
     });
     ContentPanel center = (ContentPanel) Registry.get(AppView.CENTER_PANEL);
     center.add(tabPanel);
+    center.layout();
   }
 
   public void onShowPage(Entry entry) {

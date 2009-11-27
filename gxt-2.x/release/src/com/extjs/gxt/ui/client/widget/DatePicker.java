@@ -11,8 +11,6 @@ import java.util.Date;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.Direction;
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.core.CompositeElement;
 import com.extjs.gxt.ui.client.core.CompositeFunction;
 import com.extjs.gxt.ui.client.core.El;
@@ -26,14 +24,11 @@ import com.extjs.gxt.ui.client.event.IconButtonEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.fx.FxConfig;
-import com.extjs.gxt.ui.client.messages.XMessages;
 import com.extjs.gxt.ui.client.util.DateWrapper;
 import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.IconButton;
-import com.extjs.gxt.ui.client.widget.layout.TableData;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
@@ -42,6 +37,7 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Grid;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 
 /**
  * Simple date picker.
@@ -85,15 +81,15 @@ public class DatePicker extends BoxComponent {
    * DatePicker messages.
    */
   public class DatePickerMessages {
-    private String todayText;
-    private String okText = "&#160;OK&#160;";
-    private String cancelText;
+    private String todayText = GXT.MESSAGES.datePicker_todayText();
+    private String okText = GXT.MESSAGES.datePicker_okText();
+    private String cancelText = GXT.MESSAGES.datePicker_cancelText();
     private String todayTip;
-    private String minText;
-    private String maxText;
-    private String prevText;
-    private String nextText;
-    private String monthYearText;
+    private String minText = GXT.MESSAGES.datePicker_minText();
+    private String maxText = GXT.MESSAGES.datePicker_maxText();
+    private String prevText = GXT.MESSAGES.datePicker_prevText();
+    private String nextText = GXT.MESSAGES.datePicker_nextText();
+    private String monthYearText = GXT.MESSAGES.datePicker_monthYearText();
 
     /**
      * Sets the text to display on the cancel button.
@@ -290,11 +286,6 @@ public class DatePicker extends BoxComponent {
       setElement(XDOM.create(sb.toString()));
       el().insertInto(target, index);
 
-      el().setWidth(175, true);
-
-      String pt = messages.getPrevText() != null ? messages.getPrevText() : myMessages.datePicker_prevText();
-      String nt = messages.getNextText() != null ? messages.getNextText() : myMessages.datePicker_nextText();
-
       monthBtn = new Button("&#160;", new SelectionListener<ButtonEvent>() {
         public void componentSelected(ButtonEvent ce) {
           showMonthPicker();
@@ -309,7 +300,7 @@ public class DatePicker extends BoxComponent {
           showPrevMonth();
         }
       });
-      prevBtn.setToolTip(pt);
+      prevBtn.setToolTip(messages.getPrevText());
       prevBtn.render(el().selectNode(".x-date-left").dom);
 
       nextBtn = new IconButton("x-date-right-icon", new SelectionListener<IconButtonEvent>() {
@@ -317,7 +308,7 @@ public class DatePicker extends BoxComponent {
           showNextMonth();
         }
       });
-      nextBtn.setToolTip(nt);
+      nextBtn.setToolTip(messages.getNextText());
       nextBtn.render(el().selectNode(".x-date-right").dom);
     }
 
@@ -333,7 +324,7 @@ public class DatePicker extends BoxComponent {
   private int mpyear;
   private Grid days, grid;
   private Component header;
-  private HorizontalPanel footer;
+  private com.google.gwt.user.client.ui.HorizontalPanel footer;
   private DateWrapper activeDate, value;
   private int mpSelMonth, mpSelYear;
   private Button monthBtn;
@@ -343,7 +334,6 @@ public class DatePicker extends BoxComponent {
   private CompositeElement mpMonths, mpYears;
   private El monthPicker;
   private DateTimeConstants constants;
-  private XMessages myMessages = (XMessages) GWT.create(XMessages.class);
   private DatePickerMessages messages;
 
   /**
@@ -434,6 +424,9 @@ public class DatePicker extends BoxComponent {
       maxDate = new DateWrapper(maxDate).clearTime().asDate();
     }
     this.maxDate = maxDate;
+    if (rendered) {
+      update(value);
+    }
   }
 
   /**
@@ -455,6 +448,9 @@ public class DatePicker extends BoxComponent {
       minDate = new DateWrapper(minDate).clearTime().asDate();
     }
     this.minDate = minDate;
+    if (rendered) {
+      update(value);
+    }
   }
 
   /**
@@ -497,7 +493,7 @@ public class DatePicker extends BoxComponent {
   protected void doAttachChildren() {
     super.doAttachChildren();
     header.onAttach();
-    footer.onAttach();
+    ComponentHelper.doAttach(footer);
     ComponentHelper.doAttach(grid);
   }
 
@@ -505,13 +501,13 @@ public class DatePicker extends BoxComponent {
   protected void doDetachChildren() {
     super.doDetachChildren();
     header.onDetach();
-    footer.onDetach();
+    ComponentHelper.doDetach(footer);
     ComponentHelper.doDetach(grid);
     monthPicker.setVisible(false);
   }
 
   protected void onClick(ComponentEvent be) {
-    be.stopEvent();
+    be.preventDefault();
     El target = be.getTargetEl();
     El pn = null;
     String cls = target.getStyleName();
@@ -548,7 +544,7 @@ public class DatePicker extends BoxComponent {
   }
 
   protected void onDayClick(ComponentEvent ce) {
-    ce.stopEvent();
+    ce.preventDefault();
     El target = ce.getTargetEl();
     El e = target.findParent("a", 5);
     if (e != null) {
@@ -564,16 +560,6 @@ public class DatePicker extends BoxComponent {
   protected void onRender(Element target, int index) {
     setElement(DOM.createDiv(), target, index);
     disableTextSelection(true);
-    if (messages.getMinText() == null) {
-      messages.setMinText(GXT.MESSAGES.datePicker_minText());
-    }
-    if (messages.getMaxText() == null) {
-      messages.setMaxText(GXT.MESSAGES.datePicker_maxText());
-    }
-
-    if (messages.getTodayText() == null) {
-      messages.setTodayText(GXT.MESSAGES.datePicker_todayText());
-    }
 
     header = new Header();
     header.render(getElement());
@@ -614,22 +600,24 @@ public class DatePicker extends BoxComponent {
       }
     }
 
-    footer = new HorizontalPanel();
-    footer.setTableWidth("100%");
-    footer.setHorizontalAlign(HorizontalAlignment.CENTER);
+    footer = new com.google.gwt.user.client.ui.HorizontalPanel();
+    // footer.setTableWidth("100%");
+    footer.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+    footer.setWidth("100%");
+    // footer.setHorizontalAlign(HorizontalAlignment.CENTER);
 
-    footer.setStyleName("x-date-bottom");
 
-    if (GXT.isIE) {
-      footer.setWidth(175);
-    }
 
     todayBtn = new Button(messages.getTodayText(), new SelectionListener<ButtonEvent>() {
       public void componentSelected(ButtonEvent ce) {
         selectToday();
       }
     });
-    footer.add(todayBtn, new TableData(HorizontalAlignment.CENTER, VerticalAlignment.MIDDLE));
+    if (messages.getTodayTip() != null) {
+      todayBtn.setToolTip(messages.getTodayTip());
+    }
+    footer.add(todayBtn);
+    todayBtn.getElement().getParentElement().setClassName("x-date-bottom");
 
     monthPicker = new El(DOM.createDiv());
     monthPicker.dom.setClassName("x-date-mp");
@@ -640,7 +628,7 @@ public class DatePicker extends BoxComponent {
     getElement().appendChild(footer.getElement());
     getElement().appendChild(monthPicker.dom);
 
-    el().setWidth(175);
+    setWidth(177);
 
     cells = Util.toElementArray(el().select("table.x-date-inner tbody td"));
     textNodes = Util.toElementArray(el().select("table.x-date-inner tbody span"));
@@ -648,21 +636,22 @@ public class DatePicker extends BoxComponent {
     activeDate = value != null ? value : new DateWrapper();
     update(activeDate);
 
-    el().addEventsSunk(Event.ONCLICK | Event.MOUSEEVENTS);
+    sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS);
     el().makePositionable();
 
   }
 
   private void createMonthPicker() {
-    String ok = messages.getOkText() != null ? messages.getOkText() : myMessages.datePicker_okText();
-    String cancel = messages.getCancelText() != null ? messages.getCancelText() : myMessages.datePicker_cancelText();
-
     StringBuffer buf = new StringBuffer();
     buf.append("<table border=0 cellspacing=0>");
     String[] monthNames = constants.shortMonths();
     for (int i = 0; i < 6; i++) {
-      buf.append("<tr><td class=x-date-mp-month><a href=#>" + monthNames[i] + "</a></td>");
-      buf.append("<td class='x-date-mp-month x-date-mp-sep'><a href=#>" + monthNames[i + 6] + "</a></td>");
+      buf.append("<tr><td class=x-date-mp-month><a href=#>");
+      buf.append(monthNames[i]);
+      buf.append("</a></td>");
+      buf.append("<td class='x-date-mp-month x-date-mp-sep'><a href=#>");
+      buf.append(monthNames[i + 6]);
+      buf.append("</a></td>");
       if (i == 0) {
         buf.append("<td class=x-date-mp-ybtn align=center><a class=x-date-mp-prev href=#></a></td><td class='x-date-mp-ybtn' align=center><a class='x-date-mp-next'></a></td></tr>");
       } else {
@@ -670,9 +659,9 @@ public class DatePicker extends BoxComponent {
       }
     }
     buf.append("<tr class=x-date-mp-btns><td colspan='4'><button type='button' class='x-date-mp-ok'>");
-    buf.append(ok);
+    buf.append(messages.getOkText());
     buf.append("</button><button type=button class=x-date-mp-cancel>");
-    buf.append(cancel);
+    buf.append(messages.getCancelText());
     buf.append("</button></td></tr></table>");
 
     monthPicker.update(buf.toString());
@@ -768,22 +757,21 @@ public class DatePicker extends BoxComponent {
 
     String dd = year + "," + month + "," + day;
 
-    El cellEl = new El(cell);
-    cellEl.firstChild().dom.setPropertyString("dateValue", dd);
+    cell.getFirstChildElement().setPropertyString("dateValue", dd);
     if (t == today) {
-      cellEl.addStyleName("x-date-today");
-      cellEl.setTitle(messages.getTodayText());
+      fly(cell).addStyleName("x-date-today");
+      cell.setTitle(messages.getTodayText());
     }
     if (t == sel) {
-      cellEl.addStyleName("x-date-selected");
+      fly(cell).addStyleName("x-date-selected");
     }
     if (t < min) {
-      cellEl.addStyleName("x-date-disabled");
-      cellEl.setTitle(messages.getMinText());
+      fly(cell).addStyleName("x-date-disabled");
+      cell.setTitle(messages.getMinText());
     }
     if (t > max) {
-      cellEl.addStyleName("x-date-disabled");
-      cellEl.setTitle(messages.getMaxText());
+      fly(cell).addStyleName("x-date-disabled");
+      cell.setTitle(messages.getMaxText());
     }
   }
 
@@ -838,7 +826,7 @@ public class DatePicker extends BoxComponent {
 
       DateWrapper d = new DateWrapper(pm.getFullYear(), pm.getMonth(), prevStart).clearTime();
       today = new DateWrapper().clearTime().getTime();
-      long sel = activeDate.clearTime().getTime();
+      long sel = value != null ? value.clearTime().getTime() : 0;
       long min = minDate != null ? new DateWrapper(minDate).getTime() : Long.MIN_VALUE;
       long max = maxDate != null ? new DateWrapper(maxDate).getTime() : Long.MAX_VALUE;
 
@@ -879,20 +867,18 @@ public class DatePicker extends BoxComponent {
 
   private void updateMPYear(int year) {
     mpyear = year;
-
     for (int i = 1; i <= 10; i++) {
       El td = new El(mpYears.item(i - 1));
       int y2;
       if (i % 2 == 0) {
         y2 = (int) (year + (Math.round(i * .5)));
-        td.firstChild().update("" + y2);
-        td.dom.setPropertyInt("xyear", y2);
       } else {
         y2 = (int) (year - (5 - Math.round(i * .5)));
-        td.firstChild().update("" + y2);
-        td.dom.setPropertyInt("xyear", y2);
       }
-      fly(mpYears.item(i - 1)).setStyleName("x-date-mp-sel", y2 == year);
+      td.firstChild().update("" + y2);
+      td.dom.setPropertyInt("xyear", y2);
+      td.setStyleName("x-date-mp-sel", y2 == mpSelYear);
     }
+
   }
 }

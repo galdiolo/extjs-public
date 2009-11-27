@@ -18,30 +18,26 @@ public class ComponentHelper {
 
   public static void doAttach(Widget widget) {
     if (widget != null && !widget.isAttached()) {
-      if (widget instanceof Component) {
-        ((Component) widget).onAttach();
-      } else {
-        doAttachNative(widget);
-      }
+      doAttachNative(widget);
     }
   }
 
   public static void doDetach(Widget widget) {
     if (widget != null && widget.isAttached()) {
-      if (widget instanceof Component) {
-        ((Component) widget).onDetach();
-      } else {
-        doDetachNative(widget);
-      }
+      doDetachNative(widget);
     }
   }
 
   public static LayoutData getLayoutData(Component c) {
-    return c.getLayoutData();
+    return c.<LayoutData> getData("layoutData");
   }
 
   public static void setLayoutData(Component c, LayoutData data) {
-    c.setLayoutData(data);
+    Widget parent = c.getParent();
+    c.setData("layoutData", data);
+    if (parent != null && parent instanceof Container<?>) {
+      ((Container<?>) parent).setLayoutNeeded(true);
+    }
   }
 
   public static void setModel(Component c, ModelData model) {

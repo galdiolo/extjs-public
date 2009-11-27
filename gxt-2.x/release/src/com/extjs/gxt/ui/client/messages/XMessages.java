@@ -194,7 +194,11 @@ public interface XMessages extends Messages {
 
   String rowEditor_cancelText();
   
+  String rowEditor_dirtyText();
+  
   String rowEditor_saveText();
+  
+  String rowEditor_tipTitleText();
   
   String propertyColumnModel_nameText();
 

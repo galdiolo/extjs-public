@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.widget.grid;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseObservable;
@@ -290,7 +291,7 @@ public class ColumnModel extends BaseObservable {
     if (c != null) {
       return configs.indexOf(c);
     }
-    return -1;
+    return Style.DEFAULT;
   }
 
   /**

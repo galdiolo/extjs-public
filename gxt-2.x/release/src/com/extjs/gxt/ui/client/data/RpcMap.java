@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.data;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -41,7 +42,7 @@ import com.extjs.gxt.ui.client.core.FastMap;
  * List, Set and Map
  */
 @SuppressWarnings("unused")
-public class RpcMap {
+public class RpcMap implements Serializable {
 
   private Byte _byte;
   private Short _short;
@@ -65,7 +66,7 @@ public class RpcMap {
   private Set<String> _set;
   private Map<String, String> _map;
 
-  private transient Map<String, Object> map = new FastMap<Object>();
+  private transient FastMap<Object> map = new FastMap<Object>();
 
   /**
    * Returns the internal map.

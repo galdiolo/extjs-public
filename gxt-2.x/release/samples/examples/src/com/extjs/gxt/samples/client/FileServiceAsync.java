@@ -10,6 +10,7 @@ package com.extjs.gxt.samples.client;
 import java.util.List;
 
 import com.extjs.gxt.samples.client.examples.model.FileModel;
+import com.extjs.gxt.ui.client.data.RemoteSortTreeLoadConfig;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -18,5 +19,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public interface FileServiceAsync {
 
   public void getFolderChildren(FileModel model, AsyncCallback<List<FileModel>> children);
+  
+  public void getFolderChildren(RemoteSortTreeLoadConfig loadConfig, AsyncCallback<List<FileModel>> children);
 
 }

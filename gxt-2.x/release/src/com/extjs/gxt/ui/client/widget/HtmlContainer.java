@@ -309,7 +309,7 @@ public class HtmlContainer extends Container<Component> {
       if (!item.isRendered()) {
         item.render(elem.dom);
       } else {
-        getElement().appendChild(item.getElement());
+        elem.appendChild(item.getElement());
       }
       if (isAttached() && !item.isAttached()) {
         ComponentHelper.doAttach(item);

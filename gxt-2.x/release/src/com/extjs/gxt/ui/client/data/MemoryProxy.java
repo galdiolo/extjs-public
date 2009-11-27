@@ -7,6 +7,9 @@
  */
 package com.extjs.gxt.ui.client.data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -17,14 +20,14 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public class MemoryProxy<D> implements DataProxy<D> {
 
-  protected D data;
+  protected Object data;
 
   /**
    * Creates new memory proxy.
    * 
    * @param data the local data
    */
-  public MemoryProxy(D data) {
+  public MemoryProxy(Object data) {
     this.data = data;
   }
 
@@ -33,10 +36,11 @@ public class MemoryProxy<D> implements DataProxy<D> {
    * 
    * @return the data
    */
-  public D getData() {
+  public Object getData() {
     return data;
   }
 
+  @SuppressWarnings("unchecked")
   public void load(DataReader<D> reader, Object loadConfig, AsyncCallback<D> callback) {
     try {
       D d = null;
@@ -44,6 +48,9 @@ public class MemoryProxy<D> implements DataProxy<D> {
         d = reader.read(loadConfig, data);
       } else {
         d = (D) data;
+        if (d instanceof List) {
+          d = (D) new ArrayList((List) d);
+        }
       }
       callback.onSuccess(d);
     } catch (Exception e) {
@@ -56,7 +63,7 @@ public class MemoryProxy<D> implements DataProxy<D> {
    * 
    * @param data the data
    */
-  public void setData(D data) {
+  public void setData(Object data) {
     this.data = data;
   }
 

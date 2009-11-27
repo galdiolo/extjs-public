@@ -8,10 +8,8 @@
 package com.extjs.gxt.ui.client.fx;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.BaseObservable;
@@ -261,12 +259,10 @@ public class Resizable extends BaseObservable {
     resize.removeListener(Events.Attach, listener);
     resize.removeListener(Events.Detach, listener);
     resize.removeListener(Events.Render, listener);
-
-    Iterator<ResizeHandle> iter = handleList.iterator();
-    while (iter.hasNext()) {
-      ResizeHandle handle = iter.next();
-      iter.remove();
-      DOM.removeChild(resize.getElement(), handle.getElement());
+    if (handleList != null) {
+      for (ResizeHandle handle : handleList) {
+        DOM.removeChild(resize.getElement(), handle.getElement());
+      }
     }
   }
 
@@ -296,9 +292,15 @@ public class Resizable extends BaseObservable {
    * @param enable <code>true</code> to enable
    */
   public void setEnabled(boolean enable) {
-    for (ResizeHandle handle : handleList) {
-      El.fly(handle.getElement()).setVisibility(enable);
+    if (enabled != enable && handleList != null) {
+      for (ResizeHandle handle : handleList) {
+        handle.el().setVisibility(enable);
+      }
+      if (enable) {
+        syncHandleHeight();
+      }
     }
+    this.enabled = enable;
   }
 
   /**
@@ -357,14 +359,15 @@ public class Resizable extends BaseObservable {
   }
 
   public void syncHandleHeight() {
-    int height = resize.getHeight(true);
-    for (ResizeHandle r : handleList) {
-      if (r.dir == Dir.E || r.dir == Dir.W) {
-        r.el().setHeight(height);
+    if (resize != null && handleList != null) {
+      int height = resize.getHeight(true);
+      for (ResizeHandle r : handleList) {
+        if (r.dir == Dir.E || r.dir == Dir.W) {
+          r.el().setHeight(height);
+        }
       }
+      resize.el().repaint();
     }
-    resize.el().repaint();
-
   }
 
   protected Element createProxy() {
@@ -378,7 +381,7 @@ public class Resizable extends BaseObservable {
     resize.el().makePositionable();
     if (handleList == null) {
       handleList = new ArrayList<ResizeHandle>();
-      if (handles.equals("all")) {
+      if ("all".equals(handles)) {
         handles = "n s e w ne nw se sw";
       }
       String[] temp = handles.split(" ");
@@ -425,18 +428,22 @@ public class Resizable extends BaseObservable {
     }
 
     syncHandleHeight();
-
+    setEnabled(enabled);
   }
 
   protected void onAttach() {
-    for (ResizeHandle handle : handleList) {
-      ComponentHelper.doAttach(handle);
+    if (handleList != null) {
+      for (ResizeHandle handle : handleList) {
+        ComponentHelper.doAttach(handle);
+      }
     }
   }
 
   protected void onDetach() {
-    for (ResizeHandle handle : handleList) {
-      ComponentHelper.doDetach(handle);
+    if (handleList != null) {
+      for (ResizeHandle handle : handleList) {
+        ComponentHelper.doDetach(handle);
+      }
     }
   }
 
@@ -459,17 +466,13 @@ public class Resizable extends BaseObservable {
   }
 
   private void handleMouseDown(Event event, ResizeHandle handle) {
-    if (!enabled) {
-      return;
-    }
-
-    if (!fireEvent(Events.ResizeStart, new ResizeEvent(this, resize, event))) {
+    if (!enabled || !fireEvent(Events.ResizeStart, new ResizeEvent(this, resize, event))) {
       return;
     }
 
     dir = handle.dir;
 
-    startBox = resize.getBounds(false);
+    startBox = resize.el().getBounds(false);
     int x = DOM.eventGetClientX(event);
     int y = DOM.eventGetClientY(event);
     startPoint = new Point(x, y);
@@ -477,22 +480,21 @@ public class Resizable extends BaseObservable {
     resizing = true;
 
     if (proxyEl == null) {
-      proxyEl = new El(DOM.createDiv());
-      proxyEl.setStyleName(proxyStyle, true);
-      proxyEl.disableTextSelection(true);
-      Element body = RootPanel.getBodyElement();
-      DOM.appendChild(body, proxyEl.dom);
+      proxyEl = new El(createProxy());
     }
+    Element body = RootPanel.getBodyElement();
+    DOM.appendChild(body, proxyEl.dom);
 
     proxyEl.makePositionable(true);
     proxyEl.setLeft(startBox.x).setTop(startBox.y);
-    proxyEl.setSize(startBox.width, startBox.height);
+    proxyEl.setSize(startBox.width, startBox.height, true);
     proxyEl.setVisible(true);
-    proxyEl.updateZIndex(5);
 
     preview.add();
 
     Shim.get().cover(false);
+
+    proxyEl.updateZIndex(5);
     Shim.get().setStyleAttribute("cursor", handle.el().getStyleAttribute("cursor"));
 
   }
@@ -618,7 +620,8 @@ public class Resizable extends BaseObservable {
           }
         }
       }
-      proxyEl.setBounds(x, y, (int) w, (int) h);
+      proxyEl.setLeftTop(x, y);
+      proxyEl.setSize((int) w, (int) h, true);
     }
   }
 
@@ -627,29 +630,19 @@ public class Resizable extends BaseObservable {
     preview.remove();
     Shim.get().uncover();
 
-    Rectangle rect;
-    if (!GXT.isBorderBox) {
-      rect = proxyEl.getBounds(false, true);
-    } else {
-      rect = proxyEl.getBounds();
-    }
+    Rectangle rect = proxyEl.getBounds();
 
     rect.width = Math.min(rect.width, maxWidth);
     rect.height = Math.min(rect.height, maxHeight);
 
-    if (proxyEl != null) {
-      proxyEl.disableTextSelection(false);
-    }
+    proxyEl.disableTextSelection(false);
     proxyEl.setVisible(false);
-
+    proxyEl.remove();
     resize.setBounds(rect);
 
     syncHandleHeight();
 
-    ResizeEvent ce = new ResizeEvent(this);
-    ce.setComponent(resize);
-    ce.setEvent(event);
-    fireEvent(Events.ResizeEnd, ce);
+    fireEvent(Events.ResizeEnd, new ResizeEvent(this, resize, event));
   }
 
 }

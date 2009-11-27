@@ -140,7 +140,7 @@ public class TreeItem extends Component {
   public TreeItem() {
     children = new ArrayList<TreeItem>();
   }
-
+  
   /**
    * Creates a new tree item.
    * 
@@ -158,18 +158,6 @@ public class TreeItem extends Component {
    */
   public void add(TreeItem item) {
     add(item, getItemCount());
-  }
-
-  public int getIndent() {
-    return (getDepth()) * tree.getIndentWidth();
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj instanceof TreeItem) {
-      return getId().equals(((TreeItem)obj).getId());
-    }
-    return false;
   }
 
   /**
@@ -221,6 +209,14 @@ public class TreeItem extends Component {
     }
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof TreeItem) {
+      return getId().equals(((TreeItem)obj).getId());
+    }
+    return false;
+  }
+
   /**
    * Returns the item's first child.
    * 
@@ -264,6 +260,10 @@ public class TreeItem extends Component {
    */
   public String getIconStyle() {
     return iconStyle;
+  }
+
+  public int getIndent() {
+    return (getDepth()) * tree.getIndentWidth();
   }
 
   /**
@@ -561,6 +561,10 @@ public class TreeItem extends Component {
     }
   }
 
+  public void setChildrenRendered(boolean rendered) {
+    childrenRendered = rendered;
+  }
+
   @Override
   public void setElement(Element elem) {
     super.setElement(elem);
@@ -575,10 +579,6 @@ public class TreeItem extends Component {
         tree.setAnimate(anim);
       }
     }
-  }
-
-  public void setTreeTableElement(Element elem) {
-    super.setElement(elem);
   }
 
   /**
@@ -713,6 +713,10 @@ public class TreeItem extends Component {
     }
   }
 
+  public void setTreeTableElement(Element elem) {
+    super.setElement(elem);
+  }
+
   public void setUI(TreeItemUI ui) {
     this.ui = ui;
   }
@@ -752,6 +756,27 @@ public class TreeItem extends Component {
     }
   }
 
+  protected String calculateIconStyle() {
+    String style = null;
+    if (iconStyle != null) {
+      style = iconStyle;
+    } else {
+      TreeStyle ts = tree.getStyle();
+      if (!isLeaf()) {
+        if (isExpanded() && ts.getNodeOpenIconStyle() != null) {
+          style = ts.getNodeOpenIconStyle();
+        } else if (isExpanded() && ts.getNodeOpenIconStyle() != null) {
+          style = ts.getNodeCloseIconStyle();
+        } else if (!isExpanded()) {
+          style = ts.getNodeCloseIconStyle();
+        }
+      } else {
+        style = ts.getLeafIconStyle();
+      }
+    }
+    return style;
+  }
+
   protected Joint calculateJoint() {
     if (root) {
       return Joint.NONE;
@@ -774,27 +799,6 @@ public class TreeItem extends Component {
         joint = Joint.NONE;
     }
     return joint;
-  }
-
-  protected String calculateIconStyle() {
-    String style = null;
-    if (iconStyle != null) {
-      style = iconStyle;
-    } else {
-      TreeStyle ts = tree.getStyle();
-      if (!isLeaf()) {
-        if (isExpanded() && ts.getNodeOpenIconStyle() != null) {
-          style = ts.getNodeOpenIconStyle();
-        } else if (isExpanded() && ts.getNodeOpenIconStyle() != null) {
-          style = ts.getNodeCloseIconStyle();
-        } else if (!isExpanded()) {
-          style = ts.getNodeCloseIconStyle();
-        }
-      } else {
-        style = ts.getLeafIconStyle();
-      }
-    }
-    return style;
   }
 
   protected boolean fireEvent(EventType type, TreeEvent te) {
@@ -842,10 +846,6 @@ public class TreeItem extends Component {
       child.setElement(elems.getItem(i));
     }
     childrenRendered = true;
-  }
-
-  protected void setChildrenRendered(boolean rendered) {
-    childrenRendered = rendered;
   }
 
   protected void setRoot(boolean isRoot) {

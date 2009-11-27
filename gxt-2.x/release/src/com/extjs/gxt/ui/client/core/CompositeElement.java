@@ -73,7 +73,7 @@ public class CompositeElement {
     } else if (elements.isArray()) {
       items.addAll(Arrays.asList(elements.elements));
     } else if (elements.isId()) {
-      add(DOM.getElementById(elements.id));
+      add(XDOM.getElementById(elements.id));
     }
   }
 
@@ -84,7 +84,7 @@ public class CompositeElement {
    * @return the contains state
    */
   public boolean contains(Element elem) {
-    return indexOf(elem) != -1;
+    return items != null && items.contains(elem);
   }
 
   /**
@@ -125,7 +125,7 @@ public class CompositeElement {
    * @return the element
    */
   public Element getElement(int index) {
-    return (Element) (index < items.size() ? items.get(index) : null);
+    return index < items.size() ? items.get(index) : null;
   }
 
   /**
@@ -143,12 +143,7 @@ public class CompositeElement {
    */
   public int indexOf(Element elem) {
     if (items != null) {
-      for (int i = 0; i < items.size(); i++) {
-        Element e = items.get(i);
-        if (e == elem) {
-          return i;
-        }
-      }
+      return items.indexOf(elem);
     }
     return -1;
   }

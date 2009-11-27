@@ -65,6 +65,7 @@ public class IconButton extends BoxComponent {
    * Creates a new icon button. When using the default constructor,
    * {@link #changeStyle(String)} must be called to initialize the button.
    */
+  @Deprecated
   public IconButton() {
     this("");
   }

@@ -11,6 +11,7 @@ import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.MenuEvent;
+import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.google.gwt.user.client.Element;
 
@@ -167,7 +168,7 @@ public class CheckMenuItem extends MenuItem {
       for (Component item : parentMenu.getItems()) {
         if (item instanceof CheckMenuItem) {
           CheckMenuItem check = (CheckMenuItem) item;
-          if (check != this && check.isChecked()) {
+          if (check != this && check.isChecked() && Util.equalWithNull(group, check.getGroup())) {
             check.setChecked(false);
           }
         }

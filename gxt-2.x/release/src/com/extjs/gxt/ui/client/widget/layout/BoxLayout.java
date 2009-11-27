@@ -28,9 +28,8 @@ import com.google.gwt.user.client.Element;
 public abstract class BoxLayout extends Layout {
 
   protected El innerCt;
-  
+
   private int scrollOffset = 0;
-  private String ctCls = "x-box-layout-ct";
   private String innerCls = "x-box-inner";
   private BoxLayoutPack pack;
   private Padding padding = new Padding(0);
@@ -56,7 +55,8 @@ public abstract class BoxLayout extends Layout {
 
   public BoxLayout() {
     monitorResize = true;
-    setExtraStyle("x-box-item");
+    componentStyleName = "x-box-item";
+    targetStyleName = "x-box-layout-ct";
   }
 
   /**
@@ -87,7 +87,8 @@ public abstract class BoxLayout extends Layout {
   }
 
   /**
-   * Returns true if the remaining space after flex calculation is applied to the last component being flexed.
+   * Returns true if the remaining space after flex calculation is applied to
+   * the last component being flexed.
    * 
    * @return true if adjusting for flex remainder
    */
@@ -96,7 +97,8 @@ public abstract class BoxLayout extends Layout {
   }
 
   /**
-   * Set to true if the remaining space after flex calculation should be applied to the last component being flexed.
+   * Set to true if the remaining space after flex calculation should be applied
+   * to the last component being flexed.
    * 
    * @param adjustForFlexRemainder true to add the space
    */
@@ -133,16 +135,9 @@ public abstract class BoxLayout extends Layout {
   }
 
   @Override
-  protected boolean isValidParent(Element elem, Element parent) {
-    return elem.getParentElement() == innerCt.dom;
-  }
-
-  @Override
   protected void onLayout(Container<?> container, El target) {
 
     if (innerCt == null) {
-      target.addStyleName(ctCls);
-
       // the innerCt prevents wrapping and shuffling while
       // the container is resizing
       Element div = DOM.createDiv();

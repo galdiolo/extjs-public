@@ -27,8 +27,7 @@ import com.google.gwt.user.client.Window;
  * <p/>
  * The viewport is not added to the root panel automatically. Is is not
  * necessary to call {@link #layout()} after adding the viewport to the
- * RootPanel. Layout will be called in a deferred command after being added to
- * the root panel.
+ * RootPanel. Layout will be called after being added to the root panel.
  * 
  * <dl>
  * <dt>Inherited Events:</dt>
@@ -86,10 +85,10 @@ public class Viewport extends LayoutContainer {
   }
 
   public void onAttach() {
-    super.onAttach();
-    GXT.hideLoadingPanel(loadingPanelId);
     setEnableScroll(enableScroll);
     setSize(Window.getClientWidth(), Window.getClientHeight());
+    super.onAttach();
+    GXT.hideLoadingPanel(loadingPanelId);
   }
 
   /**
@@ -118,8 +117,8 @@ public class Viewport extends LayoutContainer {
   }
 
   @Override
-  protected void onWindowResize(final int width, final int height) {
-    setSize(Window.getClientWidth(), Window.getClientHeight());
+  protected void onWindowResize(int width, int height) {
+    setSize(width, height);
   }
 
 }

@@ -65,9 +65,29 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
 public abstract class Store<M extends ModelData> extends BaseObservable {
 
   /**
+   * BeforeAdd event type.
+   */
+  public static final EventType BeforeAdd = new EventType();
+
+  /**
+   * BeforeClear event type.
+   */
+  public static final EventType BeforeClear = new EventType();
+
+  /**
    * BeforeDataChanged event type.
    */
   public static final EventType BeforeDataChanged = new EventType();
+
+  /**
+   * BeforeRemove event type.
+   */
+  public static final EventType BeforeRemove = new EventType();
+
+  /**
+   * BeforeSort event type.
+   */
+  public static final EventType BeforeSort = new EventType();
 
   /**
    * DataChanged event type.
@@ -111,7 +131,7 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
   protected SortInfo sortInfo = new SortInfo();
   protected StoreSorter<M> storeSorter;
   protected String filterProperty;
-  protected String filterBeginsWidth;
+  protected String filterBeginsWith;
   protected boolean filtersEnabled;
   protected List<M> snapshot;
   protected List<StoreFilter<M>> filters;
@@ -123,7 +143,7 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
 
   @SuppressWarnings("unchecked")
   public Store() {
-    comparer = DefaultModelComparer.DFFAULT;
+    comparer = DefaultModelComparer.DEFAULT;
   }
 
   /**
@@ -162,9 +182,6 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
    * @param property the optional active property
    */
   public void applyFilters(String property) {
-    if (filters != null && filters.size() == 0) {
-      return;
-    }
     filterProperty = property;
     if (!filtersEnabled) {
       snapshot = all;
@@ -173,10 +190,10 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
     filtersEnabled = true;
     filtered = new ArrayList<M>();
     for (M items : snapshot) {
-      if (filterBeginsWidth != null) {
+      if (filterBeginsWith != null && property != null) {
         Object o = items.get(property);
         if (o != null) {
-          if (!o.toString().toLowerCase().startsWith(filterBeginsWidth.toLowerCase())) {
+          if (!o.toString().toLowerCase().startsWith(filterBeginsWith.toLowerCase())) {
             continue;
           }
         }
@@ -225,8 +242,8 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
    * @param item the item
    * @return true if container
    */
-  public boolean contains(ModelData item) {
-    return all.contains(item);
+  public boolean contains(M item) {
+    return findModel(item) != null;
   }
 
   /**
@@ -246,9 +263,7 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
    * @param property the property to filter by
    */
   public void filter(String property) {
-    filterProperty = property;
-    filterBeginsWidth = null;
-    applyFilters(property);
+    filter(property, null);
   }
 
   /**
@@ -259,7 +274,7 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
    */
   public void filter(String property, String beginsWith) {
     filterProperty = property;
-    filterBeginsWidth = beginsWith;
+    filterBeginsWith = beginsWith;
     applyFilters(property);
   }
 
@@ -278,7 +293,7 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
     }
     return null;
   }
-  
+
   public M findModel(String key) {
     if (keyProvider != null) {
       for (int i = 0, len = all.size(); i < len; i++) {
@@ -364,7 +379,7 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
   }
 
   /**
-   * Gets all records modified since the last commit. Modified records are
+   * Gets all records modified since the last commit. Modified records are not
    * persisted across load operations (e.g., during paging).
    * 
    * @return a list of modified records
@@ -381,6 +396,7 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
    * @return the record for the item
    */
   public Record getRecord(M model) {
+    assert model != null: "Model my not be null";
     Record record = recordMap.get(model);
     if (record == null) {
       record = new Record(model);
@@ -441,16 +457,19 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
    * Remove all items from the store and fires the <i>Clear</i> event.
    */
   public void removeAll() {
-    for (M m : all) {
-      unregisterModel(m);
+    StoreEvent<M> event = createStoreEvent();
+    if (fireEvent(BeforeClear, event)) {
+      for (M m : all) {
+        unregisterModel(m);
+      }
+      all.clear();
+      modified.clear();
+      recordMap.clear();
+      if (snapshot != null) {
+        snapshot.clear();
+      }
+      fireEvent(Clear, event);
     }
-    all.clear();
-    modified.clear();
-    recordMap.clear();
-    if (snapshot != null) {
-      snapshot.clear();
-    }
-    fireEvent(Clear, createStoreEvent());
   }
 
   /**
@@ -628,17 +647,18 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
   }
 
   protected void swapModelInstance(M oldModel, M newModel) {
-    int index = all.indexOf(oldModel);
+    M oldM = findModel(oldModel);
+    int index = all.indexOf(oldM);
     if (index != -1) {
-      all.remove(oldModel);
+      all.remove(oldM);
       all.add(index, newModel);
-      unregisterModel(oldModel);
+      unregisterModel(oldM);
       registerModel(newModel);
     }
     if (isFiltered()) {
-      index = snapshot.indexOf(oldModel);
+      index = snapshot.indexOf(oldM);
       if (index != -1) {
-        snapshot.remove(oldModel);
+        snapshot.remove(oldM);
         snapshot.add(index, newModel);
       }
     }

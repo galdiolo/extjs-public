@@ -10,33 +10,13 @@ package com.extjs.gxt.ui.client.util;
 /**
  * Represents 4-side margins.
  */
-public class Margins {
-
-  /**
-   * The left margin.
-   */
-  public int left;
-
-  /**
-   * The right margin.
-   */
-  public int right;
-
-  /**
-   * The top margin.
-   */
-  public int top;
-
-  /**
-   * The bottom margin.
-   */
-  public int bottom;
+public class Margins extends Region {
 
   /**
    * Creates a new margins instance with 0 values for all sides.
    */
   public Margins() {
-
+    this(0);
   }
 
   /**

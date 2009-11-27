@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.widget.menu;
 
+import com.extjs.gxt.ui.client.util.Util;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 
@@ -46,13 +47,14 @@ public class HeaderMenuItem extends Item {
    */
   public void setText(String text) {
     this.text = text;
-    if (rendered && text != null) {
-      el().update(text);
+    if (rendered) {
+      el().update(Util.isEmptyString(text) ? "&#160;" : text);
     }
   }
 
+  @Override
   protected void onRender(Element target, int index) {
-    Element span = DOM.createSpan();    
+    Element span = DOM.createSpan();
     span.setClassName(itemStyle);
     setElement(span, target, index);
     super.onRender(target, index);

@@ -10,10 +10,9 @@ package com.extjs.gxt.samples.client.examples.grid;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Plant;
-import com.extjs.gxt.samples.resources.client.model.Stock;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -48,14 +47,6 @@ public class RowEditorExample extends LayoutContainer {
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
     setLayout(new FlowLayout(10));
-
-    List<Stock> stocks = TestData.getStocks();
-    for (Stock s : stocks) {
-      DateWrapper w = new DateWrapper();
-      w = w.clearTime();
-      w = w.addDays((int) (Math.random() * 1000));
-      s.set("date", w.asDate());
-    }
 
     List<ColumnConfig> configs = new ArrayList<ColumnConfig>();
 
@@ -135,7 +126,7 @@ public class RowEditorExample extends LayoutContainer {
     ColumnModel cm = new ColumnModel(configs);
 
     ContentPanel cp = new ContentPanel();
-    cp.setIcon(Examples.ICONS.table());
+    cp.setIcon(Resources.ICONS.table());
     cp.setHeading("Edit Plants with RowEditor");
     cp.setFrame(true);
     cp.setSize(600, 300);

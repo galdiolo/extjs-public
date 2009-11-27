@@ -122,8 +122,9 @@ public class Header extends Component implements IconSupport {
    */
   public void setIcon(AbstractImagePrototype icon) {
     if (rendered) {
-      if (el().selectNode("img") != null) {
-        el().selectNode("img").remove();
+      El oldIcon = el().selectNode(".x-panel-inline-icon");
+      if (oldIcon != null) {
+        oldIcon.remove();
       }
 
       if (icon != null) {
@@ -149,7 +150,7 @@ public class Header extends Component implements IconSupport {
   public void setText(String text) {
     this.text = text;
     if (rendered) {
-      textEl.dom.setInnerHTML(text == null ? "&#160;" : text);
+      textEl.update(text == null ? "&#160;" : text);
     }
   }
 
@@ -184,7 +185,8 @@ public class Header extends Component implements IconSupport {
 
     addStyleName("x-small-editor");
     widgetPanel = new HorizontalPanel();
-    widgetPanel.setStyleName("x-panel-toolbar");
+    widgetPanel.setParent(this);
+    widgetPanel.addStyleName("x-panel-toolbar");
     widgetPanel.setLayoutOnChange(true);
     widgetPanel.setStyleAttribute("float", "right");
 

@@ -124,11 +124,11 @@ public class SplitButton extends Button {
   }
 
   protected boolean isMenuTriggerOver(ComponentEvent ce) {
-    return menu != null && ce.getTarget().getTagName().equals("EM");
+    return menu != null && ce.getTarget().getTagName().equalsIgnoreCase("EM");
   }
 
   protected boolean isMenuTriggerOut(ComponentEvent ce) {
-    return menu != null && !ce.getTarget().getTagName().equals("EM");
+    return menu != null && !ce.getTarget().getTagName().equalsIgnoreCase("EM");
   }
 
 }

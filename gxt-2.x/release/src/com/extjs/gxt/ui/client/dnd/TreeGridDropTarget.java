@@ -1,3 +1,10 @@
+/*
+ * Ext GWT - Ext for GWT
+ * Copyright(c) 2007-2009, Ext JS, LLC.
+ * licensing@extjs.com
+ * 
+ * http://extjs.com/license
+ */
 package com.extjs.gxt.ui.client.dnd;
 
 import java.util.ArrayList;
@@ -8,12 +15,25 @@ import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.TreeModel;
 import com.extjs.gxt.ui.client.dnd.DND.Feedback;
 import com.extjs.gxt.ui.client.event.DNDEvent;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.TreeGridEvent;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.widget.treegrid.TreeGrid;
 import com.extjs.gxt.ui.client.widget.treegrid.TreeGrid.TreeNode;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
 
+/**
+ * DropTarget implementation for TreeGrid.
+ * <p />
+ * Supported drag data:
+ * <ul>
+ * <li>A single ModelData instance.</li>
+ * <li>A List of ModelData instances.</li>
+ * <li>A List of TreeStoreModel instances (children are ignored).
+ * </ul>
+ */
 @SuppressWarnings("unchecked")
 public class TreeGridDropTarget extends DropTarget {
 
@@ -24,10 +44,12 @@ public class TreeGridDropTarget extends DropTarget {
   private boolean allowDropOnLeaf = false;
   private boolean autoExpand = true;
   private int autoExpandDelay = 800;
+  private boolean addChildren;
 
   public TreeGridDropTarget(TreeGrid tree) {
     super(tree);
     this.treeGrid = tree;
+    bind(tree);
   }
 
   /**
@@ -37,6 +59,15 @@ public class TreeGridDropTarget extends DropTarget {
    */
   public TreeGrid<?> getTreeGrid() {
     return treeGrid;
+  }
+
+  /**
+   * Returns true if children are being added when inserting into the TreeStore.
+   * 
+   * @return the add children state
+   */
+  public boolean isAddChildren() {
+    return addChildren;
   }
 
   /**
@@ -55,6 +86,16 @@ public class TreeGridDropTarget extends DropTarget {
    */
   public boolean isAutoExpand() {
     return autoExpand;
+  }
+
+  /**
+   * True to add children when inserting models into the TreeStore (defaults to
+   * false).
+   * 
+   * @param addChildren true to add children
+   */
+  public void setAddChildren(boolean addChildren) {
+    this.addChildren = addChildren;
   }
 
   /**
@@ -118,7 +159,17 @@ public class TreeGridDropTarget extends DropTarget {
       treeGrid.getTreeStore().insert(p, models, index, false);
     }
   }
-  
+
+  protected void bind(TreeGrid tree) {
+    tree.addListener(Events.Unregister, new Listener<TreeGridEvent>() {
+      public void handleEvent(TreeGridEvent be) {
+        if (activeItem == be.getTreeNode()) {
+          activeItem = null;
+        }
+      }
+    });
+  }
+
   protected void clearStyle(TreeNode node) {
     El.fly(treeGrid.getView().getRow(node.getModel())).removeStyleName("x-ftree2-node-drop");
   }
@@ -136,14 +187,12 @@ public class TreeGridDropTarget extends DropTarget {
       clearStyle(activeItem);
     }
 
-    if (item != appendItem && autoExpand && !item.isExpanded()) {
+    if (item != null && item != appendItem && autoExpand && !item.isExpanded()) {
       Timer t = new Timer() {
         @Override
         public void run() {
           if (item == appendItem) {
-
             item.setExpanded(true);
-          } else {
           }
         }
       };
@@ -151,14 +200,22 @@ public class TreeGridDropTarget extends DropTarget {
     }
     appendItem = item;
     activeItem = item;
-    El.fly(treeGrid.getView().findRow(event.getTarget())).addStyleName("x-ftree2-node-drop");
+    if (activeItem != null) {
+      El.fly(treeGrid.getView().findRow(event.getTarget())).addStyleName("x-ftree2-node-drop");
+    }
   }
 
   protected void handleAppendDrop(DNDEvent event, TreeNode item) {
-    List sel = event.getData();
-    if (sel.size() > 0) {
-      ModelData p = item.getModel();
-      appendModel(p, sel, treeGrid.getTreeStore().getChildCount(item.getModel()));
+    List<ModelData> models = prepareDropData(event.getData(), false);
+    if (models.size() > 0) {
+      ModelData p = null;
+      if (item != null) {
+        p = item.getModel();
+        appendModel(p, models, treeGrid.getTreeStore().getChildCount(item.getModel()));
+      } else {
+        appendModel(p, models, 0);
+      }
+
     }
   }
 
@@ -181,17 +238,6 @@ public class TreeGridDropTarget extends DropTarget {
         return;
       }
     }
-    
-    if (event.getDropTarget().component == event.getDragSource().component) {
-      TreeGrid source = (TreeGrid) event.getDragSource().component;
-      ModelData sel = source.getSelectionModel().getSelectedItem();
-      ModelData overModel = item.getModel();
-      if (before && overModel == treeGrid.getTreeStore().getNextSibling(sel)) {
-        Insert.get().hide();
-        event.getStatus().setStatus(false);
-        return;
-      }
-    }
 
     appendItem = null;
 
@@ -203,25 +249,27 @@ public class TreeGridDropTarget extends DropTarget {
 
     activeItem = item;
 
-    int idx = 0;
-    if (activeItem.getParent() != null) {
-      idx = activeItem.getParent().indexOf(item);
-    } else {
-      idx = treeGrid.getTreeStore().indexOf(activeItem.getModel());
-    }
+    if (activeItem != null) {
+      int idx = 0;
+      if (activeItem.getParent() != null) {
+        idx = activeItem.getParent().indexOf(item);
+      } else {
+        idx = treeGrid.getTreeStore().indexOf(activeItem.getModel());
+      }
 
-    String status = "x-tree-drop-ok-between";
-    if (before && idx == 0) {
-      status = "x-tree-drop-ok-above";
-    } else if (idx > 1 && !before && idx == item.getParent().getItemCount() - 1) {
-      status = "x-tree-drop-ok-below";
-    }
-    event.getStatus().setStatus(true, status);
+      String status = "x-tree-drop-ok-between";
+      if (before && idx == 0) {
+        status = "x-tree-drop-ok-above";
+      } else if (idx > 1 && !before && item.getParent() != null && idx == item.getParent().getItemCount() - 1) {
+        status = "x-tree-drop-ok-below";
+      }
+      event.getStatus().setStatus(true, status);
 
-    if (before) {
-      showInsert(event, (Element) treeGrid.getView().getRow(item.getModel()), true);
-    } else {
-      showInsert(event, (Element) treeGrid.getView().getRow(item.getModel()), false);
+      if (before) {
+        showInsert(event, (Element) treeGrid.getView().getRow(item.getModel()), true);
+      } else {
+        showInsert(event, (Element) treeGrid.getView().getRow(item.getModel()), false);
+      }
     }
   }
 
@@ -252,9 +300,16 @@ public class TreeGridDropTarget extends DropTarget {
       if (event.getData() != null) {
         handleInsertDrop(event, activeItem, status);
       }
+    } else if (activeItem == null && status == -1) {
+      if (event.getData() != null) {
+        handleAppendDrop(event, activeItem);
+      }
     } else {
       event.setCancelled(true);
     }
+    status = -1;
+    activeItem = null;
+    appendItem = null;
   }
 
   @Override
@@ -284,30 +339,34 @@ public class TreeGridDropTarget extends DropTarget {
       if (activeItem != null) {
         clearStyle(activeItem);
       }
-      event.getStatus().setStatus(false);
-      return;
     }
-    if (event.getDropTarget().component == event.getDragSource().component) {
+
+    if (item != null && event.getDropTarget().component == event.getDragSource().component) {
       TreeGrid source = (TreeGrid) event.getDragSource().component;
-      ModelData sel = source.getSelectionModel().getSelectedItem();
+      List<ModelData> list = source.getSelectionModel().getSelection();
       ModelData overModel = item.getModel();
-      if (overModel == sel) {
-        Insert.get().hide();
-        event.getStatus().setStatus(false);
-        return;
-      }
-      List<ModelData> children = treeGrid.getTreeStore().getChildren(sel, true);
-      if (children.contains(item.getModel())) {
-        Insert.get().hide();
-        event.getStatus().setStatus(false);
-        return;
+      for (int i = 0; i < list.size(); i++) {
+        ModelData sel = list.get(i);
+        if (overModel == sel) {
+          Insert.get().hide();
+          event.getStatus().setStatus(false);
+          return;
+        }
+        List<ModelData> children = treeGrid.getTreeStore().getChildren(sel, true);
+        if (children.contains(item.getModel())) {
+          Insert.get().hide();
+          event.getStatus().setStatus(false);
+          return;
+        }
       }
     }
 
     boolean append = feedback == Feedback.APPEND || feedback == Feedback.BOTH;
     boolean insert = feedback == Feedback.INSERT || feedback == Feedback.BOTH;
 
-    if (insert) {
+    if (item == null) {
+      handleAppend(event, item);
+    } else if (insert) {
       handleInsert(event, item);
     } else if ((!item.isLeaf() || allowDropOnLeaf) && append) {
       handleAppend(event, item);
@@ -325,7 +384,7 @@ public class TreeGridDropTarget extends DropTarget {
 
   private void showInsert(DNDEvent event, Element elem, boolean before) {
     Insert insert = Insert.get();
-    insert.show();
+    insert.show(elem);
     Rectangle rect = El.fly(elem).getBounds();
     int y = before ? rect.y - 2 : (rect.y + rect.height - 4);
     insert.setBounds(rect.x, y, rect.width, 6);

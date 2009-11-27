@@ -16,6 +16,7 @@ import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FormEvent;
+import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
@@ -156,7 +157,7 @@ public class FormPanel extends ContentPanel implements FormPanelImplHost {
    */
   public void clear() {
     for (Field<?> f : getFields()) {
-      f.setValue(null);
+      f.clear();
     }
   }
 
@@ -419,7 +420,7 @@ public class FormPanel extends ContentPanel implements FormPanelImplHost {
   }
 
   /**
-   * Sets the padding to be applied to the forms children (defaults to 10).
+   * Sets the padding to be applied to the FormPanel body (defaults to 10).
    * 
    * @param padding the padding
    */
@@ -448,6 +449,11 @@ public class FormPanel extends ContentPanel implements FormPanelImplHost {
   }
 
   @Override
+  protected Size adjustBodySize() {
+    return body.getFrameSize();
+  }
+
+  @Override
   protected void onAttach() {
     super.onAttach();
     createFrame();
@@ -461,17 +467,6 @@ public class FormPanel extends ContentPanel implements FormPanelImplHost {
     impl.unhookEvents(iframe, form.dom);
     XDOM.getBody().removeChild(iframe);
     iframe = null;
-  }
-
-  @Override
-  protected void onRemove(Component item) {
-    super.onRemove(item);
-    if (rendered && item.isRendered()) {
-      El wrap = item.el().findParent(".x-form-item", 3);
-      if (wrap != null) {
-        wrap.removeFromParent();
-      }
-    }
   }
 
   @Override
@@ -508,17 +503,10 @@ public class FormPanel extends ContentPanel implements FormPanelImplHost {
     form.addEventsSunk(Event.ONLOAD);
   }
 
-  @Override
-  protected void onResize(int width, int height) {
-    super.onResize(width, height);
-    if (!isAutoWidth() && !frame && GXT.isIE) {
-      getLayoutTarget().setWidth(width - getFrameWidth() - 2, true);
-    }
-  }
-
   private void createFrame() {
     Element dummy = DOM.createDiv();
-    DOM.setInnerHTML(dummy, "<iframe src=\"javascript:''\" name='" + frameName
+    DOM.setInnerHTML(dummy, "<iframe id=\"" + XDOM.getUniqueId() + "\""
+        + ((GXT.isIE && GXT.isSecure) ? (" src=\"" + GXT.SSL_SECURE_URL + "\"") : "") + " name='" + frameName
         + "' style='position:absolute;width:0;height:0;border:0'>");
 
     iframe = DOM.getFirstChild(dummy);

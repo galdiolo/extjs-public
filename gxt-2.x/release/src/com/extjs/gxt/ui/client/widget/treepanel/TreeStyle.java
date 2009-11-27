@@ -12,14 +12,30 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 
 /**
  * Style information for Trees. There are two types for tree items: nodes and
- * leafs. Leafs are item's without children. Nodes are items with children
- * or items with their leaf flag set to false.
+ * leafs. Leafs are item's without children. Nodes are items with children or
+ * items with their leaf flag set to false.
  */
 public class TreeStyle {
 
+  private AbstractImagePrototype jointCollapsedIcon = GXT.IMAGES.tree_collapsed();
+  private AbstractImagePrototype jointExpandedIcon = GXT.IMAGES.tree_expanded();
+  private AbstractImagePrototype leafIcon = null;
   private AbstractImagePrototype nodeOpenIcon = GXT.IMAGES.tree_folder();
   private AbstractImagePrototype nodeCloseIcon = GXT.IMAGES.tree_folder_closed();
-  private AbstractImagePrototype leafIcon = null;
+
+  /**
+   * @return the jointExpandedIcon
+   */
+  public AbstractImagePrototype getJointExpandedIcon() {
+    return jointExpandedIcon;
+  }
+
+  /**
+   * @return the jointCollapsedIcon
+   */
+  public AbstractImagePrototype getJointCollapsedIcon() {
+    return jointCollapsedIcon;
+  }
 
   /**
    * Returns the icon style for leaf items.
@@ -46,6 +62,20 @@ public class TreeStyle {
    */
   public AbstractImagePrototype getNodeOpenIcon() {
     return nodeOpenIcon;
+  }
+
+  /**
+   * @param jointCollapsedIcon the jointCollapsedIcon to set
+   */
+  public void setJointCollapsedIcon(AbstractImagePrototype jointCollapsedIcon) {
+    this.jointCollapsedIcon = jointCollapsedIcon;
+  }
+
+  /**
+   * @param jointExpandedIcon the jointExpandedIcon to set
+   */
+  public void setJointExpandedIcon(AbstractImagePrototype jointExpandedIcon) {
+    this.jointExpandedIcon = jointExpandedIcon;
   }
 
   /**

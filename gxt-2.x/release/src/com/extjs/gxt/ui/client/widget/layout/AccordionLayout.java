@@ -36,19 +36,18 @@ public class AccordionLayout extends FitLayout {
   private boolean autoWidth;
   private boolean fill = true;
   private boolean hideCollapseTool;
-  private Listener<ComponentEvent> listener, elistener;
+  private Listener<ComponentEvent> listener;
   private boolean sequence;
   private boolean titleCollapse = true;
 
   public AccordionLayout() {
     listener = new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent ce) {
-        onBeforeExpand(ce);
-      }
-    };
-    elistener = new Listener<ComponentEvent>() {
-      public void handleEvent(ComponentEvent ce) {
-        onExpand(ce);
+        if (ce.getType() == Events.BeforeExpand) {
+          onBeforeExpand(ce);
+        } else if (ce.getType() == Events.Expand) {
+          onExpand(ce);
+        }
       }
     };
   }
@@ -103,16 +102,16 @@ public class AccordionLayout extends FitLayout {
   }
 
   /**
-   * Sets the active item.
+   * Sets the active component.
    * 
-   * @param item the active item
+   * @param component the active component
    */
-  public void setActiveItem(Component item) {
-    if (container == null || !container.isRendered()) {
-      activeItem = item;
-      return;
+  public void setActiveItem(Component component) {
+    if (activeItem != component && container != null && container.getItems().contains(component)) {
+      activeItem = component;
+      ((ContentPanel) activeItem).expand();
     }
-    ((ContentPanel) activeItem).expand();
+
   }
 
   /**
@@ -229,35 +228,60 @@ public class AccordionLayout extends FitLayout {
 
     super.renderComponent(component, index, target);
 
+    El.fly(cp.getElement("header")).addStyleName("x-accordion-hd");
+
+  }
+
+  protected void onAdd(Component component) {
+    assert component instanceof ContentPanel : "AccordionLayout can only handle ContentPanels";
+    super.onAdd(component);
+    component.addListener(Events.BeforeExpand, listener);
+    component.addListener(Events.Expand, listener);
+
     if (activeItem == null || activeItem == component) {
       activeItem = component;
     } else {
-      cp.collapse();
+      ((ContentPanel) component).collapse();
     }
+  }
 
-    El.fly(cp.getElement("header")).addStyleName("x-accordion-hd");
-    cp.addListener(Events.BeforeExpand, listener);
-    cp.addListener(Events.Expand, elistener);
+  @Override
+  protected void onRemove(Component component) {
+    super.onRemove(component);
+    component.addListener(Events.BeforeExpand, listener);
+    component.addListener(Events.Expand, listener);
   }
 
   @Override
   protected void setItemSize(Component item, Size size) {
-    if (fill && item != null) {
-      int count = container.getItemCount();
-      int hh = 0;
-      for (int i = 0, len = count; i < len; i++) {
-        ContentPanel cp = (ContentPanel) container.getItem(i);
-        if (cp != item) {
-          hh += (cp.getHeader().getOffsetHeight());
-          if (!autoWidth) {
-            cp.setWidth(size.width);
+    ContentPanel cp = (ContentPanel) item;
+
+    if (!fill) {
+      if (!autoWidth) {
+        cp.setWidth(size.width);
+      }
+    } else {
+      if (cp.isExpanded()) {
+        int hh = 0;
+        for (int i = 0, len = container.getItemCount(); i < len; i++) {
+          ContentPanel c = (ContentPanel) container.getItem(i);
+          if (c != item) {
+            hh += (c.getHeader().getOffsetHeight());
+            if (!autoWidth) {
+              c.setWidth(size.width);
+            }
           }
         }
-      }
-      size.height -= hh;
-      ContentPanel cp = (ContentPanel) item;
-      if (cp.isExpanded()) {
-        setSize(item, size.width, size.height);
+        setSize(item, size.width, size.height - hh);
+      } else {
+        if (!autoWidth) {
+          for (int i = 0, len = container.getItemCount(); i < len; i++) {
+            ContentPanel c = (ContentPanel) container.getItem(i);
+            if (!autoWidth) {
+              c.setWidth(size.width);
+            }
+          }
+        }
       }
     }
   }

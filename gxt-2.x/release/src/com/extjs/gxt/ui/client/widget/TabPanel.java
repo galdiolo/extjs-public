@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Stack;
 
 import com.extjs.gxt.ui.client.GXT;
-import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.aria.FocusFrame;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.Template;
@@ -28,9 +27,11 @@ import com.extjs.gxt.ui.client.event.TabPanelEvent;
 import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.util.Params;
+import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.layout.CardLayout;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
+import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -465,12 +466,12 @@ public class TabPanel extends Container<TabItem> {
         onScrollRight();
       }
     }
-    if (ce.getEventTypeInt() == Event.ONBLUR) {
+    if (ce.getEventTypeInt() == Event.ONBLUR && GXT.isAriaEnabled()) {
       FocusFrame.get().unframe();
     }
-    if (ce.getEventTypeInt() == Event.ONFOCUS) {
+    if (ce.getEventTypeInt() == Event.ONFOCUS && GXT.isAriaEnabled()) {
       if (activeItem != null) {
-        FocusFrame.get().frame(activeItem.getHeader());
+        FocusFrame.get().frame(activeItem);
       }
     }
 
@@ -689,7 +690,7 @@ public class TabPanel extends Container<TabItem> {
    */
   public void setSelection(TabItem item) {
     TabPanelEvent tpe = new TabPanelEvent(this, item);
-    if (item == null || !fireEvent(Events.BeforeSelect, tpe)) {
+    if (item == null || !fireEvent(Events.BeforeSelect, tpe) || !item.fireEvent(Events.BeforeSelect, tpe)) {
       return;
     }
 
@@ -761,7 +762,7 @@ public class TabPanel extends Container<TabItem> {
 
   protected void close(TabItem item) {
     TabPanelEvent e = new TabPanelEvent(this, item);
-    if (item.fireEvent(Events.BeforeClose, e) && remove(item)) {
+    if (item.isClosable() && item.fireEvent(Events.BeforeClose, e) && remove(item)) {
       item.fireEvent(Events.Close, new TabPanelEvent(this, item));
     }
   }
@@ -795,6 +796,7 @@ public class TabPanel extends Container<TabItem> {
 
   @Override
   protected void onAfterLayout() {
+    super.onAfterLayout();
     delegateUpdates();
   }
 
@@ -823,6 +825,25 @@ public class TabPanel extends Container<TabItem> {
   protected void onDetach() {
     bar.disableTextSelection(false);
     super.onDetach();
+  }
+
+  protected void onInsert(TabItem item, int index) {
+    super.onInsert(item, index);
+    item.tabPanel = this;
+    item.setAutoHeight(isAutoHeight());
+    if (rendered) {
+      renderItem(item, index);
+      if (isAttached()) {
+        ComponentHelper.doAttach(item.header);
+      }
+      if (activeItem == null && autoSelect) {
+        setSelection(item);
+      }
+      delegateUpdates();
+      if (getItemCount() == 1) {
+        syncSize();
+      }
+    }
   }
 
   protected void onItemContextMenu(TabItem item, int x, int y) {
@@ -867,20 +888,8 @@ public class TabPanel extends Container<TabItem> {
     }
   }
 
-  protected void onInsert(TabItem item, int index) {
-    super.onInsert(item, index);
-    item.tabPanel = this;
-    item.setAutoHeight(isAutoHeight());
-    if (rendered) {
-      renderItem(item, index);
-      if (isAttached()) {
-        ComponentHelper.doAttach(item.header);
-      }
-      if (activeItem == null && autoSelect) {
-        setSelection(item);
-      }
-      delegateUpdates();
-    }
+  protected void onItemTextChange(TabItem tabItem, String oldText, String newText) {
+    delegateUpdates();
   }
 
   protected void onLeft(ComponentEvent ce) {
@@ -923,12 +932,13 @@ public class TabPanel extends Container<TabItem> {
     }
 
     String pos = tabPosition == TabPosition.BOTTOM ? "bottom" : "top";
-    stripWrap = bar.createChild("<div class=x-tab-strip-wrap role='presentation'><ul class='x-tab-strip x-tab-strip-"
-        + pos + "'></ul>");
+    stripWrap = bar.createChild("<div class=x-tab-strip-wrap><ul class='x-tab-strip x-tab-strip-" + pos + "'></ul>");
+    Accessibility.setRole(stripWrap.dom, "presentation");
+
     bar.createChild("<div class=x-tab-strip-spacer></div>");
     strip = stripWrap.firstChild();
-    edge = strip.createChild("<li class=x-tab-edge></li>");
-    strip.createChild("<div class=x-clear></div>");
+    edge = strip.createChild("<li class=x-tab-edge role='presentation'></li>");
+    strip.createChild("<div class='x-clear' role='presentation'></div>");
 
     if (plain) {
       String p = tabPosition == TabPosition.BOTTOM ? "bottom" : "header";
@@ -937,9 +947,9 @@ public class TabPanel extends Container<TabItem> {
 
     if (itemTemplate == null) {
       StringBuffer sb = new StringBuffer();
-      sb.append("<li class='{style}' id={id} role='tab'><a class=x-tab-strip-close onclick='return false;' role='presentation'></a>");
-      sb.append("<a class='x-tab-right' role='tab'><em class='x-tab-left'>");
-      sb.append("<span class='x-tab-strip-inner'><span class='x-tab-strip-text {textStyle} {iconStyle}'>{text}</span></span>");
+      sb.append("<li class='{style}' id={id} role='tab'><a class=x-tab-strip-close role='presentation'></a>");
+      sb.append("<a class='x-tab-right' role='presentation'><em role='presentation' class='x-tab-left'>");
+      sb.append("<span class='x-tab-strip-inner' role='presentation'><span class='x-tab-strip-text {textStyle} {iconStyle}'>{text}</span></span>");
       sb.append("</em></a></li>");
       itemTemplate = new Template(sb.toString());
       itemTemplate.compile();
@@ -949,44 +959,65 @@ public class TabPanel extends Container<TabItem> {
 
     new KeyNav<ComponentEvent>(this) {
       @Override
-      public void onLeft(ComponentEvent ce) {
-        TabPanel.this.onLeft(ce);
+      public void onKeyPress(ComponentEvent ce) {
+        TabPanel.this.onKeyPress(ce);
       }
-
-      @Override
-      public void onRight(ComponentEvent ce) {
-        TabPanel.this.onRight(ce);
-      }
-
     };
 
-    Accessibility.setRole(getElement(), Accessibility.ROLE_TABLIST);
     el().setTabIndex(0);
     el().setElementAttribute("hideFocus", "true");
 
-    el().addEventsSunk(Event.ONCLICK | Event.MOUSEEVENTS | Event.ONKEYUP | Event.FOCUSEVENTS);
+    if (GXT.isAriaEnabled()) {
+      Accessibility.setRole(getElement(), Accessibility.ROLE_TABLIST);
+
+      if (!getTitle().equals("")) {
+        Accessibility.setState(getElement(), "aria-label", getTitle());
+      }
+    }
+
+    sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS | Event.ONKEYUP | Event.FOCUSEVENTS);
+  }
+
+  protected void onKeyPress(ComponentEvent ce) {
+    int code = ce.getKeyCode();
+    switch (code) {
+      case KeyCodes.KEY_RIGHT:
+      case KeyCodes.KEY_PAGEDOWN:
+        onRight(ce);
+        break;
+      case KeyCodes.KEY_LEFT:
+      case KeyCodes.KEY_PAGEUP:
+        onLeft(ce);
+        break;
+      case KeyCodes.KEY_HOME:
+        if (getItemCount() > 0 && activeItem != getItem(0)) {
+          setSelection(getItem(0));
+        }
+        break;
+      case KeyCodes.KEY_END:
+        setSelection(getItem(getItemCount() - 1));
+        break;
+      
+    }
   }
 
   @Override
   protected void onResize(int width, int height) {
     super.onResize(width, height);
-    stripWrap.setScrollLeft(0);
+    Size frameWidth = el().getFrameSize();
 
-    int hh = getFrameHeight();
-    width -= el().getFrameWidth("lr");
-    if (height != Style.DEFAULT) {
-      body.setHeight(height - hh, true);
-    }
-    if (width != Style.DEFAULT) {
-      bar.setWidth(width, true);
-      body.setWidth(width, true);
-    }
+    height -= frameWidth.height + bar.getHeight();
+    width -= frameWidth.width;
+
+    body.setSize(width, height, true);
+    bar.setWidth(width, true);
 
     delegateUpdates();
   }
 
   protected void onRight(ComponentEvent ce) {
     if (activeItem != null && ce.getTarget() == getElement()) {
+      ce.stopEvent();
       int idx = indexOf(activeItem);
       if (idx < getItemCount()) {
         setSelection(getItem(idx + 1));
@@ -996,6 +1027,7 @@ public class TabPanel extends Container<TabItem> {
   }
 
   protected void onUnload() {
+    super.onUnload();
     if (stack != null) {
       stack.clear();
     }
@@ -1053,9 +1085,10 @@ public class TabPanel extends Container<TabItem> {
     }
 
     if (l <= tw) {
-      stripWrap.setScrollLeft(0);
+
       stripWrap.setWidth(tw);
       if (scrolling) {
+        stripWrap.setScrollLeft(0);
         scrolling = false;
         bar.removeStyleName("x-tab-scrolling");
         scrollLeft.setVisible(false);
@@ -1121,17 +1154,10 @@ public class TabPanel extends Container<TabItem> {
   }
 
   private void focusTab(TabItem item) {
-    Accessibility.setState(getElement(), "aria-activedescendant", getId() + "__" + item.getId());
+    Accessibility.setState(getElement(), "aria-activedescendant", item.header.getId());
     if (GXT.isAriaEnabled()) {
-      FocusFrame.get().frame(item.getHeader());
+      FocusFrame.get().frame(item);
     }
-
-  }
-
-  private int getFrameHeight() {
-    int h = el().getFrameWidth("tb");
-    h += bar.getHeight();
-    return h;
   }
 
   private int getScollPos() {

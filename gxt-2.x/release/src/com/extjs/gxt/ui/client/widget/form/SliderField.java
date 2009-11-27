@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.widget.form;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
@@ -30,24 +31,18 @@ public class SliderField extends Field<Integer> {
     setSlider(slider);
   }
 
-  @Override
-  public El getFocusEl() {
-    return slider.getFocusEl();
-  }
-
-  @Override
-  public El getInputEl() {
-    return hidden;
-  }
-
   public Slider getSlider() {
     return slider;
   }
 
   @Override
-  public void setValue(Integer value) {
-    slider.setValue(value);
-    super.setValue(value);
+  public void setReadOnly(boolean readOnly) {
+    super.setReadOnly(readOnly);
+    if (readOnly) {
+      slider.disable();
+    } else if (!readOnly && isEnabled()) {
+      slider.enable();
+    }
   }
 
   public void setSlider(Slider slider) {
@@ -61,8 +56,19 @@ public class SliderField extends Field<Integer> {
         }
       };
     }
-    this.slider = slider;
-    slider.addListener(Events.Change, listener);
+    if (this.slider != slider) {
+      if (this.slider != null) {
+        this.slider.removeListener(Events.Change, listener);
+      }
+      this.slider = slider;
+      slider.addListener(Events.Change, listener);
+    }
+  }
+
+  @Override
+  public void setValue(Integer value) {
+    slider.setValue(value);
+    super.setValue(value);
   }
 
   @Override
@@ -84,6 +90,30 @@ public class SliderField extends Field<Integer> {
   }
 
   @Override
+  protected El getFocusEl() {
+    return slider.getFocusEl();
+  }
+
+  @Override
+  protected El getInputEl() {
+    return hidden;
+  }
+
+  @Override
+  protected void onDisable() {
+    super.onDisable();
+    slider.disable();
+  }
+
+  @Override
+  protected void onEnable() {
+    super.onEnable();
+    if (!readOnly) {
+      slider.enable();
+    }
+  }
+
+  @Override
   protected void onRender(Element parent, int index) {
     setElement(DOM.createDiv(), parent, index);
 
@@ -91,8 +121,11 @@ public class SliderField extends Field<Integer> {
     hidden = new El((Element) Document.get().createHiddenInputElement().cast());;
     getElement().appendChild(hidden.dom);
 
-    super.onRender(parent, index);
+    if (GXT.isIE) {
+      el().makePositionable();
+    }
 
+    super.onRender(parent, index);
   }
 
   @Override

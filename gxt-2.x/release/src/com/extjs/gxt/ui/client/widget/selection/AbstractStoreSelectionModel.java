@@ -52,8 +52,8 @@ import com.extjs.gxt.ui.client.store.StoreListener;
  * @param <M> the model type contained within the store
  */
 @SuppressWarnings("unchecked")
-public abstract class AbstractStoreSelectionModel<M extends ModelData> extends
-    BaseObservable implements StoreSelectionModel<M>, SelectionProvider<M> {
+public abstract class AbstractStoreSelectionModel<M extends ModelData> extends BaseObservable implements
+    StoreSelectionModel<M>, SelectionProvider<M> {
 
   protected Store<M> store;
   protected SelectionMode selectionMode = SelectionMode.MULTI;
@@ -100,7 +100,7 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends
 
   public void deselect(int index) {
     if (store instanceof ListStore) {
-      ListStore<M> ls = (ListStore)store;
+      ListStore<M> ls = (ListStore) store;
       M m = ls.getAt(index);
       if (m != null) {
         doDeselect(Arrays.asList(m), false);
@@ -110,7 +110,7 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends
 
   public void deselect(int start, int end) {
     if (store instanceof ListStore) {
-      ListStore<M> ls = (ListStore)store;
+      ListStore<M> ls = (ListStore) store;
       List<M> list = new ArrayList<M>();
       for (int i = start; i < end; i++) {
         M m = ls.getAt(i);
@@ -164,13 +164,9 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends
   }
 
   public boolean isSelected(M item) {
-    if (store instanceof ListStore) {
-      ListStore<M> ls = (ListStore)store;
-      int idx = ls.indexOf(item);
-      for (M m : selected) {
-        if (ls.indexOf(m) == idx) {
-          return true;
-        }
+    for (M m : selected) {
+      if (store.equals(item, m)) {
+        return true;
       }
     }
     return false;
@@ -209,7 +205,7 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends
 
   public void select(int start, int end, boolean keepExisting) {
     if (store instanceof ListStore) {
-      ListStore<M> ls = (ListStore)store;
+      ListStore<M> ls = (ListStore) store;
       List<M> sel = new ArrayList<M>();
       if (start <= end) {
         for (int i = start; i <= end; i++) {
@@ -262,8 +258,7 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends
     if (locked) return;
     boolean change = false;
     for (M m : models) {
-      if (isSelected(m)) {
-        selected.remove(m);
+      if (selected.remove(m)) {
         if (lastSelected == m) {
           lastSelected = null;
         }
@@ -286,10 +281,10 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends
     for (M m : models) {
       SelectionEvent<M> e = new SelectionEvent<M>(this, m);
       if (store instanceof ListStore) {
-        ListStore<M> ls = (ListStore)store;
+        ListStore<M> ls = (ListStore) store;
         e.setIndex(ls.indexOf(m));
       }
-      if (e.getIndex() == -1 || !fireEvent(Events.BeforeSelect, e)) {
+      if ((keepExisting && isSelected(m)) || e.getIndex() == -1 || !fireEvent(Events.BeforeSelect, e)) {
         continue;
       }
       change = true;
@@ -317,32 +312,32 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends
 
   protected void doSingleSelect(M model, boolean supressEvent) {
     if (locked) return;
-    
-      SelectionEvent<M> e = new SelectionEvent<M>(this, model);
-      
-      if (store instanceof ListStore) {
-        ListStore<M> ls = (ListStore)store;
-        e.setIndex(ls.indexOf(model));
-      }
-     
-      if (e.getIndex() == -1 || isSelected(model) || !fireEvent(Events.BeforeSelect, e)) {
-        return;
-      }
 
-      boolean change = false;
-      if (selected.size() > 0 && !isSelected(model)) {
-        doDeselect(Arrays.asList(lastSelected), true);
-        change = true;
-      }
-      if (selected.size() == 0) {
-        change = true;
-      }
-      selected.add(model);
-      lastSelected = model;
-      onSelectChange(model, true);
-      if (change && !supressEvent) {
-        fireSelectionChange();
-      }
+    SelectionEvent<M> e = new SelectionEvent<M>(this, model);
+
+    if (store instanceof ListStore) {
+      ListStore<M> ls = (ListStore) store;
+      e.setIndex(ls.indexOf(model));
+    }
+
+    if (e.getIndex() == -1 || isSelected(model) || !fireEvent(Events.BeforeSelect, e)) {
+      return;
+    }
+
+    boolean change = false;
+    if (selected.size() > 0 && !isSelected(model)) {
+      doDeselect(Arrays.asList(lastSelected), true);
+      change = true;
+    }
+    if (selected.size() == 0) {
+      change = true;
+    }
+    selected.add(model);
+    lastSelected = model;
+    onSelectChange(model, true);
+    if (change && !supressEvent) {
+      fireSelectionChange();
+    }
   }
 
   protected void onAdd(List<? extends M> models) {
@@ -358,8 +353,7 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends
 
   protected void onRemove(M model) {
     if (locked) return;
-    if (isSelected(model)) {
-      selected.remove(model);
+    if (selected.remove(model)) {
       if (lastSelected == model) {
         lastSelected = null;
       }
@@ -368,19 +362,21 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends
   }
 
   protected abstract void onSelectChange(M model, boolean select);
-  
+
   protected void onUpdate(M model) {
     if (locked) return;
-    if (isSelected(model)) {
-      int index = selected.indexOf(model);
-      selected.remove(model);
-      selected.add(index, model);
+    for (int i = 0; i < selected.size(); i++) {
+      M m = selected.get(i);
+      if (store.equals(model, m)) {
+        selected.remove(m);
+        selected.add(i, model);
+        break;
+      }
     }
   }
 
   protected void fireSelectionChange() {
-    fireEvent(Events.SelectionChange, new SelectionChangedEvent(this, new ArrayList(
-        selected)));
+    fireEvent(Events.SelectionChange, new SelectionChangedEvent(this, new ArrayList(selected)));
   }
 
 }

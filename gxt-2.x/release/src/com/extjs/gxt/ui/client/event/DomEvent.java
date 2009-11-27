@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.event;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.util.Point;
+import com.google.gwt.dom.client.EventTarget;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -213,8 +214,16 @@ public class DomEvent extends BaseEvent {
    * @return the nav state
    */
   public boolean isNavKeyPress() {
-    int k = getKeyCode();
+    return isNavKeyPress(getKeyCode());
+  }
 
+  /**
+   * Returns true if the key is a "navigation" key.
+   * 
+   * @param k the key code
+   * @return the nav state
+   */
+  public boolean isNavKeyPress(int k) {
     return (k >= 33 && k <= 40) || k == KeyCodes.KEY_ESCAPE || k == KeyCodes.KEY_ENTER || k == KeyCodes.KEY_TAB;
   }
 
@@ -257,8 +266,8 @@ public class DomEvent extends BaseEvent {
    * @return the special state
    */
   public boolean isSpecialKey(int k) {
-    return k == 17 || k == 9 || k == 13 || k == 40 || k == 27 || (k == 16) || (k == 17) || (k >= 18 && k <= 20)
-        || (k >= 33 && k <= 35) || (k >= 36 && k <= 39) || (k >= 44 && k <= 45);
+    return isNavKeyPress(k) || k == KeyCodes.KEY_BACKSPACE || k == KeyCodes.KEY_CTRL || k == KeyCodes.KEY_SHIFT
+        || k == KeyCodes.KEY_ALT || (k >= 19 && k <= 20) || (k >= 45 && k <= 46);
   }
 
   /**
@@ -266,7 +275,7 @@ public class DomEvent extends BaseEvent {
    */
   public void preventDefault() {
     if (event != null) {
-      DOM.eventPreventDefault(event);
+      event.preventDefault();
     }
   }
 
@@ -295,10 +304,7 @@ public class DomEvent extends BaseEvent {
    * @return the within state
    */
   public boolean within(Element element) {
-    if (event != null && getTarget() != null) {
-      return DOM.isOrHasChild(element, getTarget());
-    }
-    return false;
+    return within(element, false);
   }
 
   /**
@@ -306,17 +312,19 @@ public class DomEvent extends BaseEvent {
    * of the given element.
    * 
    * @param element the element
-   * @param toElement true to use {@link Event#getToElement()}
+   * @param toElement true to use {@link Event#getRelatedEventTarget()}
    * @return the within state
    */
   public boolean within(Element element, boolean toElement) {
-    if (!toElement) {
-      return within(element);
-    } else {
-
-      if (event != null && event.getRelatedEventTarget() != null) {
-        Element to = event.getRelatedEventTarget().cast();
-        return DOM.isOrHasChild(element, to);
+    EventTarget target;
+    if (event != null) {
+      if (toElement) {
+        target = event.getRelatedEventTarget();
+      } else {
+        target = event.getEventTarget();
+      }
+      if (target != null) {
+        return DOM.isOrHasChild(element, (Element) target.cast());
       }
     }
     return false;

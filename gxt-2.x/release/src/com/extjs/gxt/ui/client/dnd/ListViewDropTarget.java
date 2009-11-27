@@ -7,7 +7,6 @@
  */
 package com.extjs.gxt.ui.client.dnd;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.core.El;
@@ -16,21 +15,26 @@ import com.extjs.gxt.ui.client.dnd.DND.Feedback;
 import com.extjs.gxt.ui.client.event.DNDEvent;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.widget.ListView;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 
 /**
  * A <code>DropTarget</code> implementation for the ListView component.
+ * 
+ * Supported drag data:
+ * <ul>
+ * <li>A single ModelData instance.</li>
+ * <li>A List of ModelData instances.</li>
+ * <li>A List of TreeStoreModel instances (children are ignored).
+ * </ul>
  */
 public class ListViewDropTarget extends DropTarget {
 
   protected ListView<ModelData> listView;
   protected int insertIndex;
   protected ModelData activeItem;
+  protected boolean before;
 
   private boolean autoSelect;
-  private boolean before;
 
   /**
    * Creates a new list view drop target instance.
@@ -64,30 +68,17 @@ public class ListViewDropTarget extends DropTarget {
   @Override
   protected void onDragDrop(DNDEvent e) {
     super.onDragDrop(e);
-    final Object data = e.getData();
-    DeferredCommand.addCommand(new Command() {
-      @SuppressWarnings("unchecked")
-      public void execute() {
-        List temp = new ArrayList();
-        if (data instanceof ModelData) {
-          temp.add((ModelData) data);
-        } else if (data instanceof List) {
-          temp = (List) data;
-        }
-        if (temp.size() > 0) {
-          if (feedback == Feedback.APPEND) {
-            listView.getStore().add(temp);
-          } else {
-            int idx = listView.getStore().indexOf(activeItem);
-            if (!before) idx++;
-            listView.getStore().insert(temp, idx);
-          }
-          if (autoSelect) {
-            listView.getSelectionModel().select(temp, false);
-          }
-        }
+    Object data = e.getData();
+    List<ModelData> models = prepareDropData(data, true);
+    if (models.size() > 0) {
+      if (feedback == Feedback.APPEND) {
+        listView.getStore().add(models);
+      } else {
+        listView.getStore().insert(models, insertIndex);
       }
-    });
+    }
+    insertIndex = -1;
+    activeItem = null;
   }
 
   @Override
@@ -106,7 +97,14 @@ public class ListViewDropTarget extends DropTarget {
 
   @Override
   protected void onDragMove(DNDEvent event) {
+    if (!event.within(listView.getElement())) {
+      event.setCancelled(true);
+      event.getStatus().setStatus(false);
+      return;
+    }
+
     event.setCancelled(false);
+    event.getStatus().setStatus(true);
   }
 
   /**
@@ -121,6 +119,7 @@ public class ListViewDropTarget extends DropTarget {
 
   @Override
   protected void showFeedback(DNDEvent event) {
+    event.getStatus().setStatus(true);
     if (feedback == Feedback.INSERT) {
       event.getStatus().setStatus(true);
       Element row = listView.findElement(event.getTarget()).cast();
@@ -135,23 +134,33 @@ public class ListViewDropTarget extends DropTarget {
         mid += row.getAbsoluteTop();
         int y = event.getClientY();
         before = y < mid;
-        int idx = listView.indexOf(row);
-        insertIndex = before ? idx : idx + 1;
+        int idx = listView.findElementIndex(row);
+
         activeItem = listView.getStore().getAt(idx);
-        if (before) {
-          showInsert(event, row, true);
-        } else {
-          showInsert(event, row, false);
-        }
+        insertIndex = adjustIndex(event, idx);
+
+        showInsert(event, row);
       } else {
         insertIndex = 0;
       }
     }
   }
 
-  private void showInsert(DNDEvent event, Element row, boolean before) {
+  private int adjustIndex(DNDEvent event, int index) {
+    Object data = event.getData();
+    List<ModelData> models = prepareDropData(data, true);
+    for (ModelData m : models) {
+      int idx = listView.getStore().indexOf(m);
+      if (idx > -1 && (before ? idx < index : idx <= index)) {
+        index--;
+      }
+    }
+    return before ? index : index + 1;
+  }
+
+  private void showInsert(DNDEvent event, Element row) {
     Insert insert = Insert.get();
-    insert.setVisible(true);
+    insert.show(row);
     Rectangle rect = El.fly(row).getBounds();
     int y = !before ? (rect.y + rect.height - 4) : rect.y - 2;
     insert.el().setBounds(rect.x, y, rect.width, 6);

@@ -8,9 +8,10 @@
 package com.extjs.gxt.ui.client.event;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.extjs.gxt.ui.client.core.FastMap;
 
 /**
  * Default implementation of the <code>Observable</code> interface.
@@ -28,7 +29,7 @@ import java.util.Map;
 public class BaseObservable implements Observable {
 
   private boolean firesEvents = true;
-  private Map<EventType, List<Listener<BaseEvent>>> listeners;
+  private Map<String, List<Listener<BaseEvent>>> listeners;
   private boolean activeEvent;
 
   /**
@@ -41,30 +42,19 @@ public class BaseObservable implements Observable {
   public void addListener(EventType eventType, Listener<? extends BaseEvent> listener) {
     if (listener == null) return;
     if (listeners == null) {
-      listeners = new HashMap<EventType, List<Listener<BaseEvent>>>();
+      listeners = new FastMap<List<Listener<BaseEvent>>>();
     }
-    List<Listener<BaseEvent>> list = listeners.get(eventType);
+    String key = getKey(eventType);
+    List<Listener<BaseEvent>> list = listeners.get(key);
     if (list == null) {
       list = new ArrayList<Listener<BaseEvent>>();
-      listeners.put(eventType, list);
-    }
-
-    if (!list.contains(listener)) {
       list.add((Listener) listener);
+      listeners.put(key, list);
+    } else {
+      if (!list.contains(listener)) {
+        list.add((Listener) listener);
+      }
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  public List<Listener<? extends BaseEvent>> getListeners(EventType eventType) {
-    if (listeners == null) {
-      listeners = new HashMap<EventType, List<Listener<BaseEvent>>>();
-    }
-    List<Listener<BaseEvent>> list = listeners.get(eventType);
-    if (list == null) {
-      list = new ArrayList<Listener<BaseEvent>>();
-      listeners.put(eventType, list);
-    }
-    return (List) list;
   }
 
   /**
@@ -85,11 +75,11 @@ public class BaseObservable implements Observable {
    * @return <code>true</code> if any listeners cancel the event.
    */
   public boolean fireEvent(EventType eventType, BaseEvent be) {
-    if (firesEvents && hasListeners(eventType) && listeners != null) {
+    if (firesEvents && listeners != null) {
       activeEvent = true;
       be.setType(eventType);
 
-      List<Listener<BaseEvent>> list = listeners.get(eventType);
+      List<Listener<BaseEvent>> list = listeners.get(getKey(eventType));
       if (list != null) {
         List<Listener<BaseEvent>> copy = new ArrayList<Listener<BaseEvent>>(list);
         for (Listener<BaseEvent> l : copy) {
@@ -111,6 +101,18 @@ public class BaseObservable implements Observable {
     return firesEvents;
   }
 
+  @SuppressWarnings("unchecked")
+  public List<Listener<? extends BaseEvent>> getListeners(EventType eventType) {
+    if (listeners == null) {
+      return new ArrayList<Listener<? extends BaseEvent>>();
+    }
+    List<Listener<BaseEvent>> list = listeners.get(getKey(eventType));
+    if (list == null) {
+      return new ArrayList<Listener<? extends BaseEvent>>();
+    }
+    return (List) list;
+  }
+
   /**
    * Returns true if there is an active event
    * 
@@ -125,12 +127,11 @@ public class BaseObservable implements Observable {
   }
 
   public boolean hasListeners(EventType eventType) {
-    if (listeners != null && listeners.containsKey(eventType)) {
-      List<Listener<BaseEvent>> list = listeners.get(eventType);
-      if (list.size() != 0) {
+    if (listeners != null) {
+      List<Listener<BaseEvent>> list = listeners.get(getKey(eventType));
+      if (list != null && !list.isEmpty()) {
         return true;
       }
-
     }
     return false;
   }
@@ -154,11 +155,12 @@ public class BaseObservable implements Observable {
     if (listeners == null) {
       return;
     }
-    List<Listener<BaseEvent>> list = listeners.get(eventType);
+    String key = getKey(eventType);
+    List<Listener<BaseEvent>> list = listeners.get(key);
     if (list != null) {
       list.remove(listener);
       if (list.isEmpty()) {
-        listeners.remove(eventType);
+        listeners.remove(key);
       }
     }
   }
@@ -174,5 +176,9 @@ public class BaseObservable implements Observable {
 
   protected void callListener(Listener<BaseEvent> listener, BaseEvent be) {
     listener.handleEvent(be);
+  }
+
+  private String getKey(EventType type) {
+    return type.id;
   }
 }

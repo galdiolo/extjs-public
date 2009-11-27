@@ -8,9 +8,8 @@
 package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.core.XDOM;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.ui.RootPanel;
 
 /**
  * Wraps the document element and provides the ability to listen for document
@@ -41,16 +40,10 @@ public class Document extends Component {
     if (instance == null) {
       instance = new Document();
       instance.setElement(XDOM.getDocument());
-      instance.sinkEvents(Event.MOUSEEVENTS | Event.ONCLICK);
-      DOM.setEventListener(instance.getElement(), instance);
+      ComponentHelper.doAttach(instance);
+      RootPanel.detachOnWindowClose(instance);
     }
     return instance;
-  }
-
-  @Override
-  protected void onRender(Element target, int index) {
-    setElement(XDOM.getDocument());
-    sinkEvents(Event.MOUSEEVENTS);
   }
 
 }

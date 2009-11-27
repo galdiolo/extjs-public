@@ -7,7 +7,7 @@
  */
 package com.extjs.gxt.samples.client.examples.toolbar;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
@@ -20,10 +20,13 @@ import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.toolbar.FillToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
+import com.google.gwt.user.client.Element;
 
 public class ToolBarOverflowExample extends LayoutContainer {
 
-  public ToolBarOverflowExample() {
+  @Override
+  protected void onRender(Element parent, int pos) {
+    super.onRender(parent, pos);
     final Window window = new Window();
 
     window.setHeading("Overflow Example");
@@ -36,19 +39,19 @@ public class ToolBarOverflowExample extends LayoutContainer {
     ButtonGroup group = new ButtonGroup(2);
     group.setHeading("Clipboard");
 
-    Button btn = new Button("Cool", Examples.ICONS.add16());
+    Button btn = new Button("Cool", Resources.ICONS.add16());
     group.add(btn);
 
-    btn = new Button("Cut", Examples.ICONS.add16());
+    btn = new Button("Cut", Resources.ICONS.add16());
     Menu menu = new Menu();
     menu.add(new MenuItem("Copy me"));
     btn.setMenu(menu);
     group.add(btn);
 
-    btn = new Button("Copy", Examples.ICONS.add16());
+    btn = new Button("Copy", Resources.ICONS.add16());
     group.add(btn);
 
-    btn = new Button("Paste", Examples.ICONS.add16());
+    btn = new Button("Paste", Resources.ICONS.add16());
     group.add(btn);
 
     toolBar.add(group);
@@ -58,19 +61,19 @@ public class ToolBarOverflowExample extends LayoutContainer {
     group = new ButtonGroup(2);
     group.setHeading("Other Bugus Actions");
 
-    btn = new Button("Cool", Examples.ICONS.add16());
+    btn = new Button("Cool", Resources.ICONS.add16());
     group.add(btn);
 
-    btn = new Button("Cut", Examples.ICONS.add16());
+    btn = new Button("Cut", Resources.ICONS.add16());
     menu = new Menu();
     menu.add(new MenuItem("Copy me"));
     btn.setMenu(menu);
     group.add(btn);
 
-    btn = new Button("Copy", Examples.ICONS.add16());
+    btn = new Button("Copy", Resources.ICONS.add16());
     group.add(btn);
 
-    btn = new Button("Paste", Examples.ICONS.add16());
+    btn = new Button("Paste", Resources.ICONS.add16());
     group.add(btn);
 
     toolBar.add(group);

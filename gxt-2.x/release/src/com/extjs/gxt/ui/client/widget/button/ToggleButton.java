@@ -133,7 +133,7 @@ public class ToggleButton extends Button {
 
   @Override
   protected void onClick(ComponentEvent ce) {
-    ce.stopEvent();
+    ce.preventDefault();
     focus();
     hideToolTip();
     if (!disabled) {

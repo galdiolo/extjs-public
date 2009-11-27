@@ -11,8 +11,8 @@ import java.util.List;
 
 import com.extjs.gxt.samples.client.ExampleService;
 import com.extjs.gxt.samples.client.ExampleServiceAsync;
-import com.extjs.gxt.samples.client.Examples;
 import com.extjs.gxt.samples.client.examples.model.Photo;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.data.BaseListLoader;
@@ -74,7 +74,7 @@ public class ImageOrganizerExample extends LayoutContainer {
 
     ToolBar toolBar = new ToolBar();
     Button newAlbum = new Button("New Album");
-    newAlbum.setIcon(Examples.ICONS.album());
+    newAlbum.setIcon(Resources.ICONS.album());
     newAlbum.addSelectionListener(new SelectionListener<ButtonEvent>() {
       @Override
       public void componentSelected(ButtonEvent ce) {

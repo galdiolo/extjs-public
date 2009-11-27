@@ -89,11 +89,11 @@ public class MenuBar extends Container<MenuBarItem> {
         onDeactivate(active);
       }
       onActivate(item);
-      
+
       if (GXT.isAriaEnabled()) {
         FocusFrame.get().frame(active);
       }
-      
+
       if (expand) {
         expand(item);
       }
@@ -136,16 +136,16 @@ public class MenuBar extends Container<MenuBarItem> {
   }
 
   protected void onDeactivate(MenuBarItem item) {
-    if (item.expanded = true) {
+    if (item.expanded) {
       item.menu.hide();
       item.expanded = false;
     }
 
     item.removeStyleName(item.getBaseStyle() + "-active");
     item.removeStyleName(item.getBaseStyle() + "-over");
-    
-    FocusFrame.get().unframe();
-
+    if (GXT.isAriaEnabled()) {
+      FocusFrame.get().unframe();
+    }
     if (active == item) {
       active = null;
     }
@@ -212,6 +212,7 @@ public class MenuBar extends Container<MenuBarItem> {
 
     if (GXT.isAriaEnabled()) {
       Accessibility.setRole(getElement(), Accessibility.ROLE_MENUBAR);
+      Accessibility.setState(getElement(), "aria-hidden", "false");
     }
 
     new KeyNav<ComponentEvent>(this) {
@@ -220,9 +221,9 @@ public class MenuBar extends Container<MenuBarItem> {
         MenuBar.this.onKeyPress(ce);
       }
     };
-    
+
     layout();
-    
+
     sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS | Event.ONFOCUS | Event.ONBLUR);
   }
 

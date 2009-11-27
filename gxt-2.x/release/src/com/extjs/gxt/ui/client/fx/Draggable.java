@@ -138,8 +138,7 @@ public class Draggable extends BaseObservable {
         event.preventDefault();
         switch (event.getEventTypeInt()) {
           case Event.ONKEYDOWN:
-            int key = event.getKeyCode();
-            if (key == KeyCodes.KEY_ESCAPE && dragging) {
+            if (dragging && event.getKeyCode() == KeyCodes.KEY_ESCAPE) {
               cancelDrag();
             }
             break;
@@ -180,11 +179,9 @@ public class Draggable extends BaseObservable {
       dragging = false;
       if (isUseProxy()) {
         proxyEl.disableTextSelection(false);
-        Element body = XDOM.getBody();
         proxyEl.setVisibility(false);
-        DOM.removeChild(body, proxyEl.dom);
-      }
-      if (!isUseProxy()) {
+        proxyEl.remove();
+      } else {
         dragWidget.el().setPagePosition(startBounds.x, startBounds.y);
       }
 
@@ -275,6 +272,15 @@ public class Draggable extends BaseObservable {
   }
 
   /**
+   * Returns <code>true</code> if enabled.
+   * 
+   * @return the enable state
+   */
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  /**
    * Returns true if the drag widget is moved after a proxy drag.
    * 
    * @return the move after proxy state
@@ -314,6 +320,7 @@ public class Draggable extends BaseObservable {
    * Removes the drag handles.
    */
   public void release() {
+    cancelDrag();
     handle.removeListener(Events.OnMouseDown, listener);
   }
 
@@ -489,8 +496,10 @@ public class Draggable extends BaseObservable {
     if (s != null && s.indexOf("x-nodrag") != -1) {
       return;
     }
-    // ff, safari, chrome starts a native drag on image
-    if ("IMG".equals(target.getTagName())) {
+
+    //still allow text selection, prevent drag of other elements
+    if (!"input".equalsIgnoreCase(ce.getTarget().getTagName())
+        && !"textarea".equalsIgnoreCase(ce.getTarget().getTagName())) {
       ce.preventDefault();
     }
 
@@ -531,55 +540,52 @@ public class Draggable extends BaseObservable {
     }
 
     if (dragging) {
-      int left = startBounds.x + (x - dragStartX);
-      int top = startBounds.y + (y - dragStartY);
-
-      int width = dragWidget.getOffsetWidth();
-      int height = dragWidget.getOffsetHeight();
-
-      if (useProxy) {
-        width = proxyEl.getWidth();
-        height = proxyEl.getHeight();
-      }
+      int left = constrainHorizontal ? startBounds.x : startBounds.x + (x - dragStartX);
+      int top = constrainVertical ? startBounds.y : startBounds.y + (y - dragStartY);
 
       if (constrainClient) {
-        left = Math.max(left, 0);
-        top = Math.max(top, 0);
-
-        left = Math.max(0, Math.min(clientWidth - width, left));
-
-        if (Math.min(clientHeight - height, top) > 0) {
-          top = Math.max(2, Math.min(clientHeight - height, top));
+        if (!constrainHorizontal) {
+          int width = startBounds.width;
+          left = Math.max(left, 0);
+          left = Math.max(0, Math.min(clientWidth - width, left));
+        }
+        if (!constrainVertical) {
+          top = Math.max(top, 0);
+          int height = startBounds.height;
+          if (Math.min(clientHeight - height, top) > 0) {
+            top = Math.max(2, Math.min(clientHeight - height, top));
+          }
         }
       }
 
       if (container != null) {
-        left = Math.max(left, conX);
-        left = Math.min(conX + conWidth - dragWidget.getOffsetWidth(), left);
-        top = Math.min(conY + conHeight - dragWidget.getOffsetHeight(), top);
-        top = Math.max(top, conY);
+        int width = startBounds.width;
+        int height = startBounds.height;
+        if (!constrainHorizontal) {
+          left = Math.max(left, conX);
+          left = Math.min(conX + conWidth - width, left);
+        }
+        if (!constrainVertical) {
+          top = Math.min(conY + conHeight - height, top);
+          top = Math.max(top, conY);
+        }
+      }
+      if (!constrainHorizontal) {
+        if (xLeft != Style.DEFAULT) {
+          left = Math.max(startBounds.x - xLeft, left);
+        }
+        if (xRight != Style.DEFAULT) {
+          left = Math.min(startBounds.x + xRight, left);
+        }
       }
 
-      if (xLeft != Style.DEFAULT) {
-        left = Math.max(startBounds.x - xLeft, left);
-      }
-      if (xRight != Style.DEFAULT) {
-        left = Math.min(startBounds.x + xRight, left);
-      }
-
-      if (xTop != Style.DEFAULT) {
-        top = Math.max(startBounds.y - xTop, top);
-
-      }
-      if (xBottom != Style.DEFAULT) {
-        top = Math.min(startBounds.y + xBottom, top);
-      }
-
-      if (constrainHorizontal) {
-        left = startBounds.x;
-      }
-      if (constrainVertical) {
-        top = startBounds.y;
+      if (!constrainVertical) {
+        if (xTop != Style.DEFAULT) {
+          top = Math.max(startBounds.y - xTop, top);
+        }
+        if (xBottom != Style.DEFAULT) {
+          top = Math.min(startBounds.y + xBottom, top);
+        }
       }
 
       lastX = left;
@@ -589,81 +595,82 @@ public class Draggable extends BaseObservable {
       dragEvent.setComponent(dragWidget);
       dragEvent.setEvent(event);
       dragEvent.setCancelled(false);
-      dragEvent.setX(x);
-      dragEvent.setY(y);
+      dragEvent.setX(lastX);
+      dragEvent.setY(lastY);
       fireEvent(Events.DragMove, dragEvent);
 
-      int tl = dragEvent.getX() != x ? dragEvent.getX() : left;
-      int tt = dragEvent.getY() != y ? dragEvent.getY() : top;
+      if (dragEvent.isCancelled()) {
+        cancelDrag();
+        return;
+      }
+
+      int tl = dragEvent.getX() != lastX ? dragEvent.getX() : lastX;
+      int tt = dragEvent.getY() != lastY ? dragEvent.getY() : lastY;
       if (useProxy) {
         proxyEl.setPagePosition(tl, tt);
       } else {
         dragWidget.el().setPagePosition(tl, tt);
-      }
-
-      if (dragEvent.isCancelled()) {
-        cancelDrag();
       }
     }
 
   }
 
   protected void startDrag(Event event) {
-    XDOM.getBodyEl().addStyleName("x-unselectable");
-    XDOM.getBodyEl().addStyleName("x-dd-cursor");
-    dragWidget.el().makePositionable();
-
-    event.preventDefault();
-
-    Shim.get().cover(true);
-
-    if (updateZIndex) {
-      dragWidget.setZIndex(XDOM.getTopZIndex());
-    }
-
     DragEvent de = new DragEvent(this);
     de.setComponent(dragWidget);
     de.setEvent(event);
     de.setX(startBounds.x);
     de.setY(startBounds.y);
-    de.setCancelled(false);
 
-    lastX = startBounds.x;
-    lastY = startBounds.y;
+    if (fireEvent(Events.DragStart, de)) {
+      dragging = true;
+      XDOM.getBodyEl().addStyleName("x-unselectable");
+      XDOM.getBodyEl().addStyleName("x-dd-cursor");
+      dragWidget.el().makePositionable();
 
-    if (!fireEvent(Events.DragStart, de)) {
-      stopDrag(event);
-      return;
-    }
+      event.preventDefault();
 
-    if (dragEvent == null) {
-      dragEvent = new DragEvent(this);
-    }
+      Shim.get().cover(true);
 
-    dragging = true;
-    if (useProxy) {
-      if (proxyEl == null) {
-        createProxy();
-      }
-      Element body = XDOM.getBody();
-      DOM.appendChild(body, proxyEl.dom);
-      proxyEl.setVisibility(true);
-      proxyEl.setZIndex(XDOM.getTopZIndex());
-      proxyEl.makePositionable(true);
+      lastX = startBounds.x;
+      lastY = startBounds.y;
 
-      if (sizeProxyToSource) {
-        proxyEl.setBounds(startBounds);
-      } else {
-        proxyEl.setXY(startBounds.x, startBounds.y);
+      if (dragEvent == null) {
+        dragEvent = new DragEvent(this);
       }
 
-      // did listeners change size?
-      if (de.getHeight() > 0) {
-        proxyEl.setHeight(de.getHeight(), true);
+      if (useProxy) {
+        if (proxyEl == null) {
+          createProxy();
+        }
+        if (container == null) {
+          XDOM.getBody().appendChild(proxyEl.dom);
+        } else {
+          container.el().appendChild(proxyEl.dom);
+        }
+        proxyEl.setVisibility(true);
+        proxyEl.setZIndex(XDOM.getTopZIndex());
+        proxyEl.makePositionable(true);
+
+        if (sizeProxyToSource) {
+          proxyEl.setBounds(startBounds);
+        } else {
+          proxyEl.setXY(startBounds.x, startBounds.y);
+        }
+
+        // did listeners change size?
+        if (de.getHeight() > 0 && de.getWidth() > 0) {
+          proxyEl.setSize(de.getWidth(), de.getHeight(), true);
+        } else if (de.getHeight() > 0) {
+          proxyEl.setHeight(de.getHeight(), true);
+        } else if (de.getWidth() > 0) {
+          proxyEl.setWidth(de.getWidth(), true);
+        }
+      } else if (updateZIndex) {
+        dragWidget.setZIndex(XDOM.getTopZIndex());
       }
-      if (de.getWidth() > 0) {
-        proxyEl.setWidth(de.getWidth(), true);
-      }
+    } else {
+      cancelDrag();
     }
   }
 
@@ -678,8 +685,7 @@ public class Draggable extends BaseObservable {
         }
         proxyEl.setVisibility(false);
         proxyEl.disableTextSelection(false);
-        Element body = XDOM.getBody();
-        DOM.removeChild(body, proxyEl.dom);
+        proxyEl.remove();
       }
       DragEvent de = new DragEvent(this);
       de.setComponent(dragWidget);

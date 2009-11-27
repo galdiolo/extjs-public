@@ -81,7 +81,7 @@ public class ColumnLayout extends Layout {
 
     renderAll(container, innerCt);
 
-    Size size = target.getSize(true);
+    Size size = target.getStyleSize();
 
     int w = size.width - (adjustForScroll ? 19 : 0);
     int pw = w;
@@ -92,27 +92,42 @@ public class ColumnLayout extends Layout {
     // so we need to make 2 passes
     for (int i = 0; i < count; i++) {
       Component c = container.getItem(i);
-      ColumnData data = (ColumnData) getLayoutData(c);
-      if (data == null) {
-        data = new ColumnData();
-        setLayoutData(c, data);
+
+      ColumnData layoutData = null;
+      LayoutData d = getLayoutData(c);
+      if (d != null && d instanceof ColumnData) {
+        layoutData = (ColumnData) d;
+      } else {
+        layoutData = new ColumnData();
       }
-      if (data.getWidth() > 1) {
-        pw -= data.getWidth();
+
+      if (layoutData.getWidth() > 1) {
+        pw -= layoutData.getWidth();
       }
+
+      pw -= getSideMargins(c);
     }
 
     pw = pw < 0 ? 0 : pw;
 
     for (int i = 0; i < count; i++) {
       Component c = container.getItem(i);
-      ColumnData data = (ColumnData) getLayoutData(c);
-      if (data.getWidth() <= 1) {
-        setSize(c, (int) (data.getWidth() * pw), -1);
+
+      ColumnData layoutData = null;
+      LayoutData d = getLayoutData(c);
+      if (d != null && d instanceof ColumnData) {
+        layoutData = (ColumnData) d;
       } else {
-        setSize(c, (int) data.getWidth(), -1);
+        layoutData = new ColumnData();
       }
+
+      int width = -1;
+      if (layoutData.getWidth() > 0 && layoutData.getWidth() <= 1) {
+        width = (int) (layoutData.getWidth() * pw);
+      } else {
+        width = (int) layoutData.getWidth();
+      }
+      setSize(c, width, -1);
     }
   }
-
 }

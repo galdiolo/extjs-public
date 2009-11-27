@@ -16,6 +16,7 @@ import com.extjs.gxt.ui.client.core.FastMap;
 import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.extjs.gxt.ui.client.event.ComponentManagerEvent;
 import com.extjs.gxt.ui.client.event.Events;
+import com.google.gwt.dom.client.Element;
 
 /**
  * Provides a registry of all attached components. Only components currently
@@ -65,6 +66,27 @@ public class ComponentManager extends BaseObservable {
 
   private Map<String, Component> map;
 
+  private ComponentManager() {
+    map = new FastMap<Component>();
+  }
+
+  /**
+   * Attempts to find a component.
+   * 
+   * @param target the element or inner element of the component
+   * @return the matching component or null if no match
+   */
+  @SuppressWarnings("unchecked")
+  public <X extends Component> X find(Element target) {
+    while (target != null && target.getPropertyString("__listener") == null) {
+      target = (Element) target.getParentElement();
+    }
+    if (target != null) {
+      return (X) map.get(target.getId());
+    }
+    return null;
+  }
+  
   /**
    * Returns all component by class.
    * 
@@ -101,18 +123,24 @@ public class ComponentManager extends BaseObservable {
     return map.values();
   }
 
-  public void register(Component component) {
+  /**
+   * Registers a component. Should never need to be called directly.
+   * 
+   * @param component the component to register
+   */
+  void register(Component component) {
     map.put(component.getId(), component);
     fireEvent(Events.Register, new ComponentManagerEvent(this, component));
   }
 
-  public void unregister(Component component) {
+  /**
+   * Unregisters a component. Should never need to be called directly.
+   * 
+   * @param component the component to unregister
+   */
+  void unregister(Component component) {
     map.remove(component.getId());
     fireEvent(Events.Unregister, new ComponentManagerEvent(this, component));
-  }
-
-  private ComponentManager() {
-    map = new FastMap<Component>();
   }
 
 }

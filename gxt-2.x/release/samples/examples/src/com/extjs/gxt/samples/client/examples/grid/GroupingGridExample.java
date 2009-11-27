@@ -10,7 +10,7 @@ package com.extjs.gxt.samples.client.examples.grid;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Stock;
 import com.extjs.gxt.ui.client.store.GroupingStore;
@@ -72,7 +72,7 @@ public class GroupingGridExample extends LayoutContainer {
 
     ContentPanel panel = new ContentPanel();
     panel.setHeading("Grouping Example");
-    panel.setIcon(Examples.ICONS.table());
+    panel.setIcon(Resources.ICONS.table());
     panel.setCollapsible(true);
     panel.setFrame(true);
     panel.setSize(700, 450);

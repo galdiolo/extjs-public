@@ -14,6 +14,7 @@ import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.util.Params;
+import com.extjs.gxt.ui.client.util.Util;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
@@ -151,7 +152,7 @@ public class ProgressBar extends BoxComponent {
    * @return this
    */
   public ProgressBar reset() {
-    updateProgress(0, text);
+    updateProgress(0, "");
     if (timer != null) {
       timer.cancel();
     }
@@ -234,9 +235,9 @@ public class ProgressBar extends BoxComponent {
    * @param text The string to display in the progress text element
    */
   public void updateText(String text) {
-    this.text = text != null ? text : "&#160;";
+    this.text = text;
     if (rendered) {
-      textEl.setInnerHtml(this.text);
+      textEl.setInnerHtml(Util.isEmptyString(text) ? "&#160;" : text);
     }
   }
 
@@ -246,33 +247,33 @@ public class ProgressBar extends BoxComponent {
     sb.append("<div class='{cls}-wrap'><div class='{cls}-inner'><div class='{cls}-bar'>");
     sb.append("<div class='{cls}-text'><div>&#160;</div></div></div>");
     sb.append("<div class='{cls}-text {cls}-text-back'><div>&#160;</div></div></div></div>");
-  
+
     Template t = new Template(sb.toString());
     setElement(t.create(new Params("cls", baseStyle)), target, index);
-  
+
     final El inner = el().firstChild();
     progressBar = inner.firstChild();
     textTopElem = progressBar.firstChild();
     textBackElem = inner.childNode(1);
     textTopElem.setStyleAttribute("zIndex", 99).addStyleName("x-hidden");
-  
+
     textEl = new CompositeElement();
     textEl.add(textTopElem.firstChild().dom);
     textEl.add(textBackElem.firstChild().dom);
-  
+
     DeferredCommand.addCommand(new Command() {
       public void execute() {
         textEl.setWidth(inner.getWidth());
       }
     });
-  
+
     if (text != null) {
       updateText(text);
     }
     if (value > 0) {
       updateProgress(value, text);
     }
-  
+
   }
 
 }

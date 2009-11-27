@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.samples.client.examples.tabs;
 
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -18,11 +19,14 @@ import com.extjs.gxt.ui.client.widget.TabPanel;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 
 public class BasicTabExample extends LayoutContainer {
 
-  public BasicTabExample() {
+  @Override
+  protected void onRender(Element parent, int pos) {
+    super.onRender(parent, pos);
     VerticalPanel vp = new VerticalPanel();
     vp.setSpacing(10);
 
@@ -51,10 +55,16 @@ public class BasicTabExample extends LayoutContainer {
     normal.addText("Just a plain old tab");
     panel.add(normal);
 
+    TabItem iconTab = new TabItem("Icon Tab");
+    iconTab.setIcon(Resources.ICONS.table());
+    iconTab.addStyleName("pad-text");
+    iconTab.addText("Just a plain old tab with an icon");
+    panel.add(iconTab);
+
     TabItem ajax1 = new TabItem("Ajax Tab");
     ajax1.setScrollMode(Scroll.AUTO);
     ajax1.addStyleName("pad-text");
-    ajax1.setAutoLoad(new RequestBuilder(RequestBuilder.GET, GWT.getHostPageBaseURL() +"data/ajax1.html"));
+    ajax1.setAutoLoad(new RequestBuilder(RequestBuilder.GET, GWT.getHostPageBaseURL() + "data/ajax1.html"));
     panel.add(ajax1);
 
     TabItem eventTab = new TabItem("Event Tab");

@@ -42,8 +42,7 @@ public class ButtonBar extends ToolBar {
   public ButtonBar() {
     super();
     setSpacing(5);
-    removeStyleName("x-toolbar");
-    addStyleName("x-panel-fbar");
+    baseStyle = "x-panel-fbar";
   }
 
 }

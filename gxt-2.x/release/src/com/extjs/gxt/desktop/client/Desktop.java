@@ -10,6 +10,7 @@ package com.extjs.gxt.desktop.client;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.extjs.gxt.ui.client.core.DomQuery;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.event.WindowEvent;
@@ -65,14 +66,19 @@ public class Desktop {
       @Override
       protected void onRender(Element parent, int index) {
         super.onRender(parent, index);
-        getElement().appendChild(XDOM.getElementById("x-desktop"));
+        Element el = DomQuery.selectNode("#x-desktop");
+        if (el == null) {
+          el = DOM.createDiv();
+          el.setClassName("x-desktop");
+        }
+        getElement().appendChild(el);
       }
     };
 
     viewport.add(desktop, new RowData(1, 1));
     viewport.add(taskBar, new RowData(1, 30));
 
-    Element el = XDOM.getElementById("x-shortcuts");
+    Element el = DomQuery.selectNode("#x-shortcuts");
     if (el == null) {
       el = DOM.createDiv();
       el.setClassName("x-shortcuts");
@@ -224,6 +230,7 @@ public class Desktop {
 
   protected void onHide(Window window) {
     if (window.getData("minimize") != null) {
+      markInactive(window);
       return;
     }
     if (activeWindow == window) {
@@ -253,6 +260,7 @@ public class Desktop {
 
   private void onShow(Window window) {
     TaskButton btn = window.getData("taskButton");
+    window.setData("minimize", null);
     if (btn != null && taskBar.getButtons().contains(btn)) {
       return;
     }

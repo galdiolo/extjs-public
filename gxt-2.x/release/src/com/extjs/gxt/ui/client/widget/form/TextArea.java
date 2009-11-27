@@ -16,12 +16,18 @@ import com.google.gwt.user.client.Element;
  */
 public class TextArea extends TextField<String> {
 
-  private boolean preventScrollbars = false;
+  private boolean preventScrollbars;
 
+  public TextArea() {
+    super();
+    setSize(100, 60);
+  }
+
+  @Override
   public int getCursorPos() {
     return impl.getTextAreaCursorPos(getInputEl().dom);
   }
-  
+
   /**
    * Returns true if scroll bars are disabled.
    * 
@@ -44,15 +50,19 @@ public class TextArea extends TextField<String> {
 
   @Override
   protected void onRender(Element target, int index) {
-    setElement(DOM.createTextArea(), target, index);
-    el().setSize(100, 60);
-    getElement().setPropertyString("autocomplete", "off");
+    if (el() == null) {
+      setElement(DOM.createDiv(), target, index);
+      getElement().appendChild(DOM.createTextArea());
+      input = el().firstChild();
+    }
+
+    getInputEl().dom.setPropertyString("autocomplete", "off");
 
     if (preventScrollbars) {
-      el().setStyleAttribute("overflow", "hidden");
+      getInputEl().setStyleAttribute("overflow", "hidden");
     }
     super.onRender(target, index);
-    
+
     addInputStyleName("x-form-textarea");
   }
 

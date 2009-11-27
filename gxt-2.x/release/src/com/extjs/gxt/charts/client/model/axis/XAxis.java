@@ -76,7 +76,7 @@ public class XAxis extends AbstractAxis {
      * @return the colour
      */
     public String getColour() {
-      return (String)get("colour");
+      return (String) get("colour");
     }
 
     /**
@@ -86,7 +86,7 @@ public class XAxis extends AbstractAxis {
      */
     @SuppressWarnings("unchecked")
     public Collection<Object> getLabels() {
-      return (Collection)get("labels");
+      return (Collection) get("labels");
     }
 
     /**
@@ -95,7 +95,7 @@ public class XAxis extends AbstractAxis {
      * @return the rotation
      */
     public Rotation getRotation() {
-      return (Rotation)get("rotate");
+      return Rotation.valueOf((String) get("rotate"));
     }
 
     /**
@@ -104,7 +104,7 @@ public class XAxis extends AbstractAxis {
      * @return the size
      */
     public int getSize() {
-      return (Integer)get("size");
+      return (Integer) get("size");
     }
 
     /**
@@ -113,7 +113,7 @@ public class XAxis extends AbstractAxis {
      * @return the steps
      */
     public int getSteps() {
-      return (Integer)get("steps");
+      return (Integer) get("steps");
     }
 
     /**
@@ -122,7 +122,7 @@ public class XAxis extends AbstractAxis {
      * @return true if visible
      */
     public boolean isVisible() {
-      return (Boolean)get("visible");
+      return (Boolean) get("visible");
     }
 
     /**
@@ -140,7 +140,7 @@ public class XAxis extends AbstractAxis {
      * @param rotate the rotate
      */
     public void setRotation(Rotation rotate) {
-      set("rotate", rotate);
+      set("rotate", rotate.toString());
     }
 
     /**
@@ -222,7 +222,7 @@ public class XAxis extends AbstractAxis {
    * @return the tick height
    */
   public Integer getTickHeight() {
-    return (Integer)get("tick-height");
+    return (Integer) get("tick-height");
   }
 
   /**

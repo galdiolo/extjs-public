@@ -30,7 +30,10 @@ import com.extjs.gxt.samples.client.examples.model.BeanPost;
 import com.extjs.gxt.samples.client.examples.model.Photo;
 import com.extjs.gxt.samples.client.examples.model.Post;
 import com.extjs.gxt.samples.resources.client.model.Customer;
+import com.extjs.gxt.ui.client.Style.SortDir;
+import com.extjs.gxt.ui.client.data.BaseModel;
 import com.extjs.gxt.ui.client.data.BasePagingLoadResult;
+import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.PagingLoadConfig;
 import com.extjs.gxt.ui.client.data.PagingLoadResult;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -40,6 +43,7 @@ public class ExampleServiceImpl extends RemoteServiceServlet implements ExampleS
   private List<Post> posts;
   private List<BeanPost> beanPosts;
   private List<Photo> photos;
+  private List<ModelData> liveGridModels;
 
   public List<Photo> getPhotos() {
     if (photos == null) {
@@ -56,23 +60,22 @@ public class ExampleServiceImpl extends RemoteServiceServlet implements ExampleS
     if (config.getSortInfo().getSortField() != null) {
       final String sortField = config.getSortInfo().getSortField();
       if (sortField != null) {
-        Collections.sort(beanPosts, config.getSortInfo().getSortDir().comparator(
-            new Comparator() {
-              public int compare(Object o1, Object o2) {
-                BeanPost p1 = (BeanPost) o1;
-                BeanPost p2 = (BeanPost) o2;
-                if (sortField.equals("forum")) {
-                  return p1.getForum().compareTo(p2.getForum());
-                } else if (sortField.equals("username")) {
-                  return p1.getUsername().compareTo(p2.getUsername());
-                } else if (sortField.equals("subject")) {
-                  return p1.getSubject().compareTo(p2.getSubject());
-                } else if (sortField.equals("date")) {
-                  return p1.getDate().compareTo(p2.getDate());
-                }
-                return 0;
-              }
-            }));
+        Collections.sort(beanPosts, config.getSortInfo().getSortDir().comparator(new Comparator() {
+          public int compare(Object o1, Object o2) {
+            BeanPost p1 = (BeanPost) o1;
+            BeanPost p2 = (BeanPost) o2;
+            if (sortField.equals("forum")) {
+              return p1.getForum().compareTo(p2.getForum());
+            } else if (sortField.equals("username")) {
+              return p1.getUsername().compareTo(p2.getUsername());
+            } else if (sortField.equals("subject")) {
+              return p1.getSubject().compareTo(p2.getSubject());
+            } else if (sortField.equals("date")) {
+              return p1.getDate().compareTo(p2.getDate());
+            }
+            return 0;
+          }
+        }));
       }
     }
 
@@ -85,8 +88,7 @@ public class ExampleServiceImpl extends RemoteServiceServlet implements ExampleS
     for (int i = config.getOffset(); i < limit; i++) {
       sublist.add(beanPosts.get(i));
     }
-    return new BasePagingLoadResult<BeanPost>(sublist, config.getOffset(),
-        beanPosts.size());
+    return new BasePagingLoadResult<BeanPost>(sublist, config.getOffset(), beanPosts.size());
   }
 
   public List<Customer> getCustomers() {
@@ -98,6 +100,60 @@ public class ExampleServiceImpl extends RemoteServiceServlet implements ExampleS
     return customers;
   }
 
+  public PagingLoadResult<ModelData> getLiveGridModels(final PagingLoadConfig config) {
+    try {
+      if (liveGridModels == null) {
+        liveGridModels = new ArrayList<ModelData>(500000);
+        for (int i = 0; i < 500000; i++) {
+          ModelData m = new BaseModel();
+          m.set("a", "a " + i);
+          m.set("b", "b " + i);
+          m.set("c", "c " + i);
+          liveGridModels.add(m);
+        }
+
+      }
+      ArrayList<ModelData> sublist = new ArrayList<ModelData>();
+      int start = config.getOffset();
+      int limit = liveGridModels.size();
+      if (config.getLimit() > 0) {
+        limit = Math.min(start + config.getLimit(), limit);
+      }
+      List<ModelData> copy = new ArrayList<ModelData>(liveGridModels);
+      if (config.getSortField() != null) {
+        Collections.sort(copy, new Comparator<ModelData>() {
+          @SuppressWarnings("unchecked")
+          public int compare(ModelData m1, ModelData m2) {
+            Object o1 = m1.get(config.getSortField());
+            Object o2 = m2.get(config.getSortField());
+            if (o1 == null || o2 == null) {
+              if (o1 == null && o2 == null) {
+                return 0;
+              } else {
+                return (o1 == null) ? -1 : 1;
+              }
+            }
+            if (o1 instanceof Comparable) {
+              return ((Comparable) o1).compareTo(o2);
+            }
+            return ((String) o1).toLowerCase().compareTo(((String) o2).toLowerCase());
+          }
+        });
+        if (config.getSortDir().equals(SortDir.DESC)) {
+          Collections.reverse(copy);
+        }
+      }
+      for (int i = config.getOffset(); i < limit; i++) {
+        sublist.add(copy.get(i));
+      }
+
+      return new BasePagingLoadResult<ModelData>(sublist, start, copy.size());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
   public PagingLoadResult<Post> getPosts(final PagingLoadConfig config) {
     if (posts == null) {
       loadPosts();
@@ -106,21 +162,20 @@ public class ExampleServiceImpl extends RemoteServiceServlet implements ExampleS
     if (config.getSortInfo().getSortField() != null) {
       final String sortField = config.getSortInfo().getSortField();
       if (sortField != null) {
-        Collections.sort(posts, config.getSortInfo().getSortDir().comparator(
-            new Comparator<Post>() {
-              public int compare(Post p1, Post p2) {
-                if (sortField.equals("forum")) {
-                  return p1.getForum().compareTo(p2.getForum());
-                } else if (sortField.equals("username")) {
-                  return p1.getUsername().compareTo(p2.getUsername());
-                } else if (sortField.equals("subject")) {
-                  return p1.getSubject().compareTo(p2.getSubject());
-                } else if (sortField.equals("date")) {
-                  return p1.getDate().compareTo(p2.getDate());
-                }
-                return 0;
-              }
-            }));
+        Collections.sort(posts, config.getSortInfo().getSortDir().comparator(new Comparator<Post>() {
+          public int compare(Post p1, Post p2) {
+            if (sortField.equals("forum")) {
+              return p1.getForum().compareTo(p2.getForum());
+            } else if (sortField.equals("username")) {
+              return p1.getUsername().compareTo(p2.getUsername());
+            } else if (sortField.equals("subject")) {
+              return p1.getSubject().compareTo(p2.getSubject());
+            } else if (sortField.equals("date")) {
+              return p1.getDate().compareTo(p2.getDate());
+            }
+            return 0;
+          }
+        }));
       }
     }
 
@@ -148,8 +203,7 @@ public class ExampleServiceImpl extends RemoteServiceServlet implements ExampleS
   private void loadPhotos() {
     photos = new ArrayList<Photo>();
 
-    String url = getThreadLocalRequest().getSession().getServletContext().getRealPath(
-        "/samples/images/photos");
+    String url = getThreadLocalRequest().getSession().getServletContext().getRealPath("/samples/images/photos");
     // %20 will be converted to a space
     File folder = new File(url);
 

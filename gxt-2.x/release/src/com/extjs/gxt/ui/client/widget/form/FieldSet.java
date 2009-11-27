@@ -7,12 +7,14 @@
  */
 package com.extjs.gxt.ui.client.widget.form;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FieldSetEvent;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -89,6 +91,7 @@ import com.google.gwt.user.client.Event;
 public class FieldSet extends LayoutContainer {
 
   private El body;
+  private El legend;
   private ToolButton collapseBtn;
   private Element heading;
   private String text;
@@ -279,7 +282,6 @@ public class FieldSet extends LayoutContainer {
     addStyleName("x-panel-collapsed");
     FieldSetEvent fe = new FieldSetEvent(this);
     fireEvent(Events.Collapse, fe);
-    fireEvent(Events.Resize, fe);
   }
 
   protected void onExpand() {
@@ -289,27 +291,25 @@ public class FieldSet extends LayoutContainer {
     }
     body.setVisible(true);
     removeStyleName("x-panel-collapsed");
-    layout();
     FieldSetEvent fe = new FieldSetEvent(this);
     fireEvent(Events.Expand, fe);
-    fireEvent(Events.Resize, fe);
   }
 
   @Override
   protected void onRender(Element parent, int pos) {
     setElement(DOM.createFieldSet(), parent, pos);
-    
 
-    Element legend = DOM.createLegend();
-    legend.setClassName("x-fieldset-header");
+    legend = new El(DOM.createLegend());
+    legend.addStyleName("x-fieldset-header");
 
     if (checkboxToggle) {
       checkbox = DOM.createInputCheck().cast();
-      El.fly(checkbox).addEventsSunk(Event.ONCLICK);
+      sinkEvents(Event.ONCLICK);
       if (checkboxName != null) {
         checkbox.setAttribute("name", checkboxName);
       }
-      legend.appendChild(checkbox);
+      legend.appendChild((Element) checkbox.cast());
+      checkbox.setDefaultChecked(!collapsed);
       checkbox.setChecked(!collapsed);
     }
 
@@ -320,13 +320,13 @@ public class FieldSet extends LayoutContainer {
           setExpanded(!isExpanded());
         }
       });
-      collapseBtn.render(legend);
+      collapseBtn.render(legend.dom);
     }
 
     heading = DOM.createSpan();
     heading.setClassName("x-fieldset-header-text");
     legend.appendChild(heading);
-    getElement().appendChild(legend);
+    getElement().appendChild(legend.dom);
 
     body = el().appendChild(DOM.createDiv());
 
@@ -342,15 +342,18 @@ public class FieldSet extends LayoutContainer {
   @Override
   protected void onResize(int width, int height) {
     super.onResize(width, height);
+    Size frameSize = el().getFrameSize();
+
     if (isAutoWidth()) {
       getLayoutTarget().setWidth("auto");
     } else if (width != -1) {
-      getLayoutTarget().setWidth(width - el().getFrameWidth("lr"), true);
+      getLayoutTarget().setWidth(width - frameSize.width, true);
     }
     if (isAutoHeight()) {
       getLayoutTarget().setHeight("auto");
     } else if (height != -1) {
-      getLayoutTarget().setHeight(height - el().getFrameWidth("tb"), true);
+      getLayoutTarget().setHeight(
+          height - frameSize.height - legend.getHeight() - (GXT.isIE ? legend.getMargins("b") : 0), true);
     }
   }
 

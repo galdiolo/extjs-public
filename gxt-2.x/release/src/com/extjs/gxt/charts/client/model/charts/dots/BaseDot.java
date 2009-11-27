@@ -144,7 +144,7 @@ public abstract class BaseDot extends DataConfig {
    * @param y the new y
    */
   public void setXY(Number x, Number y) {
-    set("y", x);
-    set("x", y);
+    set("y", y);
+    set("x", x);
   }
 }

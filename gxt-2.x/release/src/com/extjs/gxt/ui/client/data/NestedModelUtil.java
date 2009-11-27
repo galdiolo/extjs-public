@@ -15,30 +15,26 @@ public class NestedModelUtil {
 
   @SuppressWarnings("unchecked")
   public static <X> X getNestedValue(ModelData model, String property) {
-    List<String> paths = Arrays.asList(property.split("\\."));
-    return (X) getNestedValue(model, paths);
+    return (X) getNestedValue(model, getPath(property));
   }
 
   public static Object convertIfNecessary(Object obj) {
-    if (obj == null) {
-      return null;
+    if (obj == null || obj instanceof ModelData) {
+      return obj;
     }
-    BeanModelFactory factory = BeanModelLookup.get().getFactory(obj.getClass());
+    BeanModelLookup lookup = BeanModelLookup.get();
+    BeanModelFactory factory = lookup != null ? lookup.getFactory(obj.getClass()) : null;
     return factory != null ? factory.createModel(obj) : obj;
   }
 
   @SuppressWarnings("unchecked")
   public static <X> X getNestedValue(ModelData model, List<String> paths) {
+    Object obj = convertIfNecessary(model.get(paths.get(0)));
     if (paths.size() == 1) {
-      Object obj = model.get(paths.get(0));
-      obj = convertIfNecessary(obj);
       return (X) obj;
     } else {
-      Object obj = model.get(paths.get(0));
-      obj = convertIfNecessary(obj);
-
       if (obj != null && obj instanceof ModelData) {
-        ArrayList<String> tmp = new ArrayList<String>(paths);
+        List<String> tmp = new ArrayList<String>(paths);
         tmp.remove(0);
         return (X) getNestedValue((ModelData) obj, tmp);
       }
@@ -48,26 +44,23 @@ public class NestedModelUtil {
 
   @SuppressWarnings("unchecked")
   public static <X> X setNestedValue(ModelData model, String property, Object value) {
-    List<String> paths = Arrays.asList(property.split("\\."));
-    return (X) setNestedValue(model, paths, value);
+    return (X) setNestedValue(model, getPath(property), value);
   }
 
   @SuppressWarnings("unchecked")
   public static <X> X setNestedValue(ModelData model, List<String> paths, Object value) {
-    if (paths.size() == 1) {
-      return (X) model.set(paths.get(0), value);
-    } else {
-      Object data = model.get(paths.get(0));
-      if (data != null && data instanceof ModelData) {
-        ArrayList<String> tmp = new ArrayList<String>(paths);
-        tmp.remove(0);
-        return (X) setNestedValue((ModelData) data, tmp, value);
-      }
-    }
-    return null;
+    int index = paths.size() - 1;
+    String path = paths.get(index);
+    paths.remove(index);
+    ModelData m = getNestedValue(model, paths);
+    return (X) m.set(path, value);
   }
 
   public static boolean isNestedProperty(String property) {
-    return property.indexOf(".") != -1;
+    return property != null && property.contains(".");
+  }
+
+  private static List<String> getPath(String property) {
+    return new ArrayList<String>(Arrays.asList(property.split("\\.")));
   }
 }

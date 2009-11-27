@@ -10,19 +10,20 @@ package com.extjs.gxt.ui.client.widget.form;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.HideMode;
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.KeyListener;
 import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.util.KeyNav;
-import com.extjs.gxt.ui.client.util.Size;
+import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.WidgetComponent;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
+import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -146,38 +147,39 @@ public abstract class Field<D> extends BoxComponent {
 
   }
 
-  protected String forceInvalidText;
   protected boolean autoValidate;
-  protected int validationDelay = 250;
   protected String emptyText;
   protected WidgetComponent errorIcon;
-  protected D value;
-  protected String focusStyle = "x-form-focus";
-  protected String invalidStyle = "x-form-invalid";
   protected String fieldStyle = "x-form-field";
-  protected boolean readOnly;
-  protected FieldMessages messages;
-  protected PropertyEditor<D> propertyEditor;
-  protected boolean hasFocus;
+  protected String focusStyle = "x-form-focus";
   protected Object focusValue;
+  protected String forceInvalidText;
+  protected boolean hasFocus;
+  protected FieldImages images;
+  protected String invalidStyle = "x-form-invalid";
+  protected FieldMessages messages;
+  protected String name;
   protected D originalValue;
   protected boolean preventMark;
-  protected FieldImages images;
+  protected PropertyEditor<D> propertyEditor;
+  protected boolean readOnly;
+  protected String readOnlyFieldStyle = "x-form-readonly";
+  protected int validationDelay = 250;
+  protected D value;
 
   private String activeErrorMessage;
-  private String labelStyle = "";
-  private String name;
   private String fieldLabel = "";
-  private String messageTarget = "side";
-  private boolean normalWidth;
-  private boolean validateOnBlur = true;
   private boolean fireChangeEventOnSetValue;
-  private int tabIndex = 0;
-  private String labelSeparator;
-  private String inputStyle;
   private boolean hideLabel;
-
   private boolean inEditor;
+  private String inputStyle;
+  private String inputStyles = "";
+  private String labelSeparator;
+  private String labelStyle = "";
+  private String messageTarget = "side";
+
+  private int tabIndex = 0;
+  private boolean validateOnBlur = true;
 
   /**
    * Creates a new field.
@@ -216,6 +218,14 @@ public abstract class Field<D> extends BoxComponent {
   }
 
   /**
+   * Clears the value from the field.
+   */
+  public void clear() {
+    setValue(null);
+    clearInvalid();
+  }
+
+  /**
    * Clear any invalid styles / messages for this field.
    */
   public void clearInvalid() {
@@ -241,7 +251,7 @@ public abstract class Field<D> extends BoxComponent {
         toolTip.disable();
       }
     } else {
-      Element elem = DOM.getElementById(messageTarget);
+      Element elem = XDOM.getElementById(messageTarget);
       if (elem != null) {
         elem.setInnerHTML("");
       }
@@ -391,7 +401,7 @@ public abstract class Field<D> extends BoxComponent {
    */
   public String getRawValue() {
     String v = rendered ? getInputEl().getValue() : "";
-    if (v.equals(emptyText)) {
+    if (v == null || v.equals(emptyText)) {
       return "";
     }
     return v;
@@ -409,7 +419,7 @@ public abstract class Field<D> extends BoxComponent {
   /**
    * Returns the field's validation delay in milliseconds.
    * 
-   * @return the delay in millseconds
+   * @return the delay in milliseconds
    */
   public int getValidationDelay() {
     return validationDelay;
@@ -450,11 +460,7 @@ public abstract class Field<D> extends BoxComponent {
     if (disabled || !rendered) {
       return false;
     }
-    Object v = getValue();
-    if (v == null) {
-      return originalValue != null;
-    }
-    return !getValue().equals(originalValue);
+    return !Util.equalWithNull(getValue(), originalValue);
   }
 
   /**
@@ -542,9 +548,10 @@ public abstract class Field<D> extends BoxComponent {
         errorIcon = new WidgetComponent(getImages().getInvalid().createImage());
         Element p = el().getParent().dom;
         errorIcon.render(p);
-        errorIcon.el().makePositionable(true);
         errorIcon.setHideMode(HideMode.VISIBILITY);
         errorIcon.hide();
+        errorIcon.setStyleAttribute("display", "block");
+        errorIcon.el().makePositionable(true);
       } else if (!errorIcon.el().isConnected()) {
         Element p = el().getParent().dom;
         p.appendChild(errorIcon.getElement());
@@ -553,9 +560,18 @@ public abstract class Field<D> extends BoxComponent {
         ComponentHelper.doAttach(errorIcon);
       }
 
-      errorIcon.show();
       alignErrorIcon();
-      alignErrorIcon();// fixes weird initial render with ie
+      if (GXT.isIE || GXT.isOpera) {
+        alignErrorIcon();
+      }
+      // needed to prevent flickering
+      DeferredCommand.addCommand(new Command() {
+        public void execute() {
+          if (errorIcon.isAttached()) {
+            errorIcon.show();
+          }
+        }
+      });
       errorIcon.setToolTip(msg);
       errorIcon.getToolTip().addStyleName("x-form-invalid-tip");
       el().repaint();
@@ -566,9 +582,9 @@ public abstract class Field<D> extends BoxComponent {
       getToolTip().addStyleName("x-form-invalid-tip");
       getToolTip().enable();
     } else if ("none".equals(messageTarget)) {
-      //do nothing
+      // do nothing
     } else {
-      Element elem = DOM.getElementById(messageTarget);
+      Element elem = XDOM.getElementById(messageTarget);
       if (elem != null) {
         elem.setInnerHTML(msg);
       }
@@ -636,7 +652,7 @@ public abstract class Field<D> extends BoxComponent {
       if (inputEl != null) {
         inputEl.removeStyleName(style);
       }
-    } else if (style != null) {
+    } else if (inputStyle != null && style != null) {
       String[] s = inputStyle.split(" ");
       inputStyle = "";
       for (int i = 0; i < s.length; i++) {
@@ -733,6 +749,20 @@ public abstract class Field<D> extends BoxComponent {
   }
 
   /**
+   * Sets a style attribute on the input element.
+   * 
+   * @param attr the attribute
+   * @param value the attribute value
+   */
+  public void setInputStyleAttribute(String attr, String value) {
+    if (rendered) {
+      getInputEl().setStyleAttribute(attr, value);
+    } else {
+      inputStyles += attr + ":" + value + ";";
+    }
+  }
+
+  /**
    * The standard separator to display after the text of each form label
    * (defaults to the value of {@link FormLayout#setLabelSeparator(String)},
    * which is a colon ':' by default).
@@ -789,9 +819,10 @@ public abstract class Field<D> extends BoxComponent {
   public void setName(String name) {
     this.name = name;
     if (rendered) {
+      // we need to remove the old one first, else ie6 goes crazy.
       getInputEl().dom.removeAttribute("name");
       if (name != null) {
-        getInputEl().dom.setAttribute("name", name);
+        ((InputElement) getInputEl().dom.cast()).setName(name);
       }
     }
   }
@@ -837,6 +868,7 @@ public abstract class Field<D> extends BoxComponent {
   public void setReadOnly(boolean readOnly) {
     this.readOnly = readOnly;
     if (rendered) {
+      el().setStyleName(readOnlyFieldStyle, readOnly);
       getInputEl().dom.setPropertyBoolean("readOnly", readOnly);
     }
   }
@@ -888,8 +920,7 @@ public abstract class Field<D> extends BoxComponent {
       setRawValue(v);
       validate();
     }
-    if (fireChangeEventOnSetValue
-        && ((oldValue == null && value != null) || (oldValue != null && !oldValue.equals(value)))) {
+    if (fireChangeEventOnSetValue) {
       fireChangeEvent(oldValue, value);
     }
   }
@@ -937,38 +968,7 @@ public abstract class Field<D> extends BoxComponent {
     return result;
   }
 
-  protected Size adjustSize(Size size) {
-    Size s = super.adjustSize(size);
-    s.width = adjustWidth(getInputEl().dom.getTagName(), s.width);
-    return s;
-  }
-
-  protected int adjustWidth(String tag, int w) {
-    tag = tag.toLowerCase();
-
-    if (!normalWidth) {
-      if (GXT.isIE && (tag.equals("input") || tag.equals("textarea"))) {
-        if (tag.equals("input") && !GXT.isStrict) {
-          return inEditor ? w : w - 3;
-        }
-        if (tag.equals("input") && GXT.isStrict) {
-          return w - (GXT.isIE6 ? 4 : 1);
-        }
-        if (tag.equals("textarea") && GXT.isStrict) {
-          return w - 2;
-        }
-      } else if (GXT.isOpera && GXT.isStrict) {
-        if (tag.equals("input")) {
-          return w + 2;
-        }
-        if (tag.equals("textarea")) {
-          return w - 2;
-        }
-      }
-    }
-    return w;
-  }
-
+  @Override
   protected void afterRender() {
     super.afterRender();
     initValue();
@@ -997,7 +997,7 @@ public abstract class Field<D> extends BoxComponent {
   }
 
   protected void fireChangeEvent(Object oldValue, Object value) {
-    if (oldValue != value) {
+    if (!Util.equalWithNull(oldValue, value)) {
       FieldEvent e = new FieldEvent(this);
       e.setOldValue(oldValue);
       e.setValue(value);
@@ -1031,20 +1031,20 @@ public abstract class Field<D> extends BoxComponent {
   }
 
   protected void onBlur(ComponentEvent be) {
-    if (!GXT.isOpera && focusStyle != null) {
-      getInputEl().removeStyleName(focusStyle);
-    }
-    hasFocus = false;
-    if (validateOnBlur) {
-      validate();
-    }
-    
-    Object v = getValue();
+    if (hasFocus) {
+      if (getInputEl() != null) {
+        getInputEl().removeStyleName(focusStyle);
+      }
+      hasFocus = false;
+      if (validateOnBlur) {
+        validate();
+      }
 
-    if ((focusValue == null && v != null) || (focusValue != null && !focusValue.equals(v))) {
+      D v = getValue();
+      value = v;
       fireChangeEvent(focusValue, v);
+      fireEvent(Events.Blur, new FieldEvent(this));
     }
-    fireEvent(Events.Blur, new FieldEvent(this));
   }
 
   protected void onClick(ComponentEvent ce) {
@@ -1064,10 +1064,10 @@ public abstract class Field<D> extends BoxComponent {
   }
 
   protected void onFocus(ComponentEvent ce) {
-    if (!GXT.isOpera && focusStyle != null) {
-      getInputEl().addStyleName(focusStyle);
-    }
     if (!hasFocus) {
+      if (getInputEl() != null) {
+        getInputEl().addStyleName(focusStyle);
+      }
       hasFocus = true;
       focusValue = getValue();
       fireEvent(Events.Focus, new FieldEvent(this));
@@ -1077,9 +1077,8 @@ public abstract class Field<D> extends BoxComponent {
   @Override
   protected void onHide() {
     super.onHide();
-    El lbl = findLabelElement();
-    if (lbl != null) {
-      lbl.setVisible(false);
+    if (errorIcon != null && errorIcon.isAttached()) {
+      errorIcon.hide();
     }
   }
 
@@ -1122,9 +1121,14 @@ public abstract class Field<D> extends BoxComponent {
       inputStyle = null;
     }
 
-    originalValue = value;
+    if (inputStyles != null && !inputStyles.equals("")) {
+      getInputEl().applyStyles(inputStyles);
+      inputStyles = null;
+    }
 
-    getInputEl().addEventsSunk(Event.ONCLICK | Event.MOUSEEVENTS | Event.FOCUSEVENTS | Event.KEYEVENTS);
+    originalValue = value;
+    getInputEl().addEventsSunk(Event.FOCUSEVENTS);
+    sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS | Event.FOCUSEVENTS | Event.KEYEVENTS);
   }
 
   @Override
@@ -1138,9 +1142,8 @@ public abstract class Field<D> extends BoxComponent {
   @Override
   protected void onShow() {
     super.onShow();
-    El lbl = findLabelElement();
-    if (lbl != null) {
-      lbl.show();
+    if (errorIcon != null && errorIcon.isAttached()) {
+      errorIcon.show();
     }
   }
 

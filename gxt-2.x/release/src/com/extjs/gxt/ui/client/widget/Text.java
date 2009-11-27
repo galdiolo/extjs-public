@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
+import com.extjs.gxt.ui.client.util.Util;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 
@@ -89,8 +90,8 @@ public class Text extends BoxComponent {
    */
   public void setText(String text) {
     this.text = text;
-    if (rendered && text != null) {
-      getElement().setInnerText(text);
+    if (rendered) {
+      el().update(Util.isEmptyString(text) ? "&#160;" : text);
     }
   }
 

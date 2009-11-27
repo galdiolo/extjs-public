@@ -7,7 +7,7 @@
  */
 package com.extjs.gxt.samples.client.examples.misc;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.ui.client.fx.Draggable;
 import com.extjs.gxt.ui.client.fx.Resizable;
@@ -25,7 +25,7 @@ public class ResizableExample extends LayoutContainer {
 
     ContentPanel cp = new ContentPanel();
     cp.setHeading("8-Way Resizing");
-    cp.setIcon(Examples.ICONS.text());
+    cp.setIcon(Resources.ICONS.text());
     cp.setBodyStyleName("pad-text");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
 

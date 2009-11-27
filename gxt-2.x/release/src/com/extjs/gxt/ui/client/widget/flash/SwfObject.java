@@ -20,7 +20,7 @@ import com.google.gwt.core.client.JavaScriptObject;
  * 
  */
 public class SwfObject {
-  
+
   public static class SwfConfig {
     ModelData attrs = new BaseModelData();
     ModelData params = new BaseModelData();
@@ -105,7 +105,7 @@ public class SwfObject {
       this.width = width;
     }
   }
-  
+
   public static void embedSWF(String url, String replaceId, SwfConfig cfg) {
     JavaScriptObject vars = Util.getJsObject(cfg.flashVars, 4);
     JavaScriptObject params = Util.getJsObject(cfg.params, 4);
@@ -113,12 +113,19 @@ public class SwfObject {
     embedSWT(url, replaceId, cfg.width, cfg.height, cfg.version, cfg.expressInstallUrl, vars, params, attrs);
   }
 
-  private native static void embedSWT(String url, String replaceId, String width, String height,
-      String version, String expressUrl, JavaScriptObject flashvars,
-      JavaScriptObject params, JavaScriptObject attrs) /*-{
-      $wnd.swfobject.embedSWF(url, replaceId, width, height, version, expressUrl, flashvars, params, attrs);
-    }-*/;
+  /**
+   * Removes the SWF object.
+   * 
+   * @param id the id of the swf object
+   */
+  public native static void removeSWF(String id)/*-{
+    $wnd.swfobject.removeSWF(id);
+  }-*/;
 
+  private native static void embedSWT(String url, String replaceId, String width, String height, String version,
+      String expressUrl, JavaScriptObject flashvars, JavaScriptObject params, JavaScriptObject attrs) /*-{
+    $wnd.swfobject.embedSWF(url, replaceId, width, height, version, expressUrl, flashvars, params, attrs);
+  }-*/;
 
   private SwfObject() {
 

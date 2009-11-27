@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.extjs.gxt.samples.client.ExampleServiceAsync;
 import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.model.Customer;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.data.BaseListLoader;
@@ -69,7 +70,7 @@ public class BeanModelGridExample extends LayoutContainer {
     ContentPanel panel = new ContentPanel();
     panel.setHeading("BeanModel Grid Example");
     panel.setSize(400, 200);
-    panel.setIcon(Examples.ICONS.table());
+    panel.setIcon(Resources.ICONS.table());
     panel.setLayout(new FitLayout());
     panel.add(grid);
 

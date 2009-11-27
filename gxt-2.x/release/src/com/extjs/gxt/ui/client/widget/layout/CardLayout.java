@@ -10,7 +10,6 @@ package com.extjs.gxt.ui.client.widget.layout;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.widget.CardPanel;
 import com.extjs.gxt.ui.client.widget.Component;
-import com.extjs.gxt.ui.client.widget.Container;
 
 /**
  * This layout contains multiple widgets, each fit to the container, where only
@@ -69,20 +68,16 @@ public class CardLayout extends FitLayout {
    * @param component the active component
    */
   public void setActiveItem(Component component) {
-    if (activeItem != component) {
+    if (activeItem != component && container != null && container.getItems().contains(component)) {
       if (activeItem != null) {
         activeItem.hide();
       }
       activeItem = component;
       if (activeItem != null) {
         activeItem.show();
-        // deferred rendering
-        if (!activeItem.isRendered()
-            || ((activeItem instanceof Container) && isLayoutNeeded((Container<?>) activeItem))) {
-          setLayoutNeeded(container, true);
+        if (container != null && container.isRendered()) {
+          layout();
         }
-
-        layoutContainer();
       }
     }
   }

@@ -39,4 +39,15 @@ public class Point {
     return ("x: " + x + ", y: " + y);
   }
 
+  public boolean equals(Object obj) {
+    if (obj instanceof Point) {
+      Point p = (Point) obj;
+      if (x == p.x && y == p.y) {
+        return true;
+      }
+      return false;
+    }
+    return super.equals(obj);
+  }
+
 }

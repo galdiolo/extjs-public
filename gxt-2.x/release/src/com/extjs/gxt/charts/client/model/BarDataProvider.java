@@ -33,10 +33,10 @@ public class BarDataProvider extends PieDataProvider {
   @Override
   public void populateData(ChartConfig config) {
     BarChart chart = (BarChart) config;
-    chart.getValues().clear();
+    config.getValues().clear();
 
     XAxis xAxis = null;
-    if (labelProperty != null) {
+    if (labelProperty != null || labelProvider != null) {
       xAxis = chart.getModel().getXAxis();
       if (xAxis == null) {
         xAxis = new XAxis();
@@ -46,15 +46,17 @@ public class BarDataProvider extends PieDataProvider {
     }
 
     for (ModelData m : store.getModels()) {
-      Object v = m.get(valueProperty);
-      Number n = v instanceof String ? Double.parseDouble((String) v) : (Number) v;
+      Number n = getValue(m);
       if (n == null) {
-        n = 0;
+        chart.addNullValue();
+      } else {
+        chart.addBars(new Bar(n));
+        minYValue = Math.min(minYValue == null ? 0 : minYValue, n.doubleValue());
+        maxYValue = Math.max(maxYValue == null ? 0 : maxYValue, n.doubleValue());
+        if (xAxis != null) {
+          xAxis.addLabels(getLabel(m));
+        }
       }
-      chart.addBars(new Bar(n));
-      minYValue = Math.min(minYValue, n.doubleValue());
-      maxYValue = Math.max(maxYValue, n.doubleValue());
-      if (xAxis != null) xAxis.addLabels(getLabel(m, valueProperty));
     }
   }
 }

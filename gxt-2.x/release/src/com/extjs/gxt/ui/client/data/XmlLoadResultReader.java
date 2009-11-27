@@ -15,22 +15,19 @@ import java.util.List;
  * 
  * @param <D> the type of list load result being returned by the reader
  */
-public class XmlLoadResultReader<D extends ListLoadResult<? extends ModelData>>
-    extends XmlReader<D> {
-
+public class XmlLoadResultReader<D extends ListLoadResult<? extends ModelData>> extends XmlReader<D> {
+  /**
+   * Creates a new reader.
+   * 
+   * @param modelType the model type definition
+   */
   public XmlLoadResultReader(ModelType modelType) {
     super(modelType);
   }
 
   @Override
-  protected Object createReturnData(Object loadConfig, List<ModelData> records,
-      int totalCount) {
-    ListLoadResult<?> result = newLoadResult(loadConfig, records);
-    if (result instanceof PagingLoadResult) {
-      PagingLoadResult<?> r = (PagingLoadResult<?>) result;
-      r.setTotalLength(totalCount);
-    }
-    return result;
+  protected Object createReturnData(Object loadConfig, List<ModelData> records, int totalCount) {
+    return newLoadResult(loadConfig, records);
   }
 
   /**
@@ -39,8 +36,7 @@ public class XmlLoadResultReader<D extends ListLoadResult<? extends ModelData>>
    * @param models the models
    * @return the load result
    */
-  protected ListLoadResult<ModelData> newLoadResult(Object loadConfig,
-      List<ModelData> models) {
+  protected ListLoadResult<ModelData> newLoadResult(Object loadConfig, List<ModelData> models) {
     return new BaseListLoadResult<ModelData>(models);
   }
 }

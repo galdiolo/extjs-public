@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.store;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -85,8 +86,7 @@ public class Record {
    * @param wrappedModel the model
    */
   public Record(ModelData wrappedModel) {
-    if (wrappedModel == null)
-      throw new RuntimeException("Record cannot wrap a null model");
+    assert wrappedModel != null : "Record cannot wrap a null model";
     this.model = wrappedModel;
   }
 
@@ -237,7 +237,7 @@ public class Record {
    */
   public void reject(boolean silent) {
     if (modified != null) {
-      for (String p : modified.keySet()) {
+      for (String p : new ArrayList<String>(modified.keySet())) {
         model.set(p, modified.get(p));
       }
     }
@@ -270,8 +270,7 @@ public class Record {
       modified.put(name, model.get(name));
     } else {
       Object origValue = modified.get(name);
-      if ((origValue == null && value == null)
-          || (origValue != null && origValue.equals(value))) {
+      if ((origValue == null && value == null) || (origValue != null && origValue.equals(value))) {
 
         modified.remove(name);
         if (modified.size() == 0) {

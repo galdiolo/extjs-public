@@ -10,7 +10,6 @@ package com.extjs.gxt.ui.client.widget;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * A component that wraps another component, hiding the wrapped components
@@ -88,12 +87,25 @@ public class Composite extends BoxComponent {
   }
 
   @Override
+  public Element getElement() {
+    // we need this because of lazy rendering
+    return component.getElement();
+  }
+
+  @Override
   public boolean isAttached() {
-    return component != null ? component.isAttached() : false;
+    if (component != null) {
+      return component.isAttached();
+    }
+    return false;
   }
 
   @Override
   public void onBrowserEvent(Event event) {
+    // Fire any handler added to the composite itself.
+    super.onBrowserEvent(event);
+
+    // Delegate events to the widget.
     component.onBrowserEvent(event);
   }
 
@@ -114,21 +126,11 @@ public class Composite extends BoxComponent {
   protected void initComponent(Component component) {
     component.removeFromParent();
     this.component = component;
-    setParent(this, component);
+    component.setParent(this);
   }
 
   @Override
   protected void onAttach() {
-    if (!rendered) {
-      String widgetIndex = dummy.getPropertyString("__widgetID");
-      Element parent = DOM.getParent(dummy);
-      int index = DOM.getChildIndex(parent, dummy);
-      parent.removeChild(dummy);
-      component.render(parent, index);
-      if (widgetIndex != null) {
-        getElement().setPropertyInt("__widgetID", Integer.parseInt(widgetIndex));
-      }
-    }
     component.onAttach();
     DOM.setEventListener(getElement(), this);
     onLoad();
@@ -141,6 +143,19 @@ public class Composite extends BoxComponent {
     } finally {
       component.onDetach();
     }
+    onDetachHelper();
+  }
+
+  @Override
+  protected void onDisable() {
+    super.onDisable();
+    component.disable();
+  }
+
+  @Override
+  protected void onEnable() {
+    super.onEnable();
+    component.enable();
   }
 
   @Override
@@ -148,9 +163,5 @@ public class Composite extends BoxComponent {
     component.render(target, index);
     setElement(component.getElement());
   }
-
-  private native void setParent(Widget parent, Widget child) /*-{
-     child.@com.google.gwt.user.client.ui.Widget::parent = parent;
-   }-*/;
 
 }

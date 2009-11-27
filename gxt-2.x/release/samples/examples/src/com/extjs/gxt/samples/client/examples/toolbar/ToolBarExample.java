@@ -7,13 +7,20 @@
  */
 package com.extjs.gxt.samples.client.examples.toolbar;
 
-import com.extjs.gxt.samples.client.Examples;
+import java.util.List;
+
+import com.extjs.gxt.samples.resources.client.Resources;
+import com.extjs.gxt.samples.resources.client.TestData;
+import com.extjs.gxt.samples.resources.client.model.Stock;
+import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.SplitButton;
 import com.extjs.gxt.ui.client.widget.button.ToggleButton;
 import com.extjs.gxt.ui.client.widget.custom.ThemeSelector;
+import com.extjs.gxt.ui.client.widget.form.ComboBox;
+import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.menu.CheckMenuItem;
@@ -24,18 +31,36 @@ import com.extjs.gxt.ui.client.widget.menu.SeparatorMenuItem;
 import com.extjs.gxt.ui.client.widget.toolbar.FillToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
+import com.google.gwt.user.client.Element;
 
 public class ToolBarExample extends LayoutContainer {
 
-  public ToolBarExample() {
+  @Override
+  protected void onRender(Element parent, int pos) {
+    super.onRender(parent, pos);
     setLayout(new FlowLayout(10));
 
     ToolBar toolBar = new ToolBar();
 
     Button item1 = new Button("Button w/ Menu");
-    item1.setIcon(Examples.ICONS.menu_show());
+    item1.setIcon(Resources.ICONS.menu_show());
+
+    List<Stock> list = TestData.getStocks();
+    final ListStore<Stock> store = new ListStore<Stock>();
+    store.add(list);
+
+    final ComboBox<Stock> combo = new ComboBox<Stock>();
+    combo.setFieldLabel("Company");
+    combo.setDisplayField("name");
+    combo.setName("name");
+    combo.setValueField("symbol");
+    combo.setForceSelection(true);
+    combo.setStore(store);
+    combo.setTriggerAction(TriggerAction.ALL);
 
     Menu menu = new Menu();
+    menu.add(combo);
+
     CheckMenuItem menuItem = new CheckMenuItem("I Like Cats");
     menuItem.setChecked(true);
     menu.add(menuItem);
@@ -60,7 +85,7 @@ public class ToolBarExample extends LayoutContainer {
     radios.setSubMenu(radioMenu);
 
     MenuItem date = new MenuItem("Choose a Date");
-    date.setIcon(Examples.ICONS.calendar());
+    date.setIcon(Resources.ICONS.calendar());
     menu.add(date);
 
     date.setSubMenu(new DateMenu());
@@ -70,7 +95,7 @@ public class ToolBarExample extends LayoutContainer {
     toolBar.add(new SeparatorToolItem());
 
     SplitButton splitItem = new SplitButton("Split Button");
-    splitItem.setIcon(Examples.ICONS.list_items());
+    splitItem.setIcon(Resources.ICONS.list_items());
 
     menu = new Menu();
     menu.add(new MenuItem("<b>Bold</b>"));

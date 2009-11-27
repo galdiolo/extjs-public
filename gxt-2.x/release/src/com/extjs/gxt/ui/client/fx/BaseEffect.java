@@ -21,6 +21,52 @@ import com.google.gwt.user.client.Timer;
  */
 public class BaseEffect implements Effect {
 
+  static class Blink extends BaseEffect {
+
+    private int interval;
+    private Timer t;
+    private boolean visible;
+
+    public Blink(final El el, int interval) {
+      super(el);
+      this.interval = interval;
+      t = new Timer() {
+        @Override
+        public void run() {
+          el.setVisibility(visible);
+          visible = !visible;
+        }
+      };
+    }
+
+    @Override
+    public void onComplete() {
+      t.cancel();
+      // ensure timer is done executing
+      DeferredCommand.addCommand(new Command() {
+        public void execute() {
+          el.setVisibility(true);
+        }
+      });
+    }
+
+    @Override
+    public void onCancel() {
+      super.onCancel();
+      t.cancel();
+    }
+
+    @Override
+    public void onStart() {
+      t.scheduleRepeating(interval);
+    }
+
+    @Override
+    public void onUpdate(double progress) {
+
+    }
+  }
+
   static class FadeIn extends SingleStyleEffect {
 
     public FadeIn(El el) {
@@ -39,74 +85,6 @@ public class BaseEffect implements Effect {
     public void onStart() {
       el.setStyleAttribute("opacity", 0);
       el.setVisible(true);
-    }
-
-  }
-
-  static class Blink extends BaseEffect {
-
-    private Timer t;
-    private boolean visible;
-    private int interval;
-
-    public Blink(final El el, int interval) {
-      super(el);
-      this.interval = interval;
-      t = new Timer() {
-        @Override
-        public void run() {
-          el.setVisibility(visible);
-          visible = !visible;
-        }
-      };
-    }
-
-    @Override
-    public void onStart() {
-      t.scheduleRepeating(interval);
-    }
-
-    @Override
-    public void onUpdate(double progress) {
-
-    }
-
-    @Override
-    public void onComplete() {
-      t.cancel();
-      // ensure timer is done executing
-      DeferredCommand.addCommand(new Command() {
-        public void execute() {
-          el.setVisibility(true);
-        }
-      });
-    }
-  }
-
-  static class Scroll extends SingleStyleEffect {
-
-    protected ScrollDir dir;
-
-    public Scroll(El el, ScrollDir dir, int value) {
-      super(el);
-      this.dir = dir;
-      if (dir == ScrollDir.HORIZONTAL) {
-        from = el.getScrollLeft();
-        to = value;
-      } else if (dir == ScrollDir.VERTICAL) {
-        from = el.getScrollTop();
-        to = value;
-      }
-    }
-
-    @Override
-    public void increase(double value) {
-      if (dir == ScrollDir.HORIZONTAL) {
-        el.setScrollLeft((int) value);
-      } else if (dir == ScrollDir.VERTICAL) {
-        el.setScrollTop((int) value);
-      }
-
     }
 
   }
@@ -145,6 +123,12 @@ public class BaseEffect implements Effect {
     }
 
     @Override
+    public void onComplete() {
+      super.onComplete();
+      el.setXY(toX, toY);
+    }
+
+    @Override
     public void onUpdate(double progress) {
       int x = (int) getValue(fromX, toX, progress);
       int y = (int) getValue(fromY, toY, progress);
@@ -154,14 +138,48 @@ public class BaseEffect implements Effect {
 
   }
 
+  static class Scroll extends SingleStyleEffect {
+
+    protected ScrollDir dir;
+
+    public Scroll(El el, ScrollDir dir, int value) {
+      super(el);
+      this.dir = dir;
+      if (dir == ScrollDir.HORIZONTAL) {
+        from = el.getScrollLeft();
+        to = value;
+      } else if (dir == ScrollDir.VERTICAL) {
+        from = el.getScrollTop();
+        to = value;
+      }
+    }
+
+    @Override
+    public void increase(double value) {
+      if (dir == ScrollDir.HORIZONTAL) {
+        el.setScrollLeft((int) value);
+      } else if (dir == ScrollDir.VERTICAL) {
+        el.setScrollTop((int) value);
+      }
+
+    }
+
+    @Override
+    public void onComplete() {
+      super.onComplete();
+      el.setScrollTop((int) to);
+    }
+
+  }
+
   static abstract class Slide extends BaseEffect {
 
     protected Direction dir;
-    protected El wrapEl;
+    protected double from, to;
     protected Rectangle oBounds;
     protected String overflow;
     protected String style;
-    protected double from, to;
+    protected El wrapEl;
 
     public Slide(El el, Direction dir) {
       super(el);
@@ -355,14 +373,14 @@ public class BaseEffect implements Effect {
     fx.run(new FadeOut(el));
   }
 
-  public static void slideIn(El el, FxConfig config, Direction direction) {
-    Fx fx = new Fx(config);
-    fx.run(new SlideIn(el, direction));
-  }
-
   public static void scroll(El el, FxConfig config, ScrollDir direction, int value) {
     Fx fx = new Fx(config);
     fx.run(new Scroll(el, direction, value));
+  }
+
+  public static void slideIn(El el, FxConfig config, Direction direction) {
+    Fx fx = new Fx(config);
+    fx.run(new SlideIn(el, direction));
   }
 
   public static void slideOut(El el, FxConfig config, Direction direction) {

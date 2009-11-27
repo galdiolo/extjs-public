@@ -345,7 +345,7 @@ public class TreeDropTarget extends DropTarget {
 
   private void showInsert(DNDEvent event, Element elem, boolean before) {
     Insert insert = Insert.get();
-    insert.show();
+    insert.show(elem);
     Rectangle rect = El.fly(elem).getBounds();
     int y = before ? rect.y - 2 : (rect.y + rect.height - 4);
     insert.setBounds(rect.x, y, rect.width, 6);

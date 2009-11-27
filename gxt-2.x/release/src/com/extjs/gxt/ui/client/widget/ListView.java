@@ -16,6 +16,7 @@ import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.CompositeElement;
 import com.extjs.gxt.ui.client.core.DomQuery;
 import com.extjs.gxt.ui.client.core.XTemplate;
+import com.extjs.gxt.ui.client.data.BaseModel;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.ModelProcessor;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -105,7 +106,6 @@ public class ListView<M extends ModelData> extends BoxComponent {
   private CompositeElement all;
   private ListViewSelectionModel<M> sm;
   private XTemplate template;
-  private boolean initial;
   private StoreListener<M> storeListener;
   private String displayProperty = "text";
   private String loadingText;
@@ -371,19 +371,18 @@ public class ListView<M extends ModelData> extends BoxComponent {
    * Refreshes the view by reloading the data from the store and re-rendering
    * the template.
    */
-  @SuppressWarnings("unchecked")
   public void refresh() {
     if (!rendered) {
       return;
     }
     el().setInnerHtml("");
     repaint();
-    List models = store.getModels();
+    List<M> models = store.getModels();
     if (models.size() < 1) {
       all.removeAll();
       return;
     }
-    template.overwrite(getElement(), Util.getJsObjects((List) collectData(models, 0), template.getMaxDepth()));
+    template.overwrite(getElement(), Util.getJsObjects(collectData(models, 0), template.getMaxDepth()));
     all = new CompositeElement(Util.toElementArray(el().select(itemSelector)));
     updateIndexes(0, -1);
     fireEvent(Events.Refresh);
@@ -505,11 +504,10 @@ public class ListView<M extends ModelData> extends BoxComponent {
    * @param store the store to bind this view
    */
   public void setStore(ListStore<M> store) {
-    if (!initial && this.store != null) {
+    if (this.store != null) {
       this.store.removeStoreListener(storeListener);
     }
     if (store != null) {
-
       store.addStoreListener(storeListener);
     }
     this.store = store;
@@ -536,6 +534,18 @@ public class ListView<M extends ModelData> extends BoxComponent {
    */
   public void setTemplate(XTemplate template) {
     this.template = template;
+  }
+
+  @Override
+  protected void afterRender() {
+    super.afterRender();
+    if (store != null && store.getCount() > 0) {
+      refresh();
+    }
+    List<M> list = sm.getSelectedItems();
+    for (M m : list) {
+      onSelectChange(m, true);
+    }
   }
 
   protected List<M> collectData(List<M> models, int startIndex) {
@@ -606,6 +616,10 @@ public class ListView<M extends ModelData> extends BoxComponent {
 
   protected void onAdd(List<M> models, int index) {
     if (rendered) {
+      if (all.getCount() == 0) {
+        refresh();
+        return;
+      }
       NodeList<Element> nodes = bufferRender(models);
       Element[] e = Util.toElementArray(nodes);
       all.insert(e, index);
@@ -678,22 +692,20 @@ public class ListView<M extends ModelData> extends BoxComponent {
     }
   }
 
+  @Override
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
     setElement(DOM.createDiv(), target, index);
 
     el().setStyleAttribute("overflow", "auto");
     el().setStyleAttribute("padding", "0px");
+    el().setStyleAttribute("zoom", 1);
     if (!GXT.isIE) {
       el().setTabIndex(0);
     }
 
     if (template == null) {
       template = XTemplate.create("<tpl for=\".\"><div class='x-view-item'>{" + displayProperty + "}</div></tpl>");
-    }
-
-    if (store != null && store.getCount() > 0) {
-      refresh();
     }
 
     disableTextSelection(true);
@@ -725,23 +737,33 @@ public class ListView<M extends ModelData> extends BoxComponent {
         if (fly(original).hasStyleName(selectStyle)) {
           fly(node).addStyleName(selectStyle);
         }
-        el().insertChild(node, index);
-        el().removeChild(original);
+        el().dom.replaceChild(node, original);
       }
     }
   }
 
   protected M prepareData(M model) {
     if (modelProcessor != null) {
-      return modelProcessor.prepareData(model);
+      boolean silent = false;
+      if (model instanceof BaseModel) {
+        silent = ((BaseModel) model).isSilent();
+        ((BaseModel) model).setSilent(true);
+      }
+      
+      M m = modelProcessor.prepareData(model);
+      
+      if (model instanceof BaseModel) {
+        ((BaseModel) model).setSilent(silent);
+      }
+      
+      return m;
     }
     return model;
   }
 
-  @SuppressWarnings("unchecked")
   private NodeList<Element> bufferRender(List<M> models) {
     Element div = DOM.createDiv();
-    template.overwrite(div, Util.getJsObjects((List) collectData((List) models, 0), template.getMaxDepth()));
+    template.overwrite(div, Util.getJsObjects(collectData(models, 0), template.getMaxDepth()));
     return DomQuery.select(itemSelector, div);
   }
 

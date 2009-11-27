@@ -21,7 +21,7 @@ import com.google.gwt.core.client.GWT;
  */
 public abstract class BeanModelLookup {
 
-  private static BeanModelLookup instance = (BeanModelLookup) GWT.create(BeanModelLookup.class);
+  private static BeanModelLookup instance;
 
   /**
    * Returns the singleton bean model lookup.
@@ -29,6 +29,11 @@ public abstract class BeanModelLookup {
    * @return the singleton instance
    */
   public static BeanModelLookup get() {
+    if (instance == null) {
+      if (GWT.isClient()) {
+        instance = GWT.create(BeanModelLookup.class);
+      }
+    }
     return instance;
   }
 

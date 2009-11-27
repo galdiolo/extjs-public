@@ -23,7 +23,7 @@ public class CSS {
    * @param id the id of the tag
    */
   public static void removeStyleSheet(String id) {
-    Element elem = DOM.getElementById(id);
+    Element elem = XDOM.getElementById(id);
     if (elem != null) {
       Element p = DOM.getParent(elem);
       DOM.setElementProperty(p, "disabled", "disabled");

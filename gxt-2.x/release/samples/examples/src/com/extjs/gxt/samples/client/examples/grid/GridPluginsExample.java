@@ -10,7 +10,7 @@ package com.extjs.gxt.samples.client.examples.grid;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.samples.client.Examples;
+import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Stock;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -124,7 +124,7 @@ public class GridPluginsExample extends LayoutContainer {
     ContentPanel cp = new ContentPanel();
     cp.setHeading("Framed with Checkbox Selection and Horizontal Scrolling");
     cp.setFrame(true);
-    cp.setIcon(Examples.ICONS.table());
+    cp.setIcon(Resources.ICONS.table());
     cp.setLayout(new FitLayout());
     cp.setSize(600, 300);
 
@@ -191,7 +191,7 @@ public class GridPluginsExample extends LayoutContainer {
 
     ContentPanel cp = new ContentPanel();
     cp.setHeading("Expander Rows, Collapse and Auto Fill");
-    cp.setIcon(Examples.ICONS.table());
+    cp.setIcon(Resources.ICONS.table());
     cp.setAnimCollapse(false);
     cp.setCollapsible(true);
     cp.setLayout(new FitLayout());
@@ -252,7 +252,7 @@ public class GridPluginsExample extends LayoutContainer {
     ContentPanel cp = new ContentPanel();
     cp.setHeading("Support for standard Panel features such as framing, buttons and toolbars");
     cp.setFrame(true);
-    cp.setIcon(Examples.ICONS.table());
+    cp.setIcon(Resources.ICONS.table());
     cp.addButton(new Button("Save"));
     cp.addButton(new Button("Cancel"));
     cp.setButtonAlign(HorizontalAlignment.CENTER);
@@ -260,11 +260,11 @@ public class GridPluginsExample extends LayoutContainer {
     cp.setSize(600, 300);
 
     ToolBar toolBar = new ToolBar();
-    toolBar.add(new Button("Add", Examples.ICONS.add()));
+    toolBar.add(new Button("Add", Resources.ICONS.add()));
     toolBar.add(new SeparatorToolItem());
-    toolBar.add(new Button("Remove", Examples.ICONS.delete()));
+    toolBar.add(new Button("Remove", Resources.ICONS.delete()));
     toolBar.add(new SeparatorToolItem());
-    toolBar.add(new Button("Configure", Examples.ICONS.plugin()));
+    toolBar.add(new Button("Configure", Resources.ICONS.plugin()));
     cp.setTopComponent(toolBar);
 
     Grid<Stock> grid = new Grid<Stock>(store, cm);
@@ -329,11 +329,11 @@ public class GridPluginsExample extends LayoutContainer {
       }
 
     });
-    btn.setIcon(Examples.ICONS.delete());
+    btn.setIcon(Resources.ICONS.delete());
 
     ContentPanel cp = new ContentPanel();
     cp.setHeading("Grid with Numbered Rows and Force Fit");
-    cp.setIcon(Examples.ICONS.table());
+    cp.setIcon(Resources.ICONS.table());
     cp.setLayout(new FitLayout());
     cp.setSize(600, 300);
     cp.add(grid);

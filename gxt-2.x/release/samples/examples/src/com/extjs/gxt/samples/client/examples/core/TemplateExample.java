@@ -22,10 +22,13 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
+import com.google.gwt.user.client.Element;
 
 public class TemplateExample extends LayoutContainer {
 
-  public TemplateExample() {
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
     class Kid extends BaseModelData {
       public Kid(String name, int age) {
         set("name", name);
@@ -92,20 +95,19 @@ public class TemplateExample extends LayoutContainer {
     return ['<p>Name: {name}</p>',
     '<p>Company: {company}</p>',
     '<p>Location: {location}</p>'].join("");
-    }-*/;
+  }-*/;
 
   private native String getTemplate() /*-{
     var html = [
     '<p>Name: {name}</p>',
     '<p>Company: {company}</p>',
     '<p>Location: {location}</p>',
-    '<p>Kids: ',
+    '<p>Kids:</p>',
     '<tpl for="kids" if="name==\'Darrell Meyer\'">',
     '<tpl if="age &gt; 1"><p>{#}. {parent.name}\'s kid - {name}</p></tpl>',
-    '</tpl></p>'
+    '</tpl>'
     ];
     return html.join("");
-
-    }-*/;
+  }-*/;
 
 }

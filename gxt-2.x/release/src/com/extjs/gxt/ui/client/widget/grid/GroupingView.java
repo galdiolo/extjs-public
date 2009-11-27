@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.widget.grid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
@@ -52,6 +53,8 @@ public class GroupingView extends GridView {
   }
 
   protected boolean enableGrouping;
+
+  private int counter = 0;
 
   private GroupingStore<ModelData> groupingStore;
   private boolean showGroupedColumn = true;
@@ -333,7 +336,14 @@ public class GroupingView extends GridView {
   }
 
   protected String getGroupId(String gidPrefix, String groupField, String group) {
-    return gidPrefix + "-gp-" + groupField + "-" + group;
+    String s = gidPrefix + "-gp-" + groupField + "-" + group;
+    String r = map.get(s);
+    if (r == null) {
+      r = gidPrefix + "-gp-" + groupField + "-" + String.valueOf(counter++);
+      map.put(s, r);
+    }
+
+    return r;
   }
 
   @SuppressWarnings("unchecked")
@@ -366,19 +376,11 @@ public class GroupingView extends GridView {
     super.initTemplates();
 
     GridSelectionModel<ModelData> sm = grid.getSelectionModel();
-    if (sm instanceof CellSelectionModel) {
-      sm.addListener(Events.BeforeSelect, new Listener<SelectionEvent<ModelData>>() {
-        public void handleEvent(SelectionEvent<ModelData> be) {
-          onBeforeRowSelect(be);
-        }
-      });
-    } else {
-      sm.addListener(Events.BeforeSelect, new Listener<SelectionEvent<ModelData>>() {
-        public void handleEvent(SelectionEvent<ModelData> be) {
-          onBeforeRowSelect(be);
-        }
-      });
-    }
+    sm.addListener(Events.BeforeSelect, new Listener<SelectionEvent<ModelData>>() {
+      public void handleEvent(SelectionEvent<ModelData> be) {
+        onBeforeRowSelect(be);
+      }
+    });
   }
 
   @Override
@@ -401,14 +403,20 @@ public class GroupingView extends GridView {
     }
   }
 
+  protected Map<String, String> map = new FastMap<String>();
+
   @Override
   protected void onRemove(ListStore<ModelData> ds, ModelData m, int index, boolean isUpdate) {
     super.onRemove(ds, m, index, isUpdate);
     String groupField = getGroupField();
-    Element g = XDOM.getElementById(getGroupId(grid.getId(), groupField, getGroup(m.get(groupField), m, index,
-        cm.findColumnIndex(groupField), ds)));
-    if (g != null && !g.getChildNodes().getItem(1).hasChildNodes()) {
-      fly(g).removeFromParent();
+    if (enableGrouping) {
+      String id = getGroupId(grid.getId(), groupField, getGroup(m.get(groupField), m, index,
+          cm.findColumnIndex(groupField), ds));
+      Element g = XDOM.getElementById(id);
+      if (g != null && !g.getChildNodes().getItem(1).hasChildNodes()) {
+        fly(g).removeFromParent();
+        removeGroupId(id);
+      }
     }
     // appply empty text
   }
@@ -423,13 +431,9 @@ public class GroupingView extends GridView {
 
   @Override
   protected void refreshRow(int row) {
-    if (ds.getCount() == 1) {
-      refresh(false);
-    } else {
-      isUpdating = true;
-      super.refreshRow(row);
-      isUpdating = false;
-    }
+    isUpdating = true;
+    super.refreshRow(row);
+    isUpdating = false;
   }
 
   @Override
@@ -474,6 +478,15 @@ public class GroupingView extends GridView {
     updateGroupWidths();
   }
 
+  protected void toggleGroup(Element g, boolean expanded) {
+    if (grid instanceof EditorGrid<?>) {
+      ((EditorGrid<ModelData>) grid).stopEditing();
+    }
+    state.put(fly(g).getId(), expanded);
+    fly(g).setStyleName("x-grid-group-collapsed", !expanded);
+    calculateVBar(false);
+  }
+
   private Element findGroup(Element el) {
     return fly(el).findParentElement(".x-grid-group", 10);
   }
@@ -497,18 +510,13 @@ public class GroupingView extends GridView {
     groupingStore.groupBy(cm.getDataIndex(colIndex));
   }
 
-  private void toggleGroup(Element g, boolean expanded) {
-    if (grid instanceof EditorGrid) {
-      ((EditorGrid<ModelData>) grid).stopEditing();
+  private void removeGroupId(String id) {
+    for (Entry<String, String> e : map.entrySet()) {
+      if (e.getValue().equals(id)) {
+        map.remove(e.getKey());
+        return;
+      }
     }
-    El gel = fly(g);
-    state.put(gel.getId(), expanded);
-    if (expanded) {
-      gel.removeStyleName("x-grid-group-collapsed");
-    } else {
-      gel.addStyleName("x-grid-group-collapsed");
-    }
-    calculateVBar(false);
   }
 
   private void updateGroupWidths() {

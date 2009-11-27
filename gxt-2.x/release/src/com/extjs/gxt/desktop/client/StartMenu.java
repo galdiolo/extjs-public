@@ -29,10 +29,11 @@ import com.google.gwt.user.client.Event;
  */
 public class StartMenu extends Menu {
 
-  private List<Item> tools = new ArrayList<Item>();;
+  private El header, headerText, menuBWrap, menuPanel, toolsPanel;;
   private String heading;
   private String iconStyle;
-  private El header, headerText, menuBWrap, menuPanel, toolsPanel;
+  private List<Item> tools = new ArrayList<Item>();
+  private int toolWidth = 100;
 
   public StartMenu() {
     addStyleName("ux-start-menu");
@@ -58,6 +59,21 @@ public class StartMenu extends Menu {
     SeparatorMenuItem sep = new SeparatorMenuItem();
     sep.setStyleName("ux-toolmenu-sep");
     addTool(sep);
+  }
+
+  @Override
+  public Component findItem(Element elem) {
+    Component item = super.findItem(elem);
+    if (item == null) {
+      for (Item c : tools) {
+        if (DOM.isOrHasChild(c.getElement(), elem)) {
+          return c;
+        }
+      }
+    } else {
+      return item;
+    }
+    return null;
   }
 
   public El getFocusEl() {
@@ -87,6 +103,10 @@ public class StartMenu extends Menu {
     return menuPanel.firstChild();
   }
 
+  public int getToolWidth() {
+    return toolWidth;
+  }
+
   /**
    * Sets the menu's heading text.
    * 
@@ -108,31 +128,19 @@ public class StartMenu extends Menu {
     this.iconStyle = iconStyle;
   }
 
-  @Override
-  public void show(Element elem, String pos) {
-    super.show(elem, pos);
-    int tPanelWidth = 100;
-    Rectangle box = menuBWrap.getBounds();
-    menuPanel.setWidth(box.width - tPanelWidth, true);
-    menuPanel.setHeight(box.height, true);
-    toolsPanel.setWidth(tPanelWidth, true);
-    toolsPanel.setHeight(box.height, true);
-    toolsPanel.alignTo(menuPanel.dom, "tl-tr", null);
+  public void setToolWidth(int toolWidth) {
+    this.toolWidth = toolWidth;
   }
 
   @Override
-  public Component findItem(Element elem) {
-    Component item = super.findItem(elem);
-    if (item == null) {
-      for (Item c : tools) {
-        if (DOM.isOrHasChild(c.getElement(), elem)) {
-          return c;
-        }
-      }
-    } else {
-      return item;
-    }
-    return null;
+  public void show(Element elem, String pos) {
+    super.show(elem, pos);
+    Rectangle box = menuBWrap.getBounds();
+    menuPanel.setWidth(box.width - toolWidth, true);
+    menuPanel.setHeight(box.height, true);
+    toolsPanel.setWidth(toolWidth, true);
+    toolsPanel.setHeight(box.height, true);
+    toolsPanel.alignTo(menuPanel.dom, "tl-tr", null);
   }
 
   @Override

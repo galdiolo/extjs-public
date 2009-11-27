@@ -32,4 +32,9 @@ public class Move extends BaseEffect {
     el.setXY(x, y);
   }
 
+  @Override
+  public void onComplete() {
+    super.onComplete();
+    el.setXY(toX, toY);
+  }
 }

@@ -24,6 +24,10 @@ public class Template {
 
   static {
     GXT.init();
+    Ext.loadExt();
+    Ext.loadFormat();
+    Ext.loadDomHelper();
+    Ext.loadTemplate();
   }
 
   private native static Element appendInternal(JavaScriptObject t, Element el,
