@@ -1,19 +1,18 @@
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
+/*!
+ * Ext JS Library 3.1.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
  * licensing@extjs.com
- * 
- * http://extjs.com/license
+ * http://www.extjs.com/license
  */
-
 Ext.onReady(function(){
 
     // NOTE: This is an example showing simple state management. During development,
     // it is generally best to disable state management as dynamically-generated ids
     // can change across page loads, leading to unpredictable results.  The developer
-    // should ensure that stable state ids are set for stateful components in real apps.
+    // should ensure that stable state ids are set for stateful components in real apps.    
     Ext.state.Manager.setProvider(new Ext.state.CookieProvider());
 
+    // sample static data for the store
     var myData = [
         ['3m Co',71.72,0.02,0.03,'9/1 12:00am'],
         ['Alcoa Inc',29.01,0.42,1.47,'9/1 12:00am'],
@@ -42,11 +41,14 @@ Ext.onReady(function(){
         ['The Home Depot, Inc.',34.64,0.35,1.02,'9/1 12:00am'],
         ['The Procter & Gamble Company',61.91,0.01,0.02,'9/1 12:00am'],
         ['United Technologies Corporation',63.26,0.55,0.88,'9/1 12:00am'],
-        ['Verizon Communications',35.57,0.39,1.11,'9/1 12:00am'],
+        ['Verizon Communications',35.57,0.39,1.11,'9/1 12:00am'],            
         ['Wal-Mart Stores, Inc.',45.45,0.73,1.63,'9/1 12:00am']
     ];
 
-    // example of custom renderer function
+    /**
+     * Custom function used for column renderer
+     * @param {Object} val
+     */
     function change(val){
         if(val > 0){
             return '<span style="color:green;">' + val + '</span>';
@@ -56,7 +58,10 @@ Ext.onReady(function(){
         return val;
     }
 
-    // example of custom renderer function
+    /**
+     * Custom function used for column renderer
+     * @param {Object} val
+     */
     function pctChange(val){
         if(val > 0){
             return '<span style="color:green;">' + val + '%</span>';
@@ -67,7 +72,7 @@ Ext.onReady(function(){
     }
 
     // create the data store
-    var store = new Ext.data.SimpleStore({
+    var store = new Ext.data.ArrayStore({
         fields: [
            {name: 'company'},
            {name: 'price', type: 'float'},
@@ -76,24 +81,30 @@ Ext.onReady(function(){
            {name: 'lastChange', type: 'date', dateFormat: 'n/j h:ia'}
         ]
     });
+
+    // manually load local data
     store.loadData(myData);
 
     // create the Grid
     var grid = new Ext.grid.GridPanel({
         store: store,
         columns: [
-            {id:'company',header: "Company", width: 160, sortable: true, dataIndex: 'company'},
-            {header: "Price", width: 75, sortable: true, renderer: 'usMoney', dataIndex: 'price'},
-            {header: "Change", width: 75, sortable: true, renderer: change, dataIndex: 'change'},
-            {header: "% Change", width: 75, sortable: true, renderer: pctChange, dataIndex: 'pctChange'},
-            {header: "Last Updated", width: 85, sortable: true, renderer: Ext.util.Format.dateRenderer('m/d/Y'), dataIndex: 'lastChange'}
+            {id:'company',header: 'Company', width: 160, sortable: true, dataIndex: 'company'},
+            {header: 'Price', width: 75, sortable: true, renderer: 'usMoney', dataIndex: 'price'},
+            {header: 'Change', width: 75, sortable: true, renderer: change, dataIndex: 'change'},
+            {header: '% Change', width: 75, sortable: true, renderer: pctChange, dataIndex: 'pctChange'},
+            {header: 'Last Updated', width: 85, sortable: true, renderer: Ext.util.Format.dateRenderer('m/d/Y'), dataIndex: 'lastChange'}
         ],
         stripeRows: true,
         autoExpandColumn: 'company',
-        height:350,
-        width:600,
-        title:'Array Grid'
+        height: 350,
+        width: 600,
+        title: 'Array Grid',
+        // config options for stateful behavior
+        stateful: true,
+        stateId: 'grid'        
     });
-
+    
+    // render the grid to the specified div in the page
     grid.render('grid-example');
 });
