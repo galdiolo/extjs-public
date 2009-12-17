@@ -1,5 +1,8 @@
 #!/bin/sh
-#find . -name *.html -exec svn propset svn:mime-type text/html {} +
+svn stat | grep ^\? | sed -e "s/^\? \+//" | xargs svn add
+svn stat | grep ^\! | sed -e "s/^\! \+//" | xargs svn delete
+
+find . -name *.html -exec svn propset svn:mime-type text/html {} +
 find . -name *.htm -exec svn propset svn:mime-type text/html {} +
 find . -name *.png -exec svn propset svn:mime-type image/png {} +
 find . -name *.gif -exec svn propset svn:mime-type image/gif {} +
