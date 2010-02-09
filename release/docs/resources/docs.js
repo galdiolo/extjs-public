@@ -40,24 +40,89 @@ ApiPanel = function() {
 };
 
 Ext.extend(ApiPanel, Ext.tree.TreePanel, {
+    initComponent: function(){
+        this.hiddenPkgs = [];
+        Ext.apply(this, {
+            tbar:[ ' ',
+			new Ext.form.TextField({
+				width: 200,
+				emptyText:'Find a Class',
+                enableKeyEvents: true,
+				listeners:{
+					render: function(f){
+                    	this.filter = new Ext.tree.TreeFilter(this, {
+                    		clearBlank: true,
+                    		autoClear: true
+                    	});
+					},
+                    keydown: {
+                        fn: this.filterTree,
+                        buffer: 350,
+                        scope: this
+                    },
+                    scope: this
+				}
+			}), ' ', ' ',
+			{
+                iconCls: 'icon-expand-all',
+				tooltip: 'Expand All',
+                handler: function(){ this.root.expand(true); },
+                scope: this
+            }, '-', {
+                iconCls: 'icon-collapse-all',
+                tooltip: 'Collapse All',
+                handler: function(){ this.root.collapse(true); },
+                scope: this
+            }]
+        })
+        ApiPanel.superclass.initComponent.call(this);
+    },
+	filterTree: function(t, e){
+		var text = t.getValue();
+		Ext.each(this.hiddenPkgs, function(n){
+			n.ui.show();
+		});
+		if(!text){
+			this.filter.clear();
+			return;
+		}
+		this.expandAll();
+
+		var re = new RegExp('^' + Ext.escapeRe(text), 'i');
+		this.filter.filterBy(function(n){
+			return !n.attributes.isClass || re.test(n.text);
+		});
+
+		// hide empty packages that weren't filtered
+		this.hiddenPkgs = [];
+		this.root.cascade(function(n){
+			if(!n.attributes.isClass && n.ui.ctNode.offsetHeight < 3){
+				n.ui.hide();
+				this.hiddenPkgs.push(n);
+			}
+		});
+	},
     selectClass : function(cls){
         if(cls){
             var parts = cls.split('.');
             var last = parts.length-1;
+            var res = [];
+            var pkg = [];
             for(var i = 0; i < last; i++){ // things get nasty - static classes can have .
                 var p = parts[i];
                 var fc = p.charAt(0);
                 var staticCls = fc.toUpperCase() == fc;
                 if(p == 'Ext' || !staticCls){
-                    parts[i] = 'pkg-'+p;
+                    pkg.push(p);
+                    res[i] = 'pkg-'+pkg.join('.');
                 }else if(staticCls){
                     --last;
-                    parts.splice(i, 1);
+                    res.splice(i, 1);
                 }
             }
-            parts[last] = cls;
+            res[last] = cls;
 
-            this.selectPath('/root/apidocs/'+parts.join('/'));
+            this.selectPath('/root/apidocs/'+res.join('/'));
         }
     }
 });
@@ -70,15 +135,62 @@ DocPanel = Ext.extend(Ext.Panel, {
     initComponent : function(){
         var ps = this.cclass.split('.');
         this.title = ps[ps.length-1];
-
+        Ext.apply(this,{
+            tbar: ['->',{
+                text: 'Config Options',
+                handler: this.scrollToMember.createDelegate(this, ['configs']),
+                iconCls: 'icon-config'
+            },'-',{
+                text: 'Properties',
+                handler: this.scrollToMember.createDelegate(this, ['props']),
+                iconCls: 'icon-prop'
+            }, '-',{
+                text: 'Methods',
+                handler: this.scrollToMember.createDelegate(this, ['methods']),
+                iconCls: 'icon-method'
+            }, '-',{
+                text: 'Events',
+                handler: this.scrollToMember.createDelegate(this, ['events']),
+                iconCls: 'icon-event'
+            }, '-',{
+                text: 'Direct Link',
+                handler: this.directLink,
+                scope: this,
+                iconCls: 'icon-fav'
+            }, '-',{
+                tooltip:'Hide Inherited Members',
+                iconCls: 'icon-hide-inherited',
+                enableToggle: true,
+                scope: this,
+                toggleHandler : function(b, pressed){
+                     this.body[pressed ? 'addClass' : 'removeClass']('hide-inherited');
+                }
+            }, '-', {
+                tooltip:'Expand All Members',
+                iconCls: 'icon-expand-members',
+                enableToggle: true,
+                scope: this,
+                toggleHandler : function(b, pressed){
+                    this.body[pressed ? 'addClass' : 'removeClass']('full-details');
+                }
+            }]
+        });
         DocPanel.superclass.initComponent.call(this);
+    },
+
+    directLink : function(){
+        var link = String.format(
+            "<a href=\"{0}\" target=\"_blank\">{0}</a>",
+            document.location.href+'?class='+this.cclass
+        );
+        Ext.Msg.alert('Direct Link to ' + this.cclass,link);
     },
 
     scrollToMember : function(member){
         var el = Ext.fly(this.cclass + '-' + member);
         if(el){
             var top = (el.getOffsetsTo(this.body)[1]) + this.body.dom.scrollTop;
-            this.body.scrollTo('top', top-25, {duration:.75, callback: this.hlMember.createDelegate(this, [member])});
+            this.body.scrollTo('top', top-25, {duration:0.75, callback: this.hlMember.createDelegate(this, [member])});
         }
     },
 
@@ -86,8 +198,8 @@ DocPanel = Ext.extend(Ext.Panel, {
 		var el = Ext.getDom(id);
 		if(el){
 			var top = (Ext.fly(el).getOffsetsTo(this.body)[1]) + this.body.dom.scrollTop;
-			this.body.scrollTo('top', top-25, {duration:.5, callback: function(){
-                Ext.fly(el).next('h2').pause(.2).highlight('#8DB2E3', {attr:'color'});
+			this.body.scrollTo('top', top-25, {duration:0.5, callback: function(){
+                Ext.fly(el).next('h2').pause(0.2).highlight('#8DB2E3', {attr:'color'});
             }});
         }
 	},
@@ -95,21 +207,23 @@ DocPanel = Ext.extend(Ext.Panel, {
     hlMember : function(member){
         var el = Ext.fly(this.cclass + '-' + member);
         if(el){
-            el.up('tr').highlight('#cadaf9');
+            if (tr = el.up('tr')) {
+                tr.highlight('#cadaf9');
+            }
         }
     }
 });
 
 
 MainPanel = function(){
-	
+
 	this.searchStore = new Ext.data.Store({
         proxy: new Ext.data.ScriptTagProxy({
             url: 'http://extjs.com/playpen/api.php'
         }),
         reader: new Ext.data.JsonReader({
 	            root: 'data'
-	        }, 
+	        },
 			['cls', 'member', 'type', 'doc']
 		),
 		baseParams: {},
@@ -118,8 +232,8 @@ MainPanel = function(){
                 this.baseParams.qt = Ext.getCmp('search-type').getValue();
             }
         }
-    }); 
-	
+    });
+
     MainPanel.superclass.constructor.call(this, {
         id:'doc-body',
         region:'center',
@@ -213,20 +327,20 @@ Ext.extend(MainPanel, Ext.TabPanel, {
             this.setActiveTab(p);
         }
     },
-	
+
 	initSearch : function(){
 		// Custom rendering Template for the View
 	    var resultTpl = new Ext.XTemplate(
 	        '<tpl for=".">',
 	        '<div class="search-item">',
 	            '<a class="member" ext:cls="{cls}" ext:member="{member}" href="output/{cls}.html">',
-				'<img src="../resources/images/default/s.gif" class="item-icon icon-{type}"/>{member}',
+				'<img src="resources/images/default/s.gif" class="item-icon icon-{type}"/>{member}',
 				'</a> ',
 				'<a class="cls" ext:cls="{cls}" href="output/{cls}.html">{cls}</a>',
 	            '<p>{doc}</p>',
 	        '</div></tpl>'
 	    );
-		
+
 		var p = new Ext.DataView({
             applyTo: 'search',
 			tpl: resultTpl,
@@ -236,7 +350,7 @@ Ext.extend(MainPanel, Ext.TabPanel, {
 			emptyText: '<h3>Use the search field above to search the Ext API for classes, properties, config options, methods and events.</h3>'
         });
 	},
-	
+
 	doSearch : function(e){
 		var k = e.getKey();
 		if(!e.isSpecialKey()){
@@ -250,183 +364,6 @@ Ext.extend(MainPanel, Ext.TabPanel, {
 			}
 		}
 	}
-});
-
-
-Ext.onReady(function(){
-
-    Ext.QuickTips.init();
-
-    var api = new ApiPanel();
-    var mainPanel = new MainPanel();
-
-    api.on('click', function(node, e){
-         if(node.isLeaf()){
-            e.stopEvent();
-            mainPanel.loadClass(node.attributes.href, node.id);
-         }
-    });
-
-    mainPanel.on('tabchange', function(tp, tab){
-        api.selectClass(tab.cclass); 
-    });
-
-    var hd = new Ext.Panel({
-        border: false,
-        layout:'anchor',
-        region:'north',
-        cls: 'docs-header',
-        height:60,
-        items: [{
-            xtype:'box',
-            el:'header',
-            border:false,
-            anchor: 'none -25'
-        },
-        new Ext.Toolbar({
-            cls:'top-toolbar',
-            items:[ ' ',
-			new Ext.form.TextField({
-				width: 200,
-				emptyText:'Find a Class',
-				listeners:{
-					render: function(f){
-						f.el.on('keydown', filterTree, f, {buffer: 350});
-					}
-				}
-			}), ' ', ' ',
-			{
-                iconCls: 'icon-expand-all',
-				tooltip: 'Expand All',
-                handler: function(){ api.root.expand(true); }
-            }, '-', {
-                iconCls: 'icon-collapse-all',
-                tooltip: 'Collapse All',
-                handler: function(){ api.root.collapse(true); }
-            }, '->', {
-                tooltip:'Hide Inherited Members',
-                iconCls: 'icon-hide-inherited',
-                enableToggle: true,
-                toggleHandler : function(b, pressed){
-                     mainPanel[pressed ? 'addClass' : 'removeClass']('hide-inherited');
-                }
-            }, '-', {
-                tooltip:'Expand All Members',
-                iconCls: 'icon-expand-members',
-                enableToggle: true,
-                toggleHandler : function(b, pressed){
-                    mainPanel[pressed ? 'addClass' : 'removeClass']('full-details');
-                }
-            }]
-        })]
-    })
-
-    var viewport = new Ext.Viewport({
-        layout:'border',
-        items:[ hd, api, mainPanel ]
-    });
-
-    api.expandPath('/root/apidocs');
-
-    // allow for link in
-    var page = window.location.href.split('?')[1];
-    if(page){
-        var ps = Ext.urlDecode(page);
-        var cls = ps['class'];
-        mainPanel.loadClass('output/' + cls + '.html', cls, ps.member);
-    }
-    
-    viewport.doLayout();
-	
-	setTimeout(function(){
-        Ext.get('loading').remove();
-        Ext.get('loading-mask').fadeOut({remove:true});
-    }, 250);
-	
-	var filter = new Ext.tree.TreeFilter(api, {
-		clearBlank: true,
-		autoClear: true
-	});
-	var hiddenPkgs = [];
-	function filterTree(e){
-		var text = e.target.value;
-		Ext.each(hiddenPkgs, function(n){
-			n.ui.show();
-		});
-		if(!text){
-			filter.clear();
-			return;
-		}
-		api.expandAll();
-		
-		var re = new RegExp('^' + Ext.escapeRe(text), 'i');
-		filter.filterBy(function(n){
-			return !n.attributes.isClass || re.test(n.text);
-		});
-		
-		// hide empty packages that weren't filtered
-		hiddenPkgs = [];
-		api.root.cascade(function(n){
-			if(!n.attributes.isClass && n.ui.ctNode.offsetHeight < 3){
-				n.ui.hide();
-				hiddenPkgs.push(n);
-			}
-		});
-	}
-	
-});
-
-
-Ext.app.SearchField = Ext.extend(Ext.form.TwinTriggerField, {
-    initComponent : function(){
-        if(!this.store.baseParams){
-			this.store.baseParams = {};
-		}
-		Ext.app.SearchField.superclass.initComponent.call(this);
-		this.on('specialkey', function(f, e){
-            if(e.getKey() == e.ENTER){
-                this.onTrigger2Click();
-            }
-        }, this);
-    },
-
-    validationEvent:false,
-    validateOnBlur:false,
-    trigger1Class:'x-form-clear-trigger',
-    trigger2Class:'x-form-search-trigger',
-    hideTrigger1:true,
-    width:180,
-    hasSearch : false,
-    paramName : 'query',
-
-    onTrigger1Click : function(){
-        if(this.hasSearch){
-            this.store.baseParams[this.paramName] = '';
-			this.store.removeAll();
-			this.el.dom.value = '';
-            this.triggers[0].hide();
-            this.hasSearch = false;
-			this.focus();
-        }
-    },
-
-    onTrigger2Click : function(){
-        var v = this.getRawValue();
-        if(v.length < 1){
-            this.onTrigger1Click();
-            return;
-        }
-		if(v.length < 2){
-			Ext.Msg.alert('Invalid Search', 'You must enter a minimum of 2 characters to search the API');
-			return;
-		}
-		this.store.baseParams[this.paramName] = v;
-        var o = {start: 0};
-        this.store.reload({params:o});
-        this.hasSearch = true;
-        this.triggers[0].show();
-		this.focus();
-    }
 });
 
 
@@ -621,6 +558,111 @@ Ext.extend(Ext.ux.SelectBox, Ext.form.ComboBox, {
 	}
 
 });
+
+Ext.onReady(function(){
+
+    Ext.QuickTips.init();
+
+    var api = new ApiPanel();
+    var mainPanel = new MainPanel();
+
+    api.on('click', function(node, e){
+         if(node.isLeaf()){
+            e.stopEvent();
+            mainPanel.loadClass(node.attributes.href, node.id);
+         }
+    });
+
+    mainPanel.on('tabchange', function(tp, tab){
+        api.selectClass(tab.cclass);
+    });
+
+    var viewport = new Ext.Viewport({
+        layout:'border',
+        items:[ {
+            cls: 'docs-header',
+            height: 36,
+            region:'north',
+            xtype:'box',
+            el:'header',
+            border:false,
+            margins: '0 0 5 0'
+        }, api, mainPanel ]
+    });
+
+    api.expandPath('/root/apidocs');
+
+    // allow for link in
+    var page = window.location.href.split('?')[1];
+    if(page){
+        var ps = Ext.urlDecode(page);
+        var cls = ps['class'];
+        mainPanel.loadClass('output/' + cls + '.html', cls, ps.member);
+    }
+
+    viewport.doLayout();
+
+	setTimeout(function(){
+        Ext.get('loading').remove();
+        Ext.get('loading-mask').fadeOut({remove:true});
+    }, 250);
+
+});
+
+
+Ext.app.SearchField = Ext.extend(Ext.form.TwinTriggerField, {
+    initComponent : function(){
+        if(!this.store.baseParams){
+			this.store.baseParams = {};
+		}
+		Ext.app.SearchField.superclass.initComponent.call(this);
+		this.on('specialkey', function(f, e){
+            if(e.getKey() == e.ENTER){
+                this.onTrigger2Click();
+            }
+        }, this);
+    },
+
+    validationEvent:false,
+    validateOnBlur:false,
+    trigger1Class:'x-form-clear-trigger',
+    trigger2Class:'x-form-search-trigger',
+    hideTrigger1:true,
+    width:180,
+    hasSearch : false,
+    paramName : 'query',
+
+    onTrigger1Click : function(){
+        if(this.hasSearch){
+            this.store.baseParams[this.paramName] = '';
+			this.store.removeAll();
+			this.el.dom.value = '';
+            this.triggers[0].hide();
+            this.hasSearch = false;
+			this.focus();
+        }
+    },
+
+    onTrigger2Click : function(){
+        var v = this.getRawValue();
+        if(v.length < 1){
+            this.onTrigger1Click();
+            return;
+        }
+		if(v.length < 2){
+			Ext.Msg.alert('Invalid Search', 'You must enter a minimum of 2 characters to search the API');
+			return;
+		}
+		this.store.baseParams[this.paramName] = v;
+        var o = {start: 0};
+        this.store.reload({params:o});
+        this.hasSearch = true;
+        this.triggers[0].show();
+		this.focus();
+    }
+});
+
+
 
 Ext.Ajax.on('requestcomplete', function(ajax, xhr, o){
     if(typeof urchinTracker == 'function' && o && o.url){
