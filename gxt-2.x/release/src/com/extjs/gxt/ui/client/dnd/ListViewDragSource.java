@@ -12,7 +12,10 @@ import java.util.List;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.dnd.DND.Operation;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.DNDEvent;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.widget.ListView;
 import com.google.gwt.user.client.Element;
@@ -36,6 +39,12 @@ public class ListViewDragSource extends DragSource {
     super(listView);
     this.listView = listView;
     setStatusText("{0} items selected");
+    
+    listView.addListener(Events.OnMouseDown, new Listener<ComponentEvent>() {
+      public void handleEvent(ComponentEvent be) {
+        ListViewDragSource.this.listView.focus();
+      }
+    });
   }
 
   /**

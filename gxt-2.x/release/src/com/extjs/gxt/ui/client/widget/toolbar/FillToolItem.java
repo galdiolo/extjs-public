@@ -16,6 +16,13 @@ import com.google.gwt.user.client.Element;
  */
 public class FillToolItem extends Component {
 
+  /**
+   * Creates a new fill item.
+   */
+  public FillToolItem() {
+    setAriaIgnore(true);
+  }
+  
   @Override
   protected void onRender(Element target, int index) {
     setElement(DOM.createDiv(), target, index);

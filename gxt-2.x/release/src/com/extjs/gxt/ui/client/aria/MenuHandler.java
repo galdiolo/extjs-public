@@ -21,6 +21,7 @@ public class MenuHandler extends FocusHandler {
   
   @Override
   public void onTab(Component component, PreviewEvent pe) {
+    if (!isManaged()) return;
     Menu menu = (Menu)component;
     if (menu.isVisible()) {
       Button btn = menu.getData("parent");

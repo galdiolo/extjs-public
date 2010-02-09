@@ -9,13 +9,9 @@ package com.extjs.gxt.ui.client.core;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
-import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.util.Size;
-import com.extjs.gxt.ui.client.widget.Html;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.ui.RootPanel;
 
 /**
  * Provides additional static methods that allow you to manipulate the browser's
@@ -26,7 +22,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 public final class XDOM {
 
   private static El bodyEl;
-  private static int scrollBarHeight = Style.DEFAULT;
+  private static int scrollBarWidth = Style.DEFAULT;
   private static int autoId = 0;
   private static int zIndexId = 1000;
   private static String autoIdPrefix = "x-auto";
@@ -105,11 +101,21 @@ public final class XDOM {
     }
   }-*/;
 
+  /**
+   * Returns the document's height.
+   * 
+   * @return the document height
+   */
   public static native int getDocumentHeight()/*-{
     var scrollHeight = ($doc.compatMode != "CSS1Compat") ? $doc.body.scrollHeight : $doc.documentElement.scrollHeight;
     return Math.max(scrollHeight, @com.extjs.gxt.ui.client.core.XDOM::getViewportHeight()());
   }-*/;
 
+  /**
+   * Returns the document width.
+   * 
+   * @return the document width
+   */
   public static native int getDocumentWidth()/*-{
     var scrollWidth = ($doc.compatMode != "CSS1Compat") ? $doc.body.scrollWidth : $doc.documentElement.scrollWidth;
     return Math.max(scrollWidth, @com.extjs.gxt.ui.client.core.XDOM::getViewportWidth()());
@@ -127,7 +133,7 @@ public final class XDOM {
   /**
    * Returns the document element.
    * 
-   * @return the docuemnt
+   * @return the document
    */
   public static native Element getDocument() /*-{
     return $doc;
@@ -149,14 +155,15 @@ public final class XDOM {
    * @return the scroll bar width
    */
   public static int getScrollBarWidth() {
-    if (scrollBarHeight == Style.DEFAULT) {
-      scrollBarHeight = getScrollBarWidthInternal();
+    if (scrollBarWidth == Style.DEFAULT) {
+      scrollBarWidth = getScrollBarWidthInternal();
     }
-    return scrollBarHeight;
+    return scrollBarWidth;
   }
 
   /**
-   * Increments and returns the top z-index value.
+   * Increments and returns the top z-index value. Use this value to ensure the
+   * z-index is the highest value of all elements in the DOM.
    * 
    * @return the z-index
    */
@@ -164,6 +171,13 @@ public final class XDOM {
     return ++zIndexId;
   }
 
+  /**
+   * Increments and returns the top z-index value. Use this value to ensure the
+   * z-index is the highest value of all elements in the DOM.
+   * 
+   * @param i the increment amount
+   * @return the z-index
+   */
   public static int getTopZIndex(int i) {
     zIndexId += i + 1;
     return zIndexId;
@@ -178,10 +192,21 @@ public final class XDOM {
     return autoIdPrefix + "-" + autoId++;
   }
 
+  /**
+   * Returns the view height.
+   * 
+   * @param full true to return the document height, false for viewport height
+   * @return the view height
+   */
   public static int getViewHeight(boolean full) {
     return full ? getDocumentHeight() : getViewportHeight();
   }
 
+  /**
+   * Returns the viewport height.
+   * 
+   * @return the viewport height
+   */
   public static native int getViewportHeight()/*-{
     if(@com.extjs.gxt.ui.client.GXT::isIE){
         return @com.extjs.gxt.ui.client.GXT::isStrict ? $doc.documentElement.clientHeight :
@@ -191,6 +216,11 @@ public final class XDOM {
     }
   }-*/;
 
+  /**
+   * Returns the viewport width.
+   * 
+   * @return the viewport width
+   */
   public static native int getViewportWidth() /*-{
     if(@com.extjs.gxt.ui.client.GXT::isIE){
         return @com.extjs.gxt.ui.client.GXT::isStrict ? $doc.documentElement.clientWidth :
@@ -200,6 +230,12 @@ public final class XDOM {
     }
   }-*/;
 
+  /**
+   * Returns the view width.
+   * 
+   * @param full true to return the document width, false for viewport width
+   * @return the view width
+   */
   public static int getViewWidth(boolean full) {
     return full ? getDocumentWidth() : getViewportWidth();
   }
@@ -207,7 +243,7 @@ public final class XDOM {
   /**
    * Returns the viewports size.
    * 
-   * @return the size
+   * @return the viewport size
    */
   public static Size getViewportSize() {
     return new Size(getViewportWidth(), getViewportHeight());
@@ -230,31 +266,35 @@ public final class XDOM {
     XDOM.autoIdPrefix = autoIdPrefix;
   }
 
-  private static int getScrollBarWidthInternal() {
-    LayoutContainer wc = new LayoutContainer();
-    RootPanel.get().add(wc);
-    wc.el().setVisibility(false);
-    wc.setScrollMode(Scroll.AUTO);
-    wc.setSize(300, 300);
-
-    Html html = new Html("test");
-    html.setHeight("284");
-    html.setWidth("500");
-
-    wc.add(html);
-
-    int height = 17;
-
-    for (int i = 280; i < 300; i++) {
-      html.setHeight("" + i);
-      wc.setVScrollPosition(20);
-      if (wc.getVScrollPosition() == 1) {
-        height = 300 - i + 1;
-      }
+  private native static int getScrollBarWidthInternal() /*-{
+    var scr = null;
+    var inn = null;
+    var wNoScroll = 0;
+    var wScroll = 0;
+    scr = $doc.createElement('div');
+    scr.style.position = 'absolute';
+    scr.style.top = '-1000px';
+    scr.style.left = '-1000px';
+    scr.style.width = '100px';
+    scr.style.height = '50px';
+    scr.style.overflow = 'hidden';
+    inn = $doc.createElement('div');
+    inn.style.height = '200px';
+    scr.appendChild(inn);
+    $doc.body.appendChild(scr);
+    wNoScroll = inn.offsetWidth;
+    scr.style.overflow = 'auto';
+    if (inn.clientWidth != 'undefined') {
+    wScroll = inn.clientWidth;
+    } else {
+    wScroll = inn.offsetWidth;
     }
-    RootPanel.get().remove(wc);
-    return height;
-  }
+
+    $doc.body.removeChild(
+    $doc.body.lastChild);
+
+    return (wNoScroll - wScroll);
+  }-*/;
 
   private XDOM() {
 

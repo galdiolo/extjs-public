@@ -33,6 +33,7 @@ code {
 <body>
 <h1>Ext GWT Library Release Notes</h1>
 <ul>
+  <li><a href="#Release_2.1.1">Release 2.1.1 (2/2/2010)</a></li>
   <li><a href="#Release_2.1">Release 2.1 (11/25/2009)</a></li>
   <li><a href="#Release_2.0.4">Release 2.0.4 (10/20/2009)</a></li>
   <li><a href="#Release_2.0.3">Release 2.0.3 (10/19/2009)</a></li>
@@ -54,6 +55,91 @@ code {
   <li><a href="#Release_1.1">Release 1.1</a></li>
   <li><a href="#Release_1.0">Release 1.0</a></li>
 </ul>
+
+<h2><a name="Release_2.1.1">Release 2.1.1 (Released February 2nd 2010)</a></h2>
+
+<h2>General Changes &amp; Enhancements</h2>
+<ul>
+  <li>Added CustomFormExample to examples.</li>
+  <li>Added CheckGroupingGridExample.</li>
+  <li>Added selection model combo to check box grid plugins and check grouping grid examples.</li>
+  <li>Added FilterTreeGridExample.</li>
+  <li>Added keyboard support to IconButton.</li>
+  <li>Added support for cell style to AggregationRowConfig.</li>
+</ul>
+
+<h2>API Changes</h2>
+<ul>
+	<li>Added RowExpanderEvent type.</li>
+	<li>Added expandRow and collapseRow to RowExpander.</li>
+	<li>Added getPlugins to Component.</li>
+	<li>Added getGroups to GroupingView.</li>
+	<li>Added expandOnFilter config to TreeGrid.</li>
+	<li>Added isDisableTextSelection to Component.</li>
+	<li>Added getTools and indexOf to IconButton.</li>
+	<li>Added getScroller to GridView.</li>
+	<li>Added adjustForHScroll to GridView.</li>
+	<li>LiveGridView protected isChached changed to isCached.</li>
+	<li>Added enableQuickTips config to ListView.</li>
+	<li>Added getQuickTip to ListView.</li>
+	<li>Changed ComboBox selectByValue visibility to protected.</li>
+	<li>Added get / set tabIndex to Component.</li>
+	<li>Added updateOriginalValue config to FieldBinding and FormBinding.</li>
+</ul>
+
+<h2>Bug Fixes</h2>
+<ul>
+  <li>Fixed CheckBoxSelectionModel not working with multi-selection under all circumstances.</li>
+  <li>Cannot put cursor into TextField embedded in Grid cell.</li>
+  <li>Grid disables text selection in cells which causes problems when inserting TextField. Text selection can now be enabled by using Grid.disableTextSelection(false).</li>
+  <li>Added SelectionMode.SIMPLE support to grid selection models.</li>
+  <li>TreeGrid filtering not working.</li>
+  <li>Removed extra padding for Gecko TextArea.</li>
+  <li>TreeStore onLoad not updating sortInfo based on load config</li>
+  <li>IE6 disabled fields label text blurred.</li>
+  <li>Sort state not restored if sort column initially hidden.</li>
+  <li>Buttons not showing focus in Safari and Chrome.</li>
+  <li>Improved performance of Grid and TreeGrid remove.</li>
+  <li>MultiField not showing input elements in some cases with IE.</li>
+  <li>TreePanel showing extra vertical space when last empty child expanded.</li>
+  <li>CheckBox not showing focus in Mac Safari.</li>
+  <li>WidgetComponent call to widget.removeFromParent throwing IllegalException when widget not a Component.</li>
+  <li>AutoHeightGridExample showing vertical scroll bar on first insert in webkit.</li>
+  <li>[89252]Issue with ToolBarLayout which is resized while not visible.</li>
+  <li>[89231] Fixed bug when selected model in a combo box's display property is updated.</li>
+  <li>[89230] PagingToolBar not updating page size before load request.</li>
+  <li>TriggerField not creating password input when password set to true.</li>
+  <li>Events DragFail null.</li>
+  <li>TreePanelDragSource, ListViewDragSource stopping focus of TreePanel on mouse down.</li>
+  <li>[90060] getSelectedItem returning null when last selected item is deselected with other selections (multi-select).</li>
+  <li>[89736] TreeGrid onDoubleClick should be calling toggle rather than implementing logic.</li>
+  <li>[87617] Calling reset on FileUploadField disables the browser button.</li>
+  <li>[89488] ListView fireing selection changed event twice with multi-select.</li>
+  <li>[89740] Reordering root nodes in TreePanel throwing exceptions.</li>
+  <li>[89715] Using the layout constructor (public Portlet(Layout layout)) does not add style name "x-portlet".</li>
+  <li>[87137] BorderLayoutData size of "1" not treated as percentage.</li>
+  <li>[89096] CheckBoxListView missing TD in markup.</li>
+  <li>[88629] ColumnFooter not public.</li>
+  <li>[88441] LiveGridView protected isChached changed to isCached.</li>
+  <li>[90119] TreePanelDragSource breaks keyboard navigation.</li>
+  <li>[88140] IE8: Debug window appear after a drag and drop out of the dropbox.</li>
+  <li>[88045] SplitButton showing Blue theme divider in Slate theme.</li>
+  <li>[87365] GridSelectionModel firing Select TWICE with SelectionMode= Multi.</li>
+  <li>[86732] WidgetComponent Bug when widget being wrapped belonged to a previous parent.</li>
+  <li>[86546] Type is grid css - ..x-grid3-invalid-cell</li>
+  <li>[86445] TabPanel key navigation - home and end keys catching when tab not focused.</li>
+  <li>[90199] Event.OnPaste javadocs stating DOM OMMOUSEWHEEL.</li>
+  <li>[s1913] MessageBox not using defaultTextHeightConfig. </li>
+  <li>[s1883] TreeGrid expanding nodes still making data request with autoLoad enabled.</li>
+  <li>[81712] Added FormPanel clearDirtyFields method.</li>
+  <li>[s1922] Added updateOriginalValue config to FieldBinding and FormBinding.</li>
+  <li>[s1874] Portal right column jumps during DND if browser scroll bar width &gt; 19 pixels.</li>
+  <li>[s1909] Fixed an issue in BeanModelGenerator when looking up the BeanModelFactory.</li>
+  <li>[90886] Fixed bug in BaseTreeMOdel using nested property 'gxt.parent'.</li>
+  <li>[90837] DomHelper overwrite contains misspelling in JSNI code.</li>
+  <li>[90638] Window drag proxy not updating header text if window header changed after first drag.</li>
+</ul>
+
 
 <h2><a name="Release_2.1">Release 2.1 (Released November 25 2009)</a></h2>
 

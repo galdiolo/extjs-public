@@ -264,7 +264,7 @@ public class BorderLayout extends Layout {
         }
         Rectangle b = new Rectangle();
         Margins m = data.getMargins();
-        float s = data.getSize() < 1 ? data.getSize() * size.height : data.getSize();
+        float s = data.getSize() <= 1 ? data.getSize() * size.height : data.getSize();
         b.height = (int) s;
         b.width = w - (m.left + m.right);
         b.x = m.left;
@@ -293,7 +293,7 @@ public class BorderLayout extends Layout {
         }
         Rectangle b = south.getBounds(false);
         Margins m = data.getMargins();
-        float s = data.getSize() < 1 ? data.getSize() * size.height : data.getSize();
+        float s = data.getSize() <= 1 ? data.getSize() * size.height : data.getSize();
         b.height = (int) s;
         b.width = w - (m.left + m.right);
         b.x = m.left;
@@ -324,7 +324,7 @@ public class BorderLayout extends Layout {
 
         Rectangle box = new Rectangle();
         Margins m = data.getMargins();
-        float s = data.getSize() < 1 ? data.getSize() * size.width : data.getSize();
+        float s = data.getSize() <= 1 ? data.getSize() * size.width : data.getSize();
         box.width = (int) s;
         box.height = centerH - (m.top + m.bottom);
         box.x = m.left;
@@ -356,7 +356,7 @@ public class BorderLayout extends Layout {
         }
         Rectangle b = east.getBounds(false);
         Margins m = data.getMargins();
-        float s = data.getSize() < 1 ? data.getSize() * size.width : data.getSize();
+        float s = data.getSize() <= 1 ? data.getSize() * size.width : data.getSize();
         b.width = (int) s;
         b.height = centerH - (m.top + m.bottom);
         int totalWidth = (b.width + m.left + m.right);

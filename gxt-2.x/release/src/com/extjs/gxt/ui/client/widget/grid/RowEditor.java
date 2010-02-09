@@ -129,15 +129,17 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
 
   }
 
-  private Grid<M> grid;
+  protected ContentPanel btns;
+  protected boolean renderButtons = true;
+  protected Grid<M> grid;
+  protected int rowIndex;
+  
   private Listener<GridEvent<M>> listener;
   private ClicksToEdit clicksToEdit = ClicksToEdit.ONE;
   private int frameWidth = 5;
   private boolean initialized;
-  private ContentPanel btns;
   private int buttonPad = 3;
   private boolean editing;
-  private int rowIndex;
   private Record record;
   private Timer monitorTimer;
   private boolean monitorValid = true;
@@ -157,9 +159,37 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     messages = new RowEditorMessages();
   }
 
+  /**
+   * Returns the clicks to edit.
+   * 
+   * @return the clicks to edit
+   */
+  public ClicksToEdit getClicksToEdit() {
+    return clicksToEdit;
+  }
+
+  /**
+   * Returns the roweditors's messages.
+   * 
+   * @return the messages
+   */
+  public RowEditorMessages getMessages() {
+    return messages;
+  }
+
+  /**
+   * Returns the interval in ms in that the roweditor is validated
+   * 
+   * @return the interval in ms in that the roweditor is validated
+   */
+  public int getMonitorPoll() {
+    return monitorPoll;
+  }
+
   @SuppressWarnings("unchecked")
   public void init(Component component) {
     grid = (Grid<M>) component;
+    grid.disableTextSelection(false);
 
     listener = new Listener<GridEvent<M>>() {
 
@@ -201,39 +231,12 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   }
 
   /**
-   * Returns the clicks to edit.
-   * 
-   * @return the clicks to edit
-   */
-  public ClicksToEdit getClicksToEdit() {
-    return clicksToEdit;
-  }
-
-  /**
-   * Returns the interval in ms in that the roweditor is validated
-   * 
-   * @return the interval in ms in that the roweditor is validated
-   */
-  public int getMonitorPoll() {
-    return monitorPoll;
-  }
-
-  /**
    * Returns true if a tooltip with an error summary is shown.
    * 
    * @return true if a tooltip with an error summary is shown
    */
   public boolean isErrorSummary() {
     return errorSummary;
-  }
-
-  /**
-   * Returns the roweditors's messages.
-   * 
-   * @return the messages
-   */
-  public RowEditorMessages getMessages() {
-    return messages;
   }
 
   /**
@@ -285,15 +288,6 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   }
 
   /**
-   * True to monitor the valid status of this roweditor (defaults to true)
-   * 
-   * @param monitorValid true to monitor this roweditor
-   */
-  public void setMonitorValid(boolean monitorValid) {
-    this.monitorValid = monitorValid;
-  }
-
-  /**
    * Sets the polling interval in ms in that the roweditor validation is done
    * (defaults to 200)
    * 
@@ -301,6 +295,15 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
    */
   public void setMonitorPoll(int monitorPoll) {
     this.monitorPoll = monitorPoll;
+  }
+
+  /**
+   * True to monitor the valid status of this roweditor (defaults to true)
+   * 
+   * @param monitorValid true to monitor this roweditor
+   */
+  public void setMonitorValid(boolean monitorValid) {
+    this.monitorValid = monitorValid;
   }
 
   /**
@@ -346,6 +349,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       Field<Object> f = (Field<Object>) getItem(i);
       String dIndex = cm.getDataIndex(i);
       Object val = cm.getEditor(i).preProcessValue(record.get(dIndex));
+      f.addStyleName("x-row-editor-field");
       f.updateOriginalValue(val);
       f.setValue(val);
     }
@@ -353,16 +357,18 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     if (!isVisible()) {
       show();
     }
-    el().setXY(El.fly(row).getXY());
+
+    el().setXY(getPosition(row));
     verifyLayout(true);
     if (doFocus) {
       deferFocus(null);
     }
     lastValid = false;
 
-    el().scrollIntoView((Element) grid.getView().getEditorParent(), false, new int[] {btns.getHeight(), 0});
+    el().scrollIntoView((Element) grid.getView().getEditorParent(), false,
+        new int[] {renderButtons ? btns.getHeight() : 0, 0});
   }
-
+  
   /**
    * Stops editing.
    * 
@@ -416,10 +422,13 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   protected void afterRender() {
     super.afterRender();
     positionButtons();
+    
     if (monitorValid) {
       startMonitoring();
     }
-    btns.setWidth((getMinButtonWidth() * 2) + (frameWidth * 2) + (buttonPad * 4));
+    if (renderButtons) {
+      btns.setWidth((getMinButtonWidth() * 2) + (frameWidth * 2) + (buttonPad * 4));
+    }
   }
 
   protected void bindHandler() {
@@ -434,7 +443,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       lastValid = true;
     }
 
-    btns.getItem(0).setEnabled(valid);
+    if (renderButtons) btns.getItem(0).setEnabled(valid);
 
     if (!isVisible()) {
       monitorTimer.cancel();
@@ -504,6 +513,10 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     return sb.toString();
   }
 
+  protected Point getPosition(Element row) {
+    return El.fly(row).getXY();
+  }
+
   protected Record getRecord(M model) {
     return grid.getView().ds.getRecord(model);
   }
@@ -521,6 +534,13 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       }
     }
     return match;
+  }
+
+  protected void hideTooltip() {
+    if (tooltip != null) {
+      tooltip.hide();
+      tooltip.disable();
+    }
   }
 
   protected void initFields() {
@@ -547,17 +567,13 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       }
 
       f.setMessageTarget("tooltip");
-      //needed because we remove it from the celleditor
+      // needed because we remove it from the celleditor
       clearParent(f);
       insert(f, i, ld);
     }
     initialized = true;
   }
 
-  private native void clearParent(Widget parent) /*-{
-  parent.@com.google.gwt.user.client.ui.Widget::parent=null;
-}-*/;
-  
   @SuppressWarnings("unchecked")
   protected boolean isDirty() {
     for (Component f : getItems()) {
@@ -609,6 +625,9 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     swallowEvent(Events.OnKeyUp, el().dom, false);
     swallowEvent(Events.OnKeyPress, el().dom, false);
 
+    if (!renderButtons) {
+      return;
+    }
     btns = new ContentPanel() {
       protected void createStyles(String baseStyle) {
         baseStyle = "x-plain";
@@ -650,7 +669,6 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     btns.add(cancelBtn);
     btns.render(getElement("bwrap"));
     btns.layout();
-
   }
 
   protected void onRowClick(GridEvent<M> e) {
@@ -685,18 +703,9 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       int bw = btns.getWidth(true);
       this.btns.setPosition((width / 2) - (bw / 2) + scroll, h - 2);
     }
-
-  }
-
-  protected void hideTooltip() {
-    if (tooltip != null) {
-      tooltip.hide();
-      tooltip.disable();
-    }
   }
 
   protected void showTooltip(String msg) {
-
     if (tooltip == null) {
       ToolTipConfig config = new ToolTipConfig();
       config.setAutoHide(false);
@@ -742,13 +751,17 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   protected void verifyLayout(boolean force) {
     if (isRendered() && (isVisible() || force)) {
       Element row = (Element) grid.getView().getRow(rowIndex);
-      setSize(El.fly(row).getWidth(false), btns.getHeight());
+      
+      setSize(El.fly(row).getWidth(false), renderButtons ? btns.getHeight() : 0);
+
       syncSize();
+      
       ColumnModel cm = grid.getColumnModel();
       for (int i = 0, len = cm.getColumnCount(); i < len; i++) {
         if (!cm.isHidden(i)) {
           Field<?> f = (Field<?>) getItem(i);
           f.show();
+          f.getElement().setAttribute("gxt-dindex", "" + cm.getDataIndex(i));
           MarginData md = (MarginData) ComponentHelper.getLayoutData(f);
           f.setWidth(cm.getColumnWidth(i) - md.getMargins().left - md.getMargins().right);
         } else {
@@ -759,4 +772,8 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       positionButtons();
     }
   }
+
+  private native void clearParent(Widget parent) /*-{
+    parent.@com.google.gwt.user.client.ui.Widget::parent=null;
+  }-*/;
 }

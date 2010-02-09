@@ -28,7 +28,10 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
  * {@link FormPanel#setEncoding(Encoding)}. In addition, the method should be
  * set to POST using
  * {@link FormPanel#setMethod(com.extjs.gxt.ui.client.widget.form.FormPanel.Method)}
- * .
+ * 
+ * <p />
+ * You must set a name for uploads to work with Firefox.
+ * 
  */
 public class FileUploadField extends TextField<String> {
 
@@ -215,8 +218,10 @@ public class FileUploadField extends TextField<String> {
     file.setTabIndex(-1);
     ((InputElement) file.dom.cast()).setName(name);
     ((InputElement) file.dom.cast()).setAccept(accept);
-    setReadOnly(readOnly);
     file.insertInto(getElement(), 1);
+    if (file != null) {
+      file.setEnabled(isEnabled());
+    }
   }
 
   @Override

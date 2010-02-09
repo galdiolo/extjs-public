@@ -21,6 +21,7 @@ import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.widget.selection.AbstractStoreSelectionModel;
 import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.user.client.Element;
 
 /**
  * Grid selection model.
@@ -34,17 +35,6 @@ import com.google.gwt.event.dom.client.KeyCodes;
 public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelectionModel<M> implements
     Listener<BaseEvent> {
 
-  public static class Cell {
-    public int row;
-    public int cell;
-
-    public Cell(int row, int cell) {
-      this.row = row;
-      this.cell = cell;
-    }
-
-  }
-
   @SuppressWarnings("unchecked")
   public static class Callback {
 
@@ -57,6 +47,17 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
     public boolean isSelectable(int row, int cell, boolean acceptsNav) {
       return sm.isSelectable(row, cell, acceptsNav);
     }
+  }
+
+  public static class Cell {
+    public int row;
+    public int cell;
+
+    public Cell(int row, int cell) {
+      this.row = row;
+      this.cell = cell;
+    }
+
   }
 
   protected Grid<M> grid;
@@ -218,10 +219,10 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
 
   @SuppressWarnings("unchecked")
   protected void handleMouseClick(GridEvent<M> e) {
-    if (isLocked()) {
+    if (isLocked() || isInput(e.getTarget())) {
       return;
     }
-    if (!e.isRightClick() && selectionMode == SelectionMode.MULTI) {
+    if (selectionMode == SelectionMode.MULTI) {
       GridView view = grid.getView();
       M sel = listStore.getAt(e.getRowIndex());
       if (e.isControlKey() && isSelected(sel)) {
@@ -229,7 +230,7 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
       } else if (e.isControlKey()) {
         doSelect(Arrays.asList(sel), true, false);
         view.focusCell(e.getRowIndex(), e.getColIndex(), true);
-      } else if(isSelected(sel) && !e.isShiftKey()){
+      } else if (isSelected(sel) && !e.isShiftKey() && !e.isControlKey() && selected.size() > 1) {
         doSelect(Arrays.asList(sel), false, false);
         view.focusCell(e.getRowIndex(), e.getColIndex(), true);
       }
@@ -239,7 +240,7 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
 
   @SuppressWarnings("unchecked")
   protected void handleMouseDown(GridEvent<M> e) {
-    if (isLocked()) {
+    if (isLocked() || isInput(e.getTarget())) {
       return;
     }
     if (e.isRightClick()) {
@@ -252,8 +253,12 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
     } else {
       GridView view = grid.getView();
       M sel = listStore.getAt(e.getRowIndex());
+      if (selectionMode == SelectionMode.SIMPLE) {
+        if (!isSelected(sel)) {
+          select(sel, true);
+        }
 
-      if (selectionMode == SelectionMode.SINGLE) {
+      } else if (selectionMode == SelectionMode.SINGLE) {
         if (e.isControlKey() && isSelected(sel)) {
           deselect(sel);
         } else if (!isSelected(sel)) {
@@ -269,7 +274,7 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
           select(a, b, e.isControlKey());
           lastSelected = listStore.getAt(last);
           view.focusCell(index, e.getColIndex(), true);
-        } else if(!isSelected(sel)){
+        } else if (!isSelected(sel)) {
           doSelect(Arrays.asList(sel), false, false);
           view.focusCell(e.getRowIndex(), e.getColIndex(), true);
         }
@@ -283,6 +288,11 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
 
   protected boolean hasPrevious() {
     return lastSelected != null && listStore.indexOf(lastSelected) > 0;
+  }
+
+  protected boolean isInput(Element target) {
+    String tag = target.getTagName();
+    return "INPUT".equals(tag) || "TEXTAREA".equals(tag);
   }
 
   protected boolean isSelectable(int row, int cell, boolean acceptsNav) {

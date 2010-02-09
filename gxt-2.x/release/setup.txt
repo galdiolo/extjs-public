@@ -1,7 +1,7 @@
 Quick Setup for Ext GWT 2.X
 ===========================
 
-Note : Ext GWT 2.X requires GWT 1.6.x  
+Note : Ext GWT 2.X requires GWT 1.6.x or GWT 2.0 (any build ending in "-gwt2.zip"). 
 
 STEP 1 -> Create a GWT 1.6.x project within Eclipse.
 

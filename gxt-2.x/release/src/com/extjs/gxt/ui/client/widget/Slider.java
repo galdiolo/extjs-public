@@ -465,7 +465,6 @@ public class Slider extends BoxComponent {
     if (!ce.getTarget().getTagName().equals("INPUT")) {
       focus();
     }
-
   }
 
   protected void onDragCancel(DragEvent de) {

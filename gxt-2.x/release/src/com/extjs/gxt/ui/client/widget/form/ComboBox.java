@@ -1052,6 +1052,11 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
       public void storeDataChanged(StoreEvent<D> se) {
         onLoad(se);
       }
+      
+      @Override
+      public void storeUpdate(StoreEvent<D> se) {
+        onUpdate(se);
+      }
 
     };
 
@@ -1114,7 +1119,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
 
     };
   }
-
+  
   @SuppressWarnings("unchecked")
   protected void initList() {
     if (listView == null) {
@@ -1339,6 +1344,15 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     }
   }
 
+  protected void onUpdate(StoreEvent<D> se) {
+    // handle the case when the selected model's display property is updated
+    if (!getRawValue().equals("") && getValue() == null && forceSelection) {
+      setValue(null);
+      store.clearFilters();
+      setValue(se.getModel());
+    }
+  }
+
   protected void onViewClick(DomEvent de, boolean focus) {
     int idx = -1;
     // when testing in selenium the items will not be selected as the mouse
@@ -1368,6 +1382,15 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
 
   protected void onWindowResize(int width, int height) {
     collapse();
+  }
+
+  protected boolean selectByValue(String value) {
+    D r = findModel(getDisplayField(), value);
+    if (r != null) {
+      select(r);
+      return true;
+    }
+    return false;
   }
 
   @Override
@@ -1476,15 +1499,6 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
       list.el().setTop(y);
     }
     list.el().setVisibility(true);
-  }
-
-  private boolean selectByValue(String value) {
-    D r = findModel(getDisplayField(), value);
-    if (r != null) {
-      select(r);
-      return true;
-    }
-    return false;
   }
 
   private void selectNext() {

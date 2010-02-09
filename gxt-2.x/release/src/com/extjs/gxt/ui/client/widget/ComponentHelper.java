@@ -44,6 +44,31 @@ public class ComponentHelper {
     c.setModel(model);
   }
 
+  @SuppressWarnings("unchecked")
+  public static void removeFromParent(Widget widget) {
+    Widget parent = widget.getParent();
+
+    if (parent instanceof ContentPanel) {
+      ContentPanel cp = (ContentPanel) parent;
+      if (cp.getTopComponent() == widget) {
+        cp.setTopComponent(null);
+        return;
+      } else if (cp.getBottomComponent() == widget) {
+        cp.setBottomComponent(null);
+        return;
+      }
+    }
+    if (parent instanceof Container) {
+      ((Container) parent).remove((Component) widget);
+      return;
+    }
+    if (parent instanceof WidgetComponent) {
+      setParent(null, widget);
+      return;
+    }
+    widget.removeFromParent();
+  }
+
   static native void doAttachNative(Widget widget) /*-{
     widget.@com.google.gwt.user.client.ui.Widget::onAttach()();
   }-*/;
@@ -51,4 +76,8 @@ public class ComponentHelper {
   static native void doDetachNative(Widget widget) /*-{
     widget.@com.google.gwt.user.client.ui.Widget::onDetach()();
   }-*/;
+  
+  private static native void setParent(Widget parent, Widget child) /*-{
+  child.@com.google.gwt.user.client.ui.Widget::parent = parent;
+}-*/;
 }

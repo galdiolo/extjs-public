@@ -78,7 +78,7 @@ public class ComponentManager extends BaseObservable {
    */
   @SuppressWarnings("unchecked")
   public <X extends Component> X find(Element target) {
-    while (target != null && target.getPropertyString("__listener") == null) {
+    while (target != null && (target.getPropertyString("__listener") == null || target.getId().equals(""))) {
       target = (Element) target.getParentElement();
     }
     if (target != null) {

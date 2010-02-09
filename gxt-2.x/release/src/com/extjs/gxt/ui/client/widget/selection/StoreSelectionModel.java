@@ -13,6 +13,20 @@ import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.store.Store;
 
+/**
+ * Defines the interface for store based selection models.
+ * 
+ * <p>
+ * The selection model supports 3 different selection modes:
+ * <ul>
+ * <li>SINGLE - Only single selections allowed
+ * <li>SIMPLE - Multiple selections without having to use the control and shift
+ * keys
+ * <li>MULTI - Multiple selections
+ * </ul>
+ * 
+ * @param <M> the model type
+ */
 public interface StoreSelectionModel<M extends ModelData> {
 
   /**
@@ -142,6 +156,15 @@ public interface StoreSelectionModel<M extends ModelData> {
 
   /**
    * Sets the selection mode.
+   * 
+   * <p>
+   * The selection model supports 3 different selection modes:
+   * <ul>
+   * <li>SINGLE - Only single selections allowed
+   * <li>SIMPLE - Multiple selections without having to use the control and
+   * shift keys
+   * <li>MULTI - Multiple selections
+   * </ul>
    * 
    * @param selectionMode the selection mode
    */

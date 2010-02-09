@@ -96,6 +96,7 @@ import com.google.gwt.user.client.ui.impl.RichTextAreaImpl;
  * 
  * </dl>
  */
+@SuppressWarnings("deprecation")
 public class HtmlEditor extends Field<String> {
 
   public class HtmlEditorImages extends FieldImages {

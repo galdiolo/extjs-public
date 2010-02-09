@@ -98,19 +98,18 @@ public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSe
     if (isLocked() || e.getIndex() == -1) {
       return;
     }
-    if (!e.isRightClick() && selectionMode == SelectionMode.MULTI) {
+    if (selectionMode == SelectionMode.MULTI) {
       M sel = listStore.getAt(e.getIndex());
       if (e.isControlKey() && isSelected(sel)) {
         doDeselect(Arrays.asList(sel), false);
       } else if (e.isControlKey()) {
         doSelect(Arrays.asList(sel), true, false);
         listView.focusItem(e.getIndex());
-      } else if (isSelected(sel) && !e.isShiftKey()) {
+      } else if (isSelected(sel) && !e.isShiftKey() && !e.isControlKey() && selected.size() > 1) {
         doSelect(Arrays.asList(sel), false, false);
         listView.focusItem(e.getIndex());
       }
     }
-
   }
 
   @SuppressWarnings("unchecked")

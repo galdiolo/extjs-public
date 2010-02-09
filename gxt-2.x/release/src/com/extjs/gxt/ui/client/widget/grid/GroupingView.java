@@ -53,9 +53,9 @@ public class GroupingView extends GridView {
   }
 
   protected boolean enableGrouping;
-
+  protected Map<String, String> map = new FastMap<String>();
+  
   private int counter = 0;
-
   private GroupingStore<ModelData> groupingStore;
   private boolean showGroupedColumn = true;
   private boolean enableGroupingMenu = true;
@@ -88,6 +88,17 @@ public class GroupingView extends GridView {
    */
   public GridGroupRenderer getGroupRenderer() {
     return groupRenderer;
+  }
+
+  /**
+   * Returns the group elements.
+   */
+  @SuppressWarnings("unchecked")
+  public NodeList<Element> getGroups() {
+    if (!enableGrouping) {
+      return new JsArray().getJsObject().cast();
+    }
+    return (NodeList) mainBody.dom.getChildNodes();
   }
 
   @Override
@@ -327,6 +338,10 @@ public class GroupingView extends GridView {
     return buf.toString();
   }
 
+  protected Element findGroup(Element el) {
+    return fly(el).findParentElement(".x-grid-group", 10);
+  }
+
   protected String getGroup(Object value, ModelData m, int rowIndex, int colIndex, ListStore<ModelData> ds) {
     return value == null ? "" : value.toString();
   }
@@ -344,14 +359,6 @@ public class GroupingView extends GridView {
     }
 
     return r;
-  }
-
-  @SuppressWarnings("unchecked")
-  protected NodeList<Element> getGroups() {
-    if (!enableGrouping) {
-      return new JsArray().getJsObject().cast();
-    }
-    return (NodeList) mainBody.dom.getChildNodes();
   }
 
   @Override
@@ -402,8 +409,6 @@ public class GroupingView extends GridView {
       toggleGroup(hd.dom.getParentElement(), isGroupExpanded(hd.dom.getParentElement()));
     }
   }
-
-  protected Map<String, String> map = new FastMap<String>();
 
   @Override
   protected void onRemove(ListStore<ModelData> ds, ModelData m, int index, boolean isUpdate) {
@@ -467,14 +472,14 @@ public class GroupingView extends GridView {
   }
 
   @Override
-  protected void templateOnColumnWidthUpdated(int col, int w, int tw) {
-    super.templateOnColumnWidthUpdated(col, w, tw);
+  protected void templateOnColumnHiddenUpdated(int col, boolean hidden, int tw) {
+    super.templateOnColumnHiddenUpdated(col, hidden, tw);
     updateGroupWidths();
   }
 
   @Override
-  protected void templateOnColumnHiddenUpdated(int col, boolean hidden, int tw) {
-    super.templateOnColumnHiddenUpdated(col, hidden, tw);
+  protected void templateOnColumnWidthUpdated(int col, int w, int tw) {
+    super.templateOnColumnWidthUpdated(col, w, tw);
     updateGroupWidths();
   }
 
@@ -485,10 +490,6 @@ public class GroupingView extends GridView {
     state.put(fly(g).getId(), expanded);
     fly(g).setStyleName("x-grid-group-collapsed", !expanded);
     calculateVBar(false);
-  }
-
-  private Element findGroup(Element el) {
-    return fly(el).findParentElement(".x-grid-group", 10);
   }
 
   private boolean isGroupExpanded(Element g) {

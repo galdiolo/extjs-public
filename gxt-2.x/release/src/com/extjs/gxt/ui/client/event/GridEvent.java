@@ -20,69 +20,18 @@ import com.google.gwt.user.client.Event;
  */
 public class GridEvent<M extends ModelData> extends BoxComponentEvent {
 
-  /**
-   * The column index.
-   */
   private int colIndex = -1;
-
-  /**
-   * The source grid.
-   */
   private Grid<M> grid;
-
-  /**
-   * The context menu.
-   */
   private Menu menu;
-
-  /**
-   * The model.
-   */
   private M model;
-
-  /**
-   * The property name.
-   */
   private String property;
-
-  /**
-   * The record.
-   */
   private Record record;
-
-  /**
-   * The row index.
-   */
   private int rowIndex = -1;
-
-  /**
-   * The scroll left value.
-   */
   private int scrollLeft;
-
-  /**
-   * The scroll top value.
-   */
   private int scrollTop;
-
-  /**
-   * SortInfo value.
-   */
   private SortInfo sortInfo;
-
-  /**
-   * The start value.
-   */
   private Object startValue;
-
-  /**
-   * The value.
-   */
   private Object value;
-
-  /**
-   * The width.
-   */
   private int width;
 
   public GridEvent(Grid<M> grid) {

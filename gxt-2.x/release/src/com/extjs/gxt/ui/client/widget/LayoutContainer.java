@@ -327,15 +327,25 @@ public class LayoutContainer extends ScrollContainer<Component> {
   }
   
   protected void onFocus(ComponentEvent ce) {
-    if (getData("aria-ignore") != null && getItemCount() > 0){
-      getItem(0).focus();
-    } else {
-      FocusFrame.get().frame(this);
+    if (GXT.isAriaEnabled()) {
+      if (isAriaIgnore()){
+         for (int i = 0; i < getItemCount(); i++) {
+           Component c = getItem(i);
+           if (!c.isAriaIgnore()) {
+             c.focus();
+             break;
+           }
+         }
+      } else {
+        FocusFrame.get().frame(this);
+      }
     }
   }
   
   protected void onBlur(ComponentEvent ce) {
-
+    if (GXT.isAriaEnabled()) {
+      FocusFrame.get().unframe();
+    }
   }
   
   protected void onRender(Element parent, int index) {

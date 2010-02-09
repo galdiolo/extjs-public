@@ -20,6 +20,7 @@ import com.google.gwt.dom.client.TableCellElement;
 import com.google.gwt.dom.client.TableElement;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.Accessibility;
 
 /**
  * <code>TableLayout</code> allows you to easily render content into an HTML
@@ -365,6 +366,9 @@ public class TableLayout extends Layout {
     target.removeChildren();
 
     table = DOM.createTable().cast();
+    if (container.isAriaIgnore()) {
+      Accessibility.setRole((Element)table.cast(), "presentation");
+    }
 
     if (tableStyle != null) {
       El.fly((Element) table.cast()).applyStyles(tableStyle);

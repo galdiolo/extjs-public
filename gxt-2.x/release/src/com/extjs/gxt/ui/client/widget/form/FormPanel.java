@@ -162,6 +162,19 @@ public class FormPanel extends ContentPanel implements FormPanelImplHost {
   }
 
   /**
+   * Resets the dirty state for all fields by setting the original value to be
+   * equal to the current value.
+   */
+  @SuppressWarnings("unchecked")
+  public void clearDirtyFields() {
+    for (Field f : getFields()) {
+      if (f.isDirty()) {
+        f.setOriginalValue(f.getValue());
+      }
+    }
+  }
+
+  /**
    * Resets all field values.
    */
   public void reset() {

@@ -57,18 +57,39 @@ public class ToolBarLayout extends Layout {
     targetStyleName = "x-toolbar-layout-ct";
   }
 
+  /**
+   * Returns the no menu item text.
+   * 
+   * @return the no menu item text
+   */
   public String getNoItemsMenuText() {
     return noItemsMenuText;
   }
 
+  /**
+   * Returns the item spacing.
+   * 
+   * @return the spacing
+   */
   public int getSpacing() {
     return spacing;
   }
 
+  /**
+   * Sets the no menu items text (defaults to '<div
+   * class=\"x-toolbar-no-items\">(None)</div>').
+   * 
+   * @param noItemsMenuText the no menu items text
+   */
   public void setNoItemsMenuText(String noItemsMenuText) {
     this.noItemsMenuText = noItemsMenuText;
   }
 
+  /**
+   * Sets the amount of spacing between items (defaults to 0).
+   * 
+   * @param spacing the spacing
+   */
   public void setSpacing(int spacing) {
     this.spacing = spacing;
   }
@@ -158,6 +179,9 @@ public class ToolBarLayout extends Layout {
 
   protected void fitToSize(El t) {
     if (!((ToolBar) container).isEnableOverflow()) {
+      return;
+    }
+    if (target.getWidth() < 1) {
       return;
     }
     int w = t.getWidth(true);

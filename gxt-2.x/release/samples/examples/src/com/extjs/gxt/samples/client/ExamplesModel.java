@@ -32,12 +32,14 @@ import com.extjs.gxt.samples.client.examples.dnd.TreePanelToTreePanelExample;
 import com.extjs.gxt.samples.client.examples.forms.AdvancedComboBoxExample;
 import com.extjs.gxt.samples.client.examples.forms.AdvancedFormsExample;
 import com.extjs.gxt.samples.client.examples.forms.ComboBoxExample;
+import com.extjs.gxt.samples.client.examples.forms.CustomFormExample;
 import com.extjs.gxt.samples.client.examples.forms.FileUploadExample;
 import com.extjs.gxt.samples.client.examples.forms.FormsExample;
 import com.extjs.gxt.samples.client.examples.grid.AggregationGridExample;
 import com.extjs.gxt.samples.client.examples.grid.AutoHeightGridExample;
 import com.extjs.gxt.samples.client.examples.grid.BeanModelGridExample;
 import com.extjs.gxt.samples.client.examples.grid.BufferedGridExample;
+import com.extjs.gxt.samples.client.examples.grid.CheckGroupingGridExample;
 import com.extjs.gxt.samples.client.examples.grid.ColumnGroupingExample;
 import com.extjs.gxt.samples.client.examples.grid.EditableBufferedGridExample;
 import com.extjs.gxt.samples.client.examples.grid.EditableGridExample;
@@ -81,6 +83,7 @@ import com.extjs.gxt.samples.client.examples.toolbar.ToolBarExample;
 import com.extjs.gxt.samples.client.examples.toolbar.ToolBarOverflowExample;
 import com.extjs.gxt.samples.client.examples.treegrid.AsyncTreeGridExample;
 import com.extjs.gxt.samples.client.examples.treegrid.EditorTreeGridExample;
+import com.extjs.gxt.samples.client.examples.treegrid.FilterTreeGridExample;
 import com.extjs.gxt.samples.client.examples.treegrid.RemoteSortTreeGridExample;
 import com.extjs.gxt.samples.client.examples.treegrid.RowEditorTreeGridExample;
 import com.extjs.gxt.samples.client.examples.treegrid.RowNumberTreeGridExample;
@@ -127,6 +130,7 @@ public class ExamplesModel extends BaseTreeModel {
     grids.add("Paging", new PagingGridExample(), g.paging().getHTML());
     grids.add("Local Paging", new MemoryPagingGridExample(), g.localpaging().getHTML());
     grids.add("Grouping", new GroupingGridExample(), g.grouping().getHTML());
+    grids.add("Check Grouping", new CheckGroupingGridExample(), g.grouping().getHTML());
     grids.add("Live Group Summary", new TotalsGridExample(), g.livegroupsummary().getHTML());
     grids.add("BeanModel Grid", new BeanModelGridExample(), g.beanmodelgrid().getHTML());
     grids.add("Paging BeanModel Grid", new PagingBeanModelGridExample(), g.pagingbeanmodelgrid().getHTML());
@@ -138,6 +142,7 @@ public class ExamplesModel extends BaseTreeModel {
 
     Category treeGrids = new Category("TreeGrid");
     treeGrids.add("Basic TreeGrid", new TreeGridExample(), Resources.IMAGES.basictreegrid().getHTML());
+    treeGrids.add("Filter TreeGrid", new FilterTreeGridExample(), Resources.IMAGES.filtertreegrid().getHTML());
     treeGrids.add("Async TreeGrid", new AsyncTreeGridExample(), Resources.IMAGES.asynctreegrid().getHTML());
     treeGrids.add("Remote Sort TreeGrid", new RemoteSortTreeGridExample(), Resources.IMAGES.asynctreegrid().getHTML());
     treeGrids.add("RowNumber TreeGrid", new RowNumberTreeGridExample(), g.rownumbertreegrid().getHTML());
@@ -206,6 +211,7 @@ public class ExamplesModel extends BaseTreeModel {
 
     Category forms = new Category("Forms");
     forms.add("Forms", new FormsExample(), g.forms().getHTML());
+    forms.add("Custom Form", new CustomFormExample(), g.forms().getHTML());
     forms.add("Advanced Forms", new AdvancedFormsExample(), g.advancedforms().getHTML(), false, true, HideMode.OFFSETS);
     forms.add("DualListField", new DualListFieldExample(), g.duallistfield().getHTML());
     forms.add("File Upload", new FileUploadExample(), g.fileupload().getHTML());

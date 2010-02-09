@@ -54,11 +54,11 @@ public class Portlet extends ContentPanel {
 
   public Portlet() {
     this(new FlowLayout());
-    addStyleName("x-portlet");
   }
 
   public Portlet(Layout layout) {
     super(layout);
+    addStyleName("x-portlet");
     setFrame(true);
     getHeader().setStyleAttribute("cursor", "move");
   }

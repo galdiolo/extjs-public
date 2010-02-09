@@ -23,6 +23,7 @@ import com.extjs.gxt.ui.client.data.BaseModel;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.PagingLoadConfig;
 import com.extjs.gxt.ui.client.data.SortInfo;
+import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.extjs.gxt.ui.client.event.ColumnModelEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -37,6 +38,7 @@ import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.store.Record;
 import com.extjs.gxt.ui.client.store.StoreEvent;
 import com.extjs.gxt.ui.client.store.StoreListener;
+import com.extjs.gxt.ui.client.util.DelayedTask;
 import com.extjs.gxt.ui.client.util.Point;
 import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.util.Util;
@@ -145,8 +147,16 @@ public class GridView extends BaseObservable {
   private String rowSelector = "div.x-grid3-row";
   private int rowSelectorDepth = 10;
   private boolean showDirtyCells = true;
-
   private boolean showInvalidCells;
+  private boolean adjustForHScroll = true;
+  private boolean selectable = false;
+
+  private DelayedTask removeTask = new DelayedTask(new Listener<BaseEvent>() {
+
+    public void handleEvent(BaseEvent be) {
+      processRows(0, false);
+    }
+  });
 
   /**
    * Ensured the current row and column is visible.
@@ -414,6 +424,15 @@ public class GridView extends BaseObservable {
   }
 
   /**
+   * Returns the scroll element.
+   * 
+   * @return the scroll element
+   */
+  public El getScroller() {
+    return scroller;
+  }
+
+  /**
    * Returns the current scroll state.
    * 
    * @return the scroll state
@@ -444,6 +463,16 @@ public class GridView extends BaseObservable {
   }
 
   /**
+   * Returns true if the grid width will be adjusted based on visibility of
+   * horizontal scroll bar.
+   * 
+   * @return true if adjusting
+   */
+  public boolean isAdjustForHScroll() {
+    return adjustForHScroll;
+  }
+
+  /**
    * Returns true if auto fill is enabled.
    * 
    * @return true for auto fill
@@ -470,6 +499,11 @@ public class GridView extends BaseObservable {
     return showDirtyCells;
   }
 
+  /**
+   * Returns true if invalid cell markers are enabled.
+   * 
+   * @return true if enabled
+   */
   public boolean isShowInvalidCells() {
     return showInvalidCells;
   }
@@ -547,6 +581,16 @@ public class GridView extends BaseObservable {
   }
 
   /**
+   * True to adjust the grid width when the horizontal scrollbar is hidden and
+   * visible (defaults to true).
+   * 
+   * @param adjustForHScroll true to adjust for horizontal scroll bar
+   */
+  public void setAdjustForHScroll(boolean adjustForHScroll) {
+    this.adjustForHScroll = adjustForHScroll;
+  }
+
+  /**
    * True to auto expand the columns to fit the grid <b>when the grid is
    * created</b>.
    * 
@@ -607,6 +651,11 @@ public class GridView extends BaseObservable {
     this.showDirtyCells = showDirtyCells;
   }
 
+  /**
+   * True to enabled invalid cell markers (defaults to false).
+   * 
+   * @param showInvalidCells true to enable
+   */
   public void setShowInvalidCells(boolean showInvalidCells) {
     this.showInvalidCells = showInvalidCells;
   }
@@ -730,6 +779,7 @@ public class GridView extends BaseObservable {
     MenuItem columns = new MenuItem();
     columns.setText(GXT.MESSAGES.gridView_columnsText());
     columns.setIcon(getImages().getColumns());
+    columns.setData("gxt-columns", "true");
 
     final Menu columnMenu = new Menu();
 
@@ -835,6 +885,9 @@ public class GridView extends BaseObservable {
       if (stripe && ((rowIndex + 1) % 2 == 0)) {
         buf.append(" x-grid3-row-alt");
       }
+      if (!selectable) {
+        buf.append(" x-unselectable-single");
+      }
 
       if (showDirtyCells && r != null && r.isDirty()) {
         buf.append(" x-grid3-dirty-row");
@@ -875,7 +928,9 @@ public class GridView extends BaseObservable {
         buf.append(c.style);
         buf.append("\" tabIndex=0 ");
         buf.append(cellAttr);
-        buf.append("><div unselectable=\"on\" class=\"x-grid3-cell-inner x-grid3-col-");
+        buf.append("><div unselectable=\"");
+        buf.append(selectable ? "off" : "on");
+        buf.append("\" class=\"x-grid3-cell-inner x-grid3-col-");
         buf.append(c.id);
         buf.append("\" ");
         buf.append(attr);
@@ -1004,7 +1059,8 @@ public class GridView extends BaseObservable {
   protected String getColumnStyle(int colIndex, boolean isHeader) {
     String style = !isHeader ? cm.getColumnStyle(colIndex) : "";
     if (style == null) style = "";
-    style += "width:" + getColumnWidth(colIndex) + "px;";
+    int adj = GXT.isWebKit ? 2 : 0;
+    style += "width:" + (getColumnWidth(colIndex) + adj) + "px;";
     if (cm.isHidden(colIndex)) {
       style += "display:none;";
     }
@@ -1066,7 +1122,7 @@ public class GridView extends BaseObservable {
   }
 
   protected int getScrollAdjust() {
-    return scroller != null ? (vbar ? scrollOffset : 2) : scrollOffset;
+    return adjustForHScroll ? (scroller != null ? (vbar ? scrollOffset : 2) : scrollOffset) : scrollOffset;
   }
 
   protected SortInfo getSortState() {
@@ -1127,7 +1183,8 @@ public class GridView extends BaseObservable {
   protected void init(final Grid grid) {
     this.grid = grid;
     this.cm = grid.getColumnModel();
-
+    selectable = !grid.isDisableTextSelection();
+    
     initListeners();
 
     initTemplates();
@@ -1484,7 +1541,7 @@ public class GridView extends BaseObservable {
     detachWidget(index, true);
     removeRow(index);
     if (!isUpdate) {
-      processRows(0, false);
+      removeTask.delay(10);
     }
     calculateVBar(false);
     applyEmptyText();
@@ -1626,7 +1683,6 @@ public class GridView extends BaseObservable {
     El head = grid.el().selectNode(".x-grid3-hh");
     head.removeChildren();
     if (!header.isRendered()) {
-      header.disableTextSelection(true);
       header.render(head.dom);
     } else {
       head.appendChild(header.getElement());
@@ -1669,6 +1725,7 @@ public class GridView extends BaseObservable {
     if (footer != null) {
       renderFooter();
     }
+
     updateHeaderSortState();
   }
 

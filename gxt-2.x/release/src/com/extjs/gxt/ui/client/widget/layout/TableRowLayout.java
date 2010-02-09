@@ -12,6 +12,7 @@ import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.Accessibility;
 
 /**
  * A single row TableLayout.
@@ -81,7 +82,10 @@ public class TableRowLayout extends TableLayout {
     target.removeChildren();
 
     table = DOM.createTable().cast();
-
+    if (container.isAriaIgnore()) {
+      Accessibility.setRole((Element)table.cast(), "presentation");
+    }
+    
     if (getTableStyle() != null) {
       fly(table).applyStyles(getTableStyle());
     }

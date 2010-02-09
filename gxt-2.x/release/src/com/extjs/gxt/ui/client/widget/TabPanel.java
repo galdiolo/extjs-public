@@ -32,7 +32,9 @@ import com.extjs.gxt.ui.client.widget.layout.CardLayout;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Accessibility;
@@ -467,14 +469,10 @@ public class TabPanel extends Container<TabItem> {
       }
     }
     if (ce.getEventTypeInt() == Event.ONBLUR && GXT.isAriaEnabled()) {
-      FocusFrame.get().unframe();
+      onBlur(ce);
+    } else if (ce.getEventTypeInt() == Event.ONFOCUS && GXT.isAriaEnabled()) {
+      onFocus(ce);
     }
-    if (ce.getEventTypeInt() == Event.ONFOCUS && GXT.isAriaEnabled()) {
-      if (activeItem != null) {
-        FocusFrame.get().frame(activeItem);
-      }
-    }
-
   }
 
   /**
@@ -712,10 +710,14 @@ public class TabPanel extends Container<TabItem> {
         scrollToTab(item, getAnimScroll());
       }
 
-      focusTab(activeItem);
+      focusTab(activeItem, false);
 
       fireEvent(Events.Select, tpe);
       item.fireEvent(Events.Select, tpe);
+    }
+
+    if (GXT.isAriaEnabled() && activeItem == item) {
+      focusTab(activeItem, false);
     }
   }
 
@@ -821,10 +823,28 @@ public class TabPanel extends Container<TabItem> {
     }
   }
 
+  protected void onBlur(ComponentEvent ce) {
+    FocusFrame.get().unframe();
+  }
+
   @Override
   protected void onDetach() {
     bar.disableTextSelection(false);
     super.onDetach();
+  }
+
+  protected void onFocus(ComponentEvent ce) {
+    FocusFrame.get().frame(this);
+    if (getItemCount() > 0 && getSelectedItem() == null) {
+      setSelection(getItem(0));
+    } else if (getSelectedItem() != null) {
+      focusTab(getSelectedItem(), true);
+      DeferredCommand.addCommand(new Command() {
+        public void execute() {
+          FocusFrame.get().frame(TabPanel.this);
+        }
+      });
+    }
   }
 
   protected void onInsert(TabItem item, int index) {
@@ -892,12 +912,37 @@ public class TabPanel extends Container<TabItem> {
     delegateUpdates();
   }
 
+  protected void onKeyPress(ComponentEvent ce) {
+    int code = ce.getKeyCode();
+    switch (code) {
+      case KeyCodes.KEY_RIGHT:
+      case KeyCodes.KEY_PAGEDOWN:
+        onRight(ce);
+        break;
+      case KeyCodes.KEY_LEFT:
+      case KeyCodes.KEY_PAGEUP:
+        onLeft(ce);
+        break;
+      case KeyCodes.KEY_HOME:
+        if (ce.getTarget() == activeItem.getHeader().getElement() && getItemCount() > 0 && activeItem != getItem(0)) {
+          setSelection(getItem(0));
+        }
+        break;
+      case KeyCodes.KEY_END:
+        if (ce.getTarget() == activeItem.getHeader().getElement()) {
+          setSelection(getItem(getItemCount() - 1));
+        }
+        break;
+
+    }
+  }
+
   protected void onLeft(ComponentEvent ce) {
-    if (activeItem != null && ce.getTarget() == getElement()) {
+    if (activeItem != null && ce.getTarget() == activeItem.getHeader().getElement()) {
       int idx = indexOf(activeItem);
       if (idx > 0) {
         setSelection(getItem(idx - 1));
-        focusTab(activeItem);
+        focusTab(activeItem, true);
       }
     }
   }
@@ -947,7 +992,7 @@ public class TabPanel extends Container<TabItem> {
 
     if (itemTemplate == null) {
       StringBuffer sb = new StringBuffer();
-      sb.append("<li class='{style}' id={id} role='tab'><a class=x-tab-strip-close role='presentation'></a>");
+      sb.append("<li class='{style}' id={id} role='tab' tabindex='0'><a class=x-tab-strip-close role='presentation'></a>");
       sb.append("<a class='x-tab-right' role='presentation'><em role='presentation' class='x-tab-left'>");
       sb.append("<span class='x-tab-strip-inner' role='presentation'><span class='x-tab-strip-text {textStyle} {iconStyle}'>{text}</span></span>");
       sb.append("</em></a></li>");
@@ -978,29 +1023,6 @@ public class TabPanel extends Container<TabItem> {
     sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS | Event.ONKEYUP | Event.FOCUSEVENTS);
   }
 
-  protected void onKeyPress(ComponentEvent ce) {
-    int code = ce.getKeyCode();
-    switch (code) {
-      case KeyCodes.KEY_RIGHT:
-      case KeyCodes.KEY_PAGEDOWN:
-        onRight(ce);
-        break;
-      case KeyCodes.KEY_LEFT:
-      case KeyCodes.KEY_PAGEUP:
-        onLeft(ce);
-        break;
-      case KeyCodes.KEY_HOME:
-        if (getItemCount() > 0 && activeItem != getItem(0)) {
-          setSelection(getItem(0));
-        }
-        break;
-      case KeyCodes.KEY_END:
-        setSelection(getItem(getItemCount() - 1));
-        break;
-      
-    }
-  }
-
   @Override
   protected void onResize(int width, int height) {
     super.onResize(width, height);
@@ -1016,12 +1038,12 @@ public class TabPanel extends Container<TabItem> {
   }
 
   protected void onRight(ComponentEvent ce) {
-    if (activeItem != null && ce.getTarget() == getElement()) {
+    if (activeItem != null && ce.getTarget() == activeItem.getHeader().getElement()) {
       ce.stopEvent();
       int idx = indexOf(activeItem);
       if (idx < getItemCount()) {
         setSelection(getItem(idx + 1));
-        focusTab(activeItem);
+        focusTab(activeItem, true);
       }
     }
   }
@@ -1040,6 +1062,9 @@ public class TabPanel extends Container<TabItem> {
       close(item);
     } else if (item != activeItem) {
       setSelection(item);
+      focusTab(item, true);
+    } else if (item == activeItem) {
+      focusTab(item, true);
     }
   }
 
@@ -1153,11 +1178,14 @@ public class TabPanel extends Container<TabItem> {
     }
   }
 
-  private void focusTab(TabItem item) {
-    Accessibility.setState(getElement(), "aria-activedescendant", item.header.getId());
-    if (GXT.isAriaEnabled()) {
-      FocusFrame.get().frame(item);
+  private void focusTab(TabItem item, boolean setFocus) {
+    if (setFocus) {
+      item.getHeader().el().focus();
     }
+    if (GXT.isAriaEnabled()) {
+      item.getHeader().el().focus();
+      FocusFrame.get().frame(this);
+    } 
   }
 
   private int getScollPos() {
@@ -1206,6 +1234,10 @@ public class TabPanel extends Container<TabItem> {
       strip.insertChild(item.header.getElement(), index);
     } else {
       item.header.render(strip.dom, index);
+    }
+    if (!GXT.isAriaEnabled()) {
+      item.header.el().setElementAttribute("hideFocus", "true");
+      item.header.el().setStyleAttribute("-moz-outline", "none");
     }
   }
 

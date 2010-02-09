@@ -14,8 +14,12 @@ import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Stock;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.core.XTemplate;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.FieldEvent;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.Component;
@@ -23,6 +27,8 @@ import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
+import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.grid.CheckBoxSelectionModel;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnData;
@@ -33,6 +39,7 @@ import com.extjs.gxt.ui.client.widget.grid.RowExpander;
 import com.extjs.gxt.ui.client.widget.grid.RowNumberer;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.table.NumberCellRenderer;
+import com.extjs.gxt.ui.client.widget.toolbar.LabelToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -87,7 +94,9 @@ public class GridPluginsExample extends LayoutContainer {
 
     List<ColumnConfig> configs = new ArrayList<ColumnConfig>();
 
-    CheckBoxSelectionModel<Stock> sm = new CheckBoxSelectionModel<Stock>();
+    final CheckBoxSelectionModel<Stock> sm = new CheckBoxSelectionModel<Stock>();
+    // selection model supports the SIMPLE selection mode
+    // sm.setSelectionMode(SelectionMode.SIMPLE);
 
     configs.add(sm.getColumn());
 
@@ -132,6 +141,28 @@ public class GridPluginsExample extends LayoutContainer {
     grid.setSelectionModel(sm);
     grid.setBorders(true);
     grid.addPlugin(sm);
+    
+    ToolBar toolBar = new ToolBar();
+    toolBar.add(new LabelToolItem("Selection Mode: "));
+    final SimpleComboBox<String> type = new SimpleComboBox<String>();
+    type.setTriggerAction(TriggerAction.ALL);
+    type.setEditable(false);
+    type.setFireChangeEventOnSetValue(true);
+    type.setWidth(100);
+    type.add("Multi");
+    type.add("Simple");
+    type.setSimpleValue("Multi");
+    type.addListener(Events.Change, new Listener<FieldEvent>() {
+      public void handleEvent(FieldEvent be) {
+        boolean simple = type.getSimpleValue().equals("Simple");
+        sm.deselectAll();
+        sm.setSelectionMode(simple ? SelectionMode.SIMPLE : SelectionMode.MULTI);
+      }
+    });
+
+    toolBar.add(type);
+    toolBar.add(new SeparatorToolItem());
+    cp.setTopComponent(toolBar);
 
     cp.add(grid);
     panel.add(cp);

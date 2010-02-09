@@ -201,7 +201,12 @@ public class TreePanelDropTarget extends DropTarget {
 
     activeItem = item;
 
-    int idx = activeItem.getParent().indexOf(item);
+    int idx = -1;
+    if (activeItem.getParent() == null) {
+      idx = tree.getStore().getRootItems().indexOf(activeItem);
+    } else {
+      idx = activeItem.getParent().indexOf(item);
+    }
 
     String status = "x-tree-drop-ok-between";
     if (before && idx == 0) {
@@ -221,10 +226,20 @@ public class TreePanelDropTarget extends DropTarget {
   protected void handleInsertDrop(DNDEvent event, TreeNode item, int index) {
     List sel = event.getData();
     if (sel.size() > 0) {
-      int idx = item.getParent().indexOf(item);
+      int idx = -1;
+      if (item.getParent() == null) {
+        idx = tree.getStore().getRootItems().indexOf(item.getModel());
+      } else {
+        idx = activeItem.getParent().indexOf(item);
+      }
+      
       idx = status == 0 ? idx : idx + 1;
-      ModelData p = item.getParent().getModel();
-      appendModel(p, sel, idx);
+      if (item.getParent() == null) {
+        appendModel(null, sel, idx);
+      } else {
+        ModelData p = item.getParent().getModel();
+        appendModel(p, sel, idx);
+      }
     }
   }
 

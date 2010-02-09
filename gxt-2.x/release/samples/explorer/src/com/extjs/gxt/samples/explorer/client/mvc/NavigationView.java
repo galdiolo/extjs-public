@@ -18,6 +18,7 @@ import com.extjs.gxt.samples.explorer.client.Explorer;
 import com.extjs.gxt.samples.explorer.client.ExplorerModel;
 import com.extjs.gxt.samples.resources.client.model.Folder;
 import com.extjs.gxt.ui.client.Registry;
+import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.data.BaseTreeLoader;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.TreeLoader;
@@ -141,6 +142,7 @@ public class NavigationView extends View {
     treeStore = new TreeStore<ModelData>(loader);
 
     tree = new TreePanel<ModelData>(treeStore);
+    tree.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     tree.getStyle().setLeafIcon(IconHelper.createStyle("icon-list"));
     tree.setAutoLoad(true);
     tree.setDisplayProperty("name");

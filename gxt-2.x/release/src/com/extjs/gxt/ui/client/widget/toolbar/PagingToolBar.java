@@ -677,6 +677,7 @@ public class PagingToolBar extends ToolBar {
       config.setLimit(pageSize);
       loader.load(config);
     } else {
+      loader.setLimit(pageSize);
       loader.load(offset, limit);
     }
   }

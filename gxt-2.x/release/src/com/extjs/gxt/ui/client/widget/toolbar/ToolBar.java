@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.widget.toolbar;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.aria.FocusFrame;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.ContainerEvent;
@@ -104,7 +105,7 @@ public class ToolBar extends Container<Component> {
   public ToolBar() {
     setLayoutOnChange(true);
     enableLayout = true;
-                      baseStyle = "x-toolbar";
+    baseStyle = "x-toolbar";
     setLayout(new ToolBarLayout());
   }
 
@@ -183,7 +184,7 @@ public class ToolBar extends Container<Component> {
   }
 
   /**
-   * Sets the ailgnment of the items. (defaults to LEFT, pre-render).
+   * Sets the alignment of the items. (defaults to LEFT, pre-render).
    * 
    * @param alignment the alignment to set
    */
@@ -252,10 +253,9 @@ public class ToolBar extends Container<Component> {
       }
     }
 
-    el().setTabIndex(0);
-    el().setElementAttribute("hideFocus", "true");
-
     if (GXT.isAriaEnabled()) {
+      el().setTabIndex(0);
+      el().setElementAttribute("hideFocus", "true");
       Accessibility.setRole(getElement(), "toolbar");
 
       if (!getTitle().equals("")) {
@@ -269,12 +269,20 @@ public class ToolBar extends Container<Component> {
   @Override
   public void onComponentEvent(ComponentEvent ce) {
     super.onComponentEvent(ce);
-    switch (ce.getEventTypeInt()) {
-      case Event.ONFOCUS:
-        if (getItemCount() > 0) {
-          getItem(0).focus();
-        }
+    if (ce.getEventTypeInt() == Event.ONFOCUS) {
+      onFocus(ce);
+    }
+  }
+
+  protected void onFocus(ComponentEvent ce) {
+    FocusFrame.get().unframe();
+    ce.stopEvent();
+    for (int i = 0; i < getItemCount(); i++) {
+      Component c = getItem(i);
+      if (!c.isAriaIgnore()) {
+        c.focus();
         break;
+      }
     }
   }
 

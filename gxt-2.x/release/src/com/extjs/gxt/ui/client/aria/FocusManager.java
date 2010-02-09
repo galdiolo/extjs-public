@@ -26,9 +26,12 @@ public class FocusManager {
   }
 
   private List<FocusHandler> handlers = new ArrayList<FocusHandler>();
+  private List<NavigationHandler> navigationHandlers = new ArrayList<NavigationHandler>();
+
   private BaseEventPreview preview;
   private static FocusManager instance;
-  
+  private boolean managed = true;
+
   private FocusManager() {
     preview = new BaseEventPreview() {
       @Override
@@ -68,13 +71,31 @@ public class FocusManager {
     preview.setAutoHide(false);
     initHandlers();
   }
-  
+
   public void disable() {
     preview.remove();
   }
-  
+
   public void enable() {
     preview.add();
+  }
+
+  public NavigationHandler findNavigationHandler(Component comp) {
+    for (int i = 0, len = navigationHandlers.size(); i < len; i++) {
+      NavigationHandler h = navigationHandlers.get(i);
+      if (h.canHandleTabKey(comp)) {
+        return h;
+      }
+    }
+    return null;
+  }
+
+  public boolean isManaged() {
+    return managed;
+  }
+
+  public void register(NavigationHandler handler) {
+    navigationHandlers.add(handler);
   }
 
   public void register(FocusHandler handler) {
@@ -83,24 +104,31 @@ public class FocusManager {
     }
   }
 
+  public void setManaged(boolean managed) {
+    this.managed = managed;
+  }
+
+  public void unregister(NavigationHandler handler) {
+    navigationHandlers.remove(handler);
+  }
+
   public void unregister(FocusHandler handler) {
     handlers.remove(handler);
   }
 
-  protected void activate(Component component) {
-//    for (int i = 0; i < handlers.size(); i++) {
-//      FocusHandler handler = handlers.get(i);
-//      if (handler.canActivate(component)) {
-//        handler.onActivate(component);
-//      }
-//    }
-  }
-  
   protected void initHandlers() {
     register(new ButtonBarHandler());
     register(new MenuHandler());
     register(new TabPanelHandler());
+    register(new InputSliderHandler());
+    register(new FieldHandler());
+    register(new HeaderHandler());
+    register(new ContentPanelHandler());
+    // always last
     register(new DefaultHandler());
+
+    register(new ContentPanelNavigationHandler());
+
   }
 
 }

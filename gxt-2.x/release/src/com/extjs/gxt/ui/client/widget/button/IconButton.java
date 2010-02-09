@@ -7,15 +7,20 @@
  */
 package com.extjs.gxt.ui.client.widget.button;
 
+import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.aria.FocusFrame;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.IconButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
+import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.ui.Accessibility;
 
 /**
  * A simple css styled button with 3 states: normal, over, and disabled.
@@ -123,6 +128,12 @@ public class IconButton extends BoxComponent {
       case Event.ONCLICK:
         onClick(ce);
         break;
+      case Event.ONFOCUS:
+        onFocus(ce);
+        break;
+      case Event.ONBLUR:
+        onBlur(ce);
+        break;
     }
   }
 
@@ -138,6 +149,12 @@ public class IconButton extends BoxComponent {
   @Override
   protected ComponentEvent createComponentEvent(Event event) {
     return new IconButtonEvent(this, event);
+  }
+
+  protected void onBlur(ComponentEvent ce) {
+    if (GXT.isAriaEnabled()) {
+      FocusFrame.get().unframe();
+    }
   }
 
   protected void onClick(ComponentEvent ce) {
@@ -156,13 +173,39 @@ public class IconButton extends BoxComponent {
     removeStyleName(style + "-disabled");
   }
 
+  protected void onFocus(ComponentEvent ce) {
+    if (GXT.isAriaEnabled()) {
+      FocusFrame.get().frame(this);
+    }
+  }
+
+  protected void onKeyPress(ComponentEvent ce) {
+    int code = ce.getKeyCode();
+    if (code == KeyCodes.KEY_ENTER || code == 32) {
+      onClick(ce);
+    }
+  }
+  
   protected void onRender(Element target, int index) {
     setElement(DOM.createDiv(), target, index);
     addStyleName("x-icon-btn");
     addStyleName("x-nodrag");
     addStyleName(style);
-    sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS);
+    sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS | Event.FOCUSEVENTS);
     super.onRender(target, index);
+    
+    new KeyNav<ComponentEvent>(this){
+      @Override
+      public void onKeyPress(ComponentEvent ce) {
+        IconButton.this.onKeyPress(ce);
+      }
+      
+    };
+    
+    if (GXT.isAriaEnabled()) {
+      el().setTabIndex(0);
+      Accessibility.setRole(getElement(), Accessibility.ROLE_BUTTON);
+    }
   }
 
 }

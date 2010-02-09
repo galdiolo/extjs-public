@@ -193,10 +193,11 @@ public class ToggleButton extends Button {
       ButtonEvent be = new ButtonEvent(this);
       el().setStyleName("x-btn-pressed", state);
       if (state) {
-        onBlur(null);
+//        onBlur(null);
         removeStyleName(baseStyle + "-over");
+        removeStyleName(baseStyle + "-blur");
       } else {
-        onFocus(null);
+//        onFocus(null);
       }
       if (state && toggleGroup != null && toggleGroup.length() > 0) {
         List<ToggleButton> list = ComponentManager.get().get(ToggleButton.class);

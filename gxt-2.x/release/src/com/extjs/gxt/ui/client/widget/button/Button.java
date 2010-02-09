@@ -657,7 +657,7 @@ public class Button extends BoxComponent implements IconSupport {
   protected void onMouseOver(ComponentEvent ce) {
     if (handleMouseEvents) {
       addStyleName(baseStyle + "-over");
-//      preview.add();
+      preview.add();
     }
   }
 

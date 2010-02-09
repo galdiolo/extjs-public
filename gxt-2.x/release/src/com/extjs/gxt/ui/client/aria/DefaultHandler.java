@@ -19,18 +19,29 @@ public class DefaultHandler extends FocusHandler {
 
   @Override
   public void onTab(Component component, PreviewEvent pe) {
+    if (!isManaged()) return;
+
+    if (component.isAriaIgnore()) {
+      return;
+    }
     pe.stopEvent();
-    focusNextWidget(component);
+    if (pe.isShiftKey()) {
+      focusPreviousWidget(component);
+    } else {
+      focusNextWidget(component);
+    }
   }
 
   @Override
   public void onEscape(Component component, PreviewEvent pe) {
+    if (!isManaged()) return;
     stepOut(component);
   }
-  
+
   @Override
   public void onEnter(Component component, PreviewEvent pe) {
-    stepInto(component, pe);
+    if (!isManaged()) return;
+    stepInto(component, pe, true);
   }
 
 }

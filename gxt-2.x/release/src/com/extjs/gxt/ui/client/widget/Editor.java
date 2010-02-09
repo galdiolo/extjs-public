@@ -143,6 +143,7 @@ public class Editor extends BoxComponent {
     this.field = field;
     field.setParent(this);
     setShadow(false);
+//    addStyleName("x-selectable");
   }
 
   /**
@@ -567,6 +568,7 @@ public class Editor extends BoxComponent {
   @Override
   protected void onShow() {
     super.onShow();
+    el().setVisibility(true);
     el().updateZIndex(0);
   }
 

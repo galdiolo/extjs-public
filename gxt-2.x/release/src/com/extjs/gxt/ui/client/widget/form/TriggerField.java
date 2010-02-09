@@ -53,7 +53,6 @@ public class TriggerField<D> extends TextField<D> {
   protected BaseEventPreview focusEventPreview;
   protected El trigger;
   protected String triggerStyle = "x-form-trigger-arrow";
-
   protected boolean mimicing;
 
   private boolean editable = true;
@@ -92,6 +91,11 @@ public class TriggerField<D> extends TextField<D> {
     return hideTrigger;
   }
 
+  /**
+   * Returns true if tab key events are being monitored.
+   * 
+   * @return true if monitoring
+   */
   public boolean isMonitorTab() {
     return monitorTab;
   }
@@ -132,6 +136,12 @@ public class TriggerField<D> extends TextField<D> {
     this.hideTrigger = hideTrigger;
   }
 
+  /**
+   * True to monitor tab key events to force the bluring of the field (defaults
+   * to true).
+   * 
+   * @param monitorTab true to monitor tab key events
+   */
   public void setMonitorTab(boolean monitorTab) {
     this.monitorTab = monitorTab;
   }
@@ -239,7 +249,11 @@ public class TriggerField<D> extends TextField<D> {
 
     setElement(DOM.createDiv(), target, index);
 
-    input = new El(DOM.createInputText());
+    if (!isPassword()) {
+      input = new El(DOM.createInputText());
+    } else {
+      input = new El(DOM.createInputPassword());
+    }
 
     addStyleName("x-form-field-wrap");
 

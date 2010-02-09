@@ -121,6 +121,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
   protected TreeStore<M> treeStore;
   private boolean autoLoad, filtering, autoExpand;
   private boolean caching = true;
+  private boolean expandOnFilter = true;
 
   private ModelIconProvider<M> iconProvider;
   private ListStore<M> listStore = new ListStore<M>() {
@@ -195,7 +196,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
       setExpanded(child, false, true);
     }
   }
-
+  
   /**
    * Expands all nodes.
    */
@@ -204,7 +205,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
       setExpanded(child, true, true);
     }
   }
-
+  
   /**
    * Returns the tree node for the given target.
    * 
@@ -295,6 +296,15 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
   public boolean isExpanded(M model) {
     TreeNode node = findNode(model);
     return node.isExpanded();
+  }
+
+  /**
+   * Returns the if expand all and collapse all is enabled on filter changes.
+   * 
+   * @return the expand all collapse all state
+   */
+  public boolean isExpandOnFilter() {
+    return expandOnFilter;
   }
 
   /**
@@ -395,7 +405,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
             node.expanded = true;
 
             if (!node.childrenRendered) {
-              renderChildren(model);
+              renderChildren(model, false);
               node.childrenRendered = true;
             }
             // expand
@@ -444,6 +454,16 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
         }
       }
     }
+  }
+
+  /**
+   * Sets whether the tree should expand all and collapse all when filters are
+   * applied (defaults to true).
+   * 
+   * @param expandOnFilter true to expand and collapse on filter changes
+   */
+  public void setExpandOnFilter(boolean expandOnFilter) {
+    this.expandOnFilter = expandOnFilter;
   }
 
   /**
@@ -620,7 +640,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
     if (treeStore.getRootItems().size() == 0 && loader != null) {
       loader.load();
     } else {
-      renderChildren(null);
+      renderChildren(null, false);
       if (autoExpand) {
         expandAll();
       } else {
@@ -649,7 +669,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
     if (!isRendered() || !viewReady) {
       return;
     }
-
+    
     M p = se.getParent();
     if (p == null) {
       store.removeAll();
@@ -657,13 +677,13 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
         cache.clear();
       }
       nodes.clear();
-      renderChildren(null);
+      renderChildren(null, autoLoad);
       statefulExpand(treeStore.getRootItems());
     } else {
       TreeNode n = findNode(p);
       n.loaded = true;
 
-      renderChildren(p);
+      renderChildren(p, autoLoad);
 
       if (n.expand && !n.isLeaf()) {
         n.expand = false;
@@ -681,15 +701,14 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
   @Override
   protected void onDoubleClick(GridEvent<M> e) {
     super.onDoubleClick(e);
-    M m = e.getModel();
-    if (m != null) {
-      TreeNode node = findNode(m);
-      setExpanded(node.m, !node.expanded);
-    }
+    toggle(e.getModel());
   }
 
   protected void onFilter(TreeStoreEvent<M> se) {
     onDataChanged(se);
+    if (expandOnFilter && treeStore.isFiltered()) {
+      expandAll();
+    }
   }
 
   protected void onRemove(TreeStoreEvent<M> se) {
@@ -760,7 +779,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
     return id;
   }
 
-  protected void renderChildren(M parent) {
+  protected void renderChildren(M parent, boolean auto) {
     List<M> children = parent == null ? treeStore.getRootItems() : treeStore.getChildren(parent);
 
     for (M child : children) {
@@ -781,8 +800,8 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
         });
       } else if (loader != null) {
         if (autoLoad) {
-          if (store.isFiltered()) {
-            renderChildren(child);
+          if (store.isFiltered() || (!auto)) {
+            renderChildren(child, auto);
           } else {
             loader.loadChildren(child);
           }

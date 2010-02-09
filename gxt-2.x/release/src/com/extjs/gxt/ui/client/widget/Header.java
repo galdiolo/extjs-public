@@ -15,6 +15,7 @@ import com.extjs.gxt.ui.client.util.IconHelper;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.Accessibility;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.AbstractImagePrototype.ImagePrototypeElement;
 
@@ -30,6 +31,10 @@ public class Header extends Component implements IconSupport {
   private List<Component> tools = new ArrayList<Component>();
   private HorizontalPanel widgetPanel;
   private String text;
+  
+  public Header() {
+    setAriaIgnore(true);
+  }
 
   /**
    * Adds a tool.
@@ -82,6 +87,25 @@ public class Header extends Component implements IconSupport {
   }
 
   /**
+   * Returns the tool's.
+   * 
+   * @return the tools
+   */
+  public List<Component> getTools() {
+    return tools;
+  }
+
+  /**
+   * Returns the index of the given tool.
+   * 
+   * @param tool the tool
+   * @return the index or -1 if no match
+   */
+  public int indexOf(Component tool) {
+    return tools.indexOf(tool);
+  }
+
+  /**
    * Inserts a tool.
    * 
    * @param tool the tool to insert
@@ -90,6 +114,7 @@ public class Header extends Component implements IconSupport {
   public void insertTool(Component tool, int index) {
     tools.add(index, tool);
     if (rendered) {
+      widgetPanel.setVisible(true);
       widgetPanel.insert((Widget) tool, index);
     }
   }
@@ -189,17 +214,22 @@ public class Header extends Component implements IconSupport {
     widgetPanel.addStyleName("x-panel-toolbar");
     widgetPanel.setLayoutOnChange(true);
     widgetPanel.setStyleAttribute("float", "right");
+    widgetPanel.setAriaIgnore(true);
 
     if (tools.size() > 0) {
       for (int i = 0; i < tools.size(); i++) {
         widgetPanel.add(tools.get(i));
       }
+    } else {
+      widgetPanel.setVisible(false);
     }
 
     widgetPanel.render(getElement());
+    widgetPanel.setParent(this);
 
     textEl = new El(DOM.createSpan());
     textEl.setId(getId() + "-label");
+    Accessibility.setRole(textEl.dom, "header");
     getElement().appendChild(textEl.dom);
 
     if (textStyle != null) {

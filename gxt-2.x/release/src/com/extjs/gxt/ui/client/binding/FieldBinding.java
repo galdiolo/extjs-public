@@ -38,6 +38,7 @@ public class FieldBinding {
   private Listener<FieldEvent> changeListener;
   private ChangeListener modelListener;
   private Converter converter;
+  private boolean updateOriginalValue = false;
 
   /**
    * Creates a new binding instance.
@@ -64,7 +65,8 @@ public class FieldBinding {
   }
 
   /**
-   * Binds the model and field.
+   * Binds the model and field. This method also updates the fields original
+   * value which controls the dirty state of the field.
    * 
    * @param model the model to be bound
    */
@@ -77,7 +79,7 @@ public class FieldBinding {
     if (model instanceof Model) {
       ((Model) model).addChangeListener(modelListener);
     }
-    updateField();
+    updateField(updateOriginalValue);
   }
 
   /**
@@ -126,6 +128,16 @@ public class FieldBinding {
   }
 
   /**
+   * Returns true if the field's original value is updated when the field is
+   * bound.
+   * 
+   * @return true if original value is updated
+   */
+  public boolean isUpdateOriginalValue() {
+    return updateOriginalValue;
+  }
+
+  /**
    * Sets the converter which is used to translate data types when updating
    * either the field or model.
    * 
@@ -146,6 +158,15 @@ public class FieldBinding {
   }
 
   /**
+   * True to update the field's original value when bound (defaults to false).
+   * 
+   * @param updateOriginalValue true to update the original value
+   */
+  public void setUpdateOriginalValue(boolean updateOriginalValue) {
+    this.updateOriginalValue = updateOriginalValue;
+  }
+
+  /**
    * Unbinds the model and field by removing all listeners.
    */
   public void unbind() {
@@ -163,10 +184,23 @@ public class FieldBinding {
    * Updates the field's value with the model value.
    */
   public void updateField() {
+    updateField(false);
+  }
+
+  /**
+   * Updates the field's value and original value with the model value. Updating
+   * the original value will reset the field to a non-dirty state.
+   * 
+   * @param updateOriginalValue true to update the original value
+   */
+  public void updateField(boolean updateOriginalValue) {
     Object val = onConvertModelValue(model.get(property));
     field.setValue(val);
+    if (updateOriginalValue) {
+      field.setOriginalValue(val);
+    }
   }
-  
+
   /**
    * Updates the model's value with the field value.
    */
@@ -183,7 +217,7 @@ public class FieldBinding {
     }
 
   }
-  
+
   protected Object onConvertFieldValue(Object value) {
     if (converter != null) {
       return converter.convertFieldValue(value);

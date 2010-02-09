@@ -51,7 +51,7 @@ public class WidgetComponent extends BoxComponent {
    */
   public WidgetComponent(Widget widget) {
     assert widget != null : "widget must not be null";
-    widget.removeFromParent();
+    ComponentHelper.removeFromParent(widget);
     this.widget = widget;
     setParent(this, widget);
   }

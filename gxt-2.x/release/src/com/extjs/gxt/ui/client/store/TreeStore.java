@@ -733,6 +733,14 @@ public class TreeStore<M extends ModelData> extends Store<M> {
       for (M model : (List<M>) le.getData()) {
         insert.add(wrap(model));
       }
+      if (le.<Object> getConfig() instanceof ListLoadConfig) {
+        ListLoadConfig config = le.getConfig();
+        if (config.getSortInfo().getSortField() != null) {
+          sortInfo = config.getSortInfo();
+        } else {
+          sortInfo = new SortInfo();
+        }
+      }
       doInsert(rootWrapper, insert, 0, false, true);
       fireEvent(DataChanged, new TreeStoreEvent(this));
     } else {

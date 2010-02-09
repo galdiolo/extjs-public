@@ -111,6 +111,8 @@ public class ListView<M extends ModelData> extends BoxComponent {
   private String loadingText;
   private Element overElement;
   private ModelProcessor<M> modelProcessor;
+  private boolean enableQuickTip = true;
+  private QuickTip quickTip;
 
   /**
    * Creates a new view.
@@ -121,7 +123,6 @@ public class ListView<M extends ModelData> extends BoxComponent {
     all = new CompositeElement();
     baseStyle = "x-view";
     focusable = true;
-    new QuickTip(this);
   }
 
   /**
@@ -151,7 +152,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
   public Element findElement(Element element) {
     return fly(element).findParentElement(itemSelector, 5);
   }
-
+  
   /**
    * Returns the element's index.
    * 
@@ -240,6 +241,15 @@ public class ListView<M extends ModelData> extends BoxComponent {
   }
 
   /**
+   * Returns the view's quick tip instance.
+   * 
+   * @return the quicktip instance or null if not enabled
+   */
+  public QuickTip getQuickTip() {
+    return quickTip;
+  }
+
+  /**
    * Returns the view's selection model.
    * 
    * @return the selection model
@@ -295,6 +305,15 @@ public class ListView<M extends ModelData> extends BoxComponent {
       return element.getPropertyInt("viewIndex");
     }
     return all.indexOf(element);
+  }
+
+  /**
+   * Returns true if quicktips are enabled.
+   * 
+   * @return true for enabled
+   */
+  public boolean isEnableQuickTips() {
+    return enableQuickTip;
   }
 
   /**
@@ -405,6 +424,15 @@ public class ListView<M extends ModelData> extends BoxComponent {
    */
   public void setDisplayProperty(String displayProperty) {
     this.displayProperty = displayProperty;
+  }
+
+  /**
+   * True to enable quicktips (defaults to true, pre-render).
+   * @param enableQuickTip true to enable quicktips
+   */
+  public void setEnableQuickTips(boolean enableQuickTip) {
+    assertPreRender();
+    this.enableQuickTip = enableQuickTip;
   }
 
   /**
@@ -707,6 +735,10 @@ public class ListView<M extends ModelData> extends BoxComponent {
     if (template == null) {
       template = XTemplate.create("<tpl for=\".\"><div class='x-view-item'>{" + displayProperty + "}</div></tpl>");
     }
+    
+    if (enableQuickTip) {
+      quickTip = new QuickTip(this);
+    }
 
     disableTextSelection(true);
     sinkEvents(Event.ONCLICK | Event.ONDBLCLICK | Event.MOUSEEVENTS);
@@ -739,6 +771,10 @@ public class ListView<M extends ModelData> extends BoxComponent {
         }
         el().dom.replaceChild(node, original);
       }
+      ListViewEvent<M> evt = new ListViewEvent<M>(this);
+      evt.setModel(model);
+      evt.setIndex(index);
+      fireEvent(Events.RowUpdated, evt);
     }
   }
 

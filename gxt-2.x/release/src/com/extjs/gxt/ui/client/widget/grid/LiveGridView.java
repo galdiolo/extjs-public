@@ -28,7 +28,8 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.Event;
 
 /**
- * LiveGridView for displaying large amount of data.
+ * LiveGridView for displaying large amount of data. Data is loaded on demand as
+ * the user scrolls the grid.
  */
 public class LiveGridView extends GridView {
 
@@ -112,7 +113,11 @@ public class LiveGridView extends GridView {
   }
 
   /**
-   * Sets the amount of rows that should be cached (default to 200).
+   * Sets the amount of rows that should be cached (default to 200). The cache
+   * size is the number of rows that are retrieved each time a data request is made.
+   * The cache size should always be greater than the number of visible rows of
+   * the grid. The number of visible rows will vary depending on the grid height
+   * and the height of each row.
    * 
    * @param cacheSize the new cache size
    */
@@ -130,7 +135,14 @@ public class LiveGridView extends GridView {
   }
 
   /**
-   * Sets the pre-fetch factor (defaults to .2).
+   * Sets the pre-fetch factor (defaults to .2). The pre-fetch factor is used to
+   * determine when new data should be fetched as the user scrolls the grid. The
+   * factor is used with the cache size.
+   * 
+   * <p />
+   * For example, if the cache size is 1000 with a pre-fetch of .20, the grid
+   * will request new data when the 800th (1000 * .20) row of the grid becomes
+   * visible.
    * 
    * @param prefetchFactor the pre-fetch factor
    */
@@ -139,7 +151,10 @@ public class LiveGridView extends GridView {
   }
 
   /**
-   * Sets the height of one row (defaults to 20).
+   * Sets the height of one row (defaults to 20). <code>LiveGridView</code> will
+   * only work with fixed row heights with all rows being the same height.
+   * Changing this value will not physically resize the row heights, rather, the
+   * specified height will be used internally for calculations.
    * 
    * @param rowHeight the new row height.
    */
@@ -227,7 +242,7 @@ public class LiveGridView extends GridView {
           liveScroller.setInnerHtml(sb.toString());
 
         }
-        if (viewIndexReload != -1 && !isChached(viewIndexReload)) {
+        if (viewIndexReload != -1 && !isCached(viewIndexReload)) {
           loadLiveStore(getLiveStoreCalculatedIndex(viewIndexReload));
         } else {
           viewIndexReload = -1;
@@ -243,7 +258,7 @@ public class LiveGridView extends GridView {
     });
   }
 
-  protected boolean isChached(int index) {
+  protected boolean isCached(int index) {
     if ((index < liveStoreOffset) || (index > (liveStoreOffset + cacheSize - getVisibleRowCount()))) {
       return false;
     }
@@ -332,7 +347,7 @@ public class LiveGridView extends GridView {
     int liveStoreIndex = Math.max(0, viewIndex - liveStoreOffset);
 
     // load data if not already cached
-    if (!isChached(viewIndex)) {
+    if (!isCached(viewIndex)) {
       if (!isMasked) {
         scroller.mask(GXT.MESSAGES.loadMask_msg());
         isMasked = true;

@@ -260,7 +260,7 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     for (M m : models) {
       if (selected.remove(m)) {
         if (lastSelected == m) {
-          lastSelected = null;
+          lastSelected = selected.size() > 0 ? selected.get(0) : null;
         }
         onSelectChange(m, false);
         change = true;

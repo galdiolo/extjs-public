@@ -310,7 +310,7 @@ public class Events {
   /**
    * DragFail event type.
    */
-  public static final EventType DragFail = null;
+  public static final EventType DragFail = new EventType();
 
   /**
    * DragLeave event type.

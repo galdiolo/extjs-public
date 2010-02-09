@@ -1,3 +1,10 @@
+/*
+ * Ext GWT - Ext for GWT
+ * Copyright(c) 2007-2009, Ext JS, LLC.
+ * licensing@extjs.com
+ * 
+ * http://extjs.com/license
+ */
 package com.extjs.gxt.samples.client.examples.grid;
 
 import java.util.ArrayList;
@@ -54,6 +61,7 @@ public class AutoHeightGridExample extends LayoutContainer {
 
   protected void doAutoHeight() {
     if (grid.isViewReady()) {
+      grid.getView().getScroller().setStyleAttribute("overflowY", "hidden");
       cp.setHeight((grid.getView().getBody().isScrollableX() ? 19 : 0) + grid.el().getFrameWidth("tb")
           + grid.getView().getHeader().getHeight() + cp.getFrameHeight()
           + grid.getView().getBody().firstChild().getHeight());
@@ -190,6 +198,8 @@ public class AutoHeightGridExample extends LayoutContainer {
 
     add(cp);
     store.insert(createPlant(), 0);
+    store.insert(createPlant(), 1);
+    store.insert(createPlant(), 2);
 
     grid.addListener(Events.ViewReady, new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent be) {

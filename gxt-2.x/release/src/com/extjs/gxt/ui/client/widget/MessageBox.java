@@ -360,6 +360,7 @@ public class MessageBox {
             icon = null;
           } else if (type == MessageBoxType.MULTIPROMPT) {
             textArea = new TextArea();
+            textArea.setHeight(defaultTextHeight);
             dialog.setFocusWidget(textArea);
             textArea.render(contentEl, 2);
             icon = null;

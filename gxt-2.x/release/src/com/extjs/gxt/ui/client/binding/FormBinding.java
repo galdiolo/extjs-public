@@ -25,6 +25,7 @@ public class FormBinding extends Bindings {
 
   protected FormPanel panel;
   protected Store store;
+  protected boolean updateOriginalValue;
 
   /**
    * Creates a new form binding instance.
@@ -83,6 +84,16 @@ public class FormBinding extends Bindings {
   }
 
   /**
+   * Returns true if the field's original value are updated when the field is
+   * bound.
+   * 
+   * @return true if original value is updated
+   */
+  public boolean isUpdateOriginalValue() {
+    return updateOriginalValue;
+  }
+
+  /**
    * Sets the form binding's store. When set, edits will done using record
    * instances from the store, rather than editing the model directly.
    * 
@@ -90,6 +101,18 @@ public class FormBinding extends Bindings {
    */
   public void setStore(Store store) {
     this.store = store;
+  }
+
+  /**
+   * True to update the field's original value when bound (defaults to false).
+   * 
+   * @param update true to update the original value
+   */
+  public void setUpdateOriginalValue(boolean update) {
+    this.updateOriginalValue = update;
+    for (FieldBinding b : getBindings()) {
+      b.setUpdateOriginalValue(update);
+    }
   }
 
 }

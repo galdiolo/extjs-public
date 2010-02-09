@@ -184,24 +184,22 @@ public class BaseTreeModel extends BaseModel implements TreeModel {
   public void setParent(TreeModel parent) {
     this.parent = parent;
   }
-  
-  
-  
+
   private void setParentInternal(ModelData child) {
     if (child instanceof TreeModel) {
-      TreeModel treeChild = (TreeModel)child;
+      TreeModel treeChild = (TreeModel) child;
       treeChild.setParent(this);
     } else {
-      child.set("gxt.parent", child);
+      child.set("gxt-parent", child);
     }
   }
-  
+
   private TreeModel getParentInternal(ModelData child) {
     if (child instanceof TreeModel) {
-      TreeModel treeChild = (TreeModel)child;
+      TreeModel treeChild = (TreeModel) child;
       return treeChild.getParent();
     } else {
-      return (TreeModel)child.get("gxt.parent");
+      return (TreeModel) child.get("gxt-parent");
     }
   }
 
@@ -212,13 +210,13 @@ public class BaseTreeModel extends BaseModel implements TreeModel {
     }
     setParentInternal(child);
   }
-  
+
   private void orphan(ModelData child) {
     if (child instanceof TreeModel) {
-      TreeModel treeChild = (TreeModel)child;
+      TreeModel treeChild = (TreeModel) child;
       treeChild.setParent(null);
     } else {
-      child.remove("gxt.parent");
+      child.remove("gxt-parent");
     }
   }
 

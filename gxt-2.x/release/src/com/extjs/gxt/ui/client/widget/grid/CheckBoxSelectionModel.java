@@ -25,6 +25,11 @@ import com.google.gwt.user.client.Event;
  * the column model using {@link #getColumn()} and add this object to the grids
  * plugin.
  * 
+ * <p>
+ * This selection mode defaults to SelectionMode.MULTI and also supports
+ * SelectionMode.SIMPLE. With SIMPLE, the control and shift keys do not need to
+ * be pressed for multiple selections.
+ * 
  * @param <M> the model data type
  */
 public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionModel<M> implements ComponentPlugin {
@@ -94,7 +99,7 @@ public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionMo
 
   @Override
   protected void handleMouseClick(GridEvent<M> e) {
-    if (e.getEvent().getButton() == Event.BUTTON_LEFT && e.getTarget().getClassName().equals("x-grid3-row-checker")) {
+    if (e.getTarget().getClassName().equals("x-grid3-row-checker")) {
       return;
     }
     super.handleMouseClick(e);

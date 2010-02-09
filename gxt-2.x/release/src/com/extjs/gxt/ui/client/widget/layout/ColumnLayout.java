@@ -8,6 +8,7 @@
 package com.extjs.gxt.ui.client.widget.layout;
 
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
@@ -83,7 +84,7 @@ public class ColumnLayout extends Layout {
 
     Size size = target.getStyleSize();
 
-    int w = size.width - (adjustForScroll ? 19 : 0);
+    int w = size.width - (adjustForScroll ? Math.max(19, XDOM.getScrollBarWidth()) : 0);
     int pw = w;
 
     int count = container.getItemCount();

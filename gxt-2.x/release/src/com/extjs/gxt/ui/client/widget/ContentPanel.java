@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.core.DomHelper;
@@ -29,6 +30,7 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.Accessibility;
 import com.google.gwt.user.client.ui.Frame;
 
 /**
@@ -220,8 +222,8 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
    * expanding.
    */
   public void expand() {
-    if (rendered ) {
-      if (collapsed && !animating  && fireEvent(Events.BeforeExpand)) {
+    if (rendered) {
+      if (collapsed && !animating && fireEvent(Events.BeforeExpand)) {
         hideShadow();
         onExpand();
       }
@@ -572,12 +574,14 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
    */
   public void setBottomComponent(Component bottomComponent) {
     assertPreRender();
-    if(this.bottomComponent != null){
-      this.bottomComponent.removeFromParent();
-      this.bottomComponent.setParent(null);
+    if (this.bottomComponent != null) {
+      Component c = this.bottomComponent;
+      this.bottomComponent = null;
+      c.removeFromParent();
     }
-    this.bottomComponent = bottomComponent;
-    if(this.bottomComponent != null){
+
+    if (bottomComponent != null) {
+      this.bottomComponent = bottomComponent;
       this.bottomComponent.setParent(this);
     }
   }
@@ -735,12 +739,14 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
    */
   public void setTopComponent(Component topComponent) {
     assertPreRender();
-    if(this.topComponent != null){
-      this.topComponent.removeFromParent();
-      this.topComponent.setParent(null);
+    if (this.topComponent != null) {
+      Component c = this.topComponent;
+      this.topComponent = null;
+      c.removeFromParent();
     }
-    this.topComponent = topComponent;
-    if(this.topComponent != null){
+
+    if (topComponent != null) {
+      this.topComponent = topComponent;
       this.topComponent.setParent(this);
     }
   }
@@ -1048,6 +1054,13 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
       setAnimCollapse(anim);
     }
 
+    if (GXT.isAriaEnabled()) {
+      Accessibility.setRole(getElement(), "region");
+      if (head != null) {
+        setAriaLabelledBy(head.getId() + "-label");
+      }
+    }
+
     // early render
     layoutBars();
   }
@@ -1087,6 +1100,18 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
     if (mask) {
       mask(maskMessage, maskMessageStyleName);
     }
+  }
+
+  @Override
+  protected boolean remove(Component item) {
+    if (item == topComponent) {
+      setTopComponent(null);
+      return true;
+    } else if (item == bottomComponent) {
+      setBottomComponent(null);
+      return true;
+    }
+    return super.remove(item);
   }
 
 }

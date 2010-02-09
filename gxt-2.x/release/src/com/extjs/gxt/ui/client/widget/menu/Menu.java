@@ -352,6 +352,35 @@ public class Menu extends Container<Component> {
   }
 
   /**
+   * Sets the active item. The component must be of type <code>Item</code> to be
+   * activated. All other types are ignored.
+   * 
+   * @param c the component to set active
+   * @param autoExpand true to auto expand the item
+   */
+  public void setActiveItem(Component c, boolean autoExpand) {
+    if (c instanceof Item) {
+      Item item = (Item) c;
+      if (item != activeItem) {
+        deactiveActiveItem();
+
+        this.activeItem = item;
+        item.activate(autoExpand);
+        item.el().scrollIntoView(ul.dom, false);
+        focus();
+
+        if (GXT.isAriaEnabled()) {
+          FocusFrame.get().frame(item);
+          Accessibility.setState(getElement(), "aria-activedescendant", item.getId());
+        }
+
+      } else if (autoExpand) {
+        item.expandMenu(autoExpand);
+      }
+    }
+  }
+
+  /**
    * Sets whether the menu should be constrained to the viewport when shown.
    * Only applies when using {@link #showAt(int, int)}.
    * 
@@ -499,19 +528,6 @@ public class Menu extends Container<Component> {
     }
   }
 
-  @Override
-  protected void onLayoutExcecuted(Layout layout) {
-    super.onLayoutExcecuted(layout);
-    doAutoSize();
-  }
-
-  protected void doAutoSize() {
-    if (showing && width == null) {
-      int width = getLayoutTarget().getWidth() + el().getFrameWidth("lr");
-      el().setWidth(Math.max(width, minWidth), true);
-    }
-  }
-
   protected void constrainScroll(int y) {
     int full = ul.setHeight("auto").getHeight();
 
@@ -583,6 +599,13 @@ public class Menu extends Container<Component> {
     }
   }
 
+  protected void doAutoSize() {
+    if (showing && width == null) {
+      int width = getLayoutTarget().getWidth() + el().getFrameWidth("lr");
+      el().setWidth(Math.max(width, minWidth), true);
+    }
+  }
+
   protected boolean onAutoHide(PreviewEvent pe) {
     if (pe.getEventTypeInt() == Event.ONMOUSEDOWN
         && !(pe.within(getElement()) || (fly(pe.getTarget()).findParent(".x-ignore", -1) != null))) {
@@ -615,6 +638,26 @@ public class Menu extends Container<Component> {
   protected void onHide() {
     super.onHide();
     deactiveActiveItem();
+  }
+
+  protected void onKeyDown(ComponentEvent ce) {
+    ce.stopEvent();
+    if (tryActivate(indexOf(activeItem) + 1, 1) == null) {
+      tryActivate(0, 1);
+    }
+  }
+
+  protected void onKeyUp(ComponentEvent ce) {
+    ce.stopEvent();
+    if (tryActivate(indexOf(activeItem) - 1, -1) == null) {
+      tryActivate(getItemCount() - 1, -1);
+    }
+  }
+
+  @Override
+  protected void onLayoutExcecuted(Layout layout) {
+    super.onLayoutExcecuted(layout);
+    doAutoSize();
   }
 
   protected void onMouseOut(ComponentEvent ce) {
@@ -652,10 +695,8 @@ public class Menu extends Container<Component> {
     super.onRender(target, index);
 
     keyNav = new KeyNav<ComponentEvent>(this) {
-      public void onDown(ComponentEvent be) {
-        if (tryActivate(indexOf(activeItem) + 1, 1) == null) {
-          tryActivate(0, 1);
-        }
+      public void onDown(ComponentEvent ce) {
+        onKeyDown(ce);
       }
 
       public void onEnter(ComponentEvent be) {
@@ -677,15 +718,12 @@ public class Menu extends Container<Component> {
 
       public void onRight(ComponentEvent be) {
         if (activeItem != null) {
-
           activeItem.expandMenu(true);
         }
       }
 
-      public void onUp(ComponentEvent be) {
-        if (tryActivate(indexOf(activeItem) - 1, -1) == null) {
-          tryActivate(getItemCount() - 1, -1);
-        }
+      public void onUp(ComponentEvent ce) {
+        onKeyUp(ce);
       }
     };
 
@@ -745,28 +783,6 @@ public class Menu extends Container<Component> {
   protected void scrollMenu(boolean top) {
     ul.setScrollTop(ul.getScrollTop() + scrollIncrement * (top ? -1 : 1));
 
-  }
-
-  public void setActiveItem(Component c, boolean autoExpand) {
-    if (c instanceof Item) {
-      Item item = (Item) c;
-      if (item != activeItem) {
-        deactiveActiveItem();
-
-        this.activeItem = item;
-        item.activate(autoExpand);
-        item.el().scrollIntoView(ul.dom, false);
-        focus();
-
-        if (GXT.isAriaEnabled()) {
-          FocusFrame.get().frame(item);
-          Accessibility.setState(getElement(), "aria-activedescendant", item.getId());
-        }
-
-      } else if (autoExpand) {
-        item.expandMenu(autoExpand);
-      }
-    }
   }
 
   protected Item tryActivate(int start, int step) {

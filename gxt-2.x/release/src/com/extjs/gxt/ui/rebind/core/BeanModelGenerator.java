@@ -77,8 +77,6 @@ public class BeanModelGenerator extends Generator {
         sw.println("public BeanModelFactory getFactory(Class b) {");
         sw.indent();
         sw.println("String n = b.getName();");
-        // innerclass rename
-        sw.println("n = n.replace(\"$\",\".\");");
         sw.println("if (m == null) {");
         sw.indentln("m = new FastMap<BeanModelFactory>();");
         sw.println("}");
@@ -93,15 +91,13 @@ public class BeanModelGenerator extends Generator {
           if (i > 0) {
             sw.print(" else ");
           }
-          sw.println("if (\"" + bean.getQualifiedSourceName() + "\".equals(n)) {");
-          sw.indent();
-          sw.println("m" + i + "();");
+          sw.println("if (" + bean.getQualifiedSourceName() + ".class.getName().equals(n)) {");
+          sw.indentln("m" + i + "();");
 
           sb.append("private void m" + i + "() {\n");
-          sb.append("  m.put(\"" + bean.getQualifiedSourceName() + "\", new " + factory + "());\n");
+          sb.append("  m.put(" + bean.getQualifiedSourceName() + ".class.getName(), new " + factory + "());\n");
           sb.append("}\n");
 
-          sw.outdent();
           sw.print("}");
         }
         sw.outdent();

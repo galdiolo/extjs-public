@@ -192,6 +192,7 @@ public class TabItem extends LayoutContainer implements IconSupport {
   public TabItem() {
     header = new HeaderItem();
     header.setParent(this);
+    setAriaIgnore(true);
   }
 
   /**

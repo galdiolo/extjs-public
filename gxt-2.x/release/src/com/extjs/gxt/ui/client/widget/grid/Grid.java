@@ -188,8 +188,9 @@ import com.google.gwt.user.client.Timer;
  * </ul>
  * </dd>
  * 
- * <dd><b>HeaderContextMenu</b> : TableEvent(grid, colIndex, menu)<br>
- * <div>Fires right before the header's context menu is displayed.</div>
+ * <dd><b>HeaderContextMenu</b> : GridEvent(grid, colIndex, menu)<br>
+ * <div>Fires right before the header's context menu is displayed. Listeners can
+ * cancel the action by calling {@link BaseEvent#setCancelled(boolean)}.</div>
  * <ul>
  * <li>grid : this</li>
  * <li>colIndex : the column index</li>
@@ -299,6 +300,12 @@ public class Grid<M extends ModelData> extends BoxComponent {
     disabledStyle = null;
     baseStyle = "x-grid-panel";
     setSelectionModel(new GridSelectionModel<M>());
+    disableTextSelection(true);
+  }
+  
+  @Override
+  public void disableTextSelection(boolean disable) {
+    disableTextSelection = disable ? 1 : 0;
   }
 
   protected Grid() {

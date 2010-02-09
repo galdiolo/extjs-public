@@ -112,20 +112,20 @@ public abstract class Container<T extends Component> extends BoxComponent {
    * (defaults to false).
    */
   protected boolean enableLayout;
-
-  protected boolean layoutExecuted;
-
-  protected boolean layoutNeeded = true;
-  protected boolean layoutOnAttach = true;
+  
   /**
    * True to execute the container's layout when children are inserted and
    * removed (defaults to false).
    */
   protected boolean layoutOnChange;
 
-  Listener<LayoutEvent> layoutListener;
-  private List<T> items;
+  protected boolean layoutExecuted;
+  protected boolean layoutNeeded = true;
+  protected boolean layoutOnAttach = true;
 
+  Listener<LayoutEvent> layoutListener;
+  
+  private List<T> items;
   private Layout layout;
 
   /**

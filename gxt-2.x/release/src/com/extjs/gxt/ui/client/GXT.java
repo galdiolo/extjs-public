@@ -9,6 +9,7 @@ package com.extjs.gxt.ui.client;
 
 import java.util.Map;
 
+import com.extjs.gxt.ui.client.aria.FocusManager;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.image.XImages;
@@ -250,16 +251,16 @@ public class GXT {
     isIE7 = !isOpera && ua.indexOf("msie 7") != -1;
     isIE8 = !isOpera && ua.indexOf("msie 8") != -1;
     isIE6 = isIE && !isIE7 && !isIE8;
-    
+
     isChrome = !isIE && ua.indexOf("chrome") != -1;
-    
+
     isWebKit = ua.indexOf("webkit") != -1;
-    
+
     isSafari = !isChrome && ua.indexOf("safari") != -1;
     isSafari3 = isSafari && ua.indexOf("version/3") != -1;
     isSafari4 = isSafari && ua.indexOf("version/4") != -1;
     isSafari2 = isSafari && !isSafari3 && !isSafari4;
-    
+
     isGecko = !isWebKit && ua.indexOf("gecko") != -1;
     isGecko3 = isGecko && ua.indexOf("rv:1.9.0") != -1;
     isGecko35 = isGecko && ua.indexOf("rv:1.9.1") != -1;
@@ -270,7 +271,10 @@ public class GXT {
     isAir = (ua.indexOf("adobeair") != -1);
     isLinux = (ua.indexOf("linux") != -1);
 
-    useShims = isIE6 || (isMac && isGecko2);
+    // don't override if set to true
+    if (!useShims) {
+      useShims = isIE6 || (isMac && isGecko2);
+    }
 
     isStrict = Document.get().isCSS1Compat();
 
@@ -368,6 +372,11 @@ public class GXT {
   public static void setAriaEnabled(boolean enable) {
     ariaEnabled = enable;
     Accessibility.setRole(XDOM.getBody(), enable ? "application" : "");
+    if (ariaEnabled) {
+      FocusManager.get().enable();
+    } else {
+      FocusManager.get().disable();
+    }
   }
 
   /**

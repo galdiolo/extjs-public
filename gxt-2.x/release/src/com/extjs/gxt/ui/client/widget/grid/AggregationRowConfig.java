@@ -51,6 +51,7 @@ public class AggregationRowConfig<M extends ModelData> {
   private Map<String, NumberFormat> formats;
   private Map<String, Widget> widgets;
   private Map<String, String> texts;
+  private Map<String, String> cellStyle;
   private ModelData model;
 
   /**
@@ -62,6 +63,17 @@ public class AggregationRowConfig<M extends ModelData> {
     formats = new HashMap<String, NumberFormat>();
     texts = new HashMap<String, String>();
     widgets = new HashMap<String, Widget>();
+    cellStyle = new HashMap<String, String>();
+  }
+
+  /**
+   * Returns the cell style for the given column.
+   * 
+   * @param id the column id
+   * @return the CSS style name
+   */
+  public String getCellStyle(String id) {
+    return cellStyle.get(id);
   }
 
   /**
@@ -121,6 +133,16 @@ public class AggregationRowConfig<M extends ModelData> {
    */
   public Widget getWidget(String id) {
     return widgets.get(id);
+  }
+
+  /**
+   * Sets the cell style for the given column.
+   * 
+   * @param id the column id
+   * @param style the CSS style name
+   */
+  public void setCellStyle(String id, String style) {
+    cellStyle.put(id, style);
   }
 
   /**

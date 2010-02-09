@@ -14,7 +14,10 @@ import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.TreeModel;
 import com.extjs.gxt.ui.client.dnd.DND.Operation;
 import com.extjs.gxt.ui.client.dnd.DND.TreeSource;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.DNDEvent;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
@@ -34,6 +37,12 @@ public class TreePanelDragSource extends DragSource {
     super(tree);
     this.tree = tree;
     setStatusText("{0} items selected");
+
+    tree.addListener(Events.OnMouseDown, new Listener<ComponentEvent>() {
+      public void handleEvent(ComponentEvent be) {
+        TreePanelDragSource.this.tree.focus();
+      }
+    });
   }
 
   /**
@@ -44,7 +53,7 @@ public class TreePanelDragSource extends DragSource {
   public TreeSource getTreeSource() {
     return treeSource;
   }
-  
+
   /**
    * Returns true if tree store state is enabled.
    * 

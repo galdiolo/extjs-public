@@ -65,20 +65,26 @@ public class FileUploadExample extends LayoutContainer {
     combo.setStore(store);
     combo.setTriggerAction(TriggerAction.ALL);
     panel.add(combo);
-    
-    Button btn = new Button("Submit");
+
+    Button btn = new Button("Reset");
     btn.addSelectionListener(new SelectionListener<ButtonEvent>() {
+      @Override
+      public void componentSelected(ButtonEvent ce) {
+        panel.reset();
+      }
+    });
+    panel.addButton(btn);
     
+    btn = new Button("Submit");
+    btn.addSelectionListener(new SelectionListener<ButtonEvent>() {
       @Override
       public void componentSelected(ButtonEvent ce) {
         if (!panel.isValid()) {
           return;
         }
-        
-        // normally would submit the form but for example no server set up to 
+        // normally would submit the form but for example no server set up to
         // handle the post
         // panel.submit();
-        
         MessageBox.info("Action", "You file was uploaded", null);
       }
     });

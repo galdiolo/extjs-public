@@ -45,6 +45,7 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Accessibility;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -255,7 +256,7 @@ public abstract class Component extends Widget implements Observable {
   private boolean disableBrowserEvents;
   private int disableContextMenu = Style.DEFAULT;
   private boolean disableEvents;
-  private int disableTextSelection = Style.DEFAULT;
+  protected int disableTextSelection = Style.DEFAULT;
   private El el;
   private int events;
   private boolean focused;
@@ -270,7 +271,9 @@ public abstract class Component extends Widget implements Observable {
   private Map<String, Object> state;
   private String styles = "";
   private ToolTipConfig toolTipConfig;
-  private String ariaLabelledBy;
+  private String ariaLabelledBy, ariaDescribedBy;
+  private int tabIndex = -1;
+  private boolean ariaIgnore;
 
   protected DelayedTask windowResizeTask;
   protected HandlerRegistration resizeHandler;
@@ -295,6 +298,17 @@ public abstract class Component extends Widget implements Observable {
     render(DOM.getParent(element));
     if (attach) {
       onAttach();
+    }
+  }
+
+  public int getTabIndex() {
+    return tabIndex;
+  }
+
+  public void setTabIndex(int tabIndex) {
+    this.tabIndex = tabIndex;
+    if (rendered) {
+      el().setTabIndex(tabIndex);
     }
   }
 
@@ -470,6 +484,15 @@ public abstract class Component extends Widget implements Observable {
   }
 
   /**
+   * Returns the ARIA described by id.
+   * 
+   * @return the ARIA described by id
+   */
+  public String getAriaDescribedBy() {
+    return ariaDescribedBy;
+  }
+
+  /**
    * Returns the ARIA labelled by id.
    * 
    * @return the ARIA labelled by id.
@@ -579,6 +602,18 @@ public abstract class Component extends Widget implements Observable {
   }
 
   /**
+   * Returns the component's plugins.
+   * 
+   * @return the plugins
+   */
+  public List<ComponentPlugin> getPlugins() {
+    if (plugins == null) {
+      plugins = new ArrayList<ComponentPlugin>();
+    }
+    return plugins;
+  }
+
+  /**
    * Returns the component's state. To save changes made to the state map
    * returned by this method, call {@link #saveState()}.
    * 
@@ -654,12 +689,31 @@ public abstract class Component extends Widget implements Observable {
   }
 
   /**
+   * Returns true if the component will be ignored by the ARIA and FocusManager
+   * API.
+   * 
+   * @return true if component is being ignored
+   */
+  public boolean isAriaIgnore() {
+    return ariaIgnore;
+  }
+
+  /**
    * Returns true if events are disabled.
    * 
    * @return true if events disabled
    */
   public boolean isDisabledEvents() {
     return disableEvents;
+  }
+
+  /**
+   * Returns true if text selection is disabled.
+   * 
+   * @return true for disabled
+   */
+  public boolean isDisableTextSelection() {
+    return disableTextSelection == 1;
   }
 
   /**
@@ -702,6 +756,8 @@ public abstract class Component extends Widget implements Observable {
 
   /**
    * Returns <code>true</code> if the component is visible.
+   * 
+   * @param deep true to search up the component hierarchy
    */
   public boolean isVisible(boolean deep) {
     Widget w = getParent();
@@ -852,18 +908,8 @@ public abstract class Component extends Widget implements Observable {
   @SuppressWarnings("unchecked")
   @Override
   public void removeFromParent() {
-    if (getParent() instanceof ContentPanel) {
-      ContentPanel cp = (ContentPanel) getParent();
-      if (cp.getTopComponent() == this) {
-        cp.setTopComponent(null);
-      } else if (cp.getBottomComponent() == this) {
-        cp.setBottomComponent(null);
-      }
-      return;
-    }
     if (getParent() instanceof Container) {
       ((Container) getParent()).remove(this);
-      return;
     }
     super.removeFromParent();
   }
@@ -959,6 +1005,8 @@ public abstract class Component extends Widget implements Observable {
       }
     }
 
+    addStyleName("x-component");
+
     rendered = true;
 
     createStyles(baseStyle);
@@ -978,13 +1026,21 @@ public abstract class Component extends Widget implements Observable {
     }
 
     if (ariaLabelledBy != null) {
-      getElement().setAttribute("aria-labelledby", ariaLabelledBy);
+      setAriaLabelledBy(ariaLabelledBy);
+    }
+    
+    if (ariaDescribedBy != null) {
+      setAriaDescribedBy(ariaDescribedBy);
     }
 
     if (id == null) {
       id = el.getId();
     } else {
       getElement().setId(id);
+    }
+    
+    if (tabIndex != -1) {
+      setTabIndex(tabIndex);
     }
 
     if (baseStyle != null) {
@@ -1008,6 +1064,10 @@ public abstract class Component extends Widget implements Observable {
     if (styles != null && !styles.equals("")) {
       el.applyStyles(styles);
       styles = null;
+    }
+
+    if (ariaIgnore) {
+      setAriaIgnore(true);
     }
 
     if (focused) {
@@ -1068,12 +1128,41 @@ public abstract class Component extends Widget implements Observable {
   }
 
   /**
+   * Sets the ARIA described by attribute on the component.
+   * 
+   * @param ariaDescribedBy the id of the element with the label
+   */
+  public void setAriaDescribedBy(String ariaDescribedBy) {
+    this.ariaDescribedBy = ariaDescribedBy;
+    if (rendered) {
+      getElement().setAttribute("aria-describedby", ariaDescribedBy);
+    }
+  }
+
+  /**
+   * True to mark this component to be ignored by the ARIA and FocusManager API
+   * (defaults to false). Typically set to true for any containers that should
+   * not be navigable to.
+   * 
+   * @param ignore true to ignore
+   */
+  public void setAriaIgnore(boolean ignore) {
+    ariaIgnore = ignore;
+    if (rendered) {
+      Accessibility.setRole(getElement(), ignore ? "presentation" : "");
+    }
+  }
+
+  /**
    * Sets the ARIA labelled by attribute on the component.
    * 
    * @param id the id of the element with the label.
    */
   public void setAriaLabelledBy(String id) {
     ariaLabelledBy = id;
+    if (rendered) {
+      getElement().setAttribute("aria-labelledby", ariaLabelledBy);
+    }
   }
 
   /**
@@ -1608,7 +1697,7 @@ public abstract class Component extends Widget implements Observable {
   protected void onLoad() {
     super.onLoad();
     if (disableTextSelection > 0) {
-      el.disableTextSelection(disableTextSelection == 1);
+      disableTextSelection(disableTextSelection == 1);
     }
     if (disableContextMenu > 0) {
       el.disableContextMenu(disableContextMenu == 1);
@@ -1726,6 +1815,10 @@ public abstract class Component extends Widget implements Observable {
     this.monitorWindowResize = monitorWindowResize;
   }
 
+  protected native void setParent(Widget parent) /*-{
+    this.@com.google.gwt.user.client.ui.Widget::parent=parent;
+  }-*/;
+
   /**
    * Sets delay in milliseconds used to buffer window resizing (defaults to
    * 100).
@@ -1755,8 +1848,4 @@ public abstract class Component extends Widget implements Observable {
     style.setPropertyPx("width", 0);
     return input;
   }
-
-  protected native void setParent(Widget parent) /*-{
-    this.@com.google.gwt.user.client.ui.Widget::parent=parent;
-  }-*/;
 }

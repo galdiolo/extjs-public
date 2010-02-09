@@ -76,7 +76,7 @@ public class CheckBoxListView<M extends ModelData> extends ListView<M> {
     if (getTemplate() == null) {
       String spacing = GXT.isIE ? "0" : "3";
       setTemplate(XTemplate.create("<tpl for=\".\"><div class='x-view-item x-view-item-check'><table cellspacing='"
-          + spacing + "' cellpadding=0><tr><td><input class=\"x-view-item-checkbox\" type=\"checkbox\" /><td><td>{"
+          + spacing + "' cellpadding=0><tr><td><input class=\"x-view-item-checkbox\" type=\"checkbox\" /></td><td><td>{"
           + getDisplayProperty() + "}</td></tr></table></div></tpl>"));
     }
     super.onRender(target, index);

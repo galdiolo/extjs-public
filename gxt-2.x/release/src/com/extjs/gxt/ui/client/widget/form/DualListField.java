@@ -120,7 +120,7 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
     /**
      * Sets the move selected down tooltip (defaults to 'Move selected down').
      * 
-     * @param moveDown the move down tootip
+     * @param moveDown the move down tooltip
      */
     public void setMoveDown(String moveDown) {
       this.moveDown = moveDown;
@@ -129,7 +129,7 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
     /**
      * Sets the move selected up tooltip (defaults to 'Move selected up').
      * 
-     * @param moveUp
+     * @param moveUp the move selected up text
      */
     public void setMoveUp(String moveUp) {
       this.moveUp = moveUp;
@@ -155,6 +155,9 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
 
   }
 
+  /**
+   * The DND mode enumeration.
+   */
   public enum Mode {
     APPEND, INSERT;
   }
@@ -183,9 +186,23 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
     add(buttonAdapter);
     add(toField);
   }
-
+  
+  /**
+   * Returns the DND group name.
+   * 
+   * @return the group name
+   */
   public String getDNDGroup() {
     return dndGroup;
+  }
+  
+  /**
+   * Returns the from list field.
+   * 
+   * @return the from list field
+   */
+  public ListField<D> getFromField() {
+    return fromField;
   }
 
   /**
@@ -209,6 +226,15 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
    */
   public Mode getMode() {
     return mode;
+  }
+
+  /**
+   * Return the to list field.
+   * 
+   * @return the to list field
+   */
+  public ListField<D> getToField() {
+    return toField;
   }
 
   /**

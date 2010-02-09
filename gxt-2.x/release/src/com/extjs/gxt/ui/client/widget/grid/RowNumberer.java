@@ -16,8 +16,7 @@ import com.extjs.gxt.ui.client.store.StoreListener;
 import com.extjs.gxt.ui.client.util.DelayedTask;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentPlugin;
-import com.google.gwt.dom.client.NodeList;
-import com.google.gwt.user.client.Element;
+import com.google.gwt.dom.client.Element;
 
 /**
  * A <code>ColumnConfig</code> that provides an automatic row numbering column.
@@ -91,15 +90,17 @@ public class RowNumberer extends ColumnConfig implements ComponentPlugin {
 
     task = new DelayedTask(new Listener<BaseEvent>() {
       public void handleEvent(BaseEvent be) {
-        NodeList<Element> nodes = grid.getView().getBody().select(".x-grid3-col-" + RowNumberer.this.getId());
         int columnIndex = grid.getColumnModel().getIndexById(RowNumberer.this.getId());
         ColumnData columnData = grid.getView().getColumnData().get(columnIndex);
         ListStore<ModelData> store = (ListStore<ModelData>) grid.getStore();
         String property = RowNumberer.this.getDataIndex();
-        for (int i = 0; i < nodes.getLength(); i++) {
-          nodes.getItem(i).setInnerHTML(
-              RowNumberer.this.getRenderer().render((ModelData) grid.getStore().getAt(i), property, columnData, i,
-                  columnIndex, store, (Grid<ModelData>) grid).toString());
+        for (int i = 0; i < grid.getStore().getCount(); i++) {
+          Element cell = grid.getView().getCell(i, columnIndex);
+          if (cell != null) {
+            cell.getFirstChildElement().setInnerHTML(
+                RowNumberer.this.getRenderer().render((ModelData) grid.getStore().getAt(i), property, columnData, i,
+                    columnIndex, store, (Grid<ModelData>) grid).toString());
+          }
         }
       }
     });

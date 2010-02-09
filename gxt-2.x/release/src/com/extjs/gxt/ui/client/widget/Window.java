@@ -231,6 +231,14 @@ public class Window extends ContentPanel {
     Point p = el().getAlignToXY(elem, pos, offsets);
     setPagePosition(p.x, p.y);
   }
+  
+  @Override
+  public void setHeading(String text) {
+    super.setHeading(text);
+    if (ghost != null) {
+      ghost.selectNode(".x-window-header-text").setInnerHtml(text);
+    }
+  }
 
   /**
    * Centers the window in the viewport. Should only be called when the window
@@ -299,7 +307,7 @@ public class Window extends ContentPanel {
    * @return the draggable instance
    */
   public Draggable getDraggable() {
-    if(dragger == null && draggable){
+    if (dragger == null && draggable) {
       dragger = new Draggable(this, head);
       dragger.setConstrainClient(getConstrain());
       dragger.setSizeProxyToSource(false);
@@ -676,13 +684,13 @@ public class Window extends ContentPanel {
    */
   public void setConstrain(boolean constrain) {
     this.constrain = constrain;
-    if(dragger != null){
+    if (dragger != null) {
       dragger.setConstrainClient(constrain);
     }
   }
 
   /**
-   * Sets the container elemen to be used to size and position the window when
+   * Sets the container element to be used to size and position the window when
    * maximized.
    * 
    * @param container the container element
@@ -701,7 +709,7 @@ public class Window extends ContentPanel {
     if (draggable) {
       head.addStyleName("x-window-draggable");
       getDraggable();
-    } else if (dragger != null){
+    } else if (dragger != null) {
       dragger.release();
       dragger = null;
       head.removeStyleName("x-window-draggable");
@@ -748,7 +756,7 @@ public class Window extends ContentPanel {
    */
   public void setMinHeight(int minHeight) {
     this.minHeight = minHeight;
-    if(resizer != null){
+    if (resizer != null) {
       resizer.setMinHeight(minHeight);
     }
   }
@@ -775,7 +783,7 @@ public class Window extends ContentPanel {
    */
   public void setMinWidth(int minWidth) {
     this.minWidth = minWidth;
-    if(resizer != null){
+    if (resizer != null) {
       resizer.setMinWidth(minWidth);
     }
   }
@@ -937,6 +945,10 @@ public class Window extends ContentPanel {
       maximize();
     }
     el().setVisibility(true);
+    
+    if (GXT.isAriaEnabled()) {
+      Accessibility.setState(getElement(), "aria-hidden", "false");
+    }
 
     fireEvent(Events.Show, new WindowEvent(this));
     toFront();
@@ -1070,6 +1082,16 @@ public class Window extends ContentPanel {
     }
   }
 
+  @Override
+  protected void onFocus(ComponentEvent ce) {
+    super.onFocus(ce);
+    if (GXT.isAriaEnabled()) {
+      if (focusWidget != null) {
+        El.fly(focusWidget.getElement()).focus();
+      }
+    }
+  }
+
   protected void onEndResize(ResizeEvent re) {
     resizing = false;
   }
@@ -1127,8 +1149,9 @@ public class Window extends ContentPanel {
 
       Accessibility.setRole(getElement(), "alertdialog");
       Accessibility.setState(getElement(), "aria-labelledby", head.getId() + "-label");
+      Accessibility.setState(getElement(), "aria-hidden", "true");
     }
-    
+
     if (modal || maximizable || constrain) {
       monitorWindowResize = true;
     }
@@ -1170,6 +1193,14 @@ public class Window extends ContentPanel {
       onShow();
     } else {
       onHide();
+    }
+  }
+  
+  @Override
+  protected void onHide() {
+    super.onHide();
+    if (GXT.isAriaEnabled()) {
+      Accessibility.setState(getElement(), "aria-hidden", "true");
     }
   }
 

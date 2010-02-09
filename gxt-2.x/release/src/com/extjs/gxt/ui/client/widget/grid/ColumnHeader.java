@@ -14,7 +14,9 @@ import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.core.DomQuery;
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.data.SortInfo;
 import com.extjs.gxt.ui.client.event.BaseEvent;
+import com.extjs.gxt.ui.client.event.ColumnHeaderEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.DragEvent;
 import com.extjs.gxt.ui.client.event.DragListener;
@@ -43,6 +45,9 @@ import com.google.gwt.user.client.ui.FlexTable.FlexCellFormatter;
 import com.google.gwt.user.client.ui.HTMLTable.RowFormatter;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment.HorizontalAlignmentConstant;
 
+/**
+ * ColumnHeader Component.
+ */
 public class ColumnHeader extends BoxComponent {
 
   public class GridSplitBar extends BoxComponent {
@@ -153,10 +158,9 @@ public class ColumnHeader extends BoxComponent {
       super.onRender(target, index);
       setElement(DOM.createDiv(), target, index);
 
-      
-      if(GXT.isOpera){
+      if (GXT.isOpera) {
         el().setStyleAttribute("cursor", "w-resize");
-      }else{
+      } else {
         el().setStyleAttribute("cursor", "col-resize");
       }
       setStyleAttribute("position", "absolute");
@@ -270,11 +274,10 @@ public class ColumnHeader extends BoxComponent {
     }
 
     public void updateWidth(int width) {
-
       if (!cm.isHidden(cm.indexOf(config))) {
         El td = el().findParent("td", 3);
         td.setWidth(width);
-        el().setWidth(width-td.getFrameWidth("lr"), true);
+        el().setWidth(width - td.getFrameWidth("lr"), true);
       }
     }
 
@@ -393,6 +396,16 @@ public class ColumnHeader extends BoxComponent {
   public ColumnHeader(BoxComponent container, ColumnModel cm) {
     this.container = container;
     this.cm = cm;
+    disableTextSelection(true);
+  }
+  
+  /**
+   * Returns the header's container component.
+   * ì
+   * @return the container component
+   */
+  public BoxComponent getContainer() {
+    return container;
   }
 
   public void enableColumnResizing() {
@@ -441,6 +454,7 @@ public class ColumnHeader extends BoxComponent {
     table.onBrowserEvent(event);
   }
 
+  @SuppressWarnings("unchecked")
   public void refresh() {
     groups.clear();
     heads.clear();
@@ -536,6 +550,15 @@ public class ColumnHeader extends BoxComponent {
       }
       updateColumnWidth(i, cm.getColumnWidth(i));
     }
+    if (container instanceof Grid) {
+      Grid grid = (Grid)container;
+      SortInfo sortInfo = grid.getStore().getSortState();
+      if (sortInfo != null && sortInfo.getSortField() != null) {
+        ColumnModel cm = grid.getColumnModel();
+        ColumnConfig column = cm.getColumnById(sortInfo.getSortField());
+        updateSortIcon(cm.indexOf(column), sortInfo.getSortDir());
+      }
+    }
     cleanCells();
     if (isAttached()) {
       adjustHeights();
@@ -595,7 +618,7 @@ public class ColumnHeader extends BoxComponent {
   }
 
   public void updateTotalWidth(int offset, int width) {
-    if (offset != -1) table.getElement().getParentElement().getStyle().setPropertyPx("width",++offset);
+    if (offset != -1) table.getElement().getParentElement().getStyle().setPropertyPx("width", ++offset);
     table.getElement().getStyle().setProperty("width", (++width) + "px");
   }
 
@@ -621,7 +644,7 @@ public class ColumnHeader extends BoxComponent {
   }
 
   protected ComponentEvent createColumnEvent(ColumnHeader header, int column, Menu menu) {
-    return new ComponentEvent(header);
+    return new ColumnHeaderEvent(header, container, column, menu);
   }
 
   protected Group createNewGroup(HeaderGroupConfig config) {
@@ -741,7 +764,7 @@ public class ColumnHeader extends BoxComponent {
       rows = Math.max(rows, config.getRow() + 1);
     }
     rows++;
-    
+
     new QuickTip(this);
 
     refresh();

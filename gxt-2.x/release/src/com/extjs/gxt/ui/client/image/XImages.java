@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.image;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.ImageBundle;
 
+@SuppressWarnings("deprecation")
 public interface XImages extends ImageBundle {
   @Resource("hmenu-asc.gif")
   AbstractImagePrototype grid_sortAsc();

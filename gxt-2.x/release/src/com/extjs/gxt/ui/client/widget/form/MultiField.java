@@ -226,6 +226,9 @@ public class MultiField<D> extends Field<D> {
   @Override
   protected void doAttachChildren() {
     ComponentHelper.doAttach(lc);
+    if (GXT.isIE) {
+      el().repaint();
+    }
   }
 
   @Override

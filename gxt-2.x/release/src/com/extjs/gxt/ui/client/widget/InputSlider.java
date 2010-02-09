@@ -7,7 +7,10 @@
  */
 package com.extjs.gxt.ui.client.widget;
 
+import com.extjs.gxt.ui.client.aria.FocusFrame;
+import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XDOM;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
@@ -22,12 +25,25 @@ public class InputSlider extends Slider {
   protected NumberField input;
   protected Element inputCt, sliderCt;
   protected int inputWidth = 22;
-  
+
   public InputSlider() {
-    input = new NumberField();
+    input = new NumberField() {
+      @Override
+      protected void onFocus(ComponentEvent be) {
+        FocusFrame.get().unframe();
+        super.onFocus(be);
+        setValue(InputSlider.this.getValue());
+      }
+    };
     input.setParent(this);
+    input.setData("gxt-input-slider", "true");
   }
-  
+
+  @Override
+  public El getFocusEl() {
+    return El.fly(sliderCt).firstChild();
+  }
+
   /**
    * Returns the input field.
    * 
@@ -61,12 +77,25 @@ public class InputSlider extends Slider {
     ComponentHelper.doAttach(input);
   }
 
+  protected void onClick(ComponentEvent ce) {
+    if (ce.getTarget() == input.getElement().getFirstChildElement()) {
+      return;
+    }
+    super.onClick(ce);
+  }
+  
   @Override
   protected void onDetach() {
     super.onDetach();
     ComponentHelper.doDetach(input);
   }
 
+  protected void onInputChange(FieldEvent be) {
+    be.setCancelled(true);
+    int value = ((Double) be.getValue()).intValue();
+    setValue(value);
+  }
+  
   @Override
   protected void onRender(Element target, int index) {
     StringBuffer sb = new StringBuffer();
@@ -82,7 +111,6 @@ public class InputSlider extends Slider {
     inputCt = el().selectNode(".x-slider-input").dom;
     sliderCt = el().selectNode(".x-slider-ct").dom;
 
-  
     input.setWidth(inputWidth);
     input.addListener(Events.Change, new Listener<FieldEvent>() {
       public void handleEvent(FieldEvent be) {
@@ -94,13 +122,8 @@ public class InputSlider extends Slider {
     input.render(inputCt);
 
     super.onRender(sliderCt, 0);
-
-  }
-
-  protected void onInputChange(FieldEvent be) {
-    be.setCancelled(true);
-    int value = ((Double)be.getValue()).intValue();
-    setValue(value);
+    
+    el().selectNode(".x-slider").dom.setPropertyString("__listener", "");
   }
 
   @Override

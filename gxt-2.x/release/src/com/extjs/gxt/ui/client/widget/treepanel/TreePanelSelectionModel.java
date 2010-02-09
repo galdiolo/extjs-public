@@ -280,7 +280,7 @@ public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreS
     if (isLocked()) {
       return;
     }
-    if (!e.isRightClick() && selectionMode == SelectionMode.MULTI) {
+    if (selectionMode == SelectionMode.MULTI) {
       M sel = (M) e.getItem();
       if (isSelected(sel) && getSelectedItems().size() > 1) {
         if (!e.isControlKey() && !e.isShiftKey()) {

@@ -85,7 +85,7 @@ public class StoreListener<M extends ModelData> implements Listener<StoreEvent<M
   }
 
   /**
-   * Fires when a tecord has been removed from the store.
+   * Fires when a record has been removed from the store.
    * 
    * @param se the store event
    */
@@ -103,7 +103,7 @@ public class StoreListener<M extends ModelData> implements Listener<StoreEvent<M
   }
 
   /**
-   * Fires when a tecord has been updated.
+   * Fires when a record has been updated.
    * 
    * @param se the store event
    */

@@ -10,12 +10,15 @@ package com.extjs.gxt.ui.client.widget;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.util.Params;
 import com.extjs.gxt.ui.client.util.Point;
 import com.extjs.gxt.ui.client.util.Size;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.ui.Accessibility;
 import com.google.gwt.user.client.ui.RootPanel;
 
 /**
@@ -85,7 +88,7 @@ public class Info extends ContentPanel {
    * 
    * @param title the info title
    * @param text the info text
-   * @param params the paramters to be applied to the title and text
+   * @param params the parameters to be applied to the title and text
    */
   public static void display(String title, String text, Params params) {
     InfoConfig config = new InfoConfig(title, text, params);
@@ -167,8 +170,20 @@ public class Info extends ContentPanel {
     Point p = position();
     el().setLeftTop(p.x, p.y);
     setSize(config.width, config.height);
+    
+    if (GXT.isAriaEnabled()) {
+      Accessibility.setState(getElement(), "aria-live", config.title + " " + config.text);
+    }
 
     afterShow();
+  }
+  
+  @Override
+  protected void onRender(Element parent, int pos) {
+    super.onRender(parent, pos);
+    if (GXT.isAriaEnabled()) {
+      Accessibility.setRole(getElement(), "aria-region");
+    }
   }
 
   protected Point position() {

@@ -32,7 +32,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * Column footer widget for Grid, which renders one to many aggregation rows.
  */
-class ColumnFooter extends BoxComponent {
+public class ColumnFooter extends BoxComponent {
 
   public class Foot extends SimplePanel {
 
@@ -95,8 +95,10 @@ class ColumnFooter extends BoxComponent {
       int cols = cm.getColumnCount();
       for (int i = 0; i < cols; i++) {
         Foot f = new Foot(config, cm.getDataIndex(i));
+        
+        String cellStyle = config.getCellStyle(cm.getDataIndex(i));
         table.setWidget(0, i, f);
-        table.getCellFormatter().setStyleName(0, i, "x-grid3-footer-cell");
+        table.getCellFormatter().setStyleName(0, i, "x-grid3-footer-cell " + cellStyle);
         HorizontalAlignment align = cm.getColumnAlignment(i);
         if (align != null) {
           switch (align) {

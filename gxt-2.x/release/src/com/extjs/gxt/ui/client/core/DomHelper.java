@@ -85,7 +85,7 @@ public class DomHelper {
    * @return the new element
    */
   public static native Element overwrite(Element elem, String html) /*-{
-    $wnd.GXT.Ext.DomHelper.overwite(elem, html);
+    $wnd.GXT.Ext.DomHelper.overwrite(elem, html);
   }-*/;
 
 }

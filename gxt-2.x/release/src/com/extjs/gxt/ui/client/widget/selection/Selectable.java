@@ -12,7 +12,7 @@ import java.util.List;
 import com.extjs.gxt.ui.client.widget.Component;
 
 /**
- * Interface for containers whos children can be selected.
+ * Interface for containers who's children can be selected.
  * 
  * @param <T> the child component type
  */
