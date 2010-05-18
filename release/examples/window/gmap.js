@@ -1,11 +1,9 @@
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
+/*!
+ * Ext JS Library 3.2.1
+ * Copyright(c) 2006-2010 Ext JS, Inc.
  * licensing@extjs.com
- * 
- * http://extjs.com/license
+ * http://www.extjs.com/license
  */
-
 
 Ext.onReady(function(){
 
@@ -26,7 +24,6 @@ Ext.onReady(function(){
                 y: 60,
                 items: {
                     xtype: 'gmappanel',
-                    region: 'center',
                     zoomLevel: 14,
                     gmapType: 'map',
                     mapConfOpts: ['enableScrollWheelZoom','enableDoubleClickZoom','enableDragging'],
