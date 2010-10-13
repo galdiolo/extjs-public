@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -24,15 +24,14 @@ import com.google.gwt.dom.client.Element;
  * when attached, and unregister when detached.
  * 
  * <pre>
-    Collection<Component> components = ComponentManager.get().getAll();
-    Component comp = ComponentManager.get().get("foo");
-    for (Component c : components) {
-      
-    }
+ * Collection<Component> components = ComponentManager.get().getAll();
+ * Component comp = ComponentManager.get().get("foo");
+ * for (Component c : components) {
+ * }
  * </pre>
  * 
  * <dl>
- * <dt>Events:</dt>
+ * <dt><b>Events:</b></dt>
  * 
  * <dd><b>Register</b> : ComponentManagerEvent(source, component)<br>
  * <div>Fires after the component is registered.</div>
@@ -78,15 +77,30 @@ public class ComponentManager extends BaseObservable {
    */
   @SuppressWarnings("unchecked")
   public <X extends Component> X find(Element target) {
-    while (target != null && (target.getPropertyString("__listener") == null || target.getId().equals(""))) {
-      target = (Element) target.getParentElement();
-    }
-    if (target != null) {
-      return (X) map.get(target.getId());
+    return (X) find(target, null);
+  }
+
+  /**
+   * Attempts to find a component.
+   * 
+   * @param target the element or inner element of the component
+   * @param clazz the class the component should have
+   * @return the matching component or null if no match
+   */
+  @SuppressWarnings("unchecked")
+  public <X extends Component> X find(Element target, Class<X> clazz) {
+    while (target != null) {
+      Component c = map.get(target.getId());
+      if (c != null && (clazz == null || c.getClass().equals(clazz))) {
+        return (X) c;
+      } else {
+        target = (Element) target.getParentElement();
+      }
+
     }
     return null;
   }
-  
+
   /**
    * Returns all component by class.
    * 

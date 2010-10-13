@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -22,8 +22,6 @@ import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.store.StoreEvent;
 import com.extjs.gxt.ui.client.store.StoreListener;
 import com.extjs.gxt.ui.client.util.DelayedTask;
-import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
-import com.extjs.gxt.ui.client.widget.grid.GridView;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.Event;
 
@@ -50,6 +48,7 @@ public class LiveGridView extends GridView {
   private double prefetchFactor = .2;
   private int rowHeight = 20;
   private int viewIndexReload = -1;
+  private StoreListener<ModelData> liveStoreListener;
 
   /**
    * Returns the numbers of rows that should be cached.
@@ -57,7 +56,11 @@ public class LiveGridView extends GridView {
    * @return the cache size
    */
   public int getCacheSize() {
-    return cacheSize;
+    int c = -1;
+    if (grid.isViewReady()) {
+      c = getVisibleRowCount();
+    }
+    return Math.max(c, cacheSize);
   }
 
   /**
@@ -87,7 +90,7 @@ public class LiveGridView extends GridView {
     return rowHeight;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   @Override
   public void handleComponentEvent(GridEvent ge) {
     super.handleComponentEvent(ge);
@@ -100,24 +103,40 @@ public class LiveGridView extends GridView {
         int v = ge.getEvent().getMouseWheelVelocityY() * getCalculatedRowHeight();
         liveScroller.setScrollTop(liveScroller.getScrollTop() + v);
       } else {
-        updateRows(liveScroller.getScrollTop() / getCalculatedRowHeight(), false);
+        updateRows((int) Math.ceil((double) liveScroller.getScrollTop() / getCalculatedRowHeight()), false);
       }
     }
   }
 
   /**
-   * Refreshed the view.
+   * Refreshed the view. Reloads the store based on the current settings
    */
   public void refresh() {
     loadLiveStore(liveStoreOffset);
   }
 
+  @Override
+  public void refresh(boolean headerToo) {
+    super.refresh(headerToo);
+    if (!preventScrollToTopOnRefresh) {
+      // we scrolled to the top
+      updateRows(0, false);
+    }
+  }
+
+  @Override
+  public void scrollToTop() {
+    liveScroller.setScrollTop(0);
+  }
+
   /**
    * Sets the amount of rows that should be cached (default to 200). The cache
-   * size is the number of rows that are retrieved each time a data request is made.
-   * The cache size should always be greater than the number of visible rows of
-   * the grid. The number of visible rows will vary depending on the grid height
-   * and the height of each row.
+   * size is the number of rows that are retrieved each time a data request is
+   * made. The cache size should always be greater than the number of visible
+   * rows of the grid. The number of visible rows will vary depending on the
+   * grid height and the height of each row. If the set cache size is smaller
+   * than the number of visible rows of the grid than it gets set to the number
+   * of visible rows of the grid.
    * 
    * @param cacheSize the new cache size
    */
@@ -179,7 +198,7 @@ public class LiveGridView extends GridView {
   }
 
   protected void doLoad() {
-    loader.load(loaderOffset, cacheSize);
+    loader.load(loaderOffset, getCacheSize());
   }
 
   protected int getCalculatedRowHeight() {
@@ -191,11 +210,10 @@ public class LiveGridView extends GridView {
   }
 
   protected int getLiveStoreCalculatedIndex(int index) {
-    int calcIndex = index - (cacheSize / 2) + getVisibleRowCount();
-    calcIndex = Math.max(0, calcIndex);
-    calcIndex = Math.min(totalCount - cacheSize, calcIndex);
+    int calcIndex = index - (getCacheSize() / 2) + getVisibleRowCount();
+    calcIndex = Math.min(totalCount - getCacheSize(), calcIndex);
     calcIndex = Math.min(index, calcIndex);
-    return calcIndex;
+    return Math.max(0, calcIndex);
   }
 
   @Override
@@ -209,8 +227,59 @@ public class LiveGridView extends GridView {
     return (int) ((visibleHeight < 1) ? 0 : Math.floor((double) visibleHeight / rh));
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void initData(ListStore ds, ColumnModel cm) {
+    if (liveStoreListener == null) {
+      liveStoreListener = new StoreListener<ModelData>() {
+
+        public void storeDataChanged(StoreEvent<ModelData> se) {
+          liveStoreOffset = loader.getOffset();
+
+          if (totalCount != loader.getTotalCount()) {
+            totalCount = loader.getTotalCount();
+            int height = totalCount * getCalculatedRowHeight();
+            // 1000000 as browser maxheight hack
+            int count = height / 1000000;
+            int h = 0;
+            
+            StringBuilder sb = new StringBuilder();
+
+            if (count > 0) {
+              h = height / count;
+             
+              for (int i = 0; i < count; i++) {
+                sb.append("<div style=\"height:");
+                sb.append(h);
+                sb.append("px;\"></div>");
+              }
+            }
+            int diff = height - count * h;
+            if (diff != 0) {
+              sb.append("<div style=\"height:");
+              sb.append(diff);
+              sb.append("px;\"></div>");
+            }
+            liveScroller.setInnerHtml(sb.toString());
+
+          }
+          if (viewIndexReload != -1 && !isCached(viewIndexReload)) {
+            loadLiveStore(getLiveStoreCalculatedIndex(viewIndexReload));
+          } else {
+            viewIndexReload = -1;
+            updateRows(viewIndex, true);
+            isLoading = false;
+            if (isMasked) {
+              isMasked = false;
+              scroller.unmask();
+            }
+          }
+
+        }
+      };
+    }
+    if (liveStore != null) {
+      liveStore.removeStoreListener(liveStoreListener);
+    }
     liveStore = ds;
     super.initData(new ListStore() {
       @Override
@@ -222,44 +291,12 @@ public class LiveGridView extends GridView {
     }, cm);
 
     loader = (PagingLoader) liveStore.getLoader();
-    liveStore.addStoreListener(new StoreListener<ModelData>() {
-
-      public void storeDataChanged(StoreEvent<ModelData> se) {
-        liveStoreOffset = loader.getOffset();
-
-        if (totalCount != loader.getTotalCount()) {
-          totalCount = loader.getTotalCount();
-          int height = (totalCount + 1) * getCalculatedRowHeight();
-          // 1000000 as browser maxheight hack
-          int count = height / 1000000 + 1;
-          int h = height / count;
-          StringBuilder sb = new StringBuilder();
-          for (int i = 0; i < count; i++) {
-            sb.append("<div style=\"height:");
-            sb.append(h);
-            sb.append("px;\"></div>");
-          }
-          liveScroller.setInnerHtml(sb.toString());
-
-        }
-        if (viewIndexReload != -1 && !isCached(viewIndexReload)) {
-          loadLiveStore(getLiveStoreCalculatedIndex(viewIndexReload));
-        } else {
-          viewIndexReload = -1;
-          updateRows(viewIndex, true);
-          isLoading = false;
-          if (isMasked) {
-            isMasked = false;
-            scroller.unmask();
-          }
-        }
-
-      }
-    });
+    liveStore.addStoreListener(liveStoreListener);
+    grid.getSelectionModel().bind(this.ds);
   }
 
   protected boolean isCached(int index) {
-    if ((index < liveStoreOffset) || (index > (liveStoreOffset + cacheSize - getVisibleRowCount()))) {
+    if ((index < liveStoreOffset) || (index > (liveStoreOffset + getCacheSize() - getVisibleRowCount()))) {
       return false;
     }
     return true;
@@ -285,6 +322,12 @@ public class LiveGridView extends GridView {
       isLoading = true;
       return false;
     }
+  }
+
+  @Override
+  protected void notifyShow() {
+    super.notifyShow();
+    updateRows(viewIndex, true);
   }
 
   @Override
@@ -324,16 +367,21 @@ public class LiveGridView extends GridView {
   }
 
   protected boolean shouldCache(int index) {
-    int i = (int) (cacheSize * prefetchFactor);
+    int cz = getCacheSize();
+    int i = (int) (cz * prefetchFactor);
     double low = liveStoreOffset + i;
-    double high = liveStoreOffset + cacheSize - getVisibleRowCount() - i;
-    if ((index < low && liveStoreOffset != 0) || (index > high && liveStoreOffset != totalCount - cacheSize)) {
+    double high = liveStoreOffset + cz - getVisibleRowCount() - i;
+    if ((index < low && liveStoreOffset != 0) || (index > high && liveStoreOffset != totalCount - cz)) {
       return true;
     }
     return false;
   }
 
   protected void updateRows(int newIndex, boolean reload) {
+    int rowCount = getVisibleRowCount();
+
+    newIndex = Math.min(newIndex, Math.max(0, totalCount - rowCount));
+
     int diff = newIndex - viewIndex;
     int delta = Math.abs(diff);
 
@@ -341,14 +389,13 @@ public class LiveGridView extends GridView {
     if (delta == 0 && !reload) {
       return;
     }
-    int rowCount = getVisibleRowCount();
-    viewIndex = Math.min(newIndex, Math.abs(totalCount - rowCount));
 
+    viewIndex = newIndex;
     int liveStoreIndex = Math.max(0, viewIndex - liveStoreOffset);
 
     // load data if not already cached
     if (!isCached(viewIndex)) {
-      if (!isMasked) {
+      if (!isMasked && grid.isLoadMask()) {
         scroller.mask(GXT.MESSAGES.loadMask_msg());
         isMasked = true;
       }
@@ -363,13 +410,17 @@ public class LiveGridView extends GridView {
       loadLiveStore(getLiveStoreCalculatedIndex(viewIndex));
     }
 
-    if (delta > getVisibleRowCount() - 1) {
+    int rc = getVisibleRowCount();
+    if (delta > rc - 1) {
       reload = true;
     }
 
     if (reload) {
-      delta = diff = getVisibleRowCount();
+      delta = diff = rc;
+      boolean p = preventScrollToTopOnRefresh;
+      preventScrollToTopOnRefresh = true;
       ds.removeAll();
+      preventScrollToTopOnRefresh = p;
     }
 
     if (delta == 0) {

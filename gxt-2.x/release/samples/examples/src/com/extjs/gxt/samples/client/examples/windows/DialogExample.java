@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -29,11 +29,13 @@ public class DialogExample extends LayoutContainer {
   @Override
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
+
     final Dialog simple = new Dialog();
     simple.setHeading("Dialog Test");
     simple.setButtons(Dialog.YESNO);
     simple.setBodyStyleName("pad-text");
     simple.addText(TestData.DUMMY_TEXT_SHORT);
+    simple.getItem(0).getAriaSupport().setIgnore(true);
     simple.setScrollMode(Scroll.AUTO);
     simple.setHideOnButtonClick(true);
 
@@ -55,7 +57,6 @@ public class DialogExample extends LayoutContainer {
     data.setMargins(new Margins(0, 5, 0, 0));
     data.setSplit(true);
     data.setCollapsible(true);
-    data.setFloatable(true);
     complex.add(panel, data);
 
     // center

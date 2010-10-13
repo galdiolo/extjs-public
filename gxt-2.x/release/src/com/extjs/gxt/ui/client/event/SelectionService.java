@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -49,7 +49,7 @@ public class SelectionService {
    * 
    * @param listener the listener to add
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public void addListener(SelectionChangedListener<? extends ModelData> listener) {
     listeners.add((SelectionChangedListener)listener);
   }
@@ -77,9 +77,10 @@ public class SelectionService {
    * 
    * @param provider the provider to add
    */
-  public void register(SelectionProvider<ModelData> provider) {
-    provider.addSelectionChangedListener(listener);
-    providers.add(provider);
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  public void register(SelectionProvider<? extends ModelData> provider) {
+    provider.addSelectionChangedListener((SelectionChangedListener)listener);
+    providers.add((SelectionProvider)provider);
   }
 
   /**

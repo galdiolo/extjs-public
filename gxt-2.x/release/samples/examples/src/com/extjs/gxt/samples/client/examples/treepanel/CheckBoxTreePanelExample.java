@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -49,6 +49,7 @@ public class CheckBoxTreePanelExample extends LayoutContainer {
     final TreePanel<ModelData> tree = new TreePanel<ModelData>(store);
     tree.setDisplayProperty("name");
     tree.getStyle().setLeafIcon(Resources.ICONS.music());
+    tree.setWidth(300);
     tree.setCheckable(true);
     tree.setAutoLoad(true);
 

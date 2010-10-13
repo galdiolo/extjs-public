@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -73,6 +73,10 @@ public class Slider extends BoxComponent {
 
       super.onRender(target, index);
 
+      if (GXT.isAriaEnabled() && GXT.isHighContrastMode) {
+        getElement().setInnerHTML("<i>&nbsp;</i>");
+      }
+      
       sinkEvents(Event.ONMOUSEOVER | Event.ONMOUSEOUT);
     }
 
@@ -327,8 +331,8 @@ public class Slider extends BoxComponent {
   protected void afterRender() {
     super.afterRender();
 
-    if (getAriaLabelledBy() != null) {
-      targetEl.dom.setAttribute("aria-labelledby", getAriaLabelledBy());
+    if (getAriaSupport().getLabelledBy() != null) {
+      targetEl.dom.setAttribute("aria-labelledby", getAriaSupport().getLabelledBy());
     }
 
     if (isDraggable()) {
@@ -488,6 +492,7 @@ public class Slider extends BoxComponent {
   }
 
   protected void onDragStart(DragEvent de) {
+    focus();
     thumb.el().addStyleName("x-slider-thumb-drag");
     thumb.el().setStyleAttribute("position", "");
     if (useTip) {
@@ -533,9 +538,11 @@ public class Slider extends BoxComponent {
         // do nothing
         break;
       case KeyCodes.KEY_HOME:
+        ce.stopEvent();
         setValue(minValue);
         break;
       case KeyCodes.KEY_END:
+        ce.stopEvent();
         setValue(maxValue);
         break;
     }

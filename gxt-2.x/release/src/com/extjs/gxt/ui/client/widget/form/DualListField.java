@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -186,7 +186,7 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
     add(buttonAdapter);
     add(toField);
   }
-  
+
   /**
    * Returns the DND group name.
    * 
@@ -195,7 +195,7 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
   public String getDNDGroup() {
     return dndGroup;
   }
-  
+
   /**
    * Returns the from list field.
    * 
@@ -214,6 +214,7 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
     return fromField;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public DualListFieldMessages getMessages() {
     return (DualListFieldMessages) messages;
@@ -285,18 +286,21 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
     this.mode = mode;
   }
 
+  private void configureButton(IconButton btn, String msg, String tip) {
+    btn.setHeight(18);
+    tip = msg != null ? msg : tip;
+    if (GXT.isAriaEnabled()) {
+      btn.setTitle(tip);
+      btn.getAriaSupport().setIgnore(true);
+    } else {
+      btn.setToolTip(tip);
+    }
+  }
+
   protected void initButtons() {
     if (mode == Mode.INSERT) {
-      String tip = "";
-      if (getMessages().getMoveUp() == null) {
-        tip = GXT.MESSAGES.listField_moveSelectedUp();
-      } else {
-        tip = getMessages().getMoveUp();
-      }
-
       IconButton up = new IconButton("arrow-up");
-      up.setHeight(18);
-      up.setToolTip(tip);
+      configureButton(up, getMessages().getMoveUp(), GXT.MESSAGES.listField_moveSelectedUp());
       up.addListener(Events.Select, new Listener<ComponentEvent>() {
         public void handleEvent(ComponentEvent be) {
           toField.getListView().moveSelectedUp();
@@ -305,16 +309,8 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
       buttonBar.add(up);
     }
 
-    String tip = "";
-    if (getMessages().getAddAll() == null) {
-      tip = GXT.MESSAGES.listField_addAll();
-    } else {
-      tip = getMessages().getAddAll();
-    }
-
     IconButton allRight = new IconButton("arrow-double-right");
-    allRight.setHeight(18);
-    allRight.setToolTip(tip);
+    configureButton(allRight, getMessages().getAddAll(), GXT.MESSAGES.listField_addAll());
     allRight.addListener(Events.Select, new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent be) {
         List<D> sel = fromField.getStore().getModels();
@@ -324,16 +320,8 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
     });
     buttonBar.add(allRight);
 
-    tip = "";
-    if (getMessages().getAddSelected() == null) {
-      tip = GXT.MESSAGES.listField_addSelected();
-    } else {
-      tip = getMessages().getAddSelected();
-    }
-
     IconButton right = new IconButton("arrow-right");
-    right.setHeight(18);
-    right.setToolTip(tip);
+    configureButton(right, getMessages().getAddSelected(), GXT.MESSAGES.listField_addSelected());
     right.addListener(Events.Select, new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent be) {
         List<D> sel = fromField.getSelection();
@@ -345,16 +333,8 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
       }
     });
 
-    tip = "";
-    if (getMessages().getRemoveSelected() == null) {
-      tip = GXT.MESSAGES.listField_removeSelected();
-    } else {
-      tip = getMessages().getRemoveSelected();
-    }
-
     IconButton left = new IconButton("arrow-left");
-    left.setHeight(18);
-    left.setToolTip(tip);
+    configureButton(left, getMessages().getRemoveSelected(), GXT.MESSAGES.listField_removeSelected());
     left.addListener(Events.Select, new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent be) {
         List<D> sel = toField.getSelection();
@@ -369,16 +349,8 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
     buttonBar.add(right);
     buttonBar.add(left);
 
-    tip = "";
-    if (getMessages().getRemoveAll() == null) {
-      tip = GXT.MESSAGES.listField_removeAll();
-    } else {
-      tip = getMessages().getRemoveAll();
-    }
-
     IconButton allLeft = new IconButton("arrow-double-left");
-    allLeft.setHeight(18);
-    allLeft.setToolTip(tip);
+    configureButton(allLeft, getMessages().getRemoveAll(), GXT.MESSAGES.listField_removeAll());
     allLeft.addListener(Events.Select, new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent be) {
         List<D> sel = toField.getStore().getModels();
@@ -389,16 +361,8 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
     buttonBar.add(allLeft);
 
     if (mode == Mode.INSERT) {
-      tip = "";
-      if (getMessages().getMoveDown() == null) {
-        tip = GXT.MESSAGES.listField_moveSelectedDown();
-      } else {
-        tip = getMessages().getMoveDown();
-      }
-
       IconButton down = new IconButton("arrow-down");
-      down.setHeight(18);
-      down.setToolTip(tip);
+      configureButton(down, getMessages().getMoveDown(), GXT.MESSAGES.listField_moveSelectedDown());
       down.addListener(Events.Select, new Listener<ComponentEvent>() {
         public void handleEvent(ComponentEvent be) {
           toField.getListView().moveSelectedDown();
@@ -438,10 +402,17 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
     initButtons();
 
     super.onRender(target, index);
+    getElement().removeAttribute("tabindex");
 
     if (enableDND) {
       initDND();
     }
+  }
+
+  @Override
+  protected void onFocus(ComponentEvent ce) {
+    super.onFocus(ce);
+    fromField.focus();
   }
 
   @Override
@@ -459,7 +430,7 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private void select(final ListField<?> field, final List list) {
     DeferredCommand.addCommand(new Command() {
       public void execute() {

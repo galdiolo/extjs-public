@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -158,7 +158,7 @@ public class NavigationView extends View {
     treeItem.add(tree);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private void createListContent() {
     listItem.setLayout(new FitLayout());
     listItem.setBorders(false);
@@ -193,7 +193,7 @@ public class NavigationView extends View {
     listItem.add(list);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void handleEvent(AppEvent event) {
     EventType type = event.getType();
     if (type == AppEvents.HidePage) {

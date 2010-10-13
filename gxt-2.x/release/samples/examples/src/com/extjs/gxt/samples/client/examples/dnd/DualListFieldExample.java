@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -12,9 +12,11 @@ import com.extjs.gxt.samples.resources.client.model.Stock;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.store.StoreSorter;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.DualListField;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.ListField;
+import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.google.gwt.user.client.Element;
 
@@ -26,7 +28,12 @@ public class DualListFieldExample extends LayoutContainer {
     setStyleAttribute("margin", "10px");
 
     FormPanel panel = new FormPanel();
-    panel.setHeading("Drag and Drop Lists");
+    panel.setFrame(true);
+    panel.setHeading("DualListField Example");
+    
+    TextField<String> name = new TextField<String>();
+    name.setFieldLabel("Name");
+    panel.add(name, new FormData("98%"));
 
     final DualListField<Stock> lists = new DualListField<Stock>();
 
@@ -45,6 +52,14 @@ public class DualListFieldExample extends LayoutContainer {
     to.setStore(store);
 
     panel.add(lists, new FormData("98%"));
+    
+    TextField<String> email = new TextField<String>();
+    email.setFieldLabel("Email");
+    panel.add(email, new FormData("98%"));
+    
+    panel.addButton(new Button("Cancel"));
+    panel.addButton(new Button("Save"));
+    
     panel.setWidth(550);
 
     add(panel);

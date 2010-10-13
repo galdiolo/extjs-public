@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -26,6 +26,7 @@ import com.extjs.gxt.ui.client.util.Rectangle;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.ui.Accessibility;
 
 /**
  * Creates a draggable splitter on the side of a widget.
@@ -57,7 +58,7 @@ import com.google.gwt.user.client.Event;
  * </ul>
  * </dd>
  * 
- * <dl>
+ * </dl>
  */
 public class SplitBar extends BoxComponent {
 
@@ -276,6 +277,7 @@ public class SplitBar extends BoxComponent {
     resizeWidget.removeListener(Events.Attach, listener);
     resizeWidget.removeListener(Events.Detach, listener);
     resizeWidget.removeListener(Events.Resize, listener);
+    resizeWidget.removeListener(Events.Move, listener);
     removeSplitBar();
     draggable.release();
   }
@@ -392,6 +394,10 @@ public class SplitBar extends BoxComponent {
     disableTextSelection(true);
     el().makePositionable(true);
     sinkEvents(Event.MOUSEEVENTS);
+    
+    if (GXT.isAriaEnabled()) {
+      Accessibility.setRole(getElement(), "separator");
+    }
   }
 
   protected void removeSplitBar() {

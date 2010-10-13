@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -13,6 +13,8 @@ import com.extjs.gxt.samples.client.examples.model.BeanPost;
 import com.extjs.gxt.samples.client.examples.model.Photo;
 import com.extjs.gxt.samples.client.examples.model.Post;
 import com.extjs.gxt.samples.resources.client.model.Customer;
+import com.extjs.gxt.samples.resources.client.model.Stock;
+import com.extjs.gxt.ui.client.data.FilterPagingLoadConfig;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.PagingLoadConfig;
 import com.extjs.gxt.ui.client.data.PagingLoadResult;
@@ -28,4 +30,6 @@ public interface ExampleServiceAsync {
   public void getPhotos(AsyncCallback<List<Photo>> callback);
 
   public void getLiveGridModels(PagingLoadConfig config, AsyncCallback<PagingLoadResult<ModelData>> callback);
+
+  public void getStocks(FilterPagingLoadConfig config, AsyncCallback<PagingLoadResult<Stock>> callback);
 }

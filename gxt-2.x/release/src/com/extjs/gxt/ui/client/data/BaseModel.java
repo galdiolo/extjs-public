@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -101,6 +101,11 @@ public class BaseModel extends BaseModelData implements Model, Serializable {
     }
   }
 
+  /**
+   * Returns true if change events are disabled.
+   * 
+   * @return true if silent
+   */
   public boolean isSilent() {
     return changeEventSupport.isSilent();
   }

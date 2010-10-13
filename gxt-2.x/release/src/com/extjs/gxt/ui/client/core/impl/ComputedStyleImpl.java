@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -31,7 +31,7 @@ public class ComputedStyleImpl {
   }
 
   public void setStyleAttribute(Element elem, String name, Object value) {
-    elem.getStyle().setProperty(checkCamelCache(Arrays.asList(name)).get(0), String.valueOf(value));
+    elem.getStyle().setProperty(checkCamelCache(Arrays.asList(name)).get(0), value == null ? "" : String.valueOf(value));
   }
 
   protected List<String> checkCamelCache(List<String> l) {

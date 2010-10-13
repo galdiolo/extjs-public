@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -65,6 +65,7 @@ public class StatusToolBarExample extends LayoutContainer {
     form.setHeading("Status Toolbar");
     form.setSize(450, 300);
     form.setPadding(5);
+    
     form.setBottomComponent(toolBar);
     TextArea textArea = new TextArea();
     textArea.setHideLabel(true);

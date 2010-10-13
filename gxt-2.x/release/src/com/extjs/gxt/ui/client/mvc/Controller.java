@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -17,9 +17,9 @@ import com.extjs.gxt.ui.client.event.EventType;
  */
 public abstract class Controller {
 
-  protected Controller parent;
   protected List<Controller> children;
   protected boolean initialized;
+  protected Controller parent;
 
   private List<EventType> supportedEvents;
 
@@ -44,10 +44,24 @@ public abstract class Controller {
    *         otherwise
    */
   public boolean canHandle(AppEvent event) {
+    return canHandle(event, true);
+  }
+
+  /**
+   * Determines if the controller can handle the particular event. Default
+   * implementation checks against registered event types then queries all child
+   * controllers if bubbleUp set to true.
+   * 
+   * @param event the event
+   * @param bubbleDown true to bubble down children controllers
+   * @return <code>true</code> if event can be handled, <code>false</code>
+   *         otherwise
+   */
+  public boolean canHandle(AppEvent event, boolean bubbleDown) {
     if (supportedEvents != null && supportedEvents.contains(event.getType())) return true;
-    if (children != null) {
+    if (children != null && bubbleDown) {
       for (Controller c : children) {
-        if (c.canHandle(event)) return true;
+        if (c.canHandle(event, bubbleDown)) return true;
       }
     }
     return false;

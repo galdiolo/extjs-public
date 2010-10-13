@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -91,15 +91,15 @@ import com.google.gwt.user.client.Event;
 public class FieldSet extends LayoutContainer {
 
   private El body;
-  private El legend;
-  private ToolButton collapseBtn;
-  private Element heading;
-  private String text;
-  private boolean collapsible;
-  private boolean collapsed;
-  private boolean checkboxToggle;
-  private String checkboxName;
   private InputElement checkbox;
+  private String checkboxName;
+  private boolean checkboxToggle;
+  private ToolButton collapseBtn;
+  private boolean collapsed;
+  private boolean collapsible;
+  private Element heading;
+  private El legend;
+  private String text;
 
   /**
    * Creates a new fieldset.
@@ -107,6 +107,7 @@ public class FieldSet extends LayoutContainer {
   public FieldSet() {
     baseStyle = "x-fieldset";
     enableLayout = true;
+    getAriaSupport().setIgnore(false);
   }
 
   /**
@@ -146,6 +147,15 @@ public class FieldSet extends LayoutContainer {
    */
   public String getCheckboxName() {
     return checkboxName;
+  }
+
+  /**
+   * Returns the panel heading.
+   * 
+   * @return the heading
+   */
+  public String getHeading() {
+    return text;
   }
 
   @Override
@@ -267,6 +277,20 @@ public class FieldSet extends LayoutContainer {
     ComponentHelper.doDetach(collapseBtn);
   }
 
+  @Override
+  protected void notifyHide() {
+    if (!collapsed) {
+      super.notifyHide();
+    }
+  }
+
+  @Override
+  protected void notifyShow() {
+    if (!collapsed) {
+      super.notifyShow();
+    }
+  }
+
   protected void onClick(ComponentEvent ce) {
     if (checkboxToggle && ce.getTarget() == (Element) checkbox.cast()) {
       setExpanded(!isExpanded());
@@ -280,6 +304,15 @@ public class FieldSet extends LayoutContainer {
     }
     body.setVisible(false);
     addStyleName("x-panel-collapsed");
+
+    for (Component c : getItems()) {
+      if (!isComponentHidden(c) && c.isRendered()) {
+        doNotify(c, false);
+      }
+    }
+
+    updateIconTitles();
+
     FieldSetEvent fe = new FieldSetEvent(this);
     fireEvent(Events.Collapse, fe);
   }
@@ -291,8 +324,29 @@ public class FieldSet extends LayoutContainer {
     }
     body.setVisible(true);
     removeStyleName("x-panel-collapsed");
+
+    for (Component c : getItems()) {
+      if (!isComponentHidden(c) && c.isRendered()) {
+        doNotify(c, true);
+      }
+    }
+
+    updateIconTitles();
+
     FieldSetEvent fe = new FieldSetEvent(this);
     fireEvent(Events.Expand, fe);
+  }
+
+  @Override
+  protected void onFocus(ComponentEvent ce) {
+    super.onFocus(ce);
+    if (GXT.isAriaEnabled()) {
+      if (checkboxToggle) {
+        checkbox.focus();
+      } else {
+        collapseBtn.focus();
+      }
+    }
   }
 
   @Override
@@ -311,6 +365,9 @@ public class FieldSet extends LayoutContainer {
       legend.appendChild((Element) checkbox.cast());
       checkbox.setDefaultChecked(!collapsed);
       checkbox.setChecked(!collapsed);
+      if (GXT.isAriaEnabled()) {
+        checkbox.setTitle("Expand " + text);
+      }
     }
 
     if (!checkboxToggle && collapsible) {
@@ -321,6 +378,11 @@ public class FieldSet extends LayoutContainer {
         }
       });
       collapseBtn.render(legend.dom);
+      collapseBtn.getAriaSupport().setRole("checkbox");
+      if (GXT.isAriaEnabled()) {
+        collapseBtn.setTitle("Expand " + text);
+      }
+      ComponentHelper.setParent(this, collapseBtn);
     }
 
     heading = DOM.createSpan();
@@ -336,6 +398,14 @@ public class FieldSet extends LayoutContainer {
 
     if (collapsed) {
       onCollapse();
+    }
+
+    updateIconTitles();
+
+    if (GXT.isAriaEnabled() && !getAriaSupport().isIgnore()) {
+      el().setTabIndex(0);
+      el().setElementAttribute("hideFocus", "true");
+      sinkEvents(Event.FOCUSEVENTS);
     }
   }
 
@@ -356,5 +426,30 @@ public class FieldSet extends LayoutContainer {
           height - frameSize.height - legend.getHeight() - (GXT.isIE ? legend.getMargins("b") : 0), true);
     }
   }
+
+  protected void updateIconTitles() {
+    if (GXT.isAriaEnabled()) {
+      String txt = "Expand " + text;
+      if (checkbox != null) {
+        checkbox.setTitle(txt);
+      }
+      if (collapseBtn != null) {
+        collapseBtn.setTitle(txt);
+        collapseBtn.getAriaSupport().setState("aria-checked", !collapsed ? "true" : "false");
+      }
+    }
+  }
+
+  private native void doNotify(Component c, boolean show) /*-{
+    if(show){
+      c.@com.extjs.gxt.ui.client.widget.Component::notifyShow()()
+    } else {
+      c.@com.extjs.gxt.ui.client.widget.Component::notifyHide()();
+    }
+  }-*/;
+
+  private native boolean isComponentHidden(Component c) /*-{
+    return c.@com.extjs.gxt.ui.client.widget.Component::hidden;
+  }-*/;
 
 }

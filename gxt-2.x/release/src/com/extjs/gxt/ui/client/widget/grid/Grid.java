@@ -1,17 +1,17 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
  */
 package com.extjs.gxt.ui.client.widget.grid;
 
-import java.util.List;
 import java.util.Map;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.SortDir;
+import com.extjs.gxt.ui.client.aria.FocusFrame;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.ModelProcessor;
 import com.extjs.gxt.ui.client.data.ModelStringProvider;
@@ -27,6 +27,7 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.ui.Accessibility;
 
 /**
  * This class represents the primary interface of a component based grid
@@ -239,6 +240,13 @@ import com.google.gwt.user.client.Timer;
  * <li>grid : this</li>
  * </ul>
  * </dd>
+ * 
+ * <dd><b>Reconfigure</b> : GridEvent(grid)<br>
+ * <div>Fires when the grid gets reconfigured.</div>
+ * <ul>
+ * <li>grid : this</li>
+ * </ul>
+ * </dd>
  * </dl>
  * 
  * <dl>
@@ -277,6 +285,8 @@ public class Grid<M extends ModelData> extends BoxComponent {
   private String autoExpandColumn;
   private int autoExpandMax = 500;
   private int autoExpandMin = 25;
+  private boolean columnLines;
+  private boolean enableColumnReorder;
   private boolean enableColumnResize = true;
   private boolean hideHeaders;
   private int lazyRowRender = 10;
@@ -296,20 +306,19 @@ public class Grid<M extends ModelData> extends BoxComponent {
     this.store = store;
     this.cm = cm;
     this.view = new GridView();
-    focusable = true;
     disabledStyle = null;
     baseStyle = "x-grid-panel";
     setSelectionModel(new GridSelectionModel<M>());
     disableTextSelection(true);
   }
-  
-  @Override
-  public void disableTextSelection(boolean disable) {
-    disableTextSelection = disable ? 1 : 0;
-  }
 
   protected Grid() {
 
+  }
+
+  @Override
+  public void disableTextSelection(boolean disable) {
+    disableTextSelection = disable ? 1 : 0;
   }
 
   /**
@@ -403,11 +412,29 @@ public class Grid<M extends ModelData> extends BoxComponent {
   }
 
   /**
+   * Returns true if column lines are enabled.
+   * 
+   * @return true if column lines are enabled
+   */
+  public boolean isColumnLines() {
+    return columnLines;
+  }
+
+  /**
+   * Returns true if column reordering is enabled.
+   * 
+   * @return true if enabled
+   */
+  public boolean isColumnReordering() {
+    return enableColumnReorder;
+  }
+
+  /**
    * Returns true if column resizing is enabled.
    * 
    * @return true if resizing is enabled
    */
-  public boolean isEnableColumnResize() {
+  public boolean isColumnResize() {
     return enableColumnResize;
   }
 
@@ -457,7 +484,7 @@ public class Grid<M extends ModelData> extends BoxComponent {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public void onComponentEvent(ComponentEvent ce) {
     super.onComponentEvent(ce);
     GridEvent ge = (GridEvent) ce;
@@ -474,6 +501,12 @@ public class Grid<M extends ModelData> extends BoxComponent {
       case Event.ONMOUSEUP:
         onMouseUp(ge);
         break;
+      case Event.ONFOCUS:
+        onFocus(ce);
+        break;
+      case Event.ONBLUR:
+        onBlur(ce);
+        break;
     }
     view.handleComponentEvent(ge);
   }
@@ -489,17 +522,20 @@ public class Grid<M extends ModelData> extends BoxComponent {
     if (loadMask && rendered) {
       mask(GXT.MESSAGES.loadMask_msg());
     }
-    view.initData(store, cm);
+    if (rendered) {
+      view.initData(store, cm);
+    }
     this.store = store;
     this.cm = cm;
     // rebind the sm
     setSelectionModel(sm);
-    if (rendered) {
+    if (isViewReady()) {
       view.refresh(true);
     }
     if (loadMask && rendered) {
       unmask();
     }
+    fireEvent(Events.Reconfigure);
   }
 
   /**
@@ -514,7 +550,7 @@ public class Grid<M extends ModelData> extends BoxComponent {
 
   /**
    * The maximum width the autoExpandColumn can have (if enabled) (defaults to
-   * 1000, pre-render).
+   * 500, pre-render).
    * 
    * @param autoExpandMax the auto expand max
    */
@@ -532,11 +568,29 @@ public class Grid<M extends ModelData> extends BoxComponent {
   }
 
   /**
+   * True to enable column separation lines (defaults to false).
+   * 
+   * @param columnLines true to enable column separation lines
+   */
+  public void setColumnLines(boolean columnLines) {
+    this.columnLines = columnLines;
+  }
+
+  /**
+   * True to enable column reordering via drag and drop (defaults to false).
+   * 
+   * @param enableColumnReorder true to enable
+   */
+  public void setColumnReordering(boolean enableColumnReorder) {
+    this.enableColumnReorder = enableColumnReorder;
+  }
+
+  /**
    * Sets whether columns may be resized (defaults to true).
    * 
    * @param enableColumnResize true to allow column resizing
    */
-  public void setEnableColumnResize(boolean enableColumnResize) {
+  public void setColumnResize(boolean enableColumnResize) {
     this.enableColumnResize = enableColumnResize;
   }
 
@@ -661,11 +715,6 @@ public class Grid<M extends ModelData> extends BoxComponent {
     viewReady = true;
     view.afterRender();
     onAfterRenderView();
-    List<M> list = sm.getSelectedItems();
-    for (M m : list) {
-      view.onRowSelect(store.indexOf(m));
-    }
-
     fireEvent(Events.ViewReady);
   }
 
@@ -683,18 +732,22 @@ public class Grid<M extends ModelData> extends BoxComponent {
         }
 
       }
-      String sortField = (String) state.get("sortField");
-      if (store.getLoader() == null && sortField != null) {
-        String sortDir = (String) state.get("sortDir");
-        SortDir dir = SortDir.findDir(sortDir);
-        store.sort(sortField, dir);
-      }
+      doApplyStoreState(state);
     }
   }
 
   @Override
   protected ComponentEvent createComponentEvent(Event event) {
     return new GridEvent<M>(this, event);
+  }
+
+  protected void doApplyStoreState(Map<String, Object> state) {
+    String sortField = (String) state.get("sortField");
+    if (store.getLoader() == null && sortField != null) {
+      String sortDir = (String) state.get("sortDir");
+      SortDir dir = SortDir.findDir(sortDir);
+      store.sort(sortField, dir);
+    }
   }
 
   @Override
@@ -728,6 +781,12 @@ public class Grid<M extends ModelData> extends BoxComponent {
   protected void onAfterRenderView() {
   }
 
+  protected void onBlur(ComponentEvent ce) {
+    if (GXT.isAriaEnabled()) {
+      FocusFrame.get().unframe();
+    }
+  }
+
   protected void onClick(GridEvent<M> e) {
     if (e.getRowIndex() != -1) {
       fireEvent(Events.RowClick, e);
@@ -758,8 +817,18 @@ public class Grid<M extends ModelData> extends BoxComponent {
     unmask();
   }
 
+  protected void onFocus(ComponentEvent ce) {
+    if (GXT.isAriaEnabled()) {
+      if (getSelectionModel().selectedHeader != null) {
+        FocusFrame.get().frame(getSelectionModel().selectedHeader);
+      } else {
+        FocusFrame.get().frame(this);
+      }
+    }
+  }
+
   protected void onMouseDown(GridEvent<M> e) {
-    if (GXT.isChrome || GXT.isSafari4) {
+    if (isDisableTextSelection() && GXT.isWebKit) {
       String tagName = e.getEvent().getEventTarget().<Element> cast().getTagName();
       if (!"input".equalsIgnoreCase(tagName) && !"textarea".equalsIgnoreCase(tagName)) {
         e.preventDefault();
@@ -787,7 +856,20 @@ public class Grid<M extends ModelData> extends BoxComponent {
     setElement(DOM.createDiv(), target, index);
     super.onRender(target, index);
     el().setStyleAttribute("position", "relative");
+
+    if (columnLines) {
+      addStyleName("x-grid-with-col-lines");
+    }
     view.init(this);
+
+    el().setTabIndex(0);
+    el().setElementAttribute("hideFocus", "true");
+
+    if (GXT.isAriaEnabled()) {
+      Accessibility.setRole(getElement(), "grid");
+      setAriaState("aria-readonly", "true");
+      setAriaState("aria-multiselectable", "true");
+    }
   }
 
   @Override
@@ -806,6 +888,9 @@ public class Grid<M extends ModelData> extends BoxComponent {
     int rlen = store.getCount();
     if (step < 0) {
       if (col < 0) {
+        if (GXT.isAriaEnabled()) {
+          return new Cell(row, 0);
+        }
         row--;
         first = false;
       }
@@ -823,6 +908,9 @@ public class Grid<M extends ModelData> extends BoxComponent {
         row--;
       }
     } else {
+      if (col == clen && GXT.isAriaEnabled()) {
+        return new Cell(row, col - 1);
+      }
       if (col >= clen) {
         row++;
         first = false;

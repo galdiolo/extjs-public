@@ -1,13 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-/*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -55,7 +48,6 @@ public class ChartManager {
     charts.remove(chart.getSwfId());
   }
 
-  @SuppressWarnings("unused")
   private String handleGetData(String id) {
     Chart chart = charts.get(id);
     if (chart != null) {
@@ -64,7 +56,6 @@ public class ChartManager {
     return "";
   }
 
-  @SuppressWarnings("unused")
   private void handleOnClick(String id, int chartIndex, int dataIndex) {
     Chart chart = charts.get(id);
     if (chart != null) {
@@ -72,7 +63,6 @@ public class ChartManager {
     }
   }
 
-  @SuppressWarnings("unused")
   private void handleOnReady(String id) {
     Chart chart = charts.get(id);
     if (chart != null) {

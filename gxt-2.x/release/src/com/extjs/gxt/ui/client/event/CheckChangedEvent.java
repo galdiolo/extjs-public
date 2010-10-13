@@ -1,16 +1,16 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
  */
 package com.extjs.gxt.ui.client.event;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.data.ModelData;
-import com.extjs.gxt.ui.client.util.Util;
 
 /**
  * Check change event type.
@@ -30,9 +30,7 @@ public class CheckChangedEvent<M extends ModelData> extends BaseEvent {
    */
   @SuppressWarnings("unchecked")
   public CheckChangedEvent(CheckProvider<M> provider, M selection) {
-    super(provider);
-    this.provider = provider;
-    this.selection = Util.createList(selection);
+    this(provider, selection == null ? null : Arrays.asList(selection));
   }
 
   /**
@@ -53,6 +51,9 @@ public class CheckChangedEvent<M extends ModelData> extends BaseEvent {
    * @return the checked selection
    */
   public List<M> getCheckedSelection() {
+    if (selection == null && provider != null) {
+      selection = provider.getCheckedSelection();
+    }
     return selection;
   }
 

@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -29,10 +29,14 @@ import com.extjs.gxt.samples.client.ExampleService;
 import com.extjs.gxt.samples.client.examples.model.BeanPost;
 import com.extjs.gxt.samples.client.examples.model.Photo;
 import com.extjs.gxt.samples.client.examples.model.Post;
+import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Customer;
+import com.extjs.gxt.samples.resources.client.model.Stock;
 import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.data.BaseModel;
 import com.extjs.gxt.ui.client.data.BasePagingLoadResult;
+import com.extjs.gxt.ui.client.data.FilterConfig;
+import com.extjs.gxt.ui.client.data.FilterPagingLoadConfig;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.PagingLoadConfig;
 import com.extjs.gxt.ui.client.data.PagingLoadResult;
@@ -44,6 +48,7 @@ public class ExampleServiceImpl extends RemoteServiceServlet implements ExampleS
   private List<BeanPost> beanPosts;
   private List<Photo> photos;
   private List<ModelData> liveGridModels;
+  private List<Stock> stocks;
 
   public List<Photo> getPhotos() {
     if (photos == null) {
@@ -52,7 +57,7 @@ public class ExampleServiceImpl extends RemoteServiceServlet implements ExampleS
     return photos;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public PagingLoadResult<BeanPost> getBeanPosts(PagingLoadConfig config) {
     if (beanPosts == null) {
       loadPosts();
@@ -122,7 +127,7 @@ public class ExampleServiceImpl extends RemoteServiceServlet implements ExampleS
       List<ModelData> copy = new ArrayList<ModelData>(liveGridModels);
       if (config.getSortField() != null) {
         Collections.sort(copy, new Comparator<ModelData>() {
-          @SuppressWarnings("unchecked")
+          @SuppressWarnings({"unchecked", "rawtypes"})
           public int compare(ModelData m1, ModelData m2) {
             Object o1 = m1.get(config.getSortField());
             Object o2 = m2.get(config.getSortField());
@@ -266,6 +271,64 @@ public class ExampleServiceImpl extends RemoteServiceServlet implements ExampleS
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  public PagingLoadResult<Stock> getStocks(FilterPagingLoadConfig config) {
+    if (stocks == null) {
+      stocks = TestData.getStocks();
+    }
+
+    if (config.getSortInfo().getSortField() != null) {
+      final String sortField = config.getSortInfo().getSortField();
+      if (sortField != null) {
+        Collections.sort(stocks, config.getSortInfo().getSortDir().comparator(new Comparator() {
+          public int compare(Object o1, Object o2) {
+            Stock s1 = (Stock) o1;
+            Stock s2 = (Stock) o2;
+
+            if (sortField.equals("name")) {
+              return s1.getName().compareTo(s2.getName());
+            } else if (sortField.equals("symbol")) {
+              return s1.getSymbol().compareTo(s2.getSymbol());
+            }
+            return 0;
+          }
+        }));
+      }
+    }
+    ArrayList<Stock> temp = new ArrayList<Stock>();
+    ArrayList<Stock> remove = new ArrayList<Stock>();
+    for (Stock s : stocks) {
+      temp.add(s);
+    }
+
+    List<FilterConfig> filters = config.getFilterConfigs();
+    for (FilterConfig f : filters) {
+      Object ov = f.getValue();
+      String c = f.getComparison();
+      for (Stock s : stocks) {
+        Object value = s.get(f.getField());
+        if (f.isFiltered(s, ov, c, value)) {
+          remove.add(s);
+        }
+      }
+    }
+
+    for (Stock s : remove) {
+      temp.remove(s);
+    }
+
+    ArrayList<Stock> sublist = new ArrayList<Stock>();
+    int start = config.getOffset();
+    int limit = temp.size();
+    if (config.getLimit() > 0) {
+      limit = Math.min(start + config.getLimit(), limit);
+    }
+    for (int i = config.getOffset(); i < limit; i++) {
+      sublist.add(temp.get(i));
+    }
+    return new BasePagingLoadResult<Stock>(sublist, config.getOffset(), temp.size());
   }
 
 }

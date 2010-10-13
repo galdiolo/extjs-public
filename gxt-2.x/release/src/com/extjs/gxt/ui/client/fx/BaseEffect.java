@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -217,19 +217,19 @@ public class BaseEffect implements Effect {
       switch (dir) {
         case LEFT:
           wrapEl.setLeft(oBounds.width - v);
-          wrapEl.setStyleAttribute(style, v);
+          wrapEl.setStyleAttribute(style, v + "px");
           break;
         case UP:
           wrapEl.setTop((oBounds.height - v));
-          wrapEl.setStyleAttribute(style, v);
+          wrapEl.setStyleAttribute(style, v + "px");
           break;
         case DOWN:
-          el.setStyleAttribute("marginTop", -(oBounds.height - v));
-          wrapEl.setStyleAttribute(style, v);
+          el.setStyleAttribute("marginTop", -(oBounds.height - v) + "px");
+          wrapEl.setStyleAttribute(style, v + "px");
           break;
         case RIGHT:
-          el.setStyleAttribute("marginLeft", -(oBounds.width - v));
-          wrapEl.setStyleAttribute(style, v);
+          el.setStyleAttribute("marginLeft", -(oBounds.width - v) + "px");
+          wrapEl.setStyleAttribute(style, v + "px");
           break;
       }
     }
@@ -293,11 +293,11 @@ public class BaseEffect implements Effect {
     public void increase(int v) {
       switch (dir) {
         case LEFT:
-          el.setStyleAttribute("marginLeft", -(oBounds.width - v));
+          el.setStyleAttribute("marginLeft", -(oBounds.width - v) + "px");
           wrapEl.setStyleAttribute(style, v);
           break;
         case UP:
-          el.setStyleAttribute("marginTop", -(oBounds.height - v));
+          el.setStyleAttribute("marginTop", -(oBounds.height - v) + "px");
           wrapEl.setStyleAttribute(style, v);
           break;
         case DOWN:

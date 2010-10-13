@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -93,7 +93,15 @@ public class ReorderingTreeGridExample extends LayoutContainer {
     toolBar.add(new SeparatorToolItem());
     cp.setTopComponent(toolBar);
 
-    TreeGrid<ModelData> tree = new TreeGrid<ModelData>(store, cm);
+    TreeGrid<ModelData> tree = new TreeGrid<ModelData>(store, cm) {
+      @Override
+      protected boolean hasChildren(ModelData m) {
+        if (m instanceof Folder) {
+          return true;
+        }
+        return super.hasChildren(m);
+      }
+    };
     tree.setBorders(true);
     tree.getStyle().setLeafIcon(Resources.ICONS.music());
     tree.setAutoExpandColumn("name");
@@ -104,8 +112,7 @@ public class ReorderingTreeGridExample extends LayoutContainer {
     target = new TreeGridDropTarget(tree);
     target.setAllowSelfAsSource(true);
     target.setFeedback(Feedback.BOTH);
-    
-    
+
     cp.add(tree);
 
     add(cp);

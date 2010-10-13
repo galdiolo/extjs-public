@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -15,6 +15,7 @@ import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.core.XTemplate;
+import com.extjs.gxt.ui.client.data.BaseLoader;
 import com.extjs.gxt.ui.client.data.BasePagingLoadConfig;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.PagingLoadConfig;
@@ -282,8 +283,13 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     eventPreview.remove();
     expanded = false;
     list.hide();
-    RootPanel.get().remove(list);
 
+    RootPanel.get().remove(list);
+    if (GXT.isAriaEnabled()) {
+      // inspect 32 is keeping focus on hidden list item in dropdown
+      input.blur();
+      input.focus();
+    }
     fireEvent(Events.Collapse, new FieldEvent(this));
   }
 
@@ -335,7 +341,6 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     if (expanded || !hasFocus) {
       return;
     }
-    expanded = true;
 
     if (!initialized) {
       createList(false);
@@ -349,7 +354,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     restrict();
 
     eventPreview.add();
-
+    expanded = true;
     fireEvent(Events.Expand, new FieldEvent(this));
   }
 
@@ -435,6 +440,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     return maxHeight;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public ComboBoxMessages getMessages() {
     return (ComboBoxMessages) messages;
@@ -858,6 +864,9 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
    */
   public void setStore(ListStore<D> store) {
     this.store = store;
+    if (rendered) {
+      bindStore(store);
+    }
   }
 
   /**
@@ -996,6 +1005,10 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
         if (lastSelectionText != null && !"".equals(lastSelectionText)) {
           setRawValue(lastSelectionText);
           if (mode.equals("local")) {
+            // we need to filter the store here, so that the store only contains
+            // the items needed.
+            // we adjust the lastQuery, so doLoad does not use an old value
+            lastQuery = lastSelectionText;
             store.filter(getDisplayField(), getRawValue());
           }
         } else {
@@ -1028,7 +1041,12 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
   }
 
   protected PagingLoadConfig getParams(String query) {
-    BasePagingLoadConfig config = new BasePagingLoadConfig();
+    PagingLoadConfig config = null;
+    if (store.getLoader() instanceof BaseLoader<?> && ((BaseLoader<?>) store.getLoader()).isReuseLoadConfig()) {
+      config = (PagingLoadConfig) ((BaseLoader<?>) store.getLoader()).getLastConfig();
+    } else {
+      config = new BasePagingLoadConfig();
+    }
     config.setLimit(pageSize);
     config.setOffset(0);
     config.set("query", query);
@@ -1039,7 +1057,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     return hasFocus || expanded;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   protected void initComponent() {
     storeListener = new StoreListener<D>() {
 
@@ -1052,7 +1070,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
       public void storeDataChanged(StoreEvent<D> se) {
         onLoad(se);
       }
-      
+
       @Override
       public void storeUpdate(StoreEvent<D> se) {
         onUpdate(se);
@@ -1068,6 +1086,13 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
           case Event.ONMOUSEWHEEL:
           case Event.ONMOUSEDOWN:
             collapseIf(pe);
+            break;
+          case Event.ONKEYPRESS:
+            if (expanded && pe.getKeyCode() == KeyCodes.KEY_ENTER) {
+              pe.stopEvent();
+              onViewClick(pe, false);
+            }
+            break;
         }
         return true;
       }
@@ -1075,12 +1100,16 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     eventPreview.setAutoHide(false);
 
     new KeyNav(this) {
+
+      @Override
       public void onDown(ComponentEvent ce) {
-        ce.cancelBubble();
-        if (!isExpanded()) {
-          onTriggerClick(ce);
-        } else {
-          selectNext();
+        if (!isReadOnly()) {
+          ce.cancelBubble();
+          if (!isExpanded()) {
+            onTriggerClick(ce);
+          } else {
+            selectNext();
+          }
         }
       }
 
@@ -1119,8 +1148,8 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
 
     };
   }
-  
-  @SuppressWarnings("unchecked")
+
+  @SuppressWarnings("rawtypes")
   protected void initList() {
     if (listView == null) {
       listView = new ListView<D>();
@@ -1137,6 +1166,10 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     listView.getSelectionModel().addListener(Events.SelectionChange, new Listener<SelectionChangedEvent<D>>() {
       public void handleEvent(SelectionChangedEvent<D> se) {
         selectedItem = listView.getSelectionModel().getSelectedItem();
+        if (GXT.isAriaEnabled()) {
+          Element e = listView.getElement(listView.getStore().indexOf(selectedItem));
+          ComboBox.this.setAriaState("aria-activedescendant", e.getId());
+        }
       }
     });
 
@@ -1146,7 +1179,8 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
       }
     });
     if (template == null) {
-      String html = "<tpl for=\".\"><div class=\"" + style + "-item\">{" + getDisplayField() + "}</div></tpl>";
+      String html = "<tpl for=\".\"><div role=\"listitem\" class=\"" + style + "-item\">{" + getDisplayField()
+          + "}</div></tpl>";
       template = XTemplate.create(html);
     }
 
@@ -1173,6 +1207,8 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
         super.onRender(parent, index);
         eventPreview.getIgnoreList().add(getElement());
 
+        setAriaRole("presentation");
+
         if (pageTb != null) {
           footer = list.el().createChild("<div class='" + listStyle + "-ft'></div>");
           pageTb.setBorders(false);
@@ -1192,15 +1228,14 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
 
     list.add(listView);
 
-    if (!lazyRender) {
-      createList(true);
-    }
-
-    listView.setStyleAttribute("backgroundColor", "white");
     listView.setTemplate(template);
     listView.setSelectStyle(selectedStyle);
 
-    bindStore(store, true);
+    bindStore(store);
+
+    if (!lazyRender) {
+      createList(true);
+    }
   }
 
   protected void onBeforeLoad(StoreEvent<D> se) {
@@ -1238,7 +1273,8 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
   @Override
   protected void onKeyUp(FieldEvent fe) {
     super.onKeyUp(fe);
-    if (isEditable() && (!fe.isSpecialKey() || fe.getKeyCode() == KeyCodes.KEY_BACKSPACE || fe.getKeyCode() == 46)) {
+    if (!isReadOnly() && isEditable()
+        && (!fe.isSpecialKey() || fe.getKeyCode() == KeyCodes.KEY_BACKSPACE || fe.getKeyCode() == 46)) {
       // last key
       dqTask.delay(queryDelay);
     }
@@ -1304,6 +1340,9 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
       });
     }
     eventPreview.getIgnoreList().add(getElement());
+
+    setAriaState("aria-owns", listView.getId());
+    setAriaRole("combobox");
   }
 
   protected void onSelect(D model, int index) {
@@ -1431,21 +1470,17 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     return super.validateValue(value);
   }
 
-  private void bindStore(ListStore<D> store, boolean initial) {
-    if (this.store != null && !initial) {
+  private void bindStore(ListStore<D> store) {
+    if (this.store != null) {
       this.store.removeStoreListener(storeListener);
-      if (store == null) {
-        this.store = null;
-        if (listView != null) {
-          listView.setStore(null);
-        }
+      this.store = null;
+      if (listView != null) {
+        listView.setStore(null);
       }
     }
     if (store != null) {
       this.store = store;
-      if (store.getLoader() == null) {
-        mode = "local";
-      }
+      mode = store.getLoader() == null ? "local" : "remote";
       if (listView != null) {
         listView.setStore(store);
       }
@@ -1478,7 +1513,6 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
 
     h = Math.min(h, maxHeight - fw);
     list.setSize(w, h);
-    list.el().makePositionable(true);
     list.el().alignTo(getElement(), listAlign, null);
 
     h -= fh;

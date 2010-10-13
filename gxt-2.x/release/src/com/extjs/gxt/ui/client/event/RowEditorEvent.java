@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -22,13 +22,13 @@ public class RowEditorEvent extends BoxComponentEvent {
   private Record record;
   private Map<String, Object> changes;
   
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public RowEditorEvent(RowEditor editor) {
     super(editor);
     this.editor = editor;
   }
   
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public RowEditorEvent(RowEditor editor, int rowIndex) {
     this(editor);
     this.rowIndex = rowIndex;

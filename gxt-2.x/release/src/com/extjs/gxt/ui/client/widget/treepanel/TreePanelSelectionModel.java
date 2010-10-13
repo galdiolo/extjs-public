@@ -1,8 +1,8 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
- *
+ * 
  * http://extjs.com/license
  */
 package com.extjs.gxt.ui.client.widget.treepanel;
@@ -31,11 +31,9 @@ import com.google.gwt.user.client.Event;
  * 
  * @param <M> the model type
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreSelectionModel<M> implements
     Listener<TreePanelEvent> {
-  protected TreePanel tree;
-  protected TreeStore<M> treeStore;
   protected KeyNav<TreePanelEvent<M>> keyNav = new KeyNav<TreePanelEvent<M>>() {
     @Override
     public void onDown(TreePanelEvent<M> e) {
@@ -57,6 +55,8 @@ public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreS
       onKeyUp(e);
     }
   };
+  protected TreePanel tree;
+  protected TreeStore<M> treeStore;
 
   public TreePanelSelectionModel() {
     storeListener = new StoreListener<M>() {
@@ -91,6 +91,7 @@ public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreS
     if (this.tree != null) {
       this.tree.removeListener(Events.OnMouseDown, this);
       this.tree.removeListener(Events.OnClick, this);
+      this.tree.removeListener(Events.Render, this);
       keyNav.bind(null);
       bind(null);
       this.treeStore = null;
@@ -99,6 +100,7 @@ public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreS
     if (tree != null) {
       tree.addListener(Events.OnMouseDown, this);
       tree.addListener(Events.OnClick, this);
+      tree.addListener(Events.Render, this);
       keyNav.bind(tree);
       bind(tree.getStore());
       this.treeStore = (TreeStore) tree.getStore();
@@ -114,14 +116,18 @@ public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreS
   }
 
   public void handleEvent(TreePanelEvent tpe) {
-    int type = tpe.getEventTypeInt();
-    switch (type) {
-      case Event.ONMOUSEDOWN:
-        onMouseDown(tpe);
-        break;
-      case Event.ONCLICK:
-        onMouseClick(tpe);
-        break;
+    if (tpe.getType() == Events.Render) {
+      refresh();
+    } else {
+      int type = tpe.getEventTypeInt();
+      switch (type) {
+        case Event.ONMOUSEDOWN:
+          onMouseDown(tpe);
+          break;
+        case Event.ONCLICK:
+          onMouseClick(tpe);
+          break;
+      }
     }
   }
 
@@ -216,6 +222,20 @@ public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreS
     }
   }
 
+  protected void onMouseClick(TreePanelEvent e) {
+    if (isLocked()) {
+      return;
+    }
+    if (selectionMode == SelectionMode.MULTI) {
+      M sel = (M) e.getItem();
+      if (isSelected(sel) && getSelectedItems().size() > 1) {
+        if (!e.isControlKey() && !e.isShiftKey()) {
+          select(Arrays.asList(sel), false);
+        }
+      }
+    }
+  }
+
   protected void onMouseDown(TreePanelEvent be) {
     if (be.getItem() == null) return;
     if (!tree.getView().isSelectableTarget(be.getItem(), be.getTarget())) {
@@ -273,20 +293,6 @@ public class TreePanelSelectionModel<M extends ModelData> extends AbstractStoreS
           doSelect(Arrays.asList(sel), be.isControlKey(), false);
         }
         break;
-    }
-  }
-
-  protected void onMouseClick(TreePanelEvent e) {
-    if (isLocked()) {
-      return;
-    }
-    if (selectionMode == SelectionMode.MULTI) {
-      M sel = (M) e.getItem();
-      if (isSelected(sel) && getSelectedItems().size() > 1) {
-        if (!e.isControlKey() && !e.isShiftKey()) {
-           select(Arrays.asList(sel), false);
-        }
-      }
     }
   }
 

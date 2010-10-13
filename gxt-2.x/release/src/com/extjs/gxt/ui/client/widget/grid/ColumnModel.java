@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -10,7 +10,6 @@ package com.extjs.gxt.ui.client.widget.grid;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseObservable;
@@ -22,7 +21,7 @@ import com.extjs.gxt.ui.client.util.Rectangle;
  * This is the default implementation of a ColumnModel.
  * 
  * <dl>
- * <dt>Events:</dt>
+ * <dt><b>Events:</b></dt>
  * 
  * <dd><b>WidthChange</b> : ColumnModelEvent(cm, colIndex)<br>
  * <div>Fires when the width of a column changes.</div>
@@ -71,7 +70,7 @@ public class ColumnModel extends BaseObservable {
    * @param columns the columns
    */
   public ColumnModel(List<ColumnConfig> columns) {
-    this.configs = columns;
+    this.configs = new ArrayList<ColumnConfig>(columns);
   }
 
   /**
@@ -81,16 +80,6 @@ public class ColumnModel extends BaseObservable {
    */
   public void addAggregationRow(AggregationRowConfig<?> row) {
     rows.add(row);
-  }
-
-  /**
-   * Returns the aggregation row.
-   * 
-   * @param rowIndex the row index
-   * @return the aggregation row
-   */
-  public AggregationRowConfig<?> getAggregationRow(int rowIndex) {
-    return rowIndex < rows.size() ? rows.get(rowIndex) : null;
   }
 
   /**
@@ -122,6 +111,16 @@ public class ColumnModel extends BaseObservable {
   }
 
   /**
+   * Returns the aggregation row.
+   * 
+   * @param rowIndex the row index
+   * @return the aggregation row
+   */
+  public AggregationRowConfig<?> getAggregationRow(int rowIndex) {
+    return rowIndex < rows.size() ? rows.get(rowIndex) : null;
+  }
+
+  /**
    * Returns the aggregation rows.
    * 
    * @return the aggregation rows
@@ -137,7 +136,7 @@ public class ColumnModel extends BaseObservable {
    * @return the column or null
    */
   public ColumnConfig getColumn(int colIndex) {
-    return colIndex < configs.size() ? configs.get(colIndex) : null;
+    return colIndex >= 0 && colIndex < configs.size() ? configs.get(colIndex) : null;
   }
 
   /**
@@ -147,7 +146,8 @@ public class ColumnModel extends BaseObservable {
    * @return the alignment
    */
   public HorizontalAlignment getColumnAlignment(int colIndex) {
-    return configs.get(colIndex).getAlignment();
+    ColumnConfig c = getColumn(colIndex);
+    return c != null ? c.getAlignment() : null;
   }
 
   /**
@@ -199,7 +199,8 @@ public class ColumnModel extends BaseObservable {
    * @return the header
    */
   public String getColumnHeader(int colIndex) {
-    return configs.get(colIndex).getHeader();
+    ColumnConfig c = getColumn(colIndex);
+    return c != null ? c.getHeader() : null;
   }
 
   /**
@@ -209,7 +210,8 @@ public class ColumnModel extends BaseObservable {
    * @return the id
    */
   public String getColumnId(int colIndex) {
-    return configs.get(colIndex).getId();
+    ColumnConfig c = getColumn(colIndex);
+    return c != null ? c.getId() : null;
   }
 
   /**
@@ -228,7 +230,8 @@ public class ColumnModel extends BaseObservable {
    * @return the column style
    */
   public String getColumnStyle(int colIndex) {
-    return configs.get(colIndex).getStyle();
+    ColumnConfig c = getColumn(colIndex);
+    return c != null ? c.getStyle() : null;
   }
 
   /**
@@ -238,7 +241,8 @@ public class ColumnModel extends BaseObservable {
    * @return the tooltip
    */
   public String getColumnToolTip(int colIndex) {
-    return configs.get(colIndex).getToolTip();
+    ColumnConfig c = getColumn(colIndex);
+    return c != null ? c.getToolTip() : null;
   }
 
   /**
@@ -248,7 +252,8 @@ public class ColumnModel extends BaseObservable {
    * @return the width
    */
   public int getColumnWidth(int colIndex) {
-    return configs.get(colIndex).getWidth();
+    ColumnConfig c = getColumn(colIndex);
+    return c != null ? c.getWidth() : null;
   }
 
   /**
@@ -258,7 +263,8 @@ public class ColumnModel extends BaseObservable {
    * @return the data index
    */
   public String getDataIndex(int colIndex) {
-    return configs.get(colIndex).getDataIndex();
+    ColumnConfig c = getColumn(colIndex);
+    return c != null ? c.getDataIndex() : null;
   }
 
   /**
@@ -268,7 +274,8 @@ public class ColumnModel extends BaseObservable {
    * @return the cell editor
    */
   public CellEditor getEditor(int colIndex) {
-    return configs.get(colIndex).getEditor();
+    ColumnConfig c = getColumn(colIndex);
+    return c != null ? c.getEditor() : null;
   }
 
   /**
@@ -288,10 +295,7 @@ public class ColumnModel extends BaseObservable {
    */
   public int getIndexById(String id) {
     ColumnConfig c = getColumnById(id);
-    if (c != null) {
-      return configs.indexOf(c);
-    }
-    return Style.DEFAULT;
+    return configs.indexOf(c);
   }
 
   /**
@@ -301,7 +305,8 @@ public class ColumnModel extends BaseObservable {
    * @return the cell renderer
    */
   public GridCellRenderer<ModelData> getRenderer(int colIndex) {
-    return configs.get(colIndex).getRenderer();
+    ColumnConfig c = getColumn(colIndex);
+    return c != null ? c.getRenderer() : null;
   }
 
   /**
@@ -346,7 +351,8 @@ public class ColumnModel extends BaseObservable {
    * @return true if editable
    */
   public boolean isCellEditable(int colIndex) {
-    return configs.get(colIndex).getEditor() != null;
+    ColumnConfig c = getColumn(colIndex);
+    return c != null && c.getEditor() != null;
   }
 
   /**
@@ -356,7 +362,8 @@ public class ColumnModel extends BaseObservable {
    * @return true if fixed
    */
   public boolean isFixed(int colIndex) {
-    return configs.get(colIndex).isFixed();
+    ColumnConfig c = getColumn(colIndex);
+    return c != null && c.isFixed();
   }
 
   /**
@@ -367,7 +374,8 @@ public class ColumnModel extends BaseObservable {
    * @return true if the column is groupable.
    */
   public boolean isGroupable(int colIndex) {
-    return configs.get(colIndex).isGroupable();
+    ColumnConfig c = getColumn(colIndex);
+    return c != null && c.isGroupable();
   }
 
   /**
@@ -377,7 +385,8 @@ public class ColumnModel extends BaseObservable {
    * @return true if hidden
    */
   public boolean isHidden(int colIndex) {
-    return configs.get(colIndex).isHidden();
+    ColumnConfig c = getColumn(colIndex);
+    return c != null && c.isHidden();
   }
 
   /**
@@ -387,7 +396,8 @@ public class ColumnModel extends BaseObservable {
    * @return true if disabled
    */
   public boolean isMenuDisabled(int colIndex) {
-    return configs.get(colIndex).isMenuDisabled();
+    ColumnConfig c = getColumn(colIndex);
+    return c != null && c.isMenuDisabled();
   }
 
   /**
@@ -397,7 +407,8 @@ public class ColumnModel extends BaseObservable {
    * @return true if resizable
    */
   public boolean isResizable(int colIndex) {
-    return colIndex >= 0 && configs.get(colIndex).isResizable();
+    ColumnConfig c = getColumn(colIndex);
+    return c != null && c.isResizable();
   }
 
   /**
@@ -407,7 +418,27 @@ public class ColumnModel extends BaseObservable {
    * @return true if the column is sortable
    */
   public boolean isSortable(int colIndex) {
-    return configs.get(colIndex).isSortable();
+    ColumnConfig c = getColumn(colIndex);
+    return c != null && c.isSortable();
+  }
+
+  /**
+   * Moves a column.
+   * 
+   * @param oldIndex the column index
+   * @param newIndex the new column index
+   */
+  public void moveColumn(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) {
+      newIndex--;
+    }
+    ColumnConfig c = configs.remove(oldIndex);
+    configs.add(newIndex, c);
+
+    if (c != null) {
+      ColumnModelEvent e = new ColumnModelEvent(this, newIndex);
+      fireEvent(Events.ColumnMove, e);
+    }
   }
 
   /**
@@ -417,10 +448,13 @@ public class ColumnModel extends BaseObservable {
    * @param header the header
    */
   public void setColumnHeader(int colIndex, String header) {
-    configs.get(colIndex).setHeader(header);
-    ColumnModelEvent e = new ColumnModelEvent(this, colIndex);
-    e.setHeader(header);
-    fireEvent(Events.HeaderChange, e);
+    ColumnConfig c = getColumn(colIndex);
+    if (c != null) {
+      c.setHeader(header);
+      ColumnModelEvent e = new ColumnModelEvent(this, colIndex);
+      e.setHeader(header);
+      fireEvent(Events.HeaderChange, e);
+    }
   }
 
   /**
@@ -441,12 +475,16 @@ public class ColumnModel extends BaseObservable {
    * @param supressEvent true to suppress width change event
    */
   public void setColumnWidth(int colIndex, int width, boolean supressEvent) {
-    configs.get(colIndex).setWidth(width);
-    if (!supressEvent) {
-      ColumnModelEvent e = new ColumnModelEvent(this, colIndex);
-      e.setWidth(width);
-      fireEvent(Events.WidthChange, e);
+    ColumnConfig c = getColumn(colIndex);
+    if (c != null) {
+      c.setWidth(width);
+      if (!supressEvent) {
+        ColumnModelEvent e = new ColumnModelEvent(this, colIndex);
+        e.setWidth(width);
+        fireEvent(Events.WidthChange, e);
+      }
     }
+
   }
 
   /**
@@ -456,7 +494,10 @@ public class ColumnModel extends BaseObservable {
    * @param dataIndex the data index
    */
   public void setDataIndex(int colIndex, String dataIndex) {
-    configs.get(colIndex).setDataIndex(dataIndex);
+    ColumnConfig c = getColumn(colIndex);
+    if (c != null) {
+      c.setDataIndex(dataIndex);
+    }
   }
 
   /**
@@ -466,7 +507,10 @@ public class ColumnModel extends BaseObservable {
    * @param editor the editor
    */
   public void setEditor(int colIndex, CellEditor editor) {
-    configs.get(colIndex).setEditor(editor);
+    ColumnConfig c = getColumn(colIndex);
+    if (c != null) {
+      c.setEditor(editor);
+    }
   }
 
   /**
@@ -476,8 +520,8 @@ public class ColumnModel extends BaseObservable {
    * @param hidden true to hide the column
    */
   public void setHidden(int colIndex, boolean hidden) {
-    ColumnConfig c = configs.get(colIndex);
-    if (c.isHidden() != hidden) {
+    ColumnConfig c = getColumn(colIndex);
+    if (c != null && c.isHidden() != hidden) {
       c.setHidden(hidden);
       ColumnModelEvent e = new ColumnModelEvent(this, colIndex);
       e.setHidden(hidden);

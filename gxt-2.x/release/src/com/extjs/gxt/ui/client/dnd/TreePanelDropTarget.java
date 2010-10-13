@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -19,10 +19,11 @@ import com.extjs.gxt.ui.client.store.TreeStoreModel;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel.TreeNode;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked","rawtypes"})
 public class TreePanelDropTarget extends DropTarget {
 
   protected TreePanel<ModelData> tree;
@@ -30,13 +31,36 @@ public class TreePanelDropTarget extends DropTarget {
   protected int status;
 
   private boolean allowDropOnLeaf = false;
-  private boolean autoExpand = true;
+  private boolean autoExpand = true, autoScroll = true;
   private int autoExpandDelay = 800;
   private boolean restoreTrackMouse;
+  private ScrollSupport scrollSupport;
+  private String scrollElementId;
 
   public TreePanelDropTarget(TreePanel tree) {
     super(tree);
     this.tree = tree;
+  }
+
+  /**
+   * Returns the scroll element id.
+   * 
+   * @return the scroll element id.
+   */
+  public String getScrollElementId() {
+    return scrollElementId;
+  }
+
+  /**
+   * Returns the scroll support instance.
+   * 
+   * @return the scroll support
+   */
+  public ScrollSupport getScrollSupport() {
+    if (scrollSupport == null) {
+      scrollSupport = new ScrollSupport();
+    }
+    return scrollSupport;
   }
 
   /**
@@ -64,6 +88,15 @@ public class TreePanelDropTarget extends DropTarget {
    */
   public boolean isAutoExpand() {
     return autoExpand;
+  }
+
+  /**
+   * Returns true if auto scroll is enabled (defaults to true).
+   * 
+   * @return true if auto scroll enabled
+   */
+  public boolean isAutoScroll() {
+    return autoScroll;
   }
 
   /**
@@ -95,6 +128,28 @@ public class TreePanelDropTarget extends DropTarget {
     this.autoExpandDelay = autoExpandDelay;
   }
 
+  /**
+   * True to automatically scroll the tree when the user hovers over the top and
+   * bottom of the tree grid (defaults to true).
+   * 
+   * @see ScrollSupport
+   * 
+   * @param autoScroll true to enable auto scroll
+   */
+  public void setAutoScroll(boolean autoScroll) {
+    this.autoScroll = autoScroll;
+  }
+
+  /**
+   * Sets the element that will be scrolled when auto scroll is enabled
+   * (optional, defaults to null).
+   * 
+   * @param scrollElementId the scroll element id
+   */
+  public void setScrollElementId(String scrollElementId) {
+    this.scrollElementId = scrollElementId;
+  }
+
   protected void appendModel(ModelData p, List<ModelData> models, int index) {
     if (models.size() == 0) return;
     if (models.get(0) instanceof TreeStoreModel) {
@@ -122,6 +177,14 @@ public class TreePanelDropTarget extends DropTarget {
       tree.getStore().insert(models, index, false);
     } else {
       tree.getStore().insert(p, models, index, false);
+    }
+  }
+
+  protected void clearStyles(DNDEvent event) {
+    Insert.get().hide();
+    event.getStatus().setStatus(false);
+    if (activeItem != null) {
+      tree.getView().onDropChange(activeItem, false);
     }
   }
 
@@ -232,7 +295,7 @@ public class TreePanelDropTarget extends DropTarget {
       } else {
         idx = activeItem.getParent().indexOf(item);
       }
-      
+
       idx = status == 0 ? idx : idx + 1;
       if (item.getParent() == null) {
         appendModel(null, sel, idx);
@@ -262,6 +325,9 @@ public class TreePanelDropTarget extends DropTarget {
     status = -1;
     activeItem = null;
     appendItem = null;
+    if (autoScroll) {
+      scrollSupport.stop();
+    }
   }
 
   @Override
@@ -270,6 +336,24 @@ public class TreePanelDropTarget extends DropTarget {
     e.getStatus().setStatus(false);
     restoreTrackMouse = tree.isTrackMouseOver();
     tree.setTrackMouseOver(false);
+    if (autoScroll) {
+      if (scrollSupport == null) {
+        El scroll = scrollElementId != null ? new El(DOM.getElementById(scrollElementId)) : tree.el();
+        scrollSupport = new ScrollSupport(scroll);
+      } else if (scrollSupport.getScrollElement() == null) {
+        El scroll = scrollElementId != null ? new El(DOM.getElementById(scrollElementId)) : tree.el();
+        scrollSupport.setScrollElement(scroll);
+      }
+      scrollSupport.start();
+    }
+  }
+
+  @Override
+  protected void onDragFail(DNDEvent event) {
+    super.onDragFail(event);
+    if (autoScroll) {
+      scrollSupport.stop();
+    }
   }
 
   @Override
@@ -280,19 +364,14 @@ public class TreePanelDropTarget extends DropTarget {
       activeItem = null;
     }
     tree.setTrackMouseOver(restoreTrackMouse);
+    if (autoScroll) {
+      scrollSupport.stop();
+    }
   }
 
   @Override
   protected void onDragMove(DNDEvent event) {
     event.setCancelled(false);
-  }
-
-  protected void clearStyles(DNDEvent event) {
-    Insert.get().hide();
-    event.getStatus().setStatus(false);
-    if (activeItem != null) {
-      tree.getView().onDropChange(activeItem, false);
-    }
   }
 
   @Override

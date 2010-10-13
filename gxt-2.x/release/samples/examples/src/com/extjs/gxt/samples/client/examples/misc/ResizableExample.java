@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -22,24 +22,27 @@ public class ResizableExample extends LayoutContainer {
   @Override
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
-
-    ContentPanel cp = new ContentPanel();
-    cp.setHeading("8-Way Resizing");
-    cp.setIcon(Resources.ICONS.text());
-    cp.setBodyStyleName("pad-text");
-    cp.addText(TestData.DUMMY_TEXT_SHORT);
-
-    cp.setSize(200, 125);
-    cp.setPosition(10, 10);
-
-    Draggable d = new Draggable(cp);
-    if (getParent() instanceof Component) {
-      d.setContainer((Component) getParent());
-    }
-    new Resizable(cp);
-
     setLayout(new FlowLayout());
-    add(cp);
+
+    for (int i = 0; i < 2; i++) {
+      ContentPanel cp = new ContentPanel();
+      cp.setHeading("8-Way Resizing " + (i == 1 ? "Dynamic" : ""));
+      cp.setIcon(Resources.ICONS.text());
+      cp.setBodyStyleName("pad-text");
+      cp.addText(TestData.DUMMY_TEXT_SHORT);
+
+      cp.setSize(200, 125);
+      cp.setPosition(10, 10  + (i == 1 ? 20 : 0));
+
+      Draggable d = new Draggable(cp);
+      if (getParent() instanceof Component) {
+        d.setContainer((Component) getParent());
+      }
+      Resizable r = new Resizable(cp);
+      r.setDynamic(i == 1);
+
+      add(cp);
+    }
   }
 
 }

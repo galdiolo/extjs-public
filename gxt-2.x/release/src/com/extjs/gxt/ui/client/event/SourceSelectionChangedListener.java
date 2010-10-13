@@ -1,11 +1,13 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
  */
 package com.extjs.gxt.ui.client.event;
+
+import java.util.List;
 
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.google.gwt.user.client.Command;
@@ -17,9 +19,9 @@ import com.google.gwt.user.client.DeferredCommand;
  * <code>SelectionService</code>.
  */
 public class SourceSelectionChangedListener extends SelectionChangedListener<ModelData> {
-  private SelectionProvider<ModelData> provider;
+  private SelectionProvider<? extends ModelData> provider;
 
-  public SourceSelectionChangedListener(SelectionProvider<ModelData> provider) {
+  public SourceSelectionChangedListener(SelectionProvider<? extends ModelData> provider) {
     this.provider = provider;
   }
 
@@ -28,8 +30,9 @@ public class SourceSelectionChangedListener extends SelectionChangedListener<Mod
     if (eventProvider != provider) {
       if (provider.getSelection().get(0) != eventProvider.getSelection().get(0)) {
         DeferredCommand.addCommand(new Command() {
+          @SuppressWarnings({"unchecked", "rawtypes"})
           public void execute() {
-            provider.setSelection(event.getSelection());
+            provider.setSelection((List)event.getSelection());
           }
         });
 

@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -306,9 +306,7 @@ public class MessageBox {
    * Closes the message box.
    */
   public void close() {
-    if (dialog.isVisible()) {
-      dialog.hide();
-    }
+    dialog.hide();
   }
 
   /**
@@ -352,21 +350,37 @@ public class MessageBox {
           Element contentEl = body.dom.getChildNodes().getItem(1).cast();
           msgEl = contentEl.getFirstChild().cast();
           msgEl.setInnerHTML(message);
+          msgEl.setId(getId() + "-content");
+          
+          dialog.getAriaSupport().setDescribedBy(getId() + "-content");
 
           if (type == MessageBoxType.PROMPT) {
             textBox = new TextField<String>();
+            textBox.getAriaSupport().setLabelledBy(getId() + "-content");
             dialog.setFocusWidget(textBox);
             textBox.render(contentEl, 2);
+            textBox.setData("aria-previous", fbar.getId());
+            textBox.setData("aria-next", fbar.getId());
+            fbar.setData("aria-previous", textBox.getId());
+            fbar.setData("aria-next", textBox.getId());
             icon = null;
           } else if (type == MessageBoxType.MULTIPROMPT) {
             textArea = new TextArea();
+            textArea.getAriaSupport().setLabelledBy(getId() + "-content");
             textArea.setHeight(defaultTextHeight);
             dialog.setFocusWidget(textArea);
             textArea.render(contentEl, 2);
+            textArea.setData("aria-next", fbar.getId());
+            textArea.setData("aria-previous", fbar.getId());
+            fbar.setData("aria-next", textArea.getId());
+            fbar.setData("aria-previous", textArea.getId());
             icon = null;
           } else if (type == MessageBoxType.PROGRESSS || type == MessageBoxType.WAIT) {
+            dialog.getAriaSupport().setDescribedBy("");
             progressBar = new ProgressBar();
+            progressBar.getAriaSupport().setLabelledBy(getId() + "-content");
             progressBar.render(body.dom);
+            setFocusWidget(progressBar);
             if (type == MessageBoxType.WAIT) {
               progressBar.auto();
             }
@@ -448,13 +462,6 @@ public class MessageBox {
       dialog.setHideOnButtonClick(true);
       if (callback != null) {
         dialog.addListener(Events.Hide, callback);
-      }
-      if (getButtons() != null) {
-        if (getButtons().contains(Dialog.YES)) {
-          dialog.setFocusWidget(dialog.getButtonBar().getItemByItemId(Dialog.YES));
-        } else if (getButtons().contains(Dialog.OK)) {
-          dialog.setFocusWidget(dialog.getButtonBar().getItemByItemId(Dialog.OK));
-        }
       }
 
       if (listeners != null) {

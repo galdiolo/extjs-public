@@ -1,20 +1,18 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
  */
 package com.extjs.gxt.samples.explorer.client.mvc;
 
-import com.extjs.gxt.themes.client.Slate;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
 import com.extjs.gxt.ui.client.mvc.AppEvent;
 import com.extjs.gxt.ui.client.mvc.Controller;
 import com.extjs.gxt.ui.client.mvc.View;
 import com.extjs.gxt.ui.client.util.Margins;
-import com.extjs.gxt.ui.client.util.ThemeManager;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.HtmlContainer;
 import com.extjs.gxt.ui.client.widget.Viewport;
@@ -91,7 +89,7 @@ public class AppView extends View {
     northPanel.setStateful(false);
     northPanel.setId("demo-header");
     northPanel.addStyleName("x-small-editor");
-    ThemeManager.register(Slate.SLATE);
+
     ThemeSelector selector = new ThemeSelector();
     selector.setWidth(125);
     northPanel.add(selector, "#demo-theme");

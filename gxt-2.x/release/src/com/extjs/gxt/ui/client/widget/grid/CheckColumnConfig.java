@@ -1,12 +1,13 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
  */
 package com.extjs.gxt.ui.client.widget.grid;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.GridEvent;
@@ -24,7 +25,8 @@ import com.extjs.gxt.ui.client.widget.ComponentPlugin;
  * CheckColumnConfig is a <code>ComponentPlugin</code> and must be added to the
  * Grid's list of plugins (see @link {@link Grid#addPlugin(ComponentPlugin)}).
  * 
- * <p /> Disabled support code snippet:
+ * <p />
+ * Disabled support code snippet:
  * 
  * <pre>
     CheckColumnConfig checkColumn = new CheckColumnConfig("indoor", "Indoor?", 55) {
@@ -45,6 +47,7 @@ public class CheckColumnConfig extends ColumnConfig implements ComponentPlugin {
   public CheckColumnConfig() {
     super();
     init();
+    ariaIgnore = true;
   }
 
   /**
@@ -59,7 +62,7 @@ public class CheckColumnConfig extends ColumnConfig implements ComponentPlugin {
     init();
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public void init(Component component) {
     this.grid = (Grid) component;
     grid.addListener(Events.CellMouseDown, new Listener<GridEvent>() {
@@ -80,8 +83,7 @@ public class CheckColumnConfig extends ColumnConfig implements ComponentPlugin {
    * @param colIndex the cell index
    * @return the css style name
    */
-  protected String getCheckState(ModelData model, String property, int rowIndex,
-      int colIndex) {
+  protected String getCheckState(ModelData model, String property, int rowIndex, int colIndex) {
     Boolean v = model.get(property);
     String on = (v != null && v) ? "-on" : "";
     return on;
@@ -89,8 +91,8 @@ public class CheckColumnConfig extends ColumnConfig implements ComponentPlugin {
 
   protected void init() {
     setRenderer(new GridCellRenderer<ModelData>() {
-      public String render(ModelData model, String property, ColumnData config,
-          int rowIndex, int colIndex, ListStore<ModelData> store, Grid<ModelData> grid) {
+      public String render(ModelData model, String property, ColumnData config, int rowIndex, int colIndex,
+          ListStore<ModelData> store, Grid<ModelData> grid) {
         return onRender(model, property, config, rowIndex, colIndex, store);
       }
     });
@@ -108,8 +110,8 @@ public class CheckColumnConfig extends ColumnConfig implements ComponentPlugin {
       int index = grid.getView().findRowIndex(ge.getTarget());
       ModelData m = grid.getStore().getAt(index);
       Record r = grid.getStore().getRecord(m);
-      boolean b = (Boolean) m.get(getDataIndex());
-      r.set(getDataIndex(), !b);
+      Boolean b = (Boolean) m.get(getDataIndex());
+      r.set(getDataIndex(), b == null ? true : !b);
     }
   }
 
@@ -124,11 +126,14 @@ public class CheckColumnConfig extends ColumnConfig implements ComponentPlugin {
    * @param store the list store
    * @return the rendered HTML
    */
-  protected String onRender(ModelData model, String property, ColumnData config,
-      int rowIndex, int colIndex, ListStore<ModelData> store) {
+  protected String onRender(ModelData model, String property, ColumnData config, int rowIndex, int colIndex,
+      ListStore<ModelData> store) {
     config.css = "x-grid3-check-col-td";
-    return "<div class='x-grid3-check-col"
-        + " x-grid3-check-col" + getCheckState(model, property, rowIndex, colIndex) + " x-grid3-cc-" + getId()
+    String checked = getCheckState(model, property, rowIndex, colIndex);
+    if (GXT.isAriaEnabled()) {
+      config.cellAttr = "aria-checked=" + (checked.equals("-on") ? "true" : "false");
+    }
+    return "<div class='x-grid3-check-col" + " x-grid3-check-col" + checked + " x-grid3-cc-" + getId()
         + "'>&#160;</div>";
   }
 

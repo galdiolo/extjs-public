@@ -1,11 +1,11 @@
 Quick Setup for Ext GWT 2.X
 ===========================
 
-Note : Ext GWT 2.X requires GWT 1.6.x or GWT 2.0 (any build ending in "-gwt2.zip"). 
+Note : Ext GWT 2.X requires GWT 1.7+ or GWT 2.0+ (any build ending in "-gwt2.zip"). 
 
-STEP 1 -> Create a GWT 1.6.x project within Eclipse.
+STEP 1 -> Create a Google Web Application Project project within Eclipse.
 
-Copy the contents of the /resources folder in the download to a {foldername} location with your war folder.
+Copy the contents of the /resources folder in the download to a {foldername} location within your war folder.
 Substitute {foldername} with the name of the folder you've created for resources within your war folder. 
 
 STEP 3 -> Add the following stylesheet to your host page.
@@ -20,11 +20,7 @@ STEP 4 -> Add the following entry to you projects module xml file.
 
 <inherits name='com.extjs.gxt.ui.GXT'/>
 
-STEP 5 -> Ext GWT requires the following doctype (quirksmode).
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-
-STEP 6 -> Eclipse Setup (should be similar for other development environments)
+STEP 5 -> Eclipse Setup (should be similar for other development environments)
 These instructions assume you have a existing project and launch configuration.
 
 1. Add gxt.jar to the project.

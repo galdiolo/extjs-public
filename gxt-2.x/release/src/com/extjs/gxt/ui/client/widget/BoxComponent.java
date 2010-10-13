@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -14,9 +14,8 @@ import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.aria.FocusFrame;
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.core.FastMap;
 import com.extjs.gxt.ui.client.core.XDOM;
-import com.extjs.gxt.ui.client.data.BaseModelData;
-import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BoxComponentEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
@@ -35,7 +34,7 @@ import com.google.gwt.user.client.Event;
  * model.
  * 
  * <dl>
- * <dt>Events:</dt>
+ * <dt><b>Events:</b></dt>
  * 
  * <dd><b>Resize</b> : BoxComponentEvent(boxComponent, width, height)<br>
  * <div>Fires after the component is resized.</div>
@@ -482,7 +481,7 @@ public class BoxComponent extends Component {
       return;
     }
 
-    List<ModelData> list = makeVisible();
+    List<FastMap<Object>> list = makeVisible();
 
     lastSize = size;
 
@@ -577,7 +576,7 @@ public class BoxComponent extends Component {
     int w = -1;
     int h = -1;
 
-    List<ModelData> list = makeVisible();
+    List<FastMap<Object>> list = makeVisible();
 
     if (width.indexOf("px") != -1) {
       w = Integer.parseInt(width.substring(0, width.indexOf("px")));
@@ -784,21 +783,23 @@ public class BoxComponent extends Component {
     }
   }
 
-  private List<ModelData> makeVisible() {
+  private List<FastMap<Object>> makeVisible() {
     if (ensureVisibilityOnSizing) {
-      List<ModelData> list = new ArrayList<ModelData>();
+      List<FastMap<Object>> list = new ArrayList<FastMap<Object>>();
       Element p = getElement();
       while (p != null && p != XDOM.getBody()) {
         if (fly(p).isStyleAttribute("display", "none")) {
-          ModelData b = new BaseModelData();
-          b.set("element", p);
-          b.set("origd", p.getStyle().getProperty("display"));
-          b.set("hasxhideoffset", fly(p).hasStyleName("x-hide-offset"));
-          if (!b.<Boolean> get("hasxhideoffset")) {
+          FastMap<Object> m = new FastMap<Object>();
+          m.put("element", p);
+          m.put("origd", p.getStyle().getProperty("display"));
+
+          boolean hasxhideoffset = fly(p).hasStyleName("x-hide-offset");
+          m.put("hasxhideoffset", hasxhideoffset);
+          if (!hasxhideoffset) {
             fly(p).addStyleName("x-hide-offset");
           }
           p.getStyle().setProperty("display", "block");
-          list.add(b);
+          list.add(m);
         }
         p = (Element) p.getParentElement();
       }
@@ -807,12 +808,12 @@ public class BoxComponent extends Component {
     return null;
   }
 
-  private void restoreVisible(List<ModelData> list) {
+  private void restoreVisible(List<FastMap<Object>> list) {
     if (ensureVisibilityOnSizing && list != null) {
-      for (ModelData m : list) {
-        Element e = m.<Element> get("element");
-        e.getStyle().setProperty("display", m.<String> get("origd"));
-        if (!m.<Boolean> get("hasxhideoffset")) {
+      for (FastMap<Object> m : list) {
+        Element e = (Element) m.get("element");
+        e.getStyle().setProperty("display", (String) m.get("origd"));
+        if (!((Boolean) m.get("hasxhideoffset")).booleanValue()) {
           fly(e).removeStyleName("x-hide-offset");
         }
       }

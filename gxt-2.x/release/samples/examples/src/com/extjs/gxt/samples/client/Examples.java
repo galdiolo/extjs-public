@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -11,6 +11,7 @@ import java.util.Map;
 
 import com.extjs.gxt.samples.client.examples.model.Category;
 import com.extjs.gxt.samples.client.examples.model.Entry;
+import com.extjs.gxt.themes.client.Access;
 import com.extjs.gxt.themes.client.Slate;
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
@@ -53,6 +54,9 @@ public class Examples implements EntryPoint {
   private Viewport viewport;
 
   public void onModuleLoad() {
+    ThemeManager.register(Slate.SLATE);
+    ThemeManager.register(Access.ACCESS);
+    
     String name = GWT.getModuleName();
     if (!"com.extjs.gxt.samples.Examples".equals(name)) {
       return;
@@ -133,7 +137,6 @@ public class Examples implements EntryPoint {
     HtmlContainer northPanel = new HtmlContainer(sb.toString());
     northPanel.setStateful(false);
 
-    ThemeManager.register(Slate.SLATE);
     ThemeSelector selector = new ThemeSelector();
     selector.setWidth(125);
     northPanel.add(selector, "#demo-theme");

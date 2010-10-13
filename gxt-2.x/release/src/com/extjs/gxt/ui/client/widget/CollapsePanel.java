@@ -1,12 +1,13 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
  */
 package com.extjs.gxt.ui.client.widget;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -61,7 +62,7 @@ import com.google.gwt.user.client.Event;
  */
 public class CollapsePanel extends ContentPanel {
 
-  private ToolButton collapseBtn;
+  private ToolButton collapseButton;
   private BorderLayoutData parentData;
   private boolean expanded;
   private El headerEl;
@@ -84,6 +85,10 @@ public class CollapsePanel extends ContentPanel {
     this.collapse();
     setDeferHeight(false);
   }
+  
+  public ToolButton getCollapseButton() {
+    return collapseButton;
+  }
 
   /**
    * Returns the panel's content panel.
@@ -94,11 +99,11 @@ public class CollapsePanel extends ContentPanel {
     return panel;
   }
 
-  public int getFrameWidth() {
+  public int getFrameHeight() {
     return 0;
   }
 
-  public int getFrameHeight() {
+  public int getFrameWidth() {
     return 0;
   }
 
@@ -110,7 +115,7 @@ public class CollapsePanel extends ContentPanel {
   @Override
   public void onComponentEvent(ComponentEvent ce) {
     super.onComponentEvent(ce);
-    if (!ce.within(collapseBtn.getElement())) {
+    if (!ce.within(collapseButton.getElement())) {
       if (ce.getType().getEventCode() == Event.ONCLICK) {
         setExpanded(!expanded);
       }
@@ -135,21 +140,28 @@ public class CollapsePanel extends ContentPanel {
   }
 
   protected void afterHidePanel(ContentPanel panel) {
+
   }
 
   protected void afterShowPanel(ContentPanel panel) {
+
   }
 
   @Override
   protected void doAttachChildren() {
     super.doAttachChildren();
-    ComponentHelper.doAttach(collapseBtn);
+    ComponentHelper.doAttach(collapseButton);
   }
 
   @Override
   protected void doDetachChildren() {
     super.doDetachChildren();
-    ComponentHelper.doDetach(collapseBtn);
+    ComponentHelper.doDetach(collapseButton);
+  }
+
+  @Override
+  protected Size getFrameSize() {
+    return new Size(0, 0);
   }
 
   @Override
@@ -175,11 +187,6 @@ public class CollapsePanel extends ContentPanel {
         bar.enable();
       }
     }
-  }
-
-  @Override
-  protected Size getFrameSize() {
-    return new Size(0, 0);
   }
 
   @Override
@@ -228,10 +235,10 @@ public class CollapsePanel extends ContentPanel {
     headerEl.setStyleAttribute("cursor", "default");
 
     setStyleName("x-layout-collapsed");
-    collapseBtn = new ToolButton("x-tool-" + icon);
-    collapseBtn.render(headerEl.dom, 0);
+    collapseButton = new ToolButton("x-tool-" + icon);
+    collapseButton.render(headerEl.dom, 0);
 
-    collapseBtn.addListener(Events.Select, new Listener<ComponentEvent>() {
+    collapseButton.addListener(Events.Select, new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent ce) {
         if (expanded) {
           setExpanded(false);
@@ -245,10 +252,15 @@ public class CollapsePanel extends ContentPanel {
     }
     el().setVisibility(true);
 
-    sinkEvents(Event.MOUSEEVENTS);
-  }
+    if (GXT.isAriaEnabled()) {
+      el().setTabIndex(0);
+      el().setElementAttribute("hideFocus", "true");
+    }
 
-  protected void onShowPanel(ContentPanel panel) {
+    sinkEvents(Event.MOUSEEVENTS | Event.FOCUSEVENTS);
+  }
+  
+  protected void onShowPanel(final ContentPanel panel) {
     this.expanded = true;
     Rectangle box = getBounds(false);
 
@@ -264,7 +276,7 @@ public class CollapsePanel extends ContentPanel {
         }
       };
 
-      popup.getIgnoreList().add(collapseBtn.getElement());
+      popup.getIgnoreList().add(collapseButton.getElement());
       popup.getIgnoreList().add(getElement());
       popup.getIgnoreList().add(panel.getElement());
       popup.setStyleName("x-layout-popup");
@@ -274,7 +286,17 @@ public class CollapsePanel extends ContentPanel {
     panel.setPosition(0, 0);
     panel.setBorders(false);
     panel.getHeader().hide();
-    panel.body.addStyleName("x-panel-popup-body");
+
+    if (panel.isRendered()) {
+      panel.body.addStyleName("x-panel-popup-body");
+    } else {
+      panel.addListener(Events.Render, new Listener<ComponentEvent>() {
+        public void handleEvent(ComponentEvent be) {
+          panel.body.addStyleName("x-panel-popup-body");
+          panel.removeListener(Events.Render, this);
+        }
+      });
+    }
 
     popup.add(panel);
 
@@ -296,7 +318,7 @@ public class CollapsePanel extends ContentPanel {
     popup.show(getElement(), align, adj);
     popup.setSize(w, h);
     popup.layout();
-    
+
     afterShowPanel(panel);
   }
 }

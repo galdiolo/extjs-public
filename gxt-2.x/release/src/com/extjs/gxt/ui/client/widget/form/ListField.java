@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -22,6 +22,7 @@ import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.ListView;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -155,7 +156,7 @@ public class ListField<D extends ModelData> extends Field<D> implements Selectio
   @Override
   public D getValue() {
     List<D> sel = getSelection();
-    if (sel.size() > 1) {
+    if (sel.size() > 0) {
       return sel.get(0);
     }
     return null;
@@ -194,12 +195,19 @@ public class ListField<D extends ModelData> extends Field<D> implements Selectio
   }
 
   public void setSelection(List<D> selection) {
-    if (selection.size() > 0) {
-      setValue(selection.get(0));
+    if (selection != null && selection.size() > 0) {
+      super.setValue(selection.get(0));
       listView.getSelectionModel().setSelection(selection);
     } else {
-      setValue(null);
+      super.setValue(null);
+      listView.getSelectionModel().deselectAll();
     }
+  }
+
+  @Override
+  public void setValue(D value) {
+    super.setValue(value);
+    listView.getSelectionModel().select(value, false);
   }
 
   /**
@@ -253,18 +261,8 @@ public class ListField<D extends ModelData> extends Field<D> implements Selectio
   }
 
   @Override
-  protected El getFocusEl() {
-    return el();
-  }
-
-  @Override
   protected El getInputEl() {
     return input;
-  }
-
-  @Override
-  protected void onClick(ComponentEvent ce) {
-    super.onClick(ce);
   }
 
   @Override
@@ -278,12 +276,10 @@ public class ListField<D extends ModelData> extends Field<D> implements Selectio
     setElement(DOM.createDiv(), parent, index);
     addStyleName("x-form-list");
 
-    input = new El(DOM.createInputText());
-    input.dom.getStyle().setProperty("left", "-500");
-    input.dom.getStyle().setProperty("position", "absolute");
+    input = new El((Element) Document.get().createHiddenInputElement().cast());
     getElement().appendChild(input.dom);
     if (template == null) {
-      String html = "<tpl for=\".\"><div class='x-combo-list-item'>{" + getDisplayField() + "}</div></tpl>";
+      String html = "<tpl for=\".\"><div class='x-combo-list-item' role='option'>{" + getDisplayField() + "}</div></tpl>";
       template = XTemplate.create(html);
     }
     listView.setBorders(false);
@@ -302,8 +298,9 @@ public class ListField<D extends ModelData> extends Field<D> implements Selectio
     });
 
     listView.render(getElement());
+    listView.getAriaSupport().setRole("listbox");
+    ComponentHelper.setParent(this, listView);
     disableTextSelection(true);
-    DOM.sinkEvents(input.dom, Event.FOCUSEVENTS);
     sinkEvents(Event.ONCLICK);
 
     super.onRender(parent, index);

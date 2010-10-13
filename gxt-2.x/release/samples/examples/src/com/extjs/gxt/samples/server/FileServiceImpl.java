@@ -1,13 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-/*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -100,7 +93,7 @@ public class FileServiceImpl extends RemoteServiceServlet implements FileService
     final boolean desc = loadConfig.getSortDir() == SortDir.DESC;
     if (prop != null) {
       Collections.sort(models, new Comparator<FileModel>() {
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "rawtypes"})
         public int compare(FileModel o1, FileModel o2) {
           boolean m1Folder = o1 instanceof FolderModel;
           boolean m2Folder = o2 instanceof FolderModel;

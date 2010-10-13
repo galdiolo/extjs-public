@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.extjs.gxt.charts.client.Chart;
+import com.extjs.gxt.charts.client.model.axis.HasRightAxis;
 import com.extjs.gxt.charts.client.model.axis.RadarAxis;
 import com.extjs.gxt.charts.client.model.axis.XAxis;
 import com.extjs.gxt.charts.client.model.axis.YAxis;
@@ -39,6 +40,8 @@ public class ChartModel extends BaseModel {
 
   private boolean enableEvents;
   private ScaleProvider scaleProvider;
+
+  private ScaleProvider scaleProviderRightAxis;
 
   /**
    * Creates a new chart model instance.
@@ -144,6 +147,15 @@ public class ChartModel extends BaseModel {
    */
   public ScaleProvider getScaleProvider() {
     return scaleProvider;
+  }
+
+  /**
+   * Returns the scale provider of the right axis.
+   * 
+   * @return the scale provider
+   */
+  public ScaleProvider getScaleProviderRightAxis() {
+    return scaleProviderRightAxis;
   }
 
   /**
@@ -353,6 +365,16 @@ public class ChartModel extends BaseModel {
   }
 
   /**
+   * Optionally, sets the scale provider used to manage the min, max, and
+   * interval of the right y-axis.
+   * 
+   * @param scaleProviderRightAxis the scale provider
+   */
+  public void setScaleProviderRightAxis(ScaleProvider scaleProviderRightAxis) {
+    this.scaleProviderRightAxis = scaleProviderRightAxis;
+  }
+
+  /**
    * Sets whether the thousand separator is disabled.
    * 
    * @param disabled true for disabled
@@ -454,25 +476,43 @@ public class ChartModel extends BaseModel {
   }
 
   public void updateYScale() {
-    if (scaleProvider != null) {
+    Double max = null;
+    Double min = null;
+    Double max2 = null;
+    Double min2 = null;
+    for (ChartConfig config : getChartConfigs()) {
+      DataProvider provider = config.getDataProvider();
 
-      Double max = null;
-      Double min = null;
-      for (ChartConfig config : getChartConfigs()) {
-        DataProvider provider = config.getDataProvider();
-        if (provider != null) {
+      if (provider != null) {
+        if (config instanceof HasRightAxis && ((HasRightAxis) config).isRightAxis()) {
+          max2 = max2 == null ? provider.getMaxYValue() : Math.max(max2, provider.getMaxYValue());
+          min2 = min2 == null ? provider.getMinYValue() : Math.min(min2, provider.getMinYValue());
+        } else {
           max = max == null ? provider.getMaxYValue() : Math.max(max, provider.getMaxYValue());
           min = min == null ? provider.getMinYValue() : Math.min(min, provider.getMinYValue());
-          provider.maxYValue = null;
-          provider.minYValue = null;
         }
+        provider.maxYValue = 0;
+        provider.minYValue = 0;
       }
+    }
 
+    if (scaleProvider != null && max != null && min != null) {
       Scale scale = scaleProvider.calcScale(min, max);
       YAxis yAxis = getYAxis();
       if (yAxis == null) {
         yAxis = new YAxis();
         setYAxis(yAxis);
+      }
+      yAxis.setMin(scale.getMin());
+      yAxis.setMax(scale.getMax());
+      yAxis.setSteps(scale.getInterval());
+    }
+    if (scaleProviderRightAxis != null && max2 != null && min2 != null) {
+      Scale scale = scaleProviderRightAxis.calcScale(min2, max2);
+      YAxis yAxis = getYAxisRight();
+      if (yAxis == null) {
+        yAxis = new YAxis();
+        setYAxisRight(yAxis);
       }
       yAxis.setMin(scale.getMin());
       yAxis.setMax(scale.getMax());

@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -8,12 +8,13 @@
 package com.extjs.gxt.ui.client.widget.form;
 
 import com.extjs.gxt.ui.client.GXT;
+import com.google.gwt.user.client.Element;
 
 /**
  * A group of Radio's.
  * 
  * <dl>
- * <dt>Events:</dt>
+ * <dt><b>Events:</b></dt>
  * 
  * <dd><b>Change</b> : FieldEvent(field, value, oldValue)<br>
  * <div>Fires after a child radio is selected.</div>
@@ -124,6 +125,13 @@ public class RadioGroup extends MultiField<Radio> {
     return true;
   }
 
+  @Override
+  public void markInvalid(String msg) {
+    if (!GXT.isAriaEnabled()) {
+      super.markInvalid(msg);
+    }
+  }
+
   /**
    * Sets whether a selection is required when validating the group (defaults to
    * false).
@@ -136,33 +144,43 @@ public class RadioGroup extends MultiField<Radio> {
 
   @Override
   public void setValue(Radio value) {
-    for (int i = 0; i < getAll().size(); i++) {
-      Radio r = (Radio) getAll().get(i);
-      if (r.equals(value)) {
-        r.setValue(true);
-      }
-    }
-  }
-
-  protected void onRadioClick(Radio radio) {
-    for (int i = 0; i < getAll().size(); i++) {
-      Radio r = (Radio) getAll().get(i);
-      if (r == radio) {
-        r.setValue(true);
-      } else {
-        r.setValue(false);
-      }
+    if (value != null) {
+      value.setValue(true);
     }
   }
 
   protected void onRadioSelected(Radio radio) {
     for (int i = 0; i < getAll().size(); i++) {
       Radio r = (Radio) getAll().get(i);
-      if (r != radio && r.getValue()) {
+      if (r != radio) {
         r.setValue(false);
       }
     }
     clearInvalid();
+  }
+
+  @Override
+  protected void onRender(Element target, int index) {
+    super.onRender(target, index);
+    getElement().removeAttribute("tabindex");
+
+    if (GXT.isAriaEnabled()) {
+      setAriaRole("radiogroup");
+      StringBuffer sb = new StringBuffer();
+      for (Field<?> f : fields) {
+        String id = f.getId();
+        if (f instanceof Radio) {
+          id = f.el().selectNode("INPUT").getId();
+        }
+        sb.append(id + " ");
+      }
+      getElement().setAttribute("aria-owns", sb.toString());
+    }
+  }
+
+  @Override
+  protected void setAriaState(String stateName, String stateValue) {
+
   }
 
 }

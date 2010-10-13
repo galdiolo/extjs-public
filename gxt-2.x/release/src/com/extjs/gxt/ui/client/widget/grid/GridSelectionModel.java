@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -9,17 +9,23 @@ package com.extjs.gxt.ui.client.widget.grid;
 
 import java.util.Arrays;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.SelectionMode;
+import com.extjs.gxt.ui.client.aria.FocusFrame;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseEvent;
+import com.extjs.gxt.ui.client.event.ColumnModelEvent;
 import com.extjs.gxt.ui.client.event.DomEvent;
 import com.extjs.gxt.ui.client.event.EventType;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.store.Store;
 import com.extjs.gxt.ui.client.util.KeyNav;
+import com.extjs.gxt.ui.client.widget.grid.ColumnHeader.Head;
 import com.extjs.gxt.ui.client.widget.selection.AbstractStoreSelectionModel;
+import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.Element;
 
@@ -32,10 +38,10 @@ import com.google.gwt.user.client.Element;
  * <dd>AbstractStoreSelectionModel SelectionChange</dd>
  * </dl>
  */
+@SuppressWarnings("rawtypes")
 public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelectionModel<M> implements
     Listener<BaseEvent> {
 
-  @SuppressWarnings("unchecked")
   public static class Callback {
 
     private GridSelectionModel sm;
@@ -50,8 +56,8 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
   }
 
   public static class Cell {
-    public int row;
     public int cell;
+    public int row;
 
     public Cell(int row, int cell) {
       this.row = row;
@@ -60,8 +66,10 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
 
   }
 
+  protected boolean enableNavKeys = true;
   protected Grid<M> grid;
-  protected ListStore<M> listStore;
+  protected boolean grouped = false;
+  protected GroupingView groupingView;
   protected KeyNav<GridEvent<M>> keyNav = new KeyNav<GridEvent<M>>() {
 
     @Override
@@ -90,9 +98,23 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
     }
 
   };
+  protected ListStore<M> listStore;
+  protected Element selectedGroup;
+  protected Head selectedHeader;
 
   private Callback callback = new Callback(this);
   private boolean moveEditorOnEnter;
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void bind(Store store) {
+    super.bind(store);
+    if (store instanceof ListStore) {
+      listStore = (ListStore<M>) store;
+    } else {
+      listStore = null;
+    }
+  }
 
   @SuppressWarnings("unchecked")
   public void bindGrid(Grid grid) {
@@ -100,22 +122,26 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
       this.grid.removeListener(Events.RowMouseDown, this);
       this.grid.removeListener(Events.RowClick, this);
       this.grid.removeListener(Events.ContextMenu, this);
+      this.grid.removeListener(Events.ViewReady, this);
       this.grid.getView().removeListener(Events.RowUpdated, this);
       this.grid.getView().removeListener(Events.Refresh, this);
+      this.grid.getColumnModel().removeListener(Events.HiddenChange, this);
       keyNav.bind(null);
       bind(null);
-      this.listStore = null;
     }
     this.grid = grid;
     if (grid != null) {
       grid.addListener(Events.RowMouseDown, this);
       grid.addListener(Events.RowClick, this);
       grid.addListener(Events.ContextMenu, this);
+      grid.addListener(Events.ViewReady, this);
       grid.getView().addListener(Events.RowUpdated, this);
       grid.getView().addListener(Events.Refresh, this);
+      grid.getColumnModel().addListener(Events.HiddenChange, this);
       keyNav.bind(grid);
       bind(grid.getStore());
-      this.listStore = grid.getStore();
+      grouped = grid.getView() instanceof GroupingView;
+      if (grouped) groupingView = (GroupingView) grid.getView();
     }
   }
 
@@ -128,8 +154,13 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
       handleMouseClick((GridEvent) e);
     } else if (type == Events.RowUpdated) {
       onRowUpdated((GridEvent) e);
-    } else if (type == Events.Refresh) {
+    } else if (type == Events.Refresh || type == Events.ViewReady) {
       refresh();
+      if (getLastFocused() != null) {
+        grid.getView().onHighlightRow(listStore.indexOf(getLastFocused()), true);
+      }
+    } else if (type == Events.HiddenChange) {
+      handleColumnHidden((ColumnModelEvent) e);
     }
   }
 
@@ -212,9 +243,12 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
     this.moveEditorOnEnter = moveEditorOnEnter;
   }
 
-  protected void doFocus(int row, int cell) {
-    GridView view = grid.getView();
-    view.focusRow(row);
+  protected void handleColumnHidden(ColumnModelEvent e) {
+    int col = e.getColIndex();
+    Head h = grid.getView().getHeader().getHead(col);
+    if (h == selectedHeader) {
+      selectedHeader = null;
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -222,17 +256,20 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
     if (isLocked() || isInput(e.getTarget())) {
       return;
     }
+    if (e.getRowIndex() == -1) {
+      deselectAll();
+      return;
+    }
     if (selectionMode == SelectionMode.MULTI) {
-      GridView view = grid.getView();
       M sel = listStore.getAt(e.getRowIndex());
       if (e.isControlKey() && isSelected(sel)) {
         doDeselect(Arrays.asList(sel), false);
       } else if (e.isControlKey()) {
         doSelect(Arrays.asList(sel), true, false);
-        view.focusCell(e.getRowIndex(), e.getColIndex(), true);
+        grid.getView().focusCell(e.getRowIndex(), e.getColIndex(), true);
       } else if (isSelected(sel) && !e.isShiftKey() && !e.isControlKey() && selected.size() > 1) {
         doSelect(Arrays.asList(sel), false, false);
-        view.focusCell(e.getRowIndex(), e.getColIndex(), true);
+        grid.getView().focusCell(e.getRowIndex(), e.getColIndex(), true);
       }
     }
 
@@ -240,22 +277,21 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
 
   @SuppressWarnings("unchecked")
   protected void handleMouseDown(GridEvent<M> e) {
-    if (isLocked() || isInput(e.getTarget())) {
+    if (e.getRowIndex() == -1 || isLocked() || isInput(e.getTarget())) {
       return;
     }
     if (e.isRightClick()) {
-      if (e.getRowIndex() != -1) {
-        if (selectionMode != SelectionMode.SINGLE && isSelected(listStore.getAt(e.getRowIndex()))) {
-          return;
-        }
-        select(e.getRowIndex(), false);
+      if (selectionMode != SelectionMode.SINGLE && isSelected(listStore.getAt(e.getRowIndex()))) {
+        return;
       }
+      select(e.getRowIndex(), false);
+      grid.getView().focusCell(e.getRowIndex(), e.getColIndex(), true);
     } else {
-      GridView view = grid.getView();
       M sel = listStore.getAt(e.getRowIndex());
       if (selectionMode == SelectionMode.SIMPLE) {
         if (!isSelected(sel)) {
           select(sel, true);
+          grid.getView().focusCell(e.getRowIndex(), e.getColIndex(), true);
         }
 
       } else if (selectionMode == SelectionMode.SINGLE) {
@@ -263,20 +299,17 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
           deselect(sel);
         } else if (!isSelected(sel)) {
           select(sel, false);
-          view.focusCell(e.getRowIndex(), e.getColIndex(), true);
+          grid.getView().focusCell(e.getRowIndex(), e.getColIndex(), true);
         }
       } else if (!e.isControlKey()) {
         if (e.isShiftKey() && lastSelected != null) {
           int last = listStore.indexOf(lastSelected);
           int index = e.getRowIndex();
-          int a = (last > index) ? index : last;
-          int b = (last < index) ? index : last;
-          select(a, b, e.isControlKey());
-          lastSelected = listStore.getAt(last);
-          view.focusCell(index, e.getColIndex(), true);
+          select(last, index, e.isControlKey());
+          grid.getView().focusCell(index, e.getColIndex(), true);
         } else if (!isSelected(sel)) {
           doSelect(Arrays.asList(sel), false, false);
-          view.focusCell(e.getRowIndex(), e.getColIndex(), true);
+          grid.getView().focusCell(e.getRowIndex(), e.getColIndex(), true);
         }
       }
     }
@@ -292,7 +325,7 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
 
   protected boolean isInput(Element target) {
     String tag = target.getTagName();
-    return "INPUT".equals(tag) || "TEXTAREA".equals(tag);
+    return "input".equalsIgnoreCase(tag) || "textarea".equalsIgnoreCase(tag);
   }
 
   protected boolean isSelectable(int row, int cell, boolean acceptsNav) {
@@ -304,25 +337,302 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
   }
 
   protected void onKeyDown(GridEvent<M> e) {
-    selectNext(e.isShiftKey());
+    if (GXT.isAriaEnabled()) {
+      if (selectedGroup == null && (selectedHeader != null || selected.size() == 0)) {
+        e.cancelBubble();
+        if (e.isAltKey()) {
+          grid.getView().getHeader().showColumnMenu(selectedHeader.column);
+          return;
+        }
+        if (selectedHeader != null) {
+          selectedHeader.deactivate();
+        }
+        select(0, false);
+        return;
+      }
+      if (grouped) {
+        GroupingView view = (GroupingView) grid.getView();
+        NodeList<Element> groups = view.getGroups().cast();
+        int gc = view.getGroups().getLength();
+
+        if (selectedGroup != null) {
+          int gindex = indexOf(groups, selectedGroup);
+          if (!view.isExpanded(selectedGroup)) {
+            if (gindex < gc - 1) {
+              view.onGroupSelect(selectedGroup, false);
+              selectedGroup = groups.getItem(gindex + 1);
+              view.onGroupSelect(selectedGroup, true);
+            }
+            return;
+          }
+          view.onGroupSelect(selectedGroup, false);
+          Element r = view.getGroupRow(selectedGroup, 0).cast();
+
+          selectedGroup = null;
+
+          if (r != null) {
+            int idx = view.findRowIndex(r);
+            select(idx, false);
+            view.focusRow(idx);
+            return;
+          }
+        }
+        if (lastSelected != null) {
+          Element row = view.getRow(lastSelected).cast();
+          Element group = view.findGroup(row).cast();
+
+          int totalGroups = groups.getLength();
+          int groupIndex = indexOf(groups, group);
+
+          NodeList<Element> groupRows = group.getChildNodes().getItem(1).getChildNodes().cast();
+
+          int rowsInGroup = group.getChildNodes().getItem(1).getChildNodes().getLength();
+          int rowInGroupIndex = indexOf(groupRows, row);
+          if (rowInGroupIndex == rowsInGroup - 1) {
+            if (groupIndex < totalGroups - 1) {
+              deselectAll();
+              selectedGroup = groups.getItem(groupIndex + 1);
+              view.onGroupSelect(selectedGroup, true);
+              return;
+
+            }
+          }
+        }
+      }
+    }
+    if (!e.isControlKey() && selected.size() == 0 && getLastFocused() == null) {
+      select(0, false);
+    } else {
+      int idx = listStore.indexOf(getLastFocused());
+      if (idx >= 0) {
+        if (e.isControlKey() || (e.isShiftKey() && isSelected(listStore.getAt(idx + 1)))) {
+          if (!e.isControlKey()) {
+            deselect(idx);
+          }
+
+          M lF = listStore.getAt(idx + 1);
+          if (lF != null) {
+            setLastFocused(lF);
+            grid.getView().focusCell(idx + 1, 0, false);
+          }
+
+        } else {
+          if (e.isShiftKey() && lastSelected != getLastFocused()) {
+            select(listStore.indexOf(lastSelected), idx + 1, true);
+            grid.getView().focusCell(idx + 1, 0, false);
+          } else {
+            if (idx + 1 < listStore.getCount()) {
+              select(idx + 1, e.isShiftKey());
+              grid.getView().focusCell(idx + 1, 0, false);
+            }
+
+          }
+
+        }
+      }
+    }
+
     e.preventDefault();
   }
 
   protected void onKeyLeft(GridEvent<M> ce) {
-
+    if (GXT.isAriaEnabled() && selectedHeader != null) {
+      ColumnHeader ch = grid.getView().getHeader();
+      int idx = ch.indexOf(selectedHeader) - 1;
+      ColumnConfig config = grid.getColumnModel().getColumn(idx);
+      while (config != null) {
+        if (!config.isHidden()) {
+          Head h = getHead(idx, false);
+          selectedHeader = h;
+          grid.getView().getHeader().selectHeader(idx);
+          break;
+        } else {
+          idx--;
+          config = grid.getColumnModel().getColumn(idx);
+        }
+      }
+    }
+    if (GXT.isAriaEnabled() && selectedGroup != null) {
+      groupingView.toggleGroup(selectedGroup, false);
+    }
   }
 
+  @SuppressWarnings("unchecked")
   protected void onKeyPress(GridEvent<M> e) {
-
+    int kc = e.getKeyCode();
+    if (GXT.isAriaEnabled()) {
+      if (selectedHeader != null) {
+        if (kc == KeyCodes.KEY_ENTER) {
+          grid.getView().onHeaderClick((Grid) grid, grid.getColumnModel().indexOf(selectedHeader.config));
+          return;
+        } else if (kc == 32) {
+          ColumnHeader ch = grid.getView().getHeader();
+          int idx = ch.indexOf(selectedHeader);
+          String id = grid.getColumnModel().getColumnId(idx);
+          if (id == null || !id.equals("checker")) {
+            grid.getView().getHeader().showColumnMenu(idx);
+          }
+          return;
+        }
+      }
+    }
+    if (lastSelected != null && enableNavKeys) {
+      if (kc == KeyCodes.KEY_PAGEUP) {
+        e.stopEvent();
+        select(0, false);
+        grid.getView().focusRow(0);
+      } else if (kc == KeyCodes.KEY_PAGEDOWN) {
+        e.stopEvent();
+        int idx = listStore.indexOf(listStore.getAt(listStore.getCount() - 1));
+        select(idx, false);
+        grid.getView().focusRow(idx);
+      }
+    }
+    // if space bar is pressed
+    if (e.getKeyCode() == 32) {
+      if (getLastFocused() != null) {
+        if (e.isShiftKey() && lastSelected != null) {
+          int last = listStore.indexOf(lastSelected);
+          int i = listStore.indexOf(getLastFocused());
+          select(last, i, e.isControlKey());
+          grid.getView().focusCell(i, 0, false);
+        } else {
+          if (isSelected(getLastFocused())) {
+            deselect(getLastFocused());
+          } else {
+            select(getLastFocused(), true);
+            grid.getView().focusCell(listStore.indexOf(getLastFocused()), 0, false);
+          }
+        }
+      }
+    }
   }
 
   protected void onKeyRight(GridEvent<M> ce) {
-
+    if (GXT.isAriaEnabled() && selectedHeader != null) {
+      ColumnHeader ch = grid.getView().getHeader();
+      int idx = ch.indexOf(selectedHeader) + 1;
+      ColumnConfig config = grid.getColumnModel().getColumn(idx);
+      while (config != null) {
+        if (!config.isHidden()) {
+          Head h = getHead(idx, false);
+          selectedHeader = h;
+          grid.getView().getHeader().selectHeader(idx);
+          break;
+        } else {
+          idx++;
+          config = grid.getColumnModel().getColumn(idx);
+        }
+      }
+    }
+    if (GXT.isAriaEnabled() && selectedGroup != null) {
+      groupingView.toggleGroup(selectedGroup, true);
+    }
   }
 
   protected void onKeyUp(GridEvent<M> e) {
-    selectPrevious(e.isShiftKey());
+    if (GXT.isAriaEnabled()) {
+      if (selectedHeader != null) {
+        return;
+      }
+      if (listStore.indexOf(lastSelected) == 0 && !grouped) {
+        deselectAll();
+        ColumnHeader header = grid.getView().getHeader();
+        Head h = getHead(0, false);
+        if (h != null) {
+          selectedHeader = h;
+          header.selectHeader(header.indexOf(h));
+        }
+      }
+      if (grouped) {
+        GroupingView view = (GroupingView) grid.getView();
+        NodeList<Element> groups = view.getGroups().cast();
+        if (selectedGroup != null) {
+          int gindex = indexOf(groups, selectedGroup);
+
+          if (gindex == 0) {
+            deselectAll();
+            ColumnHeader header = grid.getView().getHeader();
+            Head h = getHead(0, false);
+            if (h != null) {
+              selectedHeader = h;
+              header.selectHeader(header.indexOf(h));
+            }
+          }
+
+          view.onGroupSelect(selectedGroup, false);
+          selectedGroup = null;
+
+          if (gindex > 0) {
+            selectedGroup = groups.getItem(gindex - 1);
+            if (view.isExpanded(selectedGroup)) {
+              int grows = view.getGroupRowCount(selectedGroup);
+              Element r = view.getGroupRow(selectedGroup, grows - 1).cast();
+              selectedGroup = null;
+              select(view.findRowIndex(r), false);
+              view.focusRow(view.findRowIndex(r));
+
+            } else {
+              view.onGroupSelect(selectedGroup, true);
+            }
+            return;
+          }
+        }
+        if (lastSelected != null) {
+          Element row = view.getRow(lastSelected).cast();
+          Element group = view.findGroup(row).cast();
+          if (row == view.getGroupRow(group, 0)) {
+            deselectAll();
+            selectedGroup = group;
+            view.onGroupSelect(selectedGroup, true);
+            return;
+          }
+        }
+      }
+    }
+    int idx = listStore.indexOf(getLastFocused());
+    if (idx >= 0) {
+      if (e.isControlKey() || (e.isShiftKey() && isSelected(listStore.getAt(idx - 1)))) {
+        if (!e.isControlKey()) {
+          deselect(idx);
+        }
+
+        M lF = listStore.getAt(idx - 1);
+        if (lF != null) {
+          setLastFocused(lF);
+          grid.getView().focusCell(idx - 1, 0, false);
+        }
+
+      } else {
+
+        if (e.isShiftKey() && lastSelected != getLastFocused()) {
+          select(listStore.indexOf(lastSelected), idx - 1, true);
+          grid.getView().focusCell(idx - 1, 0, false);
+        } else {
+          if (idx > 0) {
+            select(idx - 1, e.isShiftKey());
+            grid.getView().focusCell(idx - 1, 0, false);
+          }
+        }
+
+      }
+    }
+
     e.preventDefault();
+  }
+
+  @Override
+  protected void onLastFocusChanged(M oldFocused, M newFocused) {
+    int i;
+    i = listStore.indexOf(oldFocused);
+    if (i >= 0) {
+      grid.getView().onHighlightRow(i, false);
+    }
+
+    i = listStore.indexOf(newFocused);
+    if (i >= 0) {
+      grid.getView().onHighlightRow(i, true);
+    }
   }
 
   protected void onRowUpdated(GridEvent<M> ge) {
@@ -335,11 +645,46 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
   protected void onSelectChange(M model, boolean select) {
     int idx = listStore.indexOf(model);
     if (idx != -1) {
+      if (GXT.isAriaEnabled() && selectedHeader != null) {
+        selectedHeader = null;
+        FocusFrame.get().frame(grid);
+      }
       if (select) {
         grid.getView().onRowSelect(idx);
       } else {
         grid.getView().onRowDeselect(idx);
       }
     }
+  }
+
+  private Head getHead(int index, boolean back) {
+    ColumnHeader header = grid.getView().getHeader();
+    int cols = grid.getColumnModel().getColumnCount();
+
+    if (!back) {
+      for (int i = index; i < cols; i++) {
+        ColumnConfig config = grid.getColumnModel().getColumn(i);
+        if (!config.isHidden() && !config.ariaIgnore) {
+          return header.getHead(i);
+        }
+      }
+    } else {
+      for (int i = index; i > -1; i--) {
+        ColumnConfig config = grid.getColumnModel().getColumn(i);
+        if (!config.isHidden() && !config.ariaIgnore) {
+          return header.getHead(i);
+        }
+      }
+    }
+    return null;
+  }
+
+  private int indexOf(NodeList<Element> elems, Element elem) {
+    for (int i = 0; i < elems.getLength(); i++) {
+      if (elems.getItem(i) == elem) {
+        return i;
+      }
+    }
+    return -1;
   }
 }

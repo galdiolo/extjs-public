@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -26,11 +26,21 @@ public class SliderField extends Field<Integer> {
   protected El hidden;
   protected Listener<SliderEvent> listener;
 
+  /**
+   * Creates a new slider field.
+   * 
+   * @param slider the slider to be wrapped.
+   */
   public SliderField(Slider slider) {
     super();
     setSlider(slider);
   }
 
+  /**
+   * Returns the slider component.
+   * 
+   * @return the slider.
+   */
   public Slider getSlider() {
     return slider;
   }
@@ -45,6 +55,11 @@ public class SliderField extends Field<Integer> {
     }
   }
 
+  /**
+   * Sets the slider component.
+   * 
+   * @param slider the slider
+   */
   public void setSlider(Slider slider) {
     assertPreRender();
     if (listener == null) {
@@ -58,23 +73,37 @@ public class SliderField extends Field<Integer> {
     }
     if (this.slider != slider) {
       if (this.slider != null) {
+        ComponentHelper.removeFromParent(this.slider);
         this.slider.removeListener(Events.Change, listener);
       }
       this.slider = slider;
+      slider.getAriaSupport().setIgnore(true);
+      ComponentHelper.setParent(this, slider);
       slider.addListener(Events.Change, listener);
     }
   }
 
   @Override
   public void setValue(Integer value) {
-    slider.setValue(value);
-    super.setValue(value);
+    if (value == null) {
+      int min = slider.getMinValue();
+      slider.setValue(min);
+      super.setValue(min);
+    } else {
+      slider.setValue(value);
+      super.setValue(value);
+    }
   }
 
   @Override
   protected void afterRender() {
     super.afterRender();
     updateHiddenField();
+
+    El elem = findLabelElement();
+    if (elem != null) {
+      elem.dom.setAttribute("for", slider.getId());
+    }
   }
 
   @Override

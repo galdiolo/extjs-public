@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -9,6 +9,9 @@ package com.extjs.gxt.ui.client.widget.form;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.extjs.gxt.ui.client.GXT;
+import com.google.gwt.user.client.Element;
 
 /**
  * A group of CheckBox's.
@@ -20,6 +23,7 @@ public class CheckBoxGroup extends MultiField<CheckBox> {
    */
   public CheckBoxGroup() {
     setSpacing(5);
+    getAriaSupport().setIgnore(true);
   }
 
   /**
@@ -54,7 +58,30 @@ public class CheckBoxGroup extends MultiField<CheckBox> {
       }
     }
     return values;
+  }
+  
+  @Override
+  public void markInvalid(String msg) {
+    if (!GXT.isAriaEnabled()) {
+      super.markInvalid(msg);
+    }
+  }
 
+  @Override
+  protected void onRender(Element target, int index) {
+    super.onRender(target, index);
+    getElement().removeAttribute("tabindex");
+
+    if (GXT.isAriaEnabled()) {
+      setAriaRole("group");
+      String text = GXT.MESSAGES.checkBoxGroup_text(getFieldLabel());
+      for (Field<?> f : fields) {
+        if (f instanceof CheckBox) {
+          CheckBox check = (CheckBox) f;
+          check.getAriaSupport().setLabel(text);
+        }
+      }
+    }
   }
 
 }

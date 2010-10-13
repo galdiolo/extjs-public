@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -159,7 +160,9 @@ public class BorderLayout extends Layout {
 
   public void setContainer(Container<?> ct) {
     super.setContainer(ct);
-    assert ct instanceof LayoutContainer : "BorderLayout needs a LayoutContainer";
+    if(ct != null){
+      assert ct instanceof LayoutContainer : "BorderLayout needs a LayoutContainer";
+    }
     layoutContainer = (LayoutContainer) ct;
   }
 
@@ -240,8 +243,8 @@ public class BorderLayout extends Layout {
     int w = size.width;
     int h = size.height;
 
-    int sLeft = target.getFrameWidth("l");
-    int sTop = target.getFrameWidth("t");
+    int sLeft = target.getPadding("l");
+    int sTop = target.getPadding("t");
     int centerW = w, centerH = h, centerY = 0, centerX = 0;
 
     north = getRegionWidget(LayoutRegion.NORTH);
@@ -559,6 +562,9 @@ public class BorderLayout extends Layout {
 
       setLayoutOnChange(layoutContainer, layoutOnChange);
 
+      if (GXT.isAriaEnabled()) {
+        cp.el().focus();
+      }
       fireEvent(Events.Collapse, createBorderLaoutEvent(panel));
     }
   }
@@ -582,6 +588,9 @@ public class BorderLayout extends Layout {
 
       setLayoutOnChange(layoutContainer, layoutOnChange);
 
+      if (GXT.isAriaEnabled()) {
+        panel.el().focus();
+      }
       fireEvent(Events.Expand, createBorderLaoutEvent(panel));
     }
   }

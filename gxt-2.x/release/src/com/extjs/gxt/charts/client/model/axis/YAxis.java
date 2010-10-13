@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -26,6 +26,7 @@ public class YAxis extends AbstractAxis {
     Collection<String> labels = checkLabels();
     labels.addAll(list);
   }
+
   /**
    * Adds the labels.
    * 
@@ -42,7 +43,11 @@ public class YAxis extends AbstractAxis {
    * @return the labels
    */
   public Collection<String> getLabels() {
-    return checkLabels();
+    Collection<String> labels = get("labels");
+    if (labels == null) {
+      return new ArrayList<String>();
+    }
+    return labels;
   }
 
   /**
@@ -51,7 +56,7 @@ public class YAxis extends AbstractAxis {
    * @return the tick length
    */
   public Integer getTickLength() {
-    return (Integer)get("tick-length");
+    return (Integer) get("tick-length");
   }
 
   /**

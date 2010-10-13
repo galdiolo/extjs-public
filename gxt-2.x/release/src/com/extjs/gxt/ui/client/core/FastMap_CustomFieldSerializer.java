@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -12,14 +12,15 @@ import com.google.gwt.user.client.rpc.SerializationStreamReader;
 import com.google.gwt.user.client.rpc.SerializationStreamWriter;
 import com.google.gwt.user.client.rpc.core.java.util.Map_CustomFieldSerializerBase;
 
-@SuppressWarnings("unchecked")
 public class FastMap_CustomFieldSerializer {
 
+  @SuppressWarnings("rawtypes")
   public static void deserialize(SerializationStreamReader streamReader, FastMap instance)
       throws SerializationException {
     Map_CustomFieldSerializerBase.deserialize(streamReader, instance);
   }
 
+  @SuppressWarnings("rawtypes")
   public static void serialize(SerializationStreamWriter streamWriter, FastMap instance) throws SerializationException {
     Map_CustomFieldSerializerBase.serialize(streamWriter, instance);
   }

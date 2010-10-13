@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -28,6 +28,7 @@ import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.util.Point;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
+import com.extjs.gxt.ui.client.widget.ComponentManager;
 import com.extjs.gxt.ui.client.widget.ComponentPlugin;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -82,6 +83,7 @@ import com.google.gwt.user.client.ui.Widget;
  * <li>changes : a map of property name and new values</li>
  * </ul>
  * </dd>
+ * </dl>
  * 
  * @param <M> the model type
  */
@@ -89,6 +91,8 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   public class RowEditorMessages {
 
     private String cancelText = GXT.MESSAGES.rowEditor_cancelText();
+    private String dirtyText = GXT.MESSAGES.rowEditor_dirtyText();
+    private String errorTipTitleText = GXT.MESSAGES.rowEditor_tipTitleText();
     private String saveText = GXT.MESSAGES.rowEditor_saveText();
 
     /**
@@ -98,6 +102,24 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
      */
     public String getCancelText() {
       return cancelText;
+    }
+
+    /**
+     * Returns the tool tip dirty text.
+     * 
+     * @return the dirtyText
+     */
+    public String getDirtyText() {
+      return dirtyText;
+    }
+
+    /**
+     * Returns the error tool tip title.
+     * 
+     * @return the errorTipTitleText
+     */
+    public String getErrorTipTitleText() {
+      return errorTipTitleText;
     }
 
     /**
@@ -119,6 +141,24 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     }
 
     /**
+     * Sets the tool tip dirty text.
+     * 
+     * @param dirtyText the dirtyText to set
+     */
+    public void setDirtyText(String dirtyText) {
+      this.dirtyText = dirtyText;
+    }
+
+    /**
+     * Sets the error tool tip title.
+     * 
+     * @param errorTipTitleText the errorTipTitleText to set
+     */
+    public void setErrorTipTitleText(String errorTipTitleText) {
+      this.errorTipTitleText = errorTipTitleText;
+    }
+
+    /**
      * Sets the buttons save text
      * 
      * @param saveText the save text
@@ -130,25 +170,26 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   }
 
   protected ContentPanel btns;
-  protected boolean renderButtons = true;
   protected Grid<M> grid;
+  protected RowEditorMessages messages;
+  protected boolean renderButtons = true;
   protected int rowIndex;
-  
-  private Listener<GridEvent<M>> listener;
+
+  protected Button saveBtn, cancelBtn;
+  private boolean bound;
+  private int buttonPad = 3;
   private ClicksToEdit clicksToEdit = ClicksToEdit.ONE;
+  private boolean editing;
+  private boolean errorSummary = true;
   private int frameWidth = 5;
   private boolean initialized;
-  private int buttonPad = 3;
-  private boolean editing;
-  private Record record;
+  private boolean lastValid;
+  private Listener<GridEvent<M>> listener;
+  private int monitorPoll = 200;
   private Timer monitorTimer;
   private boolean monitorValid = true;
-  private boolean bound;
-  private int monitorPoll = 200;
-  private boolean errorSummary = true;
-  private boolean lastValid;
+  private Record record;
   private ToolTip tooltip;
-  protected RowEditorMessages messages;
 
   public RowEditor() {
     super();
@@ -200,12 +241,16 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
           onRowClick(be);
         } else if (be.getType() == Events.OnKeyDown) {
           onGridKey(be);
-        } else if (be.getType() == Events.ColumnResize) {
-          verifyLayout(true);
+        } else if (be.getType() == Events.ColumnResize || be.getType() == Events.Resize) {
+          verifyLayout(false);
         } else if (be.getType() == Events.BodyScroll) {
           positionButtons();
         } else if (be.getType() == Events.Detach) {
           stopEditing(false);
+        } else if (be.getType() == Events.Reconfigure && initialized) {
+          stopEditing(false);
+          removeAll();
+          initialized = false;
         }
 
       }
@@ -213,14 +258,25 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     };
 
     grid.addListener(Events.RowDoubleClick, listener);
+    grid.addListener(Events.Resize, listener);
     grid.addListener(Events.RowClick, listener);
     grid.addListener(Events.OnKeyDown, listener);
     grid.addListener(Events.ColumnResize, listener);
     grid.addListener(Events.BodyScroll, listener);
     grid.addListener(Events.Detach, listener);
+    grid.addListener(Events.Reconfigure, listener);
     grid.getColumnModel().addListener(Events.HiddenChange, new Listener<ColumnModelEvent>() {
       public void handleEvent(ColumnModelEvent be) {
-        verifyLayout(true);
+        verifyLayout(false);
+      }
+    });
+    grid.getColumnModel().addListener(Events.ColumnMove, new Listener<ColumnModelEvent>() {
+      public void handleEvent(ColumnModelEvent be) {
+        if (initialized) {
+          stopEditing(false);
+          removeAll();
+          initialized = false;
+        }
       }
     });
     grid.getView().addListener(Events.Refresh, new Listener<BaseEvent>() {
@@ -228,6 +284,15 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
         stopEditing(false);
       }
     });
+  }
+
+  /**
+   * Returns true of the RowEditor is active and editing.
+   * 
+   * @return true if the RowEditor is active
+   */
+  public boolean isEditing() {
+    return editing;
   }
 
   /**
@@ -256,6 +321,14 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
         stopEditing(true);
       } else if (ce.getKeyCode() == KeyCodes.KEY_ESCAPE) {
         stopEditing(false);
+      } else if (ce.getKeyCode() == KeyCodes.KEY_TAB) {
+        Element target = ce.getTarget();
+        Component c = findField(target);
+        if (saveBtn != null && c != null && ce.isShiftKey() && indexOf(c) == 0) {
+          ce.stopEvent();
+          saveBtn.focus();
+          return;
+        }
       }
     }
   }
@@ -270,7 +343,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   }
 
   /**
-   * True to show a tooltip with an errorsummary (defaults to true)
+   * True to show a tooltip with an error summary (defaults to true)
    * 
    * @param errorSummary true to show an error summary.
    */
@@ -318,20 +391,23 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       return;
     }
     if (editing && isDirty()) {
-      showTooltip(GXT.MESSAGES.rowEditor_dirtyText());
+      showTooltip(getMessages().getDirtyText());
       return;
     }
     hideTooltip();
-    M model = (M) grid.getView().ds.getAt(rowIndex);
-    record = getRecord(model);
+    M model = (M) grid.getStore().getAt(rowIndex);
+    Record r = getRecord(model);
     RowEditorEvent ree = new RowEditorEvent(this, rowIndex);
-    ree.setRecord(record);
-    if (model == null || !fireEvent(Events.BeforeEdit, ree)) {
-      record = null;
+    ree.setRecord(r);
+
+    Element row = (Element) grid.getView().getRow(rowIndex);
+
+    if (row == null || model == null || !fireEvent(Events.BeforeEdit, ree)) {
       return;
     }
+
     editing = true;
-    Element row = (Element) grid.getView().getRow(rowIndex);
+    record = r;
 
     this.rowIndex = rowIndex;
 
@@ -347,13 +423,21 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
 
     for (int i = 0, len = cm.getColumnCount(); i < len; i++) {
       Field<Object> f = (Field<Object>) getItem(i);
+      if (GXT.isAriaEnabled()) {
+        if (i == 0 && saveBtn != null) {
+          saveBtn.setData("aria-next", f.getId());
+        }
+        f.getAriaSupport().setLabel(cm.getColumnHeader(i));
+      }
       String dIndex = cm.getDataIndex(i);
       Object val = cm.getEditor(i).preProcessValue(record.get(dIndex));
       f.addStyleName("x-row-editor-field");
       f.updateOriginalValue(val);
       f.setValue(val);
     }
-
+    if (cancelBtn != null) {
+      cancelBtn.setData("aria-previous", getItem(getItemCount() - 1).getId());
+    }
     if (!isVisible()) {
       show();
     }
@@ -368,21 +452,17 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     el().scrollIntoView((Element) grid.getView().getEditorParent(), false,
         new int[] {renderButtons ? btns.getHeight() : 0, 0});
   }
-  
+
   /**
    * Stops editing.
    * 
    * @param saveChanges true to save the changes. false to ignore them.
    */
   public void stopEditing(boolean saveChanges) {
+    if (disabled || !editing || !isVisible()) {
+      return;
+    }
     editing = false;
-    if (disabled || !isVisible()) {
-      return;
-    }
-    if (!saveChanges || !isValid()) {
-      hide();
-      return;
-    }
 
     Map<String, Object> data = new FastMap<Object>();
     boolean hasChange = false;
@@ -390,7 +470,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     for (int i = 0, len = cm.getColumnCount(); i < len; i++) {
       if (!cm.isHidden(i)) {
         Field<?> f = (Field<?>) getItem(i);
-        if (f instanceof LabelField) {
+        if (f == null || f instanceof LabelField) {
           continue;
         }
         String dindex = cm.getDataIndex(i);
@@ -406,15 +486,15 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     ree.setRecord(record);
     ree.setChanges(data);
 
-    if (hasChange && fireEvent(Events.ValidateEdit, ree)) {
+    if (!saveChanges || !isValid()) {
+      fireEvent(Events.CancelEdit, ree);
+    } else if (hasChange && fireEvent(Events.ValidateEdit, ree)) {
       record.beginEdit();
       for (String k : data.keySet()) {
         record.set(k, data.get(k));
       }
       record.endEdit();
-      ree.setRecord(record);
       fireEvent(Events.AfterEdit, ree);
-
     }
     hide();
   }
@@ -422,7 +502,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   protected void afterRender() {
     super.afterRender();
     positionButtons();
-    
+
     if (monitorValid) {
       startMonitoring();
     }
@@ -443,13 +523,59 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       lastValid = true;
     }
 
-    if (renderButtons) btns.getItem(0).setEnabled(valid);
+    if (saveBtn != null) {
+      saveBtn.setEnabled(valid);
+    }
 
     if (!isVisible()) {
       monitorTimer.cancel();
       stopEditing(false);
       hideTooltip();
     }
+  }
+
+  protected void createButtons() {
+    btns = new ContentPanel() {
+      protected void createStyles(String baseStyle) {
+        baseStyle = "x-plain";
+        headerStyle = baseStyle + "-header";
+        headerTextStyle = baseStyle + "-header-text";
+        bwrapStyle = baseStyle + "-bwrap";
+        tbarStyle = baseStyle + "-tbar";
+        bodStyle = baseStyle + "-body";
+        bbarStyle = baseStyle + "-bbar";
+        footerStyle = baseStyle + "-footer";
+        collapseStyle = baseStyle + "-collapsed";
+      }
+    };
+
+    btns.setHeaderVisible(false);
+    btns.addStyleName("x-btns");
+    btns.setLayout(new TableLayout(2));
+
+    cancelBtn = new Button(getMessages().getCancelText(), new SelectionListener<ButtonEvent>() {
+      @Override
+      public void componentSelected(ButtonEvent ce) {
+        stopEditing(false);
+      }
+    });
+    cancelBtn.setMinWidth(getMinButtonWidth());
+    btns.add(cancelBtn);
+
+    saveBtn = new Button(getMessages().getSaveText(), new SelectionListener<ButtonEvent>() {
+      @Override
+      public void componentSelected(ButtonEvent ce) {
+        stopEditing(true);
+      }
+    });
+    saveBtn.setMinWidth(getMinButtonWidth());
+    btns.add(saveBtn);
+
+    btns.render(getElement("bwrap"));
+    btns.layout();
+
+    btns.getElement().removeAttribute("tabindex");
+    btns.getAriaSupport().setIgnore(true);
   }
 
   protected void deferFocus(final Point pt) {
@@ -495,6 +621,14 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     }
   }
 
+  protected Component findField(Element elem) {
+    El e = El.fly(elem).findParent(".x-row-editor-field", 3);
+    if (e != null) {
+      return ComponentManager.get().get(e.getId());
+    }
+    return null;
+  }
+
   protected String getErrorText() {
     StringBuffer sb = new StringBuffer();
     sb.append("<ul>");
@@ -518,7 +652,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   }
 
   protected Record getRecord(M model) {
-    return grid.getView().ds.getRecord(model);
+    return grid.getStore().getRecord(model);
   }
 
   protected int getTargetColumnIndex(Point pt) {
@@ -596,7 +730,8 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   }
 
   protected void onGridKey(GridEvent<M> e) {
-    if (e.getKeyCode() == KeyCodes.KEY_ENTER && !isVisible()) {
+    int kc = e.getKeyCode();
+    if ((kc == KeyCodes.KEY_ENTER || (kc == 113 && GXT.isWindows)) && !isVisible()) {
       M r = grid.getSelectionModel().getSelectedItem();
       if (r != null) {
         int index = this.grid.store.indexOf(r);
@@ -625,50 +760,11 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     swallowEvent(Events.OnKeyUp, el().dom, false);
     swallowEvent(Events.OnKeyPress, el().dom, false);
 
-    if (!renderButtons) {
-      return;
+    if (renderButtons) {
+      createButtons();
+      ComponentHelper.setParent(this, btns);
     }
-    btns = new ContentPanel() {
-      protected void createStyles(String baseStyle) {
-        baseStyle = "x-plain";
-        headerStyle = baseStyle + "-header";
-        headerTextStyle = baseStyle + "-header-text";
-        bwrapStyle = baseStyle + "-bwrap";
-        tbarStyle = baseStyle + "-tbar";
-        bodStyle = baseStyle + "-body";
-        bbarStyle = baseStyle + "-bbar";
-        footerStyle = baseStyle + "-footer";
-        collapseStyle = baseStyle + "-collapsed";
-      }
-    };
 
-    btns.setHeaderVisible(false);
-    btns.addStyleName("x-btns");
-    btns.setLayout(new TableLayout(2));
-
-    Button saveBtn = new Button(getMessages().getSaveText(), new SelectionListener<ButtonEvent>() {
-
-      @Override
-      public void componentSelected(ButtonEvent ce) {
-        stopEditing(true);
-      }
-
-    });
-    saveBtn.setMinWidth(getMinButtonWidth());
-    btns.add(saveBtn);
-
-    Button cancelBtn = new Button(getMessages().getCancelText(), new SelectionListener<ButtonEvent>() {
-
-      @Override
-      public void componentSelected(ButtonEvent ce) {
-        stopEditing(false);
-      }
-
-    });
-    cancelBtn.setMinWidth(getMinButtonWidth());
-    btns.add(cancelBtn);
-    btns.render(getElement("bwrap"));
-    btns.layout();
   }
 
   protected void onRowClick(GridEvent<M> e) {
@@ -709,8 +805,8 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     if (tooltip == null) {
       ToolTipConfig config = new ToolTipConfig();
       config.setAutoHide(false);
-      config.setMouseOffset(new int[] {25, 0});
-      config.setTitle(GXT.MESSAGES.rowEditor_tipTitleText());
+      config.setMouseOffset(new int[] {0, 0});
+      config.setTitle(getMessages().getErrorTipTitleText());
       config.setAnchor("left");
       tooltip = new ToolTip(this, config);
       tooltip.setMaxWidth(600);
@@ -749,13 +845,13 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   }
 
   protected void verifyLayout(boolean force) {
-    if (isRendered() && (isVisible() || force)) {
+    if (initialized && (isVisible() || force)) {
       Element row = (Element) grid.getView().getRow(rowIndex);
-      
+
       setSize(El.fly(row).getWidth(false), renderButtons ? btns.getHeight() : 0);
 
       syncSize();
-      
+
       ColumnModel cm = grid.getColumnModel();
       for (int i = 0, len = cm.getColumnCount(); i < len; i++) {
         if (!cm.isHidden(i)) {

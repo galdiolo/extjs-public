@@ -1,3 +1,10 @@
+/*
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
+ * licensing@extjs.com
+ * 
+ * http://extjs.com/license
+ */
 package com.extjs.gxt.samples.client.examples.dnd;
 
 import com.extjs.gxt.samples.client.Examples;
@@ -33,8 +40,7 @@ public class TreePanelToTreePanelExample extends LayoutContainer {
     StoreSorter<ModelData> sorter = new StoreSorter<ModelData>() {
 
       @Override
-      public int compare(Store<ModelData> store, ModelData m1, ModelData m2,
-          String property) {
+      public int compare(Store<ModelData> store, ModelData m1, ModelData m2, String property) {
         boolean m1Folder = m1 instanceof Category;
         boolean m2Folder = m2 instanceof Category;
         if (m1Folder && !m2Folder) {
@@ -55,7 +61,15 @@ public class TreePanelToTreePanelExample extends LayoutContainer {
 
     store.add(root, true);
 
-    TreePanel<ModelData> tree = new TreePanel<ModelData>(store);
+    TreePanel<ModelData> tree = new TreePanel<ModelData>(store){
+      @Override
+      protected boolean hasChildren(ModelData m) {
+        if ("Ext GWT".equals(m.get("name")) || m instanceof Category) {
+          return true;
+        }
+        return super.hasChildren(m);
+      }
+    };
     tree.getStyle().setLeafIcon(IconHelper.createStyle("icon-list"));
     tree.setAutoLoad(true);
     tree.setDisplayProperty("name");
@@ -75,14 +89,14 @@ public class TreePanelToTreePanelExample extends LayoutContainer {
 
     TreePanel<ModelData> tree2 = new TreePanel<ModelData>(store) {
       @Override
-      protected boolean hasChildren(ModelData model) {
-        if ("My Files".equals(model.get("name")) || model instanceof Category) {
+      protected boolean hasChildren(ModelData m) {
+        if ("My Files".equals(m.get("name")) || m instanceof Category) {
           return true;
         }
-        return super.hasChildren(model);
+        return super.hasChildren(m);
       }
     };
-    
+
     tree2.getStyle().setLeafIcon(IconHelper.createStyle("icon-list"));
     tree2.setAutoLoad(true);
     tree2.setDisplayProperty("name");
@@ -91,10 +105,10 @@ public class TreePanelToTreePanelExample extends LayoutContainer {
     hp.setSpacing(10);
 
     hp.add(tree, new TableData("250px", null));
-    hp.add(tree2, new TableData("250px",null));
+    hp.add(tree2, new TableData("250px", null));
 
     DNDListener listener = new DNDListener() {
-      @SuppressWarnings("unchecked")
+      @SuppressWarnings({"unchecked", "rawtypes"})
       @Override
       public void dragStart(DNDEvent e) {
         TreePanel tree = ((TreePanel) e.getComponent());

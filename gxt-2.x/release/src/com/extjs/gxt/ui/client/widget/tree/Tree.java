@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -714,8 +714,8 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
     return new TreeEvent(this, event == null ? null : findItem(DOM.eventGetTarget(event)));
   }
 
+  @SuppressWarnings("rawtypes")
   @Override
-  @SuppressWarnings("unchecked")
   protected ContainerEvent createContainerEvent(TreeItem item) {
     return new TreeEvent(this, item);
   }

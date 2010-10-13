@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -8,7 +8,11 @@
 package com.extjs.gxt.samples.client.examples.forms;
 
 import com.extjs.gxt.samples.resources.client.Resources;
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.aria.FocusManager;
+import com.extjs.gxt.ui.client.event.BaseEvent;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.TabItem;
 import com.extjs.gxt.ui.client.widget.TabPanel;
@@ -45,6 +49,7 @@ public class AdvancedFormsExample extends LayoutContainer {
   private void createTabForm() {
     FormData formData = new FormData("100%");
     FormPanel panel = new FormPanel();
+    panel.setBodyStyleName("example-bg");
     panel.setPadding(0);
     panel.setFrame(false);
     panel.setHeaderVisible(false);
@@ -52,7 +57,7 @@ public class AdvancedFormsExample extends LayoutContainer {
     panel.setButtonAlign(HorizontalAlignment.CENTER);
     panel.setLayout(new FitLayout());
 
-    TabPanel tabs = new TabPanel();
+    final TabPanel tabs = new TabPanel();
 
     TabItem personal = new TabItem();
     personal.setStyleAttribute("padding", "10px");
@@ -108,6 +113,25 @@ public class AdvancedFormsExample extends LayoutContainer {
     panel.addButton(new Button("Submit"));
 
     panel.setSize(340, 200);
+
+    if (GXT.isAriaEnabled()) {
+      name.setData("aria-previous", panel.getButtonBar().getId());
+      home.setData("aria-previous", panel.getButtonBar().getId());
+      
+      panel.getButtonBar().getAriaSupport().addListener(FocusManager.TabNext, new Listener<BaseEvent>() {
+        public void handleEvent(BaseEvent be) {
+          tabs.getItem(tabs.getSelectedItem() == tabs.getItem(0) ? 0 : 1).getItem(0).focus();
+          be.setCancelled(true);
+        }
+      });
+      panel.getButtonBar().getAriaSupport().addListener(FocusManager.TabPrevious, new Listener<BaseEvent>() {
+        public void handleEvent(BaseEvent be) {
+          TabItem item = tabs.getItem(tabs.getSelectedItem() == tabs.getItem(0) ? 0 : 1);
+          item.getItem(item.getItemCount() - 1).focus();
+          be.setCancelled(true);
+        }
+      });
+    }
 
     vp.add(panel);
   }

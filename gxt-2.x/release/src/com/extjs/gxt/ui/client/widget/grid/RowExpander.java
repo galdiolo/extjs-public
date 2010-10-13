@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -17,13 +17,14 @@ import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.RowExpanderEvent;
 import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentPlugin;
 import com.google.gwt.user.client.Element;
 
 /**
- * A <code>ColumnConfig</li> subclass and a <code>ComponentPlgin</code> that
+ * A <code>ColumnConfig</li> subclass and a <code>ComponentPlugin</code> that
  * adds the ability for each row to be expanded, showing custom content that
  * spans all the rows columns.
  * 
@@ -80,7 +81,7 @@ import com.google.gwt.user.client.Element;
  */
 public class RowExpander extends ColumnConfig implements ComponentPlugin {
 
-  protected Grid<?> grid;
+  protected Grid<ModelData> grid;
   private XTemplate template;
 
   /**
@@ -95,7 +96,9 @@ public class RowExpander extends ColumnConfig implements ComponentPlugin {
     setMenuDisabled(true);
     setDataIndex("");
     setId("expander");
-
+    
+    ariaIgnore = true;
+    
     setRenderer(new GridCellRenderer<ModelData>() {
       public String render(ModelData model, String property, ColumnData d, int rowIndex, int colIndex,
           ListStore<ModelData> store, Grid<ModelData> grid) {
@@ -123,7 +126,9 @@ public class RowExpander extends ColumnConfig implements ComponentPlugin {
    */
   public void collapseRow(int rowIndex) {
     El row = new El((Element)grid.getView().getRow(rowIndex));
-    collapseRow(row);
+    if (row != null && isExpanded(row)) {
+      collapseRow(row);
+    }
   }
 
   /**
@@ -133,7 +138,9 @@ public class RowExpander extends ColumnConfig implements ComponentPlugin {
    */
   public void expandRow(int rowIndex) {
     El row = new El((Element)grid.getView().getRow(rowIndex));
-    expandRow(row);
+    if (row != null && !isExpanded(row)) {
+      expandRow(row);
+    }
   }
   
   /**
@@ -154,7 +161,7 @@ public class RowExpander extends ColumnConfig implements ComponentPlugin {
     return template;
   }
   
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public void init(Component component) {
     this.grid = (Grid) component;
 
@@ -179,8 +186,19 @@ public class RowExpander extends ColumnConfig implements ComponentPlugin {
       public void handleEvent(GridEvent be) {
         onMouseDown(be);
       }
-
     });
+    
+    new KeyNav<GridEvent<?>>(grid) {
+      @Override
+      public void onLeft(GridEvent<?> ce) {
+        onKeyLeft(ce);
+      }
+      
+      @Override
+      public void onRight(GridEvent<?> ce) {
+        onKeyRight(ce);
+      }
+    };
   }
   
   /**
@@ -204,6 +222,10 @@ public class RowExpander extends ColumnConfig implements ComponentPlugin {
     }
     return false;
   }
+  
+  protected boolean isExpanded(El row) {
+    return row.hasStyleName("x-grid3-row-expanded");
+  }
 
   protected void collapseRow(El row) {
     int idx = row.dom.getPropertyInt("rowIndex");
@@ -217,7 +239,7 @@ public class RowExpander extends ColumnConfig implements ComponentPlugin {
     
     if (fireEvent(Events.BeforeCollapse, e)) {
       row.replaceStyleName("x-grid3-row-expanded", "x-grid3-row-collapsed");
-
+      row.dom.setAttribute("aria-expanded", "false");
       fireEvent(Events.Collapse, e);
     }
   }
@@ -228,6 +250,7 @@ public class RowExpander extends ColumnConfig implements ComponentPlugin {
     Element body = DomQuery.selectNode("div.x-grid3-row-body", row.dom);
     if (beforeExpand(model, body, row, idx)) {
       row.replaceStyleName("x-grid3-row-collapsed", "x-grid3-row-expanded");
+      row.dom.setAttribute("aria-expanded", "true");
       RowExpanderEvent e = new RowExpanderEvent(this);
       e.setModel(model);
       e.setRowIndex(idx);
@@ -238,6 +261,18 @@ public class RowExpander extends ColumnConfig implements ComponentPlugin {
 
   protected String getBodyContent(ModelData model, int rowIndex) {
     return template.applyTemplate(Util.getJsObject(model, template.getMaxDepth()));
+  }
+
+  protected void onKeyLeft(GridEvent<?> ce) {
+    if (grid.getSelectionModel().getSelectedItem() != null) {
+      collapseRow(grid.getStore().indexOf(grid.getSelectionModel().getSelectedItem()));
+    }
+  }
+
+  protected void onKeyRight(GridEvent<?> ce) {
+    if (grid.getSelectionModel().getSelectedItem() != null) {
+      expandRow(grid.getStore().indexOf(grid.getSelectionModel().getSelectedItem()));
+    }
   }
 
   protected void onMouseDown(GridEvent<?> e) {

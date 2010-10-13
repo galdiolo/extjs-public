@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -17,11 +17,11 @@ import com.google.gwt.i18n.client.DateTimeFormat;
  */
 public final class Version {
 
-  private static final String release = "2.1.1";
+  private static final String release = "2.2.0";
   private static final int major = 2;
-  private static final int minor = 1;
-  private static final int revision = 1;
-  private static final String buildTime = "02/02/2010 04:40";
+  private static final int minor = 2;
+  private static final int revision = 0;
+  private static final String buildTime = "08/31/2010 12:14";
 
   Version() {
 

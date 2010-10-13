@@ -1,3 +1,10 @@
+/*
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
+ * licensing@extjs.com
+ * 
+ * http://extjs.com/license
+ */
 package com.extjs.gxt.samples.resources.client.images;
 
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
@@ -172,6 +179,8 @@ public interface ExampleImages extends ImageBundle {
   AbstractImagePrototype vboxlayout();
 
   AbstractImagePrototype widgetrenderergrid();
+  
+  AbstractImagePrototype filtergrid();
   
   AbstractImagePrototype widgetrenderertreegrid();
 

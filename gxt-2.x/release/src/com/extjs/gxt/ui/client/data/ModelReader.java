@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class ModelReader implements DataReader<ListLoadResult<? extends ModelData>> {
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public ListLoadResult<ModelData> read(Object loadConfig, Object data) {
     if (data instanceof ModelData) {
       List list = new ArrayList();

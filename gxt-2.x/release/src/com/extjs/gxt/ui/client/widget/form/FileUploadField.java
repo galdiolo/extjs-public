@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -12,6 +12,7 @@ import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XDOM;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.InputElement;
+import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -141,6 +142,11 @@ public class FileUploadField extends TextField<String> {
       case Event.ONCHANGE:
         onChange(ce);
         break;
+      case Event.ONKEYDOWN:
+        if (ce.getKeyCode() != KeyCodes.KEY_TAB && GXT.isAriaEnabled()) {
+          file.focus();
+        }
+        break;
     }
   }
 
@@ -219,9 +225,7 @@ public class FileUploadField extends TextField<String> {
     ((InputElement) file.dom.cast()).setName(name);
     ((InputElement) file.dom.cast()).setAccept(accept);
     file.insertInto(getElement(), 1);
-    if (file != null) {
-      file.setEnabled(isEnabled());
-    }
+    file.setEnabled(isEnabled());
   }
 
   @Override
@@ -290,6 +294,9 @@ public class FileUploadField extends TextField<String> {
     input.addStyleName(fieldStyle);
     input.addStyleName("x-form-file-text");
     input.setId(XDOM.getUniqueId());
+    if (GXT.isAriaEnabled()) {
+      input.setTitle("File upload field");
+    }
 
     if (GXT.isIE && target.getTagName().equals("TD")) {
       input.setStyleAttribute("position", "static");
@@ -300,6 +307,7 @@ public class FileUploadField extends TextField<String> {
     setElement(wrap.dom, target, index);
 
     button = new Button(getMessages().getBrowseText());
+    button.getAriaSupport().setIgnore(true);
     button.addStyleName("x-form-file-btn");
     button.setIcon(buttonIcon);
     button.render(wrap.dom);

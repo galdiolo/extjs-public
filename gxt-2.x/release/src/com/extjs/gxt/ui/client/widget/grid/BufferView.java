@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.Listener;
@@ -32,7 +33,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class BufferView extends GridView {
 
-  private int rowHeight = 19;
+  private int rowHeight = 21;
   private int cacheSize = 20;
   private int cleanDelay = 500;
   private DelayedTask cleanTask;
@@ -101,7 +102,7 @@ public class BufferView extends GridView {
   }
 
   /**
-   * Sets the amount of rows that should be cached (default to 10).
+   * Sets the amount of rows that should be cached (default to 20).
    * 
    * @param cacheSize the new cache size
    */
@@ -139,6 +140,9 @@ public class BufferView extends GridView {
 
   // a buffered method to clean rows
   protected void clean() {
+    if (grid == null || !grid.isViewReady() || !bufferEnabled) {
+      return;
+    }
     if (cleanTask == null) {
       cleanTask = new DelayedTask(new Listener<BaseEvent>() {
         public void handleEvent(BaseEvent be) {
@@ -149,7 +153,16 @@ public class BufferView extends GridView {
     cleanTask.delay(cleanDelay);
   }
 
+  @Override
+  protected void doAttach() {
+    super.doAttach();
+    update();
+  }
+
   protected void doClean() {
+    if (grid == null || !grid.isViewReady() || !bufferEnabled) {
+      return;
+    }
     int count = getVisibleRowCount();
     if (count > 0) {
       int[] vr = getVisibleRows(count);
@@ -169,10 +182,14 @@ public class BufferView extends GridView {
         if ((i < vr[0] || i > vr[1])) {
           detachWidget(i, false);
           widgetList.set(i, null);
+          cleanModel(ds.getAt(i));
           rows.getItem(i).setInnerHTML("");
         }
       }
     }
+  }
+
+  protected void cleanModel(ModelData at) {
   }
 
   @Override
@@ -238,13 +255,14 @@ public class BufferView extends GridView {
             css += " x-grid3-dirty-cell";
           }
 
-          cb.append("<td class=\"x-grid3-col x-grid3-cell x-grid3-td-");
+          cb.append("<td id=\"" + XDOM.getUniqueId()
+              + "\" role=\"gridcell\" class=\"x-grid3-col x-grid3-cell x-grid3-td-");
           cb.append(c.id);
           cb.append(" ");
           cb.append(css);
           cb.append("\" style=\"");
           cb.append(c.style);
-          cb.append("\" tabIndex=0 ");
+          cb.append("\" ");
           cb.append(cellAttr);
           cb.append("><div unselectable=\"on\" class=\"x-grid3-cell-inner x-grid3-col-");
           cb.append(c.id);
@@ -265,40 +283,42 @@ public class BufferView extends GridView {
         alt += " x-grid3-dirty-row";
       }
 
+      if (!selectable) {
+        alt += " x-unselectable-single";
+      }
+
       if (viewConfig != null) {
         alt += " " + viewConfig.getRowStyle(model, rowIndex, ds);
       }
 
-      if (visible) {
-
-        if (!onlyBody) {
-          buf.append("<div class=\"x-grid3-row ");
-          buf.append(alt);
-          buf.append("\" style=\"");
-          buf.append(tstyle);
-          buf.append("\">");
-        }
-        buf.append("<table class=x-grid3-row-table border=0 cellspacing=0 cellpadding=0 style=\"");
+      if (!onlyBody || !visible) {
+        buf.append("<div role=\"row\" class=\"x-grid3-row ");
+        buf.append(alt);
+        buf.append("\" style=\"");
         buf.append(tstyle);
-        buf.append("\"><tbody><tr>");
+        buf.append("\" id=\"");
+        buf.append(grid.getId());
+        buf.append("_");
+        buf.append(ds.getKeyProvider() != null ? ds.getKeyProvider().getKey(model) : XDOM.getUniqueId());
+        buf.append("\">");
+      }
+      if (visible) {
+        buf.append("<table role=presentation class=x-grid3-row-table border=0 cellspacing=0 cellpadding=0 style=\"");
+        buf.append(tstyle);
+        buf.append("\"><tbody role=presentation><tr role=presentation>");
         buf.append(cb.toString());
         buf.append("</tr>");
         if (enableRowBody) {
           buf.append("<tr class=x-grid3-row-body-tr style=\"\"><td colspan=");
           buf.append(rowBodyColSpanCount);
-          buf.append(" class=x-grid3-body-cell tabIndex=0><div class=x-grid3-row-body>${body}</div></td></tr>");
+          buf.append(" class=x-grid3-body-cell><div class=x-grid3-row-body>${body}</div></td></tr>");
         }
         buf.append("</tbody></table>");
-        if (!onlyBody) {
-          buf.append("</div>");
-        }
 
-      } else {
-        buf.append("<div class=\"x-grid3-row ");
-        buf.append(alt);
-        buf.append("\" style=\"");
-        buf.append(tstyle);
-        buf.append("\"></div>");
+      }
+
+      if (!onlyBody || !visible) {
+        buf.append("</div>");
       }
 
       cb = new StringBuilder();
@@ -307,6 +327,9 @@ public class BufferView extends GridView {
   }
 
   protected void doUpdate() {
+    if (grid == null || !grid.isViewReady() || !bufferEnabled) {
+      return;
+    }
     int count = getVisibleRowCount();
     if (count > 0) {
       ColumnModel cm = grid.getColumnModel();
@@ -315,13 +338,14 @@ public class BufferView extends GridView {
       List<ColumnData> cs = getColumnData();
       boolean stripe = grid.isStripeRows();
       int[] vr = getVisibleRows(count);
+      int cc = cm.getColumnCount();
       for (int i = vr[0]; i <= vr[1]; i++) {
         // if row is NOT rendered and is visible, render it
         if (!isRowRendered(i)) {
           List<ModelData> list = new ArrayList<ModelData>();
           list.add(store.getAt(i));
           widgetList.add(i, new ArrayList<Widget>());
-          String html = doRender(cs, list, i, cm.getColumnCount(), stripe, true);
+          String html = doRender(cs, list, i, cc, stripe, true);
           getRow(i).setInnerHTML(html);
           renderWidgets(i, i);
         }
@@ -346,10 +370,11 @@ public class BufferView extends GridView {
 
   protected int[] getVisibleRows(int count) {
     int sc = scroller.getScrollTop();
-    int start = (int) (sc == 0 ? 0 : Math.floor(sc / getCalculatedRowHeight()) - 1);
+    int start = sc / getCalculatedRowHeight();
     int first = Math.max(start, 0);
-    int last = Math.min(start + count + 2, grid.getStore().getCount() - 1);
-    return new int[] {first, last};
+    int last = Math.min(start + count, grid.getStore().getCount() - 1);
+    int[] i = new int[] {first, last};
+    return i;
   }
 
   protected boolean isRowRendered(int index) {
@@ -360,9 +385,7 @@ public class BufferView extends GridView {
   @Override
   protected void notifyShow() {
     super.notifyShow();
-    if (GXT.isWebKit) {
-      update();
-    }
+    update();
   }
 
   @Override
@@ -384,7 +407,7 @@ public class BufferView extends GridView {
   }
 
   protected void update() {
-    if (!grid.isViewReady() || !bufferEnabled) {
+    if (grid == null || !grid.isViewReady() || !bufferEnabled) {
       return;
     }
     if (renderTask == null) {

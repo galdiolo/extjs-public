@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -25,7 +25,7 @@ public class BasePagingLoader<D extends PagingLoadResult<?>> extends BaseListLoa
    * 
    * @param proxy the data proxy
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public BasePagingLoader(DataProxy proxy) {
     super(proxy);
   }
@@ -36,7 +36,7 @@ public class BasePagingLoader<D extends PagingLoadResult<?>> extends BaseListLoa
    * @param proxy the data proxy
    * @param reader the data reader
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public BasePagingLoader(DataProxy proxy, DataReader reader) {
     super(proxy, reader);
   }

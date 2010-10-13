@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -10,6 +10,20 @@ package com.extjs.gxt.ui.client.image;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.ImageBundle;
 
+/**
+ * Defines the icons used by the Ext GWT library.
+ * 
+ * <p>
+ * To 'override' these images extend this interface, override the desired
+ * methods and add a @Resource annotation.
+ * 
+ * <pre>
+ * public interface CustomImages extends XImages {
+ *   @Resource("youimage.gif") 
+ *   public AbstractImagePrototype toolbar_more(); 
+ * } </pre>
+ * 
+ */
 @SuppressWarnings("deprecation")
 public interface XImages extends ImageBundle {
   @Resource("hmenu-asc.gif")
@@ -113,20 +127,31 @@ public interface XImages extends ImageBundle {
 
   @Resource("folder-closed.png")
   AbstractImagePrototype tree_folder_closed();
-  
+
   @Resource("tree-collapsed.png")
   AbstractImagePrototype tree_collapsed();
-  
+
   @Resource("tree-collapsed-over.png")
   AbstractImagePrototype tree_collapsed_over();
-  
+
   @Resource("tree-expanded.png")
   AbstractImagePrototype tree_expanded();
-  
+
   @Resource("tree-expanded-over.png")
   AbstractImagePrototype tree_expanded_over();
-  
+
   @Resource("wait.gif")
   AbstractImagePrototype icon_wait();
-
+  
+  @Resource("less_than.png")
+  AbstractImagePrototype grid_filter_lessThan();
+  
+  @Resource("greater_than.png")
+  AbstractImagePrototype grid_filter_greaterThan();
+  
+  @Resource("equals.png")
+  AbstractImagePrototype grid_filter_equal();
+  
+  @Resource("find.png")
+  AbstractImagePrototype grid_filter_find();
 }

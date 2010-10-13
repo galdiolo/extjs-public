@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -10,11 +10,13 @@ package com.extjs.gxt.ui.client.widget.menu;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.aria.FocusFrame;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.EventType;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.widget.Container;
+import com.google.gwt.dom.client.EventTarget;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -26,12 +28,44 @@ import com.google.gwt.user.client.ui.Accessibility;
  */
 public class MenuBar extends Container<MenuBarItem> {
 
-  private MenuBarItem active;
+  protected MenuBarItem active;
+  private boolean autoSelect = true;
+  private Listener<MenuEvent> listener;
 
   public MenuBar() {
     baseStyle = "x-menubar";
     enableLayout = true;
     attachChildren = false;
+
+    listener = new Listener<MenuEvent>() {
+
+      public void handleEvent(MenuEvent be) {
+        EventType type = be.getType();
+        if (type == Events.Hide) {
+          autoSelect = false;
+          focus();
+          autoSelect = true;
+          if (active != null) active.expanded = false;
+        } else if (type == Events.AutoHide) {
+
+          autoSelect = false;
+          focus();
+          autoSelect = true;
+          if (active != null) active.expanded = false;
+        } else if (type == Events.Maximize) {
+          int index = indexOf(active);
+          index = index != getItemCount() - 1 ? index + 1 : 0;
+          MenuBarItem item = getItem(index);
+          setActiveItem(item, true);
+        } else if (type == Events.Minimize) {
+          int index = indexOf(active);
+          index = index > 0 ? index - 1 : getItemCount() - 1;
+          MenuBarItem item = getItem(index);
+          setActiveItem(item, true);
+        }
+      }
+    };
+
   }
 
   @Override
@@ -60,7 +94,7 @@ public class MenuBar extends Container<MenuBarItem> {
         onClick(ce);
         break;
       case Event.ONFOCUS:
-        if (active == null && getItemCount() > 0) {
+        if (autoSelect && active == null && getItemCount() > 0) {
           setActiveItem(getItem(0), false);
         }
         break;
@@ -83,7 +117,7 @@ public class MenuBar extends Container<MenuBarItem> {
    * @param item the item to activate
    * @param expand true to expand the item's menu
    */
-  public void setActiveItem(MenuBarItem item, boolean expand) {
+  public void setActiveItem(final MenuBarItem item, boolean expand) {
     if (active != item) {
       if (active != null) {
         onDeactivate(active);
@@ -95,7 +129,7 @@ public class MenuBar extends Container<MenuBarItem> {
       }
 
       if (expand) {
-        expand(item);
+        expand(item, true);
       }
     }
   }
@@ -110,7 +144,7 @@ public class MenuBar extends Container<MenuBarItem> {
       if (item.expanded) {
         collapse(item);
       } else {
-        expand(item);
+        expand(item, false);
       }
     } else {
       setActiveItem(item, true);
@@ -122,10 +156,13 @@ public class MenuBar extends Container<MenuBarItem> {
     item.expanded = false;
   }
 
-  protected void expand(MenuBarItem item) {
+  protected void expand(MenuBarItem item, boolean selectFirst) {
     item.menu.setFocusOnShow(false);
     item.menu.show(item.getElement(), "tl-bl", new int[] {0, 1});
     item.expanded = true;
+    if (item.menu.getItemCount() > 0 && selectFirst) {
+      item.menu.setActiveItem(item.menu.getItem(0), false);
+    }
   }
 
   protected void onActivate(MenuBarItem item) {
@@ -154,20 +191,20 @@ public class MenuBar extends Container<MenuBarItem> {
   @Override
   protected void onInsert(final MenuBarItem item, int index) {
     super.onInsert(item, index);
-    item.menu.addListener(Events.Hide, new Listener<MenuEvent>() {
-      public void handleEvent(MenuEvent be) {
-        onDeactivate(item);
-        focus();
-        setActiveItem(item, false);
-      }
-    });
-    item.menu.addListener(Events.AutoHide, new Listener<MenuEvent>() {
-      public void handleEvent(MenuEvent be) {
-        if (item.getElement().isOrHasChild(be.getTarget())) {
-          be.setCancelled(true);
-        }
-      }
-    });
+
+    item.menu.addListener(Events.Hide, listener);
+    item.menu.addListener(Events.AutoHide, listener);
+    item.menu.addListener(Events.Maximize, listener);
+    item.menu.addListener(Events.Minimize, listener);
+  }
+
+  @Override
+  protected void onRemove(MenuBarItem item) {
+    super.onRemove(item);
+    item.menu.removeListener(Events.Hide, listener);
+    item.menu.removeListener(Events.AutoHide, listener);
+    item.menu.removeListener(Events.Maximize, listener);
+    item.menu.removeListener(Events.Minimize, listener);
   }
 
   protected void onKeyPress(ComponentEvent ce) {
@@ -187,11 +224,16 @@ public class MenuBar extends Container<MenuBarItem> {
   protected void onLeft(ComponentEvent ce) {
     if (active != null && getItemCount() > 1) {
       int idx = indexOf(active);
-      if (idx != 0) {
-        setActiveItem(getItem(idx - 1), true);
-      } else {
-        setActiveItem(getItem(getItemCount() - 1), true);
-      }
+      idx = idx != 0 ? idx - 1 : getItemCount() - 1;
+      MenuBarItem item = getItem(idx);
+      setActiveItem(item, item.expanded);
+    }
+  }
+
+  protected void onMouseOut(ComponentEvent ce) {
+    EventTarget eT = ce.getEvent().getRelatedEventTarget();
+    if ((eT == null || findItem((Element) Element.as(eT)) == null) && active != null && !active.expanded) {
+      onDeactivate(active);
     }
   }
 
@@ -207,7 +249,7 @@ public class MenuBar extends Container<MenuBarItem> {
     super.onRender(target, index);
     setElement(DOM.createDiv(), target, index);
 
-    el().setTabIndex(0);
+    el().setTabIndex(-1);
     el().setElementAttribute("hideFocus", "true");
 
     if (GXT.isAriaEnabled()) {
@@ -235,11 +277,9 @@ public class MenuBar extends Container<MenuBarItem> {
   protected void onRight(ComponentEvent ce) {
     if (active != null && getItemCount() > 1) {
       int idx = indexOf(active);
-      if (idx != getItemCount() - 1) {
-        setActiveItem(getItem(idx + 1), true);
-      } else {
-        setActiveItem(getItem(0), true);
-      }
+      idx = idx != getItemCount() - 1 ? idx + 1 : 0;
+      MenuBarItem item = getItem(idx);
+      setActiveItem(item, item.expanded);
     }
   }
 
@@ -253,19 +293,13 @@ public class MenuBar extends Container<MenuBarItem> {
 
   private void onDown(ComponentEvent ce) {
     if (active != null && getItemCount() > 0) {
+      ce.stopEvent();
       if (active.expanded) {
         active.menu.focus();
         active.menu.setActiveItem(active.menu.getItem(0), false);
       } else {
-        expand(active);
+        expand(active, true);
       }
-    }
-  }
-
-  private void onMouseOut(ComponentEvent ce) {
-    MenuBarItem item = findItem((Element) ce.getEvent().getRelatedEventTarget().cast());
-    if (item == null && active != null && !active.expanded) {
-      onDeactivate(active);
     }
   }
 }

@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -28,8 +28,18 @@ public class Params {
   private List<Object> values;
   private Map<String, Object> mapValues;
 
+  /**
+   * True if the parameters are a list of values.
+   * 
+   * @deprecated see {@link #isList()}.
+   */
   public boolean isList = false;
-
+  
+  /**
+   * True if the parameters are a map of key / value pairs.
+   * 
+   * @deprecated see {@link #isMap()}
+   */
   public boolean isMap = false;
 
   /**
@@ -37,6 +47,15 @@ public class Params {
    */
   public Params() {
 
+  }
+
+  /**
+   * Creates a new params instance.
+   * 
+   * @param values the initial values
+   */
+  public Params(Map<String, Object> values) {
+    mapValues = values;
   }
 
   /**
@@ -62,15 +81,6 @@ public class Params {
   }
 
   /**
-   * Creates a new params instance.
-   * 
-   * @param values the initial values
-   */
-  public Params(Map<String, Object> values) {
-    mapValues = values;
-  }
-
-  /**
    * Adds a value.
    * 
    * @param value the value to add
@@ -81,6 +91,56 @@ public class Params {
     if (values == null) values = new ArrayList<Object>();
     values.add(value);
     return this;
+  }
+
+  /**
+   * Returns the list values.
+   * 
+   * @return the list values
+   */
+  public List<Object> getList() {
+    return values;
+  }
+
+  /**
+   * Returns the values as a map.
+   * 
+   * @return the map of values
+   */
+  public Map<String, Object> getMap() {
+    return mapValues;
+  }
+
+  /**
+   * Returns the values as a JavaScriptObject.
+   * 
+   * @return the values
+   */
+  public JavaScriptObject getValues() {
+    if (values != null) {
+      return JsUtil.toJavaScriptArray(values.toArray());
+    } else if (mapValues != null) {
+      return JsUtil.toJavaScriptObject(mapValues);
+    }
+    return new JsObject().getJsObject();
+  }
+
+  /**
+   * Returns true if the parameters are a list.
+   * 
+   * @return true if a list
+   */
+  public boolean isList() {
+    return isList;
+  }
+
+  /**
+   * Returns true if the parameters are a map.
+   * 
+   * @return true if a map
+   */
+  public boolean isMap() {
+    return isMap;
   }
 
   /**
@@ -98,23 +158,6 @@ public class Params {
     }
     mapValues.put(key, value);
     return this;
-  }
-
-  public Map<String, Object> getMap() {
-    return mapValues;
-  }
-
-  public List<Object> getList() {
-    return values;
-  }
-
-  public JavaScriptObject getValues() {
-    if (values != null) {
-      return JsUtil.toJavaScriptArray(values.toArray());
-    } else if (mapValues != null) {
-      return JsUtil.toJavaScriptObject(mapValues);
-    }
-    return new JsObject().getJsObject();
   }
 
 }

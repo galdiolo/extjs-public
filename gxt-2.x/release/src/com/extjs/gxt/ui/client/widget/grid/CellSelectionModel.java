@@ -1,18 +1,20 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
  */
 package com.extjs.gxt.ui.client.widget.grid;
 
+import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.aria.FocusFrame;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.GridEvent;
-import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.store.StoreEvent;
+import com.extjs.gxt.ui.client.widget.grid.ColumnHeader.Head;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.Event;
 
@@ -38,28 +40,28 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
   private Callback callback = new Callback(this);
   protected CellSelection selection;
 
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
-  @SuppressWarnings("unchecked")
   public void bindGrid(Grid grid) {
     if (this.grid != null) {
       this.grid.removeListener(Events.CellMouseDown, this);
       this.grid.removeListener(Events.BeforeEdit, this);
+      this.grid.removeListener(Events.ViewReady, this);
       this.grid.getView().removeListener(Events.Refresh, this);
       this.grid.getView().removeListener(Events.RowUpdated, this);
       keyNav.bind(null);
       bind(null);
-      this.listStore = null;
     }
     this.grid = grid;
     if (grid != null) {
       grid.setTrackMouseOver(false);
       grid.addListener(Events.BeforeEdit, this);
       grid.addListener(Events.CellMouseDown, this);
+      grid.addListener(Events.ViewReady, this);
       grid.getView().addListener(Events.Refresh, this);
       grid.getView().addListener(Events.RowUpdated, this);
       keyNav.bind(grid);
       bind(grid.getStore());
-      this.listStore = (ListStore) grid.getStore();
     }
   }
 
@@ -69,7 +71,9 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
       // index may change with tree grid on expand / collapse
       // ask store for current row index
       int row = listStore.indexOf(selection.model);
-      grid.getView().onCellDeselect(row, selection.cell);
+      if (grid.isViewReady()) {
+        grid.getView().onCellDeselect(row, selection.cell);
+      }
       selection = null;
     }
   }
@@ -84,7 +88,7 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public void handleEvent(BaseEvent e) {
     if (e.getType() == Events.CellMouseDown) {
       handleMouseDown((GridEvent) e);
@@ -93,8 +97,12 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
     } else if (e.getType() == Events.BeforeEdit) {
       GridEvent ge = (GridEvent) e;
       selectCell(ge.getRowIndex(), ge.getColIndex());
-    }else if (e.getType() == Events.RowUpdated) {
+    } else if (e.getType() == Events.RowUpdated) {
       onRowUpdated((GridEvent) e);
+    } else if (e.getType() == Events.ViewReady) {
+      if (selection != null) {
+        selectCell(selection.row, selection.cell);
+      }
     }
   }
 
@@ -107,15 +115,14 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
   public void selectCell(int row, int cell) {
     deselectAll();
     M m = listStore.getAt(row);
+    if (GXT.isAriaEnabled() && selectedHeader != null) {
+      selectedHeader = null;
+      FocusFrame.get().frame(grid);
+    }
     selection = new CellSelection(m, row, cell);
-    grid.getView().onCellSelect(row, cell);
-    grid.getView().focusCell(row, cell, true);
-  }
-  @Override
-  protected void onRowUpdated(GridEvent<M> ge) {
-    if (selection != null && selection.model == ge.getModel()) {
-      grid.getView().onCellSelect(selection.row, selection.cell);
-      grid.getView().focusCell(selection.row, selection.cell, true);
+    if (grid.isViewReady()) {
+      grid.getView().onCellSelect(row, cell);
+      grid.getView().focusCell(row, cell, true);
     }
   }
 
@@ -134,11 +141,41 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
   }
 
   @Override
+  protected void onKeyDown(GridEvent<M> e) {
+
+  }
+
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  @Override
   protected void onKeyPress(GridEvent<M> e) {
     if (grid.editSupport != null) {
       // ignore events whose source is an input element
       String tag = e.getTarget().getTagName();
       if (tag.equals("INPUT") && !e.getTarget().getClassName().equals("_focus")) {
+        return;
+      }
+    }
+    if (GXT.isAriaEnabled()) {
+      int kc = e.getKeyCode();
+      if (kc == KeyCodes.KEY_UP && selection != null && selection.row == 0) {
+        int col = selection.cell;
+        deselectAll();
+        Head h = grid.getView().getHeader().getHead(col);
+        selectedHeader = h;
+        grid.getView().getHeader().selectHeader(col);
+        return;
+      }
+      if (selectedHeader != null && (kc == KeyCodes.KEY_LEFT || kc == KeyCodes.KEY_RIGHT)) {
+        return;
+      } else if (selectedHeader != null && (kc == 32 || kc == KeyCodes.KEY_ENTER)) {
+        grid.getView().onHeaderClick((Grid) grid, grid.getColumnModel().indexOf(selectedHeader.config));
+        return;
+      } else if (selectedHeader != null && kc == KeyCodes.KEY_DOWN) {
+        selectedHeader.deactivate();
+        int idx = selectedHeader.column;
+        selectCell(0, idx);
+        return;
+      } else if (selectedHeader != null && kc == KeyCodes.KEY_UP) {
         return;
       }
     }
@@ -157,6 +194,24 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
     Cell newCell = null;
 
     switch (e.getKeyCode()) {
+      case KeyCodes.KEY_HOME:
+        if (enableNavKeys) newCell = new Cell(selection.row, 0);
+        break;
+      case KeyCodes.KEY_END:
+        if (enableNavKeys) {
+          int col = grid.getColumnModel().getColumnCount(true) - 1;
+          newCell = new Cell(selection.row, col);
+        }
+        break;
+      case KeyCodes.KEY_PAGEUP:
+        if (enableNavKeys) newCell = new Cell(0, 0);
+        break;
+      case KeyCodes.KEY_PAGEDOWN:
+        if (enableNavKeys) {
+          int idx = listStore.indexOf(listStore.getAt(listStore.getCount() - 1));
+          newCell = new Cell(idx, 0);
+        }
+        break;
       case KeyCodes.KEY_TAB:
         if (e.isShiftKey()) {
           newCell = grid.walkCells(r, c - 1, -1, callback, false);
@@ -196,10 +251,23 @@ public class CellSelectionModel<M extends ModelData> extends GridSelectionModel<
   }
 
   @Override
+  protected void onKeyUp(GridEvent<M> e) {
+
+  }
+
+  @Override
   protected void onRemove(M model) {
     super.onRemove(model);
     if (selection != null && selection.model == model) {
       selection = null;
+    }
+  }
+
+  @Override
+  protected void onRowUpdated(GridEvent<M> ge) {
+    if (selection != null && selection.model == ge.getModel()) {
+      grid.getView().onCellSelect(selection.row, selection.cell);
+      grid.getView().focusCell(selection.row, selection.cell, true);
     }
   }
 

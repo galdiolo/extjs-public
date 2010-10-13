@@ -1,12 +1,13 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
  */
 package com.extjs.gxt.ui.client.widget;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.core.CompositeElement;
 import com.extjs.gxt.ui.client.core.El;
@@ -15,10 +16,9 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.util.Params;
 import com.extjs.gxt.ui.client.util.Util;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.ui.Accessibility;
 
 /**
  * An updateable progress bar component. The progress bar supports two different
@@ -62,17 +62,18 @@ import com.google.gwt.user.client.Timer;
  */
 public class ProgressBar extends BoxComponent {
 
-  private String text = "";
   private int duration = Style.DEFAULT;
-  private int interval = 300;
-  private int increment = 10;
-  private El progressBar;
-  private El textTopElem, textBackElem;
-  private CompositeElement textEl;
-  private Timer timer;
-  private boolean running;
   private int i = 0;
+  private int increment = 10;
+  private int interval = 300;
+  private El progressBar;
+  private boolean running;
+  private String text = "";
+  private CompositeElement textEl;
+  private El textTopElem, textBackElem;
+  private Timer timer;
   private double value;
+  private boolean auto;
 
   /**
    * Creates a new progress bar.
@@ -88,6 +89,7 @@ public class ProgressBar extends BoxComponent {
    * @return this
    */
   public ProgressBar auto() {
+    auto = true;
     if (timer == null) {
       timer = new Timer() {
         public void run() {
@@ -205,11 +207,8 @@ public class ProgressBar extends BoxComponent {
    * @return this
    */
   public ProgressBar updateProgress(double value, String text) {
-    if (value > 1) {
-      value = 1;
-    } else if (value < 0) {
-      value = 0;
-    }
+    value = Math.min(Math.max(value, 0), 1);
+
     this.value = value;
     if (text != null) {
       updateText(text);
@@ -217,6 +216,17 @@ public class ProgressBar extends BoxComponent {
     if (!rendered) {
       return this;
     }
+
+    if (GXT.isAriaEnabled()) {
+      int v = (int) (value * 100);
+      if (!auto) {
+        Accessibility.setState(getElement(), "aria-valuenow", "" + v);
+      }
+      if (text != null) {
+        Accessibility.setState(getElement(), "aria-valuetext", "" + text);
+      }
+    }
+
     double w = Math.floor(value * el().firstChild().getWidth());
     progressBar.setWidth((int) w);
     if (textTopElem != null && w != 0) {
@@ -242,6 +252,20 @@ public class ProgressBar extends BoxComponent {
   }
 
   @Override
+  protected void onAttach() {
+    super.onAttach();
+    update();
+  }
+
+  @Override
+  protected void onDetach() {
+    super.onDetach();
+    if (isRunning()) {
+      reset();
+    }
+  }
+
+  @Override
   protected void onRender(Element target, int index) {
     StringBuffer sb = new StringBuffer();
     sb.append("<div class='{cls}-wrap'><div class='{cls}-inner'><div class='{cls}-bar'>");
@@ -251,7 +275,7 @@ public class ProgressBar extends BoxComponent {
     Template t = new Template(sb.toString());
     setElement(t.create(new Params("cls", baseStyle)), target, index);
 
-    final El inner = el().firstChild();
+    El inner = el().firstChild();
     progressBar = inner.firstChild();
     textTopElem = progressBar.firstChild();
     textBackElem = inner.childNode(1);
@@ -261,19 +285,28 @@ public class ProgressBar extends BoxComponent {
     textEl.add(textTopElem.firstChild().dom);
     textEl.add(textBackElem.firstChild().dom);
 
-    DeferredCommand.addCommand(new Command() {
-      public void execute() {
-        textEl.setWidth(inner.getWidth());
+    if (GXT.isHighContrastMode) {
+      textEl.getElement(0).getStyle().setProperty("backgroundColor", "#ffffff");
+    }
+
+    if (GXT.isAriaEnabled()) {
+      setAriaRole("progressbar");
+      if (!auto) {
+        getAriaSupport().setState("aria-valuemin", "0");
+        getAriaSupport().setState("aria-valuemax", "100");
       }
-    });
-
-    if (text != null) {
-      updateText(text);
     }
-    if (value > 0) {
-      updateProgress(value, text);
-    }
+  }
 
+  @Override
+  protected void onResize(int width, int height) {
+    super.onResize(width, height);
+    update();
+  }
+
+  private void update() {
+    textEl.setWidth(el().firstChild().getWidth());
+    updateProgress(value, text);
   }
 
 }

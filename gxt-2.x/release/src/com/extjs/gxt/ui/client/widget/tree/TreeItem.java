@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -301,7 +301,7 @@ public class TreeItem extends Component {
    * @param deep true to retrieve all the item's children
    * @return the children items
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public List<TreeItem> getItems(boolean deep) {
     if (deep) {
       List list = new ArrayList();

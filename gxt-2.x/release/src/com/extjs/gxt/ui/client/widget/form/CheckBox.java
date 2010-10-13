@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -8,12 +8,14 @@
 package com.extjs.gxt.ui.client.widget.form;
 
 import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.aria.FocusFrame;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.Accessibility;
 
 /**
  * Single checkbox field. Unlike other fields, checkbox fires change events when
@@ -91,7 +93,7 @@ public class CheckBox extends Field<Boolean> {
    */
   public String getValueAttribute() {
     if (rendered) {
-      input.getValue();
+     return input.getValue();
     }
     return valueAttribute;
   }
@@ -143,12 +145,6 @@ public class CheckBox extends Field<Boolean> {
     }
   }
 
-  @Override
-  protected void afterRender() {
-    super.afterRender();
-    alignElements();
-  }
-
   protected void alignElements() {
     if (boxLabel == null) {
       input.alignTo(getElement(), "c-c", null);
@@ -184,6 +180,12 @@ public class CheckBox extends Field<Boolean> {
   }
 
   @Override
+  protected void onAttach() {
+    super.onAttach();
+    alignElements();
+  }
+
+  @Override
   protected void onClick(ComponentEvent ce) {
     super.onClick(ce);
     if (readOnly) {
@@ -194,7 +196,7 @@ public class CheckBox extends Field<Boolean> {
     boolean v = getInputEl().dom.getPropertyBoolean("checked");
     setValue(v);
   }
-
+  
   @Override
   protected void onRender(Element target, int index) {
     if (this instanceof Radio) {
@@ -209,6 +211,7 @@ public class CheckBox extends Field<Boolean> {
     wrap = new El(DOM.createDiv());
     wrap.dom.setPropertyString("hideFocus", "hideFocus");
     wrap.dom.setClassName("x-form-check-wrap");
+    wrap.dom.setAttribute("role", "presentation");
     wrap.dom.appendChild(input.dom);
 
     setElement(wrap.dom, target, index);
@@ -229,6 +232,18 @@ public class CheckBox extends Field<Boolean> {
 
     focusStyle = null;
   }
+  
+  @Override
+  protected void onFocus(ComponentEvent ce) {
+    super.onFocus(ce);
+    FocusFrame.get().frame(this);
+  }
+  
+  @Override
+  protected void onBlur(ComponentEvent be) {
+    super.onBlur(be);
+    FocusFrame.get().unframe();
+  }
 
   @Override
   protected void onResize(int width, int height) {
@@ -237,5 +252,10 @@ public class CheckBox extends Field<Boolean> {
       // center it again
       alignElements();
     }
+  }
+
+  @Override
+  protected void setAriaState(String stateName, String stateValue) {
+    Accessibility.setState(input.dom, stateName, stateValue);
   }
 }

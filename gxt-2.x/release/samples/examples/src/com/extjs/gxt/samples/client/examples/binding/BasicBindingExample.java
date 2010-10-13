@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -12,6 +12,7 @@ import com.extjs.gxt.samples.resources.client.model.Stock;
 import com.extjs.gxt.ui.client.binding.FieldBinding;
 import com.extjs.gxt.ui.client.binding.FormBinding;
 import com.extjs.gxt.ui.client.binding.SimpleComboBoxFieldBinding;
+import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XTemplate;
 import com.extjs.gxt.ui.client.data.ChangeEvent;
 import com.extjs.gxt.ui.client.data.ChangeListener;
@@ -33,6 +34,7 @@ public class BasicBindingExample extends LayoutContainer {
   @Override
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
+    El.fly(parent).addStyleName("binding-example");
 
     final Stock stock = TestData.getStocks().get(0);
 
@@ -51,6 +53,7 @@ public class BasicBindingExample extends LayoutContainer {
     final XTemplate template = XTemplate.create(sb.toString());
     final HTML html = new HTML();
     html.setWidth("160px");
+   
     template.overwrite(html.getElement(), Util.getJsObject(stock));
     hp.add(html);
     // update template when model changes

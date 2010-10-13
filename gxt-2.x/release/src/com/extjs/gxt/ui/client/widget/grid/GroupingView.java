@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -54,17 +54,17 @@ public class GroupingView extends GridView {
 
   protected boolean enableGrouping;
   protected Map<String, String> map = new FastMap<String>();
-  
+
   private int counter = 0;
-  private GroupingStore<ModelData> groupingStore;
-  private boolean showGroupedColumn = true;
   private boolean enableGroupingMenu = true;
-  private boolean isUpdating;
-  private boolean showGroupName;
-  private String lastGroupField;
-  private boolean startCollapsed;
-  private GridGroupRenderer groupRenderer;
   private boolean enableNoGroups = true;
+  private GroupingStore<ModelData> groupingStore;
+  private GridGroupRenderer groupRenderer;
+  private boolean isUpdating;
+  private String lastGroupField;
+  private boolean showGroupedColumn = true;
+  private boolean showGroupName;
+  private boolean startCollapsed;
   private Map<String, Boolean> state = new FastMap<Boolean>();
 
   /**
@@ -93,7 +93,7 @@ public class GroupingView extends GridView {
   /**
    * Returns the group elements.
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public NodeList<Element> getGroups() {
     if (!enableGrouping) {
       return new JsArray().getJsObject().cast();
@@ -109,7 +109,7 @@ public class GroupingView extends GridView {
     return (GroupingViewImages) images;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   public void initData(ListStore ds, ColumnModel cm) {
     super.initData(ds, cm);
@@ -132,6 +132,16 @@ public class GroupingView extends GridView {
    */
   public boolean isEnableNoGroups() {
     return enableNoGroups;
+  }
+
+  /**
+   * Returns true if the group is expanded.
+   * 
+   * @param group the group
+   * @return true if expanded
+   */
+  public boolean isExpanded(Element group) {
+    return group.getClassName().indexOf("x-grid-group-collapsed") == -1;
   }
 
   /**
@@ -354,17 +364,32 @@ public class GroupingView extends GridView {
     String s = gidPrefix + "-gp-" + groupField + "-" + group;
     String r = map.get(s);
     if (r == null) {
-      r = gidPrefix + "-gp-" + groupField + "-" + String.valueOf(counter++);
+      r = gidPrefix + "-gp-groupid-" + String.valueOf(counter++);
       map.put(s, r);
     }
 
     return r;
   }
 
+  protected Element getGroupRow(Element group, int rowIndex) {
+    return getGroupRows(group).getItem(rowIndex);
+  }
+
+  protected int getGroupRowCount(Element group) {
+    return group.getChildNodes().getItem(1).getChildNodes().getLength();
+  }
+
+  protected NodeList<Element> getGroupRows(Element group) {
+    return group.getChildNodes().getItem(1).getChildNodes().cast();
+  }
+
   @Override
   protected NodeList<Element> getRows() {
     if (!enableGrouping) {
       return super.getRows();
+    }
+    if (!hasRows()) {
+      return new JsArray().getJsObject().cast();
     }
 
     NodeList<Element> gs = getGroups();
@@ -376,6 +401,13 @@ public class GroupingView extends GridView {
       }
     }
     return rows.getJsObject().cast();
+  }
+
+  @SuppressWarnings("rawtypes")
+  @Override
+  protected void init(Grid grid) {
+    super.init(grid);
+    grid.getAriaSupport().setRole("treegrid");
   }
 
   @Override
@@ -401,6 +433,11 @@ public class GroupingView extends GridView {
     }
   }
 
+  protected void onGroupSelect(Element group, boolean select) {
+    El.fly(group).firstChild().setStyleName("x-grid3-group-selected", select);
+    grid.getAriaSupport().setState("aria-activedescendant", group.getFirstChildElement().getId());
+  }
+
   @Override
   protected void onMouseDown(GridEvent<ModelData> ge) {
     El hd = ge.getTarget(".x-grid-group-hd", 10);
@@ -423,7 +460,7 @@ public class GroupingView extends GridView {
         removeGroupId(id);
       }
     }
-    // appply empty text
+    // apply empty text
   }
 
   protected void onShowGroupsClick(MenuEvent be, boolean checked) {
@@ -451,7 +488,7 @@ public class GroupingView extends GridView {
         mainBody.update("");
         cm.setHidden(cm.findColumnIndex(lastGroupField), false);
         lastGroupField = null;
-      } else if (eg && lastGroupField == null) {
+      } else if (eg && (lastGroupField == null || lastGroupField == groupField)) {
         lastGroupField = groupField;
         cm.setHidden(colIndex, true);
       } else if (eg && lastGroupField != null && !groupField.equals(lastGroupField)) {
@@ -484,11 +521,12 @@ public class GroupingView extends GridView {
   }
 
   protected void toggleGroup(Element g, boolean expanded) {
-    if (grid instanceof EditorGrid<?>) {
-      ((EditorGrid<ModelData>) grid).stopEditing();
+    if (grid.editSupport != null) {
+      grid.editSupport.stopEditing();
     }
     state.put(fly(g).getId(), expanded);
     fly(g).setStyleName("x-grid-group-collapsed", !expanded);
+    g.getFirstChildElement().setAttribute("aria-expanded", expanded ? "true" : "false");
     calculateVBar(false);
   }
 
@@ -501,7 +539,7 @@ public class GroupingView extends GridView {
       return;
     }
     Element row = getRow(se.getIndex());
-    if (row != null && row.getOffsetParent() != null) {
+    if (row != null) {
       Element g = findGroup(row);
       toggleGroup(g, true);
     }

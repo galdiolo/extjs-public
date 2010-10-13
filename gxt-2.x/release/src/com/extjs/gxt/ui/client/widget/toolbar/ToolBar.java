@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -11,6 +11,7 @@ import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.aria.FocusFrame;
+import com.extjs.gxt.ui.client.aria.FocusManager;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.ContainerEvent;
@@ -27,6 +28,7 @@ import com.google.gwt.user.client.ui.Accessibility;
 /**
  * A standard tool bar.
  * 
+ * <dl>
  * <dt><b>Events:</b></dt>
  * 
  * <dd><b>BeforeAdd</b> : ToolBarEvent(container, item, index)<br>
@@ -64,7 +66,7 @@ import com.google.gwt.user.client.ui.Accessibility;
  * <li>item : the item being removed</li>
  * </ul>
  * </dd>
- * <dl>
+ * </dl>
  * 
  * <dl>
  * <dt>Inherited Events:</dt>
@@ -128,6 +130,11 @@ public class ToolBar extends Container<Component> {
     return alignment;
   }
 
+  @Override
+  public ToolBarLayout getLayout() {
+    return (ToolBarLayout)super.getLayout();
+  }
+
   /**
    * Returns the min button width.
    * 
@@ -174,6 +181,14 @@ public class ToolBar extends Container<Component> {
     return super.layout();
   }
 
+  @Override
+  public void onComponentEvent(ComponentEvent ce) {
+    super.onComponentEvent(ce);
+    if (ce.getEventTypeInt() == Event.ONFOCUS) {
+      onFocus(ce);
+    }
+  }
+
   /**
    * Removes a component from the tool bar.
    * 
@@ -194,6 +209,16 @@ public class ToolBar extends Container<Component> {
   }
 
   /**
+   * True to show a drop down icon when the available width is less than the
+   * required width (defaults to true).
+   * 
+   * @param enableOverflow true to enable overflow support
+   */
+  public void setEnableOverflow(boolean enableOverflow) {
+    this.enableOverflow = enableOverflow;
+  }
+
+  /**
    * Sets the minWidth for any Component of type Button
    * 
    * @param minButtonWidth the min button width to set
@@ -205,16 +230,6 @@ public class ToolBar extends Container<Component> {
         ((Button) c).setMinWidth(minButtonWidth);
       }
     }
-  }
-
-  /**
-   * True to show a drop down icon when the available width is less than the
-   * required width (defaults to true).
-   * 
-   * @param enableOverflow true to enable overflow support
-   */
-  public void setEnableOverflow(boolean enableOverflow) {
-    this.enableOverflow = enableOverflow;
   }
 
   /**
@@ -232,10 +247,26 @@ public class ToolBar extends Container<Component> {
     return new ToolBarEvent(this);
   }
 
+  @SuppressWarnings("rawtypes")
   @Override
-  @SuppressWarnings("unchecked")
   protected ContainerEvent createContainerEvent(Component item) {
     return new ToolBarEvent(this, item);
+  }
+
+  protected void onFocus(ComponentEvent ce) {
+    if (GXT.isAriaEnabled() && !FocusManager.get().isManaged()) {
+      FocusFrame.get().frame(this);
+      return;
+    }
+    FocusFrame.get().unframe();
+    ce.stopEvent();
+    for (int i = 0; i < getItemCount(); i++) {
+      Component c = getItem(i);
+      if (c.isEnabled() && !c.getAriaSupport().isIgnore()) {
+        c.focus();
+        break;
+      }
+    }
   }
 
   protected void onRender(Element target, int index) {
@@ -264,26 +295,6 @@ public class ToolBar extends Container<Component> {
     }
 
     sinkEvents(Event.FOCUSEVENTS);
-  }
-
-  @Override
-  public void onComponentEvent(ComponentEvent ce) {
-    super.onComponentEvent(ce);
-    if (ce.getEventTypeInt() == Event.ONFOCUS) {
-      onFocus(ce);
-    }
-  }
-
-  protected void onFocus(ComponentEvent ce) {
-    FocusFrame.get().unframe();
-    ce.stopEvent();
-    for (int i = 0; i < getItemCount(); i++) {
-      Component c = getItem(i);
-      if (!c.isAriaIgnore()) {
-        c.focus();
-        break;
-      }
-    }
   }
 
 }

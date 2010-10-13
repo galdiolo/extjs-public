@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -19,6 +19,8 @@ import com.extjs.gxt.ui.client.util.Size;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.ui.Accessibility;
 import com.google.gwt.user.client.ui.impl.TextBoxImpl;
 
 /**
@@ -70,9 +72,9 @@ public class TextField<D> extends Field<D> {
    */
   public class TextFieldMessages extends FieldMessages {
 
-    private String minLengthText;
-    private String maxLengthText;
     private String blankText = GXT.MESSAGES.textField_blankText();
+    private String maxLengthText;
+    private String minLengthText;
     private String regexText = "";
 
     /**
@@ -156,15 +158,17 @@ public class TextField<D> extends Field<D> {
   protected static TextBoxImpl impl = (TextBoxImpl) GWT.create(TextBoxImpl.class);
 
   protected String emptyStyle = "x-form-empty-field";
-  protected Validator validator;
   protected El input;
+  protected Validator validator;
 
-  private boolean password;
   private boolean allowBlank = true;
+  private int maxLength = Integer.MAX_VALUE;
+  private int minLength = 0;
+  private boolean needsPreventDefaultMouseUp;
+  private boolean password;
   private String regex;
   private boolean selectOnFocus;
-  private int minLength = 0;
-  private int maxLength = Integer.MAX_VALUE;
+
   private DelayedTask validationTask;
 
   /**
@@ -202,6 +206,7 @@ public class TextField<D> extends Field<D> {
     return maxLength;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public TextFieldMessages getMessages() {
     return (TextFieldMessages) messages;
@@ -232,7 +237,7 @@ public class TextField<D> extends Field<D> {
    */
   public String getSelectedText() {
     int start = getCursorPos(), length = getSelectionLength();
-    if(start == -1){
+    if (start == -1) {
       return "";
     }
     return getRawValue().substring(start, start + length);
@@ -272,6 +277,24 @@ public class TextField<D> extends Field<D> {
    */
   public boolean isPassword() {
     return password;
+  }
+
+  @Override
+  public void onComponentEvent(ComponentEvent ce) {
+    super.onComponentEvent(ce);
+    switch (ce.getEventTypeInt()) {
+      case Event.ONMOUSEDOWN:
+        if (!hasFocus) {
+          needsPreventDefaultMouseUp = true;
+        }
+        break;
+      case Event.ONMOUSEUP:
+        if (needsPreventDefaultMouseUp) {
+          needsPreventDefaultMouseUp = false;
+          ce.preventDefault();
+        }
+        break;
+    }
   }
 
   /**
@@ -418,7 +441,7 @@ public class TextField<D> extends Field<D> {
 
   @Override
   protected El getInputEl() {
-    return input != null ? input: el();
+    return input != null ? input : el();
   }
 
   @Override
@@ -449,12 +472,6 @@ public class TextField<D> extends Field<D> {
   }
 
   @Override
-  protected void onKeyPress(FieldEvent fe) {
-    super.onKeyPress(fe);
-
-  }
-
-  @Override
   protected void onKeyUp(FieldEvent fe) {
     super.onKeyUp(fe);
     if (validationTask != null) {
@@ -466,13 +483,14 @@ public class TextField<D> extends Field<D> {
   protected void onRender(Element target, int index) {
     if (el() == null) {
       setElement(DOM.createDiv(), target, index);
+      getElement().setAttribute("role", "presentation");
       getElement().appendChild(password ? DOM.createInputPassword() : DOM.createInputText());
       input = el().firstChild();
     }
 
     addStyleName("x-form-field-wrap");
     getInputEl().addStyleName(fieldStyle);
-   
+
     getInputEl().setId(getId() + "-input");
 
     super.onRender(target, index);
@@ -484,6 +502,12 @@ public class TextField<D> extends Field<D> {
           validate();
         }
       });
+    }
+
+    if (GXT.isAriaEnabled()) {
+      if (!getAllowBlank()) {
+        setAriaState("aria-required", "true");
+      }
     }
 
     applyEmptyText();
@@ -503,6 +527,11 @@ public class TextField<D> extends Field<D> {
         setRawValue("");
       }
     }
+  }
+
+  @Override
+  protected void setAriaState(String stateName, String stateValue) {
+    Accessibility.setState(input.dom, stateName, stateValue);
   }
 
   @Override

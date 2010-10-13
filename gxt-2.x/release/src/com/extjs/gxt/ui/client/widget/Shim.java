@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -107,11 +107,9 @@ public class Shim {
   protected void shim(NodeList<Element> elements) {
     for (int i = 0; i < elements.getLength(); i++) {
       Element e = elements.getItem(i);
-      if ((e.getAttribute("src").length() > 0) || !e.getTagName().toLowerCase().equals("iframe")) {
-        Rectangle bounds = El.fly(e).getBounds(true);
-        if (bounds.height > 0 && bounds.width > 0 && El.fly(e).isVisible()) {
-          shims.add(createShim(e, bounds.x, bounds.y, bounds.width, bounds.height));
-        }
+      Rectangle bounds = El.fly(e).getBounds(true);
+      if (bounds.height > 0 && bounds.width > 0 && El.fly(e).isVisible()) {
+        shims.add(createShim(e, bounds.x, bounds.y, bounds.width, bounds.height));
       }
     }
   }

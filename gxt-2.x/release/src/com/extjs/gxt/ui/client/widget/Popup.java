@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -368,13 +368,10 @@ public class Popup extends LayoutContainer {
     RootPanel.get().remove(this);
     hidden = true;
     hideShadow();
-    el().setVisible(false);
     fireEvent(Events.Hide, new ComponentEvent(this));
   }
 
   protected void afterShow() {
-    el().setVisible(true);
-
     if (layer != null) {
       layer.sync(true);
     }
@@ -382,7 +379,7 @@ public class Popup extends LayoutContainer {
       focus();
     }
 
-    el().setZIndex(XDOM.getTopZIndex());
+    setZIndex(XDOM.getTopZIndex());
 
     fireEvent(Events.Open, new ComponentEvent(this));
   }
@@ -440,6 +437,7 @@ public class Popup extends LayoutContainer {
     } else if (alignPoint != null) {
       p = alignPoint;
     }
+    el().makePositionable(true).setVisibility(false);
 
     el().setLeftTop(p.x, p.y);
 
@@ -448,8 +446,7 @@ public class Popup extends LayoutContainer {
     alignOffsets = null;
     alignPoint = null;
 
-    el().makePositionable(true).setVisibility(false);
-
+   
     if (constrainViewport) {
       int clientHeight = Window.getClientHeight() + XDOM.getBodyScrollTop();
       int clientWidth = Window.getClientWidth() + XDOM.getBodyScrollLeft();

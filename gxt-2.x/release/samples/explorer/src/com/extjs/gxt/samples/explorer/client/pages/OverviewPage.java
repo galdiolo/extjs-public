@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -42,6 +42,7 @@ public class OverviewPage extends LayoutContainer {
     sb.append("</div></tpl>");
 
     dataView = new ListView<ModelData>();
+    dataView.addStyleName("overview-page");
     dataView.setItemSelector(".sample-box");
     dataView.setOverStyle("sample-over");
     dataView.setSelectStyle("none");

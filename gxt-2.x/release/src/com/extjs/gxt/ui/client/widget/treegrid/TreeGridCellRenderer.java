@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -21,18 +21,20 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
  * Renderer may be used in any column, not just the first.
  */
 public class TreeGridCellRenderer<M extends ModelData> implements GridCellRenderer<M> {
-  
-  @SuppressWarnings("unchecked")
-  public Object render(M model, String property, ColumnData config, int rowIndex,
-      int colIndex, ListStore<M> store, Grid<M> grid) {
+
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  public Object render(M model, String property, ColumnData config, int rowIndex, int colIndex, ListStore<M> store,
+      Grid<M> grid) {
     config.css = "x-treegrid-column";
+
+    assert grid instanceof TreeGrid : "TreeGridCellRenderer can only be used in a TreeGrid";
     
-    TreeGrid tree = (TreeGrid)grid;
+    TreeGrid tree = (TreeGrid) grid;
     TreeStore ts = tree.getTreeStore();
     Joint j = tree.calcualteJoint(model);
     AbstractImagePrototype iconStyle = tree.calculateIconStyle(model);
     int level = ts.getDepth(model);
-    
+
     String text = String.valueOf(model.get(property));
     String id = tree.findNode(model).id;
     return tree.getTreeView().getTemplate(model, id, text, iconStyle, false, j, level - 1);

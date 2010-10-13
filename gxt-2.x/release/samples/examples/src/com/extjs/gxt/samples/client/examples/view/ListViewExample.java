@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -93,7 +93,7 @@ public class ListViewExample extends LayoutContainer {
 
   private native String getTemplate() /*-{
      return ['<tpl for=".">',
-     '<div class="thumb-wrap" id="{name}" style="border: 1px solid white">',
+     '<div class="thumb-wrap" id="{name}">',
      '<div class="thumb"><img src="{path}" title="{name}"></div>',
      '<span class="x-editable">{shortName}</span></div>',
      '</tpl>',

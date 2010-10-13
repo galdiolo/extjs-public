@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -32,8 +32,9 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 /**
  * Base class for form fields that provides default event handling, value
  * handling and other functionality.
+ * 
  * <dl>
- * <dt>Events:</dt>
+ * <dt><b>Events:</b></dt>
  * <dd><b>Focus</b> : FieldEvent(field)<br>
  * <div>Fires when this field receives input focus.</div>
  * <ul>
@@ -221,7 +222,10 @@ public abstract class Field<D> extends BoxComponent {
    * Clears the value from the field.
    */
   public void clear() {
+    boolean restore = preventMark;
+    preventMark = true;
     setValue(null);
+    preventMark = restore;
     clearInvalid();
   }
 
@@ -242,6 +246,7 @@ public abstract class Field<D> extends BoxComponent {
       if (errorIcon != null && errorIcon.isAttached()) {
         ComponentHelper.doDetach(errorIcon);
         errorIcon.setVisible(false);
+        setAriaState("aria-describedby", "");
       }
     } else if ("title".equals(messageTarget)) {
       setTitle("");
@@ -255,6 +260,9 @@ public abstract class Field<D> extends BoxComponent {
       if (elem != null) {
         elem.setInnerHTML("");
       }
+    }
+    if (GXT.isAriaEnabled()) {
+      getAriaSupport().setState("aria-invalid", "false");
     }
     fireEvent(Events.Valid, new FieldEvent(this));
   }
@@ -552,6 +560,12 @@ public abstract class Field<D> extends BoxComponent {
         errorIcon.hide();
         errorIcon.setStyleAttribute("display", "block");
         errorIcon.el().makePositionable(true);
+        errorIcon.getAriaSupport().setRole("alert");
+        if (GXT.isAriaEnabled()) {
+          setAriaState("aria-describedby", errorIcon.getId());
+          errorIcon.setTitle(getErrorMessage());
+        }
+        
       } else if (!errorIcon.el().isConnected()) {
         Element p = el().getParent().dom;
         p.appendChild(errorIcon.getElement());
@@ -588,6 +602,10 @@ public abstract class Field<D> extends BoxComponent {
       if (elem != null) {
         elem.setInnerHTML(msg);
       }
+    }
+    
+    if (GXT.isAriaEnabled()) {
+      setAriaState("aria-invalid", "true");
     }
 
     FieldEvent fe = new FieldEvent(this);
@@ -679,7 +697,10 @@ public abstract class Field<D> extends BoxComponent {
    * any validation messages.
    */
   public void reset() {
+    boolean restore = preventMark;
+    preventMark = true;
     setValue(originalValue);
+    preventMark = restore;
     clearInvalid();
   }
 
@@ -918,7 +939,7 @@ public abstract class Field<D> extends BoxComponent {
     if (rendered) {
       String v = value == null ? "" : propertyEditor.getStringValue(value);
       setRawValue(v);
-      validate();
+      validate(preventMark);
     }
     if (fireChangeEventOnSetValue) {
       fireChangeEvent(oldValue, value);
@@ -994,6 +1015,16 @@ public abstract class Field<D> extends BoxComponent {
       errorIcon.setVisible(false);
       ComponentHelper.doDetach(errorIcon);
     }
+  }
+
+  protected El findLabelElement() {
+    if (rendered) {
+      El elem = el().findParent(".x-form-item", 5);
+      if (elem != null) {
+        return elem.firstChild();
+      }
+    }
+    return null;
   }
 
   protected void fireChangeEvent(Object oldValue, Object value) {
@@ -1160,16 +1191,6 @@ public abstract class Field<D> extends BoxComponent {
       return false;
     }
     return true;
-  }
-
-  private El findLabelElement() {
-    if (rendered) {
-      El elem = el().findParent(".x-form-item", 5);
-      if (elem != null) {
-        return elem.firstChild();
-      }
-    }
-    return null;
   }
 
 }

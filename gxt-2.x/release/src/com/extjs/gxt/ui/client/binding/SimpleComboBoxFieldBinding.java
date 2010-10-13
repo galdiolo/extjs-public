@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -13,7 +13,7 @@ import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
  * A specialized binding that automatically handles data conversion when using a
  * <code>SimpleComboBox</code>.
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked","rawtypes"})
 public class SimpleComboBoxFieldBinding extends FieldBinding {
 
   protected SimpleComboBox simpleComboBox;

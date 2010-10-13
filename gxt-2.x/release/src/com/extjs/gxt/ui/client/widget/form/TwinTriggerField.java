@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -48,7 +48,7 @@ public class TwinTriggerField<D> extends TriggerField<D> {
   protected El twinTrigger;
 
   private String twinTriggerStyle = "x-form-trigger-arrow";
-  private El span;
+  protected El span;
 
   /**
    * Returns the twin trigger style.
@@ -79,12 +79,7 @@ public class TwinTriggerField<D> extends TriggerField<D> {
 
   @Override
   protected Size adjustInputSize() {
-    return new Size(span.getWidth(), 0);
-  }
-
-  protected void afterRender() {
-    super.afterRender();
-    addStyleOnOver(twinTrigger.dom, "x-form-trigger-over");
+    return new Size(isHideTrigger() ? 0 : (trigger.getStyleSize().width + twinTrigger.getStyleSize().width), 0);
   }
 
   @Override
@@ -113,6 +108,8 @@ public class TwinTriggerField<D> extends TriggerField<D> {
     if (isHideTrigger()) {
       span.setVisible(false);
     }
+
+    addStyleOnOver(twinTrigger.dom, "x-form-trigger-over");
 
     super.onRender(target, index);
 

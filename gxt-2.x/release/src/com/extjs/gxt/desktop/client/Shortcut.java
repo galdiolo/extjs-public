@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -13,6 +13,7 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.IconHelper;
+import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.IconSupport;
 import com.google.gwt.user.client.DOM;
@@ -41,9 +42,10 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
  */
 public class Shortcut extends Component implements IconSupport {
 
-  private String text;
   private AbstractImagePrototype icon;
   private El iconEl;
+  private String text;
+  private El textEl;
 
   /**
    * Creates a new shortcut.
@@ -123,6 +125,9 @@ public class Shortcut extends Component implements IconSupport {
    */
   public void setText(String text) {
     this.text = text;
+    if(textEl != null){
+      textEl.update(Util.isEmptyString(text) ? "&#160;" : text);
+    }
   }
 
   protected void onClick(ComponentEvent ce) {
@@ -136,16 +141,15 @@ public class Shortcut extends Component implements IconSupport {
     setElement(DOM.createElement("dt"), target, index);
     El a = el().createChild("<a href='#'></a>");
     iconEl = a.createChild("<div><img src='" + GXT.BLANK_IMAGE_URL + "' /></div>");
-    El txt = a.createChild("<div></div>");
+    textEl = a.createChild("<div></div>");
 
-    if (txt != null) {
-      txt.setInnerHtml(text);
-    }
+    
     el().updateZIndex(0);
     sinkEvents(Event.ONCLICK);
     if (icon != null) {
       setIcon(icon);
     }
+    setText(text);
   }
 
 }

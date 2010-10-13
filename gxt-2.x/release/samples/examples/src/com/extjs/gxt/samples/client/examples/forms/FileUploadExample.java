@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -49,6 +49,7 @@ public class FileUploadExample extends LayoutContainer {
 
     FileUploadField file = new FileUploadField();
     file.setAllowBlank(false);
+    file.setName("uploadedfile");
     file.setFieldLabel("File");
     panel.add(file);
 
@@ -74,7 +75,7 @@ public class FileUploadExample extends LayoutContainer {
       }
     });
     panel.addButton(btn);
-    
+
     btn = new Button("Submit");
     btn.addSelectionListener(new SelectionListener<ButtonEvent>() {
       @Override

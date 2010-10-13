@@ -1,12 +1,11 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
  */
 package com.extjs.gxt.ui.client.core;
-
 
 /**
  * Loads the ext javascript to make avaliable Ext, Element, DomHelper, DomQuery,
@@ -21,220 +20,222 @@ class Ext {
    * Loads the native exj javascript.
    */
 
-
   native static void loadExt() /*-{
-     var document = $doc;
-     var window = $wnd;
-     if(!!$wnd.GXT){
-       return;
-     }
-     $wnd.GXT = {};
-     $wnd.GXT.Ext = {};
-     var Ext = $wnd.GXT.Ext;
-     window["undefined"] = window["undefined"];
-     Ext.apply = function(o, c, defaults){
-          if(defaults){
-              // no "this" reference for friendly out of scope calls
-              Ext.apply(o, defaults);
-          }
-          if(o && c && typeof c == 'object'){
-              for(var p in c){
-                  o[p] = c[p];
-              }
-          }
-          return o;
-      };
-     var initload = function(){
-     var idSeed = 0;
-       Ext.apply(Ext, {
-         emptyFn : function(){},
-         applyIf : function(o, c){
-           if(o && c){
+    var document = $doc;
+    var window = $wnd;
+    if(!!$wnd.GXT){
+      return;
+    }
+    $wnd.GXT = {};
+    $wnd.GXT.Ext = {};
+    var Ext = $wnd.GXT.Ext;
+    window["undefined"] = window["undefined"];
+    Ext.apply = function(o, c, defaults){
+         if(defaults){
+             // no "this" reference for friendly out of scope calls
+             Ext.apply(o, defaults);
+         }
+         if(o && c && typeof c == 'object'){
              for(var p in c){
-               if(typeof o[p] == "undefined"){ o[p] = c[p]; }
-               }
+                 o[p] = c[p];
              }
-           return o;
-         },
-         
-         isArray : function(v){
-             return v && typeof v.pop == 'function';
-         },
-          extend : function(){
-              // inline overrides
-              var io = function(o){
-                  for(var m in o){
-                      this[m] = o[m];
-                  }
-              };
-              return function(sb, sp, overrides){
-                  if(typeof sp == 'object'){
-                      overrides = sp;
-                      sp = sb;
-                      sb = function(){sp.apply(this, arguments);};
-                  }
-                  var F = function(){}, sbp, spp = sp.prototype;
-                  F.prototype = spp;
-                  sbp = sb.prototype = new F();
-                  sbp.constructor=sb;
-                  sb.superclass=spp;
-                  if(spp.constructor == Object.prototype.constructor){
-                      spp.constructor=sp;
-                  }
-                  sb.override = function(o){
-                      Ext.override(sb, o);
-                  };
-                  sbp.override = io;
-                  Ext.override(sb, overrides);
-                  return sb;
-              };
-          }(),
-          override : function(origclass, overrides){
-              if(overrides){
-                  var p = origclass.prototype;
-                  for(var method in overrides){
-                      p[method] = overrides[method];
-                  }
+         }
+         return o;
+     };
+    var initload = function(){
+    var idSeed = 0;
+      Ext.apply(Ext, {
+        emptyFn : function(){},
+        applyIf : function(o, c){
+          if(o && c){
+            for(var p in c){
+              if(typeof o[p] == "undefined"){ o[p] = c[p]; }
               }
-          },
-          getDom : function(el){
-              if(!el || !document){
-                  return null;
-              }
-              return el.dom ? el.dom : (typeof el == 'string' ? document.getElementById(el) : el);
-          }
-        });
-      };
-      initload();
-      $wnd.GXT.Ext = Ext;
-   }-*/;
+            }
+          return o;
+        },
 
+        isArray : function(v){
+            return v && typeof v.pop == 'function';
+        },
+         extend : function(){
+             // inline overrides
+             var io = function(o){
+                 for(var m in o){
+                     this[m] = o[m];
+                 }
+             };
+             return function(sb, sp, overrides){
+                 if(typeof sp == 'object'){
+                     overrides = sp;
+                     sp = sb;
+                     sb = function(){sp.apply(this, arguments);};
+                 }
+                 var F = function(){}, sbp, spp = sp.prototype;
+                 F.prototype = spp;
+                 sbp = sb.prototype = new F();
+                 sbp.constructor=sb;
+                 sb.superclass=spp;
+                 if(spp.constructor == Object.prototype.constructor){
+                     spp.constructor=sp;
+                 }
+                 sb.override = function(o){
+                     Ext.override(sb, o);
+                 };
+                 sbp.override = io;
+                 Ext.override(sb, overrides);
+                 return sb;
+             };
+         }(),
+         override : function(origclass, overrides){
+             if(overrides){
+                 var p = origclass.prototype;
+                 for(var method in overrides){
+                     p[method] = overrides[method];
+                 }
+             }
+         },
+         getDom : function(el){
+             if(!el || !document){
+                 return null;
+             }
+             return el.dom ? el.dom : (typeof el == 'string' ? document.getElementById(el) : el);
+         }
+       });
+     };
+     initload();
+     $wnd.GXT.Ext = Ext;
+  }-*/;
 
   native static void loadFormat() /*-{
-      var Ext = $wnd.GXT.Ext;
-      if(!!Ext.util){
-        return;
-      }
-      Ext.util = {};
-      Ext.util.Format = function(){
-       var trimRe = /^\s+|\s+$/g;
-       return {
-           ellipsis : function(value, len){
-               if(value && value.length > len){
-                   return value.substr(0, len-3)+"...";
-               }
-               return value;
-           },
-           undef : function(value){
-               return value !== undefined ? value : "";
-           },
-           defaultValue : function(value, defaultValue){
-               return value !== undefined && value !== '' ? value : defaultValue;
-           },
-           htmlEncode : function(value){
-               return !value ? value : String(value).replace(/&/g, "&amp;").replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
-           },
-           htmlDecode : function(value){
-               return !value ? value : String(value).replace(/&amp;/g, "&").replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&quot;/g, '"');
-           },
-           trim : function(value){
-               return String(value).replace(trimRe, "");
-           },
-           substr : function(value, start, length){
-               return String(value).substr(start, length);
-           },
-           lowercase : function(value){
-               return String(value).toLowerCase();
-           },
-           uppercase : function(value){
-               return String(value).toUpperCase();
-           },
-           capitalize : function(value){
-               return !value ? value : value.charAt(0).toUpperCase() + value.substr(1).toLowerCase();
-           },
-           call : function(value, fn){
-               if(arguments.length > 2){
-                   var args = Array.prototype.slice.call(arguments, 2);
-                   args.unshift(value);
-                   return eval(fn).apply(window, args);
-               }else{
-                   return eval(fn).call(window, value);
-               }
-           },
-           usMoney : function(v){
-               v = (Math.round((v-0)*100))/100;
-               v = (v == Math.floor(v)) ? v + ".00" : ((v*10 == Math.floor(v*10)) ? v + "0" : v);
-               v = String(v);
-               var ps = v.split('.');
-               var whole = ps[0];
-               var sub = ps[1] ? '.'+ ps[1] : '.00';
-               var r = /(\d+)(\d{3})/;
-               while (r.test(whole)) {
-                   whole = whole.replace(r, '$1' + ',' + '$2');
-               }
-               v = whole + sub;
-               if(v.charAt(0) == '-'){
-                   return '-$' + v.substr(1);
-               }
-               return "$" +  v;
-           },
+    var Ext = $wnd.GXT.Ext;
+    if(!!Ext.util){
+      return;
+    }
+    Ext.util = {};
+    Ext.util.Format = function(){
+     var trimRe = /^\s+|\s+$/g;
+     return {
+         ellipsis : function(value, len){
+             if(value && value.length > len){
+                 return value.substr(0, len-3)+"...";
+             }
+             return value;
+         },
+         undef : function(value){
+             return value !== undefined ? value : "";
+         },
+         defaultValue : function(value, defaultValue){
+             return value !== undefined && value !== '' ? value : defaultValue;
+         },
+         htmlEncode : function(value){
+             return !value ? value : String(value).replace(/&/g, "&amp;").replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+         },
+         htmlDecode : function(value){
+             return !value ? value : String(value).replace(/&amp;/g, "&").replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&quot;/g, '"');
+         },
+         trim : function(value){
+             return String(value).replace(trimRe, "");
+         },
+         substr : function(value, start, length){
+             return String(value).substr(start, length);
+         },
+         lowercase : function(value){
+             return String(value).toLowerCase();
+         },
+         uppercase : function(value){
+             return String(value).toUpperCase();
+         },
+         capitalize : function(value){
+             return !value ? value : value.charAt(0).toUpperCase() + value.substr(1).toLowerCase();
+         },
+         call : function(value, fn){
+             if(arguments.length > 2){
+                 var args = Array.prototype.slice.call(arguments, 2);
+                 args.unshift(value);
+                 return eval(fn).apply(window, args);
+             }else{
+                 return eval(fn).call(window, value);
+             }
+         },
+         usMoney : function(v){
+             v = (Math.round((v-0)*100))/100;
+             v = (v == Math.floor(v)) ? v + ".00" : ((v*10 == Math.floor(v*10)) ? v + "0" : v);
+             v = String(v);
+             var ps = v.split('.');
+             var whole = ps[0];
+             var sub = ps[1] ? '.'+ ps[1] : '.00';
+             var r = /(\d+)(\d{3})/;
+             while (r.test(whole)) {
+                 whole = whole.replace(r, '$1' + ',' + '$2');
+             }
+             v = whole + sub;
+             if(v.charAt(0) == '-'){
+                 return '-$' + v.substr(1);
+             }
+             return "$" +  v;
+         },
 
 
-           date : function(v, format){
-               if(!v){
-                   return "";
-               }
+         date : function(v, format){
+             if(!v){
+                 return "";
+             }
+             try {
+               return @com.extjs.gxt.ui.client.util.DateWrapper::format(Ljava/util/Date;Ljava/lang/String;)(v, format || "M/d/y");
+             } catch(err){
                if(!(v instanceof Date)){
-                   v = new Date(Date.parse(v));
+                 v = new Date(Date.parse(v));
                }
-               return @com.extjs.gxt.ui.client.util.DateWrapper::format(FLjava/lang/String;)(v.getTime(), format || "m/d/Y");
-           },
+               return @com.extjs.gxt.ui.client.util.DateWrapper::format(FLjava/lang/String;)(v.getTime(), format || "M/d/y");
+             }
+         },
 
-           // private
-           stripTagsRE : /<\/?[^>]+>/gi,
-           
-
-           stripTags : function(v){
-               return !v ? v : String(v).replace(this.stripTagsRE, "");
-           },
-
-           stripScriptsRe : /(?:<script.*?>)((\n|\r|.)*?)(?:<\/script>)/ig,
+         // private
+         stripTagsRE : /<\/?[^>]+>/gi,
 
 
-           stripScripts : function(v){
-               return !v ? v : String(v).replace(this.stripScriptsRe, "");
-           },
+         stripTags : function(v){
+             return !v ? v : String(v).replace(this.stripTagsRE, "");
+         },
+
+         stripScriptsRe : /(?:<script.*?>)((\n|\r|.)*?)(?:<\/script>)/ig,
 
 
-           fileSize : function(size){
-               if(size < 1024) {
-                   return size + " bytes";
-               } else if(size < 1048576) {
-                   return (Math.round(((size*10) / 1024))/10) + " KB";
-               } else {
-                   return (Math.round(((size*10) / 1048576))/10) + " MB";
-               }
-           },
+         stripScripts : function(v){
+             return !v ? v : String(v).replace(this.stripScriptsRe, "");
+         },
 
-           math : function(){
-               var fns = {};
-               return function(v, a){
-                   if(!fns[a]){
-                       fns[a] = new Function('v', 'return v ' + a + ';');
-                   }
-                   return fns[a](v);
-               }
-           }()
-       };
-      }();
-    }-*/;
+
+         fileSize : function(size){
+             if(size < 1024) {
+                 return size + " bytes";
+             } else if(size < 1048576) {
+                 return (Math.round(((size*10) / 1024))/10) + " KB";
+             } else {
+                 return (Math.round(((size*10) / 1048576))/10) + " MB";
+             }
+         },
+
+         math : function(){
+             var fns = {};
+             return function(v, a){
+                 if(!fns[a]){
+                     fns[a] = new Function('v', 'return v ' + a + ';');
+                 }
+                 return fns[a](v);
+             }
+         }()
+     };
+    }();
+  }-*/;
 
   native static void loadDomQuery() /*-{
     var Ext = $wnd.GXT.Ext;
     if(!!Ext.DomQuery){
     return;
     }
-     
+
      Ext.DomQuery = function() {
        var cache      = {
        }, simpleCache = {
@@ -870,486 +871,481 @@ class Ext {
          }
        };
      }();
-    }-*/;
+  }-*/;
 
   native static void loadDomHelper() /*-{
-        var Ext = $wnd.GXT.Ext;
-        if(!!Ext.DomHelper){
-        return;
-        }
-        Ext.DomHelper = function(){
-           var tempTableEl = null;
-           var emptyTags = /^(?:br|frame|hr|img|input|link|meta|range|spacer|wbr|area|param|col)$/i;
-           var tableRe = /^table|tbody|tr|td$/i;
-           
-      
-           var createHtml = function(o){
-               if(typeof o == 'string'){
-                   return o;
-               }
-               var b = "";
-               if(!o.tag){
-                   o.tag = "div";
-               }
-               b += "<" + o.tag;
-               for(var attr in o){
-                   if(attr == "tag" || attr == "children" || attr == "cn" || attr == "html" || typeof o[attr] == "function") continue;
-                   if(attr == "style"){
-                       var s = o["style"];
-                       if(typeof s == "function"){
-                           s = s.call();
-                       }
-                       if(typeof s == "string"){
-                           b += ' style="' + s + '"';
-                       }else if(typeof s == "object"){
-                           b += ' style="';
-                           for(var key in s){
-                               if(typeof s[key] != "function"){
-                                   b += key + ":" + s[key] + ";";
-                               }
-                           }
-                           b += '"';
-                       }
-                   }else{
-                       if(attr == "cls"){
-                           b += ' class="' + o["cls"] + '"';
-                       }else if(attr == "htmlFor"){
-                           b += ' for="' + o["htmlFor"] + '"';
-                       }else{
-                           b += " " + attr + '="' + o[attr] + '"';
-                       }
+    var Ext = $wnd.GXT.Ext;
+    if(!!Ext.DomHelper){
+    return;
+    }
+    Ext.DomHelper = function(){
+       var tempTableEl = null;
+       var emptyTags = /^(?:br|frame|hr|img|input|link|meta|range|spacer|wbr|area|param|col)$/i;
+       var tableRe = /^table|tbody|tr|td$/i;
+
+
+       var createHtml = function(o){
+           if(typeof o == 'string'){
+               return o;
+           }
+           var b = "";
+           if(!o.tag){
+               o.tag = "div";
+           }
+           b += "<" + o.tag;
+           for(var attr in o){
+               if(attr == "tag" || attr == "children" || attr == "cn" || attr == "html" || typeof o[attr] == "function") continue;
+               if(attr == "style"){
+                   var s = o["style"];
+                   if(typeof s == "function"){
+                       s = s.call();
                    }
-               }
-               if(emptyTags.test(o.tag)){
-                   b += "/>";
+                   if(typeof s == "string"){
+                       b += ' style="' + s + '"';
+                   }else if(typeof s == "object"){
+                       b += ' style="';
+                       for(var key in s){
+                           if(typeof s[key] != "function"){
+                               b += key + ":" + s[key] + ";";
+                           }
+                       }
+                       b += '"';
+                   }
                }else{
-                   b += ">";
-                   var cn = o.children || o.cn;
-                   if(cn){
-                       if(cn instanceof Array){
-                           for(var i = 0, len = cn.length; i < len; i++) {
-                               b += createHtml(cn[i], b);
-                           }
-                       }else{
-                           b += createHtml(cn, b);
-                       }
-                   }
-                   if(o.html){
-                       b += o.html;
-                   }
-                   b += "</" + o.tag + ">";
-               }
-               return b;
-           };
-      
-      
-           var createDom = function(o, parentNode){
-               var el = document.createElement(o.tag||'div');
-               var useSet = el.setAttribute ? true : false; // In IE some elements don't have setAttribute
-               for(var attr in o){
-                   if(attr == "tag" || attr == "children" || attr == "cn" || attr == "html" || attr == "style" || typeof o[attr] == "function") continue;
-                   if(attr=="cls"){
-                       el.className = o["cls"];
+                   if(attr == "cls"){
+                       b += ' class="' + o["cls"] + '"';
+                   }else if(attr == "htmlFor"){
+                       b += ' for="' + o["htmlFor"] + '"';
                    }else{
-                       if(useSet) el.setAttribute(attr, o[attr]);
-                       else el[attr] = o[attr];
+                       b += " " + attr + '="' + o[attr] + '"';
                    }
                }
-               Ext.DomHelper.applyStyles(el, o.style);
+           }
+           if(emptyTags.test(o.tag)){
+               b += "/>";
+           }else{
+               b += ">";
                var cn = o.children || o.cn;
                if(cn){
                    if(cn instanceof Array){
                        for(var i = 0, len = cn.length; i < len; i++) {
-                           createDom(cn[i], el);
+                           b += createHtml(cn[i], b);
                        }
                    }else{
-                       createDom(cn, el);
+                       b += createHtml(cn, b);
                    }
                }
                if(o.html){
-                   el.innerHTML = o.html;
+                   b += o.html;
                }
-               if(parentNode){
-                  parentNode.appendChild(el);
+               b += "</" + o.tag + ">";
+           }
+           return b;
+       };
+
+
+       var createDom = function(o, parentNode){
+           var el = document.createElement(o.tag||'div');
+           var useSet = el.setAttribute ? true : false; // In IE some elements don't have setAttribute
+           for(var attr in o){
+               if(attr == "tag" || attr == "children" || attr == "cn" || attr == "html" || attr == "style" || typeof o[attr] == "function") continue;
+               if(attr=="cls"){
+                   el.className = o["cls"];
+               }else{
+                   if(useSet) el.setAttribute(attr, o[attr]);
+                   else el[attr] = o[attr];
                }
-               return el;
-           };
-      
-           var ieTable = function(depth, s, h, e){
-               tempTableEl.innerHTML = [s, h, e].join('');
-               var i = -1, el = tempTableEl;
-               while(++i < depth){
-                   el = el.firstChild;
+           }
+           Ext.DomHelper.applyStyles(el, o.style);
+           var cn = o.children || o.cn;
+           if(cn){
+               if(cn instanceof Array){
+                   for(var i = 0, len = cn.length; i < len; i++) {
+                       createDom(cn[i], el);
+                   }
+               }else{
+                   createDom(cn, el);
                }
-               return el;
-           };
-      
-           // kill repeat to save bytes
-           var ts = '<table>',
-               te = '</table>',
-               tbs = ts+'<tbody>',
-               tbe = '</tbody>'+te,
-               trs = tbs + '<tr>',
-               tre = '</tr>'+tbe;
-      
-      
-           var insertIntoTable = function(tag, where, el, html){
-               if(!tempTableEl){
-                   tempTableEl = document.createElement('div');
+           }
+           if(o.html){
+               el.innerHTML = o.html;
+           }
+           if(parentNode){
+              parentNode.appendChild(el);
+           }
+           return el;
+       };
+
+       var ieTable = function(depth, s, h, e){
+           tempTableEl.innerHTML = [s, h, e].join('');
+           var i = -1, el = tempTableEl;
+           while(++i < depth){
+               el = el.firstChild;
+           }
+           return el;
+       };
+
+       // kill repeat to save bytes
+       var ts = '<table>',
+           te = '</table>',
+           tbs = ts+'<tbody>',
+           tbe = '</tbody>'+te,
+           trs = tbs + '<tr>',
+           tre = '</tr>'+tbe;
+
+
+       var insertIntoTable = function(tag, where, el, html){
+           if(!tempTableEl){
+               tempTableEl = document.createElement('div');
+           }
+           var node;
+           var before = null;
+           if(tag == 'td'){
+               if(where == 'afterbegin' || where == 'beforeend'){ // INTO a TD
+                   return;
                }
-               var node;
-               var before = null;
-               if(tag == 'td'){
-                   if(where == 'afterbegin' || where == 'beforeend'){ // INTO a TD
-                       return;
-                   }
-                   if(where == 'beforebegin'){
-                       before = el;
-                       el = el.parentNode;
-                   } else{
-                       before = el.nextSibling;
-                       el = el.parentNode;
-                   }
-                   node = ieTable(4, trs, html, tre);
+               if(where == 'beforebegin'){
+                   before = el;
+                   el = el.parentNode;
+               } else{
+                   before = el.nextSibling;
+                   el = el.parentNode;
                }
-               else if(tag == 'tr'){
-                   if(where == 'beforebegin'){
-                       before = el;
-                       el = el.parentNode;
-                       node = ieTable(3, tbs, html, tbe);
-                   } else if(where == 'afterend'){
-                       before = el.nextSibling;
-                       el = el.parentNode;
-                       node = ieTable(3, tbs, html, tbe);
-                   } else{ // INTO a TR
-                       if(where == 'afterbegin'){
-                           before = el.firstChild;
-                       }
-                       node = ieTable(4, trs, html, tre);
-                   }
-               } else if(tag == 'tbody'){
-                   if(where == 'beforebegin'){
-                       before = el;
-                       el = el.parentNode;
-                       node = ieTable(2, ts, html, te);
-                   } else if(where == 'afterend'){
-                       before = el.nextSibling;
-                       el = el.parentNode;
-                       node = ieTable(2, ts, html, te);
-                   } else{
-                       if(where == 'afterbegin'){
-                           before = el.firstChild;
-                       }
-                       node = ieTable(3, tbs, html, tbe);
-                   }
-               } else{ // TABLE
-                   if(where == 'beforebegin' || where == 'afterend'){ // OUTSIDE the table
-                       return;
-                   }
+               node = ieTable(4, trs, html, tre);
+           }
+           else if(tag == 'tr'){
+               if(where == 'beforebegin'){
+                   before = el;
+                   el = el.parentNode;
+                   node = ieTable(3, tbs, html, tbe);
+               } else if(where == 'afterend'){
+                   before = el.nextSibling;
+                   el = el.parentNode;
+                   node = ieTable(3, tbs, html, tbe);
+               } else{ // INTO a TR
                    if(where == 'afterbegin'){
                        before = el.firstChild;
                    }
+                   node = ieTable(4, trs, html, tre);
+               }
+           } else if(tag == 'tbody'){
+               if(where == 'beforebegin'){
+                   before = el;
+                   el = el.parentNode;
                    node = ieTable(2, ts, html, te);
-               }
-               el.insertBefore(node, before);
-               return node;
-           };
-      
-      
-           return {
-      
-           useDom : false,
-      
-           markup : function(o){
-               return createHtml(o);
-           },
-           applyStyles : function(el, styles){
-               if(styles){
-                  if(typeof styles == "string"){
-                    @com.extjs.gxt.ui.client.core.El::fly(Lcom/google/gwt/dom/client/Element;)(el).@com.extjs.gxt.ui.client.core.El::applyStyles(Ljava/lang/String;)(styles);
-                  }else if (typeof styles == "object"){
-                      for (var style in styles){
-                         @com.extjs.gxt.ui.client.core.El::fly(Lcom/google/gwt/dom/client/Element;)(el).@com.extjs.gxt.ui.client.core.El::applyStyles(Ljava/lang/String;)(styles[tyle]);
-                      }
-                  }else if (typeof styles == "function"){
-                       Ext.DomHelper.applyStyles(el, styles.call());
-                  }
-               }
-           },
-      
-      
-           insertHtml : function(where, el, html){
-               where = where.toLowerCase();
-               if(el.insertAdjacentHTML){
-                   if(tableRe.test(el.tagName)){
-                       var rs;
-                       if(rs = insertIntoTable(el.tagName.toLowerCase(), where, el, html)){
-                           return rs;
-                       }
+               } else if(where == 'afterend'){
+                   before = el.nextSibling;
+                   el = el.parentNode;
+                   node = ieTable(2, ts, html, te);
+               } else{
+                   if(where == 'afterbegin'){
+                       before = el.firstChild;
                    }
-                   switch(where){
-                       case "beforebegin":
-                           el.insertAdjacentHTML('BeforeBegin', html);
-                           return el.previousSibling;
-                       case "afterbegin":
-                           el.insertAdjacentHTML('AfterBegin', html);
-                           return el.firstChild;
-                       case "beforeend":
-                           el.insertAdjacentHTML('BeforeEnd', html);
-                           return el.lastChild;
-                       case "afterend":
-                           el.insertAdjacentHTML('AfterEnd', html);
-                           return el.nextSibling;
-                   }
-                   throw 'Illegal insertion point -> "' + where + '"';
+                   node = ieTable(3, tbs, html, tbe);
                }
-               var range = el.ownerDocument.createRange();
-               var frag;
-               switch(where){
-                    case "beforebegin":
-                       range.setStartBefore(el);
-                       frag = range.createContextualFragment(html);
-                       el.parentNode.insertBefore(frag, el);
-                       return el.previousSibling;
-                    case "afterbegin":
-                       if(el.firstChild){
-                           range.setStartBefore(el.firstChild);
-                           frag = range.createContextualFragment(html);
-                           el.insertBefore(frag, el.firstChild);
-                           return el.firstChild;
-                       }else{
-                           el.innerHTML = html;
-                           return el.firstChild;
-                       }
-                   case "beforeend":
-                       if(el.lastChild){
-                           range.setStartAfter(el.lastChild);
-                           frag = range.createContextualFragment(html);
-                           el.appendChild(frag);
-                           return el.lastChild;
-                       }else{
-                           el.innerHTML = html;
-                           return el.lastChild;
-                       }
-                   case "afterend":
-                       range.setStartAfter(el);
-                       frag = range.createContextualFragment(html);
-                       el.parentNode.insertBefore(frag, el.nextSibling);
-                       return el.nextSibling;
-                   }
-                   throw 'Illegal insertion point -> "' + where + '"';
-           },
-      
-      
-           insertBefore : function(el, o, returnElement){
-               return this.doInsert(el, o, returnElement, "beforeBegin");
-           },
-      
-      
-           insertAfter : function(el, o, returnElement){
-               return this.doInsert(el, o, returnElement, "afterEnd", "nextSibling");
-           },
-      
-      
-           insertFirst : function(el, o, returnElement){
-               return this.doInsert(el, o, returnElement, "afterBegin", "firstChild");
-           },
-      
-           // private
-           doInsert : function(el, o, returnElement, pos, sibling){
-               var newNode;
-               if(this.useDom){
-                   newNode = createDom(o, null);
-                   (sibling === "firstChild" ? el : el.parentNode).insertBefore(newNode, sibling ? el[sibling] : el);
-               }else{
-                   var html = createHtml(o);
-                   newNode = this.insertHtml(pos, el, html);
+           } else{ // TABLE
+               if(where == 'beforebegin' || where == 'afterend'){ // OUTSIDE the table
+                   return;
                }
-               return newNode;
-           },
-      
-      
-           append : function(el, o, returnElement){
-      
-               var newNode;
-               if(this.useDom){
-                   newNode = createDom(o, null);
-                   el.appendChild(newNode);
-               }else{
-                   var html = createHtml(o);
-                   newNode = this.insertHtml("beforeEnd", el, html);
+               if(where == 'afterbegin'){
+                   before = el.firstChild;
                }
-               return newNode;
-           },
-      
-      
-           overwrite : function(el, o, returnElement){
-               el.innerHTML = createHtml(o);
-               return el.firstChild;
-           },
-      
-      
-           createTemplate : function(o){
-               var html = createHtml(o);
-               return new Ext.Template(html);
+               node = ieTable(2, ts, html, te);
            }
-           };
-        }();
-        
-        
-     
-        
-    }-*/;
+           el.insertBefore(node, before);
+           return node;
+       };
+
+
+       return {
+
+       useDom : false,
+
+       markup : function(o){
+           return createHtml(o);
+       },
+       applyStyles : function(el, styles){
+           if(styles){
+              if(typeof styles == "string"){
+                @com.extjs.gxt.ui.client.core.El::fly(Lcom/google/gwt/dom/client/Element;)(el).@com.extjs.gxt.ui.client.core.El::applyStyles(Ljava/lang/String;)(styles);
+              }else if (typeof styles == "object"){
+                  for (var style in styles){
+                     @com.extjs.gxt.ui.client.core.El::fly(Lcom/google/gwt/dom/client/Element;)(el).@com.extjs.gxt.ui.client.core.El::applyStyles(Ljava/lang/String;)(styles[tyle]);
+                  }
+              }else if (typeof styles == "function"){
+                   Ext.DomHelper.applyStyles(el, styles.call());
+              }
+           }
+       },
+
+
+       insertHtml : function(where, el, html){
+           where = where.toLowerCase();
+           if(el.insertAdjacentHTML){
+               if(tableRe.test(el.tagName)){
+                   var rs;
+                   if(rs = insertIntoTable(el.tagName.toLowerCase(), where, el, html)){
+                       return rs;
+                   }
+               }
+               switch(where){
+                   case "beforebegin":
+                       el.insertAdjacentHTML('BeforeBegin', html);
+                       return el.previousSibling;
+                   case "afterbegin":
+                       el.insertAdjacentHTML('AfterBegin', html);
+                       return el.firstChild;
+                   case "beforeend":
+                       el.insertAdjacentHTML('BeforeEnd', html);
+                       return el.lastChild;
+                   case "afterend":
+                       el.insertAdjacentHTML('AfterEnd', html);
+                       return el.nextSibling;
+               }
+               throw 'Illegal insertion point -> "' + where + '"';
+           }
+           var range = el.ownerDocument.createRange();
+           var frag;
+           switch(where){
+                case "beforebegin":
+                   range.setStartBefore(el);
+                   frag = range.createContextualFragment(html);
+                   el.parentNode.insertBefore(frag, el);
+                   return el.previousSibling;
+                case "afterbegin":
+                   if(el.firstChild){
+                       range.setStartBefore(el.firstChild);
+                       frag = range.createContextualFragment(html);
+                       el.insertBefore(frag, el.firstChild);
+                       return el.firstChild;
+                   }else{
+                       el.innerHTML = html;
+                       return el.firstChild;
+                   }
+               case "beforeend":
+                   if(el.lastChild){
+                       range.setStartAfter(el.lastChild);
+                       frag = range.createContextualFragment(html);
+                       el.appendChild(frag);
+                       return el.lastChild;
+                   }else{
+                       el.innerHTML = html;
+                       return el.lastChild;
+                   }
+               case "afterend":
+                   range.setStartAfter(el);
+                   frag = range.createContextualFragment(html);
+                   el.parentNode.insertBefore(frag, el.nextSibling);
+                   return el.nextSibling;
+               }
+               throw 'Illegal insertion point -> "' + where + '"';
+       },
+
+
+       insertBefore : function(el, o, returnElement){
+           return this.doInsert(el, o, returnElement, "beforeBegin");
+       },
+
+
+       insertAfter : function(el, o, returnElement){
+           return this.doInsert(el, o, returnElement, "afterEnd", "nextSibling");
+       },
+
+
+       insertFirst : function(el, o, returnElement){
+           return this.doInsert(el, o, returnElement, "afterBegin", "firstChild");
+       },
+
+       // private
+       doInsert : function(el, o, returnElement, pos, sibling){
+           var newNode;
+           if(this.useDom){
+               newNode = createDom(o, null);
+               (sibling === "firstChild" ? el : el.parentNode).insertBefore(newNode, sibling ? el[sibling] : el);
+           }else{
+               var html = createHtml(o);
+               newNode = this.insertHtml(pos, el, html);
+           }
+           return newNode;
+       },
+
+
+       append : function(el, o, returnElement){
+
+           var newNode;
+           if(this.useDom){
+               newNode = createDom(o, null);
+               el.appendChild(newNode);
+           }else{
+               var html = createHtml(o);
+               newNode = this.insertHtml("beforeEnd", el, html);
+           }
+           return newNode;
+       },
+
+
+       overwrite : function(el, o, returnElement){
+           el.innerHTML = createHtml(o);
+           return el.firstChild;
+       },
+
+
+       createTemplate : function(o){
+           var html = createHtml(o);
+           return new Ext.Template(html);
+       }
+       };
+    }();
+  }-*/;
 
   native static void loadTemplate() /*-{
-     var Ext = $wnd.GXT.Ext;
-     if(!!Ext.Template){
-     return;
-     }
-     Ext.Template = function(html){
-         var a = arguments;
-         if(Ext.isArray(html)){
-             html = html.join("");
-         }else if(a.length > 1){
-             var buf = [];
-             for(var i = 0, len = a.length; i < len; i++){
-                 if(typeof a[i] == 'object'){
-                     Ext.apply(this, a[i]);
-                 }else{
-                     buf[buf.length] = a[i];
-                 }
-             }
-             html = buf.join('');
-         }
-       
-         this.html = html;
-         if(this.compiled){
-             this.compile();
-         }
-     };
-       
-     
-     Ext.Template.prototype = {
-     
-     applyTemplate : function(values){
-         if(this.compiled){
-             return this.compiled(values);
-         }
-         var useF = this.disableFormats !== true;
-         var fm = Ext.util.Format, tpl = this;
-         var fn = function(m, name, format, args){
-             if(format && useF){
-                 if(format.substr(0, 5) == "this."){
-                     return tpl.call(format.substr(5), values[name], values);
-                 }else{
-                     if(args){
-                         // quoted values are required for strings in compiled templates,
-                         // but for non compiled we need to strip them
-                         // quoted reversed for jsmin
-                         var re = /^\s*['"](.*)["']\s*$/;
-                         args = args.split(',');
-                         for(var i = 0, len = args.length; i < len; i++){
-                             args[i] = args[i].replace(re, "$1");
-                         }
-                         args = [values[name]].concat(args);
-                     }else{
-                         args = [values[name]];
-                     }
-                     return fm[format].apply(fm, args);
-                 }
-             }else{
-                 return values[name] !== undefined ? values[name] : "";
-             }
-         };
-         return this.html.replace(this.re, fn);
-     },
-        
-     set : function(html, compile){
-         this.html = html;
-         this.compiled = null;
-         if(compile){
-             this.compile();
-         }
-         return this;
-     },
-        
-     disableFormats : false,
-             
-     re : /\{([\w-]+)(?:\:([\w\.]*)(?:\((.*?)?\))?)?\}/g,
-             
-        
-     compile : function(){
-         var fm = Ext.util.Format;
-         var useF = this.disableFormats !== true;
-         var sep = @com.extjs.gxt.ui.client.GXT::isGecko ? "+" : ",";
-         var fn = function(m, name, format, args){
-             if(format && useF){
-                 args = args ? ',' + args : "";
-                 if(format.substr(0, 5) != "this."){
-                     format = "fm." + format + '(';
-                 }else{
-                     format = 'this.call("'+ format.substr(5) + '", ';
-                     args = ", values";
-                 }
-             }else{
-                 args= ''; format = "(values['" + name + "'] == undefined ? '' : ";
-             }
-             return "'"+ sep + format + "values['" + name + "']" + args + ")"+sep+"'";
-         };
-         var body;
-         // branched to use + in gecko and [].join() in others
-         if(@com.extjs.gxt.ui.client.GXT::isGecko){
-             body = "this.compiled = function(values){ return '" +
-                    this.html.replace(/\\/g, '\\\\').replace(/(\r\n|\n)/g, '\\n').replace(/'/g, "\\'").replace(this.re, fn) +
-                     "';};";
-         }else{
-             body = ["this.compiled = function(values){ return ['"];
-             body.push(this.html.replace(/\\/g, '\\\\').replace(/(\r\n|\n)/g, '\\n').replace(/'/g, "\\'").replace(this.re, fn));
-             body.push("'].join('');};");
-             body = body.join('');
-         }
-         eval(body);
-         return this;
-     },
-     
-     call : function(fnName, value, allValues){
-         return this[fnName](value, allValues);
-     },
-      
-     insertFirst: function(el, values, returnElement){
-         return this.doInsert('afterBegin', el, values, returnElement);
-     },
-      
-     insertBefore: function(el, values, returnElement){
-         return this.doInsert('beforeBegin', el, values, returnElement);
-     },
-      
-     insertAfter : function(el, values, returnElement){
-         return this.doInsert('afterEnd', el, values, returnElement);
-     },
-      
-     append : function(el, values, returnElement){
-         return this.doInsert('beforeEnd', el, values, returnElement);
-     },
-     
-     doInsert : function(where, el, values, returnEl){
-         el = Ext.getDom(el);
-         var newNode = Ext.DomHelper.insertHtml(where, el, this.applyTemplate(values));
-         return returnEl ? Ext.get(newNode, true) : newNode;
-     },
-     
-     overwrite : function(el, values, returnElement){
-         el = Ext.getDom(el);
-         el.innerHTML = this.applyTemplate(values);
-         return returnElement ? Ext.get(el.firstChild, true) : el.firstChild;
-     }
-     };
-            
-     // backwards compat
-     Ext.DomHelper.Template = Ext.Template;
-    
-    }-*/;
-  
+    var Ext = $wnd.GXT.Ext;
+    if(!!Ext.Template){
+    return;
+    }
+    Ext.Template = function(html){
+        var a = arguments;
+        if(Ext.isArray(html)){
+            html = html.join("");
+        }else if(a.length > 1){
+            var buf = [];
+            for(var i = 0, len = a.length; i < len; i++){
+                if(typeof a[i] == 'object'){
+                    Ext.apply(this, a[i]);
+                }else{
+                    buf[buf.length] = a[i];
+                }
+            }
+            html = buf.join('');
+        }
+
+        this.html = html;
+        if(this.compiled){
+            this.compile();
+        }
+    };
+
+
+    Ext.Template.prototype = {
+
+    applyTemplate : function(values){
+        if(this.compiled){
+            return this.compiled(values);
+        }
+        var useF = this.disableFormats !== true;
+        var fm = Ext.util.Format, tpl = this;
+        var fn = function(m, name, format, args){
+            if(format && useF){
+                if(format.substr(0, 5) == "this."){
+                    return tpl.call(format.substr(5), values[name], values);
+                }else{
+                    if(args){
+                        // quoted values are required for strings in compiled templates,
+                        // but for non compiled we need to strip them
+                        // quoted reversed for jsmin
+                        var re = /^\s*['"](.*)["']\s*$/;
+                        args = args.split(',');
+                        for(var i = 0, len = args.length; i < len; i++){
+                            args[i] = args[i].replace(re, "$1");
+                        }
+                        args = [values[name]].concat(args);
+                    }else{
+                        args = [values[name]];
+                    }
+                    return fm[format].apply(fm, args);
+                }
+            }else{
+                return values[name] !== undefined ? values[name] : "";
+            }
+        };
+        return this.html.replace(this.re, fn);
+    },
+
+    set : function(html, compile){
+        this.html = html;
+        this.compiled = null;
+        if(compile){
+            this.compile();
+        }
+        return this;
+    },
+
+    disableFormats : false,
+
+    re : /\{([\w-]+)(?:\:([\w\.]*)(?:\((.*?)?\))?)?\}/g,
+
+
+    compile : function(){
+        var fm = Ext.util.Format;
+        var useF = this.disableFormats !== true;
+        var sep = @com.extjs.gxt.ui.client.GXT::isGecko ? "+" : ",";
+        var fn = function(m, name, format, args){
+            if(format && useF){
+                args = args ? ',' + args : "";
+                if(format.substr(0, 5) != "this."){
+                    format = "fm." + format + '(';
+                }else{
+                    format = 'this.call("'+ format.substr(5) + '", ';
+                    args = ", values";
+                }
+            }else{
+                args= ''; format = "(values['" + name + "'] == undefined ? '' : ";
+            }
+            return "'"+ sep + format + "values['" + name + "']" + args + ")"+sep+"'";
+        };
+        var body;
+        // branched to use + in gecko and [].join() in others
+        if(@com.extjs.gxt.ui.client.GXT::isGecko){
+            body = "this.compiled = function(values){ return '" +
+                   this.html.replace(/\\/g, '\\\\').replace(/(\r\n|\n)/g, '\\n').replace(/'/g, "\\'").replace(this.re, fn) +
+                    "';};";
+        }else{
+            body = ["this.compiled = function(values){ return ['"];
+            body.push(this.html.replace(/\\/g, '\\\\').replace(/(\r\n|\n)/g, '\\n').replace(/'/g, "\\'").replace(this.re, fn));
+            body.push("'].join('');};");
+            body = body.join('');
+        }
+        eval(body);
+        return this;
+    },
+
+    call : function(fnName, value, allValues){
+        return this[fnName](value, allValues);
+    },
+
+    insertFirst: function(el, values, returnElement){
+        return this.doInsert('afterBegin', el, values, returnElement);
+    },
+
+    insertBefore: function(el, values, returnElement){
+        return this.doInsert('beforeBegin', el, values, returnElement);
+    },
+
+    insertAfter : function(el, values, returnElement){
+        return this.doInsert('afterEnd', el, values, returnElement);
+    },
+
+    append : function(el, values, returnElement){
+        return this.doInsert('beforeEnd', el, values, returnElement);
+    },
+
+    doInsert : function(where, el, values, returnEl){
+        el = Ext.getDom(el);
+        var newNode = Ext.DomHelper.insertHtml(where, el, this.applyTemplate(values));
+        return returnEl ? Ext.get(newNode, true) : newNode;
+    },
+
+    overwrite : function(el, values, returnElement){
+        el = Ext.getDom(el);
+        el.innerHTML = this.applyTemplate(values);
+        return returnElement ? Ext.get(el.firstChild, true) : el.firstChild;
+    }
+    };
+
+    // backwards compat
+    Ext.DomHelper.Template = Ext.Template;
+  }-*/;
+
   static native void loadXTemplate() /*-{
     var Ext = $wnd.GXT.Ext;
     if(!!Ext.XTemplate){
@@ -1409,9 +1405,9 @@ class Ext {
      }
      this.master = tpls[tpls.length-1];
      this.tpls = tpls;
-  };
+    };
 
-  Ext.extend(Ext.XTemplate, Ext.Template, {
+    Ext.extend(Ext.XTemplate, Ext.Template, {
      // private
      re : /\{([\w-\.\#]+)(?:\:([\w\.]*)(?:\((.*?)?\))?)?(\s?[\+\-\*\\]\s?[\d\.\+\-\*\\\(\)]+)?\}/g,
      // private
@@ -1475,7 +1471,7 @@ class Ext {
          var codeFn = function(m, code){
              return "'"+ sep +'('+code+')'+sep+"'";
          };
-         
+
          var tempBody = tpl.body;
          var tempTpl = tpl;
          var body;
@@ -1501,8 +1497,8 @@ class Ext {
 
      compile : function(){return this;}
 
-  });
-     
-  Ext.XTemplate.prototype.apply = Ext.XTemplate.prototype.applyTemplate; 
+    });
+
+    Ext.XTemplate.prototype.apply = Ext.XTemplate.prototype.applyTemplate;
   }-*/;
 }

@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -29,6 +29,10 @@ public class DateWrapper {
   protected static String format(float date, String format) {
     long d = new Float(date).longValue();
     return DateTimeFormat.getFormat(format).format(new Date(d));
+  }
+  
+  protected static String format(Date date, String format) {
+    return DateTimeFormat.getFormat(format).format(date);
   }
 
   private Date date;
@@ -110,7 +114,12 @@ public class DateWrapper {
         return new DateWrapper(d);
       case MONTH:
         d = (Date) date.clone();
-        d.setMonth(d.getMonth() + quantity);
+        int day = getDate();
+        if (day > 28) {
+          day = Math.min(day, getFirstDayOfMonth().addMonths(quantity).getLastDateOfMonth().getDate());
+        }
+        d.setDate(day);
+        d.setMonth(getMonth() + quantity);
         return new DateWrapper(d);
       case YEAR:
         d = (Date) date.clone();

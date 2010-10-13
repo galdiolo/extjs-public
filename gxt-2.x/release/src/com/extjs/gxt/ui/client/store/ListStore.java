@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -20,8 +20,11 @@ import com.extjs.gxt.ui.client.data.LoadEvent;
 import com.extjs.gxt.ui.client.data.Loader;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.SortInfo;
+import com.extjs.gxt.ui.client.event.BaseEvent;
+import com.extjs.gxt.ui.client.event.EventType;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.LoadListener;
+import com.extjs.gxt.ui.client.store.Record.RecordUpdate;
 import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.ListView;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
@@ -29,7 +32,7 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
 /**
  * The store class encapsulates a client side cache of {@link ModelData} objects
  * which provide input data for Components such as the {@link ComboBox} and
- * {@link ListView ListView}
+ * {@link ListView ListView}.
  * 
  * <dl>
  * <dt><b>Events:</b></dt>
@@ -57,10 +60,39 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
  * </ul>
  * </dd>
  * 
- * <dd><b>Store.Sort</b> : StoreEvent(store)<br>
+ * <dd><b>Store.BeforeClear</b> : StoreEvent(store)<br>
+ * <div>Fires before the store is sorted. Listeners can cancel the action by
+ * calling {@link BaseEvent#setCancelled(boolean)}. </div>
+ * <ul>
+ * <li>store : this</li>
+ * </ul>
+ * </dd>
+ * 
+ * <dd><b>Store.BeforeSort</b> : StoreEvent(store, sortInfo)<br>
+ * <div>Fires before the store's data has been changed due to sorting. Listeners
+ * can cancel the action by calling {@link BaseEvent#setCancelled(boolean)}
+ * .</div>
+ * <ul>
+ * <li>store : this</li>
+ * <li>sortInfo : the new sort info about to be set
+ * </ul>
+ * </dd>
+ * 
+ * <dd><b>Store.Sort</b> : StoreEvent(store, sortInfo)<br>
  * <div>Fires after the store's data has been changed due to sorting.</div>
  * <ul>
  * <li>store : this</li>
+ * <li>sortInfo : the new sort information
+ * </ul>
+ * </dd>
+ * 
+ * <dd><b>Store.BeforeAdd</b> : StoreEvent(store, models, index)<br>
+ * <div>Fires before models have been added to the store. Listeners can cancel
+ * the action by calling {@link BaseEvent#setCancelled(boolean)}.</div>
+ * <ul>
+ * <li>store : this</li>
+ * <li>models : the added models</li>
+ * <li>index : the index at which the model(s) were added</li>
  * </ul>
  * </dd>
  * 
@@ -73,7 +105,17 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
  * </ul>
  * </dd>
  * 
- * <dd><b>Store.Remove</b> : StoreEvent(store, model)<br>
+ * <dd><b>Store.BeforeRemove</b> : StoreEvent(store, model, index)<br>
+ * <div>Fires before a model has been removed from the store. Listeners can
+ * cancel the action by calling {@link BaseEvent#setCancelled(boolean)}.</div>
+ * <ul>
+ * <li>store : this</li>
+ * <li>model : the model to be removed</li>
+ * <li>index : the index at which the model will be removed</li>
+ * </ul>
+ * </dd>
+ * 
+ * <dd><b>Store.Remove</b> : StoreEvent(store, model, index)<br>
  * <div>Fires when a model has been removed from the store.</div>
  * <ul>
  * <li>store : this</li>
@@ -103,8 +145,8 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
  */
 public class ListStore<M extends ModelData> extends Store<M> {
 
-  protected ListLoader<ListLoadResult<M>> loader;
   protected ListLoadConfig config;
+  protected ListLoader<ListLoadResult<M>> loader;
 
   /**
    * Creates a new store.
@@ -118,7 +160,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
    * 
    * @param loader the loader instance
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public ListStore(ListLoader loader) {
     this.loader = loader;
     loader.addLoadListener(new LoadListener() {
@@ -279,17 +321,12 @@ public class ListStore<M extends ModelData> extends Store<M> {
     insert(temp, index);
   }
 
-  /**
-   * Remove a item from the store and fires the <i>Remove</i> event.
-   * 
-   * @param model the model to remove
-   */
-  public void remove(M model) {
-    int index = indexOf(model);
+  public void remove(int index) {
+    M model = getAt(index);
     StoreEvent<M> se = createStoreEvent();
     se.setModel(model);
     se.setIndex(index);
-    if (index != -1 && fireEvent(BeforeRemove, se) && all.remove(model)) {
+    if (index != -1 && model != null && fireEvent(BeforeRemove, se) && all.remove(index) != null) {
       modified.remove(recordMap.get(model));
       if (isFiltered()) {
         snapshot.remove(model);
@@ -297,6 +334,16 @@ public class ListStore<M extends ModelData> extends Store<M> {
       unregisterModel(model);
       fireEvent(Remove, se);
     }
+  }
+
+  /**
+   * Remove a item from the store and fires the <i>Remove</i> event.
+   * 
+   * @param model the model to remove
+   */
+  public void remove(M model) {
+    int index = indexOf(model);
+    remove(index);
   }
 
   /**
@@ -340,7 +387,10 @@ public class ListStore<M extends ModelData> extends Store<M> {
    * @param sortDir the sort dir
    */
   public void sort(String field, SortDir sortDir) {
-    if (!fireEvent(BeforeSort, createStoreEvent())) {
+    final StoreEvent<M> event = createStoreEvent();
+    event.setSortInfo(new SortInfo(field, sortDir));
+
+    if (!fireEvent(BeforeSort, event)) {
       return;
     }
     SortInfo prev = new SortInfo(sortInfo.getSortField(), sortInfo.getSortDir());
@@ -358,7 +408,6 @@ public class ListStore<M extends ModelData> extends Store<M> {
           sortDir = SortDir.ASC;
           break;
       }
-
     }
 
     sortInfo.setSortField(field);
@@ -369,7 +418,8 @@ public class ListStore<M extends ModelData> extends Store<M> {
         public void handleEvent(LoadEvent le) {
           loader.removeListener(Loader.Load, this);
           sortInfo = le.<ListLoadConfig> getConfig().getSortInfo();
-          fireEvent(Sort, createStoreEvent());
+          event.setSortInfo(sortInfo);
+          fireEvent(Sort, event);
         }
       };
       loader.addListener(Loader.Load, l);
@@ -382,14 +432,14 @@ public class ListStore<M extends ModelData> extends Store<M> {
       }
     } else {
       applySort(false);
-      fireEvent(DataChanged, createStoreEvent());
+      fireEvent(DataChanged, event);
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   protected void applySort(boolean supressEvent) {
-    if ((loader == null || !loader.isRemoteSort())) {
+    if ((loader == null || !loader.isRemoteSort()) && sortInfo != null && sortInfo.getSortField() != null) {
       storeSorter = storeSorter == null ? new StoreSorter() : storeSorter;
       Collections.sort(all, new Comparator<M>() {
         public int compare(M m1, M m2) {
@@ -400,18 +450,32 @@ public class ListStore<M extends ModelData> extends Store<M> {
         Collections.reverse(all);
       }
       if (!supressEvent) {
-        fireEvent(Sort, createStoreEvent());
+        StoreEvent<M> event = createStoreEvent();
+        event.setSortInfo(sortInfo);
+        fireEvent(Sort, event);
       }
     }
   }
 
   @SuppressWarnings("unchecked")
+  @Override
+  protected void fireStoreEvent(EventType type, RecordUpdate operation, Record record) {
+    StoreEvent<M> evt = createStoreEvent();
+    evt.setOperation(operation);
+    evt.setRecord(record);
+    evt.setIndex(indexOf((M) record.getModel()));
+    evt.setModel((M) record.getModel());
+    fireEvent(type, evt);
+  }
+
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void insert(List<? extends M> items, int index, boolean supressEvent) {
-    if (items.size() > 0) {
+    if (items != null && items.size() > 0) {
       List<M> added = new ArrayList<M>();
-      if (storeSorter != null) {
+      if ((loader == null && storeSorter != null) || (loader != null && storeSorter != null && !loader.isRemoteSort())) {
         boolean defer = index == 0 && getCount() == 0;
-        for (M m : items) {
+        for (int i = 0; i < items.size(); i++) {
+          M m = items.get(i);
           StoreEvent evt = createStoreEvent();
           evt.setModels(Util.createList(m));
           if (m == null || (!supressEvent && !fireEvent(BeforeAdd, evt))) {
@@ -427,35 +491,37 @@ public class ListStore<M extends ModelData> extends Store<M> {
             all.add(m);
             added.add(m);
           }
-          applySort(true);
-          int idx = indexOf(m);
+
           registerModel(m);
           if (!defer && !supressEvent && added.contains(m)) {
+            applySort(true);
             evt = createStoreEvent();
             evt.setModels(Util.createList(m));
-            evt.setIndex(idx);
+            evt.setIndex(indexOf(m));
             fireEvent(Add, evt);
           }
         }
         if (defer && !supressEvent && added.size() > 0) {
+          applySort(true);
           StoreEvent evt = createStoreEvent();
           evt.setModels(getModels());
           evt.setIndex(index);
           fireEvent(Add, evt);
         }
       } else {
-        for (int i = 0; i < items.size(); i++) {
+        for (int i = 0, j = 0; i < items.size(); i++) {
           M m = items.get(i);
           StoreEvent evt = createStoreEvent();
           evt.setModels(Util.createList(m));
-          evt.setIndex(index + i);
+          evt.setIndex(index + j);
           if (m == null || (!supressEvent && !fireEvent(BeforeAdd, evt))) {
             continue;
           }
           if (isFiltered()) {
             snapshot.add(index + i, m);
             if (!isFiltered(m, filterProperty)) {
-              all.add(index + i, m);
+              all.add(index + j, m);
+              j++;
               added.add(m);
             }
           } else {
@@ -481,7 +547,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void onLoad(LoadEvent le) {
     this.config = (ListLoadConfig) le.getConfig();
 
@@ -489,7 +555,9 @@ public class ListStore<M extends ModelData> extends Store<M> {
 
     removeAll();
 
-    if (data instanceof List) {
+    if (data == null) {
+      all = new ArrayList();
+    } else if (data instanceof List) {
       List<M> list = (List) data;
       all = new ArrayList(list);
     } else if (data instanceof ListLoadResult) {
@@ -500,19 +568,17 @@ public class ListStore<M extends ModelData> extends Store<M> {
       registerModel(m);
     }
 
-    if (le.<Object> getConfig() instanceof ListLoadConfig) {
-      ListLoadConfig config = le.getConfig();
-      if (!Util.isEmptyString(config.getSortInfo().getSortField())) {
-        sortInfo = config.getSortInfo();
-      } else {
-        sortInfo = new SortInfo();
-      }
+    if (config.getSortInfo() != null && !Util.isEmptyString(config.getSortInfo().getSortField())) {
+      sortInfo = config.getSortInfo();
+    } else {
+      sortInfo = new SortInfo();
     }
 
     if (filtersEnabled) {
       filtersEnabled = false;
       applyFilters(filterProperty);
     }
+
     if (storeSorter != null) {
       applySort(true);
     }
@@ -523,7 +589,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
 
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void sortData(final String field, SortDir direction) {
     direction = direction == null ? SortDir.ASC : direction;
     storeSorter = storeSorter == null ? new StoreSorter() : storeSorter;

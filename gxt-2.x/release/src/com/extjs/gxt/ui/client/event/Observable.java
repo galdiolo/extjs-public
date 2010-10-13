@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -40,7 +40,7 @@ public interface Observable {
    * 
    * @param eventType eventType the event type
    * @param be the base event
-   * @return <code>true</code> if any listeners cancel the event.
+   * @return false if any listeners cancel the event.
    */
   public boolean fireEvent(EventType eventType, BaseEvent be);
 

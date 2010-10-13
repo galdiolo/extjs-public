@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -24,12 +24,18 @@ public class ThemeManager {
   }
 
   /**
-   * Returns all registered themes.
+   * Returns the theme with the given id.
    * 
-   * @return the themes
+   * @param id the theme id
+   * @return the matching theme or null
    */
-  public static List<Theme> getThemes() {
-    return new ArrayList<Theme>(themes);
+  public static Theme findTheme(String id) {
+    for (Theme t : themes) {
+      if (t.getId().equals(id)) {
+        return t;
+      }
+    }
+    return null;
   }
 
   /**
@@ -40,6 +46,15 @@ public class ThemeManager {
    */
   public static Theme getTheme(int index) {
     return themes.get(index);
+  }
+
+  /**
+   * Returns all registered themes.
+   * 
+   * @return the themes
+   */
+  public static List<Theme> getThemes() {
+    return new ArrayList<Theme>(themes);
   }
 
   /**

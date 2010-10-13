@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -157,13 +157,36 @@ public class Info extends ContentPanel {
     onShowInfo();
   }
 
+  protected void afterHide() {
+    RootPanel.get().remove(this);
+    slots.set(level, null);
+    push(this);
+  }
+  
+  protected void afterShow() {
+    Timer t = new Timer() {
+      public void run() {
+        afterHide();
+      }
+    };
+    t.schedule(config.display);
+  }
+
+  @Override
+  protected void onRender(Element parent, int pos) {
+    super.onRender(parent, pos);
+    if (GXT.isAriaEnabled()) {
+      Accessibility.setRole(getElement(), "alert");
+    }
+  }
+
   protected void onShowInfo() {
     RootPanel.get().add(this);
     el().makePositionable(true);
 
     setTitle();
     setText();
-
+    
     level = firstAvail();
     slots.add(level, this);
 
@@ -171,19 +194,7 @@ public class Info extends ContentPanel {
     el().setLeftTop(p.x, p.y);
     setSize(config.width, config.height);
     
-    if (GXT.isAriaEnabled()) {
-      Accessibility.setState(getElement(), "aria-live", config.title + " " + config.text);
-    }
-
     afterShow();
-  }
-  
-  @Override
-  protected void onRender(Element parent, int pos) {
-    super.onRender(parent, pos);
-    if (GXT.isAriaEnabled()) {
-      Accessibility.setRole(getElement(), "aria-region");
-    }
   }
 
   protected Point position() {
@@ -192,21 +203,6 @@ public class Info extends ContentPanel {
     int top = s.height - config.height - 10 - (level * (config.height + 10))
         + XDOM.getBodyScrollTop();
     return new Point(left, top);
-  }
-
-  private void afterHide() {
-    RootPanel.get().remove(this);
-    slots.set(level, null);
-    push(this);
-  }
-
-  private void afterShow() {
-    Timer t = new Timer() {
-      public void run() {
-        afterHide();
-      }
-    };
-    t.schedule(config.display);
   }
 
   private void setText() {

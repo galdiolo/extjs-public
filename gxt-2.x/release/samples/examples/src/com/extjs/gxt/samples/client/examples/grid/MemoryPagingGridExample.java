@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -123,6 +123,7 @@ public class MemoryPagingGridExample extends LayoutContainer {
     Grid<Stock> grid = new Grid<Stock>(store, cm);
     grid.setBorders(true);
     grid.setAutoExpandColumn("name");
+    grid.getAriaSupport().setDescribedBy(toolBar.getId() + "-display");
 
     cp.add(grid);
 

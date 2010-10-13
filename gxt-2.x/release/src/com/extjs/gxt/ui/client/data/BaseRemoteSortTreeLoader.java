@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -22,17 +22,17 @@ public class BaseRemoteSortTreeLoader<M extends ModelData> extends BaseTreeLoade
   private String sortField;
   private SortDir sortDir = SortDir.NONE;
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public BaseRemoteSortTreeLoader(DataProxy proxy) {
     super(proxy);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public BaseRemoteSortTreeLoader(DataProxy proxy, DataReader reader) {
     super(proxy, reader);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public BaseRemoteSortTreeLoader(DataReader reader) {
     super(reader);
   }

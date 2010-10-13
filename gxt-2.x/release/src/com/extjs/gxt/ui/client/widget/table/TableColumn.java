@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -171,7 +171,7 @@ public class TableColumn {
    * 
    * @return the cell renderer
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public CellRenderer getRenderer() {
     return renderer;
   }
@@ -311,7 +311,7 @@ public class TableColumn {
    * 
    * @param renderer the cell renderer
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public void setRenderer(CellRenderer renderer) {
     this.renderer = renderer;
   }

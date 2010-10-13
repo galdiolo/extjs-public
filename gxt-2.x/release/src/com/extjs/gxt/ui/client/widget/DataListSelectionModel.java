@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -15,7 +15,7 @@ import com.extjs.gxt.ui.client.widget.selection.AbstractSelectionModel;
 /**
  * A <code>AbstractSelectionModel</code> implementation for DataList.
  * 
- * @deprecated see {@link ListView}
+ * @deprecated Use {@link ListView}
  */
 public class DataListSelectionModel extends AbstractSelectionModel<DataList, DataListItem> {
 
@@ -44,7 +44,7 @@ public class DataListSelectionModel extends AbstractSelectionModel<DataList, Dat
     this.selectOnCheck = selectOnCheck;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   @Override
   protected void onMouseDown(ContainerEvent ce) {
     if (locked) return;

@@ -1,14 +1,16 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
  */
 package com.extjs.gxt.ui.client.widget;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Stack;
 
 import com.extjs.gxt.ui.client.core.XDOM;
@@ -38,11 +40,13 @@ public class WindowManager extends BaseObservable {
 
   private Window front;
   private Stack<Window> accessList;
+  private List<Window> windows;
   private Comparator<Window> comparator;
   private Listener<ComponentManagerEvent> componentManagerListener;
 
   public WindowManager() {
     accessList = new Stack<Window>();
+    windows = new ArrayList<Window>();
     comparator = new Comparator<Window>() {
       public int compare(Window w1, Window w2) {
         Long d1 = (Long) w1.getData("_gxtdate");
@@ -67,6 +71,43 @@ public class WindowManager extends BaseObservable {
   }
 
   /**
+   * Activates the next window in the access stack.
+   * 
+   * @param window the reference window
+   * @return true if the next window exists
+   */
+  public boolean activateNext(Window window) {
+    int count = windows.size();
+    if (count > 1) {
+      int idx = windows.indexOf(window);
+      if (idx == count - 1) {
+        return false;
+      }
+      setActiveWin(windows.get(++idx));
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Activates the previous window in the access stack.
+   * 
+   * @param window the reference window
+   * @return true if a previous window exists
+   */
+  public boolean activatePrevious(Window window) {
+    int count = windows.size();
+    if (count > 1) {
+      int idx = windows.indexOf(window);
+      if (idx == 0) {
+        return false;
+      }
+      setActiveWin(windows.get(--idx));
+    }
+    return false;
+  }
+
+  /**
    * Brings the specified window to the front of any other active windows.
    * 
    * @param window the window return True if the dialog was brought to the
@@ -77,6 +118,8 @@ public class WindowManager extends BaseObservable {
       window.setData("_gxtdate", System.currentTimeMillis());
       orderWindows(false);
       return true;
+    } else {
+      window.focus();
     }
 
     return false;
@@ -99,6 +142,24 @@ public class WindowManager extends BaseObservable {
    */
   public Window getActive() {
     return front;
+  }
+
+  /**
+   * Returns the visible windows.
+   * 
+   * @return the windows
+   */
+  public List<Window> getWindows() {
+    return windows;
+  }
+  
+  /**
+   * Returns the ordered windows.
+   * 
+   * @return the windows
+   */
+  public Stack<Window> getStack() {
+    return accessList;
   }
 
   /**
@@ -133,12 +194,6 @@ public class WindowManager extends BaseObservable {
     setActiveWin(null);
   }
 
-  private void register(Window window) {
-    accessList.push(window);
-    window.setData("_gxtdate", System.currentTimeMillis());
-    fireEvent(Events.Register, new WindowManagerEvent(this, window));
-  }
-
   private void orderWindows(boolean reverse) {
     if (accessList.size() > 0) {
       Collections.sort(accessList, comparator);
@@ -151,6 +206,13 @@ public class WindowManager extends BaseObservable {
       }
       activateLast();
     }
+  }
+
+  private void register(Window window) {
+    accessList.push(window);
+    windows.add(window);
+    window.setData("_gxtdate", System.currentTimeMillis());
+    fireEvent(Events.Register, new WindowManagerEvent(this, window));
   }
 
   private void setActiveWin(Window window) {
@@ -171,6 +233,7 @@ public class WindowManager extends BaseObservable {
       front = null;
     }
     accessList.remove(window);
+    windows.remove(window);
     activateLast();
     fireEvent(Events.Unregister, new WindowManagerEvent(this, window));
   }

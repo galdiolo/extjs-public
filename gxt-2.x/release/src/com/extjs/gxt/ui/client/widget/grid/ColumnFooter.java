@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -15,7 +15,6 @@ import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.FastMap;
 import com.extjs.gxt.ui.client.data.ModelData;
-import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
@@ -95,24 +94,24 @@ public class ColumnFooter extends BoxComponent {
       int cols = cm.getColumnCount();
       for (int i = 0; i < cols; i++) {
         Foot f = new Foot(config, cm.getDataIndex(i));
-        
+
         String cellStyle = config.getCellStyle(cm.getDataIndex(i));
-        table.setWidget(0, i, f);
-        table.getCellFormatter().setStyleName(0, i, "x-grid3-footer-cell " + cellStyle);
-        HorizontalAlignment align = cm.getColumnAlignment(i);
-        if (align != null) {
-          switch (align) {
-            case RIGHT:
-              table.getCellFormatter().setHorizontalAlignment(0, i, HasHorizontalAlignment.ALIGN_RIGHT);
-              break;
-            case CENTER:
-              table.getCellFormatter().setHorizontalAlignment(0, i, HasHorizontalAlignment.ALIGN_CENTER);
-              break;
-            default:
-              table.getCellFormatter().setHorizontalAlignment(0, i, HasHorizontalAlignment.ALIGN_LEFT);
-              break;
-          }
+        if (cellStyle == null) {
+          cellStyle = "";
         }
+        table.setWidget(0, i, f);
+        table.getCellFormatter().setStyleName(0, i,
+            "x-grid3-cell x-grid3-footer-cell x-grid3-td-" + cm.getColumnId(i) + " " + cellStyle);
+        HorizontalAlignment align = cm.getColumnAlignment(i);
+
+        if (align == HorizontalAlignment.RIGHT) {
+          table.getCellFormatter().setHorizontalAlignment(0, i, HasHorizontalAlignment.ALIGN_RIGHT);
+        } else if (align == HorizontalAlignment.CENTER) {
+          table.getCellFormatter().setHorizontalAlignment(0, i, HasHorizontalAlignment.ALIGN_CENTER);
+        } else {
+          table.getCellFormatter().setHorizontalAlignment(0, i, HasHorizontalAlignment.ALIGN_LEFT);
+        }
+
         if (cm.isHidden(i)) {
           updateColumnHidden(i, true);
         }
@@ -125,7 +124,7 @@ public class ColumnFooter extends BoxComponent {
   protected ColumnModel cm;
   protected List<FooterRow> rows = new ArrayList<FooterRow>();
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public ColumnFooter(Grid grid, ColumnModel cm) {
     this.grid = grid;
     this.cm = cm;
@@ -133,12 +132,6 @@ public class ColumnFooter extends BoxComponent {
 
   public void add(FooterRow row) {
     rows.add(row);
-  }
-
-  @Override
-  public void onComponentEvent(ComponentEvent ce) {
-    super.onComponentEvent(ce);
-    ce.stopEvent();
   }
 
   public void remove(FooterRow row) {
@@ -205,7 +198,7 @@ public class ColumnFooter extends BoxComponent {
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void refresh() {
     ListStore<ModelData> store = grid.getStore();
     int cols = cm.getColumnCount();

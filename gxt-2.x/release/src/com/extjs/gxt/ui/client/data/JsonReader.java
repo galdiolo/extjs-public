@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -43,7 +43,7 @@ public class JsonReader<D> implements DataReader<D> {
     this.modelType = modelType;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public D read(Object loadConfig, Object data) {
     JSONObject jsonRoot = null;
     if (data instanceof JavaScriptObject) {

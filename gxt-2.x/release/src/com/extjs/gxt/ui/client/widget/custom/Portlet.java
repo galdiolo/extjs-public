@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -64,8 +64,8 @@ public class Portlet extends ContentPanel {
   }
 
   /**
-   * True to "pin" the porlet and stop the user from being able to move the
-   * portlet (defauls to false).
+   * True to "pin" the portlet and stop the user from being able to move the
+   * portlet (defaults to false).
    * 
    * @param pinned true for pinned
    */

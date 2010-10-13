@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -262,6 +262,8 @@ public class TableLayout extends Layout {
 
     TableCellElement td = DOM.createTD().cast();
     td.setClassName("x-table-layout-cell");
+    td.setAttribute("role", "presentation");
+
     int[] cell = getNextNonSpan(currentColumn, currentRow);
     int curCol = currentColumn = cell[0];
     int curRow = currentRow = cell[1];
@@ -348,6 +350,8 @@ public class TableLayout extends Layout {
     Element row = DOM.getChild(tbody, index);
     if (row == null) {
       row = DOM.createTR();
+      row.setAttribute("role", "presentation");
+
       DOM.appendChild(tbody, row);
     }
     return new El(row);
@@ -366,7 +370,7 @@ public class TableLayout extends Layout {
     target.removeChildren();
 
     table = DOM.createTable().cast();
-    if (container.isAriaIgnore()) {
+    if (container.getAriaSupport().isIgnore()) {
       Accessibility.setRole((Element)table.cast(), "presentation");
     }
 

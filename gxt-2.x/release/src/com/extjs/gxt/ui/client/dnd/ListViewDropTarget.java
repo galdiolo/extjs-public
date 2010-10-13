@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -41,7 +41,7 @@ public class ListViewDropTarget extends DropTarget {
    * 
    * @param listView the target list view
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public ListViewDropTarget(ListView listView) {
     super(listView);
     this.listView = listView;
@@ -148,14 +148,15 @@ public class ListViewDropTarget extends DropTarget {
 
   private int adjustIndex(DNDEvent event, int index) {
     Object data = event.getData();
+    int i = index;
     List<ModelData> models = prepareDropData(data, true);
     for (ModelData m : models) {
       int idx = listView.getStore().indexOf(m);
       if (idx > -1 && (before ? idx < index : idx <= index)) {
-        index--;
+        i--;
       }
     }
-    return before ? index : index + 1;
+    return before ? i : i + 1;
   }
 
   private void showInsert(DNDEvent event, Element row) {

@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -22,7 +22,10 @@ import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.widget.DatePicker;
 import com.extjs.gxt.ui.client.widget.menu.DateMenu;
+import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 
@@ -52,6 +55,16 @@ public class DateField extends TriggerField<Date> {
     private String minText;
     private String maxText;
     private String invalidText;
+    private String ariaText = "Press Down arrow to select date from a calendar grid";
+
+    /**
+     * Returns the ARIA instruction text.
+     * 
+     * @return the text
+     */
+    public String getAriaText() {
+      return ariaText;
+    }
 
     /**
      * Returns the invalid text.
@@ -78,6 +91,16 @@ public class DateField extends TriggerField<Date> {
      */
     public String getMinText() {
       return minText;
+    }
+
+    /**
+     * Sets the ARIA instructions for invoking the date picker (defaults to
+     * 'Press Down arrow to select date from a calendar grid').
+     * 
+     * @param ariaText the aria text
+     */
+    public void setAriaText(String ariaText) {
+      this.ariaText = ariaText;
     }
 
     /**
@@ -146,7 +169,6 @@ public class DateField extends TriggerField<Date> {
           focusValue = getValue();
           setValue(menu.getDate());
           menu.hide();
-          el().blur();
         }
       });
       menu.addListener(Events.Hide, new Listener<ComponentEvent>() {
@@ -231,6 +253,12 @@ public class DateField extends TriggerField<Date> {
     this.minValue = minValue;
   }
 
+  protected void collapseIf(PreviewEvent pe) {
+    if (!menu.el().isOrHasChild(pe.getTarget()) && !el().isOrHasChild(pe.getTarget())) {
+      menu.hide();
+    }
+  }
+
   protected void expand() {
     DatePicker picker = getDatePicker();
 
@@ -248,21 +276,13 @@ public class DateField extends TriggerField<Date> {
 
     eventPreview.add();
 
-    menu.show(el().dom, "tl-bl?");
-    menu.focus();
-  }
-
-  protected void onDown(FieldEvent fe) {
-    fe.cancelBubble();
-    if (menu == null || !menu.isAttached()) {
-      expand();
-    }
-  }
-
-  protected void collapseIf(PreviewEvent pe) {
-    if (!menu.el().isOrHasChild(pe.getTarget()) && !el().isOrHasChild(pe.getTarget())) {
-      menu.hide();
-    }
+    // handle case when down arrow is opening menu
+    DeferredCommand.addCommand(new Command() {
+      public void execute() {
+        menu.show(el().dom, "tl-bl?");
+        menu.getDatePicker().focus();
+      }
+    });
   }
 
   @Override
@@ -270,6 +290,17 @@ public class DateField extends TriggerField<Date> {
     super.onDetach();
     if (eventPreview != null) {
       eventPreview.remove();
+    }
+  }
+
+  @Override
+  protected void onKeyDown(FieldEvent fe) {
+    super.onKeyDown(fe);
+    if (fe.getKeyCode() == KeyCodes.KEY_DOWN) {
+      fe.stopEvent();
+      if (menu == null || !menu.isAttached()) {
+        expand();
+      }
     }
   }
 
@@ -292,10 +323,6 @@ public class DateField extends TriggerField<Date> {
     eventPreview.setAutoHide(false);
 
     new KeyNav<FieldEvent>(this) {
-      @Override
-      public void onDown(FieldEvent fe) {
-        DateField.this.onDown(fe);
-      }
 
       @Override
       public void onEsc(FieldEvent fe) {
@@ -304,14 +331,16 @@ public class DateField extends TriggerField<Date> {
         }
       }
     };
+
+    if (GXT.isAriaEnabled()) {
+      getInputEl().dom.setAttribute("title", getMessages().getAriaText());
+    }
   }
 
   @Override
   protected void onTriggerClick(ComponentEvent ce) {
     super.onTriggerClick(ce);
     expand();
-
-    getInputEl().focus();
   }
 
   @Override

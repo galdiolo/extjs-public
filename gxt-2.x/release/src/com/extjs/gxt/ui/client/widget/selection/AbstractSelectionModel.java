@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -32,7 +32,7 @@ import com.google.gwt.user.client.DOM;
  * @param <C> the container type
  * @param <T> the container item type
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public abstract class AbstractSelectionModel<C extends Container<T>, T extends Component>
     implements SelectionModel<C, T>, Listener<ContainerEvent> {
 

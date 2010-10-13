@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -23,6 +23,7 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
+import com.extjs.gxt.ui.client.widget.menu.AdapterMenuItem;
 import com.extjs.gxt.ui.client.widget.menu.CheckMenuItem;
 import com.extjs.gxt.ui.client.widget.menu.DateMenu;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
@@ -58,8 +59,12 @@ public class ToolBarExample extends LayoutContainer {
     combo.setStore(store);
     combo.setTriggerAction(TriggerAction.ALL);
 
+    AdapterMenuItem adapter = new AdapterMenuItem(combo);
+    adapter.setManageFocus(true);
+    adapter.setCanActivate(true);
+    
     Menu menu = new Menu();
-    menu.add(combo);
+    menu.add(adapter);
 
     CheckMenuItem menuItem = new CheckMenuItem("I Like Cats");
     menuItem.setChecked(true);
@@ -136,7 +141,7 @@ public class ToolBarExample extends LayoutContainer {
     panel.setFrame(true);
     panel.setHeading("ToolBar & Menu Demo");
     panel.setLayout(new FitLayout());
-    panel.setSize(500, 300);
+    panel.setSize(550, 300);
     panel.setTopComponent(toolBar);
 
     LayoutContainer c = new LayoutContainer();

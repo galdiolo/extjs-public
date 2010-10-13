@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -69,6 +69,7 @@ public class Items<T extends Component> {
    * @param c the container
    * @return the matching item
    */
+  @SuppressWarnings("rawtypes")
   public T getItem(Container c) {
     List<T> match = getItems(c);
     if (match.size() > 0) {
@@ -83,6 +84,7 @@ public class Items<T extends Component> {
    * @param c the container
    * @return the selected items
    */
+  @SuppressWarnings("rawtypes")
   public List<T> getItems(Container c) {
     List temp = new ArrayList<T>();
 

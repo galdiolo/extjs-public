@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -8,14 +8,15 @@
 package com.extjs.gxt.samples.client.examples.button;
 
 import com.extjs.gxt.samples.resources.client.Resources;
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.ButtonArrowAlign;
 import com.extjs.gxt.ui.client.Style.ButtonScale;
 import com.extjs.gxt.ui.client.Style.IconAlign;
-import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.extjs.gxt.ui.client.widget.button.SplitButton;
 import com.extjs.gxt.ui.client.widget.button.ToggleButton;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
@@ -61,8 +62,10 @@ public class ButtonsExample extends LayoutContainer {
   @Override
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
+
     vp = new VerticalPanel();
     vp.setSpacing(10);
+    vp.getAriaSupport().setIgnore(false);
 
     for (Category cat : Category.values()) {
       vp.add(formatHeader(cat.getText()));
@@ -70,8 +73,7 @@ public class ButtonsExample extends LayoutContainer {
       for (Type type : Type.values()) {
         vp.add(format(type.getText()));
 
-        HorizontalPanel hp = new HorizontalPanel();
-        hp.setSpacing(5);
+        ButtonBar hp = new ButtonBar();
 
         Button small = createButton(cat, type);
         Button medium = createButton(cat, type);
@@ -163,12 +165,17 @@ public class ButtonsExample extends LayoutContainer {
   }
 
   private Html format(String text) {
-    return new Html("<span class='text' style='margin: 10px'>" + text + "</span>");
+    Html html = new Html("<span class='text' style='margin: 10px'>" + text + "</span>");
+    html.getAriaSupport().setIgnore(true);
+    return html;
   }
 
   private Html formatHeader(String text) {
-    return new Html("<div class='text' style='width: 400px; background-color: #ddd;padding: 4px'><b>" + text
+    String bg = "background-color: " + (GXT.isAriaEnabled() ? "#242b3a" : "#dd");
+    Html html = new Html("<div class='text' style='width: 400px;padding: 4px;" + bg + "'><b>" + text
         + "</b></div>");
+    html.getAriaSupport().setIgnore(true);
+    return html;
   }
 
   private void setIcon(Button btn, ButtonScale scale) {

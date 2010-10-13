@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -135,7 +135,7 @@ public class TreeDropTarget extends DropTarget {
     this.autoExpandDelay = autoExpandDelay;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void appendModel(ModelData p, TreeModel model, int index) {
     ModelData child = model.get("model");
     if (p == null) {
@@ -186,7 +186,7 @@ public class TreeDropTarget extends DropTarget {
     activeItem.el().firstChild().addStyleName("my-tree-drop");
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   protected void handleAppendDrop(DNDEvent event, TreeItem item) {
     List sel = event.getData();
     if (sel.size() > 0) {
@@ -250,7 +250,7 @@ public class TreeDropTarget extends DropTarget {
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   protected void handleInsertDrop(DNDEvent event, TreeItem item, int index) {
     List sel = event.getData();
     if (sel.size() > 0) {

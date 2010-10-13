@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -8,6 +8,7 @@
 package com.extjs.gxt.ui.client.store;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -49,8 +50,8 @@ import com.extjs.gxt.ui.client.util.Util;
  * <p/>
  * Remote sorting is not supported with TreeStore.
  * 
+ * <dl>
  * <dt><b>Events:</b></dt>
- * 
  * <dd><b>Store.BeforeDataChanged</b> : TreeStoreEvent(store)<br>
  * <div>Fires before the store's data is changed. Apply applies when a store is
  * bound to a loader.</div>
@@ -118,16 +119,16 @@ import com.extjs.gxt.ui.client.util.Util;
  * </ul>
  * </dd>
  * 
- * </dt>
+ * </dl>
  */
 public class TreeStore<M extends ModelData> extends Store<M> {
 
-  protected Map<M, TreeModel> modelMap;
+  protected TreeLoader<M> loader;
   protected Map<String, TreeModel> modelFastMap;
-  protected Map<String, M> wrapperMap = new FastMap<M>();
+  protected Map<M, TreeModel> modelMap;
   protected BaseTreeModel rootWrapper = new BaseTreeModel();
 
-  protected TreeLoader<M> loader;
+  protected Map<String, M> wrapperMap = new FastMap<M>();
 
   private int counter = 0;
   private Boolean useKeyProvider = null;
@@ -208,9 +209,6 @@ public class TreeStore<M extends ModelData> extends Store<M> {
 
   @Override
   public void applyFilters(String property) {
-    if (filters != null && filters.size() == 0) {
-      return;
-    }
     filterProperty = property;
     filtersEnabled = true;
 
@@ -353,14 +351,9 @@ public class TreeStore<M extends ModelData> extends Store<M> {
    * @return the first child or null if no children
    */
   public M getFirstChild(M parent) {
-    if (parent == null) {
-      if (getRootItems().size() > 0) {
-        return getRootItems().get(0);
-      }
-    } else {
-      if (getChildCount(parent) > 0) {
-        return getChild(parent, 0);
-      }
+    List<M> children = parent == null ? getRootItems() : getChildren(parent);
+    if (children != null && children.size() > 0) {
+      return children.get(0);
     }
     return null;
   }
@@ -373,7 +366,7 @@ public class TreeStore<M extends ModelData> extends Store<M> {
    */
   public M getLastChild(M parent) {
     List<M> children = parent == null ? getRootItems() : getChildren(parent);
-    if (children.size() > 0) {
+    if (children != null && children.size() > 0) {
       return children.get(children.size() - 1);
     }
     return null;
@@ -471,6 +464,29 @@ public class TreeStore<M extends ModelData> extends Store<M> {
    */
   public SortInfo getSortState() {
     return sortInfo;
+  }
+
+  /**
+   * Returns true if the given parent model has any children.
+   * 
+   * @param parent the parent model
+   * @return true if the given parent model has any children
+   */
+  public boolean hasChildren(M parent) {
+    if (parent == null) {
+      return rootWrapper.getChildCount() > 0;
+    } else {
+      TreeModel p = findWrapper(parent);
+      if (p != null) {
+        for (ModelData child : p.getChildren()) {
+          if (!isFiltered((TreeModel) child)) {
+            return true;
+          }
+        }
+      }
+
+    }
+    return false;
   }
 
   /**
@@ -620,9 +636,12 @@ public class TreeStore<M extends ModelData> extends Store<M> {
    * @param field the field to sort by
    * @param sortDir the sort dir
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public void sort(String field, SortDir sortDir) {
-    if (!fireEvent(BeforeSort, createStoreEvent())) {
+    final StoreEvent<M> event = createStoreEvent();
+    event.setSortInfo(new SortInfo(field, sortDir));
+
+    if (!fireEvent(BeforeSort, event)) {
       return;
     }
     SortInfo prev = new SortInfo(sortInfo.getSortField(), sortInfo.getSortDir());
@@ -643,14 +662,15 @@ public class TreeStore<M extends ModelData> extends Store<M> {
 
     sortInfo.setSortField(field);
     sortInfo.setSortDir(sortDir);
-    
+
     if (loader != null && loader instanceof RemoteSortTreeLoader) {
-      final RemoteSortTreeLoader treeLoader = (RemoteSortTreeLoader)loader;
+      final RemoteSortTreeLoader treeLoader = (RemoteSortTreeLoader) loader;
       if (treeLoader.isRemoteSort()) {
         Listener<LoadEvent> l = new Listener<LoadEvent>() {
           public void handleEvent(LoadEvent le) {
             treeLoader.removeListener(Loader.Load, this);
             sortInfo = le.<ListLoadConfig> getConfig().getSortInfo();
+            event.setSortInfo(sortInfo);
             fireEvent(Sort, createStoreEvent());
           }
         };
@@ -671,7 +691,7 @@ public class TreeStore<M extends ModelData> extends Store<M> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void applySort(boolean supressEvent) {
     List<TreeModel> children = (List) rootWrapper.getChildren();
     if (children.size() > 0) {
@@ -687,11 +707,13 @@ public class TreeStore<M extends ModelData> extends Store<M> {
       }
     }
     if (!supressEvent) {
-      fireEvent(Sort, createStoreEvent());
+      StoreEvent<M> event = createStoreEvent();
+      event.setSortInfo(sortInfo);
+      fireEvent(Sort, event);
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void applySort(List<TreeModel> list) {
     storeSorter = storeSorter == null ? new StoreSorter() : storeSorter;
     Collections.sort(list, new Comparator<TreeModel>() {
@@ -725,7 +747,7 @@ public class TreeStore<M extends ModelData> extends Store<M> {
     fireEvent(BeforeDataChanged, createStoreEvent());
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void onLoad(TreeLoadEvent le) {
     if (le.parent == null) {
       removeAll(true);
@@ -733,7 +755,8 @@ public class TreeStore<M extends ModelData> extends Store<M> {
       for (M model : (List<M>) le.getData()) {
         insert.add(wrap(model));
       }
-      if (le.<Object> getConfig() instanceof ListLoadConfig) {
+      Object obj = le.getConfig();
+      if (obj != null && obj instanceof ListLoadConfig) {
         ListLoadConfig config = le.getConfig();
         if (config.getSortInfo().getSortField() != null) {
           sortInfo = config.getSortInfo();
@@ -742,7 +765,12 @@ public class TreeStore<M extends ModelData> extends Store<M> {
         }
       }
       doInsert(rootWrapper, insert, 0, false, true);
-      fireEvent(DataChanged, new TreeStoreEvent(this));
+      if (filtersEnabled) {
+        filtersEnabled = false;
+        applyFilters(filterProperty);
+      } else {
+        fireEvent(DataChanged, new TreeStoreEvent(this));
+      }
     } else {
       TreeModel wrapper = findWrapper((M) le.parent);
       if (wrapper != null) {
@@ -755,10 +783,15 @@ public class TreeStore<M extends ModelData> extends Store<M> {
           insert.add(wrap(model));
         }
         doInsert(wrapper, insert, 0, false, true);
-        TreeStoreEvent evt = new TreeStoreEvent(this);
-        evt.setParent(le.parent);
-        evt.setChildren(unwrapChildren(wrapper));
-        fireEvent(DataChanged, evt);
+        if (filtersEnabled) {
+          filtersEnabled = false;
+          applyFilters(filterProperty);
+        } else {
+          TreeStoreEvent evt = new TreeStoreEvent(this);
+          evt.setParent(le.parent);
+          evt.setChildren(unwrapChildren(wrapper));
+          fireEvent(DataChanged, evt);
+        }
       }
     }
   }
@@ -791,6 +824,25 @@ public class TreeStore<M extends ModelData> extends Store<M> {
     }
   }
 
+  protected void swapModelInstance(M oldModel, M newModel) {
+    super.swapModelInstance(oldModel, newModel);
+    if (useKeyProvider != null) {
+      TreeModel wrapper = null;
+      if (useKeyProvider) {
+        wrapper = modelFastMap.get(getKey(oldModel));
+      } else {
+        wrapper = modelMap.get(oldModel);
+      }
+      if (wrapper != null) {
+        wrapperMap.put(wrapper.<String> get("id"), newModel);
+        if (!useKeyProvider && modelMap != null) {
+          modelMap.remove(oldModel);
+          modelMap.put(newModel, wrapper);
+        }
+      }
+    }
+  }
+
   protected List<M> unwrap(List<TreeModel> models) {
     List<M> children = new ArrayList<M>();
     if (isFiltered()) {
@@ -812,7 +864,7 @@ public class TreeStore<M extends ModelData> extends Store<M> {
     return wrapperMap.get(wrapper.<String> get("id"));
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected List<M> unwrapChildren(TreeModel parent) {
     return unwrap((List) parent.getChildren());
   }
@@ -838,13 +890,14 @@ public class TreeStore<M extends ModelData> extends Store<M> {
     return wrapper;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private void doInsert(TreeModel parent, List<TreeModel> children, int index, boolean addChildren, boolean supressEvent) {
     if (parent != null && children != null && children.size() > 0) {
       M modelParent = unwrap(parent);
       for (int i = children.size() - 1; i >= 0; i--) {
-        parent.insert(children.get(i), index);
-        M m = unwrap(children.get(i));
+        TreeModel child = children.get(i);
+        parent.insert(child, index);
+        M m = unwrap(child);
         all.add(m);
         registerModel(m);
         if (storeSorter != null) {
@@ -852,8 +905,8 @@ public class TreeStore<M extends ModelData> extends Store<M> {
           if (!supressEvent) {
             TreeStoreEvent evt = createStoreEvent();;
             evt.setParent(modelParent);
-            evt.setIndex(parent.indexOf(children.get(i)));
-            evt.setChildren(Util.createList(m));
+            evt.setIndex(parent.indexOf(child));
+            evt.setChildren(Arrays.asList(m));
             fireEvent(Add, evt);
           }
         }
@@ -872,13 +925,18 @@ public class TreeStore<M extends ModelData> extends Store<M> {
           M model = unwrap(sub);
           if (model instanceof TreeModel) {
             TreeModel treeSub = (TreeModel) model;
-            List<TreeModel> insert = new ArrayList<TreeModel>();
+
             List<M> c = (List) treeSub.getChildren();
-            for (M m : c) {
-              insert.add(wrap(m));
+            if (c.size() > 0) {
+              List<TreeModel> insert = new ArrayList<TreeModel>();
+              for (M m : c) {
+                insert.add(wrap(m));
+              }
+              doInsert(sub, insert, getChildCount(model), true, supressEvent);
+
+              update(model);
             }
-            doInsert(sub, insert, getChildCount(model), true, false);
-            update(model);
+
           }
         }
       }
@@ -979,6 +1037,9 @@ public class TreeStore<M extends ModelData> extends Store<M> {
   }
 
   private void removeAll(boolean supressEvent) {
+    for (M m : all) {
+      unregisterModel(m);
+    }
     all.clear();
     modified.clear();
     recordMap.clear();

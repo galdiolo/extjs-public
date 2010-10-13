@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.extjs.gxt.charts.client.model.LineDataProvider;
+import com.extjs.gxt.charts.client.model.axis.HasRightAxis;
 import com.extjs.gxt.charts.client.model.charts.dots.BaseDot;
 import com.extjs.gxt.charts.client.model.charts.dots.Dot;
 import com.extjs.gxt.charts.client.model.charts.dots.SolidDot;
@@ -19,7 +20,7 @@ import com.extjs.gxt.ui.client.data.BaseModel;
 /**
  * OFC line chart
  */
-public class LineChart extends ChartConfig {
+public class LineChart extends ChartConfig implements HasRightAxis {
 
   public static class LineStyle extends BaseModel {
 

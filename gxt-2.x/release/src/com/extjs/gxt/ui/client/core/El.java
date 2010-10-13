@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -41,7 +41,9 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 
 /**
@@ -66,13 +68,8 @@ public class El {
   private static Map<String, El> flyweights = new FastMap<El>();
 
   private static ComputedStyleImpl computedStyle = GWT.create(ComputedStyleImpl.class);
-
-  @SuppressWarnings("unused")
   private static JavaScriptObject leftRightTest;
-  
-  @SuppressWarnings("unused")
   private static JavaScriptObject removeStyleNameReCache;
-
 
   static {
     GXT.init();
@@ -110,6 +107,7 @@ public class El {
    * @return the el instance
    */
   public static El fly(com.google.gwt.dom.client.Element element, String s) {
+    assert element != null : "Element my not be null";
     El g = flyweights.get(s);
     if (g == null) {
       g = new El(DOM.createDiv());
@@ -132,6 +130,7 @@ public class El {
    * @return the global El object
    */
   public static El fly(Element element, String s) {
+    assert element != null : "Element my not be null";
     El g = flyweights.get(s);
     if (g == null) {
       g = new El(DOM.createDiv());
@@ -252,9 +251,26 @@ public class El {
     if (styleNames != null) {
       for (String styleName : styleNames) {
         if (styleName != null && !hasStyleName(styleName)) {
+          styleName = styleName.trim();
           dom.setClassName(dom.getClassName() + " " + styleName);
         }
       }
+    }
+    return this;
+  }
+
+  /**
+   * Toggles the given style name, adding if not already present, removing if
+   * present.
+   * 
+   * @param styleName the style name to toggle
+   * @return this
+   */
+  public El toggleStyleName(String styleName) {
+    if (hasStyleName(styleName)) {
+      removeStyleName(styleName);
+    } else {
+      addStyleName(styleName);
     }
     return this;
   }
@@ -1112,7 +1128,7 @@ public class El {
     if (content) {
       h -= getFrameWidth("tb");
     }
-    return h;
+    return Math.max(0,h);
   }
 
   /**
@@ -1357,7 +1373,7 @@ public class El {
       w -= frameWidth.width;
       h -= frameWidth.height;
     }
-    return new Size(w, h);
+    return new Size(Math.max(0,w),Math.max(0,h));
   }
 
   public FastMap<String> getStyleAttribute(List<String> attr) {
@@ -1397,40 +1413,98 @@ public class El {
     return dom.getClassName();
   }
 
+  public Size getStyleSize() {
+    return getStyleSize(true);
+  }
+
   /**
    * Returns the element's size, using style attribute before offsets.
    * 
    * @return the size
    */
-  public Size getStyleSize() {
-    Size frameWidth = null;
+  public Size getStyleSize(boolean contentOnly) {
+    int h = Util.parseInt(dom.getStyle().getProperty("height"), Style.DEFAULT);
+    int w = Util.parseInt(dom.getStyle().getProperty("width"), Style.DEFAULT);
+    
     boolean isBorderBox = isBorderBox();
-    if (isBorderBox) {
-      frameWidth = getFrameSize();
+
+    if (isBorderBox && contentOnly && w != Style.DEFAULT) {
+      w -= getFrameWidth("lr");
+      if (w < 0) {
+        w = Style.DEFAULT;
+      }
+    } else if (!isBorderBox && !contentOnly && w != Style.DEFAULT) {
+      w += getFrameWidth("lr");
     }
-    List<String> l = new ArrayList<String>();
-    l.add("width");
-    l.add("height");
-    Map<String, String> map = getStyleAttribute(l);
-    int w = Style.DEFAULT, h = Style.DEFAULT;
-    String width = map.get("width");
-    if (!"".equals(width) && !"auto".equals(width)) {
-      w = Util.parseInt(width, 10);
-      if (isBorderBox) {
-        w -= frameWidth.width;
+    if (isBorderBox && contentOnly && h != Style.DEFAULT) {
+      h -= getFrameWidth("tb");
+      if (h < 0) {
+        h = Style.DEFAULT;
+      }
+    } else if (!isBorderBox && !contentOnly && h != Style.DEFAULT) {
+      h += getFrameWidth("tb");
+    }
+
+    int offsetWidth = Style.DEFAULT;
+    int offsetHeight = Style.DEFAULT;
+    if (w == Style.DEFAULT && h == Style.DEFAULT) {
+      Size s = getSize(contentOnly);
+      offsetWidth = s.width;
+      offsetHeight = s.height;
+      if (s.width > 0) {
+        w = s.width;
+      }
+      if (s.height > 0) {
+        h = s.height;
+      }
+    } else if (w == Style.DEFAULT) {
+      offsetWidth = getWidth(contentOnly);
+      if (offsetWidth > 0) {
+        w = offsetWidth;
+      }
+    } else if (h == Style.DEFAULT) {
+      offsetHeight = getHeight(contentOnly);
+      if (offsetHeight > 0) {
+        h = offsetHeight;
       }
     }
-    String height = map.get("height");
-    if (!"".equals(height) && !"auto".equals(height)) {
-      h = Util.parseInt(height, 10);
-      if (isBorderBox) {
-        h -= frameWidth.height;
+
+    List<String> l = new ArrayList<String>();
+    if (w == Style.DEFAULT) {
+      l.add("width");
+    }
+    if (h == Style.DEFAULT) {
+      l.add("height");
+    }
+    Map<String, String> map = getStyleAttribute(l);
+    if (map != null) {
+      String wid = map.get("width");
+      if (wid != null) {
+        w = Util.parseInt(wid, Style.DEFAULT);
+        if (offsetWidth == 0 &&isBorderBox  && contentOnly && w != Style.DEFAULT && !GXT.isIE) {
+          w -= getFrameWidth("lr");
+        } else if(GXT.isIE && isBorderBox && w != Style.DEFAULT && contentOnly){
+          w-= getFrameWidth("lr");
+        } else if(offsetWidth == 0 && !isBorderBox && !contentOnly && w != Style.DEFAULT){
+          w += getFrameWidth("lr");
+        }
+      }
+      String hei = map.get("height");
+      if (hei != null) {
+        h = Util.parseInt(hei, Style.DEFAULT);
+        if (offsetHeight == 0 && isBorderBox && contentOnly && h != Style.DEFAULT && !GXT.isIE) {
+          h -= getFrameWidth("tb");
+        } else if(GXT.isIE && isBorderBox && h != Style.DEFAULT && contentOnly){
+          h-= getFrameWidth("tb");
+        } else if(offsetHeight == 0 && !isBorderBox && !contentOnly && h != Style.DEFAULT ){
+          h+= getFrameWidth("tb");
+        }
       }
     }
     if (w == Style.DEFAULT && h == Style.DEFAULT) {
-      return getSize(true);
+      return new Size(offsetWidth, offsetHeight);
     }
-    return new Size(w != Style.DEFAULT ? w : getWidth(true), h != Style.DEFAULT ? h : getHeight(true));
+    return new Size(w != Style.DEFAULT ? w : offsetWidth, h != Style.DEFAULT ? h : offsetHeight);
   }
 
   /**
@@ -1522,7 +1596,7 @@ public class El {
     if (content) {
       w -= getFrameWidth("lr");
     }
-    return w;
+    return Math.max(0,w);
   }
 
   /**
@@ -2097,7 +2171,7 @@ public class El {
     }
     return this;
   }
-  
+
   /**
    * Removes a style name.
    * 
@@ -2123,7 +2197,11 @@ public class El {
    */
   public El repaint() {
     addStyleName("x-repaint");
-    removeStyleName("x-repaint");
+    DeferredCommand.addCommand(new Command() {
+      public void execute() {
+        removeStyleName("x-repaint");
+      }
+    });
     return this;
   }
 
@@ -2214,7 +2292,11 @@ public class El {
    * @return this
    */
   public El scrollTo(String side, int value, FxConfig config) {
-    BaseEffect.scroll(this, config, ScrollDir.HORIZONTAL, value);
+    ScrollDir dir = ScrollDir.VERTICAL;
+    if (side.equalsIgnoreCase("left")) {
+      dir = ScrollDir.HORIZONTAL;
+    }
+    BaseEffect.scroll(this, config, dir, value);
     return this;
   }
 
@@ -2651,7 +2733,7 @@ public class El {
    * @return this
    */
   public El setStyleAttribute(String attr, Object value) {
-    computedStyle.setStyleAttribute(dom, attr, String.valueOf(value));
+    computedStyle.setStyleAttribute(dom, attr, value);
     return this;
   }
 

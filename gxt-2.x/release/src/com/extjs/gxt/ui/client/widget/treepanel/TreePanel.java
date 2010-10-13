@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -38,6 +38,7 @@ import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.store.TreeStoreEvent;
 import com.extjs.gxt.ui.client.util.DelayedTask;
 import com.extjs.gxt.ui.client.util.KeyNav;
+import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanelView.TreeViewRenderMode;
 import com.google.gwt.dom.client.Document;
@@ -207,9 +208,6 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     TreeNode(String id, M m) {
       this.id = id;
       this.m = m;
-      if (loader != null && !loaded) {
-        leaf = !loader.hasChildren(m);
-      }
     }
 
     public void clearElements() {
@@ -314,10 +312,8 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     }
   };
   private TreeStyle style = new TreeStyle();
-
   private boolean trackMouseOver = true;
   private DelayedTask updateTask, cleanTask;
-
   private Boolean useKeyProvider = null;
 
   /**
@@ -376,9 +372,9 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
 
   public List<M> getCheckedSelection() {
     List<M> checked = new ArrayList<M>();
-    for (M m : store.getAllItems()) {
-      if (isChecked(m)) {
-        checked.add(m);
+    for (TreeNode n : nodes.values()) {
+      if (n.checked) {
+        checked.add(n.m);
       }
     }
     return checked;
@@ -564,7 +560,7 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public void onComponentEvent(ComponentEvent ce) {
     super.onComponentEvent(ce);
     TreePanelEvent<M> tpe = (TreePanelEvent) ce;
@@ -688,13 +684,11 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
       if (fireEvent(Events.BeforeCheckChange, evt)) {
         node.checked = checked;
 
-        if (view.getCheckElement(node) != null) {
-          view.onCheckChange(node, checkable, checked);
-        }
+        view.onCheckChange(node, checkable, checked);
 
         fireEvent(Events.CheckChange, evt);
 
-        CheckChangedEvent<M> cce = new CheckChangedEvent<M>(this, getCheckedSelection());
+        CheckChangedEvent<M> cce = new CheckChangedEvent<M>(this, (M) null);
         fireEvent(Events.CheckChanged, cce);
 
         onCheckCascade(item, checked);
@@ -777,25 +771,26 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
    * @param deep true to expand all children recursively
    */
   public void setExpanded(M model, boolean expand, boolean deep) {
+    if (expand) {
+      // make parents visible
+      List<M> list = new ArrayList<M>();
+      M p = model;
+      while ((p = store.getParent(p)) != null) {
+        TreeNode n = findNode(p);
+        if (n != null && !n.isExpanded()) {
+          list.add(p);
+        }
+      }
+      for (int i = list.size() - 1; i >= 0; i--) {
+        M item = list.get(i);
+        setExpanded(item, expand, false);
+      }
+    }
     TreeNode node = findNode(model);
     if (node != null) {
       if (!rendered) {
         node.expand = expand;
         return;
-      }
-      if (expand) {
-        // make parents visible
-        List<M> list = new ArrayList<M>();
-        M p = model;
-        while ((p = store.getParent(p)) != null) {
-          if (!findNode(p).isExpanded()) {
-            list.add(p);
-          }
-        }
-        for (int i = list.size() - 1; i >= 0; i--) {
-          M item = list.get(i);
-          setExpanded(item, expand, false);
-        }
       }
       if (expand) {
         onExpand(model, node, deep);
@@ -914,15 +909,6 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     TreeNode node = findNode(model);
     if (node != null) {
       setExpanded(model, !node.expanded);
-    }
-  }
-
-  protected void afterRender() {
-    super.afterRender();
-    update();
-    List<M> list = sm.getSelectedItems();
-    for (M m : list) {
-      view.onSelectChange(m, true);
     }
   }
 
@@ -1075,20 +1061,19 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
   protected boolean hasChildren(M model) {
     TreeNode node = findNode(model);
     if (loader != null && !node.loaded) {
-      return loader.hasChildren(model);
+      return loader.hasChildren(node.m);
     }
-    if (!node.leaf || store.getChildCount(model) > 0) {
+    if (!node.leaf ||  store.hasChildren(node.m)) {
       return true;
     }
     return false;
   }
 
+  
   @Override
   protected void notifyShow() {
     super.notifyShow();
-    if (GXT.isWebKit) {
-      update();
-    }
+    update();
   }
 
   protected void onAdd(TreeStoreEvent<M> se) {
@@ -1119,6 +1104,12 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     }
   }
 
+  @Override
+  protected void onAttach() {
+    super.onAttach();
+    update();
+  }
+
   protected void onCheckCascade(M model, boolean checked) {
     switch (getCheckStyle()) {
       case PARENTS:
@@ -1141,7 +1132,7 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void onCheckClick(TreePanelEvent tpe, TreeNode node) {
     tpe.stopEvent();
     setChecked((M) tpe.getItem(), !node.checked);
@@ -1151,13 +1142,18 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     clear();
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void onClick(TreePanelEvent tpe) {
     TreeNode node = tpe.getNode();
     if (node != null) {
       Element jointEl = view.getJointElement(node);
       if (jointEl != null && tpe.within(jointEl)) {
         toggle((M) tpe.getItem());
+      } else if (GXT.isHighContrastMode) {
+        Rectangle r = El.fly(jointEl).getBounds();
+        if (r.contains(tpe.getClientX(), tpe.getClientY())) {
+          toggle((M) tpe.getItem());
+        }
       }
       Element checkEl = view.getCheckElement(node);
       if (checkable && checkEl != null && tpe.within(checkEl)) {
@@ -1166,7 +1162,7 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void onCollapse(M model, TreeNode node, boolean deep) {
     TreePanelEvent<M> tpe = new TreePanelEvent<M>(this);
     tpe.setItem(model);
@@ -1237,11 +1233,12 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
         setExpanded(p, true, deep);
         caching = c;
       }
+      refresh(p);
       statefulExpand(store.getChildren(p));
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void onDoubleClick(TreePanelEvent tpe) {
     TreeNode node = tpe.getNode();
     if (node != null) {
@@ -1249,7 +1246,7 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void onExpand(M model, TreeNode node, boolean deep) {
     TreePanelEvent<M> tpe = new TreePanelEvent<M>(this);
     tpe.setItem(model);
@@ -1311,6 +1308,10 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     update();
   }
 
+  protected void onFocus(ComponentEvent ce) {
+    FocusFrame.get().frame(this);
+  }
+
   protected void onRemove(TreeStoreEvent<M> se) {
     TreeNode node = findNode(se.getChild());
     if (node != null && node.getElement() != null) {
@@ -1328,10 +1329,6 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     }
   }
 
-  protected void onFocus(ComponentEvent ce) {
-    FocusFrame.get().frame(this);
-  }
-
   @Override
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
@@ -1340,6 +1337,9 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
 
     el().show();
     el().setStyleAttribute("overflow", "auto");
+    if ((GXT.isIE6 || GXT.isIE7) && GXT.isStrict) {
+      el().makePositionable();
+    }
     el().setTabIndex(0);
     el().setElementAttribute("hideFocus", "true");
 
@@ -1411,7 +1411,8 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
         view.onIconStyleChange(node, calculateIconStyle(model));
         view.onJointChange(node, calcualteJoint(model));
         view.onTextChange(node, getText(model));
-        view.onCheckChange(node, isCheckable(node), node.checked);
+        boolean checkable = isCheckable(node);
+        setChecked(node.m, node.checked && checkable);
       }
     }
   }
@@ -1482,7 +1483,9 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
           if (store.isFiltered()) {
             renderChildren(child);
           } else {
-            loader.loadChildren(child);
+            if (loader.hasChildren(child)) {
+              loader.loadChildren(child);
+            }
           }
         }
       } else if (autoLoad) {
@@ -1492,6 +1495,7 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
 
     TreeNode n = findNode(parent);
     if (n != null) {
+      onCheckCascade(n.m, n.checked);
       n.childrenRendered = true;
     }
     update();
@@ -1580,7 +1584,7 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private void statefulExpand(List<M> children) {
     if (isStateful() && store.getKeyProvider() != null) {
       List<String> expanded = (List) getState().get("expanded");
@@ -1590,6 +1594,7 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
           if (expanded.contains(id)) {
             setExpanded(child, true);
           }
+          statefulExpand(store.getChildren(child));
         }
       }
     }

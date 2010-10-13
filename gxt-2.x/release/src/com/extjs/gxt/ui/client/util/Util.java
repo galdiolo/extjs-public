@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -25,7 +25,7 @@ import com.google.gwt.user.client.Element;
  */
 public class Util {
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public static List subList(List list, int start, int end) {
     List temp = new ArrayList();
     for (int i = start; i < end; i++) {
@@ -73,7 +73,7 @@ public class Util {
    * @param collection the collection
    * @return the list
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public static List createList(Collection collection) {
     if (collection instanceof List) {
       return (List) collection;
@@ -93,7 +93,7 @@ public class Util {
    * @param element the item to add to the list
    * @return the new list
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public static List createList(Object... element) {
     List list = new ArrayList();
     fill(list, element);
@@ -116,7 +116,7 @@ public class Util {
    * @param list the list
    * @param elements the elements to be added to the list
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public static void fill(List list, Object[] elements) {
     for (int i = 0; i < elements.length; i++) {
       list.add(elements[i]);
@@ -140,7 +140,7 @@ public class Util {
    * @param maxDepth the maximum number of sub models to process
    * @return the javascript object
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public static JavaScriptObject getJsObject(ModelData model, int maxDepth) {
     JsObject jsObj = new JsObject();
     for (String key : model.getPropertyNames()) {
@@ -166,7 +166,7 @@ public class Util {
   /**
    * Iterates down into Collection, producing the required JsArray
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   private static JsArray processCollection(Collection c, int maxDepth) {
     JsArray jsArray = new JsArray();
     if (maxDepth > 0) {

@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -86,7 +86,7 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
    * @param store the store
    * @param cm the column model
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public EditorGrid(ListStore store, ColumnModel cm) {
     super(store, cm);
     setSelectionModel(new CellSelectionModel<M>());
@@ -176,6 +176,7 @@ public class EditorGrid<M extends ModelData> extends Grid<M> {
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
     editSupport.doRender();
+    setAriaState("aria-readonly", "false");
   }
 
 }

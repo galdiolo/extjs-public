@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -208,6 +208,7 @@ public class Dialog extends Window {
    */
   protected void createButtons() {
     getButtonBar().removeAll();
+    setFocusWidget(null);
     if (buttons.indexOf(OK) != -1) {
       Button okBtn = new Button(okText);
       okBtn.setItemId(OK);
@@ -228,6 +229,7 @@ public class Dialog extends Window {
       Button noBtn = new Button(noText);
       noBtn.setItemId(NO);
       noBtn.addSelectionListener(l);
+      setFocusWidget(noBtn);
       addButton(noBtn);
     }
 
@@ -235,6 +237,7 @@ public class Dialog extends Window {
       Button cancelBtn = new Button(cancelText);
       cancelBtn.setItemId(CANCEL);
       cancelBtn.addSelectionListener(l);
+      setFocusWidget(cancelBtn);
       addButton(cancelBtn);
     }
 
@@ -249,8 +252,8 @@ public class Dialog extends Window {
 
   /**
    * Called after a button in the button bar is selected. If
-   * {@link #setHideOnButtonClick(boolean)} is true, closes or hides the dialog
-   * when any button is pressed, determined by {@link #closeAction}.
+   * {@link #setHideOnButtonClick(boolean)} is true, hides the dialog
+   * when any button is pressed.
    * 
    * @param button the button
    */

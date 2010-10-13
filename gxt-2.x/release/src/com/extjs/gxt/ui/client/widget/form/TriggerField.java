@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -61,7 +61,6 @@ public class TriggerField<D> extends TextField<D> {
 
   public TriggerField() {
     super();
-    ensureVisibilityOnSizing = true;
   }
 
   /**
@@ -124,6 +123,9 @@ public class TriggerField<D> extends TextField<D> {
         fromEl.dom.setPropertyBoolean("readOnly", !editable);
       }
       fromEl.setStyleName("x-triggerfield-noedit", !editable);
+      if (GXT.isAriaEnabled()) {
+        fromEl.dom.setAttribute("aria-readonly", editable ? "false" : "true");
+      }
     }
   }
 
@@ -168,7 +170,7 @@ public class TriggerField<D> extends TextField<D> {
 
   @Override
   protected Size adjustInputSize() {
-    return new Size(trigger.getWidth(), 0);
+    return new Size(hideTrigger ? 0 : trigger.getStyleSize().width, 0);
   }
 
   @Override
@@ -259,9 +261,13 @@ public class TriggerField<D> extends TextField<D> {
 
     input.addStyleName(fieldStyle);
 
-    trigger = new El(DOM.createImg());
+    trigger = new El(GXT.isHighContrastMode ? DOM.createDiv() : DOM.createImg());
     trigger.dom.setClassName("x-form-trigger " + triggerStyle);
     trigger.dom.setPropertyString("src", GXT.BLANK_IMAGE_URL);
+    if (GXT.isAriaEnabled()) {
+      trigger.dom.setPropertyString("alt", "Dropdown");
+    }
+
     el().appendChild(input.dom);
     el().appendChild(trigger.dom);
 
@@ -279,7 +285,7 @@ public class TriggerField<D> extends TextField<D> {
   @Override
   protected void onResize(int width, int height) {
     super.onResize(width, height);
-    if (GXT.isIE && !hideTrigger) {
+    if (GXT.isIE && !GXT.isIE8 && !hideTrigger) {
       int y;
       if ((y = input.getY()) != trigger.getY()) {
         trigger.setY(y);

@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -22,7 +22,7 @@ import com.extjs.gxt.ui.client.widget.grid.Grid;
  * This is the default implementation of a ColumnModel used by the Table.
  * 
  * <dl>
- * <dt>Events:</dt>
+ * <dt><b>Events:</b></dt>
  * 
  * <dd><b>Resize</b> : TableEvent(table, columnIndex, width)<br>
  * <div>Fires after a column is resized.</div>
@@ -206,7 +206,6 @@ public class TableColumnModel extends BaseObservable {
   }
 
   protected int getWidthInPixels(int index) {
-    // TODO: need to stop calcs when column size has not changed
     TableColumn col = getColumn(index);
     float width = getColumn(index).getWidth();
     if (width <= 1) {

@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -64,7 +64,7 @@ public class AggregateModelStringProvider<M extends ModelData> implements ModelS
     this.stringProvider = provider;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public String getStringValue(M model, String property) {
     if (propertyProviders != null && propertyProviders.containsKey(property)) {
       return propertyProviders.get(property).getStringValue(model, property);

@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -32,7 +32,6 @@ public class GroupingGridExample extends LayoutContainer {
   @Override
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
-
     setLayout(new FlowLayout(10));
 
     GroupingStore<Stock> store = new GroupingStore<Stock>();
@@ -78,7 +77,7 @@ public class GroupingGridExample extends LayoutContainer {
     panel.setSize(700, 450);
     panel.setLayout(new FitLayout());
     panel.add(grid);
-
+    grid.getAriaSupport().setLabelledBy(panel.getHeader().getId() + "-label");
     add(panel);
   }
 

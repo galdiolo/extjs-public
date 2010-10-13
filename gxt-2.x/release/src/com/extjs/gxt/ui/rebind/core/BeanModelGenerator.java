@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -214,50 +214,46 @@ public class BeanModelGenerator extends Generator {
       sw.println("Object value = ((" + typeName + ")bean)." + s + "();");
 
       try {
-        if (returnType != null && returnType.isAssignableTo(oracle.getType(List.class.getName())) && returnType.isParameterized() != null) {
-              JParameterizedType type = returnType.isParameterized();
-              JClassType[] params = type.getTypeArgs();
-              if (beans.contains(params[0])) {
-                sw.println("if (value != null) {");
-                sw.indent();
-                sw.println("java.util.List list = (java.util.List)value;");
-                sw.println("java.util.List temp = new java.util.ArrayList();");
-                sw.println("for (Object obj : list) {");
-                sw.indent();
-                sw.println("temp.add(");
-                sw.println(BeanModelLookup.class.getCanonicalName() + ".get().getFactory("
-                    + params[0].getQualifiedSourceName() + ".class).createModel(obj));");
-                sw.outdent();
-                sw.println("}");
-                sw.println("return (X) temp;");
-                sw.outdent();
-                sw.println("}");
+        if (returnType != null && returnType.isAssignableTo(oracle.getType(List.class.getName()))
+            && returnType.isParameterized() != null) {
+          JParameterizedType type = returnType.isParameterized();
+          JClassType[] params = type.getTypeArgs();
+          if (beans.contains(params[0])) {
+            sw.println("if (value != null) {");
+            sw.indent();
+            sw.println("java.util.List list = (java.util.List)value;");
+            sw.println("java.util.List list2 = " + BeanModelLookup.class.getCanonicalName() + ".get().getFactory("
+                + params[0].getQualifiedSourceName() + ".class).createModel((java.util.Collection) list);");
+            sw.outdent();
+            sw.println("return (X) list2;");
+            sw.println("}");
           }
-        }
-        // swap returnType as generic types were not matching
-        // (beans.contains(returnType))
-        if (returnType != null) {
-          String t = returnType.getQualifiedSourceName();
-          if (t.indexOf("extends") == -1) {
-            returnType = oracle.getType(t);
+        } else {
+          // swap returnType as generic types were not matching
+          // (beans.contains(returnType))
+          if (returnType != null) {
+            String t = returnType.getQualifiedSourceName();
+            if (t.indexOf("extends") == -1) {
+              returnType = oracle.getType(t);
+            }
           }
-        }
-        if (beans.contains(returnType)) {
-          sw.println("if (value != null) {");
-          sw.println("    BeanModel nestedModel = nestedModels.get(s);");
-          sw.println("    if (nestedModel != null) {");
-          sw.println("      Object bean = nestedModel.getBean();");
-          sw.println("      if (!bean.equals(value)){");
-          sw.println("        nestedModel = null;");
-          sw.println("      }");
-          sw.println("    }");
-          sw.println("    if (nestedModel == null) {");
-          sw.println("        nestedModel = " + BeanModelLookup.class.getCanonicalName() + ".get().getFactory("
-              + returnType.getQualifiedSourceName() + ".class).createModel(value);");
-          sw.println("        nestedModels.put(s, nestedModel);");
-          sw.println("    }");
-          sw.println("    return (X)processValue(nestedModel);");
-          sw.println("}");
+          if (beans.contains(returnType)) {
+            sw.println("if (value != null) {");
+            sw.println("    BeanModel nestedModel = nestedModels.get(s);");
+            sw.println("    if (nestedModel != null) {");
+            sw.println("      Object bean = nestedModel.getBean();");
+            sw.println("      if (!bean.equals(value)){");
+            sw.println("        nestedModel = null;");
+            sw.println("      }");
+            sw.println("    }");
+            sw.println("    if (nestedModel == null) {");
+            sw.println("        nestedModel = " + BeanModelLookup.class.getCanonicalName() + ".get().getFactory("
+                + returnType.getQualifiedSourceName() + ".class).createModel(value);");
+            sw.println("        nestedModels.put(s, nestedModel);");
+            sw.println("    }");
+            sw.println("    return (X)processValue(nestedModel);");
+            sw.println("}");
+          }
         }
       } catch (Exception e) {
         e.printStackTrace();
@@ -288,6 +284,21 @@ public class BeanModelGenerator extends Generator {
     sw.println("public <X> X set(String s, X val) {");
     sw.indent();
     sw.println("Object obj = val;");
+    
+    sw.println("if (obj instanceof BeanModel) {");
+      sw.println("obj = ((BeanModel) obj).getBean();");
+    sw.println("} else if (obj instanceof java.util.List) {");
+      sw.println("java.util.List list = new java.util.ArrayList();");
+      sw.println("for(Object o : (java.util.List) obj) {");
+        sw.println("if(o instanceof BeanModel) {");
+          sw.println("list.add(((BeanModel) o).getBean());");
+        sw.println("} else {");
+        sw.println("list.add(obj);");
+        sw.println("}");
+      sw.println("}");
+      sw.println("obj = list;");
+    sw.println("}");
+    
     sw.println("if (allowNestedValues && val instanceof BeanModel) {");
     sw.indent();
     sw.println("obj = ((BeanModel)val).getBean();");
@@ -337,6 +348,7 @@ public class BeanModelGenerator extends Generator {
       sw.println("if (s.equals(\"" + p + "\")) {");
       sw.indent();
       sw.println("Object old = get(s);");
+           
       sw.println("((" + typeName + ")bean)." + s + "((" + type + ")obj);");
       sw.println("notifyPropertyChanged(s, val, old);");
       sw.println("return (X)old;");

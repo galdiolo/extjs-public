@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -32,18 +32,6 @@ public class ComponentHelper {
     return c.<LayoutData> getData("layoutData");
   }
 
-  public static void setLayoutData(Component c, LayoutData data) {
-    Widget parent = c.getParent();
-    c.setData("layoutData", data);
-    if (parent != null && parent instanceof Container<?>) {
-      ((Container<?>) parent).setLayoutNeeded(true);
-    }
-  }
-
-  public static void setModel(Component c, ModelData model) {
-    c.setModel(model);
-  }
-
   @SuppressWarnings("unchecked")
   public static void removeFromParent(Widget widget) {
     Widget parent = widget.getParent();
@@ -59,7 +47,7 @@ public class ComponentHelper {
       }
     }
     if (parent instanceof Container) {
-      ((Container) parent).remove((Component) widget);
+      ((Container<Component>) parent).remove((Component) widget);
       return;
     }
     if (parent instanceof WidgetComponent) {
@@ -69,15 +57,27 @@ public class ComponentHelper {
     widget.removeFromParent();
   }
 
+  public static void setLayoutData(Component c, LayoutData data) {
+    Widget parent = c.getParent();
+    c.setData("layoutData", data);
+    if (parent != null && parent instanceof Container<?>) {
+      ((Container<?>) parent).setLayoutNeeded(true);
+    }
+  }
+
+  public static void setModel(Component c, ModelData model) {
+    c.setModel(model);
+  }
+
+  public static native void setParent(Widget parent, Widget child) /*-{
+  child.@com.google.gwt.user.client.ui.Widget::parent = parent;
+}-*/;
+
   static native void doAttachNative(Widget widget) /*-{
     widget.@com.google.gwt.user.client.ui.Widget::onAttach()();
   }-*/;
-
+  
   static native void doDetachNative(Widget widget) /*-{
     widget.@com.google.gwt.user.client.ui.Widget::onDetach()();
   }-*/;
-  
-  private static native void setParent(Widget parent, Widget child) /*-{
-  child.@com.google.gwt.user.client.ui.Widget::parent = parent;
-}-*/;
 }

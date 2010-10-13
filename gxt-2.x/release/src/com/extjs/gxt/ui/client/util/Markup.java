@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -24,25 +24,25 @@ public class Markup {
 
   static {
     StringBuffer sb = new StringBuffer();
-    sb.append("<div class={0}-tl><div class={0}-tr><div class={0}-tc></div></div></div>");
-    sb.append("<div class={0}-ml><div class={0}-mr><div class={0}-mc></div></div></div>");
-    sb.append("<div class={0}-bl><div class={0}-br><div class={0}-bc></div></div></div>");
+    sb.append("<div role=presentation class={0}-tl><div role=presentation class={0}-tr><div role=presentation class={0}-tc></div></div></div>");
+    sb.append("<div role=presentation class={0}-ml><div role=presentation class={0}-mr><div role=presentation class={0}-mc></div></div></div>");
+    sb.append("<div role=presentation class={0}-bl><div role=presentation class={0}-br><div role=presentation class={0}-bc></div></div></div>");
 
     BBOX = sb.toString();
 
     sb = new StringBuffer();
-    sb.append("<div><table class={0} cellpadding=0 cellspacing=0><tbody>");
-    sb.append("<tr><td class={0}-ml><div></div></td><td class={0}-mc></td><td class={0}-mr><div></div></td></tr>");
-    sb.append("<tr><td class={0}-bl><div></div></td><td class={0}-bc></td><td class={0}-br><div></div></td></tr>");
+    sb.append("<div role=presentation><table class={0} cellpadding=0 cellspacing=0 role=presentation><tbody role=presentation>");
+    sb.append("<tr><td class={0}-ml role=presentation><div role=presentation></div></td><td class={0}-mc role=presentation></td><td class={0}-mr role=presentation><div role=presentation></div></td></tr>");
+    sb.append("<tr><td class={0}-bl role=presentation><div role=presentation></div></td><td class={0}-bc role=presentation></td><td class={0}-br role=presentation><div role=presentation></div></td></tr>");
     sb.append("</tbody></table></div>");
 
     BOTTOM_BOX = sb.toString();
 
     sb = new StringBuffer();
-    sb.append("<table class={0} cellpadding=0 cellspacing=0><tbody>");
-    sb.append("<tr class={0}-trow><td class={0}-tl><div>&nbsp;</div></td><td class={0}-tc></td><td class={0}-tr><div>&nbsp;</div></td></tr>");
-    sb.append("<tr><td class={0}-ml></td><td class={0}-mc></td><td class={0}-mr></td></tr>");
-    sb.append("<tr class={0}-brow><td class={0}-bl></td><td class={0}-bc></td><td class={0}-br></td></tr>");
+    sb.append("<table class={0} cellpadding=0 cellspacing=0 role=presentation><tbody role=presentation>");
+    sb.append("<tr class={0}-trow role=presentation><td class={0}-tl role=presentation><div role=presentation>&nbsp;</div></td><td class={0}-tc role=presentation></td><td class={0}-tr role=presentation><div role=presentation>&nbsp;</div></td></tr>");
+    sb.append("<tr role=presentation><td class={0}-ml role=presentation></td><td class={0}-mc role=presentation></td><td class={0}-mr role=presentation></td></tr>");
+    sb.append("<tr class={0}-brow role=presentation><td class={0}-bl role=presentation></td><td class={0}-bc role=presentation></td><td class={0}-br role=presentation></td></tr>");
     sb.append("</tr></tbody></table>");
 
     BOX = sb.toString();

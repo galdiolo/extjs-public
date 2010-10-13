@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -60,88 +60,93 @@ public class PagingToolBar extends ToolBar {
   /**
    * PagingToolBar images.
    */
-  public class PagingToolBarImages {
-    private AbstractImagePrototype first = GXT.IMAGES.paging_toolbar_first();
-    private AbstractImagePrototype prev = GXT.IMAGES.paging_toolbar_prev();
-    private AbstractImagePrototype next = GXT.IMAGES.paging_toolbar_next();
-    private AbstractImagePrototype last = GXT.IMAGES.paging_toolbar_last();
-    private AbstractImagePrototype refresh = GXT.IMAGES.paging_toolbar_refresh();
+  public static class PagingToolBarImages {
+    private AbstractImagePrototype first = GXT.isHighContrastMode
+        ? IconHelper.create("gxt/themes/access/images/grid/page-first.gif") : GXT.IMAGES.paging_toolbar_first();
+    private AbstractImagePrototype prev = GXT.isHighContrastMode
+        ? IconHelper.create("gxt/themes/access/images/grid/page-prev.gif") : GXT.IMAGES.paging_toolbar_prev();
+    private AbstractImagePrototype next = GXT.isHighContrastMode
+        ? IconHelper.create("gxt/themes/access/images/grid/page-next.gif") : GXT.IMAGES.paging_toolbar_next();
+    private AbstractImagePrototype last = GXT.isHighContrastMode
+        ? IconHelper.create("gxt/themes/access/images/grid/page-last.gif") : GXT.IMAGES.paging_toolbar_last();
+    private AbstractImagePrototype refresh = GXT.isHighContrastMode
+        ? IconHelper.create("gxt/themes/access/images/grid/refresh.gif") : GXT.IMAGES.paging_toolbar_refresh();
 
     private AbstractImagePrototype firstDisabled = GXT.IMAGES.paging_toolbar_first_disabled();
     private AbstractImagePrototype prevDisabled = GXT.IMAGES.paging_toolbar_prev_disabled();
     private AbstractImagePrototype nextDisabled = GXT.IMAGES.paging_toolbar_next_disabled();
     private AbstractImagePrototype lastDisabled = GXT.IMAGES.paging_toolbar_last_disabled();
 
-    public void setFirst(AbstractImagePrototype first) {
-      this.first = first;
-    }
-
     public AbstractImagePrototype getFirst() {
       return first;
-    }
-
-    public void setPrev(AbstractImagePrototype prev) {
-      this.prev = prev;
-    }
-
-    public AbstractImagePrototype getPrev() {
-      return prev;
-    }
-
-    public void setNext(AbstractImagePrototype next) {
-      this.next = next;
-    }
-
-    public AbstractImagePrototype getNext() {
-      return next;
-    }
-
-    public void setLast(AbstractImagePrototype last) {
-      this.last = last;
-    }
-
-    public AbstractImagePrototype getLast() {
-      return last;
-    }
-
-    public void setRefresh(AbstractImagePrototype refresh) {
-      this.refresh = refresh;
-    }
-
-    public AbstractImagePrototype getRefresh() {
-      return refresh;
-    }
-
-    public void setFirstDisabled(AbstractImagePrototype firstDisabled) {
-      this.firstDisabled = firstDisabled;
     }
 
     public AbstractImagePrototype getFirstDisabled() {
       return firstDisabled;
     }
 
-    public void setPrevDisabled(AbstractImagePrototype prevDisabled) {
-      this.prevDisabled = prevDisabled;
+    public AbstractImagePrototype getLast() {
+      return last;
     }
 
-    public AbstractImagePrototype getPrevDisabled() {
-      return prevDisabled;
+    public AbstractImagePrototype getLastDisabled() {
+      return lastDisabled;
     }
 
-    public void setNextDisabled(AbstractImagePrototype nextDisabled) {
-      this.nextDisabled = nextDisabled;
+    public AbstractImagePrototype getNext() {
+      return next;
     }
 
     public AbstractImagePrototype getNextDisabled() {
       return nextDisabled;
     }
 
+    public AbstractImagePrototype getPrev() {
+      return prev;
+    }
+
+    public AbstractImagePrototype getPrevDisabled() {
+      return prevDisabled;
+    }
+
+    public AbstractImagePrototype getRefresh() {
+      return refresh;
+    }
+
+    public void setFirst(AbstractImagePrototype first) {
+      this.first = first;
+    }
+
+    public void setFirstDisabled(AbstractImagePrototype firstDisabled) {
+      this.firstDisabled = firstDisabled;
+    }
+
+    public void setLast(AbstractImagePrototype last) {
+      this.last = last;
+    }
+
     public void setLastDisabled(AbstractImagePrototype lastDisabled) {
       this.lastDisabled = lastDisabled;
     }
 
-    public AbstractImagePrototype getLastDisabled() {
-      return lastDisabled;
+    public void setNext(AbstractImagePrototype next) {
+      this.next = next;
+    }
+
+    public void setNextDisabled(AbstractImagePrototype nextDisabled) {
+      this.nextDisabled = nextDisabled;
+    }
+
+    public void setPrev(AbstractImagePrototype prev) {
+      this.prev = prev;
+    }
+
+    public void setPrevDisabled(AbstractImagePrototype prevDisabled) {
+      this.prevDisabled = prevDisabled;
+    }
+
+    public void setRefresh(AbstractImagePrototype refresh) {
+      this.refresh = refresh;
     }
 
   }
@@ -149,7 +154,7 @@ public class PagingToolBar extends ToolBar {
   /**
    * PagingToolBar messages.
    */
-  public class PagingToolBarMessages {
+  public static class PagingToolBarMessages {
     private String afterPageText;
     private String beforePageText = GXT.MESSAGES.pagingToolBar_beforePageText();
     private String displayMsg;
@@ -368,6 +373,7 @@ public class PagingToolBar extends ToolBar {
       }
     }
   };
+  protected LabelToolItem beforePage;
 
   /**
    * Creates a new paging tool bar with the given page size.
@@ -376,13 +382,10 @@ public class PagingToolBar extends ToolBar {
    */
   public PagingToolBar(final int pageSize) {
     this.pageSize = pageSize;
-    msgs = new PagingToolBarMessages();
 
     first = new Button();
     first.addListener(Events.Disable, listener);
     first.addListener(Events.Enable, listener);
-    first.setIcon(getImages().getFirst());
-    if (showToolTips) first.setToolTip(msgs.getFirstText());
     first.addSelectionListener(new SelectionListener<ButtonEvent>() {
       public void componentSelected(ButtonEvent ce) {
         first();
@@ -392,8 +395,6 @@ public class PagingToolBar extends ToolBar {
     prev = new Button();
     prev.addListener(Events.Disable, listener);
     prev.addListener(Events.Enable, listener);
-    prev.setIcon(getImages().getPrev());
-    if (showToolTips) prev.setToolTip(msgs.getPrevText());
     prev.addSelectionListener(new SelectionListener<ButtonEvent>() {
       public void componentSelected(ButtonEvent ce) {
         previous();
@@ -403,8 +404,6 @@ public class PagingToolBar extends ToolBar {
     next = new Button();
     next.addListener(Events.Disable, listener);
     next.addListener(Events.Enable, listener);
-    next.setIcon(getImages().getNext());
-    if (showToolTips) next.setToolTip(msgs.getNextText());
     next.addSelectionListener(new SelectionListener<ButtonEvent>() {
       public void componentSelected(ButtonEvent ce) {
         next();
@@ -414,8 +413,6 @@ public class PagingToolBar extends ToolBar {
     last = new Button();
     last.addListener(Events.Disable, listener);
     last.addListener(Events.Enable, listener);
-    last.setIcon(getImages().getLast());
-    if (showToolTips) last.setToolTip(msgs.getLastText());
     last.addSelectionListener(new SelectionListener<ButtonEvent>() {
       public void componentSelected(ButtonEvent ce) {
         last();
@@ -423,20 +420,19 @@ public class PagingToolBar extends ToolBar {
     });
 
     refresh = new Button();
-    refresh.setIcon(getImages().getRefresh());
-    if (showToolTips) refresh.setToolTip(msgs.getRefreshText());
     refresh.addSelectionListener(new SelectionListener<ButtonEvent>() {
       public void componentSelected(ButtonEvent ce) {
         refresh();
       }
     });
 
-    LabelToolItem beforePage = new LabelToolItem(msgs.getBeforePageText());
+    beforePage = new LabelToolItem();
     beforePage.setStyleName("my-paging-text");
 
     afterText = new LabelToolItem();
     afterText.setStyleName("my-paging-text");
     pageText = new TextBox();
+    if (GXT.isAriaEnabled()) pageText.setTitle("Page");
     pageText.addKeyDownHandler(new KeyDownHandler() {
       public void onKeyDown(KeyDownEvent event) {
         if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
@@ -448,6 +444,7 @@ public class PagingToolBar extends ToolBar {
     pageText.setWidth("30px");
 
     displayText = new LabelToolItem();
+    displayText.setId(getId() + "-display");
     displayText.setStyleName("my-paging-display");
 
     add(first);
@@ -464,6 +461,9 @@ public class PagingToolBar extends ToolBar {
 
     add(new FillToolItem());
     add(displayText);
+
+    setMessages(new PagingToolBarMessages());
+    setImages(new PagingToolBarImages());
   }
 
   /**
@@ -630,6 +630,11 @@ public class PagingToolBar extends ToolBar {
 
   public void setImages(PagingToolBarImages images) {
     this.images = images;
+    refresh.setIcon(getImages().getRefresh());
+    last.setIcon(last.isEnabled() ? getImages().getLast() : getImages().getLastDisabled());
+    first.setIcon(first.isEnabled() ? getImages().getFirst() : getImages().getFirstDisabled());
+    prev.setIcon(prev.isEnabled() ? getImages().getPrev() : getImages().getPrevDisabled());
+    next.setIcon(next.isEnabled() ? getImages().getNext() : getImages().getNextDisabled());
   }
 
   /**
@@ -639,6 +644,27 @@ public class PagingToolBar extends ToolBar {
    */
   public void setMessages(PagingToolBarMessages messages) {
     msgs = messages;
+    if (showToolTips) {
+      first.setToolTip(msgs.getFirstText());
+      prev.setToolTip(msgs.getPrevText());
+      next.setToolTip(msgs.getNextText());
+      last.setToolTip(msgs.getLastText());
+      refresh.setToolTip(msgs.getRefreshText());
+    } else {
+      first.removeToolTip();
+      prev.removeToolTip();
+      next.removeToolTip();
+      last.removeToolTip();
+      refresh.removeToolTip();
+    }
+    if (GXT.isAriaEnabled()) {
+      first.getAriaSupport().setLabel(msgs.getFirstText());
+      prev.getAriaSupport().setLabel(msgs.getPrevText());
+      next.getAriaSupport().setLabel(msgs.getNextText());
+      last.getAriaSupport().setLabel(msgs.getLastText());
+      refresh.getAriaSupport().setLabel(msgs.getRefreshText());
+    }
+    beforePage.setLabel(msgs.getBeforePageText());
   }
 
   /**
@@ -694,6 +720,11 @@ public class PagingToolBar extends ToolBar {
     activePage = (int) Math.ceil((double) (start + pageSize) / pageSize);
     pageText.setText(String.valueOf((int) activePage));
     pages = totalLength < pageSize ? 1 : (int) Math.ceil((double) totalLength / pageSize);
+    
+    if(activePage > pages){
+      last();
+      return;
+    }
 
     String after = null, display = null;
     if (msgs.getAfterPageText() != null) {
@@ -715,8 +746,7 @@ public class PagingToolBar extends ToolBar {
       String[] params = new String[] {"" + (start + 1), "" + temp, "" + totalLength};
       display = Format.substitute(msgs.getDisplayMsg(), (Object[]) params);
     } else {
-      display = GXT.MESSAGES.pagingToolBar_displayMsg(start + 1, (int) temp,
-          (int) totalLength);
+      display = GXT.MESSAGES.pagingToolBar_displayMsg(start + 1, (int) temp, (int) totalLength);
     }
 
     String msg = display;
@@ -743,6 +773,10 @@ public class PagingToolBar extends ToolBar {
     if (renderEvent != null) {
       onLoad(renderEvent);
       renderEvent = null;
+    }
+
+    if (GXT.isAriaEnabled()) {
+      getAriaSupport().setDescribedBy(displayText.getId());
     }
   }
 

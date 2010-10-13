@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -34,7 +34,7 @@ public class ListViewDragSource extends DragSource {
    * 
    * @param listView the source list view
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public ListViewDragSource(ListView listView) {
     super(listView);
     this.listView = listView;
@@ -42,6 +42,7 @@ public class ListViewDragSource extends DragSource {
     
     listView.addListener(Events.OnMouseDown, new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent be) {
+        be.cancelBubble();
         ListViewDragSource.this.listView.focus();
       }
     });
@@ -57,7 +58,7 @@ public class ListViewDragSource extends DragSource {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void onDragDrop(DNDEvent e) {
     if (e.getOperation() == Operation.MOVE) {
       Object data = e.getData();

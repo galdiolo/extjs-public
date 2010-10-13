@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -102,6 +102,33 @@ public final class XDOM {
   }-*/;
 
   /**
+   * Returns the element's computed style.
+   * 
+   * @param e the element
+   * @param style the style name
+   * @return the style value
+   */
+  public static native String getComputedStyle(Element e, String style) /*-{
+    var computedStyle;
+    if (typeof e.currentStyle != 'undefined') { 
+      computedStyle = e.currentStyle; }
+    else { 
+      computedStyle = $doc.defaultView.getComputedStyle(e, null);
+    }
+
+    return computedStyle[style];
+  }-*/;
+
+  /**
+   * Returns the document element.
+   * 
+   * @return the document
+   */
+  public static native Element getDocument() /*-{
+    return $doc;
+  }-*/;
+
+  /**
    * Returns the document's height.
    * 
    * @return the document height
@@ -122,24 +149,6 @@ public final class XDOM {
   }-*/;
 
   /**
-   * Returns the HTML head element.
-   * 
-   * @return the head
-   */
-  public static native Element getHead() /*-{
-    return $doc.getElementsByTagName('head')[0];
-  }-*/;
-
-  /**
-   * Returns the document element.
-   * 
-   * @return the document
-   */
-  public static native Element getDocument() /*-{
-    return $doc;
-  }-*/;
-
-  /**
    * Returns the element with the unique id.
    * 
    * @param id the id
@@ -148,6 +157,15 @@ public final class XDOM {
   public static Element getElementById(String id) {
     return DomQuery.selectNode("#" + id);
   }
+
+  /**
+   * Returns the HTML head element.
+   * 
+   * @return the head
+   */
+  public static native Element getHead() /*-{
+    return $doc.getElementsByTagName('head')[0];
+  }-*/;
 
   /**
    * Returns the width of the scroll bar.
@@ -217,6 +235,15 @@ public final class XDOM {
   }-*/;
 
   /**
+   * Returns the viewports size.
+   * 
+   * @return the viewport size
+   */
+  public static Size getViewportSize() {
+    return new Size(getViewportWidth(), getViewportHeight());
+  }
+
+  /**
    * Returns the viewport width.
    * 
    * @return the viewport width
@@ -238,15 +265,6 @@ public final class XDOM {
    */
   public static int getViewWidth(boolean full) {
     return full ? getDocumentWidth() : getViewportWidth();
-  }
-
-  /**
-   * Returns the viewports size.
-   * 
-   * @return the viewport size
-   */
-  public static Size getViewportSize() {
-    return new Size(getViewportWidth(), getViewportHeight());
   }
 
   /**

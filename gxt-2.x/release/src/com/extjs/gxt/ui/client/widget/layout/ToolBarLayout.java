@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -67,6 +67,15 @@ public class ToolBarLayout extends Layout {
   }
 
   /**
+   * Returns the button used when the toolbar has overflow.
+   * 
+   * @return the button
+   */
+  public Button getMoreButton() {
+    return more;
+  }
+
+  /**
    * Returns the item spacing.
    * 
    * @return the spacing
@@ -102,6 +111,11 @@ public class ToolBarLayout extends Layout {
       MenuItem item = new MenuItem(sb.getText(), sb.getIcon());
       item.setEnabled(c.isEnabled());
       item.setItemId(c.getItemId());
+      if (sb.getData("gxt-menutext") != null) {
+        item.setText((String) sb.getData("gxt-menutext"));
+      } else {
+        item.setText("&nbsp;");
+      }
       if (sb.getMenu() != null) {
         item.setSubMenu(sb.getMenu());
       }
@@ -121,6 +135,10 @@ public class ToolBarLayout extends Layout {
       final Button b = (Button) c;
       MenuItem item = new MenuItem(b.getText(), b.getIcon());
       item.setItemId(c.getItemId());
+
+      if (b.getData("gxt-menutext") != null) {
+        item.setText((String) b.getData("gxt-menutext"));
+      }
       if (b.getMenu() != null) {
         item.setHideOnClick(false);
         item.setSubMenu(b.getMenu());
@@ -199,10 +217,12 @@ public class ToolBarLayout extends Layout {
           loopWidth += getComponentWidth(c);
           if (loopWidth >= clipWidth) {
             if (!isHidden(c)) {
+              c.setData("gxt-overflow", "true");
               hideComponent(c);
             }
           } else {
             if (isHidden(c)) {
+              c.setData("gxt-overflow", null);
               unhideComponent(c);
             }
           }
@@ -260,7 +280,10 @@ public class ToolBarLayout extends Layout {
       more.addStyleName("x-toolbar-more");
       more.setIcon(GXT.IMAGES.toolbar_more());
       more.setMenu(moreMenu);
-
+      ComponentHelper.setParent(container, more);
+      if (GXT.isAriaEnabled()) {
+        more.setTitle("More items...");
+      }
     }
     Element td = insertCell(more, extrasTr, 100);
     if (more.isRendered()) {
@@ -274,6 +297,7 @@ public class ToolBarLayout extends Layout {
   protected Element insertCell(Component c, El side, int pos) {
     Element td = DOM.createTD();
     td.setClassName("x-toolbar-cell");
+    td.setAttribute("role", "presentation");
     Element point;
     if (pos >= side.dom.getChildNodes().getLength()) {
       point = null;
@@ -309,10 +333,14 @@ public class ToolBarLayout extends Layout {
     if (leftTr == null) {
       target.insertHtml(
           "beforeEnd",
-          "<table cellspacing=\"0\" class=\"x-toolbar-ct\" role=\"presentation\"><tbody><tr><td class=\"x-toolbar-left\" align=\"left\"><table cellspacing=\"0\" role=\"presentation\"><tbody><tr class=\"x-toolbar-left-row\"></tr></tbody></table></td><td class=\"x-toolbar-right\" align=\"right\"><table cellspacing=\"0\" class=\"x-toolbar-right-ct\"><tbody><tr><td><table cellspacing=\"0\"><tbody><tr class=\"x-toolbar-right-row\"></tr></tbody></table></td><td><table cellspacing=\"0\"><tbody><tr class=\"x-toolbar-extras-row\"></tr></tbody></table></td></tr></tbody></td></tr></tbody></table>");
+          "<table cellspacing=\"0\" class=\"x-toolbar-ct\" role=\"presentation\"><tbody><tr><td class=\"x-toolbar-left\" align=\"left\"><table cellspacing=\"0\" role=\"presentation\"><tbody><tr class=\"x-toolbar-left-row\"></tr></tbody></table></td><td class=\"x-toolbar-right\" align=\"right\"><table cellspacing=\"0\" class=\"x-toolbar-right-ct\" role=\"presentation\"><tbody><tr><td><table cellspacing=\"0\" role=\"presentation\"><tbody><tr class=\"x-toolbar-right-row\" role=\"presentation\"></tr></tbody></table></td><td><table cellspacing=\"0\" role=\"presentation\"><tbody><tr class=\"x-toolbar-extras-row\"></tr></tbody></table></td></tr></tbody></td></tr></tbody></table>");
       leftTr = target.child("tr.x-toolbar-left-row");
       rightTr = target.child("tr.x-toolbar-right-row");
       extrasTr = target.child("tr.x-toolbar-extras-row");
+
+      leftTr.dom.setAttribute("role", "presentation");
+      rightTr.dom.setAttribute("role", "presentation");
+      extrasTr.dom.setAttribute("role", "presentation");
     }
     El side = leftTr;
     int pos = 0;
@@ -350,7 +378,8 @@ public class ToolBarLayout extends Layout {
 
   protected void unhideComponent(Component c) {
     if (hiddens.remove(c)) {
-      if (c.<Boolean> getData("xtbIsVisible")) {
+      Boolean b = c.getData("xtbIsVisible");
+      if (b) {
         c.show();
       }
       c.setData("xtbWidth", null);

@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -16,7 +16,7 @@ public class DefaultComparator<X extends Object> implements Comparator<X> {
 
   public final static DefaultComparator<?> INSTANCE = new DefaultComparator<Object>();
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public int compare(Object o1, Object o2) {
     if (o1 == null || o2 == null) {
       if (o1 == null && o2 == null) {

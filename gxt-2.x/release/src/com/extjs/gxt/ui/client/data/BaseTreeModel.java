@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -129,7 +129,7 @@ public class BaseTreeModel extends BaseModel implements TreeModel {
   @Override
   public void notify(ChangeEvent evt) {
     super.notify(evt);
-    if (parent != null && parent instanceof ChangeEventSource) {
+    if (!isSilent() && parent != null && parent instanceof ChangeEventSource) {
       evt.setSource(parent);
       ((ChangeEventSource) parent).notify(evt);
     }

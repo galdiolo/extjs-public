@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -396,7 +396,7 @@ public class DataView extends ScrollContainer<DataViewItem> implements Selectabl
    * 
    * @param store the store
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"rawtypes", "unchecked"})
   public void setStore(ListStore store) {
     binder = new DataViewBinder(this, store);
     binder.init();
@@ -429,7 +429,7 @@ public class DataView extends ScrollContainer<DataViewItem> implements Selectabl
     return new DataViewEvent(this, (event == null) ? null : findItem(DOM.eventGetTarget(event)));
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   @Override
   protected ContainerEvent createContainerEvent(DataViewItem item) {
     return new DataViewEvent(this, item);

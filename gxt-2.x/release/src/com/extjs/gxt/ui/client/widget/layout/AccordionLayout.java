@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -107,9 +107,10 @@ public class AccordionLayout extends FitLayout {
    * @param component the active component
    */
   public void setActiveItem(Component component) {
-    if (activeItem != component && container != null && container.getItems().contains(component)) {
-      activeItem = component;
-      ((ContentPanel) activeItem).expand();
+    if (component == null && activeItem != null) {
+      ((ContentPanel) activeItem).collapse();
+    } else if (activeItem != component && container != null && container.getItems().contains(component)) {
+      ((ContentPanel) component).expand();
     }
 
   }
@@ -177,8 +178,8 @@ public class AccordionLayout extends FitLayout {
     if (activeItem != null) {
       if (sequence) {
         final ContentPanel p = ce.getComponent();
-        activeItem = null;
         if (!ai.isCollapsed()) {
+          activeItem = null;
           Listener<ComponentEvent> l = new Listener<ComponentEvent>() {
             public void handleEvent(ComponentEvent be) {
               ai.removeListener(Events.Collapse, this);
@@ -189,9 +190,7 @@ public class AccordionLayout extends FitLayout {
           ai.addListener(Events.Collapse, l);
           ai.collapse();
           ce.setCancelled(true);
-          return;
         }
-
       } else {
         ai.collapse();
       }
@@ -248,8 +247,8 @@ public class AccordionLayout extends FitLayout {
   @Override
   protected void onRemove(Component component) {
     super.onRemove(component);
-    component.addListener(Events.BeforeExpand, listener);
-    component.addListener(Events.Expand, listener);
+    component.removeListener(Events.BeforeExpand, listener);
+    component.removeListener(Events.Expand, listener);
   }
 
   @Override

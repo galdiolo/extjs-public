@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -20,6 +20,7 @@ import com.extjs.gxt.ui.client.data.ModelComparer;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.ModelKeyProvider;
 import com.extjs.gxt.ui.client.data.SortInfo;
+import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.extjs.gxt.ui.client.event.EventType;
 import com.extjs.gxt.ui.client.store.Record.RecordUpdate;
@@ -48,6 +49,14 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
  * <li>model : the model that was updated</li>
  * <li>record : the record that was updated</li>
  * <li>operation : the update operation being performed.</li>
+ * </ul>
+ * </dd>
+ * 
+ * <dd><b>Store.BeforeClear</b> : StoreEvent(store)<br>
+ * <div>Fires before the store is cleared. Listeners can cancel the action by
+ * calling {@link BaseEvent#setCancelled(boolean)}. </div>
+ * <ul>
+ * <li>store : this</li>
  * </ul>
  * </dd>
  * 
@@ -190,14 +199,6 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
     filtersEnabled = true;
     filtered = new ArrayList<M>();
     for (M items : snapshot) {
-      if (filterBeginsWith != null && property != null) {
-        Object o = items.get(property);
-        if (o != null) {
-          if (!o.toString().toLowerCase().startsWith(filterBeginsWith.toLowerCase())) {
-            continue;
-          }
-        }
-      }
       if (!isFiltered(items, property)) {
         filtered.add(items);
       }
@@ -396,7 +397,7 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
    * @return the record for the item
    */
   public Record getRecord(M model) {
-    assert model != null: "Model my not be null";
+    assert model != null : "Model my not be null";
     Record record = recordMap.get(model);
     if (record == null) {
       record = new Record(model);
@@ -567,7 +568,6 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
       }
       StoreEvent<M> evt = createStoreEvent();
       evt.setModel(model);
-      evt.setIndex(all.indexOf(m));
       fireEvent(Update, evt);
     }
   }
@@ -610,8 +610,16 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
     fireEvent(type, evt);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected boolean isFiltered(ModelData record, String property) {
+    if (filterBeginsWith != null && property != null) {
+      Object o = record.get(property);
+      if (o != null) {
+        if (!o.toString().toLowerCase().startsWith(filterBeginsWith.toLowerCase())) {
+          return true;
+        }
+      }
+    }
     if (filters != null) {
       for (StoreFilter filter : filters) {
         boolean result = filter.select(this, record, record, property);

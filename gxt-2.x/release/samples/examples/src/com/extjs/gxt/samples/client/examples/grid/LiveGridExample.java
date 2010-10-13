@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -128,11 +128,11 @@ public class LiveGridExample extends LayoutContainer {
 
     ColumnModel cm = new ColumnModel(columns);
 
-    Grid<ModelData> grid = new Grid<ModelData>(store, cm);
-    grid.setTrackMouseOver(false);
+    final Grid<ModelData> grid = new Grid<ModelData>(store, cm);
     grid.setBorders(true);
     grid.setAutoExpandColumn("title");
-    grid.getSelectionModel().setLocked(true);
+    grid.setLoadMask(true);
+    grid.setStripeRows(true);
 
     LiveGridView liveView = new LiveGridView();
     liveView.setEmptyText("No rows available on the server.");
@@ -148,7 +148,8 @@ public class LiveGridExample extends LayoutContainer {
     panel.setLayout(new FitLayout());
     panel.add(grid);
     panel.setSize(600, 350);
-
+    grid.getAriaSupport().setLabelledBy(panel.getHeader().getId() + "-label");
+    
     ToolBar toolBar = new ToolBar();
     toolBar.add(new FillToolItem());
 

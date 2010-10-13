@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -80,8 +80,7 @@ public class FlashComponent extends BoxComponent {
    * @return the flash id
    */
   public String getSwfId() {
-    swfId = swfId != null ? swfId : (swfId = "extswf"
-        + XDOM.getUniqueId().replace("-", ""));
+    swfId = swfId != null ? swfId : (swfId = "extswf" + XDOM.getUniqueId().replace("-", ""));
     return swfId;
   }
 
@@ -204,6 +203,13 @@ public class FlashComponent extends BoxComponent {
 
     if (expressInstallUrl != null) {
       config.setExpressInstallUrl(expressInstallUrl);
+    }
+    if (swfHeight != null) {
+      config.setHeight(swfHeight);
+    }
+
+    if (swfWidth != null) {
+      config.setWidth(swfWidth);
     }
 
     config.addParameter("id", swfId);

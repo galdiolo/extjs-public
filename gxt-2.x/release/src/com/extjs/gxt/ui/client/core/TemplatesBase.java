@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -16,7 +16,7 @@ public class TemplatesBase implements Templates {
     private T end;
     private int order;
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public IterableRange(T start, T end) {
       this.start = start;
       this.end = end;
@@ -43,7 +43,7 @@ public class TemplatesBase implements Templates {
         return hasNext;
       }
 
-      @SuppressWarnings("unchecked")
+      @SuppressWarnings({"unchecked", "rawtypes"})
       public T next() {
         assert hasNext :"End of iterator reached.";
 

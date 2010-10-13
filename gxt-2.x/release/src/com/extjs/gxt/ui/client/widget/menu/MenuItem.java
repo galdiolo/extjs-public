@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -13,12 +13,16 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.IconHelper;
+import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.util.Util;
+import com.extjs.gxt.ui.client.widget.Component;
+import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.IconSupport;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Accessibility;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * A base class for all menu items that require menu-related functionality (like
@@ -32,6 +36,7 @@ public class MenuItem extends Item implements IconSupport {
   protected String itemStyle = "x-menu-item";
   protected AbstractImagePrototype icon;
   protected String text;
+  protected Widget widget;
 
   /**
    * Creates a new item.
@@ -48,17 +53,6 @@ public class MenuItem extends Item implements IconSupport {
   public MenuItem(String text) {
     this();
     this.text = text;
-  }
-
-  /**
-   * Creates a new item.
-   * 
-   * @param text the item text
-   * @param listener the selection listener
-   */
-  public MenuItem(String text, SelectionListener<? extends MenuEvent> listener) {
-    this(text);
-    addSelectionListener(listener);
   }
 
   /**
@@ -81,6 +75,17 @@ public class MenuItem extends Item implements IconSupport {
    */
   public MenuItem(String text, AbstractImagePrototype icon, SelectionListener<? extends MenuEvent> listener) {
     this(text, icon);
+    addSelectionListener(listener);
+  }
+
+  /**
+   * Creates a new item.
+   * 
+   * @param text the item text
+   * @param listener the selection listener
+   */
+  public MenuItem(String text, SelectionListener<? extends MenuEvent> listener) {
+    this(text);
     addSelectionListener(listener);
   }
 
@@ -122,6 +127,15 @@ public class MenuItem extends Item implements IconSupport {
   }
 
   /**
+   * Returns the item's widget.
+   * 
+   * @return the widget
+   */
+  public Widget getWidget() {
+    return widget;
+  }
+
+  /**
    * Sets the item's icon style. The style name should match a CSS style that
    * specifies a background image using the following format:
    * 
@@ -136,6 +150,7 @@ public class MenuItem extends Item implements IconSupport {
    * @param icon the icon
    */
   public void setIcon(AbstractImagePrototype icon) {
+    this.icon = icon;
     if (rendered) {
       El oldIcon = el().selectNode(".x-menu-item-icon");
       if (oldIcon != null) {
@@ -162,7 +177,6 @@ public class MenuItem extends Item implements IconSupport {
   public void setSubMenu(Menu menu) {
     this.subMenu = menu;
     menu.parentItem = this;
-
   }
 
   /**
@@ -178,11 +192,62 @@ public class MenuItem extends Item implements IconSupport {
     }
   }
 
+  /**
+   * Sets the item's widget.
+   * 
+   * @param widget the widget
+   */
+  public void setWidget(Widget widget) {
+    this.widget = widget;
+    if (rendered) {
+      if (widget instanceof Component) {
+        Component c = (Component) widget;
+        if (!c.isRendered()) {
+          c.render(getElement());
+          setIcon(icon);
+          return;
+        }
+      }
+      getElement().appendChild(widget.getElement());
+      setIcon(icon);
+    }
+  }
+
   @Override
   protected void activate(boolean autoExpand) {
     super.activate(autoExpand);
     if (autoExpand && subMenu != null) {
       expandMenu();
+    }
+  }
+
+  @Override
+  protected void afterRender() {
+    super.afterRender();
+    if (text != null) setText(text);
+  }
+
+  @Override
+  protected void deactivate() {
+    super.deactivate();
+    if (subMenu != null && subMenu.isVisible()) {
+      subMenu.hide();
+    }
+  }
+
+  @Override
+  protected void doAttachChildren() {
+    super.doAttachChildren();
+    if (widget != null) {
+      ComponentHelper.doAttach(widget);
+    }
+  }
+
+  @Override
+  protected void doDetachChildren() {
+    super.doDetachChildren();
+    if (widget != null) {
+      ComponentHelper.doDetach(widget);
     }
   }
 
@@ -197,16 +262,18 @@ public class MenuItem extends Item implements IconSupport {
   }
 
   @Override
-  protected void afterRender() {
-    super.afterRender();
-    setText(text);
+  protected void onDisable() {
+    super.onDisable();
+    if (widget != null && widget instanceof Component) {
+      ((Component) widget).disable();
+    }
   }
 
   @Override
-  protected void deactivate() {
-    super.deactivate();
-    if (subMenu != null && subMenu.isVisible()) {
-      subMenu.hide();
+  protected void onEnable() {
+    super.onEnable();
+    if (widget != null && widget instanceof Component) {
+      ((Component) widget).enable();
     }
   }
 
@@ -224,22 +291,45 @@ public class MenuItem extends Item implements IconSupport {
     String s = itemStyle + (subMenu != null ? " x-menu-item-arrow" : "");
     addStyleName(s);
 
-    setText(text);
+    if (text != null) {
+      setText(text);
+    }
+    if (widget != null) {
+      setWidget(widget);
+    }
 
     if (subMenu != null) {
       Accessibility.setState(getElement(), "aria-haspopup", "true");
     }
-
   }
 
   @Override
   protected boolean shouldDeactivate(ComponentEvent ce) {
     if (super.shouldDeactivate(ce)) {
       if (subMenu != null && subMenu.isVisible()) {
-        return !subMenu.el().getBounds().contains(ce.getXY());
+        Rectangle rec = subMenu.el().getBounds();
+        if (subMenu.getShadow() && subMenu.getShadowPosition() != null) {
+          switch (subMenu.getShadowPosition()) {
+            case DROP:
+              rec.width += subMenu.getShadowOffset();
+              rec.height += subMenu.getShadowOffset();
+              break;
+            case FRAME:
+              rec.width += subMenu.getShadowOffset();
+              rec.height += subMenu.getShadowOffset();
+              rec.x -= subMenu.getShadowOffset();
+              rec.y -= subMenu.getShadowOffset();
+              break;
+            case SIDES:
+              rec.width += subMenu.getShadowOffset();
+              rec.height += subMenu.getShadowOffset();
+              rec.x -= subMenu.getShadowOffset();
+              break;
+          }
+        }
+        return !rec.contains(ce.getXY());
       }
     }
     return true;
   }
-
 }

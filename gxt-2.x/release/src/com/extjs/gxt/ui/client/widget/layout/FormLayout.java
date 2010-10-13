@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -256,10 +256,10 @@ public class FormLayout extends AnchorLayout {
     }
     if (fieldTemplate == null) {
       StringBuffer sb = new StringBuffer();
-      sb.append("<div class='x-form-item {5}' tabIndex='-1'>");
+      sb.append("<div role='presentation' class='x-form-item {5}' tabIndex='-1'>");
       sb.append("<label for={8} style='{2};{7}' class=x-form-item-label>{1}{4}</label>");
-      sb.append("<div class='x-form-element' id='x-form-el-{0}' style='{3}'>");
-      sb.append("</div><div class='{6}'></div>");
+      sb.append("<div role='presentation' class='x-form-element x-form-el-{0}' id='x-form-el-{0}' style='{3}'>");
+      sb.append("</div><div class='{6}' role='presentation'></div>");
       sb.append("</div>");
       fieldTemplate = new Template(sb.toString());
       fieldTemplate.compile();
@@ -276,6 +276,7 @@ public class FormLayout extends AnchorLayout {
     }
   }
 
+  @SuppressWarnings("unused")
   @Override
   protected void renderComponent(Component component, int index, El target) {
     if (component instanceof Field<?> && !(component instanceof HiddenField<?>)) {
@@ -333,20 +334,20 @@ public class FormLayout extends AnchorLayout {
 
     fieldTemplate.insert(target.dom, index, p);
     if (field.isRendered()) {
-      target.selectNode("#x-form-el-" + field.getId()).appendChild(field.getElement());
+      target.selectNode(".x-form-el-" + field.getId()).appendChild(field.getElement());
     } else {
-      field.render(target.selectNode("#x-form-el-" + field.getId()).dom);
+      field.render(target.selectNode(".x-form-el-" + field.getId()).dom);
     }
 
     if (field.getStyleName().contains("-wrap")) {
       inputId += "-input";
-      target.selectNode("#x-form-el-" + field.getId()).previousSibling().setAttribute("for", inputId);
+      target.selectNode(".x-form-el-" + field.getId()).previousSibling().setAttribute("for", inputId);
     }
   }
 
   private El findItemElement(Component c) {
     if (c != null && c instanceof Field<?> && c.isRendered()) {
-      El elem = target.selectNode("#x-form-el-" + c.getId());
+      El elem = target.selectNode(".x-form-el-" + c.getId());
       if (elem != null) {
         return elem.findParent(".x-form-item", 5);
       }
@@ -356,11 +357,9 @@ public class FormLayout extends AnchorLayout {
   }
 
   private El findLabelElement(Component c) {
-    if (c != null && c instanceof Field<?> && c.isRendered()) {
-      El elem = c.el().findParent(".x-form-item", 5);
-      if (elem != null) {
-        return elem.firstChild();
-      }
+    El elem = findItemElement(c);
+    if (elem != null) {
+      return elem.firstChild();
     }
     return null;
   }

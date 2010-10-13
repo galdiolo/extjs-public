@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -31,7 +31,7 @@ public class GridDragSource extends DragSource {
    * 
    * @param grid the grid
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public GridDragSource(Grid grid) {
     super(grid);
     this.grid = grid;
@@ -47,7 +47,7 @@ public class GridDragSource extends DragSource {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void onDragDrop(DNDEvent e) {
     if (e.getOperation() == Operation.MOVE) {
       Object data = e.getData();

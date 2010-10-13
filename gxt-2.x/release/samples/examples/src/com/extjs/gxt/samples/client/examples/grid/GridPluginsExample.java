@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -140,9 +140,12 @@ public class GridPluginsExample extends LayoutContainer {
     Grid<Stock> grid = new Grid<Stock>(store, cm);
     grid.setSelectionModel(sm);
     grid.setBorders(true);
+    grid.setColumnReordering(true);
+    grid.getAriaSupport().setLabelledBy(cp.getHeader().getId() + "-label");
     grid.addPlugin(sm);
     
     ToolBar toolBar = new ToolBar();
+    toolBar.getAriaSupport().setLabel("Grid Options");
     toolBar.add(new LabelToolItem("Selection Mode: "));
     final SimpleComboBox<String> type = new SimpleComboBox<String>();
     type.setTriggerAction(TriggerAction.ALL);
@@ -230,7 +233,9 @@ public class GridPluginsExample extends LayoutContainer {
 
     Grid<Stock> grid = new Grid<Stock>(store, cm);
     grid.addPlugin(expander);
+    grid.setColumnReordering(true);
     grid.getView().setAutoFill(true);
+    grid.getAriaSupport().setLabelledBy(cp.getHeader().getId() + "-label");
     cp.add(grid);
 
     panel.add(cp);
@@ -291,6 +296,7 @@ public class GridPluginsExample extends LayoutContainer {
     cp.setSize(600, 300);
 
     ToolBar toolBar = new ToolBar();
+    toolBar.getAriaSupport().setLabel("Grid Options");
     toolBar.add(new Button("Add", Resources.ICONS.add()));
     toolBar.add(new SeparatorToolItem());
     toolBar.add(new Button("Remove", Resources.ICONS.delete()));
@@ -301,9 +307,10 @@ public class GridPluginsExample extends LayoutContainer {
     Grid<Stock> grid = new Grid<Stock>(store, cm);
     grid.setSelectionModel(sm);
     grid.setAutoExpandColumn("name");
+    grid.setColumnReordering(true);
     grid.setBorders(true);
     grid.addPlugin(sm);
-
+    grid.getAriaSupport().setLabelledBy(cp.getHeader().getId() + "-label");
     cp.add(grid);
     panel.add(cp);
   }
@@ -349,6 +356,7 @@ public class GridPluginsExample extends LayoutContainer {
     final Grid<Stock> grid = new Grid<Stock>(store, cm);
     grid.addPlugin(r);
     grid.getView().setForceFit(true);
+    
 
     Button btn = new Button("Remove a Row", new SelectionListener<ButtonEvent>() {
       @Override
@@ -369,6 +377,7 @@ public class GridPluginsExample extends LayoutContainer {
     cp.setSize(600, 300);
     cp.add(grid);
     cp.addButton(btn);
+    grid.getAriaSupport().setLabelledBy(cp.getHeader().getId() + "-label");
     panel.add(cp);
   }
 

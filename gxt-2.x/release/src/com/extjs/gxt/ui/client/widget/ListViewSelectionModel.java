@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -19,21 +19,15 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.widget.selection.AbstractStoreSelectionModel;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.user.client.Element;
 
 /**
  * ListView selection model.
- * 
- * <dl>
- * <dt>Inherited Events:</dt>
- * <dd>AbstractStoreSelectionModel BeforeSelect</dd>
- * <dd>AbstractStoreSelectionModel SelectionChange</dd>
- * </dl>
  */
 public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSelectionModel<M> implements
     Listener<ListViewEvent<M>> {
 
-  protected ListView<M> listView;
-  protected ListStore<M> listStore;
   protected KeyNav<ComponentEvent> keyNav = new KeyNav<ComponentEvent>() {
 
     @Override
@@ -52,6 +46,9 @@ public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSe
     }
 
   };
+  protected ListStore<M> listStore;
+  protected ListView<M> listView;
+  protected boolean enableNavKeys = true;
 
   /**
    * Binds the list view to the selection model.
@@ -64,6 +61,7 @@ public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSe
       this.listView.removeListener(Events.OnClick, this);
       this.listView.removeListener(Events.RowUpdated, this);
       this.listView.removeListener(Events.Refresh, this);
+      this.listView.removeListener(Events.Render, this);
       keyNav.bind(null);
       this.listStore = null;
       bind(null);
@@ -74,6 +72,7 @@ public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSe
       listView.addListener(Events.OnClick, this);
       listView.addListener(Events.Refresh, this);
       listView.addListener(Events.RowUpdated, this);
+      listView.addListener(Events.Render, this);
       keyNav.bind(listView);
       bind(listView.getStore());
       this.listStore = listView.getStore();
@@ -88,14 +87,21 @@ public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSe
       handleMouseClick(e);
     } else if (type == Events.RowUpdated) {
       onRowUpdated(e);
-    } else if (type == Events.Refresh) {
+    } else if (type == Events.Refresh || type == Events.Render) {
       refresh();
+      if (getLastFocused() != null) {
+        listView.onHighlightRow(listStore.indexOf(getLastFocused()), true);
+      }
     }
   }
 
   @SuppressWarnings("unchecked")
   protected void handleMouseClick(ListViewEvent<M> e) {
-    if (isLocked() || e.getIndex() == -1) {
+    if (isLocked() || isInput(e.getTarget())) {
+      return;
+    }
+    if(e.getIndex() == -1){
+      deselectAll();
       return;
     }
     if (selectionMode == SelectionMode.MULTI) {
@@ -110,11 +116,12 @@ public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSe
         listView.focusItem(e.getIndex());
       }
     }
+
   }
 
   @SuppressWarnings("unchecked")
   protected void handleMouseDown(ListViewEvent<M> e) {
-    if (isLocked() || e.getIndex() == -1) {
+    if (e.getIndex() == -1 || isLocked() || isInput(e.getTarget())) {
       return;
     }
     if (e.isRightClick()) {
@@ -122,11 +129,16 @@ public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSe
         return;
       }
       select(e.getIndex(), false);
-
+      listView.focusItem(e.getIndex());
     } else {
       M sel = listStore.getAt(e.getIndex());
+      if (selectionMode == SelectionMode.SIMPLE) {
+        if (!isSelected(sel)) {
+          select(sel, true);
+          listView.focusItem(e.getIndex());
+        }
 
-      if (selectionMode == SelectionMode.SINGLE) {
+      } else if (selectionMode == SelectionMode.SINGLE) {
         if (e.isControlKey() && isSelected(sel)) {
           deselect(sel);
         } else if (!isSelected(sel)) {
@@ -137,11 +149,8 @@ public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSe
         if (e.isShiftKey() && lastSelected != null) {
           int last = listStore.indexOf(lastSelected);
           int index = e.getIndex();
-          int a = (last > index) ? index : last;
-          int b = (last < index) ? index : last;
-          select(a, b, e.isControlKey());
-          lastSelected = listStore.getAt(last);
-          listView.focusItem(index);
+          select(last, index, e.isControlKey());
+          listView.focusItem(last);
         } else if (!isSelected(sel)) {
           doSelect(Arrays.asList(sel), false, false);
           listView.focusItem(e.getIndex());
@@ -150,26 +159,125 @@ public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSe
     }
   }
 
-  protected boolean hasNext() {
-    return lastSelected != null && listStore.indexOf(lastSelected) < (listStore.getCount() - 1);
-  }
-
-  protected boolean hasPrevious() {
-    return lastSelected != null && listStore.indexOf(lastSelected) > 0;
+  protected boolean isInput(Element target) {
+    String tag = target.getTagName();
+    return "INPUT".equals(tag) || "TEXTAREA".equals(tag);
   }
 
   protected void onKeyDown(ComponentEvent e) {
-    selectNext(e.isShiftKey());
+    if (!e.isControlKey() && selected.size() == 0 && getLastFocused() == null) {
+      select(0, false);
+    } else {
+      int idx = listStore.indexOf(getLastFocused());
+      if (idx >= 0) {
+        if (e.isControlKey() || (e.isShiftKey() && isSelected(listStore.getAt(idx + 1)))) {
+          if (!e.isControlKey()) {
+            deselect(idx);
+          }
+
+          M lF = listStore.getAt(idx + 1);
+          if (lF != null) {
+            setLastFocused(lF);
+            listView.focusItem(idx + 1);
+          }
+
+        } else {
+          if (e.isShiftKey() && lastSelected != getLastFocused()) {
+            select(listStore.indexOf(lastSelected), idx + 1, true);
+            listView.focusItem(idx + 1);
+          } else {
+            if (idx + 1 < listStore.getCount()) {
+              select(idx + 1, e.isShiftKey());
+              listView.focusItem(idx + 1);
+            }
+
+          }
+
+        }
+      }
+    }
+
     e.preventDefault();
   }
 
   protected void onKeyPress(ComponentEvent e) {
-
+    if (lastSelected != null && enableNavKeys) {
+      int kc = e.getKeyCode();
+      if (kc == KeyCodes.KEY_PAGEUP || kc == KeyCodes.KEY_HOME) {
+        e.stopEvent();
+        select(0, false);
+        listView.focusItem(0);
+      } else if (kc == KeyCodes.KEY_PAGEDOWN || kc == KeyCodes.KEY_END) {
+        e.stopEvent();
+        int idx = listStore.indexOf(listStore.getAt(listStore.getCount() - 1));
+        select(idx, false);
+        listView.focusItem(idx);
+      }
+    }
+    // if space bar is pressed
+    if (e.getKeyCode() == 32) {
+      if (getLastFocused() != null) {
+        if (e.isShiftKey() && lastSelected != null) {
+          int last = listStore.indexOf(lastSelected);
+          int i = listStore.indexOf(getLastFocused());
+          select(last, i, e.isControlKey());
+          listView.focusItem(i);
+        } else {
+          if (isSelected(getLastFocused())) {
+            deselect(getLastFocused());
+          } else {
+            select(getLastFocused(), true);
+            listView.focusItem(listStore.indexOf(getLastFocused()));
+          }
+        }
+      }
+    }
   }
 
   protected void onKeyUp(ComponentEvent e) {
-    selectPrevious(e.isShiftKey());
+    int idx = listStore.indexOf(getLastFocused());
+    if (idx >= 0) {
+      if (e.isControlKey() || (e.isShiftKey() && isSelected(listStore.getAt(idx - 1)))) {
+        if (!e.isControlKey()) {
+          deselect(idx);
+        }
+
+        M lF = listStore.getAt(idx - 1);
+        if (lF != null) {
+          setLastFocused(lF);
+          listView.focusItem(idx - 1);
+        }
+
+      } else {
+
+        if (e.isShiftKey() && lastSelected != getLastFocused()) {
+          select(listStore.indexOf(lastSelected), idx - 1, true);
+          listView.focusItem(idx - 1);
+        } else {
+          if (idx > 0) {
+            select(idx - 1, e.isShiftKey());
+            listView.focusItem(idx - 1);
+          }
+        }
+
+      }
+    }
+
     e.preventDefault();
+  }
+
+  @Override
+  protected void onLastFocusChanged(M oldFocused, M newFocused) {
+    int i;
+    i = listStore.indexOf(oldFocused);
+    if (i >= 0) {
+      listView.onHighlightRow(i, false);
+    }
+
+    i = listStore.indexOf(newFocused);
+    if (i >= 0) {
+      listView.onHighlightRow(i, true);
+    }
   }
 
   protected void onRowUpdated(ListViewEvent<M> ge) {
@@ -181,22 +289,6 @@ public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSe
   @Override
   protected void onSelectChange(M model, boolean select) {
     listView.onSelectChange(model, select);
-  }
-
-  protected void selectNext(boolean keepexisting) {
-    if (hasNext()) {
-      int idx = listStore.indexOf(lastSelected) + 1;
-      select(idx, keepexisting);
-      listView.focusItem(idx);
-    }
-  }
-
-  protected void selectPrevious(boolean keepexisting) {
-    if (hasPrevious()) {
-      int idx = listStore.indexOf(lastSelected) - 1;
-      select(idx, keepexisting);
-      listView.focusItem(idx);
-    }
   }
 
 }

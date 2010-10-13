@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -145,7 +145,7 @@ public class ChartGalleryExample extends LayoutContainer {
     store.add(new GalleryChartModel("Bar - Glass", "barglass.gif", new BarGlassChartExample()));
     store.add(new GalleryChartModel("Bar - 3D", "bar3d.gif", new Bar3DChartExample()));
     store.add(new GalleryChartModel("Radar", "radar.gif", new RadarChartExample()));
-    store.add(new GalleryChartModel("Horizontal Bar", "horizontalbar.gif", new HorizontalChartExample()));    
+    store.add(new GalleryChartModel("Horizontal Bar", "horizontalbar.gif", new HorizontalChartExample()));
     store.add(new GalleryChartModel("Cylinder", "cylinder.gif", new CylinderChartExample()));
     store.add(new GalleryChartModel("Sketch Bar", "sketchbar.gif", new SketchChartExample()));
 
@@ -200,7 +200,7 @@ public class ChartGalleryExample extends LayoutContainer {
     adjustUpdateSpeed(updateSpeed);
     return fs;
   }
-  
+
   @Override
   protected void onAttach() {
     updater.scheduleRepeating(updateSpeed);
@@ -229,20 +229,18 @@ public class ChartGalleryExample extends LayoutContainer {
     updater.scheduleRepeating(updateSpeed);
   }
 
-  private native String getTemplate(String base) /*-{  
-             return ['<tpl for=".">',  
-             '<div class="thumb-wrap" id="{name}" style="border: 1px solid white">',  
-             '<div class="thumb"><img src="' + base + 'samples/images/thumbs/charts/{path}" title="{name}"></div>',  
-             '<span class="x-editable">{shortName}</span></div>',  
-             '</tpl>',  
-             '<div class="x-clear"></div>'].join("");  
-               
-             }-*/;
+  private native String getTemplate(String base) /*-{
+    return ['<tpl for=".">',  
+    '<div class="thumb-wrap" id="{name}" style="border: 1px solid white">',  
+    '<div class="thumb"><img src="' + base + 'samples/images/thumbs/charts/{path}" title="{name}"></div>',  
+    '<span class="x-editable">{shortName}</span></div>',  
+    '</tpl>',  
+    '<div class="x-clear"></div>'].join("");
+  }-*/;
 
   class PieChartExample implements ChartModelExample {
     public ChartModel getChartModel(int segments) {
-      ChartModel cd = new ChartModel("Sales per Month",
-          "font-size: 14px; font-family: Verdana;");
+      ChartModel cd = new ChartModel("Sales per Month", "font-size: 14px; font-family: Verdana;");
       cd.setBackgroundColour("#fffff0");
       PieChart pie = new PieChart();
       pie.setAlpha(0.5f);
@@ -253,8 +251,7 @@ public class ChartGalleryExample extends LayoutContainer {
       pie.setColours("#ff0000", "#00aa00", "#0000ff", "#ff9900", "#ff00ff");
 
       for (int n = 0; n < segments; n++) {
-        pie.addSlices(new PieChart.Slice(Random.nextInt(110) * 100,
-            TestData.getMonths()[n]));
+        pie.addSlices(new PieChart.Slice(Random.nextInt(110) * 100, TestData.getMonths()[n]));
       }
       cd.addChartConfig(pie);
       return cd;
@@ -263,8 +260,7 @@ public class ChartGalleryExample extends LayoutContainer {
 
   class AreaChartExample implements ChartModelExample {
     public ChartModel getChartModel(int segments) {
-      ChartModel cm = new ChartModel("Growth per Region",
-          "font-size: 14px; font-family: Verdana;");
+      ChartModel cm = new ChartModel("Growth per Region", "font-size: 14px; font-family: Verdana;");
       cm.setBackgroundColour("#ffffff");
       XAxis xa = new XAxis();
       xa.setLabels("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D");
@@ -274,7 +270,7 @@ public class ChartGalleryExample extends LayoutContainer {
       area1.setColour("#ff0000");
       area1.setFillColour("#ff0000");
       for (int n = 0; n < 12; n++) {
-        if (n % 3 != 0)
+        if (n % 3 != 0 && n != 11)
           area1.addNullValue();
         else
           area1.addValues(n * Random.nextDouble());
@@ -287,7 +283,7 @@ public class ChartGalleryExample extends LayoutContainer {
       int floor = Random.nextInt(3);
       double grade = (Random.nextInt(4) + 1) / 10.0;
       for (int n = 0; n < 12; n++) {
-        if (n % 2 != 0)
+        if (n % 2 != 0 && n != 11)
           area2.addNullValue();
         else
           area2.addValues(n * grade + floor);
@@ -329,8 +325,7 @@ public class ChartGalleryExample extends LayoutContainer {
 
   class BarGlassChartExample implements ChartModelExample {
     public ChartModel getChartModel(int segments) {
-      ChartModel cm = new ChartModel("Sales by Month 2007",
-          "font-size: 14px; font-family: Verdana;");
+      ChartModel cm = new ChartModel("Sales by Month 2007", "font-size: 14px; font-family: Verdana;");
       cm.setBackgroundColour("-1");
       XAxis xa = new XAxis();
       for (String m : TestData.getMonths()) {
@@ -363,8 +358,7 @@ public class ChartGalleryExample extends LayoutContainer {
 
   class Bar3DChartExample implements ChartModelExample {
     public ChartModel getChartModel(int segments) {
-      ChartModel cm = new ChartModel("Sales by Month 2008",
-          "font-size: 14px; font-family: Verdana; color:#ffff00;");
+      ChartModel cm = new ChartModel("Sales by Month 2008", "font-size: 14px; font-family: Verdana; color:#ffff00;");
       cm.setBackgroundColour("#000077");
       XAxis xa = new XAxis();
       xa.setLabels(TestData.getShortMonths(segments));
@@ -419,7 +413,8 @@ public class ChartGalleryExample extends LayoutContainer {
 
   class HorizontalChartExample implements ChartModelExample {
     public ChartModel getChartModel(int segments) {
-      ChartModel cm = new ChartModel("Voted Best AJAX Framework", "font-size: 14px; font-family: Verdana; text-align: center;");
+      ChartModel cm = new ChartModel("Voted Best AJAX Framework",
+          "font-size: 14px; font-family: Verdana; text-align: center;");
       XAxis xa = new XAxis();
       xa.setRange(0, 200, 50);
       cm.setXAxis(xa);
@@ -433,7 +428,7 @@ public class ChartGalleryExample extends LayoutContainer {
       bchart.addBars(new HorizontalBarChart.Bar(Random.nextInt(44) + 100, "#0000ff"));
       bchart.addBars(new HorizontalBarChart.Bar(Random.nextInt(23) + 100, "#00ff00"));
       bchart.addBars(new HorizontalBarChart.Bar(Random.nextInt(50) + 150, "#ff0000"));
-      cm.addChartConfig(bchart);     
+      cm.addChartConfig(bchart);
       cm.setTooltipStyle(new ToolTip(MouseStyle.FOLLOW));
       return cm;
     }
@@ -441,7 +436,8 @@ public class ChartGalleryExample extends LayoutContainer {
 
   class CylinderChartExample implements ChartModelExample {
     public ChartModel getChartModel(int segments) {
-      ChartModel cm = new ChartModel("Licenses by Quarter 2008", "font-size: 14px; font-family: Verdana; text-align: center;");
+      ChartModel cm = new ChartModel("Licenses by Quarter 2008",
+          "font-size: 14px; font-family: Verdana; text-align: center;");
       cm.setBackgroundColour("#ffffff");
       XAxis xa = new XAxis();
       xa.setLabels("Q1", "Q2", "Q3", "Q4");
@@ -459,13 +455,13 @@ public class ChartGalleryExample extends LayoutContainer {
       bchart.setAlpha(.8f);
       bchart.setTooltip("$#val#");
       for (int t = 0; t < 4; t++) {
-        if ((t+1) == (Math.ceil(segments/3.0))) {
+        if ((t + 1) == (Math.ceil(segments / 3.0))) {
           bchart.addBars(new BarChart.Bar(Random.nextInt(50) + 50, "#aa88ff"));
         } else {
           bchart.addValues(Random.nextInt(50) + 50);
         }
       }
-      cm.addChartConfig(bchart);      
+      cm.addChartConfig(bchart);
       return cm;
     }
   }
@@ -485,7 +481,7 @@ public class ChartGalleryExample extends LayoutContainer {
       skb.setTooltip("Winner!<br>#val# points");
       sketch.addBars(skb);
       sketch.addValues(Random.nextInt(5) + 1, Random.nextInt(5) + 1);
-      cm.addChartConfig(sketch);      
+      cm.addChartConfig(sketch);
       return cm;
     }
   }

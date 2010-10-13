@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -31,17 +31,21 @@ import com.google.gwt.user.client.Element;
  */
 public class GridDropTarget extends DropTarget {
 
+  protected ModelData activeItem;
   protected Grid<ModelData> grid;
   protected int insertIndex;
-  protected ModelData activeItem;
   boolean before;
+
+  private boolean autoScroll = true;
+
+  private ScrollSupport scrollSupport;
 
   /**
    * Creates a new drop target instance.
    * 
    * @param grid the target grid
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public GridDropTarget(Grid grid) {
     super(grid);
     this.grid = grid;
@@ -54,6 +58,34 @@ public class GridDropTarget extends DropTarget {
    */
   public Grid<ModelData> getGrid() {
     return grid;
+  }
+  /**
+   * Returns true if auto scroll is enabled (defaults to true).
+   * 
+   * @return true if auto scroll enabled
+   */
+  public boolean isAutoScroll() {
+    return autoScroll;
+  }
+
+  /**
+   * True to automatically scroll the tree when the user hovers over the top and
+   * bottom of the tree grid (defaults to true).
+   * 
+   * @see ScrollSupport
+   * 
+   * @param autoScroll true to enable auto scroll
+   */
+  public void setAutoScroll(boolean autoScroll) {
+    this.autoScroll = autoScroll;
+  }
+
+  @Override
+  protected void onDragCancelled(DNDEvent event) {
+    super.onDragCancelled(event);
+    if (autoScroll) {
+      scrollSupport.stop();
+    }
   }
 
   @Override
@@ -70,6 +102,10 @@ public class GridDropTarget extends DropTarget {
     }
     insertIndex = -1;
     activeItem = null;
+
+    if (autoScroll) {
+      scrollSupport.stop();
+    }
   }
 
   @Override
@@ -77,11 +113,31 @@ public class GridDropTarget extends DropTarget {
     super.onDragEnter(e);
     e.setCancelled(false);
     e.getStatus().setStatus(true);
+
+    if (autoScroll) {
+      if (scrollSupport == null) {
+        scrollSupport = new ScrollSupport(grid.getView().getScroller());
+      } else if (scrollSupport.getScrollElement() == null) {
+        scrollSupport.setScrollElement(grid.getView().getScroller());
+      }
+      scrollSupport.start();
+    }
+  }
+
+  @Override
+  protected void onDragFail(DNDEvent event) {
+    super.onDragFail(event);
+    if (autoScroll) {
+      scrollSupport.stop();
+    }
   }
 
   @Override
   protected void onDragLeave(DNDEvent e) {
     super.onDragLeave(e);
+    if (autoScroll) {
+      scrollSupport.stop();
+    }
   }
 
   @Override
@@ -126,14 +182,15 @@ public class GridDropTarget extends DropTarget {
 
   private int adjustIndex(DNDEvent event, int index) {
     Object data = event.getData();
+    int i = index;
     List<ModelData> models = prepareDropData(data, true);
     for (ModelData m : models) {
       int idx = grid.getStore().indexOf(m);
       if (idx > -1 && (before ? idx < index : idx <= index)) {
-        index--;
+        i--;
       }
     }
-    return before ? index : index + 1;
+    return before ? i : i + 1;
   }
 
   private void showInsert(DNDEvent event, Element row) {

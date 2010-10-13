@@ -1,25 +1,27 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
  */
 package com.extjs.gxt.ui.client.widget;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.util.IconHelper;
 import com.extjs.gxt.ui.client.util.Util;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.Accessibility;
 import com.google.gwt.user.client.ui.Frame;
 
 /**
@@ -60,10 +62,10 @@ import com.google.gwt.user.client.ui.Frame;
  * <div>Fires after the item is selected.</div>
  * <ul>
  * <li>tabPanel : this</li>
- * <li>item : the item that was closed.</li>
+ * <li>item : the item that was selected.</li>
  * </ul>
  * </dd>
- * <dl>
+ * </dl>
  */
 public class TabItem extends LayoutContainer implements IconSupport {
 
@@ -192,7 +194,7 @@ public class TabItem extends LayoutContainer implements IconSupport {
   public TabItem() {
     header = new HeaderItem();
     header.setParent(this);
-    setAriaIgnore(true);
+    getAriaSupport().setIgnore(true);
   }
 
   /**
@@ -336,8 +338,9 @@ public class TabItem extends LayoutContainer implements IconSupport {
   public Frame setUrl(String url) {
     Frame f = new Frame(url);
     f.getElement().setPropertyInt("frameBorder", 0);
+    f.setSize("100%", "100%");
+    setLayout(new FlowLayout());
     removeAll();
-    setLayout(new FitLayout());
     add(f);
     layout();
     return f;
@@ -353,6 +356,9 @@ public class TabItem extends LayoutContainer implements IconSupport {
     super.onRender(parent, index);
     if (autoLoad != null) {
       el().load(autoLoad);
+    }
+    if (GXT.isAriaEnabled()) {
+      Accessibility.setRole(getElement(), Accessibility.ROLE_TABPANEL);
     }
   }
 

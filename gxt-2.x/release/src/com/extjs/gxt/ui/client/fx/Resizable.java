@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -57,8 +57,8 @@ import com.google.gwt.user.client.ui.RootPanel;
  * <dt><b>Events:</b></dt>
  * 
  * <dd><b>ResizeStart</b> : (source, widget, event) <br>
- * Fires before a resize operation start. Listeners can cancel the action by
- * calling {@link BaseEvent#setCancelled(boolean)}.
+ * <div>Fires before a resize operation start. Listeners can cancel the action by
+ * calling {@link BaseEvent#setCancelled(boolean)}.</div>
  * <ul>
  * <li>source : this</li>
  * <li>component : resize widget</li>
@@ -67,7 +67,7 @@ import com.google.gwt.user.client.ui.RootPanel;
  * </dd>
  * 
  * <dd><b>ResizeEnd</b> : (source, widget, event)<br>
- * Fires after a resize.
+ * <div>Fires after a resize.</div>
  * <ul>
  * <li>source : this</li>
  * <li>widget : resize widget</li>
@@ -151,6 +151,8 @@ public class Resizable extends BaseObservable {
           onAttach();
         } else if (type == Events.Detach) {
           onDetach();
+        } else if (type == Events.Resize) {
+          onComponentResize();
         }
       }
     };
@@ -158,6 +160,7 @@ public class Resizable extends BaseObservable {
     resize.addListener(Events.Render, listener);
     resize.addListener(Events.Attach, listener);
     resize.addListener(Events.Detach, listener);
+    resize.addListener(Events.Resize, listener);
 
     if (resize.isRendered()) {
       init();
@@ -259,6 +262,7 @@ public class Resizable extends BaseObservable {
     resize.removeListener(Events.Attach, listener);
     resize.removeListener(Events.Detach, listener);
     resize.removeListener(Events.Render, listener);
+    resize.removeListener(Events.Resize, listener);
     if (handleList != null) {
       for (ResizeHandle handle : handleList) {
         DOM.removeChild(resize.getElement(), handle.getElement());
@@ -439,6 +443,10 @@ public class Resizable extends BaseObservable {
     }
   }
 
+  protected void onComponentResize() {
+    syncHandleHeight();
+  }
+
   protected void onDetach() {
     if (handleList != null) {
       for (ResizeHandle handle : handleList) {
@@ -479,24 +487,28 @@ public class Resizable extends BaseObservable {
 
     resizing = true;
 
-    if (proxyEl == null) {
-      proxyEl = new El(createProxy());
-    }
-    Element body = RootPanel.getBodyElement();
-    DOM.appendChild(body, proxyEl.dom);
+    if (dynamic) {
+      if (proxyEl != null) {
+        proxyEl.setVisible(false);
+      }
+    } else {
+      if (proxyEl == null) {
+        proxyEl = new El(createProxy());
+      }
+      Element body = RootPanel.getBodyElement();
+      DOM.appendChild(body, proxyEl.dom);
 
-    proxyEl.makePositionable(true);
-    proxyEl.setLeft(startBox.x).setTop(startBox.y);
-    proxyEl.setSize(startBox.width, startBox.height, true);
-    proxyEl.setVisible(true);
+      proxyEl.makePositionable(true);
+      proxyEl.setLeft(startBox.x).setTop(startBox.y);
+      proxyEl.setSize(startBox.width, startBox.height, true);
+      proxyEl.setVisible(true);
+      proxyEl.updateZIndex(5);
+    }
 
     preview.add();
 
     Shim.get().cover(false);
-
-    proxyEl.updateZIndex(5);
     Shim.get().setStyleAttribute("cursor", handle.el().getStyleAttribute("cursor"));
-
   }
 
   private void handleMouseMove(int xin, int yin) {
@@ -620,8 +632,15 @@ public class Resizable extends BaseObservable {
           }
         }
       }
-      proxyEl.setLeftTop(x, y);
-      proxyEl.setSize((int) w, (int) h, true);
+
+      if (dynamic) {
+        resize.setPagePosition(x, y);
+        resize.setSize((int) w, (int) h);
+      } else {
+        proxyEl.setLeftTop(x, y);
+        proxyEl.setSize((int) w, (int) h, true);
+      }
+
     }
   }
 
@@ -630,15 +649,17 @@ public class Resizable extends BaseObservable {
     preview.remove();
     Shim.get().uncover();
 
-    Rectangle rect = proxyEl.getBounds();
+    if (!dynamic) {
+      Rectangle rect = dynamic ? resize.el().getBounds() : proxyEl.getBounds();
 
-    rect.width = Math.min(rect.width, maxWidth);
-    rect.height = Math.min(rect.height, maxHeight);
+      rect.width = Math.min(rect.width, maxWidth);
+      rect.height = Math.min(rect.height, maxHeight);
 
-    proxyEl.disableTextSelection(false);
-    proxyEl.setVisible(false);
-    proxyEl.remove();
-    resize.setBounds(rect);
+      proxyEl.disableTextSelection(false);
+      proxyEl.setVisible(false);
+      proxyEl.remove();
+      resize.setBounds(rect);
+    }
 
     syncHandleHeight();
 

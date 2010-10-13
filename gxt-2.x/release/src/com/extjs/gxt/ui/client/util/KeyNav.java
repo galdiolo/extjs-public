@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -31,24 +31,18 @@ public class KeyNav<E extends ComponentEvent> extends BaseObservable implements 
   private boolean preventDefault;
 
   static {
-    // mods press up
-    // Safari no yes
-    // IE yes yes
-    // FF yes no
-    // Opera yes no
-
-    // nav press down
-    // IE no yes
-    // FF yes yes
-    // Safari no yes
-    // Opera yes yes
-    if (GXT.isIE || GXT.isWebKit || GXT.isGecko) {
+    if (GXT.isIE || GXT.isGecko || GXT.isWebKit) {
       keyEvent = Events.OnKeyDown;
     } else {
       keyEvent = Events.OnKeyPress;
     }
   }
 
+  /**
+   * Returns the key event type.
+   * 
+   * @return the key event type
+   */
   public static EventType getKeyEvent() {
     return keyEvent;
   }
@@ -71,6 +65,11 @@ public class KeyNav<E extends ComponentEvent> extends BaseObservable implements 
     bind(target);
   }
 
+  /**
+   * Adds a key nav listener.
+   * 
+   * @param listener the key nav listener to add
+   */
   public void addKeyNavListener(KeyNavListener listener) {
     addListener(KeyboardEvents.Alt, listener);
     addListener(KeyboardEvents.BackSpace, listener);
@@ -275,6 +274,11 @@ public class KeyNav<E extends ComponentEvent> extends BaseObservable implements 
 
   }
 
+  /**
+   * Removes a key nav listener.
+   * 
+   * @param listener the key nav listener to remove
+   */
   public void removeKeyNavListener(KeyNavListener listener) {
     removeListener(KeyboardEvents.Alt, listener);
     removeListener(KeyboardEvents.BackSpace, listener);

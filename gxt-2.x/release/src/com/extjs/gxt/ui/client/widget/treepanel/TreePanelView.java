@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -26,21 +26,20 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Accessibility;
-import com.google.gwt.user.client.ui.Image;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class TreePanelView<M extends ModelData> {
 
   public enum TreeViewRenderMode {
-    ALL, BODY, MAIN, CONTAINER
+    ALL, BODY, CONTAINER, MAIN
   };
 
-  protected TreeStore<M> treeStore;
-  protected TreePanel<M> tree;
   protected TreeNode over;
+  protected TreePanel<M> tree;
+  protected TreeStore<M> treeStore;
 
-  private int cleanDelay = 500;
   private int cacheSize = 20;
+  private int cleanDelay = 500;
   private int scrollDelay = 0;
 
   public void bind(Component component, Store store) {
@@ -119,20 +118,33 @@ public class TreePanelView<M extends ModelData> {
   public String getTemplate(ModelData m, String id, String text, AbstractImagePrototype icon, boolean checkable,
       boolean checked, Joint joint, int level, TreeViewRenderMode renderMode) {
     if (renderMode == TreeViewRenderMode.CONTAINER) {
-      return "<div class=\"x-tree3-node-ct\" role=\"group\"></div>";
+      return "<div unselectable=on class=\"x-tree3-node-ct\" role=\"group\"></div>";
     }
     StringBuilder sb = new StringBuilder();
     if (renderMode == TreeViewRenderMode.ALL || renderMode == TreeViewRenderMode.MAIN) {
-      sb.append("<div id=\"");
+      sb.append("<div unselectable=on id=\"");
       sb.append(id);
       sb.append("\"");
 
-      sb.append(" class=\"x-tree3-node\">");
-      sb.append("<div class=\"x-tree3-el\" id=\"" + tree.getId() + "__" + id + "\" role=\"treeitem\" ");
+      sb.append(" class=\"x-tree3-node\"  role=\"presentation\">");
+
+      String cls = "x-tree3-el";
+      if (GXT.isHighContrastMode) {
+        switch (joint) {
+          case COLLAPSED:
+            cls += " x-tree3-node-joint-collapse";
+            break;
+          case EXPANDED:
+            cls += " x-tree3-node-joint-expand";
+            break;
+        }
+      }
+
+      sb.append("<div unselectable=on class=\"" + cls + "\" id=\"" + tree.getId() + "__" + id + "\" role=\"treeitem\" ");
       sb.append(" aria-level=\"" + (level + 1) + "\">");
     }
     if (renderMode == TreeViewRenderMode.ALL || renderMode == TreeViewRenderMode.BODY) {
-      Element jointElement;
+      Element jointElement = null;
       switch (joint) {
         case COLLAPSED:
           jointElement = (Element) tree.getStyle().getJointCollapsedIcon().createElement().cast();
@@ -140,20 +152,19 @@ public class TreePanelView<M extends ModelData> {
         case EXPANDED:
           jointElement = (Element) tree.getStyle().getJointExpandedIcon().createElement().cast();
           break;
-        default:
-          Image jointImage = new Image(GXT.BLANK_IMAGE_URL);
-          jointImage.setWidth("16px");
-          jointElement = jointImage.getElement();
       }
 
-      El.fly(jointElement).addStyleName("x-tree3-node-joint");
+      if (jointElement != null) {
+        El.fly(jointElement).addStyleName("x-tree3-node-joint");
+      }
 
       sb.append("<img src=\"");
       sb.append(GXT.BLANK_IMAGE_URL);
       sb.append("\" style=\"height: 18px; width: ");
       sb.append(level * 18);
       sb.append("px;\" />");
-      sb.append(DOM.toString(jointElement));
+      sb.append(jointElement == null ? "<img src=\"" + GXT.BLANK_IMAGE_URL
+          + "\" style=\"width: 16px\" class=\"x-tree3-node-joint\" />" : DOM.toString(jointElement));
       if (checkable) {
         Element e = (Element) (checked ? GXT.IMAGES.checked().createElement().cast()
             : GXT.IMAGES.unchecked().createElement().cast());
@@ -169,7 +180,7 @@ public class TreePanelView<M extends ModelData> {
       } else {
         sb.append("<span class=\"x-tree3-node-icon\"></span>");
       }
-      sb.append("<span class=\"x-tree3-node-text\">");
+      sb.append("<span  unselectable=on class=\"x-tree3-node-text\">");
       sb.append(text);
       sb.append("</span>");
     }
@@ -195,9 +206,11 @@ public class TreePanelView<M extends ModelData> {
     if (n == null) {
       return false;
     }
-    boolean isNotJointTarget = !El.fly(target).hasStyleName("x-tree3-node-joint");
+    boolean isNotJointTarget = false;
     if (GXT.isIE6) {
       isNotJointTarget = !El.fly(target).getParent().hasStyleName("x-tree3-node-joint");
+    } else {
+      isNotJointTarget = !El.fly(target).hasStyleName("x-tree3-node-joint");
     }
     if (isNotJointTarget && tree.isCheckable()) {
       boolean isNotCheckTarget = !El.fly(target).hasStyleName("x-tree3-node-check");
@@ -223,6 +236,10 @@ public class TreePanelView<M extends ModelData> {
       node.check = (Element) node.getElement().getFirstChild().insertBefore(e, checkEl);
       El.fly(checkEl).remove();
     }
+  }
+
+  public void onDropChange(TreeNode node, boolean drop) {
+    El.fly(getElementContainer(node)).setStyleName("x-ftree2-node-drop", drop);
   }
 
   public void onEvent(TreePanelEvent ce) {
@@ -263,14 +280,24 @@ public class TreePanelView<M extends ModelData> {
       switch (joint) {
         case COLLAPSED:
           e = (Element) tree.getStyle().getJointCollapsedIcon().createElement().cast();
+          if (GXT.isHighContrastMode) {
+            El.fly(node.elContainer).addStyleName("x-tree3-node-joint-collapse").removeStyleName(
+                "x-tree3-node-joint-expand");
+          }
           break;
         case EXPANDED:
           e = (Element) tree.getStyle().getJointExpandedIcon().createElement().cast();
+          if (GXT.isHighContrastMode) {
+            El.fly(node.elContainer).addStyleName("x-tree3-node-joint-expand").removeStyleName(
+                "x-tree3-node-joint-collapse");
+          }
           break;
         default:
-          Image image = new Image(GXT.BLANK_IMAGE_URL);
-          image.setWidth("16px");
-          e = image.getElement();
+          e = XDOM.create("<img src=\"" + GXT.BLANK_IMAGE_URL + "\" width=\"16px\"/>");
+          if (GXT.isHighContrastMode) {
+            El.fly(node.elContainer).removeStyleName("x-tree3-node-joint-collapse").removeStyleName(
+                "x-tree3-node-joint-expand");
+          }
       }
 
       El.fly(e).addStyleName("x-tree3-node-joint");
@@ -283,10 +310,6 @@ public class TreePanelView<M extends ModelData> {
     onIconStyleChange(node, IconHelper.createStyle("x-tree3-loading"));
   }
 
-  public void onDropChange(TreeNode node, boolean drop) {
-    El.fly(getElementContainer(node)).setStyleName("x-ftree2-node-drop", drop);
-  }
-
   public void onOverChange(TreeNode node, boolean select) {
     El.fly(getElementContainer(node)).setStyleName("x-ftree2-node-over", select);
   }
@@ -297,10 +320,13 @@ public class TreePanelView<M extends ModelData> {
     }
     TreeNode node = tree.findNode(model);
     if (node != null) {
-      El.fly(getElementContainer(node)).setStyleName("x-ftree2-selected", select);
-      if (select) {
-        String tid = tree.getId();
-        Accessibility.setState(tree.getElement(), "aria-activedescendant", tid + "__" + node.getElement().getId());
+      Element e = getElementContainer(node);
+      if (e != null) {
+        El.fly(e).setStyleName("x-ftree2-selected", select);
+        if (select) {
+          String tid = tree.getId();
+          Accessibility.setState(tree.getElement(), "aria-activedescendant", tid + "__" + node.getElement().getId());
+        }
       }
     }
   }

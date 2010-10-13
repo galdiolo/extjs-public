@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -18,8 +18,8 @@ public interface ScaleProvider {
         return new Scale(-1, 1, 1);
       }
       min = Math.floor(min * (min > 0 ? .9 : 1.1));
-      max = Math.round(max * (max > 0 ? 1.1 : .9));
-      return new Scale(min, max, Math.max(min > 0 ? min : min * -1, max > 0 ? max : max * -1) / 10);
+      max = Math.ceil(max * (max > 0 ? 1.1 : .9));
+      return new Scale(min, max, Math.max(Math.abs(min), Math.abs(max)) / 10);
     }
   };
 

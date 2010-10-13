@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -15,9 +15,11 @@ import com.extjs.gxt.ui.client.dnd.DND.Feedback;
 import com.extjs.gxt.ui.client.dnd.DND.Operation;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.BaseObservable;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.DNDEvent;
 import com.extjs.gxt.ui.client.event.DNDListener;
 import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.store.TreeStoreModel;
 import com.extjs.gxt.ui.client.widget.Component;
 
@@ -26,7 +28,7 @@ import com.extjs.gxt.ui.client.widget.Component;
  * 
  * <p />
  * While the cursor is over a target, the target is responsible for determining
- * if the drop is valid and showing any visual indicators for the drop. The @link
+ * if the drop is valid and showing any visual indicators for the drop. The
  * {@link StatusProxy} object should be used to specify if the drop is valid,
  * and can also be used to change the values of the proxy object displayed by
  * the cursor. The status proxy is accessible via the DNDEvent.
@@ -104,13 +106,23 @@ import com.extjs.gxt.ui.client.widget.Component;
 public class DropTarget extends BaseObservable {
 
   protected Component component;
-  protected String overStyle;
-  protected Operation operation;
   protected Feedback feedback;
+  protected Operation operation;
+  protected String overStyle;
 
   private boolean allowSelfAsSource;
-  private String group = "";
+  private Listener<ComponentEvent> componentListener = new Listener<ComponentEvent>() {
+    public void handleEvent(ComponentEvent be) {
+      if (be.getType() == Events.Attach) {
+        onComponentAttach();
+      } else if (be.getType() == Events.Detach) {
+        onComponentDetach();
+      }
+    }
+  };
   private boolean enabled = true;
+
+  private String group = "";
 
   /**
    * Creates a new drop target.
@@ -121,7 +133,11 @@ public class DropTarget extends BaseObservable {
     this.component = target;
     this.operation = Operation.MOVE;
     this.feedback = Feedback.APPEND;
-    DNDManager.get().registerDropTarget(this);
+    component.addListener(Events.Attach, componentListener);
+    component.addListener(Events.Detach, componentListener);
+    if (component.isAttached()) {
+      onComponentAttach();
+    }
   }
 
   /**
@@ -218,7 +234,11 @@ public class DropTarget extends BaseObservable {
    * Unregisters the target as a drop target.
    */
   public void release() {
-    DNDManager.get().unregisterDropTarget(this);
+    component.removeListener(Events.Attach, componentListener);
+    component.removeListener(Events.Detach, componentListener);
+    if (component.isAttached()) {
+      onComponentDetach();
+    }
   }
 
   /**
@@ -285,6 +305,14 @@ public class DropTarget extends BaseObservable {
     this.overStyle = overStyle;
   }
 
+  protected void onComponentAttach() {
+    DNDManager.get().registerDropTarget(this);
+  }
+
+  protected void onComponentDetach() {
+    DNDManager.get().unregisterDropTarget(this);
+  }
+
   /**
    * Called if the user cancels the drag operations while the mouse is over the
    * target.
@@ -315,6 +343,10 @@ public class DropTarget extends BaseObservable {
 
   }
 
+  protected void onDragFail(DNDEvent event) {
+
+  }
+
   /**
    * Called when the cursor leaves the target.
    * 
@@ -336,7 +368,7 @@ public class DropTarget extends BaseObservable {
 
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   protected List<ModelData> prepareDropData(Object data, boolean convertTreeStoreModel) {
     List<ModelData> models = new ArrayList<ModelData>();
     if (data instanceof ModelData) {

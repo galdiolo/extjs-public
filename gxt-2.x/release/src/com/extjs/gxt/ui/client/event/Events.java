@@ -256,6 +256,11 @@ public class Events {
    * ColumnClick event type.
    */
   public static final EventType ColumnClick = new EventType();
+  
+  /**
+   * ColumnMove event type.
+   */
+  public static final EventType ColumnMove = new EventType();
 
   /**
    * ColumnResize event type.
@@ -561,6 +566,11 @@ public class Events {
    * Ready event type.
    */
   public static final EventType Ready = new EventType();
+  
+  /**
+   * Reconfigure event type.
+   */
+  public static final EventType Reconfigure = new EventType();
 
   /**
    * Refresh event type.
@@ -641,6 +651,11 @@ public class Events {
    * SelectionChange event type.
    */
   public static final EventType SelectionChange = new EventType();
+  
+  /**
+   * Serialize event type.
+   */
+  public static final EventType Serialize = new EventType();
 
   /**
    * Show event type.

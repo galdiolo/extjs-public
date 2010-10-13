@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -64,7 +64,7 @@ public class ComputedStyleImplIE extends ComputedStyleImpl {
       if(v = elem.style[name]){
         map.@com.extjs.gxt.ui.client.core.FastMap::put(Ljava/lang/String;Ljava/lang/Object;)(orginal,String(v));
       } else if(cs = elem.currentStyle) {
-        map.@com.extjs.gxt.ui.client.core.FastMap::put(Ljava/lang/String;Ljava/lang/Object;)(orginal,String(cs[name]));
+        map.@com.extjs.gxt.ui.client.core.FastMap::put(Ljava/lang/String;Ljava/lang/Object;)(orginal, cs[name] ? String(cs[name]) : null);
       } else {
         map.@com.extjs.gxt.ui.client.core.FastMap::put(Ljava/lang/String;Ljava/lang/Object;)(orginal,null);
       }

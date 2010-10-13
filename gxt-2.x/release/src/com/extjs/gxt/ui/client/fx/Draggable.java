@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -39,7 +39,7 @@ import com.google.gwt.user.client.Window;
  * <dt><b>Events:</b></dt>
  * 
  * <dd><b>DragStart</b> : DragEvent(draggable, component, event) <br>
- * Fires after a drag has started.
+ * <div>Fires after a drag has started.</div>
  * <ul>
  * <li>draggable : this</li>
  * <li>component : drag component</li>
@@ -48,8 +48,7 @@ import com.google.gwt.user.client.Window;
  * </dd>
  * 
  * <dd><b>DragMove</b> : DragEvent(draggable, component, event)<br>
- * Fires after the mouse moves.
- * <ul>
+ * <div>Fires after the mouse moves.</div>
  * <li>draggable : this</li>
  * <li>component : drag component</li>
  * <li>event : the dom event</li>
@@ -57,7 +56,7 @@ import com.google.gwt.user.client.Window;
  * </dd>
  * 
  * <dd><b>DragCancel</b> : DragEvent(draggable, component, event)<br>
- * Fires after a drag has been cancelled.
+ * <div>Fires after a drag has been cancelled.</div>
  * <ul>
  * <li>draggable : this</li>
  * <li>component : drag component</li>
@@ -66,7 +65,7 @@ import com.google.gwt.user.client.Window;
  * </dd>
  * 
  * <dd><b>DragEnd</b> : DragEvent(draggable, component, event) <br>
- * Fires after a drag has ended.
+ * <div>Fires after a drag has ended.</div>
  * <ul>
  * <li>draggable : this</li>
  * <li>component : drag widget</li>
@@ -497,9 +496,9 @@ public class Draggable extends BaseObservable {
       return;
     }
 
-    //still allow text selection, prevent drag of other elements
-    if (!"input".equalsIgnoreCase(ce.getTarget().getTagName())
-        && !"textarea".equalsIgnoreCase(ce.getTarget().getTagName())) {
+    // still allow text selection, prevent drag of other elements
+    if ((!"input".equalsIgnoreCase(ce.getTarget().getTagName()) && !"textarea".equalsIgnoreCase(ce.getTarget().getTagName()))
+        || ce.getTarget().getPropertyBoolean("disabled")) {
       ce.preventDefault();
     }
 
@@ -527,9 +526,14 @@ public class Draggable extends BaseObservable {
   }
 
   protected void onMouseMove(Event event) {
-    String cls = ((Element) event.getEventTarget().cast()).getClassName();
-    if (cls != null && cls.contains("x-insert")) {
-      return;
+    Element elem = event.getEventTarget().cast();
+    // elem.getClassName throwing GWT exception when dragged component is over
+    // SVG / VML
+    if (hasAttribute(elem, "class")) {
+      String cls = ((Element) event.getEventTarget().cast()).getClassName();
+      if (cls != null && cls.contains("x-insert")) {
+        return;
+      }
     }
 
     int x = DOM.eventGetClientX(event);
@@ -696,5 +700,9 @@ public class Draggable extends BaseObservable {
       afterDrag();
     }
   }
+
+  private native boolean hasAttribute(Element elem, String name) /*-{
+    return elem.hasAttribute ? elem.hasAttribute(name) : true;
+  }-*/;
 
 }

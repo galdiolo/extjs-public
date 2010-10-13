@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -22,6 +22,7 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
+import com.extjs.gxt.ui.client.widget.treepanel.TreePanel.CheckCascade;
 import com.google.gwt.user.client.Element;
 
 public class FastTreePanelExample extends LayoutContainer {
@@ -41,8 +42,15 @@ public class FastTreePanelExample extends LayoutContainer {
     container.setLayout(new FitLayout());
 
     TreeStore<ModelData> store = new TreeStore<ModelData>();
-    final TreePanel<ModelData> tree = new TreePanel<ModelData>(store);
+    final TreePanel<ModelData> tree = new TreePanel<ModelData>(store) {
+      @Override
+      protected boolean hasChildren(ModelData m) {
+        return true;
+      }
+    };
     tree.setTrackMouseOver(false);
+    tree.setCheckable(true);
+    tree.setCheckStyle(CheckCascade.CHILDREN);
     tree.setDisplayProperty("name");
     store.setKeyProvider(new ModelKeyProvider<ModelData>() {
 
@@ -53,9 +61,6 @@ public class FastTreePanelExample extends LayoutContainer {
     });
     ModelData m = createModel("Fast Tree");
     store.add(m, false);
-
-    tree.setLeaf(m, false);
-
     tree.addListener(Events.BeforeExpand, new Listener<TreePanelEvent<ModelData>>() {
 
       public void handleEvent(TreePanelEvent<ModelData> be) {
@@ -67,11 +72,7 @@ public class FastTreePanelExample extends LayoutContainer {
           ModelData m = createModel("Tree Item " + i);
           list.add(m);
         }
-
         tree.getStore().insert(be.getNode().getModel(), list, 0, true);
-        for (ModelData m : list) {
-          tree.setLeaf(m, false);
-        }
       }
     });
 
@@ -88,7 +89,7 @@ public class FastTreePanelExample extends LayoutContainer {
     add(html);
     container.add(tree);
     add(container);
-    
+    tree.getSelectionModel().select(store.getRootItems(), true);
   }
 
   private ModelData createModel(String n) {

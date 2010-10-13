@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -48,6 +48,7 @@ import com.extjs.gxt.ui.client.store.StoreListener;
  * <li>index : the row index</li>
  * </ul>
  * </dd>
+ * </dl>
  * 
  * @param <M> the model type contained within the store
  */
@@ -55,11 +56,11 @@ import com.extjs.gxt.ui.client.store.StoreListener;
 public abstract class AbstractStoreSelectionModel<M extends ModelData> extends BaseObservable implements
     StoreSelectionModel<M>, SelectionProvider<M> {
 
-  protected Store<M> store;
-  protected SelectionMode selectionMode = SelectionMode.MULTI;
-  protected List<M> selected = new ArrayList<M>();
   protected M lastSelected;
   protected boolean locked;
+  protected List<M> selected = new ArrayList<M>();
+  protected SelectionMode selectionMode = SelectionMode.MULTI;
+  protected Store<M> store;
 
   protected StoreListener<M> storeListener = new StoreListener<M>() {
     @Override
@@ -84,10 +85,13 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
 
   };
 
+  private M lastFocused;
+
   public void addSelectionChangedListener(SelectionChangedListener<M> listener) {
     addListener(Events.SelectionChange, listener);
   }
 
+  @SuppressWarnings("rawtypes")
   public void bind(Store store) {
     if (this.store != null) {
       this.store.removeStoreListener(storeListener);
@@ -98,6 +102,7 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     }
   }
 
+  @SuppressWarnings("rawtypes")
   public void deselect(int index) {
     if (store instanceof ListStore) {
       ListStore<M> ls = (ListStore) store;
@@ -108,6 +113,7 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     }
   }
 
+  @SuppressWarnings("rawtypes")
   public void deselect(int start, int end) {
     if (store instanceof ListStore) {
       ListStore<M> ls = (ListStore) store;
@@ -178,9 +184,6 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     for (M m : selected) {
       M storeModel = store.findModel(m);
       if (storeModel != null) {
-        if (m != storeModel) {
-          change = true;
-        }
         sel.add(storeModel);
       }
     }
@@ -189,6 +192,7 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     }
     selected.clear();
     lastSelected = null;
+    setLastFocused(null);
     doSelect(sel, false, true);
     if (change) {
       fireSelectionChange();
@@ -199,10 +203,15 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     removeListener(Events.SelectionChange, listener);
   }
 
+  public void select(boolean keepExisting, M... items) {
+    select(Arrays.asList(items), keepExisting);
+  }
+
   public void select(int index, boolean keepExisting) {
     select(index, index, keepExisting);
   }
 
+  @SuppressWarnings("rawtypes")
   public void select(int start, int end, boolean keepExisting) {
     if (store instanceof ListStore) {
       ListStore<M> ls = (ListStore) store;
@@ -222,10 +231,6 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
 
   public void select(List<M> items, boolean keepExisting) {
     doSelect(items, keepExisting, false);
-  }
-
-  public void select(boolean keepExisting, M... items) {
-    select(Arrays.asList(items), keepExisting);
   }
 
   public void select(M item, boolean keepExisting) {
@@ -260,7 +265,7 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     for (M m : models) {
       if (selected.remove(m)) {
         if (lastSelected == m) {
-          lastSelected = selected.size() > 0 ? selected.get(0) : null;
+          lastSelected = selected.size() > 0 ? selected.get(selected.size() - 1) : null;
         }
         onSelectChange(m, false);
         change = true;
@@ -271,6 +276,7 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     }
   }
 
+  @SuppressWarnings("rawtypes")
   protected void doMultiSelect(List<M> models, boolean keepExisting, boolean supressEvent) {
     if (locked) return;
     boolean change = false;
@@ -280,17 +286,24 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     }
     for (M m : models) {
       SelectionEvent<M> e = new SelectionEvent<M>(this, m);
+      boolean isListStore = false;
       if (store instanceof ListStore) {
+        isListStore = true;
         ListStore<M> ls = (ListStore) store;
         e.setIndex(ls.indexOf(m));
       }
-      if ((keepExisting && isSelected(m)) || e.getIndex() == -1 || !fireEvent(Events.BeforeSelect, e)) {
+      if ((keepExisting && isSelected(m)) || (isListStore && e.getIndex() == -1)
+          || (!supressEvent && !fireEvent(Events.BeforeSelect, e))) {
         continue;
+
       }
       change = true;
       lastSelected = m;
+
       selected.add(m);
+      setLastFocused(lastSelected);
       onSelectChange(m, true);
+
     }
 
     if (change && !supressEvent) {
@@ -310,6 +323,7 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     }
   }
 
+  @SuppressWarnings("rawtypes")
   protected void doSingleSelect(M model, boolean supressEvent) {
     if (locked) return;
 
@@ -335,9 +349,19 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     selected.add(model);
     lastSelected = model;
     onSelectChange(model, true);
+    setLastFocused(lastSelected);
     if (change && !supressEvent) {
       fireSelectionChange();
     }
+  }
+
+  @SuppressWarnings("rawtypes")
+  protected void fireSelectionChange() {
+    fireEvent(Events.SelectionChange, new SelectionChangedEvent(this, new ArrayList(selected)));
+  }
+
+  protected M getLastFocused() {
+    return lastFocused;
   }
 
   protected void onAdd(List<? extends M> models) {
@@ -348,7 +372,12 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     int oldSize = selected.size();
     selected.clear();
     lastSelected = null;
+    setLastFocused(null);
     if (oldSize > 0) fireSelectionChange();
+  }
+
+  protected void onLastFocusChanged(M oldFocused, M newFocused) {
+
   }
 
   protected void onRemove(M model) {
@@ -356,6 +385,9 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     if (selected.remove(model)) {
       if (lastSelected == model) {
         lastSelected = null;
+      }
+      if (getLastFocused() == model) {
+        setLastFocused(null);
       }
       fireSelectionChange();
     }
@@ -370,13 +402,20 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
       if (store.equals(model, m)) {
         selected.remove(m);
         selected.add(i, model);
+
+        if (lastSelected == m) {
+          lastSelected = model;
+        }
         break;
       }
     }
   }
 
-  protected void fireSelectionChange() {
-    fireEvent(Events.SelectionChange, new SelectionChangedEvent(this, new ArrayList(selected)));
+  protected void setLastFocused(M lastFocused) {
+    M lF = this.lastFocused;
+    this.lastFocused = lastFocused;
+
+    onLastFocusChanged(lF, lastFocused);
   }
 
 }

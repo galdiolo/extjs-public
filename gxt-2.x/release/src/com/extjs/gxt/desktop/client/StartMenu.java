@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -199,9 +199,10 @@ public class StartMenu extends Menu {
 
     eventPreview.getIgnoreList().add(getElement());
     sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS | Event.KEYEVENTS);
+    el().addStyleName("x-ignore");
   }
 
-  protected void renderTool(Item tool) {
+  protected void renderTool(final Item tool) {
     Element li = DOM.createElement("li");
     li.setClassName("x-menu-list-item");
     toolsPanel.selectNode("ul.x-menu-list").dom.appendChild(li);
@@ -210,9 +211,17 @@ public class StartMenu extends Menu {
 
       @Override
       public void componentSelected(MenuEvent ce) {
-        hide();
+        if (tool.getHideOnClick()) {
+          hide();
+        }
       }
     });
+
+    setParentToTool(tool);
   }
+
+  private native void setParentToTool(Item tool)/*-{
+    tool.@com.extjs.gxt.ui.client.widget.menu.Item::parentMenu=this;
+  }-*/;
 
 }

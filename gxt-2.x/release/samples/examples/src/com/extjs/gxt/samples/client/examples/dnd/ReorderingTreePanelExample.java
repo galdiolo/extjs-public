@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -37,9 +37,9 @@ public class ReorderingTreePanelExample extends LayoutContainer {
     setLayout(new FlowLayout(10));
 
     LayoutContainer container = new LayoutContainer();
-    container.setSize(280, 400);
+    container.setSize(290, 400);
     container.setBorders(true);
-    container.setScrollMode(Scroll.AUTO);
+    container.setScrollMode(Scroll.AUTOY);
 
     TreeStore<ModelData> store = new TreeStore<ModelData>();
     final TreeModel root = (ExamplesModel) Registry.get(Examples.MODEL);
@@ -48,11 +48,11 @@ public class ReorderingTreePanelExample extends LayoutContainer {
 
     final TreePanel<ModelData> tree = new TreePanel<ModelData>(store) {
       @Override
-      public boolean hasChildren(ModelData parent) {
-        if ("My Files".equals(parent.get("name")) || parent instanceof Category) {
+      public boolean hasChildren(ModelData m) {
+        if ("My Files".equals(m.get("name")) ||m instanceof Category) {
           return true;
         }
-        return super.hasChildren(parent);
+        return super.hasChildren(m);
       }
     };
 
@@ -64,16 +64,16 @@ public class ReorderingTreePanelExample extends LayoutContainer {
         be.getTreePanel().setExpanded(root, true);
       }
     });
-    
+
     TreePanelDragSource source = new TreePanelDragSource(tree);
     source.addDNDListener(new DNDListener() {
       @Override
       public void dragStart(DNDEvent e) {
         ModelData sel = tree.getSelectionModel().getSelectedItem();
         if (sel != null && sel == tree.getStore().getRootItems().get(0)) {
-           e.setCancelled(true);
-           e.getStatus().setStatus(false);
-           return;
+          e.setCancelled(true);
+          e.getStatus().setStatus(false);
+          return;
         }
         super.dragStart(e);
       }
@@ -82,6 +82,7 @@ public class ReorderingTreePanelExample extends LayoutContainer {
     TreePanelDropTarget target = new TreePanelDropTarget(tree);
     target.setAllowSelfAsSource(true);
     target.setFeedback(Feedback.BOTH);
+    target.setScrollElementId(container.getId());
 
     container.add(tree);
     add(container);

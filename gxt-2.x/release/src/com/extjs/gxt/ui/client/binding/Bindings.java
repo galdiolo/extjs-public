@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -23,7 +23,7 @@ import com.google.gwt.user.client.DeferredCommand;
  * Aggregates one to many field bindings.
  * 
  * <dl>
- * <dt>Events:</dt>
+ * <dt><b>Events:</dt>
  * 
  * <dd><b>BeforeBind</b> : BindingEvent(source, model)<br>
  * <div>Fires before binding.</div>

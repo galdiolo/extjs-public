@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -36,7 +36,6 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Accessibility;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -159,6 +158,8 @@ public class Window extends ContentPanel {
 
   protected Draggable dragger;
   protected WindowManager manager;
+  protected ToolButton restoreBtn, closeBtn;
+  protected int ariaMoveResizeDistance = 5;
 
   private boolean closable = true;
   private boolean constrain = true;
@@ -174,11 +175,10 @@ public class Window extends ContentPanel {
   private boolean plain;
   private boolean resizable = true;
   private Layer ghost;
-  private ToolButton maxBtn, minBtn;
+  private ToolButton maxBtn, minBtn, moveBtn, resizeBtn;
   private boolean maximized;
   private ModalPanel modalPanel;
   private Resizable resizer;
-  private ToolButton restoreBtn, closeBtn;
   private Point restorePos;
   private Size restoreSize;
   private boolean draggable = true;
@@ -231,7 +231,7 @@ public class Window extends ContentPanel {
     Point p = el().getAlignToXY(elem, pos, offsets);
     setPagePosition(p.x, p.y);
   }
-  
+
   @Override
   public void setHeading(String text) {
     super.setHeading(text);
@@ -264,19 +264,7 @@ public class Window extends ContentPanel {
    * the window itself will receive focus.
    */
   public void focus() {
-    if (GXT.isAriaEnabled()) {
-      Timer t = new Timer() {
-        @Override
-        public void run() {
-          doFocus();
-        }
-      };
-      t.schedule(1500);
-      getFocusEl().focus();
-      return;
-    }
     DeferredCommand.addCommand(new Command() {
-
       public void execute() {
         doFocus();
       }
@@ -312,14 +300,22 @@ public class Window extends ContentPanel {
       dragger.setConstrainClient(getConstrain());
       dragger.setSizeProxyToSource(false);
       dragger.addDragListener(new DragListener() {
+        @Override
         public void dragEnd(DragEvent de) {
-          endDrag(de);
+          endDrag(de, false);
         }
 
+        @Override
+        public void dragCancel(DragEvent de) {
+          endDrag(de, true);
+        }
+
+        @Override
         public void dragMove(DragEvent de) {
           moveDrag(de);
         }
 
+        @Override
         public void dragStart(DragEvent de) {
           startDrag(de);
         }
@@ -410,6 +406,11 @@ public class Window extends ContentPanel {
     if (hidden || !fireEvent(Events.BeforeHide, new WindowEvent(this, buttonPressed))) {
       return;
     }
+
+    if (dragger != null) {
+      dragger.cancelDrag();
+    }
+
     hidden = true;
 
     if (!maximized) {
@@ -419,7 +420,7 @@ public class Window extends ContentPanel {
 
     onHide();
     RootPanel.get().remove(this);
-    if (modal) {
+    if (modalPanel != null) {
       ModalPanel.push(modalPanel);
       modalPanel = null;
     }
@@ -541,9 +542,10 @@ public class Window extends ContentPanel {
       head.removeStyleName("x-window-draggable");
 
       fitContainer();
-      maxBtn.setVisible(false);
-      restoreBtn.setVisible(true);
-
+      if (maximizable) {
+        maxBtn.setVisible(false);
+        restoreBtn.setVisible(true);
+      }
       if (draggable) {
         dragger.setEnabled(false);
       }
@@ -604,8 +606,10 @@ public class Window extends ContentPanel {
   public void restore() {
     if (maximized) {
       el().removeStyleName("x-window-maximized");
-      restoreBtn.setVisible(false);
-      maxBtn.setVisible(true);
+      if (maximizable) {
+        restoreBtn.setVisible(false);
+        maxBtn.setVisible(true);
+      }
       if (draggable) {
         dragger.setEnabled(true);
       }
@@ -868,7 +872,8 @@ public class Window extends ContentPanel {
     if (!hidden || !fireEvent(Events.BeforeShow, new WindowEvent(this))) {
       return;
     }
-
+    // remove hide style, else layout fails
+    removeStyleName(getHideMode().value());
     RootPanel.get().add(this);
     el().setVisibility(false);
     el().makePositionable(true);
@@ -897,7 +902,7 @@ public class Window extends ContentPanel {
     hidden = false;
 
     // layout early to render window's content for size calcs
-    if (!layoutExecuted) {
+    if (!layoutExecuted || isLayoutNeeded()) {
       layout();
     }
 
@@ -945,7 +950,7 @@ public class Window extends ContentPanel {
       maximize();
     }
     el().setVisibility(true);
-    
+
     if (GXT.isAriaEnabled()) {
       Accessibility.setState(getElement(), "aria-hidden", "false");
     }
@@ -974,7 +979,6 @@ public class Window extends ContentPanel {
   }
 
   protected void doFocus() {
-    getFocusEl().focus();
     if (focusWidget != null) {
       if (focusWidget instanceof Component) {
         ((Component) focusWidget).focus();
@@ -986,10 +990,13 @@ public class Window extends ContentPanel {
     }
   }
 
-  protected void endDrag(DragEvent de) {
+  protected void endDrag(DragEvent de, boolean canceled) {
     unghost(de);
-    restorePos = getPosition(true);
-    positioned = true;
+    if (!canceled) {
+      restorePos = getPosition(true);
+      positioned = true;
+    }
+
     if (layer != null && getShadow()) {
       layer.enableShadow();
     }
@@ -1030,6 +1037,19 @@ public class Window extends ContentPanel {
 
   protected void initTools() {
     super.initTools();
+
+    if (GXT.isAriaEnabled()) {
+      moveBtn = new ToolButton("x-tool-plus");
+      moveBtn.getAriaSupport().setLabel(GXT.MESSAGES.window_ariaMove());
+      moveBtn.getAriaSupport().setDescription(GXT.MESSAGES.window_ariaMoveDescription());
+      head.addTool(moveBtn);
+
+      resizeBtn = new ToolButton("x-tool-minus");
+      resizeBtn.getAriaSupport().setLabel(GXT.MESSAGES.window_ariaResize());
+      resizeBtn.getAriaSupport().setDescription(GXT.MESSAGES.window_ariaResizeDescription());
+      head.addTool(resizeBtn);
+    }
+
     if (minimizable) {
       minBtn = new ToolButton("x-tool-minimize");
       minBtn.addSelectionListener(new SelectionListener<IconButtonEvent>() {
@@ -1061,6 +1081,9 @@ public class Window extends ContentPanel {
 
     if (closable) {
       closeBtn = new ToolButton("x-tool-close");
+      if (GXT.isAriaEnabled()) {
+        closeBtn.setTitle(GXT.MESSAGES.messageBox_close());
+      }
       closeBtn.addListener(Events.Select, new Listener<ComponentEvent>() {
         public void handleEvent(ComponentEvent ce) {
           hide();
@@ -1098,9 +1121,49 @@ public class Window extends ContentPanel {
 
   protected void onKeyPress(WindowEvent we) {
     int keyCode = we.getKeyCode();
-    if (closable && onEsc && keyCode == KeyCodes.KEY_ESCAPE
-        && getElement().isOrHasChild((com.google.gwt.dom.client.Element) we.getEvent().getEventTarget().cast())) {
+    boolean t = getElement().isOrHasChild((com.google.gwt.dom.client.Element) we.getEvent().getEventTarget().cast());
+    boolean key = GXT.isAriaEnabled() ? we.isShiftKey() : true;
+    if (key && closable && onEsc && keyCode == KeyCodes.KEY_ESCAPE && t) {
       hide();
+    }
+
+    if (GXT.isAriaEnabled()) {
+      if (we.getTarget() == moveBtn.getElement()) {
+        Point p = getPosition(true);
+        switch (we.getKeyCode()) {
+          case KeyCodes.KEY_LEFT:
+            setPosition(p.x - ariaMoveResizeDistance, p.y);
+            break;
+          case KeyCodes.KEY_RIGHT:
+            setPosition(p.x + ariaMoveResizeDistance, p.y);
+            break;
+          case KeyCodes.KEY_DOWN:
+            setPosition(p.x, p.y + ariaMoveResizeDistance);
+            break;
+          case KeyCodes.KEY_UP:
+            setPosition(p.x, p.y - ariaMoveResizeDistance);
+            break;
+        }
+      } else if (we.getTarget() == resizeBtn.getElement()) {
+        if (!resizable) {
+          return;
+        }
+        Size s = getSize();
+        switch (we.getKeyCode()) {
+          case KeyCodes.KEY_LEFT:
+            setSize(s.width - ariaMoveResizeDistance, s.height);
+            break;
+          case KeyCodes.KEY_RIGHT:
+            setSize(s.width + ariaMoveResizeDistance, s.height);
+            break;
+          case KeyCodes.KEY_DOWN:
+            setSize(s.width, s.height + ariaMoveResizeDistance);
+            break;
+          case KeyCodes.KEY_UP:
+            setSize(s.width, s.height - ariaMoveResizeDistance);
+            break;
+        }
+      }
     }
   }
 
@@ -1143,10 +1206,10 @@ public class Window extends ContentPanel {
 
     sinkEvents(Event.ONMOUSEDOWN | Event.ONKEYPRESS);
 
-    if (GXT.isAriaEnabled()) {
-      el().setTabIndex(0);
-      el().setElementAttribute("hideFocus", "true");
+    el().setTabIndex(0);
+    el().setElementAttribute("hideFocus", "true");
 
+    if (GXT.isAriaEnabled()) {
       Accessibility.setRole(getElement(), "alertdialog");
       Accessibility.setState(getElement(), "aria-labelledby", head.getId() + "-label");
       Accessibility.setState(getElement(), "aria-hidden", "true");
@@ -1158,13 +1221,6 @@ public class Window extends ContentPanel {
 
     if (super.width == null) {
       setWidth(Math.max(initialWidth, minWidth));
-    }
-  }
-
-  protected void onResize(int width, int height) {
-    super.onResize(width, height);
-    if (resizer != null) {
-      resizer.syncHandleHeight();
     }
   }
 
@@ -1182,9 +1238,6 @@ public class Window extends ContentPanel {
           setPagePosition(el().adjustForConstraints(getPosition(false)));
         }
       }
-      if (modal && modalPanel != null) {
-        modalPanel.syncModal();
-      }
     }
   }
 
@@ -1195,7 +1248,7 @@ public class Window extends ContentPanel {
       onHide();
     }
   }
-  
+
   @Override
   protected void onHide() {
     super.onHide();

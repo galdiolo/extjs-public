@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -10,11 +10,13 @@ package com.extjs.gxt.desktop.client;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.IconAlign;
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.util.IconHelper;
 import com.extjs.gxt.ui.client.util.Padding;
 import com.extjs.gxt.ui.client.util.Size;
@@ -39,10 +41,13 @@ public class TaskBar extends LayoutContainer {
   protected StartBox startBox; // west
   protected TasksButtonsPanel tbPanel; // center
 
+  private String startButtonText = GXT.MESSAGES.desktop_startButton();
+
   public TaskBar() {
     setId("ux-taskbar");
     setLayout(new RowLayout(Orientation.HORIZONTAL));
     startBox = new StartBox();
+    startBox.startBtn.setText(startButtonText);
     tbPanel = new TasksButtonsPanel();
 
     add(startBox, new RowData(90, 1));
@@ -66,6 +71,15 @@ public class TaskBar extends LayoutContainer {
    */
   public List<TaskButton> getButtons() {
     return tbPanel.getItems();
+  }
+
+  /**
+   * Returns the start button text.
+   * 
+   * @return the start button text
+   */
+  public String getStartButtonText() {
+    return startButtonText;
   }
 
   /**
@@ -95,10 +109,24 @@ public class TaskBar extends LayoutContainer {
     tbPanel.setActiveButton(btn);
   }
 
+  /**
+   * Sets the start button text (defaults to 'Start').
+   * 
+   * @param startButtonText the start button text
+   */
+  public void setStartButtonText(String startButtonText) {
+    this.startButtonText = startButtonText;
+    if (rendered) {
+      startBox.startBtn.setText(startButtonText);
+    }
+  }
+
   @Override
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
     setStyleAttribute("zIndex", "10");
+    
+    startBox.startBtn.setText(startButtonText);
   }
 
 }
@@ -157,7 +185,6 @@ class StartButton extends Button {
   private StartMenu startMenu;
 
   public StartButton() {
-    setText("Start");
     setId("ux-startbutton");
     setIcon(IconHelper.createStyle("start", 23, 23));
     setMenuAlign("bl-tl");
@@ -221,16 +248,11 @@ class TaskButton extends Button {
 
   TaskButton(Window win, Element parent) {
     this.win = win;
-    setText(win.getHeading());
+    setText(Format.ellipse(win.getHeading(), 26));
     setIcon(win.getIcon());
     template = new Template(getButtonTemplate());
 
     render(parent);
-  }
-
-  @Override
-  protected void autoWidth() {
-
   }
 
   @Override
@@ -261,6 +283,11 @@ class TaskButton extends Button {
       }
     }
     this.icon = icon;
+  }
+
+  @Override
+  protected void autoWidth() {
+
   }
 
   @Override

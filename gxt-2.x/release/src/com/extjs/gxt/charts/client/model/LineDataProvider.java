@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -44,17 +44,19 @@ public class LineDataProvider extends PieDataProvider {
       xAxis.getLabels().getLabels().clear();
     }
 
+    boolean first = true;
     for (ModelData m : store.getModels()) {
       Number n = getValue(m);
       if (n == null) {
         chart.addNullValue();
       } else {
         chart.addValues(n);
-        maxYValue = maxYValue == null ? n.doubleValue() : Math.max(maxYValue, n.doubleValue());
-        minYValue = minYValue == null ? n.doubleValue() : Math.min(minYValue, n.doubleValue());
-        if (xAxis != null) {
-          xAxis.addLabels(getLabel(m));
-        }
+        maxYValue = first ? n.doubleValue() : Math.max(maxYValue, n.doubleValue());
+        minYValue = first ? n.doubleValue() : Math.min(minYValue, n.doubleValue());
+        first = false;
+      }
+      if (xAxis != null) {
+        xAxis.addLabels(getLabel(m));
       }
     }
   }

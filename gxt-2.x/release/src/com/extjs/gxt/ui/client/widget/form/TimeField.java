@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -11,9 +11,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.DateWrapper;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.user.client.Element;
 
 /**
  * Provides a time input field with a time dropdown and automatic time
@@ -31,9 +33,9 @@ import com.google.gwt.i18n.client.DateTimeFormat;
  * <pre>
  * TimeField field = new TimeField();
  * 
- * DateWrapper wrap = new DateWrapper();
+ * DateWrapper wrap = new DateWrapper(1970, 1, 1);
  * wrap = wrap.clearTime();
- * wrap.addHours(4);
+ * wrap = wrap.addHours(4);
  * 
  * field.setMinValue(wrap.asDate());
  * field.setDateValue(new Date());
@@ -100,6 +102,11 @@ public class TimeField extends ComboBox<Time> {
 
     private String minText;
     private String maxText;
+    private String ariaText = "Expected format HH:MM";
+
+    public String getAriaText() {
+      return ariaText;
+    }
 
     /**
      * Returns the max text.
@@ -111,12 +118,21 @@ public class TimeField extends ComboBox<Time> {
     }
 
     /**
-     * Returns the min text.
+     * Returns the minimum text.
      * 
-     * @return the min text
+     * @return the minimum text
      */
     public String getMinText() {
       return minText;
+    }
+
+    /**
+     * Sets the aria instruction text.
+     * 
+     * @param ariaText
+     */
+    public void setAriaText(String ariaText) {
+      this.ariaText = ariaText;
     }
 
     /**
@@ -197,16 +213,18 @@ public class TimeField extends ComboBox<Time> {
       Time t1 = store.getAt(i);
       Time t2 = store.getAt(i + 1);
 
+      long l1 = t1.getDate().getTime();
+      long l2;
+
       if (t2 == null) {
         DateWrapper temp = new DateWrapper();
         temp = temp.clearTime();
         temp = temp.addMinutes(t1.getMinutes() + increment);
         temp = temp.addHours(t1.getHour());
-        t2 = new Time(temp.asDate());
+        l2 = temp.asDate().getTime(); 
+      } else {
+        l2 = t2.getDate().getTime();
       }
-
-      long l1 = t1.getDate().getTime();
-      long l2 = t2.getDate().getTime();
 
       if (l >= l1 && l < l2) {
         return t1;
@@ -330,25 +348,31 @@ public class TimeField extends ComboBox<Time> {
   /**
    * The minimum allowed time (no default value).
    * 
-   * @param value the min date
+   * @param value the minimum date
    */
   public void setMinValue(Date value) {
     this.minValue = value;
+  }
+  
+  @Override
+  protected void onRender(Element parent, int index) {
+    super.onRender(parent, index);
+    if (GXT.isAriaEnabled()) {
+      getInputEl().dom.setAttribute("title", getMessages().getAriaText());
+    }
   }
 
   @Override
   protected void initList() {
     initialized = true;
-    DateWrapper min = minValue != null ? new DateWrapper(minValue) : new DateWrapper(
-        1970, 1, 1);
+    DateWrapper min = minValue != null ? new DateWrapper(minValue) : new DateWrapper(1970, 1, 1);
     if (minValue == null) {
       min = min.clearTime();
     }
 
-    DateWrapper max = maxValue != null ? new DateWrapper(maxValue) : new DateWrapper(
-        1970, 1, 1);
+    DateWrapper max = maxValue != null ? new DateWrapper(maxValue) : new DateWrapper(1970, 1, 1);
     if (maxValue == null) {
-      max = max.clearTime().addMinutes((24 * 60) - 1);
+      max = max.clearTime().addMinutes(24 * 60);
     }
 
     List<Time> times = new ArrayList<Time>();

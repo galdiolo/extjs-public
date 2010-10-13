@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -9,12 +9,10 @@ package com.extjs.gxt.ui.client.widget.button;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.aria.FocusFrame;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.IconButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.DOM;
@@ -39,26 +37,6 @@ import com.google.gwt.user.client.ui.Accessibility;
  * <li>event : the dom event</li>
  * </ul>
  * </dd>
- * 
- * <dl>
- * <dt>Inherited Events:</dt>
- * <dd>BoxComponent Move</dd>
- * <dd>BoxComponent Resize</dd>
- * <dd>Component Enable</dd>
- * <dd>Component Disable</dd>
- * <dd>Component BeforeHide</dd>
- * <dd>Component Hide</dd>
- * <dd>Component BeforeShow</dd>
- * <dd>Component Show</dd>
- * <dd>Component Attach</dd>
- * <dd>Component Detach</dd>
- * <dd>Component BeforeRender</dd>
- * <dd>Component Render</dd>
- * <dd>Component BrowserEvent</dd>
- * <dd>Component BeforeStateRestore</dd>
- * <dd>Component StateRestore</dd>
- * <dd>Component BeforeStateSave</dd>
- * <dd>Component SaveState</dd>
  * </dl>
  */
 public class IconButton extends BoxComponent {
@@ -134,6 +112,9 @@ public class IconButton extends BoxComponent {
       case Event.ONBLUR:
         onBlur(ce);
         break;
+      case Event.ONKEYUP:
+        onKeyPress(ce);
+        break;
     }
   }
 
@@ -142,7 +123,7 @@ public class IconButton extends BoxComponent {
    * 
    * @param listener the listener to be removed
    */
-  public void removeSelectionListener(SelectionListener<ButtonEvent> listener) {
+  public void removeSelectionListener(SelectionListener<IconButtonEvent> listener) {
     removeListener(Events.Select, listener);
   }
 
@@ -174,7 +155,7 @@ public class IconButton extends BoxComponent {
   }
 
   protected void onFocus(ComponentEvent ce) {
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isAriaEnabled() && !GXT.isIE) {
       FocusFrame.get().frame(this);
     }
   }
@@ -185,23 +166,19 @@ public class IconButton extends BoxComponent {
       onClick(ce);
     }
   }
-  
+
   protected void onRender(Element target, int index) {
     setElement(DOM.createDiv(), target, index);
     addStyleName("x-icon-btn");
     addStyleName("x-nodrag");
     addStyleName(style);
-    sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS | Event.FOCUSEVENTS);
+    sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS | Event.FOCUSEVENTS | Event.ONKEYUP);
     super.onRender(target, index);
-    
-    new KeyNav<ComponentEvent>(this){
-      @Override
-      public void onKeyPress(ComponentEvent ce) {
-        IconButton.this.onKeyPress(ce);
-      }
-      
-    };
-    
+
+    if (GXT.isHighContrastMode) {
+      getElement().setInnerHTML("<i>&nbsp;</i>");
+    }
+
     if (GXT.isAriaEnabled()) {
       el().setTabIndex(0);
       Accessibility.setRole(getElement(), Accessibility.ROLE_BUTTON);

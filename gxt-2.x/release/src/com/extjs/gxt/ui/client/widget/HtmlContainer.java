@@ -1,12 +1,15 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
  */
 package com.extjs.gxt.ui.client.widget;
 
+import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.aria.FocusFrame;
+import com.extjs.gxt.ui.client.aria.FocusManager;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.data.Loader;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -31,22 +34,17 @@ import com.google.gwt.user.client.ui.Widget;
  * <p />
  * Code snippet:
  * 
- * <pre>{@code
-   HtmlContainer hc = new HtmlContainer(
-     "<div class=text style='padding:5px'>"
-     + "<h1>Heading1</h1>"
-     + "<i>Some text</i></br>"
-     + "<div class=b1></div>"
-     + "<u>Final text</u></div>");
-   hc.add(new Button("Test"), "div.b1");
+ * <pre>
+   HtmlContainer hc = new HtmlContainer("&lt;div>&lt;table>&lt;tr>&lt;td id='foo'>&lt;/td>&lt;/tr>&lt;/div>");
+   hc.add(new Button("Test"), ".foo");
    hc.setBorders(true);
    hc.setSize(200, 100);
    hc.setPosition(10, 10);
    RootPanel.get().add(hc);
- * }</pre>
+ * </pre>
  * 
  * <dl>
- * <dt>Events:</dt>
+ * <dt><b>Events:</b></dt>
  * 
  * <dd><b>Load</b> : HtmlContainerEvent(htmlContainer, response, html)<br>
  * <div>Fires after the component is resized.</div>
@@ -100,7 +98,7 @@ public class HtmlContainer extends Container<Component> {
   private RequestCallback callback;
   private Method httpMethod = RequestBuilder.GET;
   private String requestData;
-  private boolean deferDownload;
+  private boolean deferDownload = true;
 
   /**
    * Creates a new container.
@@ -176,6 +174,8 @@ public class HtmlContainer extends Container<Component> {
   }
 
   /**
+   * Returns the tag name.
+   * 
    * @return the tagName
    */
   public String getTagName() {
@@ -191,14 +191,31 @@ public class HtmlContainer extends Container<Component> {
     return deferDownload;
   }
 
+  @Override
+  public void onComponentEvent(ComponentEvent ce) {
+    super.onComponentEvent(ce);
+    int type = ce.getEventTypeInt();
+    switch (type) {
+      case Event.ONFOCUS:
+        onFocus(ce);
+        break;
+      case Event.ONBLUR:
+        onBlur(ce);
+        break;
+    }
+  }
+
   /**
    * True to defer remote requests until the component is rendered (defaults to
-   * false).
+   * true).
    * 
    * @param deferDownload true to defer
    */
   public void setDeferDownload(boolean deferDownload) {
     this.deferDownload = deferDownload;
+    if (!deferDownload) {
+      requestData();
+    }
   }
 
   /**
@@ -262,7 +279,7 @@ public class HtmlContainer extends Container<Component> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   protected ContainerEvent createContainerEvent(Component item) {
     return new HtmlContainerEvent(this, item);
   }
@@ -281,6 +298,28 @@ public class HtmlContainer extends Container<Component> {
     setHtml(hce.getHtml());
   }
 
+  protected void onBlur(ComponentEvent ce) {
+    if (GXT.isAriaEnabled()) {
+      FocusFrame.get().unframe();
+    }
+  }
+
+  protected void onFocus(ComponentEvent ce) {
+    if (GXT.isAriaEnabled() && FocusManager.get().isManaged()) {
+      if (getAriaSupport().isIgnore()) {
+        for (int i = 0; i < getItemCount(); i++) {
+          Component c = getItem(i);
+          if (!c.getAriaSupport().isIgnore()) {
+            c.focus();
+            break;
+          }
+        }
+      } else {
+        FocusFrame.get().frame(this);
+      }
+    }
+  }
+
   @Override
   protected void onRender(Element target, int index) {
     if (elem != null) {
@@ -290,9 +329,15 @@ public class HtmlContainer extends Container<Component> {
       setElement(DOM.createElement(tagName), target, index);
       if (html != null) {
         setHtml(html);
-      } else if (url != null && deferDownload) {
+      } else if ((url != null || requestBuilder != null) && deferDownload) {
         requestData();
       }
+    }
+
+    if (GXT.isAriaEnabled() && !getAriaSupport().isIgnore()) {
+      el().setTabIndex(0);
+      el().setElementAttribute("hideFocus", "true");
+      sinkEvents(Event.FOCUSEVENTS);
     }
   }
 

@@ -1,12 +1,13 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007, 2008, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
  */
 package com.extjs.gxt.ui.client.widget.menu;
 
+import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.google.gwt.user.client.DOM;
@@ -32,6 +33,8 @@ public class AdapterMenuItem extends Item {
    * The wrapped widget.
    */
   protected Widget widget;
+
+  protected boolean manageFocus = false;
 
   private boolean needsIndent = true;
 
@@ -71,14 +74,10 @@ public class AdapterMenuItem extends Item {
   }
 
   /**
-   * Returns true if the component can be activated.
+   * Returns true if the widget will be indented.
    * 
-   * @return true if can be activated
+   * @return true if indented
    */
-  public boolean isCanActivate() {
-    return this.canActivate;
-  }
-
   public boolean isNeedsIndent() {
     return needsIndent;
   }
@@ -93,14 +92,10 @@ public class AdapterMenuItem extends Item {
   }
 
   /**
-   * Sets whether the item can be activated.
+   * True to indent the widget to account for the icon space (defaults to true).
    * 
-   * @param canActivate true to activate
+   * @param needsIndent true to indent
    */
-  public void setCanActivate(boolean canActivate) {
-    this.canActivate = canActivate;
-  }
-
   public void setNeedsIndent(boolean needsIndent) {
     this.needsIndent = needsIndent;
   }
@@ -110,6 +105,14 @@ public class AdapterMenuItem extends Item {
     ComponentHelper.doAttach(widget);
     DOM.setEventListener(getElement(), this);
     onLoad();
+  }
+
+  @Override
+  protected void onClick(ComponentEvent be) {
+    System.out.println("sdfdsf");
+    if (widget instanceof Component) {
+      ((Component) widget).focus();
+    }
   }
 
   @Override
@@ -130,12 +133,40 @@ public class AdapterMenuItem extends Item {
     }
   }
 
+  /**
+   * Returns true if the adapter manages focus for the wrapped widget.
+   * 
+   * @return true if focus being managed
+   */
+  public boolean isManageFocus() {
+    return manageFocus;
+  }
+
+  /**
+   * True to move focus to wrapped widget when the enter key is pressed and
+   * remove focus of wrapped widget when escape is pressed (defaults to false).
+   * 
+   * @param manageFocus true to manage focus
+   */
+  public void setManageFocus(boolean manageFocus) {
+    this.manageFocus = manageFocus;
+  }
+
   @Override
   protected void onEnable() {
     super.onEnable();
     if (widget instanceof Component) {
       ((Component) widget).enable();
     }
+  }
+
+  @Override
+  protected boolean onEscape() {
+    if (manageFocus) {
+      focus();
+      return false;
+    }
+    return super.onEscape();
   }
 
   protected void onRender(Element target, int index) {

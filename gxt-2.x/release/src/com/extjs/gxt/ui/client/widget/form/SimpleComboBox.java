@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -43,7 +43,7 @@ public class SimpleComboBox<T> extends ComboBox<SimpleComboValue<T>> {
    * 
    * @param values the values
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public void add(List<T> values) {
     List list = new ArrayList();
     for (T t : values) {

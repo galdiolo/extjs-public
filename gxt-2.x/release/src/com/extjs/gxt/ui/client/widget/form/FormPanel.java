@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -165,7 +165,7 @@ public class FormPanel extends ContentPanel implements FormPanelImplHost {
    * Resets the dirty state for all fields by setting the original value to be
    * equal to the current value.
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public void clearDirtyFields() {
     for (Field f : getFields()) {
       if (f.isDirty()) {
@@ -514,6 +514,8 @@ public class FormPanel extends ContentPanel implements FormPanelImplHost {
     }
 
     form.addEventsSunk(Event.ONLOAD);
+    
+    setAriaRole("region");
   }
 
   private void createFrame() {
@@ -529,9 +531,9 @@ public class FormPanel extends ContentPanel implements FormPanelImplHost {
   private void getChildFields(Container<Component> c, List<Field<?>> fields) {
     for (Component comp : c.getItems()) {
       if (comp instanceof Field) {
-        fields.add((Field) comp);
+        fields.add((Field<?>) comp);
       } else if (comp instanceof Container) {
-        getChildFields((Container) comp, fields);
+        getChildFields((Container<Component>) comp, fields);
       }
     }
   }

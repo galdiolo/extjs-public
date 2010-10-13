@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -40,7 +40,7 @@ public class BaseModelData implements ModelData, Serializable {
     setProperties(properties);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public <X> X get(String property) {
     if (allowNestedValues && NestedModelUtil.isNestedProperty(property)) {
       return (X) NestedModelUtil.getNestedValue(this, property);
@@ -116,7 +116,7 @@ public class BaseModelData implements ModelData, Serializable {
    * @param property the property name
    * @param value the property value
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public <X> X set(String property, X value) {
     if (allowNestedValues && NestedModelUtil.isNestedProperty(property)) {
       return (X) NestedModelUtil.setNestedValue(this, property, value);

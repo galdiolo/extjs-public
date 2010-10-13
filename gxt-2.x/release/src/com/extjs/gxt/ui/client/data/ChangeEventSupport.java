@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -33,7 +33,8 @@ public class ChangeEventSupport implements ChangeEventSource {
 
   public void notify(ChangeEvent event) {
     if (!silent && listeners != null) {
-      for (ChangeListener listener : listeners) {
+      for (int i = 0, len = listeners.size(); i< len; i++) {
+        ChangeListener listener = listeners.get(i);
         listener.modelChanged(event);
       }
     }

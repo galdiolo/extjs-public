@@ -1,6 +1,6 @@
 /*
- * Ext GWT Library 2.0
- * Copyright(c) 2006-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -120,10 +120,6 @@
 
 .x-btn-mc em.x-btn-split {
   background-image: url(../images/slate/button/s-arrow-b-noline.gif);
-}
-
-.x-btn-over .x-btn-mc em.x-btn-split,.x-btn-click .x-btn-mc em.x-btn-split,.x-btn-menu-active .x-btn-mc em.x-btn-split,.x-btn-pressed .x-btn-mc em.x-btn-split {
-  background-image: url(../images/slate/button/s-arrow-o.gif);
 }
 
 .x-btn-over .x-btn-mc em.x-btn-split,.x-btn-click .x-btn-mc em.x-btn-split,.x-btn-menu-active .x-btn-mc em.x-btn-split,.x-btn-pressed .x-btn-mc em.x-btn-split,.x-toolbar .x-btn-over .x-btn-mc em.x-btn-split,.x-toolbar .x-btn-click .x-btn-mc em.x-btn-split,.x-toolbar .x-btn-menu-active .x-btn-mc em.x-btn-split,.x-toolbar .x-btn-pressed .x-btn-mc em.x-btn-split
@@ -548,7 +544,7 @@ body.x-body-masked .x-window-mc,body.x-body-masked .x-window-plain .x-window-mc 
 }
 
 .x-form-field-wrap .x-form-trigger {
-  background: transparent url(../images/slate/form/trigger.gif) no-repeat 0 0;
+  background-image: url(../images/slate/form/trigger.gif);
 }
 
 .x-form-field-wrap .x-form-date-trigger {
@@ -877,37 +873,37 @@ td.x-date-mp-sel a {
 }
 
 .x-form-invalid-tip .x-tip-tc {
-  background: url(../images/default/form/error-tip-corners.gif) repeat-x 0 -12px;
+  background: url(../images/slate/form/error-tip-corners.gif) repeat-x 0 -12px;
   padding-top: 6px;
 }
 
 .x-form-invalid-tip .x-tip-tl {
-  background-image: url(../images/default/form/error-tip-corners.gif);
+  background-image: url(../images/slate/form/error-tip-corners.gif);
 }
 
 .x-form-invalid-tip .x-tip-tr {
-  background-image: url(../images/default/form/error-tip-corners.gif);
+  background-image: url(../images/slate/form/error-tip-corners.gif);
 }
 
 .x-form-invalid-tip .x-tip-bc {
-  background: url(../images/default/form/error-tip-corners.gif) repeat-x 0 -18px;
+  background: url(../images/slate/form/error-tip-corners.gif) repeat-x 0 -18px;
   height: 6px;
 }
 
 .x-form-invalid-tip .x-tip-bl {
-  background: url(../images/default/form/error-tip-corners.gif) no-repeat 0 -6px;
+  background: url(../images/slate/form/error-tip-corners.gif) no-repeat 0 -6px;
 }
 
 .x-form-invalid-tip .x-tip-br {
-  background: url(../images/default/form/error-tip-corners.gif) no-repeat right -6px;
+  background: url(../images/slate/form/error-tip-corners.gif) no-repeat right -6px;
 }
 
 .x-form-invalid-tip .x-tip-ml {
-  background-image: url(../images/default/form/error-tip-corners.gif);
+  background-image: url(../images/slate/form/error-tip-corners.gif);
 }
 
 .x-form-invalid-tip .x-tip-mr {
-  background-image: url(../images/default/form/error-tip-corners.gif);
+  background-image: url(../images/slate/form/error-tip-corners.gif);
 }
 
 .x-tree-node .x-tree-selected {
@@ -1005,4 +1001,61 @@ td.x-date-mp-sel a {
 
 .x-border {
   border: 1px solid #AABBCC;
+}
+
+.x-menubar {
+  border-color: #D0D0D0;
+  background-color: #F0F0F0;
+  background-image: url(../images/slate/toolbar/bg.gif);
+}
+
+.x-menubar-item-active {
+  background-color: #FBF0D2;
+}
+
+.x-spinner-field .x-form-spinner-up {
+  background-image: url('../images/slate/form/spinner.gif');
+}
+.x-spinner-field .x-form-spinner-down {
+  background-image: url('../images/slate/form/spinner.gif');
+}
+
+.x-spinner-field .x-form-spinner-down {
+   background-position:0 -12px;
+}
+
+.x-trigger-wrap-focus .x-form-spinner-up {
+  background-position:-85px 0;
+}
+
+.x-trigger-wrap-focus .x-form-spinner-down {
+  background-position:-85px -12px;
+}
+
+.x-form-field-wrap .x-form-spinner-overup{
+  background-position:-17px 0;
+}
+.x-form-field-wrap .x-form-spinner-clickup{
+  background-position:-34px 0;
+}
+
+.x-trigger-wrap-focus .x-form-spinner-overup{
+  background-position:-102px 0;
+}
+
+.x-trigger-wrap-focus .x-form-spinner-clickup{
+  background-position:-119px 0;
+}
+
+.x-form-field-wrap .x-form-spinner-overdown{
+  background-position:-51px -12px;
+}
+.x-form-field-wrap .x-form-spinner-clickdown{
+  background-position:-68px -12px;
+}
+.x-trigger-wrap-focus .x-form-spinner-overdown{
+  background-position:-136px -12px;
+}
+.x-trigger-wrap-focus .x-form-spinner-clickdown{
+  background-position:-153px -12px;
 }

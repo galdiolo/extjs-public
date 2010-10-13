@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -79,6 +79,15 @@ public abstract class Item extends Component {
   }
 
   /**
+   * Returns true if the component can be activated.
+   * 
+   * @return true if can be activated
+   */
+  public boolean isCanActivate() {
+    return this.canActivate;
+  }
+
+  /**
    * Removes a previously added listener.
    * 
    * @param listener the listener to be removed
@@ -95,6 +104,15 @@ public abstract class Item extends Component {
    */
   public void setActiveStyle(String activeStyle) {
     this.activeStyle = activeStyle;
+  }
+
+  /**
+   * Sets whether the item can be activated (defaults to false).
+   * 
+   * @param canActivate true to activate
+   */
+  public void setCanActivate(boolean canActivate) {
+    this.canActivate = canActivate;
   }
 
   /**
@@ -119,6 +137,10 @@ public abstract class Item extends Component {
     MenuEvent me = new MenuEvent(parentMenu);
     me.setItem(this);
     fireEvent(Events.Activate, me);
+  }
+  
+  protected boolean onEscape() {
+    return true;
   }
 
   protected void deactivate() {

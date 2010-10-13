@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -72,6 +72,12 @@ public class VBoxLayout extends BoxLayout {
   public VBoxLayout() {
     super();
     vBoxLayoutAlign = VBoxLayoutAlign.LEFT;
+    setPack(BoxLayoutPack.START);
+  }
+  
+  public VBoxLayout(VBoxLayoutAlign align) {
+    super();
+    vBoxLayoutAlign = align;
     setPack(BoxLayoutPack.START);
   }
 

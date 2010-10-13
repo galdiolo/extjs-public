@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -18,6 +18,7 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
  * A split button that provides a built-in dropdown arrow that can fire an event
  * separately from the default click event of the button.
  * 
+ * <dl>
  * <dt><b>Events:</b></dt>
  * 
  * <dd><b>ArrowClick</b> : ButtonEvent(button, item, event)<br>
@@ -29,7 +30,7 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
  * </ul>
  * </dd>
  * 
- * </dt>
+ * </dl>
  */
 public class SplitButton extends Button {
 
@@ -64,9 +65,9 @@ public class SplitButton extends Button {
   protected String getMenuClass() {
     if (menu != null) {
       if (getArrowAlign() == ButtonArrowAlign.BOTTOM) {
-        return "x-btn-split-bottom";
+        return baseStyle + "-split-bottom";
       } else {
-        return "x-btn-split";
+        return baseStyle + "-split";
       }
     } else {
       return "";
@@ -74,8 +75,7 @@ public class SplitButton extends Button {
   }
 
   protected boolean isClickOnArrow(ComponentEvent ce) {
-    return (getArrowAlign() == ButtonArrowAlign.BOTTOM)
-        ? ce.getClientY() > buttonEl.getRegion().bottom
+    return (getArrowAlign() == ButtonArrowAlign.BOTTOM) ? ce.getClientY() > buttonEl.getRegion().bottom
         : ce.getClientX() > buttonEl.getRegion().right;
   }
 

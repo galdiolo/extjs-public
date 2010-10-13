@@ -1,12 +1,13 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
  */
 package com.extjs.gxt.ui.client.widget.tips;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.event.IconButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
@@ -15,6 +16,7 @@ import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.button.ToolButton;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.Accessibility;
 import com.google.gwt.user.client.ui.RootPanel;
 
 /**
@@ -114,13 +116,14 @@ public class Tip extends ContentPanel {
    * @param y the y coordinate
    */
   public void showAt(int x, int y) {
+    setStyleAttribute("visibility", "hidden");
     if (!isAttached()) {
       RootPanel.get().add(this);
     }
+    
     super.show();
 
     updateContent();
-    
 
     doAutoWidth();
     Point p = new Point(x, y);
@@ -128,7 +131,7 @@ public class Tip extends ContentPanel {
       p = el().adjustForConstraints(p);
     }
     setPagePosition(p.x + XDOM.getBodyScrollLeft(), p.y + XDOM.getBodyScrollTop());
-    el().setVisibility(true);
+    setStyleAttribute("visibility", "visible");
   }
 
   /**
@@ -171,6 +174,11 @@ public class Tip extends ContentPanel {
       }));
     }
     super.onRender(parent, pos);
+
+    if (GXT.isAriaEnabled()) {
+      Accessibility.setRole(getElement(), "tooltip");
+      getAriaSupport().setLabelledBy("");
+    }
   }
 
   protected void updateContent() {

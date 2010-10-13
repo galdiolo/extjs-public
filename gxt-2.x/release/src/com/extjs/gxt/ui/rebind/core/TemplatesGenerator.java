@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -172,7 +172,7 @@ public class TemplatesGenerator extends Generator {
 
       sw.println("Element element = select(\"" + escape(selector) + "\");");
 
-      // TODO do all selectors have to return a node ? Should null checking be
+      // do all selectors have to return a node ? Should null checking be
       // done here, or in the caller ?
       // sw.println("assert element != null : \"" + method.getName() + " using
       // selector '" + escape(selector) + "' returned a null element\";");

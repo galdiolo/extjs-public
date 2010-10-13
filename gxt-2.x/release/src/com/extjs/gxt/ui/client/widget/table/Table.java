@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -695,7 +695,7 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
     return te;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   @Override
   protected ContainerEvent createContainerEvent(TableItem item) {
     return new TableEvent(this, item);
@@ -739,7 +739,7 @@ public class Table extends Container<TableItem> implements BaseTable, Selectable
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected String getRenderedValue(TableItem item, int column, Object value) {
     TableColumn col = cm.getColumn(column);
     CellRenderer r = col.getRenderer();

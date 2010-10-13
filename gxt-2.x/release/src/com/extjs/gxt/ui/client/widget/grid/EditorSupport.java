@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -36,13 +36,13 @@ public class EditorSupport<M extends ModelData> {
   protected ClicksToEdit clicksToEdit = ClicksToEdit.ONE;
   protected Listener<GridEvent<M>> gridListener;
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public void bind(Grid grid) {
     this.grid = grid;
     this.store = grid.getStore();
     this.cm = grid.getColumnModel();
   }
-  
+
   public void doRender() {
     gridListener = new Listener<GridEvent<M>>() {
       public void handleEvent(GridEvent<M> e) {
@@ -73,7 +73,7 @@ public class EditorSupport<M extends ModelData> {
       grid.el().makePositionable();
     }
   }
-  
+
   public CellEditor getActiveEditor() {
     return activeEditor;
   }
@@ -121,20 +121,19 @@ public class EditorSupport<M extends ModelData> {
   public void startEditing(final int row, final int col) {
     stopEditing();
     if (cm.isCellEditable(col)) {
-      grid.getView().ensureVisible(row, col, false);
-
       final M m = store.getAt(row);
-      activeRecord = store.getRecord(m);
-
       final String field = cm.getDataIndex(col);
+
       GridEvent<M> e = new GridEvent<M>(grid);
       e.setModel(m);
-      e.setRecord(activeRecord);
+      e.setRecord(store.getRecord(m));
       e.setProperty(field);
       e.setRowIndex(row);
       e.setColIndex(col);
       e.setValue(m.get(field));
       if (grid.fireEvent(Events.BeforeEdit, e)) {
+        grid.getView().ensureVisible(row, col, false);
+
         DeferredCommand.addCommand(new Command() {
           public void execute() {
             deferStartEditing(m, field, row, col);
@@ -143,12 +142,11 @@ public class EditorSupport<M extends ModelData> {
       }
     }
   }
-  
 
   public void stopEditing() {
     stopEditing(false);
   }
-  
+
   /**
    * Stops any active editing.
    * 
@@ -163,13 +161,14 @@ public class EditorSupport<M extends ModelData> {
       }
     }
   }
-  
+
   protected void deferStartEditing(M m, String field, int row, int col) {
     editing = true;
     CellEditor ed = cm.getEditor(col);
     ed.row = row;
     ed.col = col;
-
+    activeRecord = store.getRecord(m);
+    
     if (!ed.isRendered()) {
       ed.render((Element) grid.getView().getEditorParent());
     }
@@ -206,7 +205,7 @@ public class EditorSupport<M extends ModelData> {
     });
 
   }
-  
+
   protected void onAutoEditClick(GridEvent<M> e) {
     if (e.getEvent().getButton() != Event.BUTTON_LEFT) {
       return;
@@ -217,14 +216,15 @@ public class EditorSupport<M extends ModelData> {
       stopEditing();
     }
   }
-  
+
   protected void onCellDoubleClick(GridEvent<M> e) {
     startEditing(e.getRowIndex(), e.getColIndex());
   }
-  
+
   protected void onEditCancel(CellEditor ed, Object value, Object startValue) {
     editing = false;
     activeEditor = null;
+    activeRecord = null;
     ed.removeListener(Events.SpecialKey, editorListener);
     ed.removeListener(Events.Complete, editorListener);
     ed.removeListener(Events.CancelEdit, editorListener);
@@ -238,9 +238,10 @@ public class EditorSupport<M extends ModelData> {
     ed.removeListener(Events.Complete, editorListener);
     ed.removeListener(Events.CancelEdit, editorListener);
     Record r = activeRecord;
+    activeRecord = null;
+    
     String field = cm.getDataIndex(ed.col);
-    if ((value == null && startValue != null)
-        || (value != null && !value.equals(startValue))) {
+    if ((value == null && startValue != null) || (value != null && !value.equals(startValue))) {
       GridEvent<M> ge = new GridEvent<M>(grid);
       ge.setRecord(r);
       ge.setProperty(field);

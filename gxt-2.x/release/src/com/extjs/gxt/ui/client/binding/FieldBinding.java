@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -27,7 +27,7 @@ import com.extjs.gxt.ui.client.widget.form.Field;
  * @see ModelData
  * @see Field
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked","rawtypes"})
 public class FieldBinding {
 
   protected Field field;
@@ -177,6 +177,10 @@ public class FieldBinding {
       model = null;
     }
     field.removeListener(Events.Change, changeListener);
+
+    if (updateOriginalValue) {
+      field.setOriginalValue(null);
+    }
     field.clear();
   }
 
@@ -195,10 +199,12 @@ public class FieldBinding {
    */
   public void updateField(boolean updateOriginalValue) {
     Object val = onConvertModelValue(model.get(property));
-    field.setValue(val);
+
     if (updateOriginalValue) {
       field.setOriginalValue(val);
     }
+
+    field.setValue(val);
   }
 
   /**

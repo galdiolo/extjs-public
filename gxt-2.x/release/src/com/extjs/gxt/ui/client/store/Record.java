@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -301,7 +301,7 @@ public class Record {
   }
 
   /**
-   * Sets whether the record is valid (defualts to true). The valid state of a
+   * Sets whether the record is valid (defaults to true). The valid state of a
    * record is not modified or changed by the record itself. Both EditorGrid and
    * FieldBinding will set the valid state of the record to match the field's
    * valid state after an edit completes.
@@ -324,7 +324,7 @@ public class Record {
     return error != null;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void join(Store store) {
     this.store = store;
   }

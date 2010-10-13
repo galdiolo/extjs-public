@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -21,7 +21,7 @@ import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
  * 
  * @deprecated see {@link TreePanel}
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked","rawtypes"})
 public class TreeSelectionModel extends AbstractSelectionModel<Tree, TreeItem> {
 
   public TreeSelectionModel() {
@@ -36,6 +36,7 @@ public class TreeSelectionModel extends AbstractSelectionModel<Tree, TreeItem> {
    * Selects the item below the selected item in the tree, intelligently walking
    * the nodes.
    */
+ 
   public void selectNext() {
     TreeItem next = next();
     if (next != null) {

@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.FastMap;
 import com.extjs.gxt.ui.client.core.XDOM;
@@ -39,6 +41,7 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.Accessibility;
 
 /**
  * A hierarchical tree grid bound to a <code>TreeStore</code>.
@@ -59,7 +62,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
   public class TreeNode {
 
     protected String id;
-    protected Element joint, check, text;
+    protected Element joint, icon;
     protected M m;
     private boolean childrenRendered;
     private boolean expand;
@@ -71,9 +74,11 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
     public TreeNode(String id, M m) {
       this.id = id;
       this.m = m;
-      if (loader != null && !loaded) {
-        leaf = !loader.hasChildren(m);
-      }
+    }
+
+    public void clearElements() {
+      joint = null;
+      icon = null;
     }
 
     public int getItemCount() {
@@ -113,26 +118,25 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
   }
 
   protected Map<M, String> cache;
-
   protected TreeLoader<M> loader;
-
   protected Map<String, TreeNode> nodes = new FastMap<TreeNode>();
   protected TreeGridView treeGridView;
   protected TreeStore<M> treeStore;
   private boolean autoLoad, filtering, autoExpand;
   private boolean caching = true;
-  private boolean expandOnFilter = true;
+  private boolean columnLines;
 
+  private boolean expandOnFilter = true;
   private ModelIconProvider<M> iconProvider;
   private ListStore<M> listStore = new ListStore<M>() {
     public Record getRecord(M model) {
       return treeStore.getRecord(model);
-    };
+    }
 
     public boolean hasRecord(M model) {
       return treeStore.hasRecord(model);
 
-    };
+    }
 
   };
   private StoreListener<M> storeListener = new StoreListener<M>() {
@@ -169,7 +173,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
   private TreeStyle style = new TreeStyle();
   private Boolean useKeyProvider = null;
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public TreeGrid(TreeStore store, ColumnModel cm) {
     this.store = listStore;
     this.cm = cm;
@@ -184,7 +188,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
     treeStore.addStoreListener(storeListener);
 
     setView(new TreeGridView());
-
+    disableTextSelection(true);
     setSelectionModel(new TreeGridSelectionModel<M>());
   }
 
@@ -196,7 +200,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
       setExpanded(child, false, true);
     }
   }
-  
+
   /**
    * Expands all nodes.
    */
@@ -205,7 +209,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
       setExpanded(child, true, true);
     }
   }
-  
+
   /**
    * Returns the tree node for the given target.
    * 
@@ -214,11 +218,13 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
    */
   public TreeNode findNode(Element target) {
     Element row = (Element) getView().findRow(target);
-    El item = fly(row).selectNode(".x-tree3-node");
-    if (item != null) {
-      String id = item.getId();
-      TreeNode node = nodes.get(id);
-      return node;
+    if (row != null) {
+      El item = fly(row).selectNode(".x-tree3-node");
+      if (item != null) {
+        String id = item.getId();
+        TreeNode node = nodes.get(id);
+        return node;
+      }
     }
     return null;
   }
@@ -288,6 +294,15 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
   }
 
   /**
+   * Returns true if column lines are enabled.
+   * 
+   * @return true if column lines are enabled
+   */
+  public boolean isColumnLines() {
+    return columnLines;
+  }
+
+  /**
    * Returns true if the model is expanded.
    * 
    * @param model the model
@@ -317,6 +332,49 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
   public boolean isLeaf(M model) {
     TreeNode node = findNode(model);
     return node != null && node.isLeaf();
+  }
+
+  @Override
+  public void reconfigure(ListStore<M> store, ColumnModel cm) {
+    throw new UnsupportedOperationException("Please call the other reconfigure method");
+  }
+
+  public void reconfigure(TreeStore<M> store, ColumnModel cm) {
+    if (isLoadMask() && rendered) {
+      mask(GXT.MESSAGES.loadMask_msg());
+    }
+    if (rendered) {
+      this.store.removeAll();
+
+      if (cache != null) {
+        cache.clear();
+      }
+      nodes.clear();
+
+      treeGridView.initData(this.store, cm);
+      treeGridView.treeStore = store;
+    }
+    if (treeStore != null) {
+      treeStore.removeStoreListener(storeListener);
+    }
+    loader = null;
+    treeStore = store;
+    if (treeStore != null) {
+      loader = treeStore.getLoader();
+      treeStore.addStoreListener(storeListener);
+    }
+    this.cm = cm;
+    // rebind the sm
+    setSelectionModel(sm);
+    if (isViewReady()) {
+      view.refresh(true);
+      doInitialLoad();
+    }
+
+    if (isLoadMask() && rendered) {
+      unmask();
+    }
+    fireEvent(Events.Reconfigure);
   }
 
   /**
@@ -352,6 +410,15 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
   }
 
   /**
+   * True to enable column separation lines (defaults to false).
+   * 
+   * @param columnLines true to enable column separation lines
+   */
+  public void setColumnLines(boolean columnLines) {
+    this.columnLines = columnLines;
+  }
+
+  /**
    * Sets the item's expand state.
    * 
    * @param model the model
@@ -368,7 +435,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
    * @param expand true to expand
    * @param deep true to expand all children recursively
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public void setExpanded(M model, boolean expand, boolean deep) {
     TreeNode node = findNode(model);
     if (node != null) {
@@ -552,24 +619,35 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
     return style;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   protected ComponentEvent createComponentEvent(Event event) {
     return new TreeGridEvent(this, event);
   }
 
+  @Override
+  protected void doApplyStoreState(Map<String, Object> state) {
+    String sortField = (String) state.get("sortField");
+    if (treeStore.getLoader() == null && sortField != null) {
+      String sortDir = (String) state.get("sortDir");
+      SortDir dir = SortDir.findDir(sortDir);
+      treeStore.sort(sortField, dir);
+    }
+  }
+
   protected int findLastOpenChildIndex(M model) {
     TreeNode mark = findNode(model);
-    M lc = null;
+    M lc = model;
     while (mark != null && mark.expanded) {
-      lc = treeStore.getLastChild(mark.m);
-      mark = findNode(lc);
+      M m = treeStore.getLastChild(mark.m);
+      if (m != null) {
+        lc = m;
+        mark = findNode(lc);
+      } else {
+        break;
+      }
     }
-    if (lc != null) {
-      return store.indexOf(lc);
-    }
-
-    return store.indexOf(model);
+    return store.indexOf(lc);
   }
 
   protected TreeNode findNode(M m) {
@@ -582,12 +660,12 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
         + (treeStore.getKeyProvider() != null ? treeStore.getKeyProvider().getKey(m) : XDOM.getUniqueId());
   }
 
-  protected boolean hasChildren(M model) {
-    TreeNode node = findNode(model);
+  protected boolean hasChildren(M m) {
+    TreeNode node = findNode(m);
     if (loader != null && !node.loaded) {
-      return loader.hasChildren(model);
+      return loader.hasChildren(node.getModel());
     }
-    if (!node.leaf || treeStore.getChildCount(model) > 0) {
+    if (!node.leaf || treeStore.hasChildren(node.getModel())) {
       return true;
     }
     return false;
@@ -618,9 +696,8 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
             return;
           }
           int index = se.getIndex();
-          int pindex = store.indexOf(p);
-
           if (index == 0) {
+            int pindex = store.indexOf(p);
             store.insert(se.getChildren(), pindex + 1);
           } else {
             index = store.indexOf(treeStore.getChild(p, index - 1));
@@ -637,16 +714,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
   @Override
   protected void onAfterRenderView() {
     super.onAfterRenderView();
-    if (treeStore.getRootItems().size() == 0 && loader != null) {
-      loader.load();
-    } else {
-      renderChildren(null, false);
-      if (autoExpand) {
-        expandAll();
-      } else {
-        statefulExpand(treeStore.getRootItems());
-      }
-    }
+    doInitialLoad();
   }
 
   @Override
@@ -669,7 +737,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
     if (!isRendered() || !viewReady) {
       return;
     }
-    
+
     M p = se.getParent();
     if (p == null) {
       store.removeAll();
@@ -694,6 +762,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
         setExpanded(p, true, deep);
         caching = c;
       }
+      refresh(p);
       statefulExpand(treeStore.getChildren(p));
     }
   }
@@ -734,6 +803,12 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
 
     el().setTabIndex(0);
     el().setElementAttribute("hideFocus", "true");
+
+    if (columnLines) {
+      addStyleName("x-grid-with-col-lines");
+    }
+
+    Accessibility.setRole(getElement(), "treegrid");
 
     sinkEvents(Event.ONCLICK | Event.ONDBLCLICK | Event.MOUSEEVENTS | Event.KEYEVENTS);
   }
@@ -811,18 +886,31 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
   }
 
   protected void unregister(M m) {
-    if (m != null && useKeyProvider != null) {
-      TreeNode node = findNode(m);
-      if (useKeyProvider) {
-        nodes.remove(generateModelId(m));
-      } else {
-        nodes.remove(cache.remove(m));
-      }
+    TreeNode node = null;
+    if (m != null && useKeyProvider != null && (node = findNode(m)) != null) {
+      node.clearElements();
+
+      nodes.remove(useKeyProvider ? generateModelId(m) : cache.remove(m));
+
       TreeGridEvent<M> e = new TreeGridEvent<M>(this);
       e.setModel(m);
       e.setTreeNode(node);
       fireEvent(Events.Unregister, e);
     }
+  }
+
+  private void doInitialLoad() {
+    if (treeStore.getRootItems().size() == 0 && loader != null) {
+      loader.load();
+    } else {
+      renderChildren(null, false);
+      if (autoExpand) {
+        expandAll();
+      } else {
+        statefulExpand(treeStore.getRootItems());
+      }
+    }
+
   }
 
   private void setExpandChildren(M m, boolean expand) {
@@ -831,7 +919,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private void statefulExpand(List<M> children) {
     if (isStateful() && treeStore.getKeyProvider() != null) {
       List<String> expanded = (List) getState().get("expanded");
@@ -841,6 +929,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
           if (expanded.contains(id)) {
             setExpanded(child, true);
           }
+          statefulExpand(treeStore.getChildren(child));
         }
       }
     }

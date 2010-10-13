@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -54,7 +54,7 @@ public class XmlReader<D> implements DataReader<D> {
     this.modelType = modelType;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public D read(Object loadConfig, Object data) {
     Document doc = XMLParser.parse((String) data);
 
@@ -72,7 +72,9 @@ public class XmlReader<D> implements DataReader<D> {
         String v = getValue(elem, map);
         if (v == null) continue;
         if (type != null) {
-          if (type.equals(Integer.class)) {
+          if (type.equals(Boolean.class)) {
+            model.set(name, Boolean.parseBoolean(v));
+          } else if (type.equals(Integer.class)) {
             model.set(name, Integer.parseInt(v));
           } else if (type.equals(Long.class)) {
             model.set(name, Long.parseLong(v));

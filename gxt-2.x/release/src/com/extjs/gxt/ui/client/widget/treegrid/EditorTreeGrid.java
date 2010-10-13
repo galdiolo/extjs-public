@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -70,7 +70,7 @@ import com.google.gwt.user.client.Element;
  */
 public class EditorTreeGrid<M extends ModelData> extends TreeGrid<M> {
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public EditorTreeGrid(TreeStore store, ColumnModel cm) {
     super(store, cm);
     setSelectionModel(new CellTreeGridSelectionModel<M>());

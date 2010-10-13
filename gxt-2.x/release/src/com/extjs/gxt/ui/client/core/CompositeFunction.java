@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -10,7 +10,7 @@ package com.extjs.gxt.ui.client.core;
 import com.google.gwt.user.client.Element;
 
 /**
- * Inteface for functions that can be applied to all the elements of a
+ * Interface for functions that can be applied to all the elements of a
  * <code>CompositeElement</code>.
  */
 public interface CompositeFunction {

@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -41,7 +41,7 @@ public class DraggableExample extends LayoutContainer {
 
     cp = new ContentPanel();
     cp.setCollapsible(true);
-    cp.setBodyStyle("padding: 4 8px;fontSize: 12px");
+    cp.setBodyStyleName("pad-text");
     cp.setHeading("Direct Drag");
     cp.setIcon(Resources.ICONS.text());
     cp.addText("Drags can only be started from the header.");
@@ -53,7 +53,7 @@ public class DraggableExample extends LayoutContainer {
     d.setUseProxy(false);
 
     cp = new ContentPanel();
-    cp.setBodyStyle("padding: 4 8px;fontSize: 12px");
+    cp.setBodyStyleName("pad-text");
     cp.setHeading("Constrain");
     cp.setIcon(Resources.ICONS.text());
     cp.addText("Can only be dragged vertically.");

@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -75,7 +75,7 @@ import com.google.gwt.user.client.ui.Accessibility;
  * </ul>
  * </dd>
  * 
- * </dt>
+ * </dl>
  */
 
 public class Button extends BoxComponent implements IconSupport {
@@ -329,20 +329,21 @@ public class Button extends BoxComponent implements IconSupport {
    */
   public void setIcon(AbstractImagePrototype icon) {
     if (rendered) {
-      El oldIcon = buttonEl.selectNode(".x-btn-image");
+      El oldIcon = buttonEl.selectNode("." + baseStyle + "-image");
       if (oldIcon != null) {
         oldIcon.remove();
-        el().removeStyleName("x-btn-text-icon", "x-btn-icon", "x-btn-noicon");
+        el().removeStyleName(baseStyle + "-text-icon", baseStyle + "-icon", baseStyle + "-noicon");
       }
       el().addStyleName(
-          (icon != null ? (!Util.isEmptyString(text) ? " x-btn-text-icon" : " x-btn-icon") : " x-btn-noicon"));
+          (icon != null ? (!Util.isEmptyString(text) ? " " + baseStyle + "-text-icon" : " " + baseStyle + "-icon")
+              : " " + baseStyle + "-noicon"));
       Element e = null;
       String align = null;
       if (icon != null) {
         e = (Element) icon.createElement().cast();
 
         Accessibility.setRole(e, "presentation");
-        fly(e).addStyleName("x-btn-image");
+        fly(e).addStyleName(baseStyle + "-image");
 
         buttonEl.insertFirst(e);
         El.fly(e).makePositionable(true);
@@ -406,6 +407,8 @@ public class Button extends BoxComponent implements IconSupport {
       this.menu.setData("parent", this);
       this.menu.addListener(Events.Hide, menuListener);
       this.menu.addListener(Events.Show, menuListener);
+      this.menu.getAriaSupport().setLabelledBy(getId());
+      getElement().setAttribute("aria-owns", menu.getId());
     }
   }
 
@@ -515,15 +518,21 @@ public class Button extends BoxComponent implements IconSupport {
       if (!Util.isEmptyString(text)) {
         TextMetrics.get().bind(buttonEl);
         w = TextMetrics.get().getWidth(text);
-
+        w += buttonEl.getFrameWidth("lr");
         if (GXT.isGecko || GXT.isWebKit) {
           w += 6;
         }
-        w += buttonEl.getFrameWidth("lr");
       } else {
-        buttonEl.dom.getStyle().setProperty("width", null);
-        w = buttonEl.getWidth();
+        buttonEl.dom.getStyle().setProperty("width", "");
+        w = buttonEl.getStyleSize(false).width;
       }
+
+      int adj = 0;
+      if (GXT.isAriaEnabled()) {
+        adj += text == null ? 10 : 25;
+      }
+
+      w += adj;
 
       if (w < minWidth - 6) {
         buttonEl.setWidth(minWidth - 6, true);
@@ -546,9 +555,9 @@ public class Button extends BoxComponent implements IconSupport {
   protected String getMenuClass() {
     if (menu != null) {
       if (arrowAlign == ButtonArrowAlign.BOTTOM) {
-        return "x-btn-arrow-bottom";
+        return baseStyle + "-arrow-bottom";
       } else {
-        return "x-btn-arrow";
+        return baseStyle + "-arrow";
       }
     } else {
       return "";
@@ -595,12 +604,14 @@ public class Button extends BoxComponent implements IconSupport {
     }
     removeStyleName(baseStyle + "-over");
     el().disable();
+    buttonEl.dom.setAttribute("aria-disabled", "true");
   }
 
   @Override
   protected void onEnable() {
     super.onEnable();
     el().enable();
+    buttonEl.dom.setAttribute("aria-disabled", "false");
   }
 
   protected void onFocus(ComponentEvent ce) {
@@ -622,7 +633,7 @@ public class Button extends BoxComponent implements IconSupport {
 
   protected void onMenuHide(ComponentEvent ce) {
     removeStyleName(baseStyle + "-menu-active");
-    
+
     ButtonEvent be = new ButtonEvent(this);
     be.setMenu(menu);
     fireEvent(Events.MenuHide, be);
@@ -631,11 +642,11 @@ public class Button extends BoxComponent implements IconSupport {
 
   protected void onMenuShow(ComponentEvent ce) {
     addStyleName(baseStyle + "-menu-active");
-    
+
     ButtonEvent be = new ButtonEvent(this);
     be.setMenu(menu);
     fireEvent(Events.MenuShow, be);
-    
+
     if (GXT.isAriaEnabled()) {
       if (menu.getItemCount() > 0) {
         menu.setActiveItem(menu.getItem(0), false);
@@ -669,10 +680,10 @@ public class Button extends BoxComponent implements IconSupport {
     if (template == null) {
       if (buttonTemplate == null) {
         StringBuffer sb = new StringBuffer();
-        sb.append("<table cellspacing=\"0\" class=\"x-btn\" role=\"presentation\"><tbody class=\"{2}\" >");
-        sb.append("<tr><td class=\"x-btn-tl\"><i>&#160;</i></td><td class=\"x-btn-tc\"></td><td class=\"x-btn-tr\"><i>&#160;</i></td></tr>");
-        sb.append("<tr><td class=\"x-btn-ml\"><i>&#160;</i></td><td class=\"x-btn-mc\"><em class=\"{3}\" unselectable=\"on\"><button class=\"x-btn-text\" type=\"{1}\" style='position: static'>{0}</button></em></td><td class=\"x-btn-mr\"><i>&#160;</i></td></tr>");
-        sb.append("<tr><td class=\"x-btn-bl\"><i>&#160;</i></td><td class=\"x-btn-bc\"></td><td class=\"x-btn-br\"><i>&#160;</i></td></tr>");
+        sb.append("<table cellspacing=\"0\" role=\"presentation\"><tbody class=\"{2}\" >");
+        sb.append("<tr><td class=\"{4}-tl\"><i>&#160;</i></td><td class=\"{4}-tc\"></td><td class=\"{4}-tr\"><i>&#160;</i></td></tr>");
+        sb.append("<tr><td class=\"{4}-ml\"><i>&#160;</i></td><td class=\"{4}-mc\"><em class=\"{3}\" unselectable=\"on\"><button class=\"{4}-text\" type=\"{1}\" style='position: static'>{0}</button></em></td><td class=\"{4}-mr\"><i>&#160;</i></td></tr>");
+        sb.append("<tr><td class=\"{4}-bl\"><i>&#160;</i></td><td class=\"{4}-bc\"></td><td class=\"{4}-br\"><i>&#160;</i></td></tr>");
         sb.append("</tbody></table>");
 
         buttonTemplate = new Template(sb.toString());
@@ -680,9 +691,9 @@ public class Button extends BoxComponent implements IconSupport {
       template = buttonTemplate;
     }
 
-    setElement(template.create((text != null && text.length() > 0) ? text : "&nbsp;", getType(), "x-btn-"
-        + scale.name().toLowerCase() + " x-btn-icon-" + scale.name().toLowerCase() + "-"
-        + iconAlign.name().toLowerCase(), getMenuClass()), target, index);
+    setElement(template.create((text != null && text.length() > 0) ? text : "&nbsp;", getType(), baseStyle + "-"
+        + scale.name().toLowerCase() + " " + baseStyle + "-icon-" + scale.name().toLowerCase() + "-"
+        + iconAlign.name().toLowerCase(), getMenuClass(), baseStyle), target, index);
 
     super.onRender(target, index);
 
@@ -701,6 +712,7 @@ public class Button extends BoxComponent implements IconSupport {
       Accessibility.setRole(buttonEl.dom, Accessibility.ROLE_BUTTON);
       if (menu != null) {
         Accessibility.setState(buttonEl.dom, "aria-haspopup", "true");
+        addStyleName(baseStyle + "-menu");
       }
     }
 
@@ -710,6 +722,15 @@ public class Button extends BoxComponent implements IconSupport {
   @Override
   protected void onResize(int width, int height) {
     super.onResize(width, height);
-    buttonEl.setSize(width - 6, height - 6, true);
+    int adj = 0;
+    if (GXT.isAriaEnabled()) {
+      adj += text == null ? 10 : 25;
+    }
+    buttonEl.setSize(adj + width - 6, height - 6, true);
+  }
+
+  @Override
+  protected void setAriaState(String stateName, String stateValue) {
+    Accessibility.setState(buttonEl.dom, stateName, stateValue);
   }
 }

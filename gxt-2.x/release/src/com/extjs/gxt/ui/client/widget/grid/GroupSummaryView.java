@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -67,7 +67,7 @@ public class GroupSummaryView extends GroupingView {
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected Map<String, Number> calculate(List<ModelData> models, List<ColumnData> cs) {
     Map<String, Number> data = new FastMap<Number>();
 
@@ -100,7 +100,7 @@ public class GroupSummaryView extends GroupingView {
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   protected void doGroupEnd(StringBuilder buf, GroupColumnData g, List<ColumnData> cs, int colCount) {
     Map data = calculate(g.models, cs);
@@ -179,7 +179,7 @@ public class GroupSummaryView extends GroupingView {
     DomHelper.append((com.google.gwt.user.client.Element) g, markup);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   protected String renderSummary(Map<String, Number> data, List<ColumnData> cs) {
     StringBuilder buf = new StringBuilder();
     int last = cs.size() - 1;
@@ -202,7 +202,7 @@ public class GroupSummaryView extends GroupingView {
 
     }
     Params rp = new Params();
-    rp.set("tstyle", "width:" + getTotalWidth() + ";");
+    rp.set("tstyle", "width:" + getTotalWidth() + "px;");
     rp.set("cells", buf.toString());
 
     return rowTpl.applyTemplate(rp);

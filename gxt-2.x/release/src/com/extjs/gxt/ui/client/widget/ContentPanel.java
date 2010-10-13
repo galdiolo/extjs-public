@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -25,7 +25,7 @@ import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.extjs.gxt.ui.client.widget.button.ToolButton;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -179,6 +179,7 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
     head.setParent(this);
     disabledStyle = null;
     setDeferHeight(true);
+    getAriaSupport().setIgnore(false);
   }
 
   /**
@@ -198,6 +199,20 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
    */
   public void addButton(Button button) {
     fbar.add(button);
+  }
+
+  @Override
+  protected void notifyShow() {
+    if (!collapsed) {
+      super.notifyShow();
+    }
+  }
+
+  @Override
+  protected void notifyHide() {
+    if (!collapsed) {
+      super.notifyHide();
+    }
   }
 
   /**
@@ -579,7 +594,6 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
       this.bottomComponent = null;
       c.removeFromParent();
     }
-
     if (bottomComponent != null) {
       this.bottomComponent = bottomComponent;
       this.bottomComponent.setParent(this);
@@ -744,7 +758,6 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
       this.topComponent = null;
       c.removeFromParent();
     }
-
     if (topComponent != null) {
       this.topComponent = topComponent;
       this.topComponent.setParent(this);
@@ -760,8 +773,9 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
   public Frame setUrl(String url) {
     Frame f = new Frame(url);
     f.getElement().setPropertyInt("frameBorder", 0);
+    f.setSize("100%", "100%");
+    setLayout(new FlowLayout());
     removeAll();
-    setLayout(new FitLayout());
     add(f);
     layout();
     return f;
@@ -776,7 +790,20 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
     removeStyleName(baseStyle + "-animated");
     collapsed = true;
     animating = false;
+
+    for (Component c : getItems()) {
+      if (!c.hidden && c.isRendered()) {
+        c.notifyHide();
+      }
+    }
+
     sync(true);
+
+    if (GXT.isAriaEnabled()) {
+      Accessibility.setState(getElement(), "aria-expanded", "false");
+      collapseBtn.setTitle(GXT.MESSAGES.panel_expandPanel());
+    }
+
     ComponentEvent ce = new ComponentEvent(this);
     fireEvent(Events.Collapse, ce);
   }
@@ -786,7 +813,20 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
     removeStyleName(baseStyle + "-animated");
     collapsed = false;
     animating = false;
+
+    for (Component c : getItems()) {
+      if (!c.hidden && c.isRendered()) {
+        c.notifyShow();
+      }
+    }
+
     sync(true);
+
+    if (GXT.isAriaEnabled()) {
+      Accessibility.setState(getElement(), "aria-expanded", "true");
+      collapseBtn.setTitle(GXT.MESSAGES.panel_collapsePanel());
+    }
+
     ComponentEvent ce = new ComponentEvent(this);
     fireEvent(Events.Expand, ce);
   }
@@ -866,6 +906,9 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
   protected void initTools() {
     if (collapsible && !hideCollapseTool) {
       collapseBtn = new ToolButton("x-tool-toggle");
+      if (GXT.isAriaEnabled()) {
+        collapseBtn.setTitle(GXT.MESSAGES.panel_collapsePanel());
+      }
       collapseBtn.addListener(Events.Select, new Listener<ComponentEvent>() {
         public void handleEvent(ComponentEvent ce) {
           ce.stopEvent();
@@ -951,7 +994,7 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
       initTools();
       head.render(el().dom);
       el().subChild(3).dom.appendChild(head.getElement());
-      bwrap = el().createChild("<div class='" + bwrapStyle + "'></div>");
+      bwrap = el().createChild("<div role=presentation class='" + bwrapStyle + "'></div>");
 
       Element bw = bwrap.dom;
       Element ml = DOM.getChild(el().dom, 1);
@@ -962,32 +1005,32 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
       Element mc = fly(bw).getSubChild(3);
 
       if (topComponent != null) {
-        tbar = fly(mc).createChild("<div class=" + tbarStyle + "></div>");
+        tbar = fly(mc).createChild("<div role=presentation class=" + tbarStyle + "></div>");
       }
-      body = fly(mc).createChild("<div class=" + bodStyle + "></div>");
+      body = fly(mc).createChild("<div role=presentation class=" + bodStyle + "></div>");
       if (bottomComponent != null) {
-        bbar = fly(mc).createChild("<div class=" + bbarStyle + "></div>");
+        bbar = fly(mc).createChild("<div role=presentation class=" + bbarStyle + "></div>");
       }
 
       El e = fly(bw).lastChild().firstChild().firstChild();
-      foot = e.createChild("<div class=" + footerStyle + "></div>");
+      foot = e.createChild("<div role=presentation class=" + footerStyle + "></div>");
 
     } else {
       head.baseStyle = headerStyle;
       head.setTextStyle(headerTextStyle);
       initTools();
       head.render(el().dom);
-      bwrap = el().createChild("<div class=" + bwrapStyle + "></div>");
+      bwrap = el().createChild("<div role=presentation class=" + bwrapStyle + "></div>");
 
       Element bw = bwrap.dom;
       if (topComponent != null) {
-        tbar = fly(bw).createChild("<div class=" + tbarStyle + "></div>");
+        tbar = fly(bw).createChild("<div role=presentation class=" + tbarStyle + "></div>");
       }
-      body = fly(bw).createChild("<div class=" + bodStyle + "></div>");
+      body = fly(bw).createChild("<div role=presentation class=" + bodStyle + "></div>");
       if (bottomComponent != null) {
-        bbar = fly(bw).createChild("<div class=" + bbarStyle + "></div>");
+        bbar = fly(bw).createChild("<div role=presentation class=" + bbarStyle + "></div>");
       }
-      foot = fly(bw).createChild("<div class=" + footerStyle + "></div>");
+      foot = fly(bw).createChild("<div role=presentation class=" + footerStyle + "></div>");
     }
 
     if (!headerVisible) {
@@ -1046,6 +1089,10 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
       sinkEvents(Event.ONCLICK);
     }
 
+    if (collapsible && GXT.isAriaEnabled()) {
+      Accessibility.setState(getElement(), "aria-expanded", "true");
+    }
+
     if (collapsed) {
       boolean anim = animCollapse;
       collapsed = false;
@@ -1057,7 +1104,7 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
     if (GXT.isAriaEnabled()) {
       Accessibility.setRole(getElement(), "region");
       if (head != null) {
-        setAriaLabelledBy(head.getId() + "-label");
+        getAriaSupport().setLabelledBy(head.getId() + "-label");
       }
     }
 

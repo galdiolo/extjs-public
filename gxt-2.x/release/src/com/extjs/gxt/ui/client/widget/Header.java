@@ -1,8 +1,8 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
- *
+ * 
  * http://extjs.com/license
  */
 package com.extjs.gxt.ui.client.widget;
@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.widget;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.util.IconHelper;
 import com.google.gwt.user.client.DOM;
@@ -30,10 +31,10 @@ public class Header extends Component implements IconSupport {
   private El textEl;
   private List<Component> tools = new ArrayList<Component>();
   private HorizontalPanel widgetPanel;
-  private String text;
-  
+  private String text, altIconText;
+
   public Header() {
-    setAriaIgnore(true);
+    getAriaSupport().setIgnore(true);
   }
 
   /**
@@ -65,6 +66,24 @@ public class Header extends Component implements IconSupport {
    */
   public String getTextStyle() {
     return textStyle;
+  }
+
+  /**
+   * Returns the icon's alt text.
+   * 
+   * @return the alt text
+   */
+  public String getIconAltText() {
+    return altIconText;
+  }
+
+  /**
+   * Sets the header's icon alt text (defaults to null).
+   * 
+   * @param altIconText the icon alt text
+   */
+  public void setIconAltText(String altIconText) {
+    this.altIconText = altIconText;
   }
 
   /**
@@ -157,6 +176,9 @@ public class Header extends Component implements IconSupport {
         El.fly(i).addStyleName("x-panel-inline-icon");
         El.fly(i).setStyleAttribute("cursor", "default");
         El.fly(i).setStyleAttribute("float", "left");
+        if (altIconText != null || GXT.isAriaEnabled()) {
+          i.setAttribute("alt", altIconText != null ? altIconText : "Panel Icon");
+        }
         el().insertChild((Element) i.cast(), 0);
       }
     }
@@ -207,6 +229,7 @@ public class Header extends Component implements IconSupport {
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
     setElement(DOM.createDiv(), target, index);
+    getAriaSupport().setPresentation(true);
 
     addStyleName("x-small-editor");
     widgetPanel = new HorizontalPanel();
@@ -214,7 +237,7 @@ public class Header extends Component implements IconSupport {
     widgetPanel.addStyleName("x-panel-toolbar");
     widgetPanel.setLayoutOnChange(true);
     widgetPanel.setStyleAttribute("float", "right");
-    widgetPanel.setAriaIgnore(true);
+    widgetPanel.getAriaSupport().setPresentation(true);
 
     if (tools.size() > 0) {
       for (int i = 0; i < tools.size(); i++) {
@@ -229,7 +252,8 @@ public class Header extends Component implements IconSupport {
 
     textEl = new El(DOM.createSpan());
     textEl.setId(getId() + "-label");
-    Accessibility.setRole(textEl.dom, "header");
+    Accessibility.setRole(textEl.dom, "heading");
+    Accessibility.setState(textEl.dom, "aria-level", "1");
     getElement().appendChild(textEl.dom);
 
     if (textStyle != null) {

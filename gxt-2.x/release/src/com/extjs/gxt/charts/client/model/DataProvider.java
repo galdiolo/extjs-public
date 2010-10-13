@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -21,11 +21,10 @@ import com.extjs.gxt.ui.client.store.StoreListener;
  */
 public abstract class DataProvider {
 
-  protected ChartConfig chartConfig;
   protected String labelProperty, textProperty, valueProperty;
   protected ModelStringProvider<ModelData> labelProvider, textProvider;
   protected ListStore<ModelData> store;
-  protected Double maxYValue, minYValue;
+  protected double maxYValue, minYValue;
 
   private String chartId;
   private StoreListener<ModelData> storeListener;
@@ -92,7 +91,7 @@ public abstract class DataProvider {
    * 
    * @param store the store
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public void bind(ListStore store) {
     if (this.store != null) {
       this.store.removeStoreListener(storeListener);

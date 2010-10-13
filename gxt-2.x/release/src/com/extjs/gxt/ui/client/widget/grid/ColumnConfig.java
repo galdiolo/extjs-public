@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -24,6 +24,11 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class ColumnConfig extends BaseObservable {
 
+  /**
+   * True to disable keyboard column navigation of this column.
+   */
+  protected boolean ariaIgnore;
+
   private GridCellRenderer<ModelData> renderer;
   private HorizontalAlignment alignment;
   private String toolTip;
@@ -42,6 +47,8 @@ public class ColumnConfig extends BaseObservable {
   private DateTimeFormat dateTimeFormat;
   private boolean groupable = true;
   private Widget widget;
+  private String columnStyleName;
+  private boolean rowHeader;
 
   /**
    * Creates a new column config.
@@ -81,6 +88,15 @@ public class ColumnConfig extends BaseObservable {
    */
   public HorizontalAlignment getAlignment() {
     return alignment;
+  }
+
+  /**
+   * Returns the column style name.
+   * 
+   * @return the column style name
+   */
+  public String getColumnStyleName() {
+    return columnStyleName;
   }
 
   /**
@@ -233,6 +249,15 @@ public class ColumnConfig extends BaseObservable {
   }
 
   /**
+   * Returns true if the column is marked as the row header.
+   * 
+   * @return true if row header
+   */
+  public boolean isRowHeader() {
+    return rowHeader;
+  }
+
+  /**
    * Returns <code>true</code> if the column is sortable (pre-render).
    * 
    * @return the sortable state
@@ -248,6 +273,16 @@ public class ColumnConfig extends BaseObservable {
    */
   public void setAlignment(HorizontalAlignment alignment) {
     this.alignment = alignment;
+  }
+
+  /**
+   * Sets the style name to be applied to the header element (defaults to null).
+   * The style is only applied to the header cell, not the data rows.
+   * 
+   * @param columnStyleName the CSS style name
+   */
+  public void setColumnStyleName(String columnStyleName) {
+    this.columnStyleName = columnStyleName;
   }
 
   /**
@@ -347,7 +382,7 @@ public class ColumnConfig extends BaseObservable {
    * 
    * @param renderer the cell renderer
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public void setRenderer(GridCellRenderer renderer) {
     this.renderer = renderer;
   }
@@ -359,6 +394,17 @@ public class ColumnConfig extends BaseObservable {
    */
   public void setResizable(boolean resizable) {
     this.resizable = resizable;
+  }
+
+  /**
+   * True to mark this column as the row header. Only applicable when ARIA is
+   * enabled for accessibility. Screen reader will annouce the columns value
+   * when using a cell selection model.
+   * 
+   * @param rowHeader true to mark the column as the row header
+   */
+  public void setRowHeader(boolean rowHeader) {
+    this.rowHeader = rowHeader;
   }
 
   /**

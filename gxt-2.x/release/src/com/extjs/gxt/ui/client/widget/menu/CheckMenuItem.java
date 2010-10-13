@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -8,12 +8,14 @@
 package com.extjs.gxt.ui.client.widget.menu;
 
 import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.Accessibility;
 
 /**
  * Adds a menu item that contains a checkbox by default, but can also be part of
@@ -21,13 +23,16 @@ import com.google.gwt.user.client.Element;
  * 
  * A horizontal row of buttons.
  * 
+ * <dl>
  * <dt><b>Events:</b></dt>
  * 
  * <dd><b>BeforeCheckChange</b> : MenuEvent(menu, item)<br>
- * <div>Fires before the item is checked or unchecked.</div>
+ * <div>Fires before the item is checked or unchecked. Listeners can cancel the
+ * action by calling {@link BaseEvent#setCancelled(boolean)}.</div>
  * <ul>
  * <li>item : this</li>
  * <li>menu : the parent menu</li>
+ * <li>checked : the check state</li>
  * </ul>
  * </dd>
  * 
@@ -36,14 +41,16 @@ import com.google.gwt.user.client.Element;
  * <ul>
  * <li>item : this</li>
  * <li>menu : the parent menu</li>
+ * <li>checked : the check state</li>
  * </ul>
- * </dd> </dt>
+ * </dd> 
+ * </dl>
  */
 public class CheckMenuItem extends MenuItem {
 
   private String groupStyle = "x-menu-group-item";
   private boolean checked;
-  private String group;
+  private String group, groupTitle;
 
   /**
    * Creates a new check menu item.
@@ -62,6 +69,15 @@ public class CheckMenuItem extends MenuItem {
   public CheckMenuItem(String text) {
     this();
     setText(text);
+  }
+
+  /**
+   * Returns the ARIA group title.
+   * 
+   * @return the group title
+   */
+  public String getAriaGroupTitle() {
+    return groupTitle;
   }
 
   /**
@@ -92,6 +108,16 @@ public class CheckMenuItem extends MenuItem {
   }
 
   /**
+   * Sets the title attribute on the group container element. Only applies to
+   * radio check items when ARIA is enabled.
+   * 
+   * @param title the title
+   */
+  public void setAriaGroupTitle(String title) {
+    this.groupTitle = title;
+  }
+
+  /**
    * Set the checked state of this item.
    * 
    * @param checked the new checked state
@@ -113,15 +139,22 @@ public class CheckMenuItem extends MenuItem {
     }
     MenuEvent me = new MenuEvent(parentMenu);
     me.setItem(this);
+    me.setChecked(state);
     if (supressEvent || fireEvent(Events.BeforeCheckChange, me)) {
 
       if (getGroup() == null) {
-        setIcon(state ? GXT.IMAGES.checked()
-            : GXT.IMAGES.unchecked());
+        setIcon(state ? GXT.IMAGES.checked() : GXT.IMAGES.unchecked());
+        el().setStyleName("x-menu-checked", state);
       } else {
+        el().addStyleName("x-menu-item-radio");
         setIcon(state ? GXT.IMAGES.group_checked() : null);
+        el().setStyleName("x-menu-radio-sel", state);
       }
       checked = state;
+
+      if (GXT.isAriaEnabled()) {
+        Accessibility.setState(getElement(), "aria-checked", state ? "true" : "false");
+      }
       if (!supressEvent) {
         fireEvent(Events.CheckChange, me);
       }
@@ -148,6 +181,9 @@ public class CheckMenuItem extends MenuItem {
     if (rendered) {
       el().removeStyleName(this.groupStyle);
       el().addStyleName(groupStyle);
+      if (GXT.isAriaEnabled()) {
+        Accessibility.setRole(getElement(), "menuitemradio");
+      }
     }
     this.groupStyle = groupStyle;
   }
@@ -179,11 +215,13 @@ public class CheckMenuItem extends MenuItem {
   @Override
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
+    setChecked(checked, true);
+    if (GXT.isAriaEnabled()) {
+      Accessibility.setRole(getElement(), "menuitemcheckbox");
+    }
     if (getGroup() != null) {
       setGroupStyle(groupStyle);
     }
-    setChecked(checked, true);
-
   }
 
 }

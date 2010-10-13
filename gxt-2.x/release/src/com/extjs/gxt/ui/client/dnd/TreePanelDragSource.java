@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -32,7 +32,7 @@ public class TreePanelDragSource extends DragSource {
   protected TreeSource treeSource = TreeSource.BOTH;
   protected boolean treeStoreState = true;
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public TreePanelDragSource(TreePanel tree) {
     super(tree);
     this.tree = tree;
@@ -95,7 +95,7 @@ public class TreePanelDragSource extends DragSource {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void onDragStart(DNDEvent e) {
     TreeNode n = tree.findNode(e.getTarget());
     if (n == null) {

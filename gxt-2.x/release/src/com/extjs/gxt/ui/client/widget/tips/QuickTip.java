@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -13,6 +13,8 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.Component;
+import com.google.gwt.dom.client.EventTarget;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 
 /**
@@ -102,11 +104,14 @@ public class QuickTip extends ToolTip {
   protected void onHide() {
     super.onHide();
     targetElem = null;
+    text = null;
+    title = null;
   }
 
   @Override
   protected void onTargetOut(ComponentEvent ce) {
-    if (targetElem == null) {
+    EventTarget to = ce.getEvent().getRelatedEventTarget();
+    if (to == null || (to != null && !DOM.isOrHasChild(target.getElement(), (Element) Element.as(to)))) {
       super.onTargetOut(ce);
     }
   }
@@ -126,7 +131,7 @@ public class QuickTip extends ToolTip {
     }
 
     boolean hasTip = t != null && hasTip(t);
-    
+
     if (!initialized && !hasTip) {
       return;
     }
@@ -140,16 +145,12 @@ public class QuickTip extends ToolTip {
       } else if (targetElem != null && ce.within(targetElem)) {
         return;
       } else {
-        clearTimers();
-        hide();
-        targetElem = null;
-        text = null;
-        title = null;
+        delayHide();
         return;
       }
     }
 
-    clearTimer("hide");
+    clearTimers();
     targetXY = ce.getXY();
     delayShow();
   }
@@ -171,12 +172,13 @@ public class QuickTip extends ToolTip {
 
   private void updateTargetElement(Element target) {
     targetElem = target;
-    text = interceptTitles ? getAttributeValue(target, "title") : getAttributeValue(
-        target, "qtip");
-    title = getAttributeValue(target, "qtitle");
+    text = getAttributeValue(target, interceptTitles ? "title" : "qtip");
+    if (!interceptTitles) {
+      title = getAttributeValue(target, "qtitle");
+    }
 
     String width = getAttributeValue(target, "qwidth");
-    if (width != null) {
+    if (width != null && !"".equals(width)) {
       setWidth(Util.parseInt(width, 100));
     }
   }

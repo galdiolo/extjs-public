@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -43,6 +43,7 @@ import com.extjs.gxt.samples.client.examples.grid.CheckGroupingGridExample;
 import com.extjs.gxt.samples.client.examples.grid.ColumnGroupingExample;
 import com.extjs.gxt.samples.client.examples.grid.EditableBufferedGridExample;
 import com.extjs.gxt.samples.client.examples.grid.EditableGridExample;
+import com.extjs.gxt.samples.client.examples.grid.FilterGridExample;
 import com.extjs.gxt.samples.client.examples.grid.GridExample;
 import com.extjs.gxt.samples.client.examples.grid.GridPluginsExample;
 import com.extjs.gxt.samples.client.examples.grid.GroupingGridExample;
@@ -51,6 +52,7 @@ import com.extjs.gxt.samples.client.examples.grid.LiveGridExample;
 import com.extjs.gxt.samples.client.examples.grid.MemoryPagingGridExample;
 import com.extjs.gxt.samples.client.examples.grid.PagingBeanModelGridExample;
 import com.extjs.gxt.samples.client.examples.grid.PagingGridExample;
+import com.extjs.gxt.samples.client.examples.grid.RemoteFilterGridExample;
 import com.extjs.gxt.samples.client.examples.grid.RowEditorExample;
 import com.extjs.gxt.samples.client.examples.grid.TotalsGridExample;
 import com.extjs.gxt.samples.client.examples.grid.WidgetRenderingExample;
@@ -137,6 +139,8 @@ public class ExamplesModel extends BaseTreeModel {
     grids.add("Buffered Grid", new BufferedGridExample(), g.bufferedgrid().getHTML());
     grids.add("Editable Buffered Grid", new EditableBufferedGridExample(), g.editablebufferedgrid().getHTML());
     grids.add("Widget Renderer Grid", new WidgetRenderingExample(), g.widgetrenderergrid().getHTML());
+    grids.add("Filter Grid", new FilterGridExample(), g.filtergrid().getHTML());
+    grids.add("Remote Filter Grid", new RemoteFilterGridExample(), g.basicgrid().getHTML());
     grids.add("Live Grid", new LiveGridExample(), g.livegrid().getHTML());
     add(grids);
 

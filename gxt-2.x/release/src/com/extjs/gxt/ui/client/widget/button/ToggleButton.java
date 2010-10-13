@@ -1,18 +1,19 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
  */
 package com.extjs.gxt.ui.client.widget.button;
 
-import java.util.List;
+import java.util.Collection;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentManager;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
@@ -103,7 +104,7 @@ public class ToggleButton extends Button {
   public void toggle() {
     toggle(!pressed, false);
   }
-  
+
   /**
    * Sets the current pressed state.
    * 
@@ -191,19 +192,18 @@ public class ToggleButton extends Button {
     this.pressed = state;
     if (rendered) {
       ButtonEvent be = new ButtonEvent(this);
-      el().setStyleName("x-btn-pressed", state);
       if (state) {
-//        onBlur(null);
+        addStyleName(baseStyle + "-pressed");
         removeStyleName(baseStyle + "-over");
         removeStyleName(baseStyle + "-blur");
       } else {
-//        onFocus(null);
+        removeStyleName(baseStyle + "-pressed");
       }
       if (state && toggleGroup != null && toggleGroup.length() > 0) {
-        List<ToggleButton> list = ComponentManager.get().get(ToggleButton.class);
-        for (ToggleButton tb : list) {
-          if (tb != this && tb.getToggleGroup() != null && tb.getToggleGroup().equals(toggleGroup)) {
-            tb.toggle(false, silent);
+        Collection<Component> list = ComponentManager.get().getAll();
+        for (Component c : list) {
+          if (c instanceof ToggleButton && c != this && toggleGroup.equals(((ToggleButton) c).getToggleGroup())) {
+            ((ToggleButton) c).toggle(false, silent);
           }
         }
       }

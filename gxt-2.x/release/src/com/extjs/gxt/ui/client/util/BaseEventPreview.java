@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -21,6 +21,7 @@ import com.google.gwt.user.client.Event.NativePreviewHandler;
  * Specialized <code>EventPreview</code>. Provides auto hide support and the
  * ability to add elements which should be ignored when auto hide is enabled.
  * 
+ * <dl>
  * <dt><b>Events:</b></dt>
  * 
  * <dd><b>Add</b> : PreviewEvent(preview, event, target)<br>
@@ -46,7 +47,8 @@ import com.google.gwt.user.client.Event.NativePreviewHandler;
  * <li>target : the target element</li>
  * <li>event : event</li>
  * </ul>
- * </dd> </dt>
+ * </dd>
+ * </dl>
  */
 public class BaseEventPreview extends BaseObservable implements NativePreviewHandler {
 
@@ -63,16 +65,6 @@ public class BaseEventPreview extends BaseObservable implements NativePreviewHan
   }
 
   /**
-   * Returns the last xy value when a base event preview is on top of the
-   * preview stack.
-   * 
-   * @return the last client x and client y
-   */
-  public static Point getLastXY() {
-    return new Point(lastX, lastY);
-  }
-
-  /**
    * Returns the last client y value when a base event preview is on top of the
    * preview stack.
    * 
@@ -82,10 +74,25 @@ public class BaseEventPreview extends BaseObservable implements NativePreviewHan
     return lastY;
   }
 
+  /**
+   * Returns the last xy value when a base event preview is on top of the
+   * preview stack.
+   * 
+   * @return the last client x and client y
+   */
+  public static Point getLastXY() {
+    return new Point(lastX, lastY);
+  }
+
   private CompositeElement ignoreList = new CompositeElement();
   private boolean autoHide = true;
   private boolean autoHideAllowEvent;
   private HandlerRegistration handler;
+  private EventType keyEvent;
+  
+  public BaseEventPreview() {
+    keyEvent = KeyNav.getKeyEvent();
+  }
 
   /**
    * Adds this instance to the event preview stack.
@@ -201,6 +208,17 @@ public class BaseEventPreview extends BaseObservable implements NativePreviewHan
     this.ignoreList = ignoreList;
   }
 
+  /**
+   * Sets the key event type used to determine key presses for
+   * {@link #onPreview(PreviewEvent)}. By default, the key press event is
+   * determined using {@link KeyNav#getKeyEvent()}.
+   * 
+   * @param type the key event type
+   */
+  public void setKeyEvent(EventType type) {
+    keyEvent = type;
+  }
+
   protected void onAdd() {
 
   }
@@ -247,18 +265,11 @@ public class BaseEventPreview extends BaseObservable implements NativePreviewHan
    * @return true to allow the event
    */
   protected boolean onPreview(PreviewEvent pe) {
+    if (pe.getType().getEventCode() == keyEvent.getEventCode()) {
+      onPreviewKeyPress(pe);
+      return true;
+    }
     switch (pe.getType().getEventCode()) {
-      case Event.ONKEYPRESS:
-
-        if (KeyNav.getKeyEvent().getEventCode() == Event.ONKEYPRESS) {
-          onPreviewKeyPress(pe);
-        }
-        break;
-      case Event.ONKEYDOWN:
-        if (KeyNav.getKeyEvent().getEventCode() == Event.ONKEYDOWN) {
-          onPreviewKeyPress(pe);
-        }
-        break;
       case Event.ONCLICK:
         onClick(pe);
     }

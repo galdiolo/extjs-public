@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -84,7 +84,7 @@ public class XAxis extends AbstractAxis {
      * 
      * @return the labels
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public Collection<Object> getLabels() {
       return (Collection) get("labels");
     }
@@ -95,7 +95,8 @@ public class XAxis extends AbstractAxis {
      * @return the rotation
      */
     public Rotation getRotation() {
-      return Rotation.valueOf((String) get("rotate"));
+      String rotation = (String) get("rotate");
+      return rotation == null ? null : Rotation.valueOf(rotation);
     }
 
     /**

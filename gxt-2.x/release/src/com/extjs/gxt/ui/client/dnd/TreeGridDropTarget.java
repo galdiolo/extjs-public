@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -34,7 +34,7 @@ import com.google.gwt.user.client.Timer;
  * <li>A List of TreeStoreModel instances (children are ignored).
  * </ul>
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked","rawtypes"})
 public class TreeGridDropTarget extends DropTarget {
 
   protected TreeGrid<ModelData> treeGrid;
@@ -42,9 +42,10 @@ public class TreeGridDropTarget extends DropTarget {
   protected int status;
 
   private boolean allowDropOnLeaf = false;
-  private boolean autoExpand = true;
+  private boolean autoExpand = true, autoScroll = true;
   private int autoExpandDelay = 800;
   private boolean addChildren;
+  private ScrollSupport scrollSupport;
 
   public TreeGridDropTarget(TreeGrid tree) {
     super(tree);
@@ -80,12 +81,21 @@ public class TreeGridDropTarget extends DropTarget {
   }
 
   /**
-   * Returns true if auto expand is enabled.
+   * Returns true if auto expand is enabled (defaults to true).
    * 
    * @return the auto expand state
    */
   public boolean isAutoExpand() {
     return autoExpand;
+  }
+
+  /**
+   * Returns true if auto scroll is enabled (defaults to true).
+   * 
+   * @return true if auto scroll enabled
+   */
+  public boolean isAutoScroll() {
+    return autoScroll;
   }
 
   /**
@@ -125,6 +135,18 @@ public class TreeGridDropTarget extends DropTarget {
    */
   public void setAutoExpandDelay(int autoExpandDelay) {
     this.autoExpandDelay = autoExpandDelay;
+  }
+
+  /**
+   * True to automatically scroll the tree when the user hovers over the top and
+   * bottom of the tree grid (defaults to true).
+   * 
+   * @see ScrollSupport
+   * 
+   * @param autoScroll true to enable auto scroll
+   */
+  public void setAutoScroll(boolean autoScroll) {
+    this.autoScroll = autoScroll;
   }
 
   protected void appendModel(ModelData p, List<ModelData> models, int index) {
@@ -288,6 +310,22 @@ public class TreeGridDropTarget extends DropTarget {
   }
 
   @Override
+  protected void onDragCancelled(DNDEvent event) {
+    super.onDragCancelled(event);
+    if (autoScroll) {
+      scrollSupport.stop();
+    }
+  }
+
+  @Override
+  protected void onDragFail(DNDEvent event) {
+    super.onDragFail(event);
+    if (autoScroll) {
+      scrollSupport.stop();
+    }
+  }
+
+  @Override
   protected void onDragDrop(DNDEvent event) {
     super.onDragDrop(event);
 
@@ -310,12 +348,25 @@ public class TreeGridDropTarget extends DropTarget {
     status = -1;
     activeItem = null;
     appendItem = null;
+
+    if (autoScroll) {
+      scrollSupport.stop();
+    }
   }
 
   @Override
   protected void onDragEnter(DNDEvent e) {
     super.onDragEnter(e);
     e.getStatus().setStatus(false);
+
+    if (autoScroll) {
+      if (scrollSupport == null) {
+        scrollSupport = new ScrollSupport(treeGrid.el().selectNode(".x-grid3-scroller"));
+      } else if (scrollSupport.getScrollElement() == null) {
+        scrollSupport.setScrollElement(treeGrid.el().selectNode(".x-grid3-scroller"));
+      }
+      scrollSupport.start();
+    }
   }
 
   @Override
@@ -324,6 +375,10 @@ public class TreeGridDropTarget extends DropTarget {
     if (activeItem != null) {
       clearStyle(activeItem);
       activeItem = null;
+    }
+
+    if (autoScroll) {
+      scrollSupport.stop();
     }
   }
 

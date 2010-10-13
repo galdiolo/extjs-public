@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -9,6 +9,7 @@ package com.extjs.gxt.ui.client.widget.menu;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
+import com.extjs.gxt.ui.client.Style.HideMode;
 import com.extjs.gxt.ui.client.aria.FocusFrame;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XDOM;
@@ -28,6 +29,7 @@ import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.Layout;
 import com.extjs.gxt.ui.client.widget.layout.MenuLayout;
+import com.google.gwt.dom.client.EventTarget;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.DOM;
@@ -139,21 +141,21 @@ public class Menu extends Container<Component> {
   protected boolean plain;
   protected boolean showSeparator = true;
   protected El ul;
+  protected Item activeItem;
 
   private String subMenuAlign = "tl-tr?";
   private String defaultAlign = "tl-bl?";
 
   private int minWidth = 120;
-  private Item activeItem;
   private boolean showing;
   private boolean constrainViewport = true;
-
   private boolean focusOnShow = true;
   private int maxHeight = Style.DEFAULT;
   private boolean enableScrolling = true;
   private int scrollIncrement = 24;
   private int scrollerHeight = 8;
   private int activeMax;
+  private boolean hasScrollers;
 
   /**
    * Creates a new menu.
@@ -168,21 +170,29 @@ public class Menu extends Container<Component> {
     enableLayout = true;
     setLayout(new MenuLayout());
     eventPreview = new BaseEventPreview() {
+
       @Override
       protected boolean onAutoHide(PreviewEvent pe) {
         return Menu.this.onAutoHide(pe);
       }
 
       @Override
+      protected boolean onPreview(PreviewEvent pe) {
+        int type = pe.getEventTypeInt();
+        if (type == Event.ONSCROLL || type == Event.ONMOUSEWHEEL && !hasScrollers) {
+          Menu.this.hide(true);
+        }
+        return super.onPreview(pe);
+      }
+
+      @Override
       protected void onPreviewKeyPress(PreviewEvent pe) {
         super.onPreviewKeyPress(pe);
-        if (pe.getKeyCode() == KeyCodes.KEY_ESCAPE) {
-          hide(true);
-        }
+        onEscape(pe);
       }
     };
   }
-
+  
   /**
    * Adds a item to the menu.
    * 
@@ -207,6 +217,11 @@ public class Menu extends Container<Component> {
     return ul;
   }
 
+  /**
+   * Returns the max height of the menu or -1 if not set.
+   * 
+   * @return the max height in pixels
+   */
   public int getMaxHeight() {
     return maxHeight;
   }
@@ -265,9 +280,9 @@ public class Menu extends Container<Component> {
         showing = false;
         hidden = true;
         fireEvent(Events.Hide, me);
-      }
-      if (deep && parentItem != null) {
-        parentItem.parentMenu.hide(true);
+        if (deep && parentItem != null) {
+          parentItem.parentMenu.hide(true);
+        }
       }
     }
     return this;
@@ -296,10 +311,20 @@ public class Menu extends Container<Component> {
     return constrainViewport;
   }
 
+  /**
+   * Returns true if vertical scrolling is enabled.
+   * 
+   * @return true for scrolling
+   */
   public boolean isEnableScrolling() {
     return enableScrolling;
   }
 
+  /**
+   * Returns true if the menu will be focused when displayed.
+   * 
+   * @return true if focused
+   */
   public boolean isFocusOnShow() {
     return focusOnShow;
   }
@@ -316,11 +341,14 @@ public class Menu extends Container<Component> {
       case Event.ONCLICK:
         onClick(ce);
         break;
-      case Event.ONMOUSEOVER:
-        onMouseOver(ce);
+      case Event.ONMOUSEMOVE:
+        onMouseMove(ce);
         break;
       case Event.ONMOUSEOUT:
         onMouseOut(ce);
+        break;
+      case Event.ONMOUSEOVER:
+        onMouseOver(ce);
         break;
       case Event.ONMOUSEWHEEL:
         if (enableScrolling) {
@@ -331,7 +359,7 @@ public class Menu extends Container<Component> {
     if (enableScrolling && t.is(".x-menu-scroller")) {
       switch (ce.getEventTypeInt()) {
         case Event.ONMOUSEOVER:
-          deactiveActiveItem();
+          //deactiveActiveItem();
           onScrollerIn(t);
           break;
         case Event.ONMOUSEOUT:
@@ -348,7 +376,14 @@ public class Menu extends Container<Component> {
    */
   @Override
   public boolean remove(Component item) {
-    return super.remove(item);
+    if (activeItem == item) {
+      deactiveActiveItem();
+    }
+    boolean success = super.remove(item);
+    if (success && item instanceof Item) {
+      ((Item) item).parentMenu = null;
+    }
+    return success;
   }
 
   /**
@@ -359,6 +394,10 @@ public class Menu extends Container<Component> {
    * @param autoExpand true to auto expand the item
    */
   public void setActiveItem(Component c, boolean autoExpand) {
+    if (c == null) {
+      deactiveActiveItem();
+      return;
+    }
     if (c instanceof Item) {
       Item item = (Item) c;
       if (item != activeItem) {
@@ -384,7 +423,7 @@ public class Menu extends Container<Component> {
    * Sets whether the menu should be constrained to the viewport when shown.
    * Only applies when using {@link #showAt(int, int)}.
    * 
-   * @param constrainViewport true to contrain
+   * @param constrainViewport true to constrain
    */
   public void setConstrainViewport(boolean constrainViewport) {
     this.constrainViewport = constrainViewport;
@@ -400,14 +439,31 @@ public class Menu extends Container<Component> {
     this.defaultAlign = defaultAlign;
   }
 
+  /**
+   * True to enable vertical scrolling of the children in the menu (defaults to
+   * true).
+   * 
+   * @param enableScrolling true to for scrolling
+   */
   public void setEnableScrolling(boolean enableScrolling) {
     this.enableScrolling = enableScrolling;
   }
 
+  /**
+   * True to set the focus on the menu when it is displayed.
+   * 
+   * @param focusOnShow true to focus
+   */
   public void setFocusOnShow(boolean focusOnShow) {
     this.focusOnShow = focusOnShow;
   }
 
+  /**
+   * Sets the max height of the menu (defaults to -1). Only applies when
+   * {@link #setEnableScrolling(boolean)} is set to true.
+   * 
+   * @param maxHeight the max height
+   */
   public void setMaxHeight(int maxHeight) {
     this.maxHeight = maxHeight;
   }
@@ -455,12 +511,12 @@ public class Menu extends Container<Component> {
     if (fireEvent(Events.BeforeShow, me)) {
       RootPanel.get().add(this);
 
-      showing = true;
       el().makePositionable(true);
 
       onShow();
       el().updateZIndex(0);
 
+      showing = true;
       doAutoSize();
 
       el().alignTo(elem, pos, offsets);
@@ -499,12 +555,13 @@ public class Menu extends Container<Component> {
     MenuEvent me = new MenuEvent(this);
     if (fireEvent(Events.BeforeShow, me)) {
       RootPanel.get().add(this);
-      showing = true;
+
       el().makePositionable(true);
 
       onShow();
       el().updateZIndex(0);
 
+      showing = true;
       doAutoSize();
 
       if (constrainViewport) {
@@ -563,6 +620,8 @@ public class Menu extends Container<Component> {
           onScroll(be);
         }
       };
+
+      hasScrollers = true;
 
       El scroller;
 
@@ -634,10 +693,27 @@ public class Menu extends Container<Component> {
     }
   }
 
+  protected void onEscape(PreviewEvent pe) {
+    if (pe.getKeyCode() == KeyCodes.KEY_ESCAPE) {
+      if (activeItem != null && !activeItem.onEscape()) {
+        return;
+      }
+      hide(false);
+    }
+  }
+
   @Override
   protected void onHide() {
     super.onHide();
     deactiveActiveItem();
+  }
+
+  @Override
+  protected void onInsert(Component item, int index) {
+    super.onInsert(item, index);
+    if (rendered && GXT.isAriaEnabled() && item instanceof CheckMenuItem) {
+      handleRadioGroups();
+    }
   }
 
   protected void onKeyDown(ComponentEvent ce) {
@@ -661,30 +737,40 @@ public class Menu extends Container<Component> {
   }
 
   protected void onMouseOut(ComponentEvent ce) {
-    Component item = findItem(ce.getTarget());
-    if (item != null) {
-      if (item == activeItem && !ce.within(getElement()) && activeItem.shouldDeactivate(ce)) {
-        deactiveActiveItem();
-      }
-    } else {
-      if (activeItem != null && activeItem.shouldDeactivate(ce)) {
-        deactiveActiveItem();
+    EventTarget to = ce.getEvent().getRelatedEventTarget();
+    if (activeItem != null && (to == null || (to != null && !DOM.isOrHasChild(activeItem.getElement(), (Element) Element.as(to)))) && activeItem.shouldDeactivate(ce)) {
+      deactiveActiveItem();
+    }
+  }
+  
+  protected void onMouseOver(ComponentEvent ce) {
+    EventTarget from = ce.getEvent().getRelatedEventTarget();
+    if (from == null || (from != null && !DOM.isOrHasChild(getElement(), (Element) Element.as(from)))) {
+      Component c = findItem(ce.getTarget());
+      if (c != null && c instanceof Item) {
+        Item item = (Item) c;
+        if (activeItem != item && item.canActivate && item.isEnabled()) {
+          setActiveItem(item, true);
+        }
       }
     }
   }
 
-  protected void onMouseOver(ComponentEvent ce) {
+  protected void onMouseMove(ComponentEvent ce) {
     Component c = findItem(ce.getTarget());
     if (c != null && c instanceof Item) {
       Item item = (Item) c;
-      if (item.canActivate && item.isEnabled()) {
+      if (activeItem != item && item.canActivate && item.isEnabled()) {
         setActiveItem(item, true);
       }
     }
-    if (c == null) {
-      if (activeItem != null && activeItem.shouldDeactivate(ce)) {
-        deactiveActiveItem();
-      }
+  }
+
+  @Override
+  protected void onRemove(Component item) {
+    super.onRemove(item);
+    if (rendered && GXT.isAriaEnabled() && item instanceof CheckMenuItem) {
+      handleRadioGroups();
     }
   }
 
@@ -713,6 +799,12 @@ public class Menu extends Container<Component> {
           if (GXT.isAriaEnabled()) {
             FocusFrame.get().frame(parentItem);
           }
+        } else {
+          Menu menu = Menu.this;
+          while (menu.parentItem != null) {
+            menu = menu.parentItem.parentMenu;
+          }
+          menu.fireEvent(Events.Minimize);
         }
       }
 
@@ -720,6 +812,17 @@ public class Menu extends Container<Component> {
         if (activeItem != null) {
           activeItem.expandMenu(true);
         }
+        if (activeItem instanceof MenuItem) {
+          MenuItem mi = (MenuItem) activeItem;
+          if (mi.subMenu != null && mi.subMenu.isVisible()) {
+            return;
+          }
+        }
+        Menu menu = Menu.this;
+        while (menu.parentItem != null) {
+          menu = menu.parentItem.parentMenu;
+        }
+        menu.fireEvent(Events.Maximize);
       }
 
       public void onUp(ComponentEvent ce) {
@@ -737,10 +840,12 @@ public class Menu extends Container<Component> {
 
     el().setTabIndex(0);
     el().setElementAttribute("hideFocus", "true");
+
     el().addStyleName("x-ignore");
     if (GXT.isAriaEnabled()) {
       Accessibility.setRole(getElement(), "menu");
       Accessibility.setRole(ul.dom, "presentation");
+      handleRadioGroups();
     }
 
     if (plain) {
@@ -761,7 +866,6 @@ public class Menu extends Container<Component> {
     if (top ? ul.getScrollTop() <= 0 : ul.getScrollTop() + activeMax >= ul.dom.getPropertyInt("scrollHeight")) {
       onScrollerOut(target);
     }
-
   }
 
   protected void onScrollerIn(El t) {
@@ -782,7 +886,6 @@ public class Menu extends Container<Component> {
 
   protected void scrollMenu(boolean top) {
     ul.setScrollTop(ul.getScrollTop() + scrollIncrement * (top ? -1 : 1));
-
   }
 
   protected Item tryActivate(int start, int step) {
@@ -797,5 +900,44 @@ public class Menu extends Container<Component> {
       }
     }
     return null;
+  }
+
+  private void clearGroups() {
+    NodeList<Element> groups = el().select(".x-menu-radio-group");
+    for (int i = 0; i < groups.getLength(); i++) {
+      Element e = groups.getItem(i);
+      El.fly(e).removeFromParent();
+    }
+  }
+
+  private El getGroup(String groupName) {
+    El g = el().selectNode("#" + getId() + "-" + groupName);
+    if (g == null) {
+      g = new El(DOM.createDiv());
+      g.makePositionable(true);
+      g.dom.setAttribute("role", "group");
+      g.addStyleName(HideMode.OFFSETS.value());
+      g.addStyleName("x-menu-radio-group");
+      g.setId(getId() + "-" + groupName);
+      el().appendChild(g.dom);
+    }
+    return g;
+  }
+
+  private void handleRadioGroups() {
+    clearGroups();
+    for (int i = 0; i < getItemCount(); i++) {
+      Object obj = getItem(i);
+      if (obj instanceof CheckMenuItem) {
+        CheckMenuItem check = (CheckMenuItem) obj;
+        if (check.getGroup() != null) {
+          El g = getGroup(check.getGroup());
+          Accessibility.setState(g.dom, "aria-owns", g.dom.getAttribute("aria-owns") + " " + check.getId());
+          if (check.getAriaGroupTitle() != null) {
+            g.dom.setTitle(check.getAriaGroupTitle());
+          }
+        }
+      }
+    }
   }
 }

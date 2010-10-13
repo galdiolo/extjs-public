@@ -1,12 +1,13 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
  */
 package com.extjs.gxt.ui.client.widget;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -20,7 +21,7 @@ import com.google.gwt.user.client.ui.Widget;
  * with scrolling disabled.
  * 
  * <dl>
- * <dt>Events:</dt>
+ * <dt><b>Events:</b></dt>
  * <dd><b>Scroll</b> : ComponentEvent(component)<br>
  * <div>Fires when the container is scrolled.</div>
  * <ul>
@@ -153,7 +154,8 @@ public class ScrollContainer<T extends Component> extends Container<T> {
         case AUTO:
         case ALWAYS:
         case NONE:
-          getLayoutTarget().setStyleAttribute("overflow", scrollMode.value().toLowerCase());
+          getLayoutTarget().setStyleAttribute("overflowX", scrollMode.value().toLowerCase());
+          getLayoutTarget().setStyleAttribute("overflowY", scrollMode.value().toLowerCase());
           break;
         case AUTOX:
           getLayoutTarget().setStyleAttribute("overflowX", scrollMode.value().toLowerCase());
@@ -163,6 +165,9 @@ public class ScrollContainer<T extends Component> extends Container<T> {
           getLayoutTarget().setStyleAttribute("overflowY", scrollMode.value().toLowerCase());
           getLayoutTarget().setStyleAttribute("overflowX", "hidden");
           break;
+      }
+      if ((GXT.isIE6 || GXT.isIE7) && GXT.isStrict && scrollMode != Scroll.NONE) {
+        getLayoutTarget().makePositionable();
       }
 
     }

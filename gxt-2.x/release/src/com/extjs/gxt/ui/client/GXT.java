@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -18,6 +18,7 @@ import com.extjs.gxt.ui.client.state.CookieProvider;
 import com.extjs.gxt.ui.client.state.StateManager;
 import com.extjs.gxt.ui.client.util.CSS;
 import com.extjs.gxt.ui.client.util.Theme;
+import com.extjs.gxt.ui.client.util.ThemeManager;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.user.client.DOM;
@@ -167,12 +168,22 @@ public class GXT {
    * CSS background images. Default value is '/images/default/shared/clear.gif';
    */
   public static String BLANK_IMAGE_URL;
+  
+  /**
+   * Path to GXT resources (defaults to 'gxt').
+   */
+  public static String RESOURCES_URL = "gxt";
 
   private static boolean initialized;
   private static Theme defaultTheme;
   private static boolean forceTheme;
   private static Version version;
   private static boolean ariaEnabled;
+
+  /**
+   * True if the OS high contrast mode is enabled.
+   */
+  public static boolean isHighContrastMode = false;
 
   /**
    * Returns the auto id prefix.
@@ -216,7 +227,7 @@ public class GXT {
     }
     return version;
   }
-
+  
   /**
    * Hides the loading panel.
    * 
@@ -243,6 +254,15 @@ public class GXT {
       return;
     }
     initialized = true;
+    
+    Element div = DOM.createDiv();
+    div.setClassName("x-contrast-test");
+    XDOM.getBody().appendChild(div);
+    if ("none".equals(XDOM.getComputedStyle(div, "backgroundImage"))) {
+      isHighContrastMode = true;
+      XDOM.getBodyEl().addStyleName("x-contrast");
+    }
+    XDOM.getBody().removeChild(div);
 
     String ua = getUserAgent();
 
@@ -262,9 +282,11 @@ public class GXT {
     isSafari2 = isSafari && !isSafari3 && !isSafari4;
 
     isGecko = !isWebKit && ua.indexOf("gecko") != -1;
-    isGecko3 = isGecko && ua.indexOf("rv:1.9.0") != -1;
+
     isGecko35 = isGecko && ua.indexOf("rv:1.9.1") != -1;
-    isGecko2 = isGecko && !isGecko3 && !isGecko35;
+    isGecko3 = isGecko && ua.indexOf("rv:1.9.") != -1;
+
+    isGecko2 = isGecko && !isGecko3;
 
     isWindows = (ua.indexOf("windows") != -1 || ua.indexOf("win32") != -1);
     isMac = (ua.indexOf("macintosh") != -1 || ua.indexOf("mac os x") != -1);
@@ -325,7 +347,7 @@ public class GXT {
     }
 
     if (StateManager.get().getProvider() == null) {
-      StateManager.get().setProvider(new CookieProvider("/", null, null, false));
+      StateManager.get().setProvider(new CookieProvider("/", null, null, isSecure));
     }
 
     Map<String, Object> theme = StateManager.get().getMap(GWT.getModuleBaseURL() + "theme");
@@ -333,12 +355,16 @@ public class GXT {
       theme = defaultTheme.asMap();
     }
     if (theme != null) {
-      String themeId = theme.get("id").toString();
+      final String themeId = theme.get("id").toString();
       String fileName = theme.get("file").toString();
       if (!fileName.contains("gxt-all.css")) {
         CSS.addStyleSheet(themeId, fileName);
       }
       bodyEl.addStyleName("x-theme-" + themeId);
+
+      Theme t = ThemeManager.findTheme(themeId);
+      t.init();
+
       StateManager.get().set(GWT.getModuleBaseURL() + "theme", theme);
     }
 

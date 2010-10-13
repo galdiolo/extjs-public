@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -19,7 +19,7 @@ public interface XMessages extends Messages {
   String grid_ddText(int rows);
 
   String tabPanelItem_closeText();
-  
+
   String tabPanelItem_closeOtherText();
 
   String field_invalidText();
@@ -74,6 +74,10 @@ public interface XMessages extends Messages {
 
   String pagingToolBar_refreshText();
 
+  String panel_expandPanel();
+
+  String panel_collapsePanel();
+
   String pagingToolBar_displayMsg(int start, int end, int total);
 
   String pagingToolBar_emptyMsg();
@@ -87,7 +91,11 @@ public interface XMessages extends Messages {
   String textField_regexText();
 
   String textField_emptyText();
-  
+
+  String checkBoxGroup_text(String fieldLabel);
+
+  String radioGroup_text(String fieldLabel);
+
   String uploadField_browseText();
 
   String numberField_minText(double min);
@@ -95,7 +103,7 @@ public interface XMessages extends Messages {
   String numberField_maxText(double max);
 
   String numberField_nanText(String num);
-  
+
   String numberField_negativeText();
 
   String dateField_disabledDaysText();
@@ -121,70 +129,70 @@ public interface XMessages extends Messages {
   String listField_removeAll();
 
   String listField_removeSelected();
-  
+
   String htmlEditor_boldTipText();
-  
+
   String htmlEditor_boldTipTitle();
-  
+
   String htmlEditor_italicTipText();
-  
+
   String htmlEditor_italicTipTitle();
-  
+
   String htmlEditor_underlineTipText();
-  
+
   String htmlEditor_underlineTipTitle();
-  
+
   String htmlEditor_justifyLeftTipText();
-  
+
   String htmlEditor_justifyLeftTipTitle();
-  
+
   String htmlEditor_justifyCenterTipText();
-  
+
   String htmlEditor_justifyCenterTipTitle();
-  
+
   String htmlEditor_justifyRightTipText();
-  
+
   String htmlEditor_justifyRightTipTitle();
-  
+
   String htmlEditor_sourceEditTipText();
-  
+
   String htmlEditor_sourceEditTipTitle();
-  
+
   String htmlEditor_olTipText();
-  
+
   String htmlEditor_olTipTitle();
-  
+
   String htmlEditor_ulTipText();
-  
+
   String htmlEditor_ulTipTitle();
-  
+
   String htmlEditor_linkTipText();
-  
+
   String htmlEditor_linkTipTitle();
-  
+
   String htmlEditor_createLinkText();
-  
+
   String htmlEditor_increaseFontSizeTipText();
-  
+
   String htmlEditor_increaseFontSizeTipTitle();
-  
+
   String htmlEditor_decreaseFontSizeTipText();
-  
+
   String htmlEditor_decreaseFontSizeTipTitle();
-  
+
   String htmlEditor_foreColorTipText();
-  
+
   String htmlEditor_foreColorTipTitle();
-  
+
   String htmlEditor_backColorTipText();
-  
+
   String htmlEditor_backColorTipTitle();
 
   String gridView_sortAscText();
 
   String gridView_sortDescText();
 
-  String gridView_columnsText();  
+  String gridView_columnsText();
 
   String groupingView_emptyGroupText();
 
@@ -193,13 +201,13 @@ public interface XMessages extends Messages {
   String groupingView_showGroupsText();
 
   String rowEditor_cancelText();
-  
+
   String rowEditor_dirtyText();
-  
+
   String rowEditor_saveText();
-  
+
   String rowEditor_tipTitleText();
-  
+
   String propertyColumnModel_nameText();
 
   String propertyColumnModel_valueText();
@@ -212,4 +220,31 @@ public interface XMessages extends Messages {
 
   String themeSelector_grayTheme();
 
+  String desktop_startButton();
+  
+  String window_ariaResize();
+  
+  String window_ariaMove();
+  
+  String window_ariaResizeDescription();
+  
+  String window_ariaMoveDescription();
+  
+  String aria_leaveApplication();
+
+  String stringFilter_emptyText();
+
+  String booleanFilter_noText();
+
+  String booleanFilter_yesText();
+
+  String dateFilter_afterText();
+
+  String dateFilter_beforeText();
+
+  String dateFilter_onText();
+
+  String numericFilter_emptyText();
+
+  String gridFilters_filterText();
 }

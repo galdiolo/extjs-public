@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -306,7 +306,7 @@ public abstract class Container<T extends Component> extends BoxComponent {
     child.setParent(this);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"rawtypes", "unchecked"})
   protected ContainerEvent createContainerEvent(T item) {
     return new ContainerEvent(this, item);
   }
@@ -385,9 +385,8 @@ public abstract class Container<T extends Component> extends BoxComponent {
    * @param item the item to insert
    * @param index the insert location
    */
-  @SuppressWarnings("unchecked")
   protected boolean insert(T item, int index) {
-    ContainerEvent containerEvent = createContainerEvent(item);
+    ContainerEvent<?, ?> containerEvent = createContainerEvent(item);
     containerEvent.setIndex(index);
     if (fireEvent(Events.BeforeAdd, containerEvent)) {
       ComponentEvent componentEvent = item.createComponentEvent(null);
@@ -526,7 +525,7 @@ public abstract class Container<T extends Component> extends BoxComponent {
     return remove(item, false);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected boolean remove(T component, boolean force) {
     ContainerEvent containerEvent = createContainerEvent(component);
     containerEvent.setItem(component);

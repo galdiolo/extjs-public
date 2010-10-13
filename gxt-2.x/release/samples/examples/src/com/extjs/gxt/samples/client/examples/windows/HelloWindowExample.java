@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -9,6 +9,8 @@ package com.extjs.gxt.samples.client.examples.windows;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.event.WindowEvent;
+import com.extjs.gxt.ui.client.event.WindowListener;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.TabItem;
 import com.extjs.gxt.ui.client.widget.TabPanel;
@@ -33,7 +35,14 @@ public class HelloWindowExample extends LayoutContainer {
     window.setBlinkModal(true);
     window.setHeading("Hello Window");
     window.setLayout(new FitLayout());
-
+    window.addWindowListener(new WindowListener() {
+      @Override
+      public void windowHide(WindowEvent we) {
+        Button open = we.getWindow().getData("open");
+        open.focus();
+      }
+    });
+    
     TabPanel panel = new TabPanel();
     panel.setBorders(false);
     TabItem item1 = new TabItem("Hello World 1");
@@ -47,9 +56,13 @@ public class HelloWindowExample extends LayoutContainer {
     panel.add(item2);
 
     window.add(panel, new FitData(4));
-
-    window.addButton(new Button("Hello"));
-    window.addButton(new Button("World"));
+    window.addButton(new Button("Close", new SelectionListener<ButtonEvent>() {
+      @Override
+      public void componentSelected(ButtonEvent ce) {
+        window.hide();
+      }
+    }));
+    window.setFocusWidget(window.getButtonBar().getItem(0));
 
     Button btn = new Button("Hello World", new SelectionListener<ButtonEvent>() {
       @Override
@@ -57,6 +70,7 @@ public class HelloWindowExample extends LayoutContainer {
         window.show();
       }
     });
+    window.setData("open", btn);
     add(btn);
 
   }

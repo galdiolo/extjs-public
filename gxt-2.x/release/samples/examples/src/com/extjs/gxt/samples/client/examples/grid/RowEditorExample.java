@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -138,6 +138,7 @@ public class RowEditorExample extends LayoutContainer {
     grid.setBorders(true);
     grid.addPlugin(checkColumn);
     grid.addPlugin(re);
+    grid.getAriaSupport().setLabelledBy(cp.getHeader().getId() + "-label");
     cp.add(grid);
 
     ToolBar toolBar = new ToolBar();

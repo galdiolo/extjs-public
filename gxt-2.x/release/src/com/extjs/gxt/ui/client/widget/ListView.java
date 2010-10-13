@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -13,8 +13,11 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.Style.SelectionMode;
+import com.extjs.gxt.ui.client.aria.FocusFrame;
 import com.extjs.gxt.ui.client.core.CompositeElement;
 import com.extjs.gxt.ui.client.core.DomQuery;
+import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.core.XTemplate;
 import com.extjs.gxt.ui.client.data.BaseModel;
 import com.extjs.gxt.ui.client.data.ModelData;
@@ -99,20 +102,20 @@ public class ListView<M extends ModelData> extends BoxComponent {
 
   protected ListStore<M> store;
 
-  private String selectStyle = "x-view-item-sel";
-  private String overStyle = "x-view-item-over";
-  private String itemSelector = ".x-view-item";
-  private boolean selectOnHover;
   private CompositeElement all;
-  private ListViewSelectionModel<M> sm;
-  private XTemplate template;
-  private StoreListener<M> storeListener;
   private String displayProperty = "text";
-  private String loadingText;
-  private Element overElement;
-  private ModelProcessor<M> modelProcessor;
   private boolean enableQuickTip = true;
+  private String itemSelector = ".x-view-item";
+  private String loadingText;
+  private ModelProcessor<M> modelProcessor;
+  private Element overElement;
+  private String overStyle = "x-view-item-over";
   private QuickTip quickTip;
+  private boolean selectOnHover;
+  private String selectStyle = "x-view-item-sel";
+  private ListViewSelectionModel<M> sm;
+  private StoreListener<M> storeListener;
+  private XTemplate template;
 
   /**
    * Creates a new view.
@@ -122,7 +125,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
     setSelectionModel(new ListViewSelectionModel<M>());
     all = new CompositeElement();
     baseStyle = "x-view";
-    focusable = true;
+    disableTextSelection(true);
   }
 
   /**
@@ -152,7 +155,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
   public Element findElement(Element element) {
     return fly(element).findParentElement(itemSelector, 5);
   }
-  
+
   /**
    * Returns the element's index.
    * 
@@ -360,10 +363,10 @@ public class ListView<M extends ModelData> extends BoxComponent {
     getSelectionModel().select(sel, false);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public void onComponentEvent(ComponentEvent ce) {
     super.onComponentEvent(ce);
-    ListViewEvent le = (ListViewEvent) ce;
+    ListViewEvent le = (ListViewEvent<?>) ce;
     switch (ce.getEventTypeInt()) {
       case Event.ONMOUSEOVER:
         onMouseOver(le);
@@ -383,6 +386,10 @@ public class ListView<M extends ModelData> extends BoxComponent {
         if (le.getIndex() != -1) {
           onClick(le);
         }
+        break;
+      case Event.ONFOCUS:
+        onFocus(ce);
+        break;
     }
   }
 
@@ -403,6 +410,11 @@ public class ListView<M extends ModelData> extends BoxComponent {
     }
     template.overwrite(getElement(), Util.getJsObjects(collectData(models, 0), template.getMaxDepth()));
     all = new CompositeElement(Util.toElementArray(el().select(itemSelector)));
+    if (GXT.isAriaEnabled()) {
+      for (int i = 0; i < all.getCount(); i++) {
+        all.getElement(i).setId(XDOM.getUniqueId());
+      }
+    }
     updateIndexes(0, -1);
     fireEvent(Events.Refresh);
   }
@@ -428,6 +440,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
 
   /**
    * True to enable quicktips (defaults to true, pre-render).
+   * 
    * @param enableQuickTip true to enable quicktips
    */
   public void setEnableQuickTips(boolean enableQuickTip) {
@@ -570,10 +583,6 @@ public class ListView<M extends ModelData> extends BoxComponent {
     if (store != null && store.getCount() > 0) {
       refresh();
     }
-    List<M> list = sm.getSelectedItems();
-    for (M m : list) {
-      onSelectChange(m, true);
-    }
   }
 
   protected List<M> collectData(List<M> models, int startIndex) {
@@ -590,11 +599,21 @@ public class ListView<M extends ModelData> extends BoxComponent {
   }
 
   protected void focusItem(int index) {
-    Element elem = all.getElement(index);
+    Element elem = getElement(index);
     if (elem != null) {
       fly(elem).scrollIntoView(getElement(), false);
     }
     focus();
+  }
+
+  protected void onHighlightRow(int index, boolean highLight) {
+    Element e = getElement(index);
+    if (e != null) {
+      fly(e).setStyleName("x-view-highlightrow", highLight);
+      if (highLight && GXT.isAriaEnabled()) {
+        setAriaState("aria-activedescendant", e.getId());
+      }
+    }
   }
 
   protected void initComponent() {
@@ -636,7 +655,8 @@ public class ListView<M extends ModelData> extends BoxComponent {
 
       @Override
       public void storeUpdate(StoreEvent<M> se) {
-        onUpdate(se.getModel(), se.getIndex());
+        int index = store.indexOf(se.getModel());
+        onUpdate(se.getModel(), index);
       }
 
     };
@@ -652,6 +672,11 @@ public class ListView<M extends ModelData> extends BoxComponent {
       Element[] e = Util.toElementArray(nodes);
       all.insert(e, index);
       el().insertChild(e, index);
+      if (GXT.isAriaEnabled()) {
+        for (int i = 0; i < e.length; i++) {
+          e[i].setId(XDOM.getUniqueId());
+        }
+      }
       updateIndexes(index, -1);
     }
   }
@@ -671,6 +696,10 @@ public class ListView<M extends ModelData> extends BoxComponent {
 
   protected void onDoubleClick(ListViewEvent<M> e) {
     fireEvent(Events.DoubleClick, e);
+  }
+
+  protected void onFocus(ComponentEvent ce) {
+    FocusFrame.get().frame(this);
   }
 
   protected void onMouseDown(ListViewEvent<M> e) {
@@ -725,40 +754,48 @@ public class ListView<M extends ModelData> extends BoxComponent {
     super.onRender(target, index);
     setElement(DOM.createDiv(), target, index);
 
-    el().setStyleAttribute("overflow", "auto");
-    el().setStyleAttribute("padding", "0px");
-    el().setStyleAttribute("zoom", 1);
-    if (!GXT.isIE) {
-      el().setTabIndex(0);
-    }
+    el().setTabIndex(0);
+    el().setElementAttribute("hideFocus", "true");
+
+    String aria = GXT.isAriaEnabled() ? " role='option' aria-selected='false' " : "";
 
     if (template == null) {
-      template = XTemplate.create("<tpl for=\".\"><div class='x-view-item'>{" + displayProperty + "}</div></tpl>");
+      template = XTemplate.create("<tpl for=\".\"><div class='x-view-item' " + aria + ">{" + displayProperty
+          + "}</div></tpl>");
     }
-    
+
     if (enableQuickTip) {
       quickTip = new QuickTip(this);
     }
 
-    disableTextSelection(true);
-    sinkEvents(Event.ONCLICK | Event.ONDBLCLICK | Event.MOUSEEVENTS);
+    if (GXT.isAriaEnabled()) {
+      setAriaRole("listbox");
+      SelectionMode mode = getSelectionModel().getSelectionMode();
+      setAriaState("aria-multiselectable", mode != SelectionMode.SINGLE ? "true" : "false");
+      setAriaRole("listbox");
+    }
+    
+    sinkEvents(Event.ONCLICK | Event.ONDBLCLICK | Event.MOUSEEVENTS | Event.FOCUSEVENTS | Event.ONKEYDOWN);
   }
 
   protected void onSelectChange(M model, boolean select) {
     if (rendered && all != null) {
       int index = store.indexOf(model);
       if (index != -1 && index < all.getCount()) {
-        if (select) {
-          fly(all.getElement(index)).addStyleName(selectStyle);
-        } else {
-          fly(all.getElement(index)).removeStyleName(selectStyle);
+        Element e = all.getElement(index);
+        fly(e).setStyleName(selectStyle, select);
+        fly(e).removeStyleName(overStyle);
+        if (GXT.isAriaEnabled()) {
+          e.setAttribute("aria-selected", "" + select);
+          if (select) {
+            setAriaState("aria-activedescendant", e.getId());
+          }
         }
-        fly(all.getElement(index)).removeStyleName(overStyle);
       }
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void onUpdate(M model, int index) {
     if (rendered) {
       Element original = all.getElement(index);
@@ -785,13 +822,13 @@ public class ListView<M extends ModelData> extends BoxComponent {
         silent = ((BaseModel) model).isSilent();
         ((BaseModel) model).setSilent(true);
       }
-      
+
       M m = modelProcessor.prepareData(model);
-      
+
       if (model instanceof BaseModel) {
         ((BaseModel) model).setSilent(silent);
       }
-      
+
       return m;
     }
     return model;

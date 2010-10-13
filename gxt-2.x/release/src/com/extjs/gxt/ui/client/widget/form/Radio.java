@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -47,16 +47,17 @@ public class Radio extends CheckBox {
       value = new Boolean(false);
     }
     focusValue = value;
-    super.setValue(value);
     if (value && group != null) {
       group.onRadioSelected(this);
     }
+    super.setValue(value);
   }
 
   @Override
   protected void fireChangeEvent(Object oldValue, Object value) {
     super.fireChangeEvent(oldValue, value);
-    if (!Util.equalWithNull(oldValue, value) && group != null) {
+    if (value != null && value instanceof Boolean && ((Boolean) value).booleanValue()
+        && !Util.equalWithNull(oldValue, value) && group != null) {
       FieldEvent e = new FieldEvent(group);
       e.setOldValue(oldValue);
       e.setValue(value);
@@ -66,15 +67,16 @@ public class Radio extends CheckBox {
 
   @Override
   protected void onClick(ComponentEvent be) {
+    // if we click the boxLabel, the browser fires an own click event
+    // automatically, so we ignore one of it
+    if (boxLabelEl != null && boxLabelEl.dom.isOrHasChild(be.getTarget())) {
+      return;
+    }
     if (readOnly) {
       be.stopEvent();
       return;
     }
-    if (group != null) {
-      group.onRadioClick(this);
-    } else {
-      setValue(true);
-    }
+    setValue(true);
   }
 
 }

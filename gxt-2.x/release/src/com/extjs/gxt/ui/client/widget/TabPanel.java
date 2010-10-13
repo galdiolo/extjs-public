@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -13,6 +13,7 @@ import java.util.Stack;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.aria.FocusFrame;
+import com.extjs.gxt.ui.client.aria.FocusManager;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -28,6 +29,7 @@ import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.util.Params;
 import com.extjs.gxt.ui.client.util.Size;
+import com.extjs.gxt.ui.client.widget.TabItem.HeaderItem;
 import com.extjs.gxt.ui.client.widget.layout.CardLayout;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
@@ -143,8 +145,8 @@ public class TabPanel extends Container<TabItem> {
    */
   public class TabPanelMessages {
 
-    private String closeText = GXT.MESSAGES.tabPanelItem_closeText();
     private String closeOtherText = GXT.MESSAGES.tabPanelItem_closeOtherText();
+    private String closeText = GXT.MESSAGES.tabPanelItem_closeText();
 
     /**
      * Returns the close other text.
@@ -190,7 +192,7 @@ public class TabPanel extends Container<TabItem> {
    * Tab position enumeration.
    */
   public enum TabPosition {
-    TOP, BOTTOM;
+    BOTTOM, TOP;
   }
 
   private class AccessStack {
@@ -227,27 +229,27 @@ public class TabPanel extends Container<TabItem> {
 
   protected Menu closeContextMenu;
 
+  private TabItem activeItem;
+  private boolean animScroll = false;
+  private boolean autoSelect = true;
+  private El body, bar, stripWrap, strip;
   private boolean bodyBorder = true;
   private boolean border = true;
-  private int tabMargin = 2;
-  private int scrollIncrement = 100;
-  private int minTabWidth = 30;
-  private int scrollDuration = 150;
-  private boolean resizeTabs = false;
-  private TabPosition tabPosition = TabPosition.TOP;
-  private int tabWidth = 120;
-  private boolean tabScroll = false;
-  private boolean autoSelect = true;
-  private boolean animScroll = false;
-  private TabItem activeItem;
-  private El body, bar, stripWrap, strip;
-  private El edge, scrollLeft, scrollRight;
   private CardLayout cardLayout;
+  private boolean closeMenu = false;
+  private El edge, scrollLeft, scrollRight;
+  private TabPanelMessages messages;
+  private int minTabWidth = 30;
+  private boolean plain;
+  private boolean resizeTabs = false;
+  private int scrollDuration = 150;
+  private int scrollIncrement = 100;
   private boolean scrolling;
   private AccessStack stack;
-  private boolean plain;
-  private boolean closeMenu = false;
-  private TabPanelMessages messages;
+  private int tabMargin = 2;
+  private TabPosition tabPosition = TabPosition.TOP;
+  private boolean tabScroll = false;
+  private int tabWidth = 120;
 
   /**
    * Creates a new tab panel.
@@ -688,7 +690,7 @@ public class TabPanel extends Container<TabItem> {
    */
   public void setSelection(TabItem item) {
     TabPanelEvent tpe = new TabPanelEvent(this, item);
-    if (item == null || !fireEvent(Events.BeforeSelect, tpe) || !item.fireEvent(Events.BeforeSelect, tpe)) {
+    if (item == null || item.getParent() != this || !fireEvent(Events.BeforeSelect, tpe) || !item.fireEvent(Events.BeforeSelect, tpe)) {
       return;
     }
 
@@ -700,8 +702,14 @@ public class TabPanel extends Container<TabItem> {
     if (activeItem != item) {
       if (activeItem != null) {
         activeItem.header.removeStyleName("x-tab-strip-active");
+        if (GXT.isAriaEnabled()) {
+          Accessibility.setState(activeItem.header.getElement(), "aria-selected", "false");
+        }
       }
       item.header.addStyleName("x-tab-strip-active");
+      if (GXT.isAriaEnabled()) {
+        Accessibility.setState(item.header.getElement(), "aria-selected", "true");
+      }
       activeItem = item;
       stack.add(activeItem);
       cardLayout.setActiveItem(activeItem);
@@ -775,7 +783,7 @@ public class TabPanel extends Container<TabItem> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   protected ContainerEvent createContainerEvent(TabItem item) {
     return new TabPanelEvent(this, item);
   }
@@ -835,6 +843,9 @@ public class TabPanel extends Container<TabItem> {
 
   protected void onFocus(ComponentEvent ce) {
     FocusFrame.get().frame(this);
+    if (GXT.isAriaEnabled() && !FocusManager.get().isManaged()) {
+      return;
+    }
     if (getItemCount() > 0 && getSelectedItem() == null) {
       setSelection(getItem(0));
     } else if (getSelectedItem() != null) {
@@ -870,6 +881,12 @@ public class TabPanel extends Container<TabItem> {
     if (closeMenu) {
       if (closeContextMenu == null) {
         closeContextMenu = new Menu();
+        closeContextMenu.addListener(Events.Hide, new Listener<MenuEvent>() {
+          public void handleEvent(MenuEvent be) {
+            be.getContainer().setData("tab", null);
+          }
+        });
+
         closeContextMenu.add(new MenuItem(messages.getCloseText(), new SelectionListener<MenuEvent>() {
           @Override
           public void componentSelected(MenuEvent ce) {
@@ -933,7 +950,18 @@ public class TabPanel extends Container<TabItem> {
           setSelection(getItem(getItemCount() - 1));
         }
         break;
-
+      case KeyCodes.KEY_ENTER:
+        if (GXT.isAriaEnabled()) {
+          Component c = ComponentManager.get().find(ce.getTarget());
+          if (c != null && c instanceof HeaderItem) {
+            TabItem ti = (TabItem) ((HeaderItem) c).getParent();
+            if (activeItem != ti) {
+              setSelection(ti);
+              ce.preventDefault();
+            }
+          }
+        }
+        break;
     }
   }
 
@@ -945,6 +973,12 @@ public class TabPanel extends Container<TabItem> {
         focusTab(activeItem, true);
       }
     }
+  }
+
+  @Override
+  protected void onRemove(TabItem item) {
+    super.onRemove(item);
+    item.tabPanel = null;
   }
 
   @Override
@@ -977,16 +1011,21 @@ public class TabPanel extends Container<TabItem> {
     }
 
     String pos = tabPosition == TabPosition.BOTTOM ? "bottom" : "top";
-    stripWrap = bar.createChild("<div class=x-tab-strip-wrap><ul class='x-tab-strip x-tab-strip-" + pos + "'></ul>");
+    stripWrap = bar.createChild("<div class=x-tab-strip-wrap><ul class='x-tab-strip x-tab-strip-" + pos
+        + "' role='tablist'></ul>");
     Accessibility.setRole(stripWrap.dom, "presentation");
 
-    bar.createChild("<div class=x-tab-strip-spacer></div>");
+    if (tabPosition == TabPosition.TOP) {
+      bar.createChild("<div class=x-tab-strip-spacer></div>");
+    } else {
+      bar.insertFirst("<div class=x-tab-strip-spacer></div>");
+    }
     strip = stripWrap.firstChild();
     edge = strip.createChild("<li class=x-tab-edge role='presentation'></li>");
     strip.createChild("<div class='x-clear' role='presentation'></div>");
 
     if (plain) {
-      String p = tabPosition == TabPosition.BOTTOM ? "bottom" : "header";
+      String p = tabPosition == TabPosition.BOTTOM ? "footer" : "header";
       bar.addStyleName(baseStyle + "-" + p + "-plain");
     }
 
@@ -1013,8 +1052,6 @@ public class TabPanel extends Container<TabItem> {
     el().setElementAttribute("hideFocus", "true");
 
     if (GXT.isAriaEnabled()) {
-      Accessibility.setRole(getElement(), Accessibility.ROLE_TABLIST);
-
       if (!getTitle().equals("")) {
         Accessibility.setState(getElement(), "aria-label", getTitle());
       }
@@ -1088,7 +1125,7 @@ public class TabPanel extends Container<TabItem> {
       item.template = itemTemplate;
     }
     item.header.setElement(item.template.create(p));
-    item.header.sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS);
+    item.header.sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS | Event.ONCONTEXTMENU);
 
     if (item.getIcon() != null) {
       item.setIcon(item.getIcon());
@@ -1185,7 +1222,7 @@ public class TabPanel extends Container<TabItem> {
     if (GXT.isAriaEnabled()) {
       item.getHeader().el().focus();
       FocusFrame.get().frame(this);
-    } 
+    }
   }
 
   private int getScollPos() {
@@ -1238,6 +1275,9 @@ public class TabPanel extends Container<TabItem> {
     if (!GXT.isAriaEnabled()) {
       item.header.el().setElementAttribute("hideFocus", "true");
       item.header.el().setStyleAttribute("-moz-outline", "none");
+    } else {
+      Accessibility.setState(item.header.getElement(), "aria-controls", item.getId());
+      item.getAriaSupport().setLabelledBy(item.header.getId());
     }
   }
 

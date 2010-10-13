@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -13,34 +13,12 @@ package com.extjs.gxt.ui.client.event;
  */
 public class DragListener implements Listener<DragEvent> {
 
-  public void handleEvent(DragEvent de) {
-    EventType type = de.getType();
-    if (type == Events.DragCancel) {
-      dragCancel(de);
-    } else if (type == Events.DragEnd){
-      dragEnd(de);
-    } else if (type == Events.DragMove) {
-      dragMove(de);
-    } else if (type == Events.DragStart) {
-      dragStart(de);
-    } 
-  }
-
   /**
-   * Fires after a drag begins.
+   * Fires after a drag is cancelled.
    * 
    * @param de the drag event
    */
-  public void dragStart(DragEvent de) {
-
-  }
-
-  /**
-   * Fires after the mouse moves.
-   * 
-   * @param de the drag event
-   */
-  public void dragMove(DragEvent de) {
+  public void dragCancel(DragEvent de) {
 
   }
 
@@ -54,12 +32,45 @@ public class DragListener implements Listener<DragEvent> {
   }
 
   /**
-   * Fires after a drag is cancelled.
+   * Fires after the mouse leaves.
    * 
    * @param de the drag event
    */
-  public void dragCancel(DragEvent de) {
+  public void dragLeave(DragEvent de) {
 
+  }
+  
+  /**
+   * Fires after the mouse moves.
+   * 
+   * @param de the drag event
+   */
+  public void dragMove(DragEvent de) {
+
+  }
+
+  /**
+   * Fires after a drag begins.
+   * 
+   * @param de the drag event
+   */
+  public void dragStart(DragEvent de) {
+
+  }
+
+  public void handleEvent(DragEvent de) {
+    EventType type = de.getType();
+    if (type == Events.DragCancel) {
+      dragCancel(de);
+    } else if (type == Events.DragEnd){
+      dragEnd(de);
+    } else if (type == Events.DragMove) {
+      dragMove(de);
+    } else if (type == Events.DragStart) {
+      dragStart(de);
+    } else if (type == Events.DragLeave) {
+      dragLeave(de);
+    }
   }
 
 }

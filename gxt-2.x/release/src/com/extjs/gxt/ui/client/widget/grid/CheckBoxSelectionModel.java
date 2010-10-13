@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -9,6 +9,7 @@ package com.extjs.gxt.ui.client.widget.grid;
 
 import java.util.List;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.Events;
@@ -18,6 +19,7 @@ import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.store.StoreEvent;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentPlugin;
+import com.extjs.gxt.ui.client.widget.grid.ColumnHeader.Head;
 import com.google.gwt.user.client.Event;
 
 /**
@@ -35,6 +37,7 @@ import com.google.gwt.user.client.Event;
 public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionModel<M> implements ComponentPlugin {
 
   protected ColumnConfig config;
+  protected String headerCheckTitle = "Select All";
 
   public CheckBoxSelectionModel() {
     super();
@@ -73,11 +76,39 @@ public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionMo
           onHeaderClick(e);
         } else if (e.getType() == Events.ViewReady) {
           setChecked(getSelection().size() == grid.getStore().getCount());
+          
+          Head h = grid.getView().getHeader().getHead(grid.getColumnModel().indexOf(config));
+          if (h != null) {
+            h.getElement().removeAttribute("aria-haspopup");
+            if (GXT.isAriaEnabled()) {
+              h.getElement().setTitle(headerCheckTitle);
+            }
+          }
+          
+        } else if (e.getEventTypeInt() == Event.ONKEYPRESS) {
+          if (selectedHeader != null && e.getKeyCode() == 32) {
+            int idx = grid.getView().getHeader().indexOf(selectedHeader);
+            if (grid.getColumnModel().getColumn(idx) == config) {
+              boolean isChecked = selectedHeader.el().getParent().hasStyleName("x-grid3-hd-checker-on");
+              Head h = selectedHeader;
+              h.getElement().getFirstChildElement().setAttribute("aria-selected", isChecked ? "true" : "false");
+              if (isChecked) {
+                setChecked(false);
+                deselectAll();
+              } else {
+                setChecked(true);
+                selectAll();
+              }
+              selectedHeader = h;
+              grid.getView().getHeader().selectHeader(selectedHeader.column);
+            }
+          }
         }
       }
     };
     grid.addListener(Events.HeaderClick, listener);
     grid.addListener(Events.ViewReady, listener);
+    grid.addListener(Events.OnKeyPress, listener);
     this.store = grid.getStore();
   }
 
@@ -114,6 +145,7 @@ public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionMo
     if (c == config) {
       El hd = e.getTargetEl().getParent();
       boolean isChecked = hd.hasStyleName("x-grid3-hd-checker-on");
+      hd.dom.getFirstChildElement().setAttribute("aria-selected", isChecked ? "false" : "true");
       if (isChecked) {
         setChecked(false);
         deselectAll();

@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -101,7 +101,7 @@ public class TreeDragSource extends DragSource {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void onDragStart(DNDEvent e) {
     TreeItem item = tree.findItem(e.getTarget());
     if (item == null || e.getTarget(".my-tree-joint", 3) != null) {

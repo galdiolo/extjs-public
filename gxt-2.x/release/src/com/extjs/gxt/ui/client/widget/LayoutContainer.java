@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -9,6 +9,7 @@ package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.aria.FocusFrame;
+import com.extjs.gxt.ui.client.aria.FocusManager;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
@@ -39,8 +40,7 @@ import com.google.gwt.user.client.ui.Widget;
  * container.add(new Button(&quot;Click Me&quot;));
  * container.setSize(300, 300);
  * container.setBorders(true);
- * RootPanel.get().add(container);
- * </pre>
+ * RootPanel.get().add(container);</pre>
  * 
  * {@link FlowLayout} is the the default layout and will be used if not a layout
  * is not specified. You must size/position containers unless they are in an
@@ -93,6 +93,7 @@ public class LayoutContainer extends ScrollContainer<Component> {
    */
   public LayoutContainer() {
     enableLayout = true;
+    getAriaSupport().setIgnore(true);
   }
 
   /**
@@ -325,36 +326,36 @@ public class LayoutContainer extends ScrollContainer<Component> {
         break;
     }
   }
-  
+
   protected void onFocus(ComponentEvent ce) {
-    if (GXT.isAriaEnabled()) {
-      if (isAriaIgnore()){
-         for (int i = 0; i < getItemCount(); i++) {
-           Component c = getItem(i);
-           if (!c.isAriaIgnore()) {
-             c.focus();
-             break;
-           }
-         }
+    if (GXT.isAriaEnabled() && FocusManager.get().isManaged()) {
+      if (getAriaSupport().isIgnore()) {
+        for (int i = 0; i < getItemCount(); i++) {
+          Component c = getItem(i);
+          if (!c.getAriaSupport().isIgnore()) {
+            c.focus();
+            break;
+          }
+        }
       } else {
         FocusFrame.get().frame(this);
       }
     }
   }
-  
+
   protected void onBlur(ComponentEvent ce) {
     if (GXT.isAriaEnabled()) {
       FocusFrame.get().unframe();
     }
   }
-  
+
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
     if (el() == null) {
       setElement(DOM.createDiv(), parent, index);
     }
 
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isAriaEnabled() && !getAriaSupport().isIgnore()) {
       el().setTabIndex(0);
       el().setElementAttribute("hideFocus", "true");
       sinkEvents(Event.FOCUSEVENTS);

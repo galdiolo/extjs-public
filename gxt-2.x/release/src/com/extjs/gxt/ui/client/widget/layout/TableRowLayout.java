@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -12,7 +12,6 @@ import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Container;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.ui.Accessibility;
 
 /**
  * A single row TableLayout.
@@ -36,6 +35,7 @@ public class TableRowLayout extends TableLayout {
     }
 
     El td = new El(DOM.createTD());
+    td.dom.setAttribute("role", "presentation");
 
     if (data.horizontalAlign != null) {
       td.dom.setPropertyString("align", data.horizontalAlign.name());
@@ -82,9 +82,7 @@ public class TableRowLayout extends TableLayout {
     target.removeChildren();
 
     table = DOM.createTable().cast();
-    if (container.isAriaIgnore()) {
-      Accessibility.setRole((Element)table.cast(), "presentation");
-    }
+    table.setAttribute("role", "presentation");
     
     if (getTableStyle() != null) {
       fly(table).applyStyles(getTableStyle());
@@ -113,16 +111,20 @@ public class TableRowLayout extends TableLayout {
     table.appendChild(tbody);
 
     row = DOM.createTR();
+    row.setAttribute("role", "presentation");
     DOM.appendChild(tbody, row);
 
     if (getInsertSpacer()) {
       Element td = DOM.createTD();
+      td.setAttribute("role", "presentation");
       fly(td).setWidth("100%");
       DOM.appendChild(row, td);
     }
 
     target.dom.appendChild(table);
     renderAll(container, target);
+    
+    table.getFirstChildElement().setAttribute("role", "presentation");
   }
 
   @Override

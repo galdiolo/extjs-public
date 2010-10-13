@@ -1,12 +1,13 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
  */
 package com.extjs.gxt.ui.client.widget;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.aria.FocusFrame;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XDOM;
@@ -27,16 +28,20 @@ public class InputSlider extends Slider {
   protected int inputWidth = 22;
 
   public InputSlider() {
-    input = new NumberField() {
-      @Override
-      protected void onFocus(ComponentEvent be) {
-        FocusFrame.get().unframe();
-        super.onFocus(be);
-        setValue(InputSlider.this.getValue());
-      }
-    };
-    input.setParent(this);
-    input.setData("gxt-input-slider", "true");
+    if (GXT.isAriaEnabled()) {
+      inputWidth = 9;
+    } else {
+      input = new NumberField() {
+        @Override
+        protected void onFocus(ComponentEvent be) {
+          FocusFrame.get().unframe();
+          super.onFocus(be);
+          setValue(InputSlider.this.getValue());
+        }
+      };
+      input.setParent(this);
+      input.setData("gxt-input-slider", "true");
+    }
   }
 
   @Override
@@ -68,26 +73,30 @@ public class InputSlider extends Slider {
    * @param inputWidth the input width
    */
   public void setInputWidth(int inputWidth) {
-    this.inputWidth = inputWidth;
+    if (!GXT.isAriaEnabled()) {
+      this.inputWidth = inputWidth;
+    }
   }
 
   @Override
   protected void onAttach() {
     super.onAttach();
-    ComponentHelper.doAttach(input);
+    if (!GXT.isAriaEnabled()) ComponentHelper.doAttach(input);
   }
 
   protected void onClick(ComponentEvent ce) {
-    if (ce.getTarget() == input.getElement().getFirstChildElement()) {
-      return;
+    if (!GXT.isAriaEnabled()) {
+      if (ce.getTarget() == input.getElement().getFirstChildElement()) {
+        return;
+      }
     }
     super.onClick(ce);
   }
-  
+
   @Override
   protected void onDetach() {
     super.onDetach();
-    ComponentHelper.doDetach(input);
+    if (!GXT.isAriaEnabled()) ComponentHelper.doDetach(input);
   }
 
   protected void onInputChange(FieldEvent be) {
@@ -95,7 +104,7 @@ public class InputSlider extends Slider {
     int value = ((Double) be.getValue()).intValue();
     setValue(value);
   }
-  
+
   @Override
   protected void onRender(Element target, int index) {
     StringBuffer sb = new StringBuffer();
@@ -111,18 +120,20 @@ public class InputSlider extends Slider {
     inputCt = el().selectNode(".x-slider-input").dom;
     sliderCt = el().selectNode(".x-slider-ct").dom;
 
-    input.setWidth(inputWidth);
-    input.addListener(Events.Change, new Listener<FieldEvent>() {
-      public void handleEvent(FieldEvent be) {
-        onInputChange(be);
-      }
-    });
-    input.setId(getId());
-
-    input.render(inputCt);
+    if (!GXT.isAriaEnabled()) {
+      input.setWidth(inputWidth);
+      input.addListener(Events.Change, new Listener<FieldEvent>() {
+        public void handleEvent(FieldEvent be) {
+          onInputChange(be);
+        }
+      });
+      input.setId(getId());
+      input.setReadOnly(true);
+      input.render(inputCt);
+    }
 
     super.onRender(sliderCt, 0);
-    
+
     el().selectNode(".x-slider").dom.setPropertyString("__listener", "");
   }
 
@@ -138,7 +149,11 @@ public class InputSlider extends Slider {
   @Override
   protected void onValueChange(int value) {
     super.onValueChange(value);
-    input.setValue(value);
+    if (GXT.isAriaEnabled()) {
+      inputCt.setInnerHTML("" + value);
+    } else {
+      input.setValue(value);
+    }
   }
 
 }

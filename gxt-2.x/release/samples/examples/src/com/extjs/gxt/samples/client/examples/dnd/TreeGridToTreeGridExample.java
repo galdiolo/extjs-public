@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -41,7 +41,7 @@ import com.google.gwt.user.client.Element;
 public class TreeGridToTreeGridExample extends LayoutContainer {
 
   private TreeGridDropTarget target;
-  
+
   @Override
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
@@ -66,12 +66,12 @@ public class TreeGridToTreeGridExample extends LayoutContainer {
     cp.setFrame(true);
     cp.setHeading("TreeGrid to TreeGrid Example");
     cp.setButtonAlign(HorizontalAlignment.CENTER);
-    
+
     VBoxLayout layout = new VBoxLayout();
     layout.setVBoxLayoutAlign(VBoxLayoutAlign.STRETCH);
     cp.setLayout(layout);
     cp.setSize(500, 500);
-    
+
     ToolBar toolBar = new ToolBar();
     toolBar.setBorders(true);
     toolBar.add(new LabelToolItem("Feedback: "));
@@ -109,15 +109,13 @@ public class TreeGridToTreeGridExample extends LayoutContainer {
     TreeStore<ModelData> dropStore = new TreeStore<ModelData>();
     dropStore.add(f, false);
 
-  
-
     tree = new TreeGrid<ModelData>(dropStore, cm) {
       @Override
-      protected boolean hasChildren(ModelData model) {
-        if ("My Music".equals(model.get("name")) || model instanceof Folder) {
+      protected boolean hasChildren(ModelData m) {
+        if ("My Music".equals(m.get("name")) || m instanceof Folder) {
           return true;
         }
-        return super.hasChildren(model);
+        return super.hasChildren(m);
       }
     };
     tree.setBorders(true);
@@ -126,7 +124,7 @@ public class TreeGridToTreeGridExample extends LayoutContainer {
     tree.setTrackMouseOver(false);
 
     target = new TreeGridDropTarget(tree);
-    
+
     data = new VBoxLayoutData();
     data.setFlex(10);
     cp.add(tree, data);

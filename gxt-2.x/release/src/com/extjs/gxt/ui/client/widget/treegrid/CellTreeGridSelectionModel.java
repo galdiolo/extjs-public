@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.widget.treegrid;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
@@ -18,8 +19,9 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.widget.grid.CellSelectionModel;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
+import com.google.gwt.event.dom.client.KeyCodes;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked","rawtypes"})
 public class CellTreeGridSelectionModel<M extends ModelData> extends CellSelectionModel<M> {
 
   protected TreeGrid tree;
@@ -79,6 +81,17 @@ public class CellTreeGridSelectionModel<M extends ModelData> extends CellSelecti
   @Override
   protected void onAdd(List<? extends M> models) {
 
+  }
+  
+  @Override
+  protected void onKeyPress(GridEvent<M> e) {
+    super.onKeyPress(e);
+    if (GXT.isAriaEnabled()) {
+      int kc = e.getKeyCode();
+      if (kc == KeyCodes.KEY_ENTER && selection != null && !(grid instanceof EditorTreeGrid<?>)) {
+        tree.toggle(selection.model);
+      }
+    }
   }
 
   @Override

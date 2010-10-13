@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -29,6 +29,7 @@ import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.Radio;
 import com.extjs.gxt.ui.client.widget.form.RadioGroup;
 import com.extjs.gxt.ui.client.widget.form.SliderField;
+import com.extjs.gxt.ui.client.widget.form.SpinnerField;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.form.TimeField;
@@ -36,6 +37,7 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Element;
 
 public class FormsExample extends LayoutContainer {
@@ -64,6 +66,7 @@ public class FormsExample extends LayoutContainer {
     TextField<String> firstName = new TextField<String>();
     firstName.setFieldLabel("Name");
     firstName.setAllowBlank(false);
+    firstName.setData("aria-previous", simple.getButtonBar().getId());
     simple.add(firstName, formData);
 
     TextField<String> email = new TextField<String>();
@@ -162,6 +165,15 @@ public class FormsExample extends LayoutContainer {
 
     FormButtonBinding binding = new FormButtonBinding(simple);
     binding.addButton(b);
+
+    SpinnerField spinnerField = new SpinnerField();
+    spinnerField.setIncrement(.1d);
+    spinnerField.getPropertyEditor().setType(Double.class);
+    spinnerField.getPropertyEditor().setFormat(NumberFormat.getFormat("00.0"));
+    spinnerField.setFieldLabel("Duration&nbsp;(s)");
+    spinnerField.setMinValue(-10d);
+    spinnerField.setMaxValue(10d);
+    simple.add(spinnerField, formData);
 
     vp.add(simple);
   }

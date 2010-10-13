@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.store;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.data.SortInfo;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.store.Record.RecordUpdate;
 
@@ -26,6 +27,7 @@ public class StoreEvent<M extends ModelData> extends BaseEvent {
   private RecordUpdate operation;
   private Record record;
   private Store<? extends M> store;
+  private SortInfo sortInfo;
 
   /**
    * Creates a new store event.
@@ -83,6 +85,15 @@ public class StoreEvent<M extends ModelData> extends BaseEvent {
   }
 
   /**
+   * Returns the store sort info.
+   * 
+   * @return the sort info
+   */
+  public SortInfo getSortInfo() {
+    return sortInfo;
+  }
+
+  /**
    * Returns the store.
    * 
    * @return the store
@@ -134,6 +145,15 @@ public class StoreEvent<M extends ModelData> extends BaseEvent {
    */
   public void setRecord(Record record) {
     this.record = record;
+  }
+
+  /**
+   * Sets the store sort info.
+   * 
+   * @param sortInfo the sort info
+   */
+  public void setSortInfo(SortInfo sortInfo) {
+    this.sortInfo = sortInfo;
   }
 
   /**

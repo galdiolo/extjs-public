@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -16,15 +16,17 @@ import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
+import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.ColorPalette;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
-import com.extjs.gxt.ui.client.widget.WidgetComponent;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.ToggleButton;
+import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.menu.ColorMenu;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
@@ -32,19 +34,18 @@ import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.event.dom.client.FocusHandler;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RichTextArea.BasicFormatter;
 import com.google.gwt.user.client.ui.RichTextArea.ExtendedFormatter;
 import com.google.gwt.user.client.ui.RichTextArea.FontSize;
@@ -66,7 +67,7 @@ import com.google.gwt.user.client.ui.impl.RichTextAreaImpl;
  * 
  * 
  * <dl>
- * <dt>Events:</dt>
+ * <dt><b>Events:</b></dt>
  * 
  * <dd><b>BeforeSync</b> : HtmlEditorEvent(htmlEditor, change)<br>
  * <div>Fires before the iframe editor is updated with content from the
@@ -228,7 +229,7 @@ public class HtmlEditor extends Field<String> {
     }
   }
 
-  protected class EventHandler implements ClickHandler, KeyUpHandler, FocusHandler, BlurHandler {
+  protected class EventHandler implements KeyDownHandler, ClickHandler, KeyUpHandler, FocusHandler, BlurHandler {
 
     public void onClick(ClickEvent event) {
       updateStatus();
@@ -240,12 +241,43 @@ public class HtmlEditor extends Field<String> {
       syncValue();
     }
 
+    public void onKeyDown(KeyDownEvent event) {
+      onEditorKeyDown(event);
+    }
+
     public void onFocus(FocusEvent event) {
 
     }
 
     public void onBlur(BlurEvent event) {
 
+    }
+  }
+
+  protected void onEditorKeyDown(KeyDownEvent e) {
+    int kc = e.getNativeKeyCode();
+    switch (kc) {
+      case 66:
+        if (e.isControlKeyDown()) {
+          e.stopPropagation();
+          e.preventDefault();
+          getBasicFormatter().toggleBold();
+        }
+        break;
+      case 73:
+        if (e.isControlKeyDown()) {
+          e.stopPropagation();
+          e.preventDefault();
+          getBasicFormatter().toggleItalic();
+        }
+        break;
+      case 85:
+        if (e.isControlKeyDown()) {
+          e.stopPropagation();
+          e.preventDefault();
+          getBasicFormatter().toggleUnderline();
+        }
+        break;
     }
   }
 
@@ -259,6 +291,7 @@ public class HtmlEditor extends Field<String> {
       addDomHandler(handler, FocusEvent.getType());
       addDomHandler(handler, BlurEvent.getType());
       addDomHandler(handler, KeyUpEvent.getType());
+      addDomHandler(handler, KeyDownEvent.getType());
     }
 
     @Override
@@ -542,7 +575,7 @@ public class HtmlEditor extends Field<String> {
   protected RichTextAreaImpl impl = GWT.create(RichTextAreaImpl.class);
 
   protected El textarea;
-  protected ToolBar toolbar;
+  protected ToolBar tb;
 
   // the toolbar buttons
   protected ToggleButton bold;
@@ -601,7 +634,7 @@ public class HtmlEditor extends Field<String> {
 
   @Override
   public void focus() {
-
+    el().selectNode("iframe").focus();
   }
 
   /**
@@ -694,7 +727,9 @@ public class HtmlEditor extends Field<String> {
   }
 
   public void pushValue() {
-    impl.setHTML(getInputEl().getValue());
+    if (isRendered()) {
+      impl.setHTML(getInputEl().getValue());
+    }
   }
 
   public void setEnableAlignments(boolean enableAlignments) {
@@ -747,7 +782,9 @@ public class HtmlEditor extends Field<String> {
   }
 
   public void syncValue() {
-    getInputEl().setValue(impl.getHTML());
+    if (isRendered()) {
+      getInputEl().setValue(impl.getHTML());
+    }
   }
 
   @Override
@@ -764,31 +801,55 @@ public class HtmlEditor extends Field<String> {
     ToolTipConfig cfg = new ToolTipConfig(toolTipTitle, toolTip);
     item.setToolTip(cfg);
 
+    if (GXT.isAriaEnabled()) {
+      item.setData("gxt-menutext", toolTipTitle);
+    }
+
     ColorMenu menu = new ColorMenu();
     menu.getColorPalette().addListener(Events.Select, listener);
     item.setMenu(menu);
     return item;
   }
 
-  protected ToggleButton createToggleButton(AbstractImagePrototype icon, String toolTip, String toolTipTitle) {
-    ToggleButton item = new ToggleButton();
+  protected ToggleButton createToggleButton(AbstractImagePrototype icon, final String tt, String toolTipTitle) {
+    ToggleButton item = new ToggleButton() {
+      @Override
+      protected void afterRender() {
+        super.afterRender();
+        if (GXT.isAriaEnabled()) buttonEl.dom.setTitle(tt);
+      }
+    };
     item.setTabIndex(-1);
 
-    ToolTipConfig cfg = new ToolTipConfig(toolTipTitle, toolTip);
+    ToolTipConfig cfg = new ToolTipConfig(toolTipTitle, tt);
     item.setToolTip(cfg);
+
+    if (GXT.isAriaEnabled()) {
+      item.setData("gxt-menutext", toolTipTitle);
+    }
 
     item.setIcon(icon);
     item.addSelectionListener(btnListener);
     return item;
   }
 
-  protected Button createButton(AbstractImagePrototype icon, String toolTip, String toolTipTitle) {
-    Button item = new Button();
+  protected Button createButton(AbstractImagePrototype icon, final String tt, String toolTipTitle) {
+    Button item = new Button() {
+      @Override
+      protected void afterRender() {
+        super.afterRender();
+        if (GXT.isAriaEnabled()) buttonEl.dom.setTitle(tt);
+      }
+    };
     item.setIcon(icon);
     item.setTabIndex(-1);
 
-    ToolTipConfig cfg = new ToolTipConfig(toolTipTitle, toolTip);
+    ToolTipConfig cfg = new ToolTipConfig(toolTipTitle, tt);
     item.setToolTip(cfg);
+
+    if (GXT.isAriaEnabled()) {
+      item.setData("gxt-menutext", toolTipTitle);
+    }
 
     item.addSelectionListener(btnListener);
     return item;
@@ -796,13 +857,41 @@ public class HtmlEditor extends Field<String> {
 
   protected void doAttachChildren() {
     super.doAttachChildren();
-    ComponentHelper.doAttach(toolbar);
+    ComponentHelper.doAttach(tb);
     ComponentHelper.doAttach(rte);
+  }
+
+  @Override
+  protected void afterRender() {
+    super.afterRender();
+    if (GXT.isHighContrastMode) {
+      setHighContrastImage(sourceEdit, "tb-source.gif");
+      setHighContrastImage(increasefontsize, "tb-font-increase.gif");
+      setHighContrastImage(decreasefontsize, "tb-font-decrease.gif");
+      setHighContrastImage(forecolor, "tb-font-color.gif");
+      setHighContrastImage(backcolor, "tb-font-highlight.gif");
+      setHighContrastImage(bold, "tb-bold.gif");
+      setHighContrastImage(italic, "tb-italic.gif");
+      setHighContrastImage(underline, "tb-underline.gif");
+      setHighContrastImage(justifyLeft, "tb-justify-left.gif");
+      setHighContrastImage(justifyCenter, "tb-justify-center.gif");
+      setHighContrastImage(justifyRight, "tb-justify-right.gif");
+      setHighContrastImage(ol, "tb-ol.gif");
+      setHighContrastImage(ul, "tb-ul.gif");
+      setHighContrastImage(link, "tb-link.gif");
+    }
+  }
+
+  protected void setHighContrastImage(Button btn, String image) {
+    if (btn != null) {
+      btn.el().selectNode("button").setWidth(18).setInnerHtml(
+          "<img src='" + GXT.RESOURCES_URL + "/images/default/editor/" + image + "'>");
+    }
   }
 
   protected void doDetachChildren() {
     super.doAttachChildren();
-    ComponentHelper.doDetach(toolbar);
+    ComponentHelper.doDetach(tb);
     ComponentHelper.doDetach(rte);
   }
 
@@ -819,8 +908,8 @@ public class HtmlEditor extends Field<String> {
   @Override
   protected void onDisable() {
     super.onDisable();
-    if (toolbar != null) {
-      toolbar.disable();
+    if (tb != null) {
+      tb.disable();
     }
     mask();
   }
@@ -828,15 +917,15 @@ public class HtmlEditor extends Field<String> {
   @Override
   protected void onEnable() {
     super.onEnable();
-    if (toolbar != null) {
-      toolbar.enable();
+    if (tb != null) {
+      tb.enable();
     }
     unmask();
   }
 
   @Override
   protected void onFocus(ComponentEvent ce) {
-
+    el().selectNode("iframe").focus();
   }
 
   @Override
@@ -852,9 +941,14 @@ public class HtmlEditor extends Field<String> {
     textarea.setStyleAttribute("border", "0 none");
     el().appendChild(textarea.dom);
     rte.render(el().dom);
-    setupToolbar();
+
+    if (!GXT.isAriaEnabled()) {
+      setupToolbar();
+    }
 
     super.onRender(target, index);
+
+    el().selectNode("iframe").setTitle(getFieldLabel() + " HTML Editor");
   }
 
   @Override
@@ -868,10 +962,10 @@ public class HtmlEditor extends Field<String> {
     aw -= frameWidth.width;
     ah -= frameWidth.height;
 
-    if (showToolbar) {
+    if (showToolbar && !GXT.isAriaEnabled()) {
       el().down(".x-html-editor-tb").setWidth(aw, true);
-      toolbar.setWidth(aw);
-      ah -= toolbar.getHeight();
+      tb.setWidth(aw);
+      ah -= tb.getHeight();
     }
     rte.setSize(aw, ah);
 
@@ -935,81 +1029,77 @@ public class HtmlEditor extends Field<String> {
         }
       };
 
-      toolbar = new ToolBar();
+      HtmlEditorImages g = getImages();
+      HtmlEditorMessages m = getMessages();
+
+      tb = new ToolBar();
+      ComponentHelper.setParent(this, tb);
       if (sourceEditMode) {
-        toolbar.add(sourceEdit = createToggleButton(getImages().getSource(), getMessages().getSourceEditTipText(),
-            getMessages().getSourceEditTipTitle()));
-        toolbar.add(new SeparatorToolItem());
+        tb.add(sourceEdit = createToggleButton(g.getSource(), m.getSourceEditTipText(), m.getSourceEditTipTitle()));
+        tb.add(new SeparatorToolItem());
       }
 
       if (getBasicFormatter() != null) {
         if (enableFont) {
-
-          final ListBox listBox = new ListBox();
-          listBox.addChangeHandler(new ChangeHandler() {
-            public void onChange(ChangeEvent event) {
-              ListBox listBox = (ListBox) event.getSource();
-              getBasicFormatter().setFontName(listBox.getValue(listBox.getSelectedIndex()));
+          final SimpleComboBox<String> fonts = new SimpleComboBox<String>();
+          fonts.setTriggerAction(TriggerAction.ALL);
+          fonts.add("Arial");
+          fonts.add("Times New Roman");
+          fonts.add("Verdana");
+          fonts.setEditable(false);
+          fonts.setSimpleValue("Arial");
+          fonts.addSelectionChangedListener(new SelectionChangedListener<SimpleComboValue<String>>() {
+            @Override
+            public void selectionChanged(SelectionChangedEvent<SimpleComboValue<String>> se) {
+              getBasicFormatter().setFontName(fonts.getSimpleValue());
             }
           });
-          listBox.addItem("Arial");
 
-          listBox.addItem("Times New Roman");
-          listBox.addItem("Verdana");
-
-          toolbar.add(new WidgetComponent(listBox));
-          toolbar.add(new SeparatorToolItem());
+          tb.add(fonts);
+          tb.add(new SeparatorToolItem());
         }
         if (enableFontSize) {
-          toolbar.add(increasefontsize = createButton(getImages().getFontIncrease(),
-              getMessages().getIncreaseFontSizeTipText(), getMessages().getIncreaseFontSizeTipTitle()));
-          toolbar.add(decreasefontsize = createButton(getImages().getFontDecrease(),
-              getMessages().getDecreaseFontSizeTipText(), getMessages().getDecreaseFontSizeTipTitle()));
+          tb.add(increasefontsize = createButton(g.getFontIncrease(), m.getIncreaseFontSizeTipText(),
+              m.getIncreaseFontSizeTipTitle()));
+          tb.add(decreasefontsize = createButton(g.getFontDecrease(), m.getDecreaseFontSizeTipText(),
+              m.getDecreaseFontSizeTipTitle()));
 
-          toolbar.add(new SeparatorToolItem());
+          tb.add(new SeparatorToolItem());
         }
         if (enableFormat) {
-          toolbar.add(bold = createToggleButton(getImages().getBold(), getMessages().getBoldTipText(),
-              getMessages().getBackColorTipTitle()));
-          toolbar.add(italic = createToggleButton(getImages().getItalic(), getMessages().getItalicTipText(),
-              getMessages().getItalicTipTitle()));
-          toolbar.add(underline = createToggleButton(getImages().getUnderline(), getMessages().getUnderlineTipText(),
-              getMessages().getUnderlineTipTitle()));
-          toolbar.add(new SeparatorToolItem());
+          tb.add(bold = createToggleButton(g.getBold(), m.getBoldTipText(), m.getBoldTipTitle()));
+          tb.add(italic = createToggleButton(g.getItalic(), m.getItalicTipText(), m.getItalicTipTitle()));
+          tb.add(underline = createToggleButton(g.getUnderline(), m.getUnderlineTipText(), m.getUnderlineTipTitle()));
+          tb.add(new SeparatorToolItem());
         }
         if (enableAlignments) {
-          toolbar.add(justifyLeft = createButton(getImages().getJustifyLeft(), getMessages().getJustifyLeftTipText(),
-              getMessages().getJustifyLeftTipTitle()));
-          toolbar.add(justifyCenter = createButton(getImages().getJustifyCenter(),
-              getMessages().getJustifyCenterTipText(), getMessages().getJustifyCenterTipTitle()));
-          toolbar.add(justifyRight = createButton(getImages().getJustifyRight(),
-              getMessages().getJustifyRightTipText(), getMessages().getJustifyRightTipTitle()));
-          toolbar.add(new SeparatorToolItem());
+          tb.add(justifyLeft = createButton(g.getJustifyLeft(), m.getJustifyLeftTipText(), m.getJustifyLeftTipTitle()));
+          tb.add(justifyCenter = createButton(g.getJustifyCenter(), m.getJustifyCenterTipText(),
+              m.getJustifyCenterTipTitle()));
+          tb.add(justifyRight = createButton(g.getJustifyRight(), m.getJustifyRightTipText(),
+              m.getJustifyRightTipTitle()));
+          tb.add(new SeparatorToolItem());
         }
       }
 
       if (getExtendedFormatter() != null) {
         if (enableLists) {
-          toolbar.add(ol = createButton(getImages().getOl(), getMessages().getOlTipText(),
-              getMessages().getOlTipTitle()));
-          toolbar.add(ul = createButton(getImages().getUl(), getMessages().getUlTipText(),
-              getMessages().getUlTipTitle()));
-          toolbar.add(new SeparatorToolItem());
+          tb.add(ol = createButton(g.getOl(), m.getOlTipText(), m.getOlTipTitle()));
+          tb.add(ul = createButton(g.getUl(), m.getUlTipText(), m.getUlTipTitle()));
+          tb.add(new SeparatorToolItem());
         }
         if (enableLinks) {
-          toolbar.add(link = createButton(getImages().getLink(), getMessages().getLinkTipText(),
-              getMessages().getLinkTipTitle()));
-          toolbar.add(new SeparatorToolItem());
+          tb.add(link = createButton(g.getLink(), m.getLinkTipText(), m.getLinkTipTitle()));
+          tb.add(new SeparatorToolItem());
         }
         if (enableColors) {
-          toolbar.add(forecolor = createColorButton(getImages().getFontColor(), getMessages().getForeColorTipText(),
-              getMessages().getForColorTipTitle(), new Listener<ComponentEvent>() {
+          tb.add(forecolor = createColorButton(g.getFontColor(), m.getForeColorTipText(), m.getForColorTipTitle(),
+              new Listener<ComponentEvent>() {
                 public void handleEvent(ComponentEvent be) {
                   getBasicFormatter().setForeColor(((ColorPalette) be.getComponent()).getValue());
                 }
               }));
-          toolbar.add(backcolor = createColorButton(getImages().getFontHighlight(),
-              getMessages().getBackColorTipText(), getMessages().getBackColorTipTitle(),
+          tb.add(backcolor = createColorButton(g.getFontHighlight(), m.getBackColorTipText(), m.getBackColorTipTitle(),
               new Listener<ComponentEvent>() {
                 public void handleEvent(ComponentEvent be) {
                   getBasicFormatter().setBackColor(((ColorPalette) be.getComponent()).getValue());
@@ -1020,7 +1110,8 @@ public class HtmlEditor extends Field<String> {
       Element e = DOM.createDiv();
       e.setClassName("x-html-editor-tb");
       el().insertFirst(e);
-      toolbar.render(e);
+      tb.render(e);
+
     }
   }
 
@@ -1034,7 +1125,7 @@ public class HtmlEditor extends Field<String> {
       rte.el().removeStyleName("x-hidden");
       textarea.addStyleName("x-hidden");
     }
-    for (Component item : toolbar.getItems()) {
+    for (Component item : tb.getItems()) {
       if (item != sourceEdit) {
         item.setEnabled(!item.isEnabled());
       }
@@ -1042,7 +1133,7 @@ public class HtmlEditor extends Field<String> {
   }
 
   protected void updateStatus() {
-    if (showToolbar && rendered) {
+    if (showToolbar && rendered && !GXT.isAriaEnabled()) {
       BasicFormatter basic = getBasicFormatter();
       if (basic != null) {
         bold.toggle(basic.isBold());

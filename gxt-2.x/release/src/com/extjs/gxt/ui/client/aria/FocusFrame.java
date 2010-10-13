@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -61,13 +61,6 @@ public class FocusFrame extends BaseObservable {
       return;
     }
 
-    if (!initialized) {
-      init();
-    }
-
-    if (!GXT.isAriaEnabled()) {
-      return;
-    }
     if (!initialized) {
       init();
     }

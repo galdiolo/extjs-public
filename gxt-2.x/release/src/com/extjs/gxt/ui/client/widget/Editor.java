@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -28,7 +28,7 @@ import com.google.gwt.user.client.ui.RootPanel;
  * built-in sizing and event handling logic.
  * 
  * <dl>
- * <dt>Events:</dt>
+ * <dt><b>Events:</b></dt>
  * 
  * <dd><b>BeforeCancelEdit</b> : EditorEvent(editor, value, startValue)<br>
  * <div>Fires before editing is canceled</div>
@@ -115,7 +115,7 @@ import com.google.gwt.user.client.ui.RootPanel;
  * <dd>Component SaveState</dd>
  * </dl>
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked","rawtypes"})
 public class Editor extends BoxComponent {
 
   private String alignment = "c-c";
@@ -123,7 +123,6 @@ public class Editor extends BoxComponent {
   private AutoSizeMode autoSizeMode = AutoSizeMode.BOTH;
   private El boundEl;
   private boolean cancelOnEsc;
-  private boolean cancelOnInvalid = true;
   private boolean completeOnEnter;
   private boolean constrain;
   private boolean editing;
@@ -133,6 +132,7 @@ public class Editor extends BoxComponent {
   private Object startValue;
   private boolean swallowKeys = true;
   private boolean updateEl;
+
   /**
    * Creates a new editor.
    * 
@@ -143,7 +143,7 @@ public class Editor extends BoxComponent {
     this.field = field;
     field.setParent(this);
     setShadow(false);
-//    addStyleName("x-selectable");
+    // addStyleName("x-selectable");
   }
 
   /**
@@ -207,8 +207,15 @@ public class Editor extends BoxComponent {
     return cancelOnEsc;
   }
 
+  /**
+   * Returns true of the editor reverts the value to the start value on invalid.
+   * 
+   * @return true if the edit is canceled
+   * 
+   * @deprecated duplicate method see {@link #isRevertInvalid()}
+   */
   public boolean isCancelOnInvalid() {
-    return cancelOnInvalid;
+    return revertInvalid;
   }
 
   /**
@@ -314,8 +321,16 @@ public class Editor extends BoxComponent {
     this.cancelOnEsc = cancelOnEsc;
   }
 
+  /**
+   * True to automatically revert the field value and cancel the edit when the
+   * user completes an edit and the field validation fails (defaults to true).
+   * 
+   * @param cancelOnInvalid true to cancel on invalid
+   * 
+   * @deprecated duplicate method see {@link #setRevertInvalid(boolean)}
+   */
   public void setCancelOnInvalid(boolean cancelOnInvalid) {
-    this.cancelOnInvalid = cancelOnInvalid;
+    this.revertInvalid = cancelOnInvalid;
   }
 
   /**
@@ -338,7 +353,8 @@ public class Editor extends BoxComponent {
   }
 
   /**
-   * True to revert to start value on invalid value (defaults to true).
+   * True to automatically revert the field value and cancel the edit when the
+   * user completes an edit and the field validation fails (defaults to true).
    * 
    * @param revertInvalid true to revert
    */
@@ -440,7 +456,7 @@ public class Editor extends BoxComponent {
       return;
     }
 
-    if (!field.isValid() && cancelOnInvalid) {
+    if (!field.isValid() && revertInvalid) {
       cancelEdit(remainVisible, revertInvalid);
       return;
     }
@@ -529,7 +545,7 @@ public class Editor extends BoxComponent {
 
     setStyleName("x-editor");
     el().makePositionable(true);
-    setStyleAttribute("overflow", GXT.isGecko ? "auto" : "hidden");
+    setStyleAttribute("overflow", GXT.isGecko && !GXT.isStrict? "auto" : "hidden");
 
     field.setMessageTarget("tooltip");
 

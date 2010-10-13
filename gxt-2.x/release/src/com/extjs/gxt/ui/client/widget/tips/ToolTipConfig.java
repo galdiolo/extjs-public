@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -9,7 +9,6 @@ package com.extjs.gxt.ui.client.widget.tips;
 
 import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.util.Params;
-import com.google.gwt.user.client.Element;
 
 /**
  * Configuration information for a tool tip.
@@ -28,12 +27,11 @@ public class ToolTipConfig {
   private int[] mouseOffset = new int[] {15, 18};
   private Params params;
   private int showDelay = 500;
-  private Element target;
   private Template template;
   private String text;
   private String title;
   private boolean trackMouse;
-
+  private boolean closeable;
 
   /**
    * Creates a new tool tip config.
@@ -62,10 +60,20 @@ public class ToolTipConfig {
     this.setText(text);
   }
 
+  /**
+   * Returns the anchor position.
+   * 
+   * @return the anchor position
+   */
   public String getAnchor() {
     return anchor;
   }
 
+  /**
+   * Returns the distance in pixels of the tooltip and target element.
+   * 
+   * @return the offset
+   */
   public int getAnchorOffset() {
     return anchorOffset;
   }
@@ -88,10 +96,20 @@ public class ToolTipConfig {
     return hideDelay;
   }
 
+  /**
+   * Returns the tooltip's maximum width.
+   * 
+   * @return the maximum width
+   */
   public int getMaxWidth() {
     return maxWidth;
   }
 
+  /**
+   * Returns the tooltip's minimum width.
+   * 
+   * @return the minimum width
+   */
   public int getMinWidth() {
     return minWidth;
   }
@@ -124,15 +142,6 @@ public class ToolTipConfig {
   }
 
   /**
-   * Returns the element the configuration will be applied to.
-   * 
-   * @return the target element
-   */
-  public Element getTarget() {
-    return target;
-  }
-
-  /**
    * Returns the template.
    * 
    * @return the template
@@ -159,6 +168,11 @@ public class ToolTipConfig {
     return title;
   }
 
+  /**
+   * Returns true if the tooltip is anchored to the target.
+   * 
+   * @return true if anchored
+   */
   public boolean isAnchorToTarget() {
     return anchorToTarget;
   }
@@ -170,6 +184,15 @@ public class ToolTipConfig {
    */
   public boolean isAutoHide() {
     return autoHide;
+  }
+
+  /**
+   * Returns true if the tip is closable.
+   * 
+   * @return the closable state
+   */
+  public boolean isCloseable() {
+    return closeable;
   }
 
   /**
@@ -190,14 +213,35 @@ public class ToolTipConfig {
     return trackMouse;
   }
 
+  /**
+   * Sets the anchor position (defaults to "bottom").
+   * 
+   * @param anchor the anchor position (top, bottom, left, right)
+   */
   public void setAnchor(String anchor) {
     this.anchor = anchor;
   }
 
+  /**
+   * A numeric pixel value used to offset the default position of the anchor
+   * arrow (defaults to 0). When the anchor position is on the top or bottom of
+   * the tooltip, <code>anchorOffset</code> will be used as a horizontal offset.
+   * Likewise, when the anchor position is on the left or right side,
+   * <code>anchorOffset</code> will be used as a vertical offset.
+   * 
+   * 
+   * @param anchorOffset the offset in pixels
+   */
   public void setAnchorOffset(int anchorOffset) {
     this.anchorOffset = anchorOffset;
   }
 
+  /**
+   * True to anchor the tooltip to the target element, false to anchor it
+   * relative to the mouse coordinates (defaults to true). 
+   * 
+   * @param anchorToTarget true to anchor the tooltip to the target element
+   */
   public void setAnchorToTarget(boolean anchorToTarget) {
     this.anchorToTarget = anchorToTarget;
   }
@@ -211,6 +255,16 @@ public class ToolTipConfig {
    */
   public void setAutoHide(boolean autoHide) {
     this.autoHide = autoHide;
+  }
+
+  /**
+   * True to render a close tool button into the tooltip header (defaults to
+   * false).
+   * 
+   * @param closeable the closable state
+   */
+  public void setCloseable(boolean closeable) {
+    this.closeable = closeable;
   }
 
   /**
@@ -243,10 +297,20 @@ public class ToolTipConfig {
     this.hideDelay = hideDelay;
   }
 
+  /**
+   * Sets the tooltip's maximum width (defaults to 300).
+   * 
+   * @param maxWidth the maximum width in pixels
+   */
   public void setMaxWidth(int maxWidth) {
     this.maxWidth = maxWidth;
   }
 
+  /**
+   * Sets the tooltip's minimum width (defaults to 40).
+   * 
+   * @param minWidth the minimum width
+   */
   public void setMinWidth(int minWidth) {
     this.minWidth = minWidth;
   }
@@ -262,9 +326,9 @@ public class ToolTipConfig {
   }
 
   /**
-   * The paramters to be used when a custom a {@link #template} is specified.
+   * The parameters to be used when a custom a {@link #template} is specified.
    * 
-   * @param params the params
+   * @param params the parameters
    */
   public void setParams(Params params) {
     this.params = params;
@@ -280,15 +344,6 @@ public class ToolTipConfig {
     this.showDelay = showDelay;
   }
 
-  /**
-   * Sets an optional sub-element of the target component that the configuration
-   * should be applied to.
-   * 
-   * @param target the target element
-   */
-  // public void setTarget(Element target) {
-  // this.target = target;
-  // }
   /**
    * A optional template to be used to render the tool tip. The {@link #params}
    * will be applied to the template. If specified, {@link #title} and

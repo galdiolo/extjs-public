@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -57,9 +57,9 @@ public class MultiField<D> extends Field<D> {
 
   protected List<Field<?>> fields;
   protected LayoutContainer lc;
-  protected Validator validator;
   protected Orientation orientation = Orientation.HORIZONTAL;
   protected int spacing;
+  protected Validator validator;
   private boolean resizeFields;
 
   /**
@@ -93,6 +93,14 @@ public class MultiField<D> extends Field<D> {
   public void add(Field<?> field) {
     assertPreRender();
     fields.add(field);
+  }
+
+  @Override
+  public void clear() {
+    for (Field<?> f : fields) {
+      f.clear();
+    }
+    clearInvalid();
   }
 
   /**
@@ -176,6 +184,7 @@ public class MultiField<D> extends Field<D> {
     for (Field<?> f : fields) {
       f.reset();
     }
+    clearInvalid();
   }
 
   /**
@@ -243,7 +252,7 @@ public class MultiField<D> extends Field<D> {
     }
     return super.getInputEl();
   }
-  
+
   @Override
   protected void onDisable() {
     super.onDisable();
@@ -289,6 +298,7 @@ public class MultiField<D> extends Field<D> {
     }
 
     lc.render(target, index);
+    ComponentHelper.setParent(this, lc);
     setElement(lc.getElement());
   }
 
@@ -297,7 +307,7 @@ public class MultiField<D> extends Field<D> {
     super.onResize(width, height);
     if (resizeFields) {
       if (orientation == Orientation.HORIZONTAL) {
-        if(!GXT.isBorderBox){
+        if (!GXT.isBorderBox) {
           width -= ((fields.size() - 1) * spacing);
         }
         int w = width / fields.size();

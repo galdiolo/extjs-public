@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.0 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -29,7 +29,7 @@ import com.google.gwt.user.client.Element;
  * http://teethgrinder.co.uk/open-flash-chart-2.
  * 
  * <dl>
- * <dt>Events:</dt>
+ * <dt><b>Events:</b></dt>
  * 
  * <dd><b>Ready</b> : ChartEvent(chart)<br>
  * <div>Fires after the chart is ready.</div>
@@ -48,6 +48,7 @@ import com.google.gwt.user.client.Element;
  * <li>value : the value</li>
  * </ul>
  * </dd>
+ * </dl>
  */
 public class Chart extends FlashComponent {
 
@@ -57,7 +58,7 @@ public class Chart extends FlashComponent {
   public static final EventType ChartClick = new EventType();
 
   private String jsonData;
-  private boolean loaded = false;
+  private boolean loaded;
   private ChartModel model;
   private DelayedTask refreshTask;
 
@@ -175,7 +176,9 @@ public class Chart extends FlashComponent {
    */
   public void setJsonData(String jsonData) {
     this.jsonData = jsonData;
-    if (loaded) updateData(swfElement, jsonData);
+    if (loaded) {
+      updateData(swfElement, jsonData);
+    }
   }
 
   protected void onClick(int configIndex, int dataIndex) {
@@ -204,12 +207,8 @@ public class Chart extends FlashComponent {
   @Override
   protected void onDetach() {
     ChartManager.get().unregisterChart(this);
+    loaded = false;
     super.onDetach();
-  }
-
-  @Override
-  protected void afterRender() {
-    super.afterRender();
   }
 
   protected String onGetChartData() {
@@ -218,9 +217,7 @@ public class Chart extends FlashComponent {
 
   protected void onReady() {
     loaded = true;
-    if (jsonData != null) {
-      setJsonData(jsonData);
-    }
+    refresh();
     fireEvent(Events.Ready, new ChartEvent(this));
   }
 
@@ -250,7 +247,9 @@ public class Chart extends FlashComponent {
   }
 
   private native void updateData(Element e, String json) /*-{
-    if ('load' in e) e.load(json);
+    if (!!e && e.load) {
+      e.load(json);
+    }
   }-*/;
 
   private native void setChartId(DataProvider provider, String id) /*-{
