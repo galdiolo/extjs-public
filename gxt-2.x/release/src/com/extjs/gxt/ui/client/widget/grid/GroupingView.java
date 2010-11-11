@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -53,14 +53,14 @@ public class GroupingView extends GridView {
   }
 
   protected boolean enableGrouping;
-  protected Map<String, String> map = new FastMap<String>();
+  protected boolean isUpdating;
 
+  protected Map<String, String> map = new FastMap<String>();
   private int counter = 0;
   private boolean enableGroupingMenu = true;
   private boolean enableNoGroups = true;
   private GroupingStore<ModelData> groupingStore;
   private GridGroupRenderer groupRenderer;
-  private boolean isUpdating;
   private String lastGroupField;
   private boolean showGroupedColumn = true;
   private boolean showGroupName;
@@ -278,7 +278,7 @@ public class GroupingView extends GridView {
       return super.doRender(cs, rows, startRow, colCount, stripe);
     }
 
-    String gstyle = "width:" + getTotalWidth() + ";";
+    String gstyle = "width:" + getTotalWidth() + "px;";
     String gidPrefix = grid.getId();
 
     ColumnConfig cfg = cm.getColumn(colIndex);
@@ -440,6 +440,7 @@ public class GroupingView extends GridView {
 
   @Override
   protected void onMouseDown(GridEvent<ModelData> ge) {
+    super.onMouseDown(ge);
     El hd = ge.getTarget(".x-grid-group-hd", 10);
     if (hd != null) {
       ge.stopEvent();

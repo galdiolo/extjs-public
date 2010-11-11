@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -18,26 +18,25 @@ public class NestedModelUtil {
     return (X) getNestedValue(model, getPath(property));
   }
 
+  @Deprecated
   public static Object convertIfNecessary(Object obj) {
     if (obj == null || obj instanceof ModelData) {
       return obj;
     }
     BeanModelLookup lookup = BeanModelLookup.get();
     BeanModelFactory factory = lookup != null ? lookup.getFactory(obj.getClass()) : null;
-    return factory != null ? factory.createModel(obj) : obj;
+    return factory != null ? factory.createModel(obj) : null;
   }
 
   @SuppressWarnings("unchecked")
   public static <X> X getNestedValue(ModelData model, List<String> paths) {
-    Object obj = convertIfNecessary(model.get(paths.get(0)));
+    Object obj = model.get(paths.get(0));
     if (paths.size() == 1) {
       return (X) obj;
-    } else {
-      if (obj != null && obj instanceof ModelData) {
-        List<String> tmp = new ArrayList<String>(paths);
-        tmp.remove(0);
-        return (X) getNestedValue((ModelData) obj, tmp);
-      }
+    } else if (obj != null && obj instanceof ModelData) {
+      List<String> tmp = new ArrayList<String>(paths);
+      tmp.remove(0);
+      return (X) getNestedValue((ModelData) obj, tmp);
     }
     return null;
   }

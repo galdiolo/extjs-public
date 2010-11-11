@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -10,6 +10,7 @@ package com.extjs.gxt.samples.client.examples.grid;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.extjs.gxt.samples.client.Examples;
 import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.data.BaseListLoader;
@@ -58,9 +59,12 @@ public class JsonGridExample extends LayoutContainer {
     type.addField("Phone", "phone");
     type.addField("State", "state");
     type.addField("Zip", "zip");
+    
+    //Determine if Explorer or Example for JSON path
+    String path =  GWT.getHostPageBaseURL() + (Examples.isExplorer() ? "" : "../../" ) + "data/data.json";
 
     // use a http proxy to get the data
-    RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, GWT.getHostPageBaseURL() + "data/data.json");
+    RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, path);
     HttpProxy<String> proxy = new HttpProxy<String>(builder);
 
     // need a loader, proxy, and reader

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -34,7 +34,7 @@ import com.google.gwt.user.client.Timer;
  * <li>A List of TreeStoreModel instances (children are ignored).
  * </ul>
  */
-@SuppressWarnings({"unchecked","rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class TreeGridDropTarget extends DropTarget {
 
   protected TreeGrid<ModelData> treeGrid;
@@ -242,11 +242,6 @@ public class TreeGridDropTarget extends DropTarget {
   }
 
   protected void handleInsert(DNDEvent event, final TreeNode item) {
-    // clear any active append item
-    if (activeItem != null && activeItem != item) {
-      clearStyle(activeItem);
-    }
-
     int height = treeGrid.getView().getRow(item.getModel()).getOffsetHeight();
     int mid = height / 2;
     int top = treeGrid.getView().getRow(item.getModel()).getAbsoluteTop();
@@ -254,11 +249,15 @@ public class TreeGridDropTarget extends DropTarget {
     int y = event.getClientY();
     boolean before = y < mid;
 
-    if (!item.isLeaf() || allowDropOnLeaf) {
-      if ((before && y > top + 4) || (!before && y < top + height - 4)) {
-        handleAppend(event, item);
-        return;
-      }
+    if ((!item.isLeaf() || allowDropOnLeaf) && (feedback == Feedback.BOTH || feedback == Feedback.APPEND)
+        && ((before && y > top + 4) || (!before && y < top + height - 4))) {
+      handleAppend(event, item);
+      return;
+    }
+
+    // clear any active append item
+    if (activeItem != null && activeItem != item) {
+      clearStyle(activeItem);
     }
 
     appendItem = null;

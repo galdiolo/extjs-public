@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -14,9 +14,9 @@ import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Folder;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.dnd.DND.Feedback;
 import com.extjs.gxt.ui.client.dnd.TreeGridDragSource;
 import com.extjs.gxt.ui.client.dnd.TreeGridDropTarget;
-import com.extjs.gxt.ui.client.dnd.DND.Feedback;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
@@ -24,13 +24,13 @@ import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
-import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
+import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.layout.VBoxLayout;
-import com.extjs.gxt.ui.client.widget.layout.VBoxLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.VBoxLayout.VBoxLayoutAlign;
+import com.extjs.gxt.ui.client.widget.layout.VBoxLayoutData;
 import com.extjs.gxt.ui.client.widget.toolbar.LabelToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
@@ -53,13 +53,6 @@ public class TreeGridToTreeGridExample extends LayoutContainer {
 
     TreeStore<ModelData> store = new TreeStore<ModelData>();
     store.add(model.getChildren(), true);
-
-    ColumnConfig name = new ColumnConfig("name", "Name", 100);
-    name.setRenderer(new TreeGridCellRenderer<ModelData>());
-
-    ColumnConfig date = new ColumnConfig("author", "Author", 100);
-    ColumnConfig size = new ColumnConfig("genre", "Genre", 100);
-    ColumnModel cm = new ColumnModel(Arrays.asList(name, date, size));
 
     ContentPanel cp = new ContentPanel();
     cp.setBodyBorder(false);
@@ -93,7 +86,7 @@ public class TreeGridToTreeGridExample extends LayoutContainer {
     toolBar.add(new SeparatorToolItem());
     cp.setTopComponent(toolBar);
 
-    TreeGrid<ModelData> tree = new TreeGrid<ModelData>(store, cm);
+    TreeGrid<ModelData> tree = new TreeGrid<ModelData>(store, createColumnModel());
     tree.setBorders(true);
     tree.getStyle().setLeafIcon(Resources.ICONS.music());
     tree.setAutoExpandColumn("name");
@@ -109,7 +102,7 @@ public class TreeGridToTreeGridExample extends LayoutContainer {
     TreeStore<ModelData> dropStore = new TreeStore<ModelData>();
     dropStore.add(f, false);
 
-    tree = new TreeGrid<ModelData>(dropStore, cm) {
+    tree = new TreeGrid<ModelData>(dropStore, createColumnModel()) {
       @Override
       protected boolean hasChildren(ModelData m) {
         if ("My Music".equals(m.get("name")) || m instanceof Folder) {
@@ -132,5 +125,15 @@ public class TreeGridToTreeGridExample extends LayoutContainer {
 
     add(vp);
 
+  }
+
+  private ColumnModel createColumnModel() {
+    ColumnConfig name = new ColumnConfig("name", "Name", 100);
+    name.setRenderer(new TreeGridCellRenderer<ModelData>());
+
+    ColumnConfig date = new ColumnConfig("author", "Author", 100);
+    ColumnConfig size = new ColumnConfig("genre", "Genre", 100);
+    ColumnModel cm = new ColumnModel(Arrays.asList(name, date, size));
+    return cm;
   }
 }

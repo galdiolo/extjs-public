@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -23,7 +23,7 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
 
-@SuppressWarnings({"unchecked","rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class TreePanelDropTarget extends DropTarget {
 
   protected TreePanel<ModelData> tree;
@@ -235,11 +235,6 @@ public class TreePanelDropTarget extends DropTarget {
   }
 
   protected void handleInsert(DNDEvent event, final TreeNode item) {
-    // clear any active append item
-    if (activeItem != null && activeItem != item) {
-      tree.getView().onDropChange(activeItem, false);
-    }
-
     int height = item.getElement().getOffsetHeight();
     int mid = height / 2;
     int top = item.getElement().getAbsoluteTop();
@@ -247,12 +242,17 @@ public class TreePanelDropTarget extends DropTarget {
     int y = event.getClientY();
     boolean before = y < mid;
 
-    if (!item.isLeaf() || allowDropOnLeaf) {
-      if ((before && y > top + 4) || (!before && y < top + height - 4)) {
-        handleAppend(event, item);
-        return;
-      }
+    if ((!item.isLeaf() || allowDropOnLeaf) && (feedback == Feedback.BOTH || feedback == Feedback.APPEND)
+        && ((before && y > top + 4) || (!before && y < top + height - 4))) {
+      handleAppend(event, item);
+      return;
     }
+    
+    // clear any active append item
+    if (activeItem != null && activeItem != item) {
+      tree.getView().onDropChange(activeItem, false);
+    }
+
 
     appendItem = null;
 

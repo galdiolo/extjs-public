@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -16,24 +16,26 @@ import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
-import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.ColorPalette;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
+import com.extjs.gxt.ui.client.widget.ComponentManager;
+import com.extjs.gxt.ui.client.widget.WidgetComponent;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.ToggleButton;
-import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.menu.ColorMenu;
+import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.FocusEvent;
@@ -46,6 +48,7 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RichTextArea.BasicFormatter;
 import com.google.gwt.user.client.ui.RichTextArea.ExtendedFormatter;
 import com.google.gwt.user.client.ui.RichTextArea.FontSize;
@@ -101,20 +104,20 @@ import com.google.gwt.user.client.ui.impl.RichTextAreaImpl;
 public class HtmlEditor extends Field<String> {
 
   public class HtmlEditorImages extends FieldImages {
-    private AbstractImagePrototype source = GXT.IMAGES.editor_source();
     private AbstractImagePrototype bold = GXT.IMAGES.editor_bold();
-    private AbstractImagePrototype underline = GXT.IMAGES.editor_underline();
-    private AbstractImagePrototype italic = GXT.IMAGES.editor_italic();
     private AbstractImagePrototype fontColor = GXT.IMAGES.editor_font_color();
     private AbstractImagePrototype fontDecrease = GXT.IMAGES.editor_font_decrease();
-    private AbstractImagePrototype fontIncrease = GXT.IMAGES.editor_font_increase();
     private AbstractImagePrototype fontHighlight = GXT.IMAGES.editor_font_highlight();
+    private AbstractImagePrototype fontIncrease = GXT.IMAGES.editor_font_increase();
+    private AbstractImagePrototype italic = GXT.IMAGES.editor_italic();
     private AbstractImagePrototype justifyCenter = GXT.IMAGES.editor_justify_center();
     private AbstractImagePrototype justifyLeft = GXT.IMAGES.editor_justify_left();
     private AbstractImagePrototype justifyRight = GXT.IMAGES.editor_justify_right();
-    private AbstractImagePrototype ul = GXT.IMAGES.editor_ul();
-    private AbstractImagePrototype ol = GXT.IMAGES.editor_ol();
     private AbstractImagePrototype link = GXT.IMAGES.editor_link();
+    private AbstractImagePrototype ol = GXT.IMAGES.editor_ol();
+    private AbstractImagePrototype source = GXT.IMAGES.editor_source();
+    private AbstractImagePrototype ul = GXT.IMAGES.editor_ul();
+    private AbstractImagePrototype underline = GXT.IMAGES.editor_underline();
 
     public AbstractImagePrototype getBold() {
       return bold;
@@ -160,16 +163,16 @@ public class HtmlEditor extends Field<String> {
       return ol;
     }
 
+    public AbstractImagePrototype getSource() {
+      return source;
+    }
+
     public AbstractImagePrototype getUl() {
       return ul;
     }
 
     public AbstractImagePrototype getUnderline() {
       return underline;
-    }
-
-    public AbstractImagePrototype getSource() {
-      return source;
     }
 
     public void setBold(AbstractImagePrototype bold) {
@@ -212,98 +215,20 @@ public class HtmlEditor extends Field<String> {
       this.link = link;
     }
 
-    public void setUnderline(AbstractImagePrototype underline) {
-      this.underline = underline;
-    }
-
     public void setOl(AbstractImagePrototype ol) {
       this.ol = ol;
+    }
+
+    public void setSource(AbstractImagePrototype source) {
+      this.source = source;
     }
 
     public void setUl(AbstractImagePrototype ul) {
       this.ul = ul;
     }
 
-    public void setSource(AbstractImagePrototype source) {
-      this.source = source;
-    }
-  }
-
-  protected class EventHandler implements KeyDownHandler, ClickHandler, KeyUpHandler, FocusHandler, BlurHandler {
-
-    public void onClick(ClickEvent event) {
-      updateStatus();
-      syncValue();
-    }
-
-    public void onKeyUp(KeyUpEvent event) {
-      updateStatus();
-      syncValue();
-    }
-
-    public void onKeyDown(KeyDownEvent event) {
-      onEditorKeyDown(event);
-    }
-
-    public void onFocus(FocusEvent event) {
-
-    }
-
-    public void onBlur(BlurEvent event) {
-
-    }
-  }
-
-  protected void onEditorKeyDown(KeyDownEvent e) {
-    int kc = e.getNativeKeyCode();
-    switch (kc) {
-      case 66:
-        if (e.isControlKeyDown()) {
-          e.stopPropagation();
-          e.preventDefault();
-          getBasicFormatter().toggleBold();
-        }
-        break;
-      case 73:
-        if (e.isControlKeyDown()) {
-          e.stopPropagation();
-          e.preventDefault();
-          getBasicFormatter().toggleItalic();
-        }
-        break;
-      case 85:
-        if (e.isControlKeyDown()) {
-          e.stopPropagation();
-          e.preventDefault();
-          getBasicFormatter().toggleUnderline();
-        }
-        break;
-    }
-  }
-
-  protected class rte extends BoxComponent {
-    protected void onRender(Element target, int index) {
-      Element e = impl.getElement();
-      e.setPropertyInt("frameBorder", 0);
-      setElement(e, target, index);
-
-      addDomHandler(handler, ClickEvent.getType());
-      addDomHandler(handler, FocusEvent.getType());
-      addDomHandler(handler, BlurEvent.getType());
-      addDomHandler(handler, KeyUpEvent.getType());
-      addDomHandler(handler, KeyDownEvent.getType());
-    }
-
-    @Override
-    protected void onAttach() {
-      super.onAttach();
-      impl.initElement();
-    }
-
-    @Override
-    protected void onDetach() {
-      super.onDetach();
-      impl.uninitElement();
+    public void setUnderline(AbstractImagePrototype underline) {
+      this.underline = underline;
     }
   }
 
@@ -331,12 +256,12 @@ public class HtmlEditor extends Field<String> {
     private String linkTipTitle = GXT.MESSAGES.htmlEditor_linkTipTitle();
     private String olTipText = GXT.MESSAGES.htmlEditor_olTipText();
     private String olTipTitle = GXT.MESSAGES.htmlEditor_olTipTitle();
+    private String sourceEditTipText = GXT.MESSAGES.htmlEditor_sourceEditTipText();
+    private String sourceEditTipTitle = GXT.MESSAGES.htmlEditor_sourceEditTipTitle();
     private String ulTipText = GXT.MESSAGES.htmlEditor_ulTipText();
     private String ulTipTitle = GXT.MESSAGES.htmlEditor_ulTipTitle();
     private String underlineTipText = GXT.MESSAGES.htmlEditor_underlineTipText();
     private String underlineTipTitle = GXT.MESSAGES.htmlEditor_underlineTipTitle();
-    private String sourceEditTipText = GXT.MESSAGES.htmlEditor_sourceEditTipText();
-    private String sourceEditTipTitle = GXT.MESSAGES.htmlEditor_sourceEditTipTitle();
 
     public String getBackColorTipText() {
       return backColorTipText;
@@ -430,12 +355,20 @@ public class HtmlEditor extends Field<String> {
       return olTipTitle;
     }
 
-    public String getUlTipTitle() {
-      return ulTipTitle;
+    public String getSourceEditTipText() {
+      return sourceEditTipText;
+    }
+
+    public String getSourceEditTipTitle() {
+      return sourceEditTipTitle;
     }
 
     public String getUlTipText() {
       return ulTipText;
+    }
+
+    public String getUlTipTitle() {
+      return ulTipTitle;
     }
 
     public String getUnderlineTipText() {
@@ -444,14 +377,6 @@ public class HtmlEditor extends Field<String> {
 
     public String getUnderlineTipTitle() {
       return underlineTipTitle;
-    }
-
-    public String getSourceEditTipText() {
-      return sourceEditTipText;
-    }
-
-    public String getSourceEditTipTitle() {
-      return sourceEditTipTitle;
     }
 
     public void setBackColorTipText(String backColorTipText) {
@@ -546,6 +471,14 @@ public class HtmlEditor extends Field<String> {
       this.olTipTitle = olTipTitle;
     }
 
+    public void setSourceEditTipText(String sourceEditTipText) {
+      this.sourceEditTipText = sourceEditTipText;
+    }
+
+    public void setSourceEditTipTitle(String sourceEditTipTitle) {
+      this.sourceEditTipTitle = sourceEditTipTitle;
+    }
+
     public void setUlTipText(String ulTipText) {
       this.ulTipText = ulTipText;
     }
@@ -562,52 +495,105 @@ public class HtmlEditor extends Field<String> {
       this.underlineTipTitle = underlineTipTitle;
     }
 
-    public void setSourceEditTipText(String sourceEditTipText) {
-      this.sourceEditTipText = sourceEditTipText;
-    }
-
-    public void setSourceEditTipTitle(String sourceEditTipTitle) {
-      this.sourceEditTipTitle = sourceEditTipTitle;
-    }
-
   }
 
-  protected RichTextAreaImpl impl = GWT.create(RichTextAreaImpl.class);
+  protected class EventHandler implements KeyDownHandler, ClickHandler, KeyUpHandler, FocusHandler, BlurHandler {
 
-  protected El textarea;
-  protected ToolBar tb;
+    public void onBlur(BlurEvent event) {
+
+    }
+
+    public void onClick(ClickEvent event) {
+      updateStatus();
+      syncValue();
+
+      ArrayList<Component> col = new ArrayList<Component>(ComponentManager.get().getAll());
+      for (Component c : col) {
+        if (c instanceof TriggerField<?>) {
+          ((TriggerField<?>) c).triggerBlur(null);
+        } else if (c instanceof Menu) {
+          ((Menu) c).hide(true);
+        }
+      }
+      impl.setFocus(true);
+    }
+
+    public void onFocus(FocusEvent event) {
+    }
+
+    public void onKeyDown(KeyDownEvent event) {
+      onEditorKeyDown(event);
+    }
+
+    public void onKeyUp(KeyUpEvent event) {
+      updateStatus();
+      syncValue();
+    }
+  }
+
+  protected class rte extends BoxComponent {
+    @Override
+    protected void onAttach() {
+      super.onAttach();
+      impl.initElement();
+    }
+
+    @Override
+    protected void onDetach() {
+      super.onDetach();
+      impl.uninitElement();
+    }
+
+    protected void onRender(Element target, int index) {
+      Element e = impl.getElement();
+      e.setPropertyInt("frameBorder", 0);
+      setElement(e, target, index);
+
+      addDomHandler(handler, ClickEvent.getType());
+      addDomHandler(handler, FocusEvent.getType());
+      addDomHandler(handler, BlurEvent.getType());
+      addDomHandler(handler, KeyUpEvent.getType());
+      addDomHandler(handler, KeyDownEvent.getType());
+    }
+  }
+
+  protected FontSize activeFontSize = FontSize.SMALL;
+
+  protected Button backcolor;
 
   // the toolbar buttons
   protected ToggleButton bold;
+  protected SelectionListener<ButtonEvent> btnListener;
+
+  protected Button decreasefontsize;
+  protected List<FontSize> fontSizesConstants = new ArrayList<FontSize>();
+  protected Button forecolor;
+  protected EventHandler handler = new EventHandler();
+  protected RichTextAreaImpl impl = GWT.create(RichTextAreaImpl.class);
+  protected Button increasefontsize;
   protected ToggleButton italic;
-  protected ToggleButton underline;
+  protected Button justifyCenter;
   protected Button justifyLeft;
   protected Button justifyRight;
-  protected Button justifyCenter;
-  protected ToggleButton sourceEdit;
-  protected Button ol;
-  protected Button ul;
   protected Button link;
-  protected Button increasefontsize;
-  protected Button decreasefontsize;
-  protected Button forecolor;
-  protected Button backcolor;
-  protected SelectionListener<ButtonEvent> btnListener;
-  protected FontSize activeFontSize = FontSize.SMALL;
-  protected List<FontSize> fontSizesConstants = new ArrayList<FontSize>();
-
-  protected EventHandler handler = new EventHandler();
+  protected Button ol;
   protected rte rte;
+  protected ToggleButton sourceEdit;
+  protected ToolBar tb;
+  protected El textarea;
+  protected Button ul;
 
-  private boolean sourceEditMode = true;
-  private boolean showToolbar = true;
-  private boolean enableFormat = true;
-  private boolean enableFontSize = true;
-  private boolean enableColors = true;
+  protected ToggleButton underline;
   private boolean enableAlignments = true;
-  private boolean enableLists = true;
-  private boolean enableLinks = true;
+
+  private boolean enableColors = true;
   private boolean enableFont = true;
+  private boolean enableFontSize = true;
+  private boolean enableFormat = true;
+  private boolean enableLinks = true;
+  private boolean enableLists = true;
+  private boolean showToolbar = true;
+  private boolean sourceEditMode = true;
 
   public HtmlEditor() {
     super();
@@ -621,20 +607,7 @@ public class HtmlEditor extends Field<String> {
     fontSizesConstants.add(FontSize.XX_LARGE);
     setSize(500, 300);
 
-    setValue("&#8203;");
-
     messages = new HtmlEditorMessages();
-
-  }
-
-  @Override
-  public void blur() {
-
-  }
-
-  @Override
-  public void focus() {
-    el().selectNode("iframe").focus();
   }
 
   /**
@@ -662,6 +635,14 @@ public class HtmlEditor extends Field<String> {
   }
 
   @Override
+  public HtmlEditorImages getImages() {
+    if (images == null) {
+      images = new HtmlEditorImages();
+    }
+    return (HtmlEditorImages) images;
+  }
+
+  @Override
   public HtmlEditorMessages getMessages() {
     return (HtmlEditorMessages) messages;
   }
@@ -680,14 +661,6 @@ public class HtmlEditor extends Field<String> {
     } else {
       return value;
     }
-  }
-
-  @Override
-  public HtmlEditorImages getImages() {
-    if (images == null) {
-      images = new HtmlEditorImages();
-    }
-    return (HtmlEditorImages) images;
   }
 
   public boolean isEnableAlignments() {
@@ -792,6 +765,49 @@ public class HtmlEditor extends Field<String> {
     return true;
   }
 
+  @Override
+  protected void afterRender() {
+    super.afterRender();
+    if (GXT.isHighContrastMode) {
+      setHighContrastImage(sourceEdit, "tb-source.gif");
+      setHighContrastImage(increasefontsize, "tb-font-increase.gif");
+      setHighContrastImage(decreasefontsize, "tb-font-decrease.gif");
+      setHighContrastImage(forecolor, "tb-font-color.gif");
+      setHighContrastImage(backcolor, "tb-font-highlight.gif");
+      setHighContrastImage(bold, "tb-bold.gif");
+      setHighContrastImage(italic, "tb-italic.gif");
+      setHighContrastImage(underline, "tb-underline.gif");
+      setHighContrastImage(justifyLeft, "tb-justify-left.gif");
+      setHighContrastImage(justifyCenter, "tb-justify-center.gif");
+      setHighContrastImage(justifyRight, "tb-justify-right.gif");
+      setHighContrastImage(ol, "tb-ol.gif");
+      setHighContrastImage(ul, "tb-ul.gif");
+      setHighContrastImage(link, "tb-link.gif");
+    }
+  }
+
+  protected Button createButton(AbstractImagePrototype icon, final String tt, String toolTipTitle) {
+    Button item = new Button() {
+      @Override
+      protected void afterRender() {
+        super.afterRender();
+        if (GXT.isAriaEnabled()) buttonEl.dom.setTitle(tt);
+      }
+    };
+    item.setIcon(icon);
+    item.setTabIndex(-1);
+
+    ToolTipConfig cfg = new ToolTipConfig(toolTipTitle, tt);
+    item.setToolTip(cfg);
+
+    if (GXT.isAriaEnabled()) {
+      item.setData("gxt-menutext", toolTipTitle);
+    }
+
+    item.addSelectionListener(btnListener);
+    return item;
+  }
+
   protected Button createColorButton(AbstractImagePrototype icon, String toolTip, String toolTipTitle,
       Listener<ComponentEvent> listener) {
     Button item = new Button();
@@ -833,60 +849,10 @@ public class HtmlEditor extends Field<String> {
     return item;
   }
 
-  protected Button createButton(AbstractImagePrototype icon, final String tt, String toolTipTitle) {
-    Button item = new Button() {
-      @Override
-      protected void afterRender() {
-        super.afterRender();
-        if (GXT.isAriaEnabled()) buttonEl.dom.setTitle(tt);
-      }
-    };
-    item.setIcon(icon);
-    item.setTabIndex(-1);
-
-    ToolTipConfig cfg = new ToolTipConfig(toolTipTitle, tt);
-    item.setToolTip(cfg);
-
-    if (GXT.isAriaEnabled()) {
-      item.setData("gxt-menutext", toolTipTitle);
-    }
-
-    item.addSelectionListener(btnListener);
-    return item;
-  }
-
   protected void doAttachChildren() {
     super.doAttachChildren();
     ComponentHelper.doAttach(tb);
     ComponentHelper.doAttach(rte);
-  }
-
-  @Override
-  protected void afterRender() {
-    super.afterRender();
-    if (GXT.isHighContrastMode) {
-      setHighContrastImage(sourceEdit, "tb-source.gif");
-      setHighContrastImage(increasefontsize, "tb-font-increase.gif");
-      setHighContrastImage(decreasefontsize, "tb-font-decrease.gif");
-      setHighContrastImage(forecolor, "tb-font-color.gif");
-      setHighContrastImage(backcolor, "tb-font-highlight.gif");
-      setHighContrastImage(bold, "tb-bold.gif");
-      setHighContrastImage(italic, "tb-italic.gif");
-      setHighContrastImage(underline, "tb-underline.gif");
-      setHighContrastImage(justifyLeft, "tb-justify-left.gif");
-      setHighContrastImage(justifyCenter, "tb-justify-center.gif");
-      setHighContrastImage(justifyRight, "tb-justify-right.gif");
-      setHighContrastImage(ol, "tb-ol.gif");
-      setHighContrastImage(ul, "tb-ul.gif");
-      setHighContrastImage(link, "tb-link.gif");
-    }
-  }
-
-  protected void setHighContrastImage(Button btn, String image) {
-    if (btn != null) {
-      btn.el().selectNode("button").setWidth(18).setInnerHtml(
-          "<img src='" + GXT.RESOURCES_URL + "/images/default/editor/" + image + "'>");
-    }
   }
 
   protected void doDetachChildren() {
@@ -898,6 +864,12 @@ public class HtmlEditor extends Field<String> {
   @Override
   protected El getInputEl() {
     return textarea;
+  }
+
+  @Override
+  protected void onAttach() {
+    super.onAttach();
+    el().repaint();
   }
 
   @Override
@@ -914,6 +886,33 @@ public class HtmlEditor extends Field<String> {
     mask();
   }
 
+  protected void onEditorKeyDown(KeyDownEvent e) {
+    int kc = e.getNativeKeyCode();
+    switch (kc) {
+      case 66:
+        if (e.isControlKeyDown()) {
+          e.stopPropagation();
+          e.preventDefault();
+          getBasicFormatter().toggleBold();
+        }
+        break;
+      case 73:
+        if (e.isControlKeyDown()) {
+          e.stopPropagation();
+          e.preventDefault();
+          getBasicFormatter().toggleItalic();
+        }
+        break;
+      case 85:
+        if (e.isControlKeyDown()) {
+          e.stopPropagation();
+          e.preventDefault();
+          getBasicFormatter().toggleUnderline();
+        }
+        break;
+    }
+  }
+
   @Override
   protected void onEnable() {
     super.onEnable();
@@ -925,7 +924,11 @@ public class HtmlEditor extends Field<String> {
 
   @Override
   protected void onFocus(ComponentEvent ce) {
-    el().selectNode("iframe").focus();
+    if (sourceEdit == null || !sourceEdit.isPressed()) {
+      impl.setFocus(true);
+    } else {
+      textarea.focus();
+    }
   }
 
   @Override
@@ -967,9 +970,16 @@ public class HtmlEditor extends Field<String> {
       tb.setWidth(aw);
       ah -= tb.getHeight();
     }
-    rte.setSize(aw, ah);
+    rte.setSize(width == -1 ? -1 : aw, height == -1 ? -1 : ah);
 
-    textarea.setSize(aw, ah, true);
+    textarea.setSize(width == -1 ? -1 : aw, height == -1 ? -1 : ah, true);
+  }
+
+  protected void setHighContrastImage(Button btn, String image) {
+    if (btn != null) {
+      btn.el().selectNode("button").setWidth(18).setInnerHtml(
+          "<img src='" + GXT.RESOURCES_URL + "/images/default/editor/" + image + "'>");
+    }
   }
 
   protected void setupToolbar() {
@@ -1033,6 +1043,13 @@ public class HtmlEditor extends Field<String> {
       HtmlEditorMessages m = getMessages();
 
       tb = new ToolBar();
+      tb.addListener(Events.OnClick, new Listener<ComponentEvent>() {
+        public void handleEvent(ComponentEvent be) {
+          if (fly(be.getTarget()).findParent(".x-toolbar-cell", 10) != null) {
+            be.cancelBubble();
+          }
+        }
+      });
       ComponentHelper.setParent(this, tb);
       if (sourceEditMode) {
         tb.add(sourceEdit = createToggleButton(g.getSource(), m.getSourceEditTipText(), m.getSourceEditTipTitle()));
@@ -1041,21 +1058,24 @@ public class HtmlEditor extends Field<String> {
 
       if (getBasicFormatter() != null) {
         if (enableFont) {
-          final SimpleComboBox<String> fonts = new SimpleComboBox<String>();
-          fonts.setTriggerAction(TriggerAction.ALL);
-          fonts.add("Arial");
-          fonts.add("Times New Roman");
-          fonts.add("Verdana");
-          fonts.setEditable(false);
-          fonts.setSimpleValue("Arial");
-          fonts.addSelectionChangedListener(new SelectionChangedListener<SimpleComboValue<String>>() {
-            @Override
-            public void selectionChanged(SelectionChangedEvent<SimpleComboValue<String>> se) {
-              getBasicFormatter().setFontName(fonts.getSimpleValue());
+          final ListBox fonts = new ListBox();
+          fonts.addItem("");
+          fonts.addItem("Arial");
+          fonts.addItem("Times New Roman");
+          fonts.addItem("Verdana");
+          fonts.setItemSelected(0, true);
+          fonts.addChangeHandler(new ChangeHandler() {
+
+            public void onChange(ChangeEvent event) {
+              int index = fonts.getSelectedIndex();
+              if (index != 0) {
+                getBasicFormatter().setFontName(fonts.getItemText(index));
+              }
+              fonts.setItemSelected(0, true);
             }
           });
 
-          tb.add(fonts);
+          tb.add(new WidgetComponent(fonts));
           tb.add(new SeparatorToolItem());
         }
         if (enableFontSize) {
@@ -1108,6 +1128,8 @@ public class HtmlEditor extends Field<String> {
         }
       }
       Element e = DOM.createDiv();
+      // needed for display issues
+      e.getStyle().setProperty("position", "relative");
       e.setClassName("x-html-editor-tb");
       el().insertFirst(e);
       tb.render(e);

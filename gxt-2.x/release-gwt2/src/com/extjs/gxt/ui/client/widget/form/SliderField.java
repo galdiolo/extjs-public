@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -77,7 +77,7 @@ public class SliderField extends Field<Integer> {
         this.slider.removeListener(Events.Change, listener);
       }
       this.slider = slider;
-      slider.getAriaSupport().setIgnore(true);
+      slider.getFocusSupport().setIgnore(true);
       ComponentHelper.setParent(this, slider);
       slider.addListener(Events.Change, listener);
     }

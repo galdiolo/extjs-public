@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -400,14 +400,18 @@ public abstract class AbstractStoreSelectionModel<M extends ModelData> extends B
     for (int i = 0; i < selected.size(); i++) {
       M m = selected.get(i);
       if (store.equals(model, m)) {
-        selected.remove(m);
-        selected.add(i, model);
-
+        if (m != model) {
+          selected.remove(m);
+          selected.add(i, model);
+        }
         if (lastSelected == m) {
           lastSelected = model;
         }
         break;
       }
+    }
+    if (model != getLastFocused() && store.equals(model, getLastFocused())) {
+      lastFocused = model;
     }
   }
 

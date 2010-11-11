@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -65,7 +65,7 @@ public class ButtonsExample extends LayoutContainer {
 
     vp = new VerticalPanel();
     vp.setSpacing(10);
-    vp.getAriaSupport().setIgnore(false);
+    vp.getFocusSupport().setIgnore(false);
 
     for (Category cat : Category.values()) {
       vp.add(formatHeader(cat.getText()));
@@ -166,7 +166,7 @@ public class ButtonsExample extends LayoutContainer {
 
   private Html format(String text) {
     Html html = new Html("<span class='text' style='margin: 10px'>" + text + "</span>");
-    html.getAriaSupport().setIgnore(true);
+    html.getFocusSupport().setIgnore(true);
     return html;
   }
 
@@ -174,7 +174,7 @@ public class ButtonsExample extends LayoutContainer {
     String bg = "background-color: " + (GXT.isAriaEnabled() ? "#242b3a" : "#dd");
     Html html = new Html("<div class='text' style='width: 400px;padding: 4px;" + bg + "'><b>" + text
         + "</b></div>");
-    html.getAriaSupport().setIgnore(true);
+    html.getFocusSupport().setIgnore(true);
     return html;
   }
 

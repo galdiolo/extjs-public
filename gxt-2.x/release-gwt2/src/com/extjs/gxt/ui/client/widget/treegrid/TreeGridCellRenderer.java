@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -28,15 +28,34 @@ public class TreeGridCellRenderer<M extends ModelData> implements GridCellRender
     config.css = "x-treegrid-column";
 
     assert grid instanceof TreeGrid : "TreeGridCellRenderer can only be used in a TreeGrid";
-    
+
     TreeGrid tree = (TreeGrid) grid;
     TreeStore ts = tree.getTreeStore();
-    Joint j = tree.calcualteJoint(model);
-    AbstractImagePrototype iconStyle = tree.calculateIconStyle(model);
+
     int level = ts.getDepth(model);
 
-    String text = String.valueOf(model.get(property));
-    String id = tree.findNode(model).id;
-    return tree.getTreeView().getTemplate(model, id, text, iconStyle, false, j, level - 1);
+    String id = getId(tree, model, property, rowIndex, colIndex);
+    String text = getText(tree, model, property, rowIndex, colIndex);
+    AbstractImagePrototype icon = calculateIconStyle(tree, model, property, rowIndex, colIndex);
+    Joint j = calcualteJoint(tree, model, property, rowIndex, colIndex);
+
+    return tree.getTreeView().getTemplate(model, id, text, icon, false, j, level - 1);
+  }
+
+  protected Joint calcualteJoint(TreeGrid<M> grid, M model, String property, int rowIndex, int colIndex) {
+    return grid.calcualteJoint(model);
+  }
+
+  protected AbstractImagePrototype calculateIconStyle(TreeGrid<M> grid, M model, String property, int rowIndex,
+      int colIndex) {
+    return grid.calculateIconStyle(model);
+  }
+
+  protected String getId(TreeGrid<M> grid, M model, String property, int rowIndex, int colIndex) {
+    return grid.findNode(model).id;
+  }
+
+  protected String getText(TreeGrid<M> grid, M model, String property, int rowIndex, int colIndex) {
+    return String.valueOf(model.get(property));
   }
 }

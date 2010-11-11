@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -299,7 +299,7 @@ public class DefaultTreeItemUI implements TreeItemUI {
     item.tree.disableEvents(false);
     containerEl.dom.getStyle().setProperty("marginTop", "0");
     fly(itemEl).removeStyleName(styleTreeJointOver);
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       Accessibility.setState(item.getElement(), "aria-expanded", "false");
       FocusFrame.get().sync(item.tree);
     }
@@ -309,7 +309,7 @@ public class DefaultTreeItemUI implements TreeItemUI {
   protected void afterExpand() {
     item.tree.disableEvents(false);
     fly(itemEl).removeStyleName(styleTreeJointOver);
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       Accessibility.setState(item.getElement(), "aria-expanded", "true");
       FocusFrame.get().sync(item.tree);
     }

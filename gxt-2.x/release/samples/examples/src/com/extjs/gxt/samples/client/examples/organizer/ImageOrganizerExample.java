@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -9,12 +9,12 @@ package com.extjs.gxt.samples.client.examples.organizer;
 
 import java.util.List;
 
-import com.extjs.gxt.samples.client.ExampleService;
 import com.extjs.gxt.samples.client.ExampleServiceAsync;
+import com.extjs.gxt.samples.client.Examples;
 import com.extjs.gxt.samples.client.examples.model.Photo;
 import com.extjs.gxt.samples.resources.client.Resources;
+import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
-import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.data.BaseListLoader;
 import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.data.BeanModel;
@@ -23,10 +23,10 @@ import com.extjs.gxt.ui.client.data.ListLoadResult;
 import com.extjs.gxt.ui.client.data.ListLoader;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.RpcProxy;
-import com.extjs.gxt.ui.client.dnd.ListViewDragSource;
-import com.extjs.gxt.ui.client.dnd.TreePanelDropTarget;
 import com.extjs.gxt.ui.client.dnd.DND.Feedback;
 import com.extjs.gxt.ui.client.dnd.DND.Operation;
+import com.extjs.gxt.ui.client.dnd.ListViewDragSource;
+import com.extjs.gxt.ui.client.dnd.TreePanelDropTarget;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.DNDEvent;
 import com.extjs.gxt.ui.client.event.Listener;
@@ -45,6 +45,7 @@ import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel.TreeNode;
@@ -53,7 +54,6 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 public class ImageOrganizerExample extends LayoutContainer {
 
@@ -78,17 +78,14 @@ public class ImageOrganizerExample extends LayoutContainer {
     newAlbum.addSelectionListener(new SelectionListener<ButtonEvent>() {
       @Override
       public void componentSelected(ButtonEvent ce) {
-        MessageBox.prompt("New Album", "Enter the new album name:",
-            new Listener<MessageBoxEvent>() {
-              public void handleEvent(MessageBoxEvent be) {
-                if (be.getButtonClicked().getItemId().equals(Dialog.OK)
-                    && be.getValue() != null) {
-                  tree.getStore().add(createAlbum(be.getValue()), false);
-                  tree.setLeaf(tree.getStore().getRootItems().get(
-                      tree.getStore().getRootItems().size() - 1), false);
-                }
-              }
-            });
+        MessageBox.prompt("New Album", "Enter the new album name:", new Listener<MessageBoxEvent>() {
+          public void handleEvent(MessageBoxEvent be) {
+            if (be.getButtonClicked().getItemId().equals(Dialog.OK) && be.getValue() != null) {
+              tree.getStore().add(createAlbum(be.getValue()), false);
+              tree.setLeaf(tree.getStore().getRootItems().get(tree.getStore().getRootItems().size() - 1), false);
+            }
+          }
+        });
       }
     });
     toolBar.add(newAlbum);
@@ -114,16 +111,14 @@ public class ImageOrganizerExample extends LayoutContainer {
 
     ContentPanel center = new ContentPanel();
     center.setHeading("My Images");
-    center.setScrollMode(Scroll.AUTO);
+//    center.setScrollMode(Scroll.AUTO);
+    center.setLayout(new FitLayout());
 
     BorderLayoutData centerData = new BorderLayoutData(LayoutRegion.CENTER);
     centerData.setMargins(new Margins(5));
     container.add(center, centerData);
 
-    final ExampleServiceAsync service = (ExampleServiceAsync) GWT.create(ExampleService.class);
-    ServiceDefTarget endpoint = (ServiceDefTarget) service;
-    String moduleRelativeURL = GWT.getModuleBaseURL() + "service";
-    endpoint.setServiceEntryPoint(moduleRelativeURL);
+    final ExampleServiceAsync service = (ExampleServiceAsync) Registry.get(Examples.SERVICE);
 
     RpcProxy<List<Photo>> proxy = new RpcProxy<List<Photo>>() {
       @Override
@@ -132,8 +127,8 @@ public class ImageOrganizerExample extends LayoutContainer {
       }
     };
 
-    ListLoader<ListLoadResult<BeanModel>> loader = new BaseListLoader<ListLoadResult<BeanModel>>(
-        proxy, new BeanModelReader());
+    ListLoader<ListLoadResult<BeanModel>> loader = new BaseListLoader<ListLoadResult<BeanModel>>(proxy,
+        new BeanModelReader());
     ListStore<BeanModel> store = new ListStore<BeanModel>(loader);
     loader.load();
 
@@ -144,8 +139,8 @@ public class ImageOrganizerExample extends LayoutContainer {
         long size = photo.getSize() / 1000;
         model.set("shortName", Format.ellipse(photo.getName(), 15));
         model.set("sizeString", NumberFormat.getFormat("#0").format(size) + "k");
-        model.set("dateString", DateTimeFormat.getMediumDateTimeFormat().format(
-            photo.getDate()));
+        model.set("dateString", DateTimeFormat.getMediumDateTimeFormat().format(photo.getDate()));
+        model.set("path", GWT.getHostPageBaseURL() + photo.getPath());  
         return model;
       }
     };
@@ -154,6 +149,7 @@ public class ImageOrganizerExample extends LayoutContainer {
     view.setBorders(false);
     view.setStore(store);
     view.setItemSelector("div.thumb-wrap");
+    
 
     center.add(view);
 

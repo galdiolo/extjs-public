@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -42,8 +42,10 @@ public class NumericFilter extends Filter {
 
   private RangeMenu rangeMenu;
   private int width = 125;
+
   public NumericFilter(String dataIndex) {
     super(dataIndex);
+    setMessages(new NumericFilterMessages());
     rangeItems.add(RangeItem.LESSTHAN);
     rangeItems.add(RangeItem.GREATERTHAN);
     rangeItems.add(RangeItem.EQUAL);
@@ -51,7 +53,7 @@ public class NumericFilter extends Filter {
     menu = new RangeMenu(this);
     rangeMenu = (RangeMenu) menu;
     rangeMenu.setRangeItems(rangeItems);
-    setMessages(new NumericFilterMessages());
+    setWidth(getWidth());
   }
 
   @Override
@@ -92,10 +94,19 @@ public class NumericFilter extends Filter {
     return false;
   }
 
+  @Override
+  public void setMessages(FilterMessages messages) {
+    super.setMessages(messages);
+    if (rangeMenu != null) {
+      rangeMenu.setEmptyText(getMessages().getEmptyText());
+    }
+  }
+
   @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   public void setValue(Object value) {
     rangeMenu.setValue((List) value);
+    fireUpdate();
   }
 
   /**
@@ -105,6 +116,7 @@ public class NumericFilter extends Filter {
    */
   public void setWidth(int width) {
     this.width = width;
+    rangeMenu.setFieldWidth(width);
   }
 
   @Override

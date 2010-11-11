@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -204,6 +204,7 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     private boolean expanded;
     private boolean leaf = true;
     private boolean loaded;
+    private boolean loading;
 
     TreeNode(String id, M m) {
       this.id = id;
@@ -262,15 +263,16 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
 
   protected Map<M, String> cache;
   protected String displayProperty;
+  protected boolean filtering;
   protected String itemSelector = ".x-tree3-node";
   protected TreeLoader<M> loader;
   protected Map<String, TreeNode> nodes = new FastMap<TreeNode>();
   protected TreePanelSelectionModel<M> sm;
   protected TreeStore<M> store;
-  protected TreePanelView<M> view = new TreePanelView<M>();
 
+  protected TreePanelView<M> view = new TreePanelView<M>();
   private boolean autoExpand;
-  private boolean autoLoad, filtering;
+  private boolean autoLoad;
   private boolean autoSelect;
   private boolean caching = true;
   private boolean checkable;
@@ -1063,13 +1065,12 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     if (loader != null && !node.loaded) {
       return loader.hasChildren(node.m);
     }
-    if (!node.leaf ||  store.hasChildren(node.m)) {
+    if (!node.leaf || store.hasChildren(node.m)) {
       return true;
     }
     return false;
   }
 
-  
   @Override
   protected void notifyShow() {
     super.notifyShow();
@@ -1217,7 +1218,7 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     } else {
       TreeNode n = findNode(p);
       n.loaded = true;
-
+      n.loading = false;
       if (n.childrenRendered) {
         getContainer(p).setInnerHTML("");
       }
@@ -1232,9 +1233,9 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
         n.expandDeep = false;
         setExpanded(p, true, deep);
         caching = c;
+      } else {
+        refresh(p);
       }
-      refresh(p);
-      statefulExpand(store.getChildren(p));
     }
   }
 
@@ -1253,12 +1254,17 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     tpe.setNode(node);
 
     if (!node.isLeaf()) {
+      // if we are loading, ignore it
+      if (node.loading) {
+        return;
+      }
       // if we have a loader and node is not loaded make
       // load request and exit method
       if (!node.expanded && loader != null && (!node.loaded || !caching) && !filtering) {
         store.removeAll(model);
         node.expand = true;
         node.expandDeep = deep;
+        node.loading = true;
         view.onLoading(node);
         loader.loadChildren(model);
         return;
@@ -1290,22 +1296,27 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
         update();
         fireEvent(Events.Expand, tpe);
       }
-    }
-    if (deep) {
-      setExpandChildren(model, true);
+
+      if (deep) {
+        setExpandChildren(model, true);
+      } else {
+        statefulExpand(store.getChildren(model));
+      }
     }
 
   }
 
   protected void onFilter(TreeStoreEvent<M> se) {
-    filtering = store.isFiltered();
-    clear();
-    renderChildren(null);
+    if (isRendered()) {
+      filtering = store.isFiltered();
+      clear();
+      renderChildren(null);
 
-    if (expandOnFilter && store.isFiltered()) {
-      expandAll();
+      if (expandOnFilter && store.isFiltered()) {
+        expandAll();
+      }
+      update();
     }
-    update();
   }
 
   protected void onFocus(ComponentEvent ce) {
@@ -1314,8 +1325,10 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
 
   protected void onRemove(TreeStoreEvent<M> se) {
     TreeNode node = findNode(se.getChild());
-    if (node != null && node.getElement() != null) {
-      El.fly(node.getElement()).removeFromParent();
+    if (node != null) {
+      if (node.getElement() != null) {
+        El.fly(node.getElement()).removeFromParent();
+      }
       unregister(se.getChild());
       for (M child : se.getChildren()) {
         unregister(child);
@@ -1353,7 +1366,7 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
       statefulExpand(store.getRootItems());
     }
 
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       Accessibility.setRole(getElement(), Accessibility.ROLE_TREE);
       new KeyNav<ComponentEvent>(this) {
         @Override
@@ -1503,10 +1516,14 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
 
   protected void unregister(M m) {
     if (m != null && useKeyProvider != null) {
+      TreeNode n = null;
       if (useKeyProvider) {
-        nodes.remove(generateModelId(m));
+        n = nodes.remove(generateModelId(m));
       } else {
-        nodes.remove(cache.remove(m));
+        n = nodes.remove(cache.remove(m));
+      }
+      if (n != null) {
+        n.clearElements();
       }
     }
   }
@@ -1588,13 +1605,12 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
   private void statefulExpand(List<M> children) {
     if (isStateful() && store.getKeyProvider() != null) {
       List<String> expanded = (List) getState().get("expanded");
-      if (expanded != null) {
+      if (expanded != null && expanded.size() > 0) {
         for (M child : children) {
           String id = store.getKeyProvider().getKey(child);
           if (expanded.contains(id)) {
             setExpanded(child, true);
           }
-          statefulExpand(store.getChildren(child));
         }
       }
     }

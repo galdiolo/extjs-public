@@ -2,19 +2,61 @@
 <head> 
     <title>Ext GWT Release Notes</title> 
     <style> 
-        * { margin: 0; padding: 0; }
-        body { padding: 40px; font-family: 'Myriad Pro', Verdana, Helvetica, verdana, sans-serif; font-size: 12px; }
-        h1 { font-size: 23px; }
-        h2 { font-size: 16px; margin-top: 1em; }
-        h3 { font-size: 14px; }
-        li { padding: 2px 0; }
-        .doc { color: blue; }
-        .change { color: #196cb4; }
-        .new { color: #6e7a32; }
-        ul { padding: .1em 1.5em; }
-        .notes { color: #777; }
-        a { color: rgb(4, 100, 187); }
-        a:hover { color: rgb(28, 65, 124); }
+		body {
+		   color: #333;
+		   padding: 0 40px 40px;
+		   font-family: Helvetica, Arial, Geneva, sans-serif;
+		   font-size: 12px;
+		   line-height: normal;
+		   width: 800px;
+		   margin: 0 auto;
+		}
+		
+		a#logo {
+		   background: transparent url(welcome/images/logo-sencha-sm.png) no-repeat scroll 0px 100%;
+		   display: block;
+		   height: 58px;
+		   margin: 0;
+		   padding: 0;
+		   width: 134px;
+		
+		   overflow: hidden;
+		   text-indent: 150%;
+		   white-space: nowrap;
+		}
+		
+		h1, h2, h3 {
+		   font-family: 'Helvetica Neue', Helvetica, Arial, Geneva, sans-serif;
+		   font-weight: 600;
+		   margin: 1em 0;
+		}
+		h1 { font-size: 28px; }
+		h2 { font-size: 20px; }
+		h3 { font-size: 16px; }
+		ul li { padding: 2px 0; }
+		.doc { color: blue; }
+		.change { color: #196cb4; }
+		.new { color: #6e7a32; }
+		ul { padding: .1em 1.5em; }
+		.notes { color: #777; }
+		a { color: #0464BB; }
+		a:hover { color: rgb(28, 65, 124); }
+		
+		pre {
+		   background: ghostWhite;
+		   border: 1px solid #ddd;
+		   font-family: Menlo, Monaco, Courier, monospace;
+		   overflow: auto;
+		   padding: 12px;
+		}
+		
+		hr {
+		   color: #e0e0e0;
+		   background-color: #e0e0e0;
+		   height: 4px;
+		   border: none;
+		   outline: none;
+		}
     </style> 
 </head> 
  
@@ -23,6 +65,7 @@
 
 <h1>Ext GWT Library Release Notes</h1>
 <ul>
+  <li><a href="#Release_2.2.1">Release 2.2.1 (11/10/10)</a></li>
   <li><a href="#Release_2.2.0">Release 2.2.0 (8/31/10)</a></li>
   <li><a href="#Release_2.2.0.RC">Release 2.2.0 RC (8/16/2010)</a></li>
   <li><a href="#Release_2.2.0.Beta">Release 2.2.0 Beta (7/19/2010)</a></li>
@@ -50,6 +93,119 @@
   <li><a href="#Release_1.1">Release 1.1 (9/18/2008)</a></li>
   <li><a href="#Release_1.0">Release 1.0 (7/7/2008)</a></li>
 </ul>
+
+<h2><a name="Release_2.2.1">Release 2.2.1 (Released November 10th, 2010)</a></h2>
+
+<h2>General Changes &amp; Enhancements</h2>
+<ul>
+  <li>Made TreeGridCellRenderer easier to extend.</li>
+  <li>[98882] Added Slovenian translation.</li>
+  <li>Added Ext GWT version info to MANIFEST.MF file in gxt.jar</li>
+  <li>Refactored FocusManager code. Added new FocusManagerSupport class</li>
+  <li>Added TreeGridFilters</li>
+  <li>Added startElement to DragEvent.</li>
+  <li>Removed BeanModelLookup dependency from NestedModelUtil.</li>
+  <li>Added java.util.Map support to Util.getJsObject.</li>
+  <li>Added detailed documentation to XTemplate</li>
+  <li>Updated TemplateExample to allow users to change and run template code.</li>
+  <li>Added support for GWT 2.1</li>
+</ul>
+
+<h2>API Changes</h2>
+<ul>
+  <li>Deprecated NestedModelUtil.convertIfNecessary as no longer used.</li>
+  <li>Added isVertical/setVertical to ListViewSelectionModel.</li>
+</ul>
+
+<h2>Bug Fixes</h2>
+<ul>
+  <li>Fixed BufferView not rendering rows on resize of the view correctly.</li>
+  <li>Fixed SlideIn and SlideOut not working correctly under all circumstances.</li>
+  <li>Fixed CollapsePanel showing popup incorrectly aligned the first time under some circumstances.</li>
+  <li>[108715] Fixed GridSelectionModel throws a NullPointerException on hiding a column before rendering the grid.</li>
+  <li>Fixed Filter setValue not working pre render under all circumstances.</li>
+  <li>Fixed StringFilter and NumericFilter not setting the width correctly on the field.</li>
+  <li>Fixed StringFilter and NumericFilter not setting the empty text under all circumstances.</li>
+  <li>Fixed GridFilters throwing a NullPointerException if updating any Filter before the grid is rendered.</li>
+  <li>[109321] Fixed RowEditor not working correctly if used with EditorGrid.</li>
+  <li>[109365] Fixed Grid aggregation row being off by 1px.</li>
+  <li>[109366] Fixed Grid not showing loading on initial load if loading was called before the view was ready.</li>
+  <li>Fixed Window maximize not working correctly if window is already in the maximized size.</li>
+  <li>Fixed Window not disabling the shadow if maximized.</li>
+  <li>Fixed Grid setColumnLines only working prerender.</li>
+  <li>[109354] Fixed GridSelectionModel scrolling horizontal on clicking a cell if that is not fully visible.</li>
+  <li>Fixed TreeGridView not updating icon correctly on the tree cell.</li>
+  <li>Fixed StringFilter working differently remote than local.</li>
+  <li>Fixed SpinnerField cannot be disabled completely.</li>
+  <li>[110087] Fixed BeanModelGenerator wrapping non BeanModel instances into an additional list.</li>
+  <li>Fixed SpinnerField allowing invalid keys if using them with the metakey.</li>
+  <li>Fixed GridFilters can be activated also they are not activatable.</li>
+  <li>[110323] Fixed ToggleButton toggle throwing a ConcurrentModificationException under some circumstances.</li>
+  <li>Fixed GridDragSource, ListViewDragSource, TreeDragSource, TreePanelDragSource and TreeGridDragSource onDragStart checking if drag is allowed on wrong element.</li>
+  <li>Fixed ToolButton not centered in CollapsePanel for south and north region.</li>
+  <li>[110473] Fixed missing closing table tag in ToolBarLayout.</li>
+  <li>Fixed TabPanel trying to set a height on the body also if autoHeight set to true.</li>
+  <li>Fixed Store not using equals method from Store in findModel.</li>
+  <li>Fixed an issue in stateful expand in TreeGrid/TreePanel that lead to more expanded nodes than needed.</li>
+  <li>Fixed TreeGrid internals ListStore not using equal method of the TreeStore bound to the TreeGrid.</li>
+  <li>Fixed TreeGrid/TreePanel starting multiply loads for the same node under some circumstances.</li>
+  <li>Fixed GroupingView showing group start part incorrectly under some circumstances.</li>
+  <li>Fixed TreePanelDropTarget and TreeGridDropTarget ignoring configured feedback.</li>
+  <li>Fixed CheckColumnConfig not checking for correct column correctly on mouse down.</li>
+  <li>Fixed LiveGridEvent getModel returning wrong model.</li>
+  <li>[112360] Fixed MenuItem shouldDeactivate not calculating for browser scrolling.</li>
+  <li>[112289] Fixed CellSelectionModel not checking if cell is selectable under all circumstances.</li>
+  <li>Fixed CellSelectionModel getSelectedItem and getSelectedItems not returning the model associated with the selection.</li>
+  <li>[112257] Fixed incorrect background color for message box in gray, access, and slate theme.</li>
+  <li>Fixed ComboBox selecting item on pressing enter in paging toolbar.</li>
+  <li>Fixed ComboBox not collapsing on blur under all circumstances.</li>
+  <li>Fixed ComboBox list can be bigger than screen.</li>
+  <li>Fixed ColorPalette setValue not working under all circumstances.</li>
+  <li>Fixed EditorSupport not firing ValidateEdit event after editing under all circumstances.</li>
+  <li>Fixed MenuItem not displaying correctly if no text set.</li>
+  <li>Fixed opening multiply Window instances with modal set to true no longer displays multiply masks at once.</li>
+  <li>Fixed HtmlEditor focusing iframe also if in source edit mode.</li>
+  <li>Fixed TriggerField triggerBlur not bluring input element.</li>
+  <li>Fixed CheckBox not aligning boxLabel correctly while hidden.</li>
+  <li>Fixed Button not aligning icon correctly while hidden.</li>
+  <li>Fixed DatePicker not working correctly with DST.</li>
+  <li>Fixed DualListField setEnableDND only works pre rendering.</li>
+  <li>Fixed Button icon alignment issue in IE8 and strict mode.</li>
+  <li>Fixed PagingToolBar not enabling again after canceling Loader.BeforeLoad event.</li>
+  <li>Fixed ListStore and TreeStore firing BeforeDataChanged event before loading, also BeforeLoad event already canceled.</li>
+  <li>Fixed possible exception in ToolTip, QuickTip and DomEvent.within if target element is not a real element.</li>
+  <li>Fixed TreePanel not removing model under all circumstances if model gets removed from the store.</li>
+  <li>Fixed possible exception in GridView, MenuBar and Menu if moving mouse from or to a non element.</li>
+  <li>Fixed Menu hiding submenu if moving mouse slowly to the submenu.</li>
+  <li>Fixed Layer not positioning shim correctly in IE.</li>
+  <li>Fixed possible leak in ToolBarLayout with enanbleOverflow set to true.</li>
+  <li>Fixed shadowOffset being hardcoded in some places in Layer and MenuItem.</li>
+  <li>Fixed LiveGridView showing liveScroller incorrectly after reconfigure.</li>
+  <li>Fixed minor issue in ColumnHeader showColumnMenu which could course a NPE.</li>
+  <li>Fixed font change not working correctly in HtmlEditor.</li>
+  <li>Fixed HtmlEditor not displaying toolbar correctly in IE.</li>
+  <li>Fixed DualListField with mode set to insert does not allow reorder with DND.</li>
+  <li>Fixed disabling FieldSet not disabling toggle item or checkbox.</li>
+  <li>Fixed Radio not working correctly in IE6.</li>
+  <li>Fixed Portal scrolling in IE and strict mode.</li>
+  <li>Fixed GridSelectionModel and ListViewSelectionModel not updating last focused if model gets updated.</li>
+  <li>Fixed rendering issues in ListView with complex templates after a refresh.</li>
+  <li>Fixed CheckBoxListView not saving check state on update.</li>
+  <li>Fixed CheckBoxListView not displaying correctly in IE and strict mode.</li>
+  <li>Fixed AbstractStoreSelectionModel not updating last focused on updating the model.</li>
+  <li>Fixed DomQuery not working in HtmlUnit.</li>
+  <li>Fixed GridView not adjusting empty text width on column hide or resize.</li>
+  <li>Fixed ListStore throwing a NullPointerException if config is null after a load.</li>
+  <li>Fixed Field with autovalidate not canceling validation task on detach.</li>
+  <li>Fixed TimeField not working correctly if date on min/max value is not what was expected.</li>
+  <li>Fixed LiveGridView internal store not using equals method of real grid store.</li>
+  <li>Fixed CheckColumnConfig and CheckBoxSelectionModel not working correctly with LiveGridView.</li>
+  <li>Fixed issue in SpinnerField and NumberField with GWT 2.1.</li>
+  <li>Fixed ColumnHeader not correctly checking if column is resizable.</li>
+  <li>Fixed TreeDragSource, ListViewDragSource causing Tree to scroll to top when contained in scrolling element in IE.</li>
+  <li>Fixed Grid in scrollable container "jumps" when first focused in IE.</li>
+</ul>
+
 
 <h2><a name="Release_2.2.0">Release 2.2.0 (Released August 31st, 2010)</a></h2>
 

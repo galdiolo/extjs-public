@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -124,7 +124,7 @@ public class MenuBar extends Container<MenuBarItem> {
       }
       onActivate(item);
 
-      if (GXT.isAriaEnabled()) {
+      if (GXT.isFocusManagerEnabled()) {
         FocusFrame.get().frame(active);
       }
 
@@ -180,7 +180,7 @@ public class MenuBar extends Container<MenuBarItem> {
 
     item.removeStyleName(item.getBaseStyle() + "-active");
     item.removeStyleName(item.getBaseStyle() + "-over");
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       FocusFrame.get().unframe();
     }
     if (active == item) {
@@ -232,7 +232,7 @@ public class MenuBar extends Container<MenuBarItem> {
 
   protected void onMouseOut(ComponentEvent ce) {
     EventTarget eT = ce.getEvent().getRelatedEventTarget();
-    if ((eT == null || findItem((Element) Element.as(eT)) == null) && active != null && !active.expanded) {
+    if ((eT == null || (Element.is(eT) && findItem((Element) Element.as(eT)) == null)) && active != null && !active.expanded) {
       onDeactivate(active);
     }
   }

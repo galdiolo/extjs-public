@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -254,7 +254,7 @@ public class ToolBar extends Container<Component> {
   }
 
   protected void onFocus(ComponentEvent ce) {
-    if (GXT.isAriaEnabled() && !FocusManager.get().isManaged()) {
+    if (GXT.isFocusManagerEnabled() && !FocusManager.get().isManaged()) {
       FocusFrame.get().frame(this);
       return;
     }
@@ -262,7 +262,7 @@ public class ToolBar extends Container<Component> {
     ce.stopEvent();
     for (int i = 0; i < getItemCount(); i++) {
       Component c = getItem(i);
-      if (c.isEnabled() && !c.getAriaSupport().isIgnore()) {
+      if (c.isEnabled() && !c.getFocusSupport().isIgnore()) {
         c.focus();
         break;
       }
@@ -284,11 +284,12 @@ public class ToolBar extends Container<Component> {
       }
     }
 
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       el().setTabIndex(0);
       el().setElementAttribute("hideFocus", "true");
+    }
+    if (GXT.isFocusManagerEnabled()) {
       Accessibility.setRole(getElement(), "toolbar");
-
       if (!getTitle().equals("")) {
         Accessibility.setState(getElement(), "aria-label", getTitle());
       }

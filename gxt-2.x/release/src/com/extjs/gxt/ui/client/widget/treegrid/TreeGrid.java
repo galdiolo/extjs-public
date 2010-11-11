@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -70,6 +70,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
     private boolean expanded;
     private boolean leaf = true;
     private boolean loaded;
+    private boolean loading;
 
     public TreeNode(String id, M m) {
       this.id = id;
@@ -118,26 +119,32 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
   }
 
   protected Map<M, String> cache;
+  protected boolean filtering;
   protected TreeLoader<M> loader;
   protected Map<String, TreeNode> nodes = new FastMap<TreeNode>();
   protected TreeGridView treeGridView;
   protected TreeStore<M> treeStore;
-  private boolean autoLoad, filtering, autoExpand;
+  private boolean autoLoad, autoExpand;
   private boolean caching = true;
   private boolean columnLines;
 
   private boolean expandOnFilter = true;
   private ModelIconProvider<M> iconProvider;
   private ListStore<M> listStore = new ListStore<M>() {
+    @Override
+    public boolean equals(M model1, M model2) {
+      return treeStore.equals(model1, model2);
+    }
+
+    @Override
     public Record getRecord(M model) {
       return treeStore.getRecord(model);
     }
 
+    @Override
     public boolean hasRecord(M model) {
       return treeStore.hasRecord(model);
-
     }
-
   };
   private StoreListener<M> storeListener = new StoreListener<M>() {
     @Override
@@ -458,12 +465,17 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
       tge.setModel(model);
       if (expand) {
         if (!node.isLeaf()) {
+          // if we are loading, ignore it
+          if (node.loading) {
+            return;
+          }
           // if we have a loader and node is not loaded make
           // load request and exit method
           if (!node.expanded && loader != null && (!node.loaded || !caching) && !filtering) {
             treeStore.removeAll(model);
             node.expand = true;
             node.expandDeep = deep;
+            node.loading = true;
             treeGridView.onLoading(node);
             loader.loadChildren(model);
             return;
@@ -493,11 +505,13 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
             }
             fireEvent(Events.Expand, tge);
           }
-        }
-        if (deep) {
-          setExpandChildren(model, true);
-        }
 
+          if (deep) {
+            setExpandChildren(model, true);
+          } else {
+            statefulExpand(treeStore.getChildren(model));
+          }
+        }
       } else {
         if (node.expanded && fireEvent(Events.BeforeCollapse, tge)) {
           node.expanded = false;
@@ -750,7 +764,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
     } else {
       TreeNode n = findNode(p);
       n.loaded = true;
-
+      n.loading = false;
       renderChildren(p, autoLoad);
 
       if (n.expand && !n.isLeaf()) {
@@ -761,9 +775,9 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
         caching = true;
         setExpanded(p, true, deep);
         caching = c;
+      } else {
+        refresh(p);
       }
-      refresh(p);
-      statefulExpand(treeStore.getChildren(p));
     }
   }
 
@@ -814,6 +828,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
   }
 
   protected void onUpdate(TreeStoreEvent<M> se) {
+    store.update(se.getModel());
     store.fireEvent(Store.Update, se);
   }
 
@@ -923,13 +938,12 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
   private void statefulExpand(List<M> children) {
     if (isStateful() && treeStore.getKeyProvider() != null) {
       List<String> expanded = (List) getState().get("expanded");
-      if (expanded != null) {
+      if (expanded != null && expanded.size() > 0) {
         for (M child : children) {
           String id = treeStore.getKeyProvider().getKey(child);
           if (expanded.contains(id)) {
             setExpanded(child, true);
           }
-          statefulExpand(treeStore.getChildren(child));
         }
       }
     }

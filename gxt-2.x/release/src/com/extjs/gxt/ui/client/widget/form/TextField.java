@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -9,11 +9,7 @@ package com.extjs.gxt.ui.client.widget.form;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
-import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
-import com.extjs.gxt.ui.client.event.FieldEvent;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.util.DelayedTask;
 import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.util.Size;
 import com.google.gwt.core.client.GWT;
@@ -27,7 +23,7 @@ import com.google.gwt.user.client.ui.impl.TextBoxImpl;
  * Basic text field. <b>Code snippet</b>:
  * 
  * <pre>
- * TextField&lt;String&gt; text = new TextField&amp;ltString&gt;();
+ * TextField&lt;String&gt; text = new TextField&lt;String&gt;();
  *     text.setFieldLabel(&quot;Name&quot;);
  *     text.setEmptyText(&quot;Enter your full name&quot;);
  *     text.setAllowBlank(false);
@@ -168,8 +164,6 @@ public class TextField<D> extends Field<D> {
   private boolean password;
   private String regex;
   private boolean selectOnFocus;
-
-  private DelayedTask validationTask;
 
   /**
    * Creates a new text field.
@@ -472,14 +466,6 @@ public class TextField<D> extends Field<D> {
   }
 
   @Override
-  protected void onKeyUp(FieldEvent fe) {
-    super.onKeyUp(fe);
-    if (validationTask != null) {
-      validationTask.delay(validationDelay);
-    }
-  }
-
-  @Override
   protected void onRender(Element target, int index) {
     if (el() == null) {
       setElement(DOM.createDiv(), target, index);
@@ -495,14 +481,6 @@ public class TextField<D> extends Field<D> {
 
     super.onRender(target, index);
     removeStyleName(fieldStyle);
-
-    if (autoValidate) {
-      validationTask = new DelayedTask(new Listener<BaseEvent>() {
-        public void handleEvent(BaseEvent be) {
-          validate();
-        }
-      });
-    }
 
     if (GXT.isAriaEnabled()) {
       if (!getAllowBlank()) {

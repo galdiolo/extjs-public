@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -553,7 +553,7 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
   }
 
   protected void onFocus(ComponentEvent ce) {
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       FocusFrame.get().frame(this);
     }
   }
@@ -740,7 +740,7 @@ public class Tree extends Container<TreeItem> implements Selectable<TreeItem> {
 
     disableTextSelection(true);
 
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       new KeyNav<ComponentEvent>(this) {
         @Override
         public void onDown(ComponentEvent ce) {

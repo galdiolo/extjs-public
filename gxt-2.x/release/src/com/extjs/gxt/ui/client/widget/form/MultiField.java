@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -14,6 +14,7 @@ import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -254,6 +255,18 @@ public class MultiField<D> extends Field<D> {
   }
 
   @Override
+  protected void notifyHide() {
+    super.notifyHide();
+    doNotify(lc, false);
+  }
+
+  @Override
+  protected void notifyShow() {
+    super.notifyShow();
+    doNotify(lc, true);
+  }
+
+  @Override
   protected void onDisable() {
     super.onDisable();
     lc.disable();
@@ -339,4 +352,12 @@ public class MultiField<D> extends Field<D> {
     clearInvalid();
     return true;
   }
+
+  private native void doNotify(Component c, boolean show) /*-{
+    if(show){
+      c.@com.extjs.gxt.ui.client.widget.Component::notifyShow()()
+    } else {
+      c.@com.extjs.gxt.ui.client.widget.Component::notifyHide()();
+    }
+  }-*/;
 }

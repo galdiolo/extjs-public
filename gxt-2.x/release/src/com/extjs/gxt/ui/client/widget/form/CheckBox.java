@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -93,7 +93,7 @@ public class CheckBox extends Field<Boolean> {
    */
   public String getValueAttribute() {
     if (rendered) {
-     return input.getValue();
+      return input.getValue();
     }
     return valueAttribute;
   }
@@ -180,9 +180,21 @@ public class CheckBox extends Field<Boolean> {
   }
 
   @Override
+  protected void notifyShow() {
+    super.notifyShow();
+    alignElements();
+  }
+
+  @Override
   protected void onAttach() {
     super.onAttach();
     alignElements();
+  }
+
+  @Override
+  protected void onBlur(ComponentEvent be) {
+    super.onBlur(be);
+    FocusFrame.get().unframe();
   }
 
   @Override
@@ -196,11 +208,17 @@ public class CheckBox extends Field<Boolean> {
     boolean v = getInputEl().dom.getPropertyBoolean("checked");
     setValue(v);
   }
-  
+
+  @Override
+  protected void onFocus(ComponentEvent ce) {
+    super.onFocus(ce);
+    FocusFrame.get().frame(this);
+  }
+
   @Override
   protected void onRender(Element target, int index) {
     if (this instanceof Radio) {
-      input = new El(DOM.createInputRadio(""));
+      input = new El(DOM.createInputRadio(name));
     } else {
       input = new El(DOM.createInputCheck());
     }
@@ -231,18 +249,6 @@ public class CheckBox extends Field<Boolean> {
     setValueAttribute(valueAttribute);
 
     focusStyle = null;
-  }
-  
-  @Override
-  protected void onFocus(ComponentEvent ce) {
-    super.onFocus(ce);
-    FocusFrame.get().frame(this);
-  }
-  
-  @Override
-  protected void onBlur(ComponentEvent be) {
-    super.onBlur(be);
-    FocusFrame.get().unframe();
   }
 
   @Override

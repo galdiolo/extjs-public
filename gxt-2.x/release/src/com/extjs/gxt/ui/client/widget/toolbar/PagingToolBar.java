@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -28,6 +28,8 @@ import com.extjs.gxt.ui.client.widget.button.Button;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.TextBox;
@@ -63,19 +65,19 @@ public class PagingToolBar extends ToolBar {
   public static class PagingToolBarImages {
     private AbstractImagePrototype first = GXT.isHighContrastMode
         ? IconHelper.create("gxt/themes/access/images/grid/page-first.gif") : GXT.IMAGES.paging_toolbar_first();
-    private AbstractImagePrototype prev = GXT.isHighContrastMode
-        ? IconHelper.create("gxt/themes/access/images/grid/page-prev.gif") : GXT.IMAGES.paging_toolbar_prev();
-    private AbstractImagePrototype next = GXT.isHighContrastMode
-        ? IconHelper.create("gxt/themes/access/images/grid/page-next.gif") : GXT.IMAGES.paging_toolbar_next();
+    private AbstractImagePrototype firstDisabled = GXT.IMAGES.paging_toolbar_first_disabled();
     private AbstractImagePrototype last = GXT.isHighContrastMode
         ? IconHelper.create("gxt/themes/access/images/grid/page-last.gif") : GXT.IMAGES.paging_toolbar_last();
+    private AbstractImagePrototype lastDisabled = GXT.IMAGES.paging_toolbar_last_disabled();
+    private AbstractImagePrototype next = GXT.isHighContrastMode
+        ? IconHelper.create("gxt/themes/access/images/grid/page-next.gif") : GXT.IMAGES.paging_toolbar_next();
+
+    private AbstractImagePrototype nextDisabled = GXT.IMAGES.paging_toolbar_next_disabled();
+    private AbstractImagePrototype prev = GXT.isHighContrastMode
+        ? IconHelper.create("gxt/themes/access/images/grid/page-prev.gif") : GXT.IMAGES.paging_toolbar_prev();
+    private AbstractImagePrototype prevDisabled = GXT.IMAGES.paging_toolbar_prev_disabled();
     private AbstractImagePrototype refresh = GXT.isHighContrastMode
         ? IconHelper.create("gxt/themes/access/images/grid/refresh.gif") : GXT.IMAGES.paging_toolbar_refresh();
-
-    private AbstractImagePrototype firstDisabled = GXT.IMAGES.paging_toolbar_first_disabled();
-    private AbstractImagePrototype prevDisabled = GXT.IMAGES.paging_toolbar_prev_disabled();
-    private AbstractImagePrototype nextDisabled = GXT.IMAGES.paging_toolbar_next_disabled();
-    private AbstractImagePrototype lastDisabled = GXT.IMAGES.paging_toolbar_last_disabled();
 
     public AbstractImagePrototype getFirst() {
       return first;
@@ -330,23 +332,14 @@ public class PagingToolBar extends ToolBar {
 
   }
 
-  protected PagingLoader<?> loader;
-  protected PagingLoadConfig config;
-  protected int start, pageSize, totalLength;
   protected int activePage = -1, pages;
-  protected Button first, prev, next, last, refresh;
   protected LabelToolItem afterText;
+  protected LabelToolItem beforePage;
+  protected PagingLoadConfig config;
   protected LabelToolItem displayText;
-  protected TextBox pageText;
-  protected PagingToolBarMessages msgs;
-  protected boolean showToolTips = true;
-  protected LoadListener loadListener;
+  protected Button first, prev, next, last, refresh;
   protected PagingToolBarImages images;
-
-  private boolean reuseConfig = true;
-  private LoadEvent renderEvent;
-  private boolean savedEnableState = true;
-  private Listener<ComponentEvent> listener = new Listener<ComponentEvent>() {
+  protected Listener<ComponentEvent> listener = new Listener<ComponentEvent>() {
 
     public void handleEvent(ComponentEvent be) {
       Component c = be.getComponent();
@@ -373,7 +366,16 @@ public class PagingToolBar extends ToolBar {
       }
     }
   };
-  protected LabelToolItem beforePage;
+  protected PagingLoader<?> loader;
+  protected LoadListener loadListener;
+  protected PagingToolBarMessages msgs;
+  protected TextBox pageText;
+
+  protected boolean showToolTips = true;
+  protected int start, pageSize, totalLength;
+  private LoadEvent renderEvent;
+  private boolean reuseConfig = true;
+  private boolean savedEnableState = true;
 
   /**
    * Creates a new paging tool bar with the given page size.
@@ -480,10 +482,18 @@ public class PagingToolBar extends ToolBar {
       loader.setLimit(pageSize);
       if (loadListener == null) {
         loadListener = new LoadListener() {
-          public void loaderBeforeLoad(LoadEvent le) {
+          public void loaderBeforeLoad(final LoadEvent le) {
             savedEnableState = isEnabled();
             setEnabled(false);
             refresh.setIcon(IconHelper.createStyle("x-tbar-loading"));
+            DeferredCommand.addCommand(new Command() {
+              public void execute() {
+                if (le.isCancelled()) {
+                  refresh.setIcon(getImages().getRefresh());
+                  setEnabled(savedEnableState);
+                }
+              }
+            });
           }
 
           public void loaderLoad(LoadEvent le) {
@@ -720,8 +730,8 @@ public class PagingToolBar extends ToolBar {
     activePage = (int) Math.ceil((double) (start + pageSize) / pageSize);
     pageText.setText(String.valueOf((int) activePage));
     pages = totalLength < pageSize ? 1 : (int) Math.ceil((double) totalLength / pageSize);
-    
-    if(activePage > pages){
+
+    if (activePage > pages) {
       last();
       return;
     }

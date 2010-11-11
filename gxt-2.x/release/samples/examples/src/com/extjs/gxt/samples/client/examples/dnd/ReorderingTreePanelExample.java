@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -11,12 +11,11 @@ import com.extjs.gxt.samples.client.Examples;
 import com.extjs.gxt.samples.client.ExamplesModel;
 import com.extjs.gxt.samples.client.examples.model.Category;
 import com.extjs.gxt.ui.client.Registry;
-import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.TreeModel;
+import com.extjs.gxt.ui.client.dnd.DND.Feedback;
 import com.extjs.gxt.ui.client.dnd.TreePanelDragSource;
 import com.extjs.gxt.ui.client.dnd.TreePanelDropTarget;
-import com.extjs.gxt.ui.client.dnd.DND.Feedback;
 import com.extjs.gxt.ui.client.event.DNDEvent;
 import com.extjs.gxt.ui.client.event.DNDListener;
 import com.extjs.gxt.ui.client.event.Events;
@@ -25,6 +24,7 @@ import com.extjs.gxt.ui.client.event.TreePanelEvent;
 import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.util.IconHelper;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.google.gwt.user.client.Element;
@@ -39,7 +39,7 @@ public class ReorderingTreePanelExample extends LayoutContainer {
     LayoutContainer container = new LayoutContainer();
     container.setSize(290, 400);
     container.setBorders(true);
-    container.setScrollMode(Scroll.AUTOY);
+    container.setLayout(new FitLayout());
 
     TreeStore<ModelData> store = new TreeStore<ModelData>();
     final TreeModel root = (ExamplesModel) Registry.get(Examples.MODEL);

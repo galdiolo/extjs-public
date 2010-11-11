@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -17,7 +17,9 @@ import com.extjs.gxt.ui.client.event.PreviewEvent;
 import com.extjs.gxt.ui.client.util.BaseEventPreview;
 import com.extjs.gxt.ui.client.util.Size;
 import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 
@@ -298,6 +300,11 @@ public class TriggerField<D> extends TextField<D> {
   }
 
   protected void triggerBlur(ComponentEvent ce) {
+    DeferredCommand.addCommand(new Command() {
+      public void execute() {
+        getFocusEl().blur();
+      }
+    });
     mimicing = false;
     focusEventPreview.remove();
     beforeBlur();

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -49,6 +49,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 
 /**
@@ -204,6 +205,8 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
   protected boolean delayedCheck;
   protected String lastQuery;
 
+  protected int pageSize;
+  protected PagingToolBar pageTb;
   protected ListStore<D> store;
   private String allQuery = "";
   private BaseEventPreview eventPreview;
@@ -222,8 +225,6 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
   private int minChars = 4;
   private int minListWidth = 70;
   private String mode = "remote";
-  private int pageSize;
-  private PagingToolBar pageTb;
   private int queryDelay = 500;
   private D selectedItem;
   private String selectedStyle = "x-combo-selected";
@@ -285,7 +286,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     list.hide();
 
     RootPanel.get().remove(list);
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isAriaEnabled() && hasFocus) {
       // inspect 32 is keeping focus on hidden list item in dropdown
       input.blur();
       input.focus();
@@ -788,7 +789,7 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
       if (pageTb != null) {
         pageTb.setPageSize(pageSize);
       } else {
-        pageTb = new PagingToolBar(pageSize);
+        pageTb = createPagingToolBar(pageSize);
       }
     } else {
       pageTb = null;
@@ -863,9 +864,10 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
    * @param store the store
    */
   public void setStore(ListStore<D> store) {
-    this.store = store;
     if (rendered) {
       bindStore(store);
+    } else {
+      this.store = store;
     }
   }
 
@@ -991,6 +993,10 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     }
   }
 
+  protected PagingToolBar createPagingToolBar(int pageSize) {
+    return new PagingToolBar(pageSize);
+  }
+
   protected void doForce() {
     if (forceSelection) {
       boolean f = forceSelection;
@@ -1033,6 +1039,10 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     if (fe.isNavKeyPress() && !isExpanded() && !delayedCheck) {
       fireEvent(Events.SpecialKey, fe);
     }
+  }
+
+  protected Element getAlignElement() {
+    return getElement();
   }
 
   @Override
@@ -1116,6 +1126,10 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
       @Override
       public void onEnter(ComponentEvent ce) {
         if (expanded) {
+          if (pageTb != null && ce.within(pageTb.getElement())) {
+            return;
+          }
+
           ce.cancelBubble();
           onViewClick(ce, false);
           delayedCheck = true;
@@ -1423,6 +1437,42 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
     collapse();
   }
 
+  protected void restrict() {
+    list.el().setVisibility(false);
+    listView.setHeight("auto");
+    list.setHeight("auto");
+    int w = Math.max(getWidth(), minListWidth);
+
+    int fh = footer != null ? footer.getHeight() : 0;
+    int fw = list.el().getFrameWidth("tb") + fh;
+
+    int h = listView.getHeight() + fw;
+
+    int mH = Math.min(maxHeight, Window.getClientHeight() - 10);
+    h = Math.min(h, mH);
+    list.setSize(w, h);
+    list.el().alignTo(getAlignElement(), listAlign, null);
+
+    h -= fw;
+
+    int width = w - list.el().getFrameWidth("lr");
+    listView.syncSize();
+    listView.setSize(width, h);
+
+    if (pageTb != null) {
+      pageTb.setWidth(width);
+    }
+
+    int y = list.el().getY();
+    int b = y + h + fw;
+    int vh = XDOM.getViewportSize().height + XDOM.getBodyScrollTop();
+    if (b > vh) {
+      y = y - (b - vh) - 5;
+      list.el().setTop(y);
+    }
+    list.el().setVisibility(true);
+  }
+
   protected boolean selectByValue(String value) {
     D r = findModel(getDisplayField(), value);
     if (r != null) {
@@ -1435,6 +1485,8 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
   @Override
   protected void triggerBlur(ComponentEvent ce) {
     doForce();
+    dqTask.cancel();
+    collapse();
     super.triggerBlur(ce);
   }
 
@@ -1498,41 +1550,6 @@ public class ComboBox<D extends ModelData> extends TriggerField<D> implements Se
 
   private void initQuery() {
     doQuery(getRawValue(), false);
-  }
-
-  private void restrict() {
-    list.el().setVisibility(false);
-    listView.setHeight("auto");
-    list.setHeight("auto");
-    int w = Math.max(getWidth(), minListWidth);
-
-    int fh = footer != null ? footer.getHeight() : 0;
-    int fw = list.el().getFrameWidth("tb") + fh;
-
-    int h = listView.getHeight() + fw;
-
-    h = Math.min(h, maxHeight - fw);
-    list.setSize(w, h);
-    list.el().alignTo(getElement(), listAlign, null);
-
-    h -= fh;
-
-    int width = w - list.el().getFrameWidth("lr");
-    listView.syncSize();
-    listView.setSize(width, h - list.el().getFrameWidth("tb"));
-
-    if (pageTb != null) {
-      pageTb.setWidth(width);
-    }
-
-    int y = list.el().getY();
-    int b = y + h;
-    int vh = XDOM.getViewportSize().height + XDOM.getBodyScrollTop();
-    if (b > vh) {
-      y = y - (b - vh) - 5;
-      list.el().setTop(y);
-    }
-    list.el().setVisibility(true);
   }
 
   private void selectNext() {

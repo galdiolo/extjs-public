@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -16,10 +16,10 @@ import com.extjs.gxt.ui.client.data.BaseDateFilterConfig;
 import com.extjs.gxt.ui.client.data.FilterConfig;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.FilterEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.util.DateWrapper;
+import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.grid.filters.RangeMenu.RangeItem;
 import com.extjs.gxt.ui.client.widget.menu.CheckMenuItem;
 import com.extjs.gxt.ui.client.widget.menu.DateMenu;
@@ -236,10 +236,10 @@ public class DateFilter extends Filter {
         beforeMenu.setDate((Date) config.getValue());
       } else if ("after".equals(comp)) {
         afterItem.setChecked(true);
-        afterMenu.setDate((Date) value);
+        afterMenu.setDate((Date) config.getValue());
       } else if ("on".equals(comp)) {
         onItem.setChecked(true);
-        onMenu.setDate((Date) value);
+        onMenu.setDate((Date) config.getValue());
       }
     }
   }
@@ -262,8 +262,8 @@ public class DateFilter extends Filter {
       }
     }
     if (onItem.isChecked() && onMenu.getDate() != null) {
-      long pvalue = new DateWrapper(onMenu.getDate()).clearTime().getTime();
-      if (d == null || pvalue != time) {
+      long pvalue = new DateWrapper(onMenu.getDate()).resetTime().getTime();
+      if (d == null || pvalue != (d == null ? 0l : new DateWrapper(d).resetTime().getTime())) {
         return false;
       }
     }
@@ -271,34 +271,45 @@ public class DateFilter extends Filter {
   }
 
   protected void onCheckChange(MenuEvent be) {
-    setActive(isActivatable(), false);
-    fireEvent(Events.Update, new FilterEvent(this));
+    updateMenuState(be.getItem(), be.isChecked());
+    fireUpdate();
   }
 
   protected void onMenuSelect(MenuEvent be) {
     DateMenu menu = (DateMenu) be.getMenu();
-    Date d = be.getDate();
     if (menu == beforeMenu) {
-      beforeItem.setChecked(true);
-      afterItem.setChecked(false);
-      onItem.setChecked(false);
-      if (afterMenu.getDate() != null && afterMenu.getDate().after(d)) {
-        afterItem.setChecked(true);
-      }
+      updateMenuState(beforeItem, true);
     } else if (menu == afterMenu) {
-      afterItem.setChecked(true);
-      onItem.setChecked(false);
-      if (beforeMenu.getDate() != null && beforeMenu.getDate().before(d)) {
-        beforeItem.setChecked(false);
-      }
+      updateMenuState(afterItem, true);
     } else if (menu == onMenu) {
-      beforeItem.setChecked(false);
-      afterItem.setChecked(false);
-      onItem.setChecked(true);
-
+      updateMenuState(onItem, true);
     }
     menu.hide(true);
-    fireEvent(Events.Update, new FilterEvent(this));
+    fireUpdate();
+  }
+
+  protected void updateMenuState(Component item, boolean isChecked) {
+
+    if (item == onItem) {
+      onItem.setChecked(isChecked, true);
+      if (isChecked) {
+        beforeItem.setChecked(false, true);
+        afterItem.setChecked(false, true);
+      }
+    } else if (item == afterItem) {
+      afterItem.setChecked(isChecked, true);
+      if (isChecked) {
+        beforeItem.setChecked(beforeMenu.getDate() != null && beforeMenu.getDate().after(afterMenu.getDate()), true);
+        onItem.setChecked(false, true);
+      }
+    } else if (item == beforeItem) {
+      beforeItem.setChecked(isChecked, true);
+      if (isChecked) {
+        onItem.setChecked(false, true);
+        afterItem.setChecked(afterMenu.getDate() != null && afterMenu.getDate().before(beforeMenu.getDate()), true);
+      }
+    }
+
   }
 
 }

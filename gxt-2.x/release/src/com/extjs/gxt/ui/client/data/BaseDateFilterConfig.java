@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -36,8 +36,8 @@ public class BaseDateFilterConfig extends BaseFilterConfig {
     } else if ("before".equals(comparison)) {
       return v.after(t);
     } else if ("on".equals(comparison)) {
-      t = new DateWrapper(t).clearTime().asDate();
-      v = new DateWrapper(v).clearTime().asDate();
+      t = new DateWrapper(t).resetTime().asDate();
+      v = new DateWrapper(v).resetTime().asDate();
       return !v.equals(t);
     }
     return true;

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -13,6 +13,7 @@ import java.util.List;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
@@ -41,6 +42,7 @@ public class ToolBarLayout extends Layout {
   protected Button more;
   protected Menu moreMenu;
 
+  private Listener<ComponentEvent> containerListener;
   private El extrasTr;
   private List<Component> hiddens;
   private boolean lastOverflow = false;
@@ -49,21 +51,13 @@ public class ToolBarLayout extends Layout {
   private String noItemsMenuText = "<div class=\"x-toolbar-no-items\">(None)</div>";
   private El rightTr;
   private int spacing = 0;
+
   private int triggerWidth = 18;
 
   public ToolBarLayout() {
     monitorResize = true;
     hiddens = new ArrayList<Component>();
     targetStyleName = "x-toolbar-layout-ct";
-  }
-
-  /**
-   * Returns the no menu item text.
-   * 
-   * @return the no menu item text
-   */
-  public String getNoItemsMenuText() {
-    return noItemsMenuText;
   }
 
   /**
@@ -76,12 +70,45 @@ public class ToolBarLayout extends Layout {
   }
 
   /**
+   * Returns the no menu item text.
+   * 
+   * @return the no menu item text
+   */
+  public String getNoItemsMenuText() {
+    return noItemsMenuText;
+  }
+
+  /**
    * Returns the item spacing.
    * 
    * @return the spacing
    */
   public int getSpacing() {
     return spacing;
+  }
+
+  @Override
+  public void setContainer(Container<?> ct) {
+    if (containerListener == null) {
+      containerListener = new Listener<ComponentEvent>() {
+        public void handleEvent(ComponentEvent be) {
+          if (be.getType() == Events.Attach && lastOverflow) {
+            ComponentHelper.doAttach(more);
+          } else if (be.getType() == Events.Detach && lastOverflow) {
+            ComponentHelper.doDetach(more);
+          }
+        }
+      };
+    }
+    if (this.container != null) {
+      this.container.removeListener(Events.Attach, containerListener);
+      this.container.removeListener(Events.Detach, containerListener);
+    }
+    super.setContainer(ct);
+    if (this.container != null) {
+      this.container.addListener(Events.Attach, containerListener);
+      this.container.addListener(Events.Detach, containerListener);
+    }
   }
 
   /**
@@ -262,7 +289,6 @@ public class ToolBarLayout extends Layout {
         public void handleEvent(MenuEvent be) {
           clearMenu();
           for (Component c : container.getItems()) {
-
             if (isHidden(c)) {
               addComponentToMenu(be.getContainer(), c);
             }
@@ -291,7 +317,9 @@ public class ToolBarLayout extends Layout {
     } else {
       more.render(td);
     }
-    ComponentHelper.doAttach(more);
+    if (container.isAttached()) {
+      ComponentHelper.doAttach(more);
+    }
   }
 
   protected Element insertCell(Component c, El side, int pos) {
@@ -309,7 +337,7 @@ public class ToolBarLayout extends Layout {
   }
 
   protected boolean isHidden(Component c) {
-    return hiddens.contains(c);
+    return hiddens != null && hiddens.contains(c);
   }
 
   @Override
@@ -333,7 +361,7 @@ public class ToolBarLayout extends Layout {
     if (leftTr == null) {
       target.insertHtml(
           "beforeEnd",
-          "<table cellspacing=\"0\" class=\"x-toolbar-ct\" role=\"presentation\"><tbody><tr><td class=\"x-toolbar-left\" align=\"left\"><table cellspacing=\"0\" role=\"presentation\"><tbody><tr class=\"x-toolbar-left-row\"></tr></tbody></table></td><td class=\"x-toolbar-right\" align=\"right\"><table cellspacing=\"0\" class=\"x-toolbar-right-ct\" role=\"presentation\"><tbody><tr><td><table cellspacing=\"0\" role=\"presentation\"><tbody><tr class=\"x-toolbar-right-row\" role=\"presentation\"></tr></tbody></table></td><td><table cellspacing=\"0\" role=\"presentation\"><tbody><tr class=\"x-toolbar-extras-row\"></tr></tbody></table></td></tr></tbody></td></tr></tbody></table>");
+          "<table cellspacing=\"0\" class=\"x-toolbar-ct\" role=\"presentation\"><tbody><tr><td class=\"x-toolbar-left\" align=\"left\"><table cellspacing=\"0\" role=\"presentation\"><tbody><tr class=\"x-toolbar-left-row\"></tr></tbody></table></td><td class=\"x-toolbar-right\" align=\"right\"><table cellspacing=\"0\" class=\"x-toolbar-right-ct\" role=\"presentation\"><tbody><tr><td><table cellspacing=\"0\" role=\"presentation\"><tbody><tr class=\"x-toolbar-right-row\" role=\"presentation\"></tr></tbody></table></td><td><table cellspacing=\"0\" role=\"presentation\"><tbody><tr class=\"x-toolbar-extras-row\"></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table>");
       leftTr = target.child("tr.x-toolbar-left-row");
       rightTr = target.child("tr.x-toolbar-right-row");
       extrasTr = target.child("tr.x-toolbar-extras-row");

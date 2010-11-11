@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -79,30 +79,31 @@ public class Draggable extends BaseObservable {
   protected int conX, conY, conWidth, conHeight;
   protected int dragStartX, dragStartY;
   protected int lastX, lastY;
-  protected Rectangle startBounds;
   protected El proxyEl;
+  protected Rectangle startBounds;
 
+  private int clientWidth, clientHeight;
+  private boolean constrainClient = true;
+  private boolean constrainHorizontal;
+  private boolean constrainVertical;
+  private Component container;
+  private DragEvent dragEvent;
+  private boolean dragging;
+  private Component dragWidget;
+  private boolean enabled = true;
+  private Component handle;
+  private Listener<ComponentEvent> listener;
+  private boolean moveAfterProxyDrag = true;
+  private BaseEventPreview preview;
+  private String proxyStyle = "x-drag-proxy";
+  private boolean sizeProxyToSource = true;
+  private int startDragDistance = 2;
+  private Element startElement;
   // config
   private boolean updateZIndex = true;
-  private boolean sizeProxyToSource = true;
-  private boolean constrainHorizontal;
-  private boolean moveAfterProxyDrag = true;
-  private boolean constrainVertical;
-  private boolean constrainClient = true;
   private boolean useProxy = true;
   private int xLeft = Style.DEFAULT, xRight = Style.DEFAULT;
   private int xTop = Style.DEFAULT, xBottom = Style.DEFAULT;
-  private String proxyStyle = "x-drag-proxy";
-  private Component container;
-  private Component dragWidget;
-  private Component handle;
-  private boolean dragging;
-  private boolean enabled = true;
-  private int clientWidth, clientHeight;
-  private BaseEventPreview preview;
-  private DragEvent dragEvent;
-  private int startDragDistance = 2;
-  private Listener<ComponentEvent> listener;
 
   /**
    * Creates a new draggable instance.
@@ -183,10 +184,12 @@ public class Draggable extends BaseObservable {
       } else {
         dragWidget.el().setPagePosition(startBounds.x, startBounds.y);
       }
-
-      fireEvent(Events.DragCancel, new DragEvent(this));
+      DragEvent de = new DragEvent(this);
+      de.setStartElement(startElement);
+      fireEvent(Events.DragCancel, de);
       afterDrag();
     }
+    startElement = null;
   }
 
   /**
@@ -503,6 +506,8 @@ public class Draggable extends BaseObservable {
     }
 
     startBounds = dragWidget.el().getBounds();
+    
+    startElement = ce.getTarget();
 
     dragStartX = ce.getClientX();
     dragStartY = ce.getClientY();
@@ -596,6 +601,7 @@ public class Draggable extends BaseObservable {
       lastY = top;
 
       dragEvent.setSource(this);
+      dragEvent.setStartElement(startElement);
       dragEvent.setComponent(dragWidget);
       dragEvent.setEvent(event);
       dragEvent.setCancelled(false);
@@ -625,6 +631,7 @@ public class Draggable extends BaseObservable {
     de.setEvent(event);
     de.setX(startBounds.x);
     de.setY(startBounds.y);
+    de.setStartElement(startElement);
 
     if (fireEvent(Events.DragStart, de)) {
       dragging = true;
@@ -633,7 +640,6 @@ public class Draggable extends BaseObservable {
       dragWidget.el().makePositionable();
 
       event.preventDefault();
-
       Shim.get().cover(true);
 
       lastX = startBounds.x;
@@ -692,6 +698,7 @@ public class Draggable extends BaseObservable {
         proxyEl.remove();
       }
       DragEvent de = new DragEvent(this);
+      de.setStartElement(startElement);
       de.setComponent(dragWidget);
       de.setEvent(event);
       de.setX(lastX);
@@ -699,6 +706,7 @@ public class Draggable extends BaseObservable {
       fireEvent(Events.DragEnd, de);
       afterDrag();
     }
+    startElement = null;
   }
 
   private native boolean hasAttribute(Element elem, String name) /*-{

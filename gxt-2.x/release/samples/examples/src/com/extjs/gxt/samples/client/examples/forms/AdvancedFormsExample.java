@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -114,17 +114,17 @@ public class AdvancedFormsExample extends LayoutContainer {
 
     panel.setSize(340, 200);
 
-    if (GXT.isAriaEnabled()) {
-      name.setData("aria-previous", panel.getButtonBar().getId());
-      home.setData("aria-previous", panel.getButtonBar().getId());
+    if (GXT.isFocusManagerEnabled()) {
+      name.getFocusSupport().setPreviousId(panel.getButtonBar().getId());
+      home.getFocusSupport().setPreviousId(panel.getButtonBar().getId());
       
-      panel.getButtonBar().getAriaSupport().addListener(FocusManager.TabNext, new Listener<BaseEvent>() {
+      panel.getButtonBar().getFocusSupport().addListener(FocusManager.TabNext, new Listener<BaseEvent>() {
         public void handleEvent(BaseEvent be) {
           tabs.getItem(tabs.getSelectedItem() == tabs.getItem(0) ? 0 : 1).getItem(0).focus();
           be.setCancelled(true);
         }
       });
-      panel.getButtonBar().getAriaSupport().addListener(FocusManager.TabPrevious, new Listener<BaseEvent>() {
+      panel.getButtonBar().getFocusSupport().addListener(FocusManager.TabPrevious, new Listener<BaseEvent>() {
         public void handleEvent(BaseEvent be) {
           TabItem item = tabs.getItem(tabs.getSelectedItem() == tabs.getItem(0) ? 0 : 1);
           item.getItem(item.getItemCount() - 1).focus();

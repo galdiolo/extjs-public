@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -48,8 +48,8 @@ public class DefaultHandler extends FocusHandler {
     if (tip != null && tip.isVisible()) {
       return;
     }
-    if (component.getData("aria-ignore") != null && (Boolean)component.getData("aria-ignore")) {
-      component.setData("aria-ignore", false);
+    if (component.getFocusSupport().isIgnore()) {
+      component.getFocusSupport().setIgnore(false);
       return;
     }
     stepOut(component);
@@ -60,7 +60,7 @@ public class DefaultHandler extends FocusHandler {
   public void onTab(Component component, PreviewEvent pe) {
     if (!isManaged()) return;
 
-    if (component.getAriaSupport().isIgnore()) {
+    if (component.getFocusSupport().isIgnore()) {
       return;
     }
     if (pe.isShiftKey()) {
@@ -74,7 +74,7 @@ public class DefaultHandler extends FocusHandler {
             return;
           } else if (w instanceof Component){
             Component c = (Component)w;
-            if (c.getAriaSupport().isIgnore()) {
+            if (c.getFocusSupport().isIgnore()) {
               w = w.getParent();
             } else {
               w = null;

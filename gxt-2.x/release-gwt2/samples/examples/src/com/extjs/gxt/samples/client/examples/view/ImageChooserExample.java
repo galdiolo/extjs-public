@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -40,9 +40,9 @@ import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.ListView;
 import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
 import com.extjs.gxt.ui.client.widget.form.StoreFilterField;
-import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
@@ -50,6 +50,7 @@ import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.LabelToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Element;
@@ -81,8 +82,8 @@ public class ImageChooserExample extends LayoutContainer {
       }
     };
 
-    ListLoader<ListLoadResult<BeanModel>> loader = new BaseListLoader<ListLoadResult<BeanModel>>(
-        proxy, new BeanModelReader());
+    ListLoader<ListLoadResult<BeanModel>> loader = new BaseListLoader<ListLoadResult<BeanModel>>(proxy,
+        new BeanModelReader());
     store = new ListStore<BeanModel>(loader);
     loader.load();
 
@@ -121,8 +122,8 @@ public class ImageChooserExample extends LayoutContainer {
 
     StoreFilterField<BeanModel> field = new StoreFilterField<BeanModel>() {
       @Override
-      protected boolean doSelect(Store<BeanModel> store, BeanModel parent,
-          BeanModel record, String property, String filter) {
+      protected boolean doSelect(Store<BeanModel> store, BeanModel parent, BeanModel record, String property,
+          String filter) {
         Photo photo = record.getBean();
         String name = photo.getName().toLowerCase();
         if (name.indexOf(filter.toLowerCase()) != -1) {
@@ -171,8 +172,8 @@ public class ImageChooserExample extends LayoutContainer {
         long size = photo.getSize() / 1000;
         model.set("shortName", Format.ellipse(photo.getName(), 15));
         model.set("sizeString", NumberFormat.getFormat("#0").format(size) + "k");
-        model.set("dateString", DateTimeFormat.getMediumDateTimeFormat().format(
-            photo.getDate()));
+        model.set("dateString", DateTimeFormat.getMediumDateTimeFormat().format(photo.getDate()));
+        model.set("path", GWT.getHostPageBaseURL() + photo.getPath());
         return model;
       }
     };
@@ -182,12 +183,11 @@ public class ImageChooserExample extends LayoutContainer {
     view.setStore(store);
     view.setItemSelector("div.thumb-wrap");
     view.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-    view.getSelectionModel().addListener(Events.SelectionChange,
-        new Listener<SelectionChangedEvent<BeanModel>>() {
-          public void handleEvent(SelectionChangedEvent<BeanModel> be) {
-            onSelectionChange(be);
-          }
-        });
+    view.getSelectionModel().addListener(Events.SelectionChange, new Listener<SelectionChangedEvent<BeanModel>>() {
+      public void handleEvent(SelectionChangedEvent<BeanModel> be) {
+        onSelectionChange(be);
+      }
+    });
     main.add(view);
 
     details = new LayoutContainer();
@@ -240,26 +240,25 @@ public class ImageChooserExample extends LayoutContainer {
   }
 
   private native String getTemplate() /*-{
-     return ['<tpl for=".">',
-     '<div class="thumb-wrap" id="{name}" style="border: 1px solid white">',
-     '<div class="thumb"><img src="{path}" title="{name}"></div>',
-     '<span class="x-editable">{shortName}</span></div>',
-     '</tpl>',
-     '<div class="x-clear"></div>'].join("");
-     
-     }-*/;
+    return ['<tpl for=".">',
+    '<div class="thumb-wrap" id="{name}" style="border: 1px solid white">',
+    '<div class="thumb"><img src="{path}" title="{name}"></div>',
+    '<span class="x-editable">{shortName}</span></div>',
+    '</tpl>',
+    '<div class="x-clear"></div>'].join("");
+  }-*/;
 
   public native String getDetailTemplate() /*-{
-     return ['<div class="details">',
-     '<tpl for=".">',
-     '<img src="{path}"><div class="details-info">',
-     '<b>Image Name:</b>',
-     '<span>{name}</span>',
-     '<b>Size:</b>',
-     '<span>{sizeString}</span>',
-     '<b>Last Modified:</b>',
-     '<span>{dateString}</span></div>',
-     '</tpl>',
-     '</div>'].join("");
-     }-*/;
+    return ['<div class="details">',
+    '<tpl for=".">',
+    '<img src="{path}"><div class="details-info">',
+    '<b>Image Name:</b>',
+    '<span>{name}</span>',
+    '<b>Size:</b>',
+    '<span>{sizeString}</span>',
+    '<b>Last Modified:</b>',
+    '<span>{dateString}</span></div>',
+    '</tpl>',
+    '</div>'].join("");
+  }-*/;
 }

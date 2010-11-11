@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -15,9 +15,7 @@ import java.util.Stack;
 
 import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.event.BaseObservable;
-import com.extjs.gxt.ui.client.event.ComponentManagerEvent;
 import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.WindowManagerEvent;
 
 /**
@@ -38,11 +36,10 @@ public class WindowManager extends BaseObservable {
     return instance;
   }
 
-  private Window front;
   private Stack<Window> accessList;
-  private List<Window> windows;
   private Comparator<Window> comparator;
-  private Listener<ComponentManagerEvent> componentManagerListener;
+  private Window front;
+  private List<Window> windows;
 
   public WindowManager() {
     accessList = new Stack<Window>();
@@ -54,20 +51,7 @@ public class WindowManager extends BaseObservable {
         return d1 == null || d1 < d2 ? -1 : 1;
       }
     };
-    componentManagerListener = new Listener<ComponentManagerEvent>() {
-      public void handleEvent(ComponentManagerEvent be) {
-        if (be.getComponent() instanceof Window) {
-          Window w = (Window) be.getComponent();
-          if (be.getType() == Events.Register) {
-            register(w);
-          } else if (be.getType() == Events.Unregister) {
-            unregister(w);
-          }
-        }
-      }
-    };
-    ComponentManager.get().addListener(Events.Register, componentManagerListener);
-    ComponentManager.get().addListener(Events.Unregister, componentManagerListener);;
+
   }
 
   /**
@@ -145,15 +129,6 @@ public class WindowManager extends BaseObservable {
   }
 
   /**
-   * Returns the visible windows.
-   * 
-   * @return the windows
-   */
-  public List<Window> getWindows() {
-    return windows;
-  }
-  
-  /**
    * Returns the ordered windows.
    * 
    * @return the windows
@@ -163,12 +138,28 @@ public class WindowManager extends BaseObservable {
   }
 
   /**
+   * Returns the visible windows.
+   * 
+   * @return the windows
+   */
+  public List<Window> getWindows() {
+    return windows;
+  }
+
+  /**
    * Hides all windows that are registered to this WindowManager.
    */
   public void hideAll() {
     for (int i = accessList.size() - 1; i >= 0; --i) {
       accessList.get(i).hide();
     }
+  }
+
+  public void register(Window window) {
+    accessList.push(window);
+    windows.add(window);
+    window.setData("_gxtdate", System.currentTimeMillis());
+    fireEvent(Events.Register, new WindowManagerEvent(this, window));
   }
 
   /**
@@ -181,6 +172,16 @@ public class WindowManager extends BaseObservable {
     window.setData("_gxtdate", System.currentTimeMillis());
     orderWindows(true);
     return window;
+  }
+
+  public void unregister(Window window) {
+    if (front == window) {
+      front = null;
+    }
+    accessList.remove(window);
+    windows.remove(window);
+    activateLast();
+    fireEvent(Events.Unregister, new WindowManagerEvent(this, window));
   }
 
   private void activateLast() {
@@ -208,13 +209,6 @@ public class WindowManager extends BaseObservable {
     }
   }
 
-  private void register(Window window) {
-    accessList.push(window);
-    windows.add(window);
-    window.setData("_gxtdate", System.currentTimeMillis());
-    fireEvent(Events.Register, new WindowManagerEvent(this, window));
-  }
-
   private void setActiveWin(Window window) {
     if (window != front) {
       if (front != null) {
@@ -226,15 +220,5 @@ public class WindowManager extends BaseObservable {
         window.focus();
       }
     }
-  }
-
-  private void unregister(Window window) {
-    if (front == window) {
-      front = null;
-    }
-    accessList.remove(window);
-    windows.remove(window);
-    activateLast();
-    fireEvent(Events.Unregister, new WindowManagerEvent(this, window));
   }
 }

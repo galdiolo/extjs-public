@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -236,7 +236,7 @@ public class DateField extends TriggerField<Date> {
    */
   public void setMaxValue(Date maxValue) {
     if (maxValue != null) {
-      maxValue = new DateWrapper(maxValue).clearTime().asDate();
+      maxValue = new DateWrapper(maxValue).resetTime().asDate();
     }
     this.maxValue = maxValue;
   }
@@ -248,7 +248,7 @@ public class DateField extends TriggerField<Date> {
    */
   public void setMinValue(Date minValue) {
     if (minValue != null) {
-      minValue = new DateWrapper(minValue).clearTime().asDate();
+      minValue = new DateWrapper(minValue).resetTime().asDate();
     }
     this.minValue = minValue;
   }

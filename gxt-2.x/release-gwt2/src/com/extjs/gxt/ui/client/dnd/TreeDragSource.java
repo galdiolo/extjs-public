@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.binder.TreeBinder;
+import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.TreeModel;
 import com.extjs.gxt.ui.client.dnd.DND.Operation;
@@ -20,6 +21,7 @@ import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.widget.tree.Tree;
 import com.extjs.gxt.ui.client.widget.tree.TreeItem;
+import com.google.gwt.user.client.Element;
 
 /**
  * A <code>DragSource</code> implementation for Trees.
@@ -103,8 +105,8 @@ public class TreeDragSource extends DragSource {
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
   protected void onDragStart(DNDEvent e) {
-    TreeItem item = tree.findItem(e.getTarget());
-    if (item == null || e.getTarget(".my-tree-joint", 3) != null) {
+    TreeItem item = tree.findItem((Element) e.getDragEvent().getStartElement());
+    if (item == null || El.fly(e.getDragEvent().getStartElement()).findParent(".my-tree-joint", 3) != null) {
       e.setCancelled(true);
       return;
     }

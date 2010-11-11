@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -86,7 +86,7 @@ public class CellTreeGridSelectionModel<M extends ModelData> extends CellSelecti
   @Override
   protected void onKeyPress(GridEvent<M> e) {
     super.onKeyPress(e);
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       int kc = e.getKeyCode();
       if (kc == KeyCodes.KEY_ENTER && selection != null && !(grid instanceof EditorTreeGrid<?>)) {
         tree.toggle(selection.model);

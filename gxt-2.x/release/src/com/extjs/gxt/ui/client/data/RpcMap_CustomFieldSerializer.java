@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -15,8 +15,7 @@ import com.google.gwt.user.client.rpc.SerializationStreamWriter;
 
 public final class RpcMap_CustomFieldSerializer {
 
-  public static void deserialize(SerializationStreamReader streamReader, RpcMap instance)
-      throws SerializationException {
+  public static void deserialize(SerializationStreamReader streamReader, RpcMap instance) throws SerializationException {
     int size = streamReader.readInt();
 
     for (int i = 0; i < size; ++i) {
@@ -27,8 +26,7 @@ public final class RpcMap_CustomFieldSerializer {
     }
   }
 
-  public static void serialize(SerializationStreamWriter streamWriter, RpcMap instance)
-      throws SerializationException {
+  public static void serialize(SerializationStreamWriter streamWriter, RpcMap instance) throws SerializationException {
     int size = instance.size();
     streamWriter.writeInt(size);
 

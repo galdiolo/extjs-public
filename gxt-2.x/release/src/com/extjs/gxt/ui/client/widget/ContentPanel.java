@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -139,32 +139,32 @@ import com.google.gwt.user.client.ui.Frame;
  */
 public class ContentPanel extends LayoutContainer implements IconSupport {
 
+  protected String bodStyle;
+  protected El body, bwrap;
+  protected String bwrapStyle;
+  protected String collapseStyle;
+
+  protected ButtonBar fbar;
   protected boolean frame;
   protected Header head;
-  protected El body, bwrap;
-  protected ButtonBar fbar;
-
-  private String bodyStyle, bodyStyleName;
-  private boolean headerVisible = true;
-  private boolean collapsed, hideCollapseTool;
-  private boolean footer, titleCollapse;
-  private HorizontalAlignment buttonAlign = HorizontalAlignment.RIGHT;
-  private boolean animCollapse = true;
-  private boolean collapsible;
-  private boolean bodyBorder = true;
-  private Component topComponent;
-  private Component bottomComponent;
-  private boolean animating;
-  private ToolButton collapseBtn;
   protected String headerStyle, footerStyle;
   protected String headerTextStyle;
-  protected String bwrapStyle;
   protected String tbarStyle, bbarStyle;
-  protected String bodStyle;
-  protected String collapseStyle;
+  private boolean animating;
+  private boolean animCollapse = true;
+  private boolean bodyBorder = true;
+  private String bodyStyle, bodyStyleName;
+  private Component bottomComponent;
+  private HorizontalAlignment buttonAlign = HorizontalAlignment.RIGHT;
+  private ToolButton collapseBtn;
+  private boolean collapsed, hideCollapseTool;
+  private boolean collapsible;
   private El foot, tbar, bbar;
-
+  private boolean footer, titleCollapse;
+  private boolean headerVisible = true;
   private int minButtonWidth = 75;
+
+  private Component topComponent;
 
   /**
    * Creates a new panel instance.
@@ -179,7 +179,7 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
     head.setParent(this);
     disabledStyle = null;
     setDeferHeight(true);
-    getAriaSupport().setIgnore(false);
+    getFocusSupport().setIgnore(false);
   }
 
   /**
@@ -199,20 +199,6 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
    */
   public void addButton(Button button) {
     fbar.add(button);
-  }
-
-  @Override
-  protected void notifyShow() {
-    if (!collapsed) {
-      super.notifyShow();
-    }
-  }
-
-  @Override
-  protected void notifyHide() {
-    if (!collapsed) {
-      super.notifyHide();
-    }
   }
 
   /**
@@ -797,6 +783,16 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
       }
     }
 
+    if (topComponent != null && topComponent.isRendered()) {
+      topComponent.notifyHide();
+    }
+    if (bottomComponent != null && bottomComponent.isRendered()) {
+      bottomComponent.notifyHide();
+    }
+    if (fbar != null && fbar.isRendered()) {
+      fbar.notifyHide();
+    }
+
     sync(true);
 
     if (GXT.isAriaEnabled()) {
@@ -818,6 +814,16 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
       if (!c.hidden && c.isRendered()) {
         c.notifyShow();
       }
+    }
+
+    if (topComponent != null && topComponent.isRendered()) {
+      topComponent.notifyShow();
+    }
+    if (bottomComponent != null && bottomComponent.isRendered()) {
+      bottomComponent.notifyShow();
+    }
+    if (fbar != null && fbar.isRendered()) {
+      fbar.notifyShow();
     }
 
     sync(true);
@@ -928,6 +934,46 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
     }
     if (bottomComponent instanceof Container<?> && !((Container<?>) bottomComponent).layoutExecuted) {
       ((Container<?>) bottomComponent).layout(false);
+    }
+  }
+
+  @Override
+  protected void notifyHide() {
+    if (!collapsed) {
+      super.notifyHide();
+
+      if (topComponent != null && topComponent.isRendered()) {
+        topComponent.notifyHide();
+      }
+      if (bottomComponent != null && bottomComponent.isRendered()) {
+        bottomComponent.notifyHide();
+      }
+      if (fbar != null && fbar.isRendered()) {
+        fbar.notifyHide();
+      }
+    }
+    if (headerVisible && head != null) {
+      head.notifyHide();
+    }
+  }
+
+  @Override
+  protected void notifyShow() {
+    if (!collapsed) {
+      super.notifyShow();
+
+      if (topComponent != null && topComponent.isRendered()) {
+        topComponent.notifyShow();
+      }
+      if (bottomComponent != null && bottomComponent.isRendered()) {
+        bottomComponent.notifyShow();
+      }
+      if (fbar != null && fbar.isRendered()) {
+        fbar.notifyShow();
+      }
+    }
+    if (headerVisible && head != null) {
+      head.notifyShow();
     }
   }
 
@@ -1093,14 +1139,6 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
       Accessibility.setState(getElement(), "aria-expanded", "true");
     }
 
-    if (collapsed) {
-      boolean anim = animCollapse;
-      collapsed = false;
-      setAnimCollapse(false);
-      collapse();
-      setAnimCollapse(anim);
-    }
-
     if (GXT.isAriaEnabled()) {
       Accessibility.setRole(getElement(), "region");
       if (head != null) {
@@ -1110,6 +1148,14 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
 
     // early render
     layoutBars();
+
+    if (collapsed) {
+      boolean anim = animCollapse;
+      collapsed = false;
+      setAnimCollapse(false);
+      collapse();
+      setAnimCollapse(anim);
+    }
   }
 
   @Override

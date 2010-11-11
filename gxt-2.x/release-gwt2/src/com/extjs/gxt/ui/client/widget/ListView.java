@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -30,6 +30,7 @@ import com.extjs.gxt.ui.client.store.StoreEvent;
 import com.extjs.gxt.ui.client.store.StoreListener;
 import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.tips.QuickTip;
+import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -100,8 +101,9 @@ import com.google.gwt.user.client.Event;
  */
 public class ListView<M extends ModelData> extends BoxComponent {
 
-  protected ListStore<M> store;
+  protected int rowSelectorDepth = 5;
 
+  protected ListStore<M> store;
   private CompositeElement all;
   private String displayProperty = "text";
   private boolean enableQuickTip = true;
@@ -115,6 +117,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
   private String selectStyle = "x-view-item-sel";
   private ListViewSelectionModel<M> sm;
   private StoreListener<M> storeListener;
+
   private XTemplate template;
 
   /**
@@ -153,7 +156,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
    * @return the parent element
    */
   public Element findElement(Element element) {
-    return fly(element).findParentElement(itemSelector, 5);
+    return fly(element).findParentElement(itemSelector, rowSelectorDepth);
   }
 
   /**
@@ -404,10 +407,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
     el().setInnerHtml("");
     repaint();
     List<M> models = store.getModels();
-    if (models.size() < 1) {
-      all.removeAll();
-      return;
-    }
+    all.removeAll();
     template.overwrite(getElement(), Util.getJsObjects(collectData(models, 0), template.getMaxDepth()));
     all = new CompositeElement(Util.toElementArray(el().select(itemSelector)));
     if (GXT.isAriaEnabled()) {
@@ -580,9 +580,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
   @Override
   protected void afterRender() {
     super.afterRender();
-    if (store != null && store.getCount() > 0) {
-      refresh();
-    }
+    refresh();
   }
 
   protected List<M> collectData(List<M> models, int startIndex) {
@@ -604,16 +602,6 @@ public class ListView<M extends ModelData> extends BoxComponent {
       fly(elem).scrollIntoView(getElement(), false);
     }
     focus();
-  }
-
-  protected void onHighlightRow(int index, boolean highLight) {
-    Element e = getElement(index);
-    if (e != null) {
-      fly(e).setStyleName("x-view-highlightrow", highLight);
-      if (highLight && GXT.isAriaEnabled()) {
-        setAriaState("aria-activedescendant", e.getId());
-      }
-    }
   }
 
   protected void initComponent() {
@@ -669,14 +657,28 @@ public class ListView<M extends ModelData> extends BoxComponent {
         return;
       }
       NodeList<Element> nodes = bufferRender(models);
-      Element[] e = Util.toElementArray(nodes);
-      all.insert(e, index);
-      el().insertChild(e, index);
-      if (GXT.isAriaEnabled()) {
-        for (int i = 0; i < e.length; i++) {
-          e[i].setId(XDOM.getUniqueId());
+      Element[] elements = Util.toElementArray(nodes);
+      all.insert(elements, index);
+      
+      Element ref = index == 0 ? all.getElement(elements.length) : all.getElement(index - 1);
+      
+      for (int i = elements.length - 1; i >= 0; i--) {
+        Node n = ref.getParentNode();
+        if (index == 0) {
+          n.insertBefore(elements[i], n.getFirstChild());
+        } else {
+          Node next = ref == null ? null : ref.getNextSibling();
+          if (next == null) {
+            n.appendChild(elements[i]);
+          } else {
+            n.insertBefore(elements[i], next);
+          }
+        }
+        if (GXT.isAriaEnabled()) {
+          elements[i].setId(XDOM.getUniqueId());
         }
       }
+
       updateIndexes(index, -1);
     }
   }
@@ -700,6 +702,16 @@ public class ListView<M extends ModelData> extends BoxComponent {
 
   protected void onFocus(ComponentEvent ce) {
     FocusFrame.get().frame(this);
+  }
+
+  protected void onHighlightRow(int index, boolean highLight) {
+    Element e = getElement(index);
+    if (e != null) {
+      fly(e).setStyleName("x-view-highlightrow", highLight);
+      if (highLight && GXT.isAriaEnabled()) {
+        setAriaState("aria-activedescendant", e.getId());
+      }
+    }
   }
 
   protected void onMouseDown(ListViewEvent<M> e) {
@@ -731,7 +743,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
     }
   }
 
-  protected void onRemove(ModelData data, int index) {
+  protected void onRemove(M data, int index) {
     if (all != null) {
       Element e = getElement(index);
       if (e != null) {
@@ -774,7 +786,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
       setAriaState("aria-multiselectable", mode != SelectionMode.SINGLE ? "true" : "false");
       setAriaRole("listbox");
     }
-    
+
     sinkEvents(Event.ONCLICK | Event.ONDBLCLICK | Event.MOUSEEVENTS | Event.FOCUSEVENTS | Event.ONKEYDOWN);
   }
 
@@ -803,10 +815,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
         List list = Util.createList(model);
         Element node = bufferRender(list).getItem(0);
         all.replaceElement(original, node);
-        if (fly(original).hasStyleName(selectStyle)) {
-          fly(node).addStyleName(selectStyle);
-        }
-        el().dom.replaceChild(node, original);
+        original.getParentElement().replaceChild(node, original);
       }
       ListViewEvent<M> evt = new ListViewEvent<M>(this);
       evt.setModel(model);

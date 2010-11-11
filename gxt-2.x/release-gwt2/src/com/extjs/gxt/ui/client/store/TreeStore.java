@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -744,7 +744,9 @@ public class TreeStore<M extends ModelData> extends Store<M> {
   }
 
   protected void onBeforeLoad(LoadEvent le) {
-    fireEvent(BeforeDataChanged, createStoreEvent());
+    if (!le.isCancelled() && !fireEvent(BeforeDataChanged, createStoreEvent())) {
+      le.setCancelled(true);
+    }
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})

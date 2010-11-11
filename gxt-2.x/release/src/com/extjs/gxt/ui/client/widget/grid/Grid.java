@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -7,11 +7,13 @@
  */
 package com.extjs.gxt.ui.client.widget.grid;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.aria.FocusFrame;
+import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.ModelProcessor;
 import com.extjs.gxt.ui.client.data.ModelStringProvider;
@@ -295,6 +297,7 @@ public class Grid<M extends ModelData> extends BoxComponent {
   private ModelProcessor<M> modelProcessor;
   private boolean stripeRows;
   private boolean trackMouseOver = true;
+  private Map<String, String> states = new HashMap<String, String>();
 
   /**
    * Creates a new grid.
@@ -574,6 +577,9 @@ public class Grid<M extends ModelData> extends BoxComponent {
    */
   public void setColumnLines(boolean columnLines) {
     this.columnLines = columnLines;
+    if (rendered) {
+      el().setStyleName("x-grid-with-col-lines", columnLines);
+    }
   }
 
   /**
@@ -715,6 +721,10 @@ public class Grid<M extends ModelData> extends BoxComponent {
     viewReady = true;
     view.afterRender();
     onAfterRenderView();
+
+    for (String key : states.keySet()) {
+      setAriaState(key, states.get(key));
+    }
     fireEvent(Events.ViewReady);
   }
 
@@ -738,7 +748,7 @@ public class Grid<M extends ModelData> extends BoxComponent {
 
   @Override
   protected ComponentEvent createComponentEvent(Event event) {
-    return new GridEvent<M>(this, event);
+    return view.createComponentEvent(event);
   }
 
   protected void doApplyStoreState(Map<String, Object> state) {
@@ -767,6 +777,15 @@ public class Grid<M extends ModelData> extends BoxComponent {
   }
 
   @Override
+  protected El getFocusEl() {
+    if (isViewReady()) {
+      return view.focusEl;
+    } else {
+      return super.getFocusEl();
+    }
+  }
+
+  @Override
   protected void notifyHide() {
     super.notifyHide();
     view.notifyHide();
@@ -782,7 +801,7 @@ public class Grid<M extends ModelData> extends BoxComponent {
   }
 
   protected void onBlur(ComponentEvent ce) {
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       FocusFrame.get().unframe();
     }
   }
@@ -818,7 +837,7 @@ public class Grid<M extends ModelData> extends BoxComponent {
   }
 
   protected void onFocus(ComponentEvent ce) {
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       if (getSelectionModel().selectedHeader != null) {
         FocusFrame.get().frame(getSelectionModel().selectedHeader);
       } else {
@@ -857,9 +876,7 @@ public class Grid<M extends ModelData> extends BoxComponent {
     super.onRender(target, index);
     el().setStyleAttribute("position", "relative");
 
-    if (columnLines) {
-      addStyleName("x-grid-with-col-lines");
-    }
+    setColumnLines(isColumnLines());
     view.init(this);
 
     el().setTabIndex(0);
@@ -882,13 +899,28 @@ public class Grid<M extends ModelData> extends BoxComponent {
     }
   }
 
+  @Override
+  protected void setAriaRole(String roleName) {
+    if (isViewReady()) {
+      Accessibility.setRole(view.focusEl.dom, roleName);
+    }
+  }
+
+  protected void setAriaState(String stateName, String stateValue) {
+    if (isViewReady()) {
+      Accessibility.setState(view.focusEl.dom, stateName, stateValue);
+    } else {
+      states.put(stateName, stateValue);
+    }
+  }
+
   protected Cell walkCells(int row, int col, int step, Callback callback, boolean acceptNavs) {
     boolean first = true;
     int clen = cm.getColumnCount();
     int rlen = store.getCount();
     if (step < 0) {
       if (col < 0) {
-        if (GXT.isAriaEnabled()) {
+        if (GXT.isFocusManagerEnabled()) {
           return new Cell(row, 0);
         }
         row--;
@@ -908,7 +940,7 @@ public class Grid<M extends ModelData> extends BoxComponent {
         row--;
       }
     } else {
-      if (col == clen && GXT.isAriaEnabled()) {
+      if (col == clen && GXT.isFocusManagerEnabled()) {
         return new Cell(row, col - 1);
       }
       if (col >= clen) {

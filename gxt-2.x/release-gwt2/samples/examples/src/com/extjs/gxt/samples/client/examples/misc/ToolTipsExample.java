@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -74,7 +74,7 @@ public class ToolTipsExample extends LayoutContainer {
     '<li>Large backyard</li>',
     '<li>Close to metro</li>',
     '</ul>',
-    '<img width="400" height="300" src="samples/images/examples/house.jpg" style="border: 1px solid #ddd">',
+    '<img width="400" height="300" src="../../samples/images/examples/house.jpg" style="border: 1px solid #ddd">',
     '</div>'
     ];
     return html.join("");

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -47,16 +47,16 @@ public class Examples implements EntryPoint {
     return true;
   }
 
-  public static final String SERVICE = "service";
-  public static final String FILE_SERVICE = "fileservice";
+  public static final String SERVICE = GWT.getModuleBaseURL() + "service";
+  public static final String FILE_SERVICE = GWT.getModuleBaseURL() + "fileservice";
   public static final String MODEL = "model";
-  
+
   private Viewport viewport;
 
   public void onModuleLoad() {
     ThemeManager.register(Slate.SLATE);
     ThemeManager.register(Access.ACCESS);
-    
+
     String name = GWT.getModuleName();
     if (!"com.extjs.gxt.samples.Examples".equals(name)) {
       return;

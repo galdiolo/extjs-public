@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -244,10 +244,13 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
   }
 
   protected void handleColumnHidden(ColumnModelEvent e) {
-    int col = e.getColIndex();
-    Head h = grid.getView().getHeader().getHead(col);
-    if (h == selectedHeader) {
-      selectedHeader = null;
+    ColumnHeader header = grid.getView().getHeader();
+    if (header != null) {
+      int col = e.getColIndex();
+      Head h = header.getHead(col);
+      if (h == selectedHeader) {
+        selectedHeader = null;
+      }
     }
   }
 
@@ -266,10 +269,10 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
         doDeselect(Arrays.asList(sel), false);
       } else if (e.isControlKey()) {
         doSelect(Arrays.asList(sel), true, false);
-        grid.getView().focusCell(e.getRowIndex(), e.getColIndex(), true);
+        grid.getView().focusCell(e.getRowIndex(), e.getColIndex(), false);
       } else if (isSelected(sel) && !e.isShiftKey() && !e.isControlKey() && selected.size() > 1) {
         doSelect(Arrays.asList(sel), false, false);
-        grid.getView().focusCell(e.getRowIndex(), e.getColIndex(), true);
+        grid.getView().focusCell(e.getRowIndex(), e.getColIndex(), false);
       }
     }
 
@@ -285,13 +288,13 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
         return;
       }
       select(e.getRowIndex(), false);
-      grid.getView().focusCell(e.getRowIndex(), e.getColIndex(), true);
+      grid.getView().focusCell(e.getRowIndex(), e.getColIndex(), false);
     } else {
       M sel = listStore.getAt(e.getRowIndex());
       if (selectionMode == SelectionMode.SIMPLE) {
         if (!isSelected(sel)) {
           select(sel, true);
-          grid.getView().focusCell(e.getRowIndex(), e.getColIndex(), true);
+          grid.getView().focusCell(e.getRowIndex(), e.getColIndex(), false);
         }
 
       } else if (selectionMode == SelectionMode.SINGLE) {
@@ -299,17 +302,17 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
           deselect(sel);
         } else if (!isSelected(sel)) {
           select(sel, false);
-          grid.getView().focusCell(e.getRowIndex(), e.getColIndex(), true);
+          grid.getView().focusCell(e.getRowIndex(), e.getColIndex(), false);
         }
       } else if (!e.isControlKey()) {
         if (e.isShiftKey() && lastSelected != null) {
           int last = listStore.indexOf(lastSelected);
           int index = e.getRowIndex();
           select(last, index, e.isControlKey());
-          grid.getView().focusCell(index, e.getColIndex(), true);
+          grid.getView().focusCell(index, e.getColIndex(), false);
         } else if (!isSelected(sel)) {
           doSelect(Arrays.asList(sel), false, false);
-          grid.getView().focusCell(e.getRowIndex(), e.getColIndex(), true);
+          grid.getView().focusCell(e.getRowIndex(), e.getColIndex(), false);
         }
       }
     }
@@ -337,7 +340,7 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
   }
 
   protected void onKeyDown(GridEvent<M> e) {
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       if (selectedGroup == null && (selectedHeader != null || selected.size() == 0)) {
         e.cancelBubble();
         if (e.isAltKey()) {
@@ -436,7 +439,7 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
   }
 
   protected void onKeyLeft(GridEvent<M> ce) {
-    if (GXT.isAriaEnabled() && selectedHeader != null) {
+    if (GXT.isFocusManagerEnabled() && selectedHeader != null) {
       ColumnHeader ch = grid.getView().getHeader();
       int idx = ch.indexOf(selectedHeader) - 1;
       ColumnConfig config = grid.getColumnModel().getColumn(idx);
@@ -452,7 +455,7 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
         }
       }
     }
-    if (GXT.isAriaEnabled() && selectedGroup != null) {
+    if (GXT.isFocusManagerEnabled() && selectedGroup != null) {
       groupingView.toggleGroup(selectedGroup, false);
     }
   }
@@ -460,7 +463,7 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
   @SuppressWarnings("unchecked")
   protected void onKeyPress(GridEvent<M> e) {
     int kc = e.getKeyCode();
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       if (selectedHeader != null) {
         if (kc == KeyCodes.KEY_ENTER) {
           grid.getView().onHeaderClick((Grid) grid, grid.getColumnModel().indexOf(selectedHeader.config));
@@ -509,7 +512,7 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
   }
 
   protected void onKeyRight(GridEvent<M> ce) {
-    if (GXT.isAriaEnabled() && selectedHeader != null) {
+    if (GXT.isFocusManagerEnabled() && selectedHeader != null) {
       ColumnHeader ch = grid.getView().getHeader();
       int idx = ch.indexOf(selectedHeader) + 1;
       ColumnConfig config = grid.getColumnModel().getColumn(idx);
@@ -531,7 +534,7 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
   }
 
   protected void onKeyUp(GridEvent<M> e) {
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       if (selectedHeader != null) {
         return;
       }
@@ -624,20 +627,26 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
   @Override
   protected void onLastFocusChanged(M oldFocused, M newFocused) {
     int i;
-    i = listStore.indexOf(oldFocused);
-    if (i >= 0) {
-      grid.getView().onHighlightRow(i, false);
+    if (oldFocused != null) {
+      i = listStore.indexOf(oldFocused);
+      if (i >= 0) {
+        grid.getView().onHighlightRow(i, false);
+      }
     }
-
-    i = listStore.indexOf(newFocused);
-    if (i >= 0) {
-      grid.getView().onHighlightRow(i, true);
+    if (newFocused != null) {
+      i = listStore.indexOf(newFocused);
+      if (i >= 0) {
+        grid.getView().onHighlightRow(i, true);
+      }
     }
   }
 
   protected void onRowUpdated(GridEvent<M> ge) {
     if (isSelected(ge.getModel())) {
-      grid.getView().onRowSelect(ge.getRowIndex());
+      onSelectChange(ge.getModel(), true);
+    }
+    if (getLastFocused() == ge.getModel()) {
+      setLastFocused(getLastFocused());
     }
   }
 
@@ -645,7 +654,7 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
   protected void onSelectChange(M model, boolean select) {
     int idx = listStore.indexOf(model);
     if (idx != -1) {
-      if (GXT.isAriaEnabled() && selectedHeader != null) {
+      if (GXT.isFocusManagerEnabled() && selectedHeader != null) {
         selectedHeader = null;
         FocusFrame.get().frame(grid);
       }

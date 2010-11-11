@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -74,7 +74,7 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
  * .</div>
  * <ul>
  * <li>store : this</li>
- * <li>sortInfo : the new sort info about to be set
+ * <li>sortInfo : the new sort info about to be set</li>
  * </ul>
  * </dd>
  * 
@@ -417,7 +417,6 @@ public class ListStore<M extends ModelData> extends Store<M> {
       Listener<LoadEvent> l = new Listener<LoadEvent>() {
         public void handleEvent(LoadEvent le) {
           loader.removeListener(Loader.Load, this);
-          sortInfo = le.<ListLoadConfig> getConfig().getSortInfo();
           event.setSortInfo(sortInfo);
           fireEvent(Sort, event);
         }
@@ -542,7 +541,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
   }
 
   protected void onBeforeLoad(LoadEvent le) {
-    if (!fireEvent(BeforeDataChanged, createStoreEvent())) {
+    if (!le.isCancelled() && !fireEvent(BeforeDataChanged, createStoreEvent())) {
       le.setCancelled(true);
     }
   }
@@ -568,7 +567,7 @@ public class ListStore<M extends ModelData> extends Store<M> {
       registerModel(m);
     }
 
-    if (config.getSortInfo() != null && !Util.isEmptyString(config.getSortInfo().getSortField())) {
+    if (config != null && config.getSortInfo() != null && !Util.isEmptyString(config.getSortInfo().getSortField())) {
       sortInfo = config.getSortInfo();
     } else {
       sortInfo = new SortInfo();

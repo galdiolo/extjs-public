@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -8,6 +8,7 @@
 package com.extjs.gxt.ui.client.widget.grid;
 
 import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.GridEvent;
@@ -104,12 +105,11 @@ public class CheckColumnConfig extends ColumnConfig implements ComponentPlugin {
    * @param ge the grid event
    */
   protected void onMouseDown(GridEvent<ModelData> ge) {
-    String cls = ge.getTarget().getClassName();
-    if (cls != null && cls.indexOf("x-grid3-cc-" + getId()) != -1 && cls.indexOf("disabled") == -1) {
+    El el = ge.getTargetEl();
+    if (el != null && el.hasStyleName("x-grid3-cc-" + getId()) && !el.hasStyleName("x-grid3-check-col-disabled")) {
       ge.stopEvent();
-      int index = grid.getView().findRowIndex(ge.getTarget());
-      ModelData m = grid.getStore().getAt(index);
-      Record r = grid.getStore().getRecord(m);
+      ModelData m = ge.getModel();
+      Record r = grid.getView().ds.getRecord(m);
       Boolean b = (Boolean) m.get(getDataIndex());
       r.set(getDataIndex(), b == null ? true : !b);
     }

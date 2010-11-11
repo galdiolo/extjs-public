@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -192,7 +192,7 @@ public class Menu extends Container<Component> {
       }
     };
   }
-  
+
   /**
    * Adds a item to the menu.
    * 
@@ -359,7 +359,7 @@ public class Menu extends Container<Component> {
     if (enableScrolling && t.is(".x-menu-scroller")) {
       switch (ce.getEventTypeInt()) {
         case Event.ONMOUSEOVER:
-          //deactiveActiveItem();
+          // deactiveActiveItem();
           onScrollerIn(t);
           break;
         case Event.ONMOUSEOUT:
@@ -408,7 +408,7 @@ public class Menu extends Container<Component> {
         item.el().scrollIntoView(ul.dom, false);
         focus();
 
-        if (GXT.isAriaEnabled()) {
+        if (GXT.isFocusManagerEnabled()) {
           FocusFrame.get().frame(item);
           Accessibility.setState(getElement(), "aria-activedescendant", item.getId());
         }
@@ -652,7 +652,7 @@ public class Menu extends Container<Component> {
       activeItem.deactivate();
       activeItem = null;
     }
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       FocusFrame.get().unframe();
       Accessibility.setState(getElement(), "aria-activedescendant", "");
     }
@@ -738,14 +738,16 @@ public class Menu extends Container<Component> {
 
   protected void onMouseOut(ComponentEvent ce) {
     EventTarget to = ce.getEvent().getRelatedEventTarget();
-    if (activeItem != null && (to == null || (to != null && !DOM.isOrHasChild(activeItem.getElement(), (Element) Element.as(to)))) && activeItem.shouldDeactivate(ce)) {
+    if (activeItem != null
+        && (to == null || (Element.is(to) && !DOM.isOrHasChild(activeItem.getElement(), (Element) Element.as(to))))
+        && activeItem.shouldDeactivate(ce)) {
       deactiveActiveItem();
     }
   }
-  
+
   protected void onMouseOver(ComponentEvent ce) {
     EventTarget from = ce.getEvent().getRelatedEventTarget();
-    if (from == null || (from != null && !DOM.isOrHasChild(getElement(), (Element) Element.as(from)))) {
+    if (from == null || (Element.is(from) && !DOM.isOrHasChild(getElement(), (Element) Element.as(from)))) {
       Component c = findItem(ce.getTarget());
       if (c != null && c instanceof Item) {
         Item item = (Item) c;
@@ -796,7 +798,7 @@ public class Menu extends Container<Component> {
         hide();
         if (parentItem != null) {
           parentItem.parentMenu.focus();
-          if (GXT.isAriaEnabled()) {
+          if (GXT.isFocusManagerEnabled()) {
             FocusFrame.get().frame(parentItem);
           }
         } else {

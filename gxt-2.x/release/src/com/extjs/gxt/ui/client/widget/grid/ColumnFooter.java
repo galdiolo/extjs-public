@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -88,6 +88,7 @@ public class ColumnFooter extends BoxComponent {
       setStyleName("x-grid3-footer-row");
 
       table = new FlexTable();
+      table.setStyleName("x-grid3-row-table");
       table.setCellPadding(0);
       table.setCellSpacing(0);
 
@@ -150,7 +151,7 @@ public class ColumnFooter extends BoxComponent {
     if (!cm.isHidden(column)) {
       for (int i = 0; i < rows.size(); i++) {
         FooterRow row = rows.get(i);
-        row.table.getCellFormatter().setWidth(0, column, width + "px");
+        El.fly(row.table.getCellFormatter().getElement(0, column)).setWidth(width, true);
         Widget w = row.table.getWidget(0, column);
         El.fly(w.getElement()).setWidth(width - 2, true);
       }

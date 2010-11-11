@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -50,7 +50,7 @@ public class TreePanelView<M extends ModelData> {
   public void collapse(TreeNode node) {
     getContainer(node).getStyle().setProperty("display", "none");
     tree.refresh((M) node.m);
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       Accessibility.setState((Element) node.getElement().getFirstChildElement(), "aria-expanded", "false");
       FocusFrame.get().sync(tree);
     }
@@ -59,7 +59,7 @@ public class TreePanelView<M extends ModelData> {
   public void expand(TreeNode node) {
     getContainer(node).getStyle().setProperty("display", "block");
     tree.refresh((M) node.m);
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       FocusFrame.get().sync(tree);
       Accessibility.setState((Element) node.getElement().getFirstChildElement(), "aria-expanded", "true");
     }
@@ -161,7 +161,7 @@ public class TreePanelView<M extends ModelData> {
       sb.append("<img src=\"");
       sb.append(GXT.BLANK_IMAGE_URL);
       sb.append("\" style=\"height: 18px; width: ");
-      sb.append(level * 18);
+      sb.append(level * getIndenting(tree.findNode((M) m)));
       sb.append("px;\" />");
       sb.append(jointElement == null ? "<img src=\"" + GXT.BLANK_IMAGE_URL
           + "\" style=\"width: 16px\" class=\"x-tree3-node-joint\" />" : DOM.toString(jointElement));
@@ -352,6 +352,10 @@ public class TreePanelView<M extends ModelData> {
 
   protected int getCalculatedRowHeight() {
     return 21;
+  }
+
+  protected int getIndenting(TreeNode node) {
+    return 18;
   }
 
   protected void onMouseOut(TreePanelEvent ce) {

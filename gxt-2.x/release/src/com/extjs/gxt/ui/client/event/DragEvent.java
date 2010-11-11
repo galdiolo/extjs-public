@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -9,6 +9,7 @@ package com.extjs.gxt.ui.client.event;
 
 import com.extjs.gxt.ui.client.fx.Draggable;
 import com.extjs.gxt.ui.client.widget.Component;
+import com.google.gwt.dom.client.Element;
 
 /**
  * Draggable event type.
@@ -35,6 +36,11 @@ public class DragEvent extends DomEvent {
    * The current height.
    */
   private int height;
+
+  /**
+   * The element where the mousedown happend
+   */
+  private Element startElement;
 
   /**
    * The current width.
@@ -89,6 +95,15 @@ public class DragEvent extends DomEvent {
   }
 
   /**
+   * Returns the element where the mousedown happened.
+   * 
+   * @return the startElement
+   */
+  public Element getStartElement() {
+    return startElement;
+  }
+
+  /**
    * Returns the current width.
    * 
    * @return the current width
@@ -140,6 +155,15 @@ public class DragEvent extends DomEvent {
    */
   public void setHeight(int height) {
     this.height = height;
+  }
+
+  /**
+   * Sets the element where the mousedown happened.
+   * 
+   * @param startElement the startElement to set
+   */
+  public void setStartElement(Element startElement) {
+    this.startElement = startElement;
   }
 
   /**

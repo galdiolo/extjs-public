@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -35,7 +35,7 @@ public class DialogExample extends LayoutContainer {
     simple.setButtons(Dialog.YESNO);
     simple.setBodyStyleName("pad-text");
     simple.addText(TestData.DUMMY_TEXT_SHORT);
-    simple.getItem(0).getAriaSupport().setIgnore(true);
+    simple.getItem(0).getFocusSupport().setIgnore(true);
     simple.setScrollMode(Scroll.AUTO);
     simple.setHideOnButtonClick(true);
 

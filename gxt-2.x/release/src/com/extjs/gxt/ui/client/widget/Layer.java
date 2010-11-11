@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -24,22 +24,22 @@ import com.google.gwt.user.client.ui.Accessibility;
  */
 public class Layer extends El {
   public enum ShadowPosition {
-    DROP, SIDES, FRAME;
+    DROP, FRAME, SIDES;
   }
-
-  private static Stack<El> shims = new Stack<El>();
 
   private static Stack<El> shadows = new Stack<El>();
 
+  private static Stack<El> shims = new Stack<El>();
+
   private El shadow;
-  private boolean shadowEnabled;
-  private El shim;
-  private boolean shimEnabled;
-
   private Rectangle shadowAdjusts;
-  private ShadowPosition shadowPosition;
-
+  private boolean shadowEnabled;
   private int shadowOffset = 4;
+
+  private ShadowPosition shadowPosition;
+  private El shim;
+
+  private boolean shimEnabled;
 
   /**
    * Creates a new layer instance.
@@ -58,43 +58,6 @@ public class Layer extends El {
     super(element);
     makePositionable();
     setShadowPosition(ShadowPosition.SIDES);
-  }
-
-  private El createShadow() {
-    El el;
-    if (GXT.isIE) {
-      el = new El(DOM.createDiv());
-      el.setStyleName("x-ie-shadow");
-      el.setStyleAttribute("filter", "progid:DXImageTransform.Microsoft.alpha("
-          + "opacity=50) progid:DXImageTransform.Microsoft.Blur(pixelradius=" + shadowOffset + ")");
-    } else {
-      el = new El(Markup.SHADOW);
-    }
-    el.hide();
-    return el;
-  }
-
-  /**
-   * Creates an iframe shim for this element to keep selects and other windowed
-   * objects from showing through.
-   * 
-   * @return the new shim element
-   */
-  private El createShim() {
-    El el = new El(DOM.createIFrame());
-    el.dom.setPropertyString("frameborder", "no");
-    el.dom.setPropertyString("frameBorder", "no");
-    el.dom.setClassName("ext-shim");
-    el.setTabIndex(-1);
-    el.setVisibility(true);
-    el.setVisible(false);
-    if (GXT.isIE && GXT.isSecure) {
-      el.dom.setPropertyString("src", GXT.SSL_SECURE_URL);
-    }
-
-    Accessibility.setRole(el.dom, "presentation");
-
-    return el;
   }
 
   /**
@@ -159,21 +122,21 @@ public class Layer extends El {
   }
 
   /**
-   * Returns the shadow position.
-   * 
-   * @return the shadow position
-   */
-  public ShadowPosition getShadowPosition() {
-    return shadowPosition;
-  }
-
-  /**
    * Returns the shadow offset.
    * 
    * @return the shadow offset
    */
   public int getShadowOffset() {
     return shadowOffset;
+  }
+
+  /**
+   * Returns the shadow position.
+   * 
+   * @return the shadow position
+   */
+  public ShadowPosition getShadowPosition() {
+    return shadowPosition;
   }
 
   /**
@@ -231,6 +194,14 @@ public class Layer extends El {
     hideShim();
   }
 
+  public boolean isShadow() {
+    return shadowEnabled;
+  }
+
+  public boolean isShim() {
+    return shimEnabled;
+  }
+
   @Override
   public El remove() {
     super.remove();
@@ -257,6 +228,16 @@ public class Layer extends El {
     super.setLeft(left);
     sync(true);
     return this;
+  }
+
+  /**
+   * Sets the shadow offset (defaults to 4).
+   * 
+   * @param shadowOffset the offset
+   */
+  public void setShadowOffset(int shadowOffset) {
+    this.shadowOffset = shadowOffset;
+    setShadowPosition(shadowPosition);
   }
 
   /**
@@ -309,16 +290,6 @@ public class Layer extends El {
         }
         break;
     }
-  }
-
-  /**
-   * Sets the shadow offset (defaults to 4).
-   * 
-   * @param shadowOffset the offset
-   */
-  public void setShadowOffset(int shadowOffset) {
-    this.shadowOffset = shadowOffset;
-    setShadowPosition(shadowPosition);
   }
 
   @Override
@@ -424,15 +395,17 @@ public class Layer extends El {
         Rectangle a = shadow == null ? new Rectangle(0, 0, 0, 0) : shadowAdjusts;
 
         if (GXT.isIE && shadow != null && shadow.isVisible()) {
-          w += 8;
-          h += 8;
+          w += shadowOffset * 2;
+          l -= shadowOffset;
+          t -= shadowOffset;
+          h += shadowOffset * 2;
         }
 
         try {
-          shim.setLeft(Math.min(l, l + a.x));
-          shim.setTop(Math.min(t, t + a.y));
-          shim.setWidth(Math.max(1, w + a.width));
-          shim.setHeight(Math.max(1, h + a.height));
+          shim.setLeft(l + a.x);
+          shim.setTop(t + a.y);
+          shim.setWidth(w + a.width);
+          shim.setHeight(h + a.height);
         } catch (Exception e) {
           GWT.log("shim error", e);
         }
@@ -440,6 +413,45 @@ public class Layer extends El {
       }
     }
     return this;
+  }
+
+  private El createShadow() {
+    El el;
+    if (GXT.isIE) {
+      el = new El(DOM.createDiv());
+      el.setStyleName("x-ie-shadow");
+      el.setStyleAttribute("filter", "progid:DXImageTransform.Microsoft.alpha("
+          + "opacity=50) progid:DXImageTransform.Microsoft.Blur(pixelradius=" + shadowOffset + ")");
+    } else {
+      el = new El(Markup.SHADOW);
+    }
+    el.addStyleName("x-ignore");
+    el.hide();
+    return el;
+  }
+
+  /**
+   * Creates an iframe shim for this element to keep selects and other windowed
+   * objects from showing through.
+   * 
+   * @return the new shim element
+   */
+  private El createShim() {
+    El el = new El(DOM.createIFrame());
+    el.dom.setPropertyString("frameborder", "no");
+    el.dom.setPropertyString("frameBorder", "no");
+    el.dom.setClassName("ext-shim");
+    el.setTabIndex(-1);
+    el.setVisibility(true);
+    el.setVisible(false);
+    el.addStyleName("x-ignore");
+    if (GXT.isIE && GXT.isSecure) {
+      el.dom.setPropertyString("src", GXT.SSL_SECURE_URL);
+    }
+
+    Accessibility.setRole(el.dom, "presentation");
+
+    return el;
   }
 
 }

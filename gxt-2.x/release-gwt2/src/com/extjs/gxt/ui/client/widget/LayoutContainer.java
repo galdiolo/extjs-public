@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -93,7 +93,7 @@ public class LayoutContainer extends ScrollContainer<Component> {
    */
   public LayoutContainer() {
     enableLayout = true;
-    getAriaSupport().setIgnore(true);
+    getFocusSupport().setIgnore(true);
   }
 
   /**
@@ -328,11 +328,11 @@ public class LayoutContainer extends ScrollContainer<Component> {
   }
 
   protected void onFocus(ComponentEvent ce) {
-    if (GXT.isAriaEnabled() && FocusManager.get().isManaged()) {
-      if (getAriaSupport().isIgnore()) {
+    if (GXT.isFocusManagerEnabled() && FocusManager.get().isManaged()) {
+      if (getFocusSupport().isIgnore()) {
         for (int i = 0; i < getItemCount(); i++) {
           Component c = getItem(i);
-          if (!c.getAriaSupport().isIgnore()) {
+          if (!c.getFocusSupport().isIgnore()) {
             c.focus();
             break;
           }
@@ -344,7 +344,7 @@ public class LayoutContainer extends ScrollContainer<Component> {
   }
 
   protected void onBlur(ComponentEvent ce) {
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       FocusFrame.get().unframe();
     }
   }
@@ -355,7 +355,7 @@ public class LayoutContainer extends ScrollContainer<Component> {
       setElement(DOM.createDiv(), parent, index);
     }
 
-    if (GXT.isAriaEnabled() && !getAriaSupport().isIgnore()) {
+    if (GXT.isFocusManagerEnabled() && !getFocusSupport().isIgnore()) {
       el().setTabIndex(0);
       el().setElementAttribute("hideFocus", "true");
       sinkEvents(Event.FOCUSEVENTS);

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -126,8 +126,8 @@ public class ColumnHeader extends BoxComponent {
       }
 
       // find the previous column which is not hidden
-      int before = activeHdIndex - 1;
-      for (int i = activeHdIndex; i >= 0; i--) {
+      int before = -1;
+      for (int i = activeHdIndex - 1; i >= 0; i--) {
         if (!cm.isHidden(i)) {
           before = i;
           break;
@@ -143,11 +143,12 @@ public class ColumnHeader extends BoxComponent {
 
       Style ss = getElement().getStyle();
 
-      if (x - r.left <= hw && cm.isResizable(activeHdIndex - before)) {
+      if (x - r.left <= hw && before != -1 && cm.isResizable(activeHdIndex - before)
+          && cm.isFixed(activeHdIndex - before)) {
         bar.el().setVisibility(true);
         el().setX(r.left);
         ss.setProperty("cursor", GXT.isSafari ? "e-resize" : "col-resize");
-      } else if (r.right - x <= hw && cm.isResizable(activeHdIndex)) {
+      } else if (r.right - x <= hw && cm.isResizable(activeHdIndex) && !cm.isFixed(activeHdIndex)) {
         el().setX(r.right - (hw / 2));
         bar.el().setVisibility(true);
         ss.setProperty("cursor", GXT.isSafari ? "w-resize" : "col-resize");
@@ -290,7 +291,7 @@ public class ColumnHeader extends BoxComponent {
     }
 
     public void updateWidth(int width) {
-      if (!cm.isHidden(cm.indexOf(config))) {
+      if (!config.isHidden()) {
         El td = el().findParent("td", 3);
         td.setWidth(width);
         el().setWidth(width - td.getFrameWidth("lr"), true);
@@ -328,7 +329,7 @@ public class ColumnHeader extends BoxComponent {
     }
 
     protected void onKeyPress(ComponentEvent ce) {
-      if (GXT.isAriaEnabled() && ce.getKeyCode() == 32) {
+      if (GXT.isFocusManagerEnabled() && ce.getKeyCode() == 32) {
         onHeaderClick(ce, column);
       }
     }
@@ -869,17 +870,15 @@ public class ColumnHeader extends BoxComponent {
     if (!container.fireEvent(Events.HeaderContextMenu, ge)) {
       return;
     }
-
-    final Head h = getHead(column);
-    menu.setId(h.getId() + "-menu");
-
     if (menu != null) {
+      final Head h = getHead(column);
+      menu.setId(h.getId() + "-menu");
       h.activateTrigger(true);
       menu.addListener(Events.Hide, new Listener<BaseEvent>() {
         public void handleEvent(BaseEvent be) {
           h.activateTrigger(false);
           container.focus();
-          if (GXT.isAriaEnabled()) {
+          if (GXT.isFocusManagerEnabled()) {
             selectHeader(column);
           }
         }
@@ -1070,7 +1069,7 @@ public class ColumnHeader extends BoxComponent {
       h.activate();
 
       FocusFrame.get().frame(h);
-      container.getElement().setAttribute("aria-activedescendant", h.getId());
+      container.getAriaSupport().setState("aria-activedescendant", h.getId());
     }
   }
 }

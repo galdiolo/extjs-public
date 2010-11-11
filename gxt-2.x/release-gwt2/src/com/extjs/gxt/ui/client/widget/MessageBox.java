@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -359,10 +359,10 @@ public class MessageBox {
             textBox.getAriaSupport().setLabelledBy(getId() + "-content");
             dialog.setFocusWidget(textBox);
             textBox.render(contentEl, 2);
-            textBox.setData("aria-previous", fbar.getId());
-            textBox.setData("aria-next", fbar.getId());
-            fbar.setData("aria-previous", textBox.getId());
-            fbar.setData("aria-next", textBox.getId());
+            textBox.getFocusSupport().setPreviousId(fbar.getId());
+            textBox.getFocusSupport().setNextId(fbar.getId());
+            fbar.getFocusSupport().setPreviousId(textBox.getId());
+            fbar.getFocusSupport().setNextId(textBox.getId());
             icon = null;
           } else if (type == MessageBoxType.MULTIPROMPT) {
             textArea = new TextArea();
@@ -370,10 +370,10 @@ public class MessageBox {
             textArea.setHeight(defaultTextHeight);
             dialog.setFocusWidget(textArea);
             textArea.render(contentEl, 2);
-            textArea.setData("aria-next", fbar.getId());
-            textArea.setData("aria-previous", fbar.getId());
-            fbar.setData("aria-next", textArea.getId());
-            fbar.setData("aria-previous", textArea.getId());
+            textArea.getFocusSupport().setNextId(fbar.getId());
+            textArea.getFocusSupport().setPreviousId(fbar.getId());
+            fbar.getFocusSupport().setNextId(textArea.getId());
+            fbar.getFocusSupport().setPreviousId(textArea.getId());
             icon = null;
           } else if (type == MessageBoxType.PROGRESSS || type == MessageBoxType.WAIT) {
             dialog.getAriaSupport().setDescribedBy("");

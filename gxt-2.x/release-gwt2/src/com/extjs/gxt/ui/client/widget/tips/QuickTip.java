@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -111,7 +111,9 @@ public class QuickTip extends ToolTip {
   @Override
   protected void onTargetOut(ComponentEvent ce) {
     EventTarget to = ce.getEvent().getRelatedEventTarget();
-    if (to == null || (to != null && !DOM.isOrHasChild(target.getElement(), (Element) Element.as(to)))) {
+    if (to == null
+        || (Element.is(target.getElement()) && Element.is(to) && !DOM.isOrHasChild(target.getElement(),
+            (Element) Element.as(to)))) {
       super.onTargetOut(ce);
     }
   }
@@ -165,9 +167,7 @@ public class QuickTip extends ToolTip {
   }
 
   private boolean hasTip(Element target) {
-    String tip = target.getAttribute("qtip");
-    String title = target.getAttribute("title");
-    return hasAttributeValue(tip) || (interceptTitles && hasAttributeValue(title));
+    return hasAttributeValue(target.getAttribute("qtip")) || (interceptTitles && hasAttributeValue(target.getAttribute("title")));
   }
 
   private void updateTargetElement(Element target) {

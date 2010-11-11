@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -12,6 +12,7 @@ import java.util.List;
 import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Stock;
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -141,7 +142,7 @@ public class ToolBarExample extends LayoutContainer {
     panel.setFrame(true);
     panel.setHeading("ToolBar & Menu Demo");
     panel.setLayout(new FitLayout());
-    panel.setSize(550, 300);
+    panel.setSize(GXT.isAriaEnabled() ? 800 : 550, 300);
     panel.setTopComponent(toolBar);
 
     LayoutContainer c = new LayoutContainer();

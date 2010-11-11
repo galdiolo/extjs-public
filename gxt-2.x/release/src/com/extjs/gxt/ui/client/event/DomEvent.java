@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -316,15 +316,10 @@ public class DomEvent extends BaseEvent {
    * @return the within state
    */
   public boolean within(Element element, boolean toElement) {
-    EventTarget target;
-    if (event != null) {
-      if (toElement) {
-        target = event.getRelatedEventTarget();
-      } else {
-        target = event.getEventTarget();
-      }
-      if (target != null) {
-        return DOM.isOrHasChild(element, (Element) target.cast());
+    if (event != null && Element.is(element)) {
+      EventTarget target = toElement ? event.getRelatedEventTarget() : event.getEventTarget();
+      if (Element.is(target)) {
+        return DOM.isOrHasChild(element, (Element) Element.as(target));
       }
     }
     return false;

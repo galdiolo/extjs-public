@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -178,7 +178,7 @@ public class GXT {
   private static Theme defaultTheme;
   private static boolean forceTheme;
   private static Version version;
-  private static boolean ariaEnabled;
+  private static boolean ariaEnabled, focusManagerEnabled;
 
   /**
    * True if the OS high contrast mode is enabled.
@@ -389,16 +389,35 @@ public class GXT {
   public static boolean isAriaEnabled() {
     return ariaEnabled;
   }
+  
+  /**
+   * Returns the focus managed enabled state.
+   * 
+   * @return true if enabled, false otherwise
+   */
+  public static boolean isFocusManagerEnabled() {
+    return focusManagerEnabled;
+  }
 
   /**
-   * True to enable ARIA functionality.
+   * True to enable ARIA functionality. Enabling ARIA will also cause the focus manager to enabled.
    * 
    * @param enable true to enable
    */
   public static void setAriaEnabled(boolean enable) {
     ariaEnabled = enable;
     Accessibility.setRole(XDOM.getBody(), enable ? "application" : "");
-    if (ariaEnabled) {
+    setFocusManagerEnabled(enable);
+  }
+  
+  /**
+   * True to enable the focus manager.
+   * 
+   * @param enable true to enable
+   */
+  public static void setFocusManagerEnabled(boolean enable) {
+    focusManagerEnabled = enable;
+    if (enable) {
       FocusManager.get().enable();
     } else {
       FocusManager.get().disable();

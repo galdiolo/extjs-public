@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -21,10 +21,10 @@ import com.google.gwt.user.client.Event;
  */
 public class GridEvent<M extends ModelData> extends BoxComponentEvent {
 
+  protected M model;
   private int colIndex = -1;
   private Grid<M> grid;
   private Menu menu;
-  private M model;
   private String property;
   private Record record;
   private int rowIndex = -1;

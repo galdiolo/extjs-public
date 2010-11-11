@@ -1,11 +1,13 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
  */
 package com.extjs.gxt.ui.client.widget;
+
+import java.util.ArrayList;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
@@ -30,12 +32,17 @@ import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.ToolButton;
+import com.extjs.gxt.ui.client.widget.form.TriggerField;
+import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.Event.NativePreviewEvent;
+import com.google.gwt.user.client.Event.NativePreviewHandler;
 import com.google.gwt.user.client.ui.Accessibility;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -160,6 +167,7 @@ public class Window extends ContentPanel {
   protected WindowManager manager;
   protected ToolButton restoreBtn, closeBtn;
   protected int ariaMoveResizeDistance = 5;
+  protected boolean removeFromParentOnHide = true;
 
   private boolean closable = true;
   private boolean constrain = true;
@@ -187,6 +195,10 @@ public class Window extends ContentPanel {
   private BaseEventPreview eventPreview;
   private boolean resizing;
   private Element container;
+  private Boolean restoreShadow;
+  private Boolean restoreWindowScrolling;
+  private HandlerRegistration modalPreview;
+  private boolean dragging;
 
   /**
    * Creates a new window.
@@ -418,8 +430,17 @@ public class Window extends ContentPanel {
       restorePos = getPosition(true);
     }
 
+    if (modalPreview != null) {
+      modalPreview.removeHandler();
+      modalPreview = null;
+    }
+
     onHide();
-    RootPanel.get().remove(this);
+    manager.unregister(this);
+    if (removeFromParentOnHide) {
+      removeFromParent();
+    }
+
     if (modalPanel != null) {
       ModalPanel.push(modalPanel);
       modalPanel = null;
@@ -427,6 +448,11 @@ public class Window extends ContentPanel {
 
     eventPreview.remove();
     notifyHide();
+
+    if (restoreWindowScrolling != null) {
+      com.google.gwt.dom.client.Document.get().enableScrolling(restoreWindowScrolling.booleanValue());
+    }
+
     fireEvent(Events.Hide, new WindowEvent(this, buttonPressed));
   }
 
@@ -537,11 +563,28 @@ public class Window extends ContentPanel {
     if (!maximized) {
       restoreSize = getSize();
       restorePos = getPosition(true);
+      restoreShadow = getShadow();
+      if (container == null) {
+        String bodyOverflow = com.google.gwt.dom.client.Document.get().isCSS1Compat()
+            ? com.google.gwt.dom.client.Document.get().getDocumentElement().getStyle().getProperty("overflow")
+            : com.google.gwt.dom.client.Document.get().getBody().getStyle().getProperty("overflow");
+        if (!"hidden".equals(bodyOverflow)) {
+          restoreWindowScrolling = true;
+        }
+        com.google.gwt.dom.client.Document.get().enableScrolling(false);
+      }
       maximized = true;
       addStyleName("x-window-maximized");
       head.removeStyleName("x-window-draggable");
+      if (layer != null) {
+        layer.disableShadow();
+      }
 
+      boolean cacheSizesRestore = cacheSizes;
+      cacheSizes = false;
       fitContainer();
+      cacheSizes = cacheSizesRestore;
+
       if (maximizable) {
         maxBtn.setVisible(false);
         restoreBtn.setVisible(true);
@@ -610,6 +653,10 @@ public class Window extends ContentPanel {
         restoreBtn.setVisible(false);
         maxBtn.setVisible(true);
       }
+      if (restoreShadow != null && restoreShadow.booleanValue() && layer != null) {
+        layer.enableShadow();
+        restoreShadow = null;
+      }
       if (draggable) {
         dragger.setEnabled(true);
       }
@@ -619,7 +666,15 @@ public class Window extends ContentPanel {
       head.addStyleName("x-window-draggable");
       if (restorePos != null) {
         setPosition(restorePos.x, restorePos.y);
+
+        boolean cacheSizesRestore = cacheSizes;
+        cacheSizes = false;
         setSize(restoreSize.width, restoreSize.height);
+        cacheSizes = cacheSizesRestore;
+      }
+      if (container == null && restoreWindowScrolling != null) {
+        com.google.gwt.dom.client.Document.get().enableScrolling(restoreWindowScrolling.booleanValue());
+        restoreWindowScrolling = null;
       }
       maximized = false;
       fireEvent(Events.Restore, new WindowEvent(this));
@@ -641,9 +696,20 @@ public class Window extends ContentPanel {
       }
       if (isVisible()) {
         eventPreview.push();
+
+        if (modal && modalPanel == null) {
+          modalPanel = ModalPanel.pop();
+          modalPanel.setBlink(blinkModal);
+          modalPanel.show(this);
+        }
       }
+
       fireEvent(Events.Activate, new WindowEvent(this));
     } else {
+      if (modalPanel != null) {
+        ModalPanel.push(modalPanel);
+        modalPanel = null;
+      }
       hideShadow();
       fireEvent(Events.Deactivate, new WindowEvent(this));
     }
@@ -667,6 +733,9 @@ public class Window extends ContentPanel {
    */
   public void setBlinkModal(boolean blinkModal) {
     this.blinkModal = blinkModal;
+    if (modalPanel != null) {
+      modalPanel.setBlink(blinkModal);
+    }
   }
 
   /**
@@ -874,10 +943,13 @@ public class Window extends ContentPanel {
     }
     // remove hide style, else layout fails
     removeStyleName(getHideMode().value());
-    RootPanel.get().add(this);
+    if (!isAttached()) {
+      RootPanel.get().add(this);
+    }
     el().setVisibility(false);
     el().makePositionable(true);
     onShow();
+    manager.register(this);
 
     afterShow();
     notifyShow();
@@ -912,6 +984,9 @@ public class Window extends ContentPanel {
         setSize(restoreSize.width, restoreSize.height);
       }
     }
+    if (restoreWindowScrolling != null) {
+      com.google.gwt.dom.client.Document.get().enableScrolling(false);
+    }
 
     int h = getHeight();
     int w = getWidth();
@@ -930,9 +1005,34 @@ public class Window extends ContentPanel {
 
     el().updateZIndex(0);
     if (modal) {
-      modalPanel = ModalPanel.pop();
-      modalPanel.setBlink(blinkModal);
-      modalPanel.show(this);
+      modalPreview = Event.addNativePreviewHandler(new NativePreviewHandler() {
+        public void onPreviewNativeEvent(NativePreviewEvent event) {
+          if (Element.is(event.getNativeEvent().getEventTarget())) {
+            Element target = (Element) Element.as(event.getNativeEvent().getEventTarget());
+
+            String tag = target.getTagName();
+            // ignore html and body because of frames
+            if (!resizing && !dragging && !tag.equalsIgnoreCase("html") && !tag.equalsIgnoreCase("body")
+                && event.getTypeInt() != Event.ONLOAD && manager.getActive() == Window.this
+                && (modalPanel == null || (modalPanel != null && !modalPanel.getElement().isOrHasChild(target)))
+                && !Window.this.getElement().isOrHasChild(target) && fly(target).findParent(".x-ignore", -1) == null) {
+              ArrayList<Component> col = new ArrayList<Component>(ComponentManager.get().getAll());
+              for (Component c : col) {
+                if (c instanceof TriggerField<?>) {
+                  triggerBlur((TriggerField<?>) c);
+                } else if (c instanceof Menu) {
+                  ((Menu) c).hide(true);
+                }
+              }
+              Window.this.focus();
+            }
+          }
+        }
+
+        private native void triggerBlur(TriggerField<?> field) /*-{
+    field.@com.extjs.gxt.ui.client.widget.form.TriggerField::triggerBlur(Lcom/extjs/gxt/ui/client/event/ComponentEvent;)(null);
+  }-*/;
+      });
     }
 
     // missing cursor workaround
@@ -991,6 +1091,7 @@ public class Window extends ContentPanel {
   }
 
   protected void endDrag(DragEvent de, boolean canceled) {
+    dragging = false;
     unghost(de);
     if (!canceled) {
       restorePos = getPosition(true);
@@ -1039,12 +1140,12 @@ public class Window extends ContentPanel {
     super.initTools();
 
     if (GXT.isAriaEnabled()) {
-      moveBtn = new ToolButton("x-tool-plus");
+      moveBtn = new ToolButton("x-tool-move");
       moveBtn.getAriaSupport().setLabel(GXT.MESSAGES.window_ariaMove());
       moveBtn.getAriaSupport().setDescription(GXT.MESSAGES.window_ariaMoveDescription());
       head.addTool(moveBtn);
 
-      resizeBtn = new ToolButton("x-tool-minus");
+      resizeBtn = new ToolButton("x-tool-resize");
       resizeBtn.getAriaSupport().setLabel(GXT.MESSAGES.window_ariaResize());
       resizeBtn.getAriaSupport().setDescription(GXT.MESSAGES.window_ariaResizeDescription());
       head.addTool(resizeBtn);
@@ -1108,7 +1209,7 @@ public class Window extends ContentPanel {
   @Override
   protected void onFocus(ComponentEvent ce) {
     super.onFocus(ce);
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       if (focusWidget != null) {
         El.fly(focusWidget.getElement()).focus();
       }
@@ -1122,7 +1223,7 @@ public class Window extends ContentPanel {
   protected void onKeyPress(WindowEvent we) {
     int keyCode = we.getKeyCode();
     boolean t = getElement().isOrHasChild((com.google.gwt.dom.client.Element) we.getEvent().getEventTarget().cast());
-    boolean key = GXT.isAriaEnabled() ? we.isShiftKey() : true;
+    boolean key = GXT.isFocusManagerEnabled() ? we.isShiftKey() : true;
     if (key && closable && onEsc && keyCode == KeyCodes.KEY_ESCAPE && t) {
       hide();
     }
@@ -1258,6 +1359,7 @@ public class Window extends ContentPanel {
   }
 
   protected void startDrag(DragEvent de) {
+    dragging = true;
     WindowManager.get().bringToFront(this);
     hideShadow();
     ghost = ghost();

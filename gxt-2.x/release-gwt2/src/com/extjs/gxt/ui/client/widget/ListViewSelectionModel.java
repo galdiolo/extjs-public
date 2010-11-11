@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -28,11 +28,14 @@ import com.google.gwt.user.client.Element;
 public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSelectionModel<M> implements
     Listener<ListViewEvent<M>> {
 
+  protected boolean enableNavKeys = true;
   protected KeyNav<ComponentEvent> keyNav = new KeyNav<ComponentEvent>() {
 
     @Override
     public void onDown(ComponentEvent e) {
-      onKeyDown(e);
+      if (isVertical) {
+        onKeyDown(e);
+      }
     }
 
     @Override
@@ -41,14 +44,30 @@ public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSe
     }
 
     @Override
+    public void onLeft(ComponentEvent e) {
+      if (!isVertical) {
+        onKeyUp(e);
+      }
+    }
+
+    @Override
+    public void onRight(ComponentEvent e) {
+      if (!isVertical) {
+        onKeyDown(e);
+      }
+    }
+
+    @Override
     public void onUp(ComponentEvent e) {
-      onKeyUp(e);
+      if (isVertical) {
+        onKeyUp(e);
+      }
     }
 
   };
   protected ListStore<M> listStore;
   protected ListView<M> listView;
-  protected boolean enableNavKeys = true;
+  private boolean isVertical = true;
 
   /**
    * Binds the list view to the selection model.
@@ -95,12 +114,32 @@ public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSe
     }
   }
 
+  /**
+   * Returns true if up and down arrow keys are used for navigation. Else left
+   * and right arrow keys are used.
+   * 
+   * @return the isVertical
+   */
+  public boolean isVertical() {
+    return isVertical;
+  }
+
+  /**
+   * Sets if up and down arrow keys or left and right arrow keys should be used
+   * (defaults to true).
+   * 
+   * @param isVertical the isVertical to set
+   */
+  public void setVertical(boolean isVertical) {
+    this.isVertical = isVertical;
+  }
+
   @SuppressWarnings("unchecked")
   protected void handleMouseClick(ListViewEvent<M> e) {
     if (isLocked() || isInput(e.getTarget())) {
       return;
     }
-    if(e.getIndex() == -1){
+    if (e.getIndex() == -1) {
       deselectAll();
       return;
     }
@@ -269,20 +308,26 @@ public class ListViewSelectionModel<M extends ModelData> extends AbstractStoreSe
   @Override
   protected void onLastFocusChanged(M oldFocused, M newFocused) {
     int i;
-    i = listStore.indexOf(oldFocused);
-    if (i >= 0) {
-      listView.onHighlightRow(i, false);
+    if (oldFocused != null) {
+      i = listStore.indexOf(oldFocused);
+      if (i >= 0) {
+        listView.onHighlightRow(i, false);
+      }
     }
-
-    i = listStore.indexOf(newFocused);
-    if (i >= 0) {
-      listView.onHighlightRow(i, true);
+    if (newFocused != null) {
+      i = listStore.indexOf(newFocused);
+      if (i >= 0) {
+        listView.onHighlightRow(i, true);
+      }
     }
   }
 
   protected void onRowUpdated(ListViewEvent<M> ge) {
     if (isSelected(ge.getModel())) {
       onSelectChange(ge.getModel(), true);
+    }
+    if (getLastFocused() == ge.getModel()) {
+      setLastFocused(getLastFocused());
     }
   }
 

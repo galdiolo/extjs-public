@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -38,12 +38,12 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
    */
   public class DualListFieldMessages extends FieldMessages {
 
-    private String moveUp;
-    private String moveDown;
     private String addAll;
     private String addSelected;
-    private String removeSelected;
+    private String moveDown;
+    private String moveUp;
     private String removeAll;
+    private String removeSelected;
 
     /**
      * Returns the add all tooltip.
@@ -162,14 +162,18 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
     APPEND, INSERT;
   }
 
-  protected ListField<D> fromField;
-  protected ListField<D> toField;
   protected AdapterField buttonAdapter;
   protected VerticalPanel buttonBar;
+  protected ListField<D> fromField;
   protected Mode mode = Mode.APPEND;
+  protected ListField<D> toField;
 
   private String dndGroup;
   private boolean enableDND = true;
+  private ListViewDragSource sourceFromField;
+  private ListViewDragSource sourceToField;
+  private ListViewDropTarget targetFromField;
+  private ListViewDropTarget targetToField;
 
   public DualListField() {
     fromField = new ListField<D>();
@@ -263,7 +267,22 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
    * @param group the group name
    */
   public void setDNDGroup(String group) {
+    if (group == null) {
+      group = getId() + "-group";
+    }
     this.dndGroup = group;
+    if (sourceFromField != null) {
+      sourceFromField.setGroup(dndGroup);
+    }
+    if (sourceToField != null) {
+      sourceToField.setGroup(dndGroup);
+    }
+    if (targetFromField != null) {
+      targetFromField.setGroup(dndGroup);
+    }
+    if (targetToField != null) {
+      targetToField.setGroup(dndGroup);
+    }
   }
 
   /**
@@ -273,6 +292,41 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
    * @param enableDND true to enable drag and drop
    */
   public void setEnableDND(boolean enableDND) {
+    if (rendered) {
+      if (enableDND && !this.enableDND) {
+        sourceFromField = new ListViewDragSource(fromField.getListView());
+        sourceToField = new ListViewDragSource(toField.getListView());
+
+        targetFromField = new ListViewDropTarget(fromField.getListView());
+        targetFromField.setAutoSelect(true);
+        targetToField = new ListViewDropTarget(toField.getListView());
+        targetToField.setAutoSelect(true);
+        
+        if (mode == Mode.INSERT) {
+          targetToField.setAllowSelfAsSource(true);
+          targetFromField.setFeedback(Feedback.INSERT);
+          targetToField.setFeedback(Feedback.INSERT);
+        }
+        setDNDGroup(dndGroup);
+      } else if (!enableDND) {
+        if (sourceFromField != null) {
+          sourceFromField.release();
+          sourceFromField = null;
+        }
+        if (sourceToField != null) {
+          sourceToField.release();
+          sourceToField = null;
+        }
+        if (targetFromField != null) {
+          targetFromField.release();
+          targetFromField = null;
+        }
+        if (targetToField != null) {
+          targetToField.release();
+          targetToField = null;
+        }
+      }
+    }
     this.enableDND = enableDND;
   }
 
@@ -284,17 +338,6 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
    */
   public void setMode(Mode mode) {
     this.mode = mode;
-  }
-
-  private void configureButton(IconButton btn, String msg, String tip) {
-    btn.setHeight(18);
-    tip = msg != null ? msg : tip;
-    if (GXT.isAriaEnabled()) {
-      btn.setTitle(tip);
-      btn.getAriaSupport().setIgnore(true);
-    } else {
-      btn.setToolTip(tip);
-    }
   }
 
   protected void initButtons() {
@@ -372,29 +415,10 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
     }
   }
 
-  protected void initDND() {
-    if (dndGroup == null) {
-      dndGroup = getId() + "-group";
-    }
-
-    ListViewDragSource source1 = new ListViewDragSource(fromField.getListView());
-    ListViewDragSource source2 = new ListViewDragSource(toField.getListView());
-
-    source1.setGroup(dndGroup);
-    source2.setGroup(dndGroup);
-
-    ListViewDropTarget target1 = new ListViewDropTarget(fromField.getListView());
-    target1.setAutoSelect(true);
-    ListViewDropTarget target2 = new ListViewDropTarget(toField.getListView());
-    target2.setAutoSelect(true);
-
-    target1.setGroup(dndGroup);
-    target2.setGroup(dndGroup);
-
-    if (mode == Mode.INSERT) {
-      target1.setFeedback(Feedback.INSERT);
-      target2.setFeedback(Feedback.INSERT);
-    }
+  @Override
+  protected void onFocus(ComponentEvent ce) {
+    super.onFocus(ce);
+    fromField.focus();
   }
 
   @Override
@@ -405,14 +429,9 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
     getElement().removeAttribute("tabindex");
 
     if (enableDND) {
-      initDND();
+      enableDND = false;
+      setEnableDND(true);
     }
-  }
-
-  @Override
-  protected void onFocus(ComponentEvent ce) {
-    super.onFocus(ce);
-    fromField.focus();
   }
 
   @Override
@@ -427,6 +446,17 @@ public class DualListField<D extends ModelData> extends MultiField<Field<?>> {
       for (Field<?> f : fields) {
         f.setWidth(width);
       }
+    }
+  }
+
+  private void configureButton(IconButton btn, String msg, String tip) {
+    btn.setHeight(18);
+    tip = msg != null ? msg : tip;
+    if (GXT.isAriaEnabled()) {
+      btn.setTitle(tip);
+      btn.getFocusSupport().setIgnore(true);
+    } else {
+      btn.setToolTip(tip);
     }
   }
 

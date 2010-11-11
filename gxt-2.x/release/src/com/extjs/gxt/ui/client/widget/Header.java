@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -34,7 +34,7 @@ public class Header extends Component implements IconSupport {
   private String text, altIconText;
 
   public Header() {
-    getAriaSupport().setIgnore(true);
+    getFocusSupport().setIgnore(true);
   }
 
   /**

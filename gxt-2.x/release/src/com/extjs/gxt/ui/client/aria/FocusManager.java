@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -22,12 +22,27 @@ import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
+/**
+ * The FocusManager is used to control keyboard navigation among and within
+ * components.
+ */
 public class FocusManager {
 
+  /**
+   * The TabNext event type.
+   */
   public static final EventType TabNext = new EventType();
 
+  /**
+   * The TabPrevious event type.
+   */
   public static final EventType TabPrevious = new EventType();
 
+  /**
+   * Returns the singleton instance.
+   * 
+   * @return the focus manager instance
+   */
   public static FocusManager get() {
     if (instance == null) {
       instance = new FocusManager();
@@ -106,14 +121,26 @@ public class FocusManager {
     initHandlers();
   }
 
+  /**
+   * Disables the focus manager.
+   */
   public void disable() {
     preview.remove();
   }
 
+  /**
+   * Enables the focus manager.
+   */
   public void enable() {
     preview.add();
   }
 
+  /**
+   * Returns the first matching navigation handler given the target component.
+   * 
+   * @param comp the target component
+   * @return the handler or null if no matches
+   */
   public NavigationHandler findNavigationHandler(Component comp) {
     for (int i = 0, len = navigationHandlers.size(); i < len; i++) {
       NavigationHandler h = navigationHandlers.get(i);
@@ -128,32 +155,69 @@ public class FocusManager {
     return insertExitFocusElement;
   }
 
+  /**
+   * Returns true if focus manager is managed.
+   * 
+   * @return true if managed
+   */
   public boolean isManaged() {
     return managed;
   }
 
+  /**
+   * Registers a focus handler.
+   * 
+   * @param handler the handler
+   */
   public void register(FocusHandler handler) {
     if (!handlers.contains(handler)) {
       handlers.add(handler);
     }
   }
 
+  /**
+   * Registers a navigation handler.
+   * 
+   * @param handler the handler
+   */
   public void register(NavigationHandler handler) {
     navigationHandlers.add(handler);
   }
 
+  /**
+   * True to insert a dummy element to allow the user to tab out of the
+   * application (defaults to true).
+   * 
+   * @param insertExitFocusElement true to insert exit element
+   */
   public void setInsertExitFocusElement(boolean insertExitFocusElement) {
     this.insertExitFocusElement = insertExitFocusElement;
   }
 
+  /**
+   * True to let focus manager control navigation keys, false to use natural tab
+   * indexes (defaults to true).
+   * 
+   * @param managed true if managed
+   */
   public void setManaged(boolean managed) {
     this.managed = managed;
   }
 
+  /**
+   * Unregisters a focus handler.
+   * 
+   * @param handler the focus handler
+   */
   public void unregister(FocusHandler handler) {
     handlers.remove(handler);
   }
 
+  /**
+   * Unregisters a navigation handler.
+   * 
+   * @param handler the navigation handler
+   */
   public void unregister(NavigationHandler handler) {
     navigationHandlers.remove(handler);
   }
@@ -169,12 +233,10 @@ public class FocusManager {
     register(new DualListFieldHandler());
     register(new FieldHandler());
     register(new HeaderHandler());
-
     // always last
     register(new DefaultHandler());
 
     register(new ContentPanelNavigationHandler());
-
   }
 
   protected void onToggle(Component c, PreviewEvent pe) {

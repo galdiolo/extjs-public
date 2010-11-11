@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -24,14 +24,20 @@ public class ListFilter extends Filter {
 
   private String displayProperty = "text";
   private ListMenu listMenu;
+  private ListStore store;
 
   public ListFilter(String dataIndex, ListStore store) {
     super(dataIndex);
-
+    this.store = store;
     menu = new ListMenu(this, store);
     listMenu = (ListMenu) menu;
   }
 
+  /**
+   * Returns the display property.
+   * 
+   * @return the display property
+   */
   public String getDisplayProperty() {
     return displayProperty;
   }
@@ -40,6 +46,15 @@ public class ListFilter extends Filter {
   public List<FilterConfig> getSerialArgs() {
     BaseListFilterConfig config = new BaseListFilterConfig("list", listMenu.getValue());
     return Util.createList(config);
+  }
+
+  /**
+   * Returns the list store.
+   * 
+   * @return the list store
+   */
+  public ListStore getStore() {
+    return store;
   }
 
   @Override
@@ -63,6 +78,7 @@ public class ListFilter extends Filter {
   @Override
   public void setValue(Object value) {
     listMenu.setSelected((List) value);
+    fireUpdate();
   }
 
   @Override

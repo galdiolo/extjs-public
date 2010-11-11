@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.SortDir;
+import com.extjs.gxt.ui.client.core.DomQuery;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.data.ModelData;
@@ -36,7 +37,7 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Widget;
 
-@SuppressWarnings( {"unchecked", "rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class TreeGridView extends BufferView {
 
   protected TreeGrid tree;
@@ -86,26 +87,26 @@ public class TreeGridView extends BufferView {
     tree.refresh(node.m);
   }
 
+  public Element getIconElement(TreeNode node) {
+    if (node.icon == null) {
+      Element row = getRowElement(node);
+      if (row != null) {
+        node.icon = DomQuery.selectNode(".x-tree3-node-icon", row);
+      }
+    }
+    return node.icon;
+  }
+
   public Element getJointElement(TreeNode node) {
     if (node.joint == null) {
       Element row = getRowElement(node);
       if (row != null) {
-        El jointEl = fly(row).selectNode(".x-tree3-el");
-        if (jointEl != null && widgetList.size() > 0) {
-          El j = jointEl.selectNode(".x-tree3-el-jnt");
-          if (j != null) {
-            node.joint = j.dom.getFirstChild().cast();
-          }
-        }
-        if (node.joint == null) {
-
-          node.joint = jointEl == null ? null : (Element) jointEl.dom.getChildNodes().getItem(1);
-        }
+        node.joint = DomQuery.selectNode(".x-tree3-node-joint", row);
       }
     }
     return node.joint;
   }
-
+  
   public String getTemplate(ModelData m, String id, String text, AbstractImagePrototype icon, boolean checkable,
       Joint joint, int level) {
 
@@ -128,33 +129,39 @@ public class TreeGridView extends BufferView {
 
     sb.append("<div role=\"presentation\" unselectable=\"on\" class=\"" + cls + "\">");
 
-    String h = "";
+    Element jointElement = null;
     switch (joint) {
       case COLLAPSED:
-        h = tree.getStyle().getJointCollapsedIcon().getHTML();
+        jointElement = (Element) tree.getStyle().getJointCollapsedIcon().createElement().cast();
         break;
       case EXPANDED:
-        h = tree.getStyle().getJointExpandedIcon().getHTML();
+        jointElement = (Element) tree.getStyle().getJointExpandedIcon().createElement().cast();
         break;
-      default:
-        h = "<img src=\"" + GXT.BLANK_IMAGE_URL + "\" style='width: 16px'>";
+    }
+    if (jointElement != null) {
+      El.fly(jointElement).addStyleName("x-tree3-node-joint");
     }
 
     sb.append("<img src=\"");
     sb.append(GXT.BLANK_IMAGE_URL);
     sb.append("\" style=\"height: 18px; width: ");
-    sb.append(level * 18);
+    sb.append(level * getIndenting(tree.findNode(m)));
     sb.append("px;\" />");
-    sb.append(h);
+    sb.append(jointElement == null ? "<img src=\"" + GXT.BLANK_IMAGE_URL
+        + "\" style=\"width: 16px\" class=\"x-tree3-node-joint\" />" : DOM.toString(jointElement));
     if (checkable) {
-      sb.append(GXT.IMAGES.unchecked().getHTML());
+      Element e = (Element) GXT.IMAGES.unchecked().createElement().cast();
+      El.fly(e).addStyleName("x-tree3-node-check");
+      sb.append(DOM.toString(e));
     } else {
-      sb.append("<span></span>");
+      sb.append("<span class=\"x-tree3-node-check\"></span>");
     }
     if (icon != null) {
-      sb.append(icon.getHTML());
+      Element e = icon.createElement().cast();
+      El.fly(e).addStyleName("x-tree3-node-icon");
+      sb.append(DOM.toString(e));
     } else {
-      sb.append("<span></span>");
+      sb.append("<span class=\"x-tree3-node-icon\"></span>");
     }
     sb.append("<span unselectable=\"on\" class=\"x-tree3-node-text\">");
     sb.append(text);
@@ -179,35 +186,46 @@ public class TreeGridView extends BufferView {
 
     sb.append("<table cellpadding=0 cellspacing=0 role=presentation><tr role=presentation><td role=presentation>");
 
-    String h = "";
+    Element jointElement = null;
     switch (joint) {
       case COLLAPSED:
-        h = tree.getStyle().getJointCollapsedIcon().getHTML();
+        jointElement = (Element) tree.getStyle().getJointCollapsedIcon().createElement().cast();
         break;
       case EXPANDED:
-        h = tree.getStyle().getJointExpandedIcon().getHTML();
+        jointElement = (Element) tree.getStyle().getJointExpandedIcon().createElement().cast();
         break;
-      default:
-        h = "<img src=\"" + GXT.BLANK_IMAGE_URL + "\" style='width: 16px'>";
+    }
+    if (jointElement != null) {
+      El.fly(jointElement).addStyleName("x-tree3-node-joint");
     }
 
     sb.append("</td><td><img src=\"");
     sb.append(GXT.BLANK_IMAGE_URL);
     sb.append("\" style=\"height: 18px; width: ");
-    sb.append(level * 18);
+    sb.append(level * getIndenting(tree.findNode(m)));
     sb.append("px;\" /></td><td  class='x-tree3-el-jnt'>");
-    sb.append(h);
+    
+    sb.append(jointElement == null ? "<img src=\"" + GXT.BLANK_IMAGE_URL
+        + "\" style=\"width: 16px\" class=\"x-tree3-node-joint\" />" : DOM.toString(jointElement));
+    
     if (checkable) {
-      sb.append(GXT.IMAGES.unchecked().getHTML());
+      Element e = (Element) GXT.IMAGES.unchecked().createElement().cast();
+      El.fly(e).addStyleName("x-tree3-node-check");
+      sb.append(DOM.toString(e));
     } else {
-      sb.append("<span></span>");
+      sb.append("<span class=\"x-tree3-node-check\"></span>");
     }
+    
     sb.append("</td><td>");
+    
     if (icon != null) {
-      sb.append(icon.getHTML());
+      Element e = icon.createElement().cast();
+      El.fly(e).addStyleName("x-tree3-node-icon");
+      sb.append(DOM.toString(e));
     } else {
-      sb.append("<span></span>");
+      sb.append("<span class=\"x-tree3-node-icon\"></span>");
     }
+    
     sb.append("</td><td>");
     sb.append("<span unselectable=\"on\" class=\"x-tree3-node-text\">");
     sb.append(text);
@@ -233,24 +251,16 @@ public class TreeGridView extends BufferView {
   }
 
   public void onIconStyleChange(TreeNode node, AbstractImagePrototype icon) {
-    Element iconEl = node.icon;
-    if (iconEl == null) {
-
-      Element rowEl = getRowElement(node);
-      if (rowEl != null) {
-        El nodeEl = fly(rowEl).selectNode(".x-tree3-el");
-        if (nodeEl != null) {
-          iconEl = nodeEl.dom.getChildNodes().getItem(3).cast();
-
-        }
-      }
-    }
+    Element iconEl = getIconElement(node);
     if (iconEl != null) {
+      Element e;
       if (icon != null) {
-        node.icon = (Element) iconEl.getParentElement().insertBefore(icon.createElement(), iconEl);
+        e = (Element) icon.createElement().cast();
       } else {
-        node.icon = (Element) iconEl.getParentElement().insertBefore(DOM.createSpan(), iconEl);
+        e = DOM.createSpan();
       }
+      El.fly(e).addStyleName("x-tree3-node-icon");
+      node.icon = (Element) iconEl.getParentElement().insertBefore(e, iconEl);
       El.fly(iconEl).remove();
     }
   }
@@ -283,6 +293,7 @@ public class TreeGridView extends BufferView {
                 "x-tree3-node-joint-expand");
           }
       }
+      El.fly(node.joint).addStyleName("x-tree3-node-joint");
       El.fly(jointEl).remove();
     }
   }
@@ -304,6 +315,10 @@ public class TreeGridView extends BufferView {
     treeStore.sort(cm.getDataIndex(colIndex), sortDir);
   }
 
+  protected int getIndenting(TreeNode node) {
+    return 18;
+  }
+
   @Override
   protected String getRenderedValue(ColumnData data, int rowIndex, int colIndex, ModelData m, String property) {
     GridCellRenderer<ModelData> r = cm.getRenderer(colIndex);
@@ -311,7 +326,8 @@ public class TreeGridView extends BufferView {
     rowMap.add(colIndex, null);
     if (r != null) {
       Object o = r.render(ds.getAt(rowIndex), property, data, rowIndex, colIndex, ds, grid);
-      if ((o instanceof Widget && !(r instanceof WidgetTreeGridCellRenderer))  || r instanceof WidgetTreeGridCellRenderer) {
+      if ((o instanceof Widget && !(r instanceof WidgetTreeGridCellRenderer))
+          || r instanceof WidgetTreeGridCellRenderer) {
         Widget w = null;
         if (o instanceof Widget) {
           w = (Widget) o;

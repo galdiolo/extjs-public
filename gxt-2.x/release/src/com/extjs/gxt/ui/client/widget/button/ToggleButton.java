@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -7,7 +7,8 @@
  */
 package com.extjs.gxt.ui.client.widget.button;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -200,7 +201,7 @@ public class ToggleButton extends Button {
         removeStyleName(baseStyle + "-pressed");
       }
       if (state && toggleGroup != null && toggleGroup.length() > 0) {
-        Collection<Component> list = ComponentManager.get().getAll();
+        List<Component> list = new ArrayList<Component>(ComponentManager.get().getAll());
         for (Component c : list) {
           if (c instanceof ToggleButton && c != this && toggleGroup.equals(((ToggleButton) c).getToggleGroup())) {
             ((ToggleButton) c).toggle(false, silent);

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -293,7 +293,7 @@ public class BeanModelGenerator extends Generator {
         sw.println("if(o instanceof BeanModel) {");
           sw.println("list.add(((BeanModel) o).getBean());");
         sw.println("} else {");
-        sw.println("list.add(obj);");
+          sw.println("list.add(o);");
         sw.println("}");
       sw.println("}");
       sw.println("obj = list;");
@@ -367,9 +367,11 @@ public class BeanModelGenerator extends Generator {
   }
 
   protected void addGetters(JClassType cls, List<JMethod> methods) {
-
+    if (cls == null) {
+      return;
+    }
     // ignore methods of Object
-    if (cls.getSuperclass() != null) {
+    if (cls.isInterface() != null || cls.getSuperclass() != null) {
       addGetters(cls.getSuperclass(), methods);
       for (JMethod m : cls.getMethods()) {
         if (m.isPublic() || m.isProtected()) {

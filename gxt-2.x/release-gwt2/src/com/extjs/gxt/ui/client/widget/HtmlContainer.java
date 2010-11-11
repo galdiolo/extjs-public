@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -299,17 +299,17 @@ public class HtmlContainer extends Container<Component> {
   }
 
   protected void onBlur(ComponentEvent ce) {
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       FocusFrame.get().unframe();
     }
   }
 
   protected void onFocus(ComponentEvent ce) {
-    if (GXT.isAriaEnabled() && FocusManager.get().isManaged()) {
-      if (getAriaSupport().isIgnore()) {
+    if (GXT.isFocusManagerEnabled() && FocusManager.get().isManaged()) {
+      if (getFocusSupport().isIgnore()) {
         for (int i = 0; i < getItemCount(); i++) {
           Component c = getItem(i);
-          if (!c.getAriaSupport().isIgnore()) {
+          if (!c.getFocusSupport().isIgnore()) {
             c.focus();
             break;
           }
@@ -334,7 +334,7 @@ public class HtmlContainer extends Container<Component> {
       }
     }
 
-    if (GXT.isAriaEnabled() && !getAriaSupport().isIgnore()) {
+    if (GXT.isFocusManagerEnabled() && !getFocusSupport().isIgnore()) {
       el().setTabIndex(0);
       el().setElementAttribute("hideFocus", "true");
       sinkEvents(Event.FOCUSEVENTS);

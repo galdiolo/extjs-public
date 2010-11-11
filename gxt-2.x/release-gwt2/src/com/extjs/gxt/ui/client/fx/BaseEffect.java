@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -180,6 +180,8 @@ public class BaseEffect implements Effect {
     protected String overflow;
     protected String style;
     protected El wrapEl;
+    protected String marginTop;
+    protected String marginLeft;
 
     public Slide(El el, Direction dir) {
       super(el);
@@ -192,7 +194,7 @@ public class BaseEffect implements Effect {
       } else if (style.equalsIgnoreCase("y")) {
         el.setY(v);
       } else {
-        el.setStyleAttribute(style, "" + v);
+        el.setStyleAttribute(style, v + "px");
       }
 
     }
@@ -201,6 +203,15 @@ public class BaseEffect implements Effect {
     public void onUpdate(double progress) {
       int v = (int) (from + ((to - from) * progress));
       increase(v);
+    }
+
+    @Override
+    public void onComplete() {
+      wrapEl.unwrap(el.dom, oBounds);
+      el.setStyleAttribute("marginTop", marginTop);
+      el.setStyleAttribute("marginLeft", marginLeft);
+      el.setStyleAttribute("overflow", overflow);
+      super.onComplete();
     }
 
   }
@@ -235,16 +246,11 @@ public class BaseEffect implements Effect {
     }
 
     @Override
-    public void onComplete() {
-      wrapEl.unwrap(el.dom, oBounds);
-      el.setStyleAttribute("marginTop", 0);
-      el.setStyleAttribute("overflow", overflow);
-      super.onComplete();
-    }
-
-    @Override
     public void onStart() {
       overflow = el.getStyleAttribute("overflow");
+      marginTop = el.getStyleAttribute("marginTop");
+      marginLeft = el.getStyleAttribute("marginLeft");
+
       wrapEl = new El(DOM.createDiv());
       oBounds = el.wrap(wrapEl.dom);
 
@@ -294,11 +300,11 @@ public class BaseEffect implements Effect {
       switch (dir) {
         case LEFT:
           el.setStyleAttribute("marginLeft", -(oBounds.width - v) + "px");
-          wrapEl.setStyleAttribute(style, v);
+          wrapEl.setStyleAttribute(style, v + "px");
           break;
         case UP:
           el.setStyleAttribute("marginTop", -(oBounds.height - v) + "px");
-          wrapEl.setStyleAttribute(style, v);
+          wrapEl.setStyleAttribute(style, v + "px");
           break;
         case DOWN:
           el.setY(v);
@@ -312,8 +318,6 @@ public class BaseEffect implements Effect {
     @Override
     public void onComplete() {
       el.setVisible(false);
-      wrapEl.unwrap(el.dom, oBounds);
-      el.setStyleAttribute("overflow", overflow);
       super.onComplete();
     }
 
@@ -321,6 +325,9 @@ public class BaseEffect implements Effect {
     public void onStart() {
       super.onStart();
       overflow = el.getStyleAttribute("overflow");
+      marginTop = el.getStyleAttribute("marginTop");
+      marginLeft = el.getStyleAttribute("marginLeft");
+
       wrapEl = new El(DOM.createDiv());
       oBounds = el.wrap(wrapEl.dom);
 

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -75,7 +75,7 @@ public class ListViewDragSource extends DragSource {
 
   @Override
   protected void onDragStart(DNDEvent e) {
-    Element r = listView.findElement(e.getTarget()).cast();
+    Element r = listView.findElement((Element) e.getDragEvent().getStartElement());
     if (r == null) {
       e.setCancelled(true);
       return;

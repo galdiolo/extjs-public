@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -19,6 +19,7 @@ import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.treegrid.TreeGrid;
 import com.extjs.gxt.ui.client.widget.treegrid.TreeGrid.TreeNode;
+import com.google.gwt.user.client.Element;
 
 /**
  * <code>DragSource</code> implementation for TreeGrid.
@@ -67,13 +68,13 @@ public class TreeGridDragSource extends DragSource {
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
   protected void onDragStart(DNDEvent e) {
-    TreeNode n = treeGrid.findNode(e.getTarget());
+    TreeNode n = treeGrid.findNode((Element) e.getDragEvent().getStartElement());
     if (n == null) {
       e.setCancelled(true);
       return;
     }
     ModelData m = n.getModel();
-    if (!treeGrid.getTreeView().isSelectableTarget(m, e.getTarget())) {
+    if (!treeGrid.getTreeView().isSelectableTarget(m, (Element) e.getDragEvent().getStartElement())) {
       e.setCancelled(true);
       return;
     }

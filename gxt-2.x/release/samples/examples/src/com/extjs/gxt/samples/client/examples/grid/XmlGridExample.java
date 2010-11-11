@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -10,6 +10,7 @@ package com.extjs.gxt.samples.client.examples.grid;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.extjs.gxt.samples.client.Examples;
 import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.data.BaseListLoader;
@@ -60,17 +61,18 @@ public class XmlGridExample extends LayoutContainer {
     type.addField("State");
     type.addField("Zip");
 
+    // Determine if Explorer or Example for XML path
+    String path = GWT.getHostPageBaseURL() + (Examples.isExplorer() ? "" : "../../") + "data/data.xml";
+
     // use a http proxy to get the data
-    RequestBuilder builder = new RequestBuilder(RequestBuilder.GET,
-        GWT.getHostPageBaseURL() + "data/data.xml");
+    RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, path);
     HttpProxy<String> proxy = new HttpProxy<String>(builder);
 
     // need a loader, proxy, and reader
-    XmlLoadResultReader<ListLoadResult<ModelData>> reader = new XmlLoadResultReader<ListLoadResult<ModelData>>(
-        type);
+    XmlLoadResultReader<ListLoadResult<ModelData>> reader = new XmlLoadResultReader<ListLoadResult<ModelData>>(type);
 
-    final BaseListLoader<ListLoadResult<ModelData>> loader = new BaseListLoader<ListLoadResult<ModelData>>(
-        proxy, reader);
+    final BaseListLoader<ListLoadResult<ModelData>> loader = new BaseListLoader<ListLoadResult<ModelData>>(proxy,
+        reader);
 
     ListStore<ModelData> store = new ListStore<ModelData>(loader);
     final Grid<ModelData> grid = new Grid<ModelData>(store, cm);

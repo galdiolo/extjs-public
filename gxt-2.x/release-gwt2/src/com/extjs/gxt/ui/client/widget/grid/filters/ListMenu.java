@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -20,14 +20,14 @@ import com.extjs.gxt.ui.client.widget.menu.Menu;
 
 public class ListMenu extends Menu {
 
-  private ListFilter filter;
-  private ListStore<ModelData> store;
-  private List<ModelData> selected;
   private Listener<MenuEvent> checkListener = new Listener<MenuEvent>() {
     public void handleEvent(MenuEvent be) {
       onCheckChange(be);
     }
   };
+  private ListFilter filter;
+  private List<ModelData> selected;
+  private ListStore<ModelData> store;
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   public ListMenu(ListFilter filter, ListStore store) {
@@ -54,17 +54,16 @@ public class ListMenu extends Menu {
   }
 
   public void setSelected(List<ModelData> selected) {
-    for (int i = 0; i < getItemCount(); i++) {
-      CheckMenuItem item = (CheckMenuItem) getItem(i);
-      item.setChecked(store.findModel((ModelData) item.getData("model")) != null, true);
-    }
+    this.selected = new ArrayList<ModelData>(selected);
   }
 
   protected void onCheckChange(MenuEvent be) {
     CheckMenuItem item = (CheckMenuItem) be.getItem();
     ModelData m = (ModelData) item.getData("model");
     if (be.isChecked()) {
-      selected.add(m);
+      if (!selected.contains(m)) {
+        selected.add(m);
+      }
     } else {
       selected.remove(m);
     }

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -107,7 +107,7 @@ public class FieldSet extends LayoutContainer {
   public FieldSet() {
     baseStyle = "x-fieldset";
     enableLayout = true;
-    getAriaSupport().setIgnore(false);
+    getFocusSupport().setIgnore(false);
   }
 
   /**
@@ -317,6 +317,26 @@ public class FieldSet extends LayoutContainer {
     fireEvent(Events.Collapse, fe);
   }
 
+  @Override
+  protected void onDisable() {
+    super.onDisable();
+    if (collapseBtn != null) {
+      collapseBtn.disable();
+    } else if (checkbox != null) {
+      checkbox.setDisabled(true);
+    }
+  }
+
+  @Override
+  protected void onEnable() {
+    super.onEnable();
+    if (collapseBtn != null) {
+      collapseBtn.enable();
+    } else if (checkbox != null) {
+      checkbox.setDisabled(false);
+    }
+  }
+
   protected void onExpand() {
     collapsed = false;
     if (checkboxToggle && checkbox != null) {
@@ -340,7 +360,7 @@ public class FieldSet extends LayoutContainer {
   @Override
   protected void onFocus(ComponentEvent ce) {
     super.onFocus(ce);
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       if (checkboxToggle) {
         checkbox.focus();
       } else {
@@ -356,7 +376,7 @@ public class FieldSet extends LayoutContainer {
     legend = new El(DOM.createLegend());
     legend.addStyleName("x-fieldset-header");
 
-    if (checkboxToggle) {
+    if (checkboxToggle && collapsible) {
       checkbox = DOM.createInputCheck().cast();
       sinkEvents(Event.ONCLICK);
       if (checkboxName != null) {
@@ -368,9 +388,7 @@ public class FieldSet extends LayoutContainer {
       if (GXT.isAriaEnabled()) {
         checkbox.setTitle("Expand " + text);
       }
-    }
-
-    if (!checkboxToggle && collapsible) {
+    } else if (!checkboxToggle && collapsible) {
       collapseBtn = new ToolButton("x-tool-toggle");
       collapseBtn.addListener(Events.Select, new Listener<ComponentEvent>() {
         public void handleEvent(ComponentEvent be) {
@@ -402,7 +420,7 @@ public class FieldSet extends LayoutContainer {
 
     updateIconTitles();
 
-    if (GXT.isAriaEnabled() && !getAriaSupport().isIgnore()) {
+    if (GXT.isFocusManagerEnabled() && !getFocusSupport().isIgnore()) {
       el().setTabIndex(0);
       el().setElementAttribute("hideFocus", "true");
       sinkEvents(Event.FOCUSEVENTS);

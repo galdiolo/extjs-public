@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -143,7 +143,7 @@ public class FileUploadField extends TextField<String> {
         onChange(ce);
         break;
       case Event.ONKEYDOWN:
-        if (ce.getKeyCode() != KeyCodes.KEY_TAB && GXT.isAriaEnabled()) {
+        if (ce.getKeyCode() != KeyCodes.KEY_TAB && GXT.isFocusManagerEnabled()) {
           file.focus();
         }
         break;
@@ -307,7 +307,7 @@ public class FileUploadField extends TextField<String> {
     setElement(wrap.dom, target, index);
 
     button = new Button(getMessages().getBrowseText());
-    button.getAriaSupport().setIgnore(true);
+    button.getFocusSupport().setIgnore(true);
     button.addStyleName("x-form-file-btn");
     button.setIcon(buttonIcon);
     button.render(wrap.dom);

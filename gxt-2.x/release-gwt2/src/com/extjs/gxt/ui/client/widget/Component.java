@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -274,6 +274,7 @@ public abstract class Component extends Widget implements Observable {
   private ToolTipConfig toolTipConfig;
   private int tabIndex = -1;
   private AriaSupport ariaSupport;
+  private FocusManagerSupport focusManagerSupport;
 
   protected DelayedTask windowResizeTask;
   protected HandlerRegistration resizeHandler;
@@ -451,7 +452,7 @@ public abstract class Component extends Widget implements Observable {
    */
   public boolean fireEvent(EventType type, ComponentEvent ce) {
     if (disableEvents) return true;
-    return ce == null ? fireEvent(type) :  observable.fireEvent(type, previewEvent(type, ce));
+    return ce == null ? fireEvent(type) : observable.fireEvent(type, previewEvent(type, ce));
   }
 
   /**
@@ -537,6 +538,19 @@ public abstract class Component extends Widget implements Observable {
       return dummy;
     }
     return super.getElement();
+  }
+
+  /**
+   * Returns the focus manager support configuration. Only applicable when the
+   * focus manager has been enabled.
+   * 
+   * @return the focus manager configuration
+   */
+  public FocusManagerSupport getFocusSupport() {
+    if (focusManagerSupport == null) {
+      focusManagerSupport = new FocusManagerSupport(this);
+    }
+    return focusManagerSupport;
   }
 
   /**
@@ -710,6 +724,11 @@ public abstract class Component extends Widget implements Observable {
     return !disabled;
   }
 
+  /**
+   * Returns true if the component is masked.
+   * 
+   * @return true if masked
+   */
   public boolean isMasked() {
     return mask;
   }
@@ -1024,7 +1043,7 @@ public abstract class Component extends Widget implements Observable {
       }
       if (ariaSupport.presentation) {
         setAriaRole("presentation");
-        ariaSupport.setIgnore(true);
+        focusManagerSupport.setIgnore(true);
       }
       if (ariaSupport.role != null) {
         ariaSupport.setRole(ariaSupport.role);
@@ -1373,7 +1392,7 @@ public abstract class Component extends Widget implements Observable {
 
   public void setZIndex(int zIndex) {
     el().setZIndex(zIndex);
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       FocusFrame.get().sync(this);
     }
   }
@@ -1552,7 +1571,7 @@ public abstract class Component extends Widget implements Observable {
   }
 
   protected void frame() {
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       FocusFrame.get().frame(this);
     }
   }
@@ -1630,7 +1649,7 @@ public abstract class Component extends Widget implements Observable {
 
   protected void onDetachHelper() {
     hideToolTip();
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       FocusFrame.get().hide(this);
     }
     if (disableTextSelection > 0) {
@@ -1664,7 +1683,7 @@ public abstract class Component extends Widget implements Observable {
   protected void onHide() {
     addStyleName(hideMode.value());
     hideToolTip();
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       FocusFrame.get().hide(this);
     }
   }
@@ -1723,7 +1742,7 @@ public abstract class Component extends Widget implements Observable {
 
   protected void onShow() {
     removeStyleName(hideMode.value());
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       FocusFrame.get().show(this);
     }
   }
@@ -1813,7 +1832,7 @@ public abstract class Component extends Widget implements Observable {
   }
 
   protected void unframe() {
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       FocusFrame.get().unframe(this);
     }
   }

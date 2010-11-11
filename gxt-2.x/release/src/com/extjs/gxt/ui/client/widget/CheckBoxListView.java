@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -16,11 +16,16 @@ import com.extjs.gxt.ui.client.data.ModelData;
 import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Event;
 
 public class CheckBoxListView<M extends ModelData> extends ListView<M> {
 
   protected List<M> checkedPreRender;
   private String checkBoxSelector = ".x-view-item-checkbox";
+
+  public CheckBoxListView() {
+    rowSelectorDepth = 10;
+  }
 
   public String getCheckBoxSelector() {
     return checkBoxSelector;
@@ -44,6 +49,31 @@ public class CheckBoxListView<M extends ModelData> extends ListView<M> {
     }
   }
 
+  @Override
+  public void onBrowserEvent(Event event) {
+    if (disabled && event.getTypeInt() == Event.ONCLICK && Element.is(event.getEventTarget())
+        && fly((Element) Element.as(event.getEventTarget())).is(checkBoxSelector)) {
+      event.preventDefault();
+    }
+    super.onBrowserEvent(event);
+  }
+
+  @Override
+  public void refresh() {
+    List<M> checked = getChecked();
+    super.refresh();
+    if (checkedPreRender != null) {
+      for (M m : checkedPreRender) {
+        setChecked(m, true);
+      }
+      checkedPreRender = null;
+    } else if (checked != null) {
+      for (M m : checked) {
+        setChecked(m, true);
+      }
+    }
+  }
+
   public void setCheckBoxSelector(String checkBoxSelector) {
     this.checkBoxSelector = checkBoxSelector;
   }
@@ -60,8 +90,9 @@ public class CheckBoxListView<M extends ModelData> extends ListView<M> {
       int index = store.indexOf(m);
       if (index != -1) {
         Element e = nodes.getItem(index);
-        if (e != null) {
-          ((InputElement) e.cast()).setChecked(checked);
+        if (InputElement.is(e)) {
+          InputElement i = InputElement.as(e);
+          i.setChecked(checked);
         }
       }
     } else {
@@ -79,25 +110,23 @@ public class CheckBoxListView<M extends ModelData> extends ListView<M> {
   }
 
   @Override
-  protected void afterRender() {
-    super.afterRender();
-    if (checkedPreRender != null) {
-      for (M m : checkedPreRender) {
-        setChecked(m, true);
-      }
-      checkedPreRender = null;
-    }
-  }
-
-  @Override
   protected void onRender(Element target, int index) {
     if (getTemplate() == null) {
-      String spacing = GXT.isIE ? "0" : "3";
+      String spacing = GXT.isIE && !GXT.isStrict ? "0" : "3";
       setTemplate(XTemplate.create("<tpl for=\".\"><div class='x-view-item x-view-item-check'><table cellspacing='"
           + spacing
           + "' cellpadding=0><tr><td><input class=\"x-view-item-checkbox\" type=\"checkbox\" /></td><td><td>{"
           + getDisplayProperty() + "}</td></tr></table></div></tpl>"));
     }
     super.onRender(target, index);
+  }
+
+  @Override
+  protected void onUpdate(M model, int index) {
+    boolean isChecked = getChecked().contains(model);
+    super.onUpdate(model, index);
+    if (isChecked) {
+      setChecked(model, true);
+    }
   }
 }

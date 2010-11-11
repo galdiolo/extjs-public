@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -18,9 +18,10 @@ import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FieldEvent;
-import com.extjs.gxt.ui.client.event.FilterEvent;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.util.DelayedTask;
+import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.google.gwt.event.dom.client.KeyCodes;
 
@@ -49,12 +50,13 @@ public class StringFilter extends Filter {
   }
 
   private TextField<String> field;
+
   private DelayedTask updateTask = new DelayedTask(new Listener<BaseEvent>() {
     public void handleEvent(BaseEvent be) {
       fireUpdate();
     }
   });
-  private int width;
+  private int width = 125;
 
   public StringFilter(String dataIndex) {
     super(dataIndex);
@@ -66,9 +68,15 @@ public class StringFilter extends Filter {
         onFieldKeyUp(fe);
       }
     };
-    field.setWidth(getWidth());
-
+    setWidth(getWidth());
     menu.add(field);
+    menu.addListener(Events.BeforeHide, new Listener<MenuEvent>() {
+      public void handleEvent(MenuEvent be) {
+        // blur the field because of empty text
+        field.el().firstChild().blur();
+        blurField(field);
+      }
+    });
     setMessages(new StringFilterMessages());
   }
 
@@ -115,7 +123,7 @@ public class StringFilter extends Filter {
   @Override
   public void setValue(Object value) {
     field.setValue((String) value);
-    fireEvent(Events.Update, new FilterEvent(this));
+    fireUpdate();
   }
 
   /**
@@ -125,12 +133,14 @@ public class StringFilter extends Filter {
    */
   public void setWidth(int width) {
     this.width = width;
+    field.setWidth(width);
   }
 
   @Override
   public boolean validateModel(ModelData model) {
     String val = getModelValue(model);
-    String v = getValue().toString();
+    Object value = getValue();
+    String v = value == null ? "" : value.toString();
     if (v.length() == 0 && (val == null || val.length() == 0)) {
       return true;
     } else if (val == null) {
@@ -149,5 +159,9 @@ public class StringFilter extends Filter {
     }
     updateTask.delay(getUpdateBuffer());
   }
+
+  private native void blurField(Field<?> f) /*-{
+    f.@com.extjs.gxt.ui.client.widget.form.Field::onBlur(Lcom/extjs/gxt/ui/client/event/ComponentEvent;)(null)
+  }-*/;
 
 }

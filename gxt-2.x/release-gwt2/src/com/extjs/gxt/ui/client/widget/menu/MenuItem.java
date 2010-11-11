@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -9,15 +9,18 @@ package com.extjs.gxt.ui.client.widget.menu;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.IconHelper;
+import com.extjs.gxt.ui.client.util.Point;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.IconSupport;
+import com.extjs.gxt.ui.client.widget.Layer;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
@@ -291,11 +294,10 @@ public class MenuItem extends Item implements IconSupport {
     String s = itemStyle + (subMenu != null ? " x-menu-item-arrow" : "");
     addStyleName(s);
 
-    if (text != null) {
-      setText(text);
-    }
     if (widget != null) {
       setWidget(widget);
+    } else {
+      setText(text);
     }
 
     if (subMenu != null) {
@@ -307,27 +309,24 @@ public class MenuItem extends Item implements IconSupport {
   protected boolean shouldDeactivate(ComponentEvent ce) {
     if (super.shouldDeactivate(ce)) {
       if (subMenu != null && subMenu.isVisible()) {
+        Point xy = ce.getXY();
+        xy.x += XDOM.getBodyScrollLeft();
+        xy.y += XDOM.getBodyScrollTop();
+
         Rectangle rec = subMenu.el().getBounds();
-        if (subMenu.getShadow() && subMenu.getShadowPosition() != null) {
-          switch (subMenu.getShadowPosition()) {
-            case DROP:
-              rec.width += subMenu.getShadowOffset();
-              rec.height += subMenu.getShadowOffset();
-              break;
-            case FRAME:
-              rec.width += subMenu.getShadowOffset();
-              rec.height += subMenu.getShadowOffset();
-              rec.x -= subMenu.getShadowOffset();
-              rec.y -= subMenu.getShadowOffset();
-              break;
-            case SIDES:
-              rec.width += subMenu.getShadowOffset();
-              rec.height += subMenu.getShadowOffset();
-              rec.x -= subMenu.getShadowOffset();
-              break;
+        if ((subMenu.el() instanceof Layer)) {
+          Layer l = (Layer) subMenu.el();
+          if (l.isShim() && l.isShadow()) {
+            return !rec.contains(xy) && !l.getShadow().getBounds().contains(xy)
+                && !l.getShim().getBounds().contains(xy);
+          } else if (l.isShadow()) {
+            return !rec.contains(xy) && !l.getShadow().getBounds().contains(xy);
+          } else if (l.isShim()) {
+            return !rec.contains(xy) && !l.getShim().getBounds().contains(xy);
           }
         }
-        return !rec.contains(ce.getXY());
+
+        return !rec.contains(xy);
       }
     }
     return true;

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -64,7 +64,7 @@ public class GridDragSource extends DragSource {
 
   @Override
   protected void onDragStart(DNDEvent e) {
-    Element r = grid.getView().findRow(e.getTarget()).cast();
+    Element r = grid.getView().findRow(e.getDragEvent().getStartElement()).cast();
     if (r == null) {
       e.setCancelled(true);
       return;

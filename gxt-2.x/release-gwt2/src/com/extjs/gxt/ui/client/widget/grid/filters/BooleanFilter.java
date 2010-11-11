@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -126,13 +126,15 @@ public class BooleanFilter extends Filter {
     } else if (value instanceof String) {
       yes = Boolean.valueOf((String) value);
     }
-    yesItem.setChecked(yes);
+    yesItem.setChecked(yes, false);
+    noItem.setChecked(!yes, false);
+    fireUpdate();
   }
 
   @Override
   public boolean validateModel(ModelData model) {
     Boolean val = getModelValue(model);
-    return getValue().equals(val == null ? Boolean.FALSE: val);
+    return getValue().equals(val == null ? Boolean.FALSE : val);
   }
 
 }

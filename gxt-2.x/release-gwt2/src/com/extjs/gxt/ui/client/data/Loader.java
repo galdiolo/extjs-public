@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -28,7 +28,7 @@ import com.extjs.gxt.ui.client.event.Observable;
  * </dd>
  * 
  * <dd><b>Load</b> : LoadEvent(loader, config, result)<br>
- * <div>Fires after the button is selected.</div>
+ * <div>Fires after a load operation.</div>
  * <ul>
  * <li>loader : this</li>
  * <li>config : the load config</li>
@@ -37,11 +37,11 @@ import com.extjs.gxt.ui.client.event.Observable;
  * </dd>
  * 
  * <dd><b>LoadException</b> : LoadEvent(loader, config, result)<br>
- * <div>Fires after the button is selected.</div>
+ * <div>Fires when an exception occurs during a load operation.</div>
  * <ul>
  * <li>loader : this</li>
  * <li>config : the load config</li>
- * <li>result : the load result</li>
+ * <li>exception : the load exception</li>
  * </ul>
  * </dd>
  * </dl>

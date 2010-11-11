@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -370,7 +370,7 @@ public class TableLayout extends Layout {
     target.removeChildren();
 
     table = DOM.createTable().cast();
-    if (container.getAriaSupport().isIgnore()) {
+    if (container.getFocusSupport().isIgnore()) {
       Accessibility.setRole((Element)table.cast(), "presentation");
     }
 

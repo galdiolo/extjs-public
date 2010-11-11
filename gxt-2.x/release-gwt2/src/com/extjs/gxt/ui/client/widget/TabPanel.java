@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -470,9 +470,9 @@ public class TabPanel extends Container<TabItem> {
         onScrollRight();
       }
     }
-    if (ce.getEventTypeInt() == Event.ONBLUR && GXT.isAriaEnabled()) {
+    if (ce.getEventTypeInt() == Event.ONBLUR && GXT.isFocusManagerEnabled()) {
       onBlur(ce);
-    } else if (ce.getEventTypeInt() == Event.ONFOCUS && GXT.isAriaEnabled()) {
+    } else if (ce.getEventTypeInt() == Event.ONFOCUS && GXT.isFocusManagerEnabled()) {
       onFocus(ce);
     }
   }
@@ -724,7 +724,7 @@ public class TabPanel extends Container<TabItem> {
       item.fireEvent(Events.Select, tpe);
     }
 
-    if (GXT.isAriaEnabled() && activeItem == item) {
+    if (GXT.isFocusManagerEnabled() && activeItem == item) {
       focusTab(activeItem, false);
     }
   }
@@ -822,7 +822,7 @@ public class TabPanel extends Container<TabItem> {
       setSelection(getItem(0));
     }
 
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       FocusFrame.get().unframe();
     }
 
@@ -843,7 +843,7 @@ public class TabPanel extends Container<TabItem> {
 
   protected void onFocus(ComponentEvent ce) {
     FocusFrame.get().frame(this);
-    if (GXT.isAriaEnabled() && !FocusManager.get().isManaged()) {
+    if (GXT.isFocusManagerEnabled() && !FocusManager.get().isManaged()) {
       return;
     }
     if (getItemCount() > 0 && getSelectedItem() == null) {
@@ -951,7 +951,7 @@ public class TabPanel extends Container<TabItem> {
         }
         break;
       case KeyCodes.KEY_ENTER:
-        if (GXT.isAriaEnabled()) {
+        if (GXT.isFocusManagerEnabled()) {
           Component c = ComponentManager.get().find(ce.getTarget());
           if (c != null && c instanceof HeaderItem) {
             TabItem ti = (TabItem) ((HeaderItem) c).getParent();
@@ -1068,7 +1068,7 @@ public class TabPanel extends Container<TabItem> {
     height -= frameWidth.height + bar.getHeight();
     width -= frameWidth.width;
 
-    body.setSize(width, height, true);
+    body.setSize(width, isAutoHeight() ? -1 : height, true);
     bar.setWidth(width, true);
 
     delegateUpdates();
@@ -1219,7 +1219,7 @@ public class TabPanel extends Container<TabItem> {
     if (setFocus) {
       item.getHeader().el().focus();
     }
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       item.getHeader().el().focus();
       FocusFrame.get().frame(this);
     }
@@ -1272,7 +1272,7 @@ public class TabPanel extends Container<TabItem> {
     } else {
       item.header.render(strip.dom, index);
     }
-    if (!GXT.isAriaEnabled()) {
+    if (!GXT.isFocusManagerEnabled()) {
       item.header.el().setElementAttribute("hideFocus", "true");
       item.header.el().setStyleAttribute("-moz-outline", "none");
     } else {

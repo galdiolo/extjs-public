@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -133,7 +133,7 @@ public class IconButton extends BoxComponent {
   }
 
   protected void onBlur(ComponentEvent ce) {
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       FocusFrame.get().unframe();
     }
   }
@@ -155,7 +155,7 @@ public class IconButton extends BoxComponent {
   }
 
   protected void onFocus(ComponentEvent ce) {
-    if (GXT.isAriaEnabled() && !GXT.isIE) {
+    if (GXT.isFocusManagerEnabled() && !GXT.isIE) {
       FocusFrame.get().frame(this);
     }
   }
@@ -179,7 +179,7 @@ public class IconButton extends BoxComponent {
       getElement().setInnerHTML("<i>&nbsp;</i>");
     }
 
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       el().setTabIndex(0);
       Accessibility.setRole(getElement(), Accessibility.ROLE_BUTTON);
     }

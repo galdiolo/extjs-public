@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -13,13 +13,12 @@ import java.util.Map;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XDOM;
-import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.google.gwt.user.client.DOM;
 
 /**
  * ARIA component support.
  */
-public class AriaSupport extends BaseObservable {
+public class AriaSupport {
 
   String labelledBy, label;
   String role;
@@ -98,15 +97,7 @@ public class AriaSupport extends BaseObservable {
     return states;
   }
 
-  /**
-   * Returns true if the component will be ignored by the ARIA and FocusManager
-   * API.
-   * 
-   * @return true if component is being ignored
-   */
-  public boolean isIgnore() {
-    return ignore;
-  }
+
 
   /**
    * Returns true if the component is a presentation element.
@@ -152,16 +143,7 @@ public class AriaSupport extends BaseObservable {
     }
   }
 
-  /**
-   * True to mark this component to be ignored by the ARIA and FocusManager API
-   * (defaults to false). Typically set to true for any containers that should
-   * not be navigable to.
-   * 
-   * @param ignore true to ignore
-   */
-  public void setIgnore(boolean ignore) {
-    this.ignore = ignore;
-  }
+
 
   /**
    * Sets the ARIA label attribute on the component.
@@ -171,7 +153,7 @@ public class AriaSupport extends BaseObservable {
   public void setLabel(String label) {
     this.label = label;
     if (GXT.isAriaEnabled() && c.isRendered()) {
-      c.setAriaState("title", label);
+      c.setAriaState("aria-label", label);
     }
   }
 
@@ -194,7 +176,7 @@ public class AriaSupport extends BaseObservable {
    */
   public void setPresentation(boolean presentation) {
     this.presentation = presentation;
-    setIgnore(true);
+    c.getFocusSupport().setIgnore(true);
     if (c.isRendered() && presentation) {
       c.setAriaRole("presentation");
     }

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -7,6 +7,7 @@
  */
 package com.extjs.gxt.samples.explorer.client.pages;
 
+import com.extjs.gxt.samples.client.Examples;
 import com.extjs.gxt.samples.client.ExamplesModel;
 import com.extjs.gxt.samples.client.examples.model.Entry;
 import com.extjs.gxt.samples.explorer.client.Explorer;
@@ -30,7 +31,7 @@ public class OverviewPage extends LayoutContainer {
 
     setScrollMode(Scroll.AUTO);
 
-    ExamplesModel model = (ExamplesModel) Registry.get(Explorer.MODEL);
+    ExamplesModel model = (ExamplesModel) Registry.get(Examples.MODEL);
     ListStore<ModelData> store = new ListStore<ModelData>();
     store.add(model.getEntries());
 

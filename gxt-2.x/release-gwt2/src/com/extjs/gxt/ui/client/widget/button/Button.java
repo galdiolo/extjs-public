@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -84,6 +84,7 @@ public class Button extends BoxComponent implements IconSupport {
 
   protected El buttonEl;
   protected String buttonSelector = "button";
+  protected AbstractImagePrototype icon;
   protected Menu menu;
   protected ButtonScale scale = ButtonScale.SMALL;
   protected Template template;
@@ -91,14 +92,13 @@ public class Button extends BoxComponent implements IconSupport {
   private ButtonArrowAlign arrowAlign = ButtonArrowAlign.RIGHT;
   private boolean handleMouseEvents = true;
   private IconAlign iconAlign = IconAlign.LEFT;
-  protected AbstractImagePrototype icon;
   private String menuAlign = "tl-bl?";
+  private Listener<MenuEvent> menuListener;
   private int minWidth = Style.DEFAULT;
+  private BaseEventPreview preview;
+
   private int tabIndex = 0;
   private String type = "button";
-
-  private BaseEventPreview preview;
-  private Listener<MenuEvent> menuListener;
 
   /**
    * Creates a new button.
@@ -338,7 +338,7 @@ public class Button extends BoxComponent implements IconSupport {
           (icon != null ? (!Util.isEmptyString(text) ? " " + baseStyle + "-text-icon" : " " + baseStyle + "-icon")
               : " " + baseStyle + "-noicon"));
       Element e = null;
-      String align = null;
+
       if (icon != null) {
         e = (Element) icon.createElement().cast();
 
@@ -348,21 +348,9 @@ public class Button extends BoxComponent implements IconSupport {
         buttonEl.insertFirst(e);
         El.fly(e).makePositionable(true);
 
-        if (iconAlign == IconAlign.BOTTOM) {
-          align = "b-b";
-        } else if (iconAlign == IconAlign.TOP) {
-          align = "t-t";
-        } else if (iconAlign == IconAlign.LEFT) {
-          align = "l-l";
-        } else if (iconAlign == IconAlign.RIGHT) {
-          align = "r-r";
-        }
-
       }
       autoWidth();
-      if (e != null) {
-        El.fly(e).alignTo(buttonEl.dom, align, null);
-      }
+      alignIcon(e);
     }
     this.icon = icon;
   }
@@ -456,6 +444,7 @@ public class Button extends BoxComponent implements IconSupport {
    * 
    * @param index the tab index
    */
+  @Override
   public void setTabIndex(int index) {
     this.tabIndex = index;
     if (rendered && buttonEl != null) {
@@ -512,6 +501,33 @@ public class Button extends BoxComponent implements IconSupport {
     setIcon(icon);
   }
 
+  protected void alignIcon(Element icon) {
+    if (icon != null) {
+      String align = null;
+      if (iconAlign == IconAlign.BOTTOM) {
+        align = "b-b";
+      } else if (iconAlign == IconAlign.TOP) {
+        align = "t-t";
+      } else if (iconAlign == IconAlign.LEFT) {
+        align = "l-l";
+      } else if (iconAlign == IconAlign.RIGHT) {
+        align = "r-r";
+      }
+      int[] offset = null;
+      if (GXT.isIE8 && GXT.isStrict && (iconAlign == IconAlign.LEFT || iconAlign == IconAlign.RIGHT)
+          && (scale == ButtonScale.LARGE || scale == ButtonScale.MEDIUM)) {
+        if (scale == ButtonScale.LARGE) {
+          offset = new int[] {0, -8};
+        } else if (scale == ButtonScale.MEDIUM) {
+          offset = new int[] {0, -4};
+        }
+        icon.getStyle().setProperty("left", "");
+        icon.getStyle().setProperty("top", "");
+      }
+      El.fly(icon).alignTo(buttonEl.dom, align, offset);
+    }
+  }
+
   protected void autoWidth() {
     if (rendered && width == null && buttonEl != null) {
       int w = 0;
@@ -564,9 +580,20 @@ public class Button extends BoxComponent implements IconSupport {
     }
   }
 
+  @Override
+  protected void notifyShow() {
+    super.notifyShow();
+    if (icon != null) {
+      El e = buttonEl.selectNode("." + baseStyle + "-image");
+      if (e != null) {
+        alignIcon(e.dom);
+      }
+    }
+  }
+
   protected void onBlur(ButtonEvent e) {
     removeStyleName(baseStyle + "-focus");
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       FocusFrame.get().unframe();
     }
   }
@@ -617,7 +644,7 @@ public class Button extends BoxComponent implements IconSupport {
   protected void onFocus(ComponentEvent ce) {
     if (!disabled) {
       addStyleName(baseStyle + "-focus");
-      if (GXT.isAriaEnabled() && !GXT.isIE) {
+      if (GXT.isFocusManagerEnabled() && !GXT.isIE) {
         FocusFrame.get().frame(this);
       }
     }
@@ -647,7 +674,7 @@ public class Button extends BoxComponent implements IconSupport {
     be.setMenu(menu);
     fireEvent(Events.MenuShow, be);
 
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       if (menu.getItemCount() > 0) {
         menu.setActiveItem(menu.getItem(0), false);
       }
@@ -676,6 +703,7 @@ public class Button extends BoxComponent implements IconSupport {
     removeStyleName(baseStyle + "-click");
   }
 
+  @Override
   protected void onRender(Element target, int index) {
     if (template == null) {
       if (buttonTemplate == null) {
@@ -691,9 +719,10 @@ public class Button extends BoxComponent implements IconSupport {
       template = buttonTemplate;
     }
 
-    setElement(template.create((text != null && text.length() > 0) ? text : "&nbsp;", getType(), baseStyle + "-"
-        + scale.name().toLowerCase() + " " + baseStyle + "-icon-" + scale.name().toLowerCase() + "-"
-        + iconAlign.name().toLowerCase(), getMenuClass(), baseStyle), target, index);
+    setElement(
+        template.create((text != null && text.length() > 0) ? text : "&nbsp;", getType(), baseStyle + "-"
+            + scale.name().toLowerCase() + " " + baseStyle + "-icon-" + scale.name().toLowerCase() + "-"
+            + iconAlign.name().toLowerCase(), getMenuClass(), baseStyle), target, index);
 
     super.onRender(target, index);
 

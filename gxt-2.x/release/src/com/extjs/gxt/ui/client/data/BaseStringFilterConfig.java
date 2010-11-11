@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -22,12 +22,15 @@ public class BaseStringFilterConfig extends BaseFilterConfig {
   }
 
   public boolean isFiltered(ModelData model, Object test, String comparison, Object value) {
-    String t = (String) test;
-    String v = (String)value;
-    if (value == null) {
+    String val = value == null ? null : value.toString();
+    String v = test == null ? "" : test.toString();
+    if (v.length() == 0 && (val == null || val.length() == 0)) {
       return false;
+    } else if (val == null) {
+      return true;
+    } else {
+      return val.toLowerCase().indexOf(v.toLowerCase()) == -1;
     }
-    return v.toLowerCase().indexOf(t) == -1;
   }
 
 }

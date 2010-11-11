@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -75,8 +75,8 @@ public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionMo
         if (e.getType() == Events.HeaderClick) {
           onHeaderClick(e);
         } else if (e.getType() == Events.ViewReady) {
-          setChecked(getSelection().size() == grid.getStore().getCount());
-          
+          updateHeaderCheckBox();
+
           Head h = grid.getView().getHeader().getHead(grid.getColumnModel().indexOf(config));
           if (h != null) {
             h.getElement().removeAttribute("aria-haspopup");
@@ -84,7 +84,7 @@ public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionMo
               h.getElement().setTitle(headerCheckTitle);
             }
           }
-          
+
         } else if (e.getEventTypeInt() == Event.ONKEYPRESS) {
           if (selectedHeader != null && e.getKeyCode() == 32) {
             int idx = grid.getView().getHeader().indexOf(selectedHeader);
@@ -109,7 +109,14 @@ public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionMo
     grid.addListener(Events.HeaderClick, listener);
     grid.addListener(Events.ViewReady, listener);
     grid.addListener(Events.OnKeyPress, listener);
-    this.store = grid.getStore();
+  }
+
+  @Override
+  protected void handleMouseClick(GridEvent<M> e) {
+    if (e.getTarget().getClassName().equals("x-grid3-row-checker")) {
+      return;
+    }
+    super.handleMouseClick(e);
   }
 
   @Override
@@ -128,16 +135,20 @@ public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionMo
     }
   }
 
-  @Override
-  protected void handleMouseClick(GridEvent<M> e) {
-    if (e.getTarget().getClassName().equals("x-grid3-row-checker")) {
-      return;
-    }
-    super.handleMouseClick(e);
-  }
-
   protected ColumnConfig newColumnConfig() {
     return new ColumnConfig();
+  }
+
+  @Override
+  protected void onAdd(List<? extends M> models) {
+    super.onAdd(models);
+    updateHeaderCheckBox();
+  }
+
+  @Override
+  protected void onClear(StoreEvent<M> se) {
+    super.onClear(se);
+    setChecked(false);
   }
 
   protected void onHeaderClick(GridEvent<M> e) {
@@ -157,27 +168,15 @@ public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionMo
   }
 
   @Override
-  protected void onAdd(List<? extends M> models) {
-    super.onAdd(models);
-    setChecked(getSelection().size() == grid.getStore().getCount());
-  }
-
-  @Override
-  protected void onClear(StoreEvent<M> se) {
-    super.onClear(se);
-    setChecked(false);
-  }
-
-  @Override
   protected void onRemove(M model) {
     super.onRemove(model);
-    setChecked(getSelection().size() == grid.getStore().getCount());
+    updateHeaderCheckBox();
   }
 
   @Override
   protected void onSelectChange(M model, boolean select) {
     super.onSelectChange(model, select);
-    setChecked(getSelection().size() == grid.getStore().getCount());
+    updateHeaderCheckBox();
   }
 
   private void setChecked(boolean checked) {
@@ -187,6 +186,10 @@ public class CheckBoxSelectionModel<M extends ModelData> extends GridSelectionMo
         hd.getParent().setStyleName("x-grid3-hd-checker-on", checked);
       }
     }
+  }
+
+  private void updateHeaderCheckBox() {
+    setChecked(getSelection().size() == listStore.getCount());
   }
 
 }

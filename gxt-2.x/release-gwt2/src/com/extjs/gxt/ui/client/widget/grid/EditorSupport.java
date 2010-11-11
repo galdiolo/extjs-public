@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -168,7 +168,7 @@ public class EditorSupport<M extends ModelData> {
     ed.row = row;
     ed.col = col;
     activeRecord = store.getRecord(m);
-    
+
     if (!ed.isRendered()) {
       ed.render((Element) grid.getView().getEditorParent());
     }
@@ -239,22 +239,20 @@ public class EditorSupport<M extends ModelData> {
     ed.removeListener(Events.CancelEdit, editorListener);
     Record r = activeRecord;
     activeRecord = null;
-    
-    String field = cm.getDataIndex(ed.col);
-    if ((value == null && startValue != null) || (value != null && !value.equals(startValue))) {
-      GridEvent<M> ge = new GridEvent<M>(grid);
-      ge.setRecord(r);
-      ge.setProperty(field);
-      ge.setValue(value);
-      ge.setStartValue(startValue);
-      ge.setRowIndex(ed.row);
-      ge.setColIndex(ed.col);
 
-      if (grid.fireEvent(Events.ValidateEdit, ge)) {
-        r.setValid(ge.getProperty(), ed.getField().isValid(true));
-        r.set(ge.getProperty(), ge.getValue());
-        grid.fireEvent(Events.AfterEdit, ge);
-      }
+    String field = cm.getDataIndex(ed.col);
+    GridEvent<M> ge = new GridEvent<M>(grid);
+    ge.setRecord(r);
+    ge.setProperty(field);
+    ge.setValue(value);
+    ge.setStartValue(startValue);
+    ge.setRowIndex(ed.row);
+    ge.setColIndex(ed.col);
+
+    if (grid.fireEvent(Events.ValidateEdit, ge)) {
+      r.setValid(ge.getProperty(), ed.getField().isValid(true));
+      r.set(ge.getProperty(), ge.getValue());
+      grid.fireEvent(Events.AfterEdit, ge);
     }
 
     grid.getView().focusCell(ed.row, ed.col, false);

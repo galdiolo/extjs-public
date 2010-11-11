@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -26,6 +26,10 @@ import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 
+/**
+ * Abstract base class for classes that know how to handle navigation key events
+ * for a given component.
+ */
 public abstract class FocusHandler {
 
   protected static boolean managed;
@@ -96,7 +100,7 @@ public abstract class FocusHandler {
         c.focus();
         return true;
       }
-      if (c.getAriaSupport().isIgnore()) {
+      if (c.getFocusSupport().isIgnore()) {
         if (isContainer(c)) {
           stepInto(c, null, forward);
         } else {
@@ -162,15 +166,15 @@ public abstract class FocusHandler {
   }
 
   protected static Widget findForwardOverride(Component comp) {
-    if (comp.getData("aria-next") != null) {
-      String id = comp.getData("aria-next");
+    if (comp.getFocusSupport().getNextId() != null) {
+      String id = comp.getFocusSupport().getNextId();
       Component p = ComponentManager.get().get(id);
       if (p != null) {
         return p;
       }
     }
-    if (comp.getAriaSupport().hasListeners(FocusManager.TabNext)) {
-      if (comp.getAriaSupport().fireEvent(FocusManager.TabNext)) {
+    if (comp.getFocusSupport().hasListeners(FocusManager.TabNext)) {
+      if (comp.getFocusSupport().fireEvent(FocusManager.TabNext)) {
         return comp;
       }
     }
@@ -230,20 +234,9 @@ public abstract class FocusHandler {
     return null;
   }
 
-  protected static boolean isIgnore(Widget w) {
-    if (w instanceof Component) {
-      Component c = (Component) w;
-      if (c.getAriaSupport().isIgnore()) {
-        return true;
-      }
-
-    }
-    return false;
-  }
-
   protected static Widget findPreviousOverride(Component comp) {
-    if (comp.getData("aria-previous") != null) {
-      String id = comp.getData("aria-previous");
+    if (comp.getFocusSupport().getPreviousId() != null) {
+      String id = comp.getFocusSupport().getPreviousId();
       if ("parent-previous".equals(id)) {
         Widget p = comp.getParent();
         return p;
@@ -253,8 +246,8 @@ public abstract class FocusHandler {
         return p;
       }
     }
-    if (comp.getAriaSupport().hasListeners(FocusManager.TabPrevious)) {
-      if (comp.getAriaSupport().fireEvent(FocusManager.TabPrevious)) {
+    if (comp.getFocusSupport().hasListeners(FocusManager.TabPrevious)) {
+      if (comp.getFocusSupport().fireEvent(FocusManager.TabPrevious)) {
         return comp;
       }
     }
@@ -313,6 +306,17 @@ public abstract class FocusHandler {
     return false;
   }
 
+  protected static boolean isIgnore(Widget w) {
+    if (w instanceof Component) {
+      Component c = (Component) w;
+      if (c.getFocusSupport().isIgnore()) {
+        return true;
+      }
+
+    }
+    return false;
+  }
+
   protected static boolean previousIfOverride(Component comp) {
     Widget c = findPreviousOverride(comp);
     if (c != null) {
@@ -322,6 +326,13 @@ public abstract class FocusHandler {
     return false;
   }
 
+  /**
+   * Return true if this handler can handle key events for the given component.
+   * 
+   * @param component the target component
+   * @param pe the preview event
+   * @return true if can handle
+   */
   public abstract boolean canHandleKeyPress(Component component, PreviewEvent pe);
 
   public void onEnter(Component component, PreviewEvent pe) {
@@ -345,14 +356,36 @@ public abstract class FocusHandler {
 
   }
 
-  public void stepOut(Widget w) {
+  protected int firstActive(Container<?> c) {
+    for (int i = 0; i < c.getItemCount(); i++) {
+      Component comp = c.getItem(i);
+      if (!comp.isEnabled() || comp.getFocusSupport().isIgnore()) {
+        continue;
+      }
+      return i;
+    }
+    return -1;
+  }
+
+  protected int lastActive(Container<?> c) {
+    for (int i = c.getItemCount() - 1; i >= 0; i--) {
+      Component comp = c.getItem(i);
+      if (!comp.isEnabled() || comp.getFocusSupport().isIgnore()) {
+        continue;
+      }
+      return i;
+    }
+    return -1;
+  }
+
+  protected void stepOut(Widget w) {
     Widget p = w.getParent();
     if (p != null) {
       if (p instanceof TabItem) {
         ((TabItem) p).getTabPanel().focus();
       } else if (p instanceof Component) {
         Component c = (Component) p;
-        while (c.getAriaSupport().isIgnore()) {
+        while (c.getFocusSupport().isIgnore()) {
           p = c.getParent();
           if (p != null) {
             if (p instanceof Component) {
@@ -369,28 +402,6 @@ public abstract class FocusHandler {
         FocusFrame.get().unframe();
       }
     }
-  }
-
-  protected int firstActive(Container<?> c) {
-    for (int i = 0; i < c.getItemCount(); i++) {
-      Component comp = c.getItem(i);
-      if (!comp.isEnabled() || comp.getAriaSupport().isIgnore()) {
-        continue;
-      }
-      return i;
-    }
-    return -1;
-  }
-
-  protected int lastActive(Container<?> c) {
-    for (int i = c.getItemCount() - 1; i >= 0; i--) {
-      Component comp = c.getItem(i);
-      if (!comp.isEnabled() || comp.getAriaSupport().isIgnore()) {
-        continue;
-      }
-      return i;
-    }
-    return -1;
   }
 
 }

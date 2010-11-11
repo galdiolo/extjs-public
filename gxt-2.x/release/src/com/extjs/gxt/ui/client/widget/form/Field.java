@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -11,10 +11,13 @@ import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.HideMode;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XDOM;
+import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.KeyListener;
+import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.util.DelayedTask;
 import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.util.Util;
@@ -166,8 +169,9 @@ public abstract class Field<D> extends BoxComponent {
   protected boolean readOnly;
   protected String readOnlyFieldStyle = "x-form-readonly";
   protected int validationDelay = 250;
-  protected D value;
+  protected DelayedTask validationTask;
 
+  protected D value;
   private String activeErrorMessage;
   private String fieldLabel = "";
   private boolean fireChangeEventOnSetValue;
@@ -177,9 +181,10 @@ public abstract class Field<D> extends BoxComponent {
   private String inputStyles = "";
   private String labelSeparator;
   private String labelStyle = "";
-  private String messageTarget = "side";
 
+  private String messageTarget = "side";
   private int tabIndex = 0;
+
   private boolean validateOnBlur = true;
 
   /**
@@ -565,7 +570,7 @@ public abstract class Field<D> extends BoxComponent {
           setAriaState("aria-describedby", errorIcon.getId());
           errorIcon.setTitle(getErrorMessage());
         }
-        
+
       } else if (!errorIcon.el().isConnected()) {
         Element p = el().getParent().dom;
         p.appendChild(errorIcon.getElement());
@@ -603,7 +608,7 @@ public abstract class Field<D> extends BoxComponent {
         elem.setInnerHTML(msg);
       }
     }
-    
+
     if (GXT.isAriaEnabled()) {
       setAriaState("aria-invalid", "true");
     }
@@ -710,6 +715,16 @@ public abstract class Field<D> extends BoxComponent {
    * @param autoValidate true to validate on each key press
    */
   public void setAutoValidate(boolean autoValidate) {
+    if (!this.autoValidate && autoValidate) {
+      validationTask = new DelayedTask(new Listener<BaseEvent>() {
+        public void handleEvent(BaseEvent be) {
+          validate();
+        }
+      });
+    } else if (!autoValidate && validationTask != null) {
+      validationTask.cancel();
+      validationTask = null;
+    }
     this.autoValidate = autoValidate;
   }
 
@@ -1083,6 +1098,14 @@ public abstract class Field<D> extends BoxComponent {
   }
 
   @Override
+  protected void onDetach() {
+    if (validationTask != null) {
+      validationTask.cancel();
+    }
+    super.onDetach();
+  }
+
+  @Override
   protected void onDisable() {
     super.onDisable();
     getInputEl().disable();
@@ -1122,6 +1145,9 @@ public abstract class Field<D> extends BoxComponent {
   }
 
   protected void onKeyUp(FieldEvent fe) {
+    if (autoValidate && validationTask != null) {
+      validationTask.delay(validationDelay);
+    }
     fireEvent(Events.KeyUp, new FieldEvent(this, fe.getEvent()));
   }
 

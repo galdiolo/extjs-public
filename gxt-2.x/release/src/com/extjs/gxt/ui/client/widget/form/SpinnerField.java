@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -20,7 +20,7 @@ import com.extjs.gxt.ui.client.util.ClickRepeater;
 import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.util.Size;
-import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.i18n.client.constants.NumberConstants;
@@ -38,7 +38,7 @@ import com.google.gwt.user.client.Element;
  * 
  * <code><pre>
  * SpinnerField field = new SpinnerField();
- * field.setPropertyEdtiorType(Integer.class);
+ * field.setPropertyEditorType(Integer.class);
  * </pre></code>
  * 
  * <dl>
@@ -141,15 +141,14 @@ public class SpinnerField extends TwinTriggerField<Number> {
     }
   }
 
+  protected List<Character> allowed;
+  protected NumberConstants constants;
+  protected String decimalSeparator = ".";
   protected KeyNav<ComponentEvent> keyNav;
   private boolean allowDecimals = true;
-  private List<Character> allowed;
   private boolean allowNegative = true;
   private String baseChars = "0123456789";
-  private NumberConstants constants;
-  private String decimalSeparator = ".";
   private Number increment = 1d;
-  private int lastKeyCode;
   private Number maxValue = Double.MAX_VALUE;
   private Number minValue = Double.NEGATIVE_INFINITY;
 
@@ -345,27 +344,23 @@ public class SpinnerField extends TwinTriggerField<Number> {
       if (up) {
         setValue(Math.max(minValue.doubleValue(), Math.min(d + increment.doubleValue(), maxValue.doubleValue())));
       } else {
-        setValue(Math.max(minValue.doubleValue(), Math.min(allowNegative ? d - increment.doubleValue() : Math.max(0, d - increment.doubleValue()), maxValue.doubleValue())));
+        setValue(Math.max(
+            minValue.doubleValue(),
+            Math.min(allowNegative ? d - increment.doubleValue() : Math.max(0, d - increment.doubleValue()),
+                maxValue.doubleValue())));
       }
     }
   }
 
   @Override
-  protected void onKeyDown(FieldEvent fe) {
-    super.onKeyDown(fe);
-    // must key code in key code as gwt returns character in key press
-    lastKeyCode = fe.getKeyCode();
-  }
-
-  @Override
   protected void onKeyPress(FieldEvent fe) {
     super.onKeyPress(fe);
-    char key = (char) fe.getKeyCode();
 
-    if (fe.isSpecialKey(lastKeyCode) || lastKeyCode == KeyCodes.KEY_BACKSPACE || lastKeyCode == KeyCodes.KEY_DELETE
-        || fe.isControlKey()) {
+    if (fe.isSpecialKey(getKeyCode(fe.getEvent()))) {
       return;
     }
+
+    char key = getChar(fe.getEvent());
 
     if (!allowed.contains(key)) {
       fe.stopEvent();
@@ -391,29 +386,30 @@ public class SpinnerField extends TwinTriggerField<Number> {
 
     Listener<ClickRepeaterEvent> listener = new Listener<ClickRepeaterEvent>() {
       public void handleEvent(ClickRepeaterEvent be) {
-        if (!hasFocus) {
-          focus();
-        }
-        if (be.getType() == Events.OnClick) {
-          if (be.getEl() == trigger) {
-            onTriggerClick(null);
-          } else if (be.getEl() == twinTrigger) {
-            onTwinTriggerClick(null);
+        if (SpinnerField.this.isEnabled()) {
+          if (!hasFocus) {
+            focus();
           }
-        } else if (be.getType() == Events.OnMouseDown) {
-          if (be.getEl() == trigger) {
-            trigger.addStyleName("x-form-spinner-clickup");
-          } else if (be.getEl() == twinTrigger) {
-            twinTrigger.addStyleName("x-form-spinner-clickdown");
-          }
+          if (be.getType() == Events.OnClick) {
+            if (be.getEl() == trigger) {
+              onTriggerClick(null);
+            } else if (be.getEl() == twinTrigger) {
+              onTwinTriggerClick(null);
+            }
+          } else if (be.getType() == Events.OnMouseDown) {
+            if (be.getEl() == trigger) {
+              trigger.addStyleName("x-form-spinner-clickup");
+            } else if (be.getEl() == twinTrigger) {
+              twinTrigger.addStyleName("x-form-spinner-clickdown");
+            }
 
-        } else if (be.getType() == Events.OnMouseUp) {
-          if (be.getEl() == trigger) {
-            trigger.removeStyleName("x-form-spinner-clickup");
-          } else if (be.getEl() == twinTrigger) {
-            twinTrigger.removeStyleName("x-form-spinner-clickdown");
+          } else if (be.getType() == Events.OnMouseUp) {
+            if (be.getEl() == trigger) {
+              trigger.removeStyleName("x-form-spinner-clickup");
+            } else if (be.getEl() == twinTrigger) {
+              twinTrigger.removeStyleName("x-form-spinner-clickdown");
+            }
           }
-
         }
       }
     };
@@ -433,10 +429,10 @@ public class SpinnerField extends TwinTriggerField<Number> {
     addStyleName("x-spinner-field");
     trigger.addStyleName("x-form-spinner-up");
     twinTrigger.addStyleName("x-form-spinner-down");
-    
+
     setMaxValue(maxValue);
     setMinValue(minValue);
-    getAriaSupport().setRole("spinbutton");
+    getInputEl().dom.setAttribute("role", "spinbutton");
 
     keyNav = new KeyNav<ComponentEvent>(this) {
       @Override
@@ -531,11 +527,21 @@ public class SpinnerField extends TwinTriggerField<Number> {
         return false;
       }
     }
-    
+
     if (GXT.isAriaEnabled()) {
       getInputEl().dom.setAttribute("aria-valuenow", "" + value);
     }
 
     return true;
   }
+
+  // needed due to GWT 2.1 changes
+  private native char getChar(NativeEvent e) /*-{
+    return e.which || e.charCode || e.keyCode || 0;
+  }-*/;
+
+  // needed due to GWT 2.1 changes
+  private native int getKeyCode(NativeEvent e) /*-{
+    return e.keyCode || 0;
+  }-*/;
 }

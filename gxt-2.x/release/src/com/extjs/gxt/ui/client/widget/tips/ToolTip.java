@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -54,6 +54,7 @@ public class ToolTip extends Tip {
   public ToolTip() {
     toolTipConfig = new ToolTipConfig();
     lastActive = new Date();
+    monitorWindowResize = true;
   }
 
   /**
@@ -110,7 +111,7 @@ public class ToolTip extends Tip {
       this.target.removeListener(Events.Hide, listener);
       this.target.removeListener(Events.Detach, listener);
       this.target.removeListener(Events.Render, listener);
-      if (GXT.isAriaEnabled()) {
+      if (GXT.isFocusManagerEnabled()) {
         this.target.removeListener(Events.OnFocus, listener);
         this.target.removeListener(Events.OnBlur, listener);
         this.target.removeListener(Events.OnKeyDown, listener);
@@ -125,12 +126,14 @@ public class ToolTip extends Tip {
           EventType type = be.getType();
           if (type == Events.OnMouseOver) {
             EventTarget from = be.getEvent().getRelatedEventTarget();
-            if (from == null || (from != null && !DOM.isOrHasChild(source, (Element) Element.as(from)))) {
+            if (from == null
+                || (Element.is(source) && Element.is(from) && !DOM.isOrHasChild(source, (Element) Element.as(from)))) {
               onTargetOver(be);
             }
           } else if (type == Events.OnMouseOut) {
             EventTarget to = be.getEvent().getRelatedEventTarget();
-            if (to == null || (to != null && !DOM.isOrHasChild(source, (Element) Element.as(to)))) {
+            if (to == null
+                || (Element.is(source) && Element.is(to) && !DOM.isOrHasChild(source, (Element) Element.as(to)))) {
               onTargetOut(be);
             }
           } else if (type == Events.OnMouseMove) {
@@ -138,19 +141,19 @@ public class ToolTip extends Tip {
           } else if (type == Events.Hide || type == Events.Detach) {
             hide();
           } else if (type == Events.OnFocus) {
-            if (GXT.isAriaEnabled()) {
+            if (GXT.isFocusManagerEnabled()) {
               targetXY = be.getXY();
               targetXY.y += target.getOffsetHeight();
               targetXY.x += target.getOffsetWidth();
               show();
             }
           } else if (type == Events.OnBlur) {
-            if (GXT.isAriaEnabled() && !isClosable()) {
+            if (GXT.isFocusManagerEnabled() && !isClosable()) {
               hide();
             }
           } else if (type == Events.OnKeyDown) {
-            if (GXT.isAriaEnabled() && be.getKeyCode() == KeyCodes.KEY_ESCAPE) {
-              target.setData("aria-ignore", true);
+            if (GXT.isFocusManagerEnabled() && be.getKeyCode() == KeyCodes.KEY_ESCAPE) {
+              target.getFocusSupport().setIgnore(true);
               hide();
             }
           }
@@ -164,7 +167,7 @@ public class ToolTip extends Tip {
       target.addListener(Events.OnMouseMove, listener);
       target.addListener(Events.Hide, listener);
       target.addListener(Events.Detach, listener);
-      if (GXT.isAriaEnabled()) {
+      if (GXT.isFocusManagerEnabled()) {
         this.target.addListener(Events.OnFocus, listener);
         this.target.addListener(Events.OnBlur, listener);
         this.target.addListener(Events.OnKeyDown, listener);
@@ -236,7 +239,7 @@ public class ToolTip extends Tip {
    */
   public void update(ToolTipConfig config) {
     updateConfig(config);
-    if (isRendered() && !hidden) {
+    if (isRendered() && isAttached()) {
       updateContent();
     }
   }
@@ -272,7 +275,7 @@ public class ToolTip extends Tip {
   }
 
   protected void delayHide() {
-    if (!hidden && hideTimer == null && toolTipConfig.isAutoHide() && !toolTipConfig.isCloseable()) {
+    if (isAttached() && hideTimer == null && toolTipConfig.isAutoHide() && !toolTipConfig.isCloseable()) {
       if (toolTipConfig.getHideDelay() == 0) {
         hide();
         return;
@@ -287,7 +290,7 @@ public class ToolTip extends Tip {
   }
 
   protected void delayShow() {
-    if (hidden && showTimer == null) {
+    if (!isAttached() && showTimer == null) {
       if ((new Date().getTime() - lastActive.getTime()) < quickShowInterval) {
         show();
       } else {
@@ -302,7 +305,7 @@ public class ToolTip extends Tip {
           show();
         }
       }
-    } else if (!hidden) {
+    } else if (isAttached()) {
       show();
     }
   }
@@ -365,7 +368,7 @@ public class ToolTip extends Tip {
 
   protected void onMouseMove(ComponentEvent ce) {
     targetXY = ce.getXY();
-    if (isRendered() && !hidden && toolTipConfig.isTrackMouse()) {
+    if (isRendered() && isAttached() && toolTipConfig.isTrackMouse()) {
       String origAnchor = toolTipConfig.getAnchor();
       Point p = getTargetXY(0);
       toolTipConfig.setAnchor(origAnchor);
@@ -400,6 +403,14 @@ public class ToolTip extends Tip {
     clearTimer("hide");
     targetXY = ce.getXY();
     delayShow();
+  }
+
+  @Override
+  protected void onWindowResize(int width, int height) {
+    super.onWindowResize(width, height);
+    // this can only be reached if the tooltip is already visible, show it again
+    // to sync anchor
+    show();
   }
 
   protected void syncAnchor() {
@@ -497,7 +508,7 @@ public class ToolTip extends Tip {
     } else {
       int x = targetXY.x;
       int y = targetXY.y;
-      
+
       int[] mouseOffset = toolTipConfig.getMouseOffset();
       if (mouseOffset != null) {
         x += mouseOffset[0];

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -288,7 +288,7 @@ public abstract class Store<M extends ModelData> extends BaseObservable {
    */
   public M findModel(M model) {
     for (M m : all) {
-      if (comparer.equals(m, model)) {
+      if (equals(m, model)) {
         return m;
       }
     }

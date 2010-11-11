@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -26,13 +26,13 @@ public class DateWrapper {
     DAY, HOUR, MILLI, MINUTE, MONTH, SECOND, YEAR;
   }
 
+  protected static String format(Date date, String format) {
+    return DateTimeFormat.getFormat(format).format(date);
+  }
+
   protected static String format(float date, String format) {
     long d = new Float(date).longValue();
     return DateTimeFormat.getFormat(format).format(new Date(d));
-  }
-  
-  protected static String format(Date date, String format) {
-    return DateTimeFormat.getFormat(format).format(date);
   }
 
   private Date date;
@@ -368,6 +368,27 @@ public class DateWrapper {
    */
   public long getTime() {
     return date.getTime();
+  }
+
+  /**
+   * Returns a new instance with the time portion
+   * (hours/minutes/seconds/milliseconds) reseted to 12am. This keeps the date
+   * the same also during daylight saving times.
+   * 
+   * @return a new instance with the time portion reseted to 12am
+   */
+  public DateWrapper resetTime() {
+    Date date = asDate();
+    // remove millis
+    long msec = date.getTime();
+    msec = (msec / 1000) * 1000;
+    date.setTime(msec);
+
+    // reset time to 12am
+    date.setHours(12);
+    date.setMinutes(0);
+    date.setSeconds(0);
+    return new DateWrapper(date);
   }
 
   @Override

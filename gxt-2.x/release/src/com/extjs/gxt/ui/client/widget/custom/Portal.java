@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -10,6 +10,7 @@ package com.extjs.gxt.ui.client.widget.custom;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.dnd.ScrollSupport;
@@ -20,8 +21,8 @@ import com.extjs.gxt.ui.client.event.PortalEvent;
 import com.extjs.gxt.ui.client.fx.Draggable;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
-import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.ScrollContainer;
 import com.extjs.gxt.ui.client.widget.layout.ColumnData;
 import com.extjs.gxt.ui.client.widget.layout.ColumnLayout;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
@@ -90,7 +91,7 @@ import com.google.gwt.user.client.ui.Widget;
  * <dd>Component SaveState</dd>
  * </dl>
  */
-public class Portal extends Container<LayoutContainer> {
+public class Portal extends ScrollContainer<LayoutContainer> {
 
   private Portlet active;
   private boolean autoScroll = true;
@@ -114,7 +115,7 @@ public class Portal extends Container<LayoutContainer> {
     cl = new ColumnLayout();
     cl.setAdjustForScroll(true);
     setLayout(cl);
-    setStyleAttribute("overflow", "auto");
+    setScrollMode(Scroll.AUTO);
     baseStyle = "x-portal";
     enableLayout = true;
 

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -43,6 +43,7 @@ public abstract class Filter extends BaseObservable {
     this.dataIndex = dataIndex;
     menu = new Menu();
   }
+
   /**
    * Returns the filter's data index.
    * 
@@ -121,12 +122,14 @@ public abstract class Filter extends BaseObservable {
   }
 
   /**
-   * Sets the status of the filter and fires the appropriate events.
+   * Sets the status of the filter and fires the appropriate events. You can
+   * only set it to active if the filter is activatable.
    * 
    * @param active the new filter state
    * @param supressEvent true to prevent events from being fired
    */
   public void setActive(boolean active, boolean supressEvent) {
+    active = active && isActivatable();
     if (this.active != active) {
       this.active = active;
       if (!supressEvent) {
@@ -175,9 +178,9 @@ public abstract class Filter extends BaseObservable {
     }
     setActive(isActivatable(), false);
   }
-  
+
   @SuppressWarnings("unchecked")
-  protected <X> X getModelValue(ModelData model){
+  protected <X> X getModelValue(ModelData model) {
     return (X) model.get(dataIndex);
   }
 

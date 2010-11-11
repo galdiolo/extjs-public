@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -318,17 +318,11 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     super.onComponentEvent(ce);
     if (ce.getEventTypeInt() == KeyNav.getKeyEvent().getEventCode()) {
       if (ce.getKeyCode() == KeyCodes.KEY_ENTER) {
-        stopEditing(true);
+        onEnter(ce);
       } else if (ce.getKeyCode() == KeyCodes.KEY_ESCAPE) {
-        stopEditing(false);
+        onEscape(ce);
       } else if (ce.getKeyCode() == KeyCodes.KEY_TAB) {
-        Element target = ce.getTarget();
-        Component c = findField(target);
-        if (saveBtn != null && c != null && ce.isShiftKey() && indexOf(c) == 0) {
-          ce.stopEvent();
-          saveBtn.focus();
-          return;
-        }
+        onTab(ce);
       }
     }
   }
@@ -425,18 +419,19 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       Field<Object> f = (Field<Object>) getItem(i);
       if (GXT.isAriaEnabled()) {
         if (i == 0 && saveBtn != null) {
-          saveBtn.setData("aria-next", f.getId());
+          saveBtn.getFocusSupport().setNextId(f.getId());
         }
         f.getAriaSupport().setLabel(cm.getColumnHeader(i));
       }
       String dIndex = cm.getDataIndex(i);
-      Object val = cm.getEditor(i).preProcessValue(record.get(dIndex));
-      f.addStyleName("x-row-editor-field");
+      CellEditor ed = cm.getEditor(i);
+      Object val = ed != null ? ed.preProcessValue(record.get(dIndex)) : record.get(dIndex);
+
       f.updateOriginalValue(val);
       f.setValue(val);
     }
     if (cancelBtn != null) {
-      cancelBtn.setData("aria-previous", getItem(getItemCount() - 1).getId());
+      cancelBtn.getFocusSupport().setPreviousId(getItem(getItemCount() - 1).getId());
     }
     if (!isVisible()) {
       show();
@@ -459,7 +454,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
    * @param saveChanges true to save the changes. false to ignore them.
    */
   public void stopEditing(boolean saveChanges) {
-    if (disabled || !editing || !isVisible()) {
+    if (disabled || !editing) {
       return;
     }
     editing = false;
@@ -469,16 +464,21 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     ColumnModel cm = grid.getColumnModel();
     for (int i = 0, len = cm.getColumnCount(); i < len; i++) {
       if (!cm.isHidden(i)) {
-        Field<?> f = (Field<?>) getItem(i);
-        if (f == null || f instanceof LabelField) {
+        Component c = getItem(i);
+        if (c instanceof LabelField) {
           continue;
-        }
-        String dindex = cm.getDataIndex(i);
-        Object oldValue = record.get(dindex);
-        Object value = cm.getEditor(i).postProcessValue(f.getValue());
-        if ((oldValue == null && value != null) || (oldValue != null && !oldValue.equals(value))) {
-          data.put(dindex, value);
-          hasChange = true;
+        } else if (c instanceof Field<?>) {
+          Field<?> f = (Field<?>) c;
+
+          String dindex = cm.getDataIndex(i);
+          Object oldValue = record.get(dindex);
+
+          CellEditor ed = cm.getEditor(i);
+          Object value = ed != null ? ed.postProcessValue(f.getValue()) : f.getValue();
+          if ((oldValue == null && value != null) || (oldValue != null && !oldValue.equals(value))) {
+            data.put(dindex, value);
+            hasChange = true;
+          }
         }
       }
     }
@@ -527,9 +527,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       saveBtn.setEnabled(valid);
     }
 
-    if (!isVisible()) {
-      monitorTimer.cancel();
-      stopEditing(false);
+    if (!isVisible() && tooltip != null && tooltip.isEnabled()) {
       hideTooltip();
     }
   }
@@ -570,12 +568,15 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     });
     saveBtn.setMinWidth(getMinButtonWidth());
     btns.add(saveBtn);
+    
+    cancelBtn.getFocusSupport().setNextId(saveBtn.getId());
+    saveBtn.getFocusSupport().setPreviousId(cancelBtn.getId());
 
     btns.render(getElement("bwrap"));
     btns.layout();
 
     btns.getElement().removeAttribute("tabindex");
-    btns.getAriaSupport().setIgnore(true);
+    btns.getFocusSupport().setIgnore(true);
   }
 
   protected void deferFocus(final Point pt) {
@@ -682,11 +683,8 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     for (int i = 0, len = cm.getColumnCount(); i < len; i++) {
       ColumnConfig c = cm.getColumn(i);
       CellEditor ed = c.getEditor();
-      if (ed == null) {
-        ed = new CellEditor(new LabelField());
-        c.setEditor(ed);
-      }
-      Field<?> f = ed.getField();
+
+      Field<?> f = ed != null ? ed.getField() : new LabelField();
       if (f instanceof TriggerField<?>) {
         ((TriggerField<? extends Object>) f).setMonitorTab(true);
       }
@@ -701,6 +699,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       }
 
       f.setMessageTarget("tooltip");
+      f.addStyleName("x-row-editor-field");
       // needed because we remove it from the celleditor
       clearParent(f);
       insert(f, i, ld);
@@ -727,6 +726,14 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       }
     }
     return valid;
+  }
+
+  protected void onEnter(ComponentEvent ce) {
+    stopEditing(true);
+  }
+
+  protected void onEscape(ComponentEvent ce) {
+    stopEditing(false);
   }
 
   protected void onGridKey(GridEvent<M> e) {
@@ -788,6 +795,16 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     }
   }
 
+  protected void onTab(ComponentEvent ce) {
+    Element target = ce.getTarget();
+    Component c = findField(target);
+    if (saveBtn != null && c != null && ce.isShiftKey() && indexOf(c) == 0) {
+      ce.stopEvent();
+      saveBtn.focus();
+      return;
+    }
+  }
+
   protected void positionButtons() {
     if (btns != null) {
       int h = el().getClientHeight();
@@ -815,7 +832,10 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     config.setText(msg);
     tooltip.update(config);
     tooltip.enable();
-    tooltip.show();
+    if (!tooltip.isAttached()) {
+      tooltip.show();
+      tooltip.el().updateZIndex(0);
+    }
   }
 
   protected void startMonitoring() {
@@ -838,10 +858,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     if (monitorTimer != null) {
       monitorTimer.cancel();
     }
-    if (tooltip != null) {
-      tooltip.disable();
-      tooltip.hide();
-    }
+    hideToolTip();
   }
 
   protected void verifyLayout(boolean force) {

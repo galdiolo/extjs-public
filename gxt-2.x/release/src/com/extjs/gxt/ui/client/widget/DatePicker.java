@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -436,7 +436,7 @@ public class DatePicker extends BoxComponent {
    */
   public void setMaxDate(Date maxDate) {
     if (maxDate != null) {
-      maxDate = new DateWrapper(maxDate).clearTime().asDate();
+      maxDate = new DateWrapper(maxDate).resetTime().asDate();
     }
     this.maxDate = maxDate;
     if (rendered) {
@@ -460,7 +460,7 @@ public class DatePicker extends BoxComponent {
    */
   public void setMinDate(Date minDate) {
     if (minDate != null) {
-      minDate = new DateWrapper(minDate).clearTime().asDate();
+      minDate = new DateWrapper(minDate).resetTime().asDate();
     }
     this.minDate = minDate;
     if (rendered) {
@@ -493,7 +493,7 @@ public class DatePicker extends BoxComponent {
    * @param supressEvent true to suppress the select event
    */
   public void setValue(Date date, boolean supressEvent) {
-    this.value = new DateWrapper(date).clearTime();
+    this.value = new DateWrapper(date).resetTime();
     if (rendered) {
       update(value);
     }
@@ -572,7 +572,7 @@ public class DatePicker extends BoxComponent {
   }
 
   protected void onFocus(ComponentEvent ce) {
-    if (GXT.isAriaEnabled()) {
+    if (GXT.isFocusManagerEnabled()) {
       FocusFrame.get().frame(this);
     }
     update(activeDate);
@@ -1028,9 +1028,9 @@ public class DatePicker extends BoxComponent {
 
       days += startingPos;
 
-      DateWrapper d = new DateWrapper(pm.getFullYear(), pm.getMonth(), prevStart).clearTime();
-      today = new DateWrapper().clearTime().getTime();
-      long sel = date != null ? date.clearTime().getTime() : 0;
+      DateWrapper d = new DateWrapper(pm.getFullYear(), pm.getMonth(), prevStart).resetTime();
+      today = new DateWrapper().resetTime().getTime();
+      long sel = date != null ? date.resetTime().getTime() : 0;
       long min = minDate != null ? new DateWrapper(minDate).getTime() : Long.MIN_VALUE;
       long max = maxDate != null ? new DateWrapper(maxDate).getTime() : Long.MAX_VALUE;
 

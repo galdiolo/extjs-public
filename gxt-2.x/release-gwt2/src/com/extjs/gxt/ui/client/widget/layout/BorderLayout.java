@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -160,7 +160,7 @@ public class BorderLayout extends Layout {
 
   public void setContainer(Container<?> ct) {
     super.setContainer(ct);
-    if(ct != null){
+    if (ct != null) {
       assert ct instanceof LayoutContainer : "BorderLayout needs a LayoutContainer";
     }
     layoutContainer = (LayoutContainer) ct;
@@ -196,6 +196,24 @@ public class BorderLayout extends Layout {
     if (c != null) {
       c.show();
     }
+  }
+
+  protected CollapsePanel createCollapsePanel(ContentPanel panel, BorderLayoutData data) {
+    CollapsePanel cp = new CollapsePanel(panel, data) {
+      protected void onExpandButton(BaseEvent be) {
+        if (isExpanded()) {
+          setExpanded(false);
+        }
+        onExpandClick(this);
+      }
+    };
+    BorderLayoutData collapseData = new BorderLayoutData(data.getRegion());
+    collapseData.setSize(24);
+    collapseData.setMargins(data.getMargins());
+    ComponentHelper.setLayoutData(cp, collapseData);
+    cp.setData("panel", panel);
+    panel.setData("collapse", cp);
+    return cp;
   }
 
   protected SplitBar createSplitBar(LayoutRegion region, BoxComponent component) {
@@ -429,24 +447,6 @@ public class BorderLayout extends Layout {
     return event;
   }
 
-  private CollapsePanel createCollapsePanel(ContentPanel panel, BorderLayoutData data) {
-    CollapsePanel cp = new CollapsePanel(panel, data) {
-      protected void onExpandButton(BaseEvent be) {
-        if (isExpanded()) {
-          setExpanded(false);
-        }
-        onExpandClick(this);
-      }
-    };
-    BorderLayoutData collapseData = new BorderLayoutData(data.getRegion());
-    collapseData.setSize(24);
-    collapseData.setMargins(data.getMargins());
-    ComponentHelper.setLayoutData(cp, collapseData);
-    cp.setData("panel", panel);
-    panel.setData("collapse", cp);
-    return cp;
-  }
-
   private BoxComponent getRegionWidget(LayoutRegion region) {
     for (int i = 0; i < container.getItemCount(); i++) {
       BoxComponent w = (BoxComponent) container.getItem(i);
@@ -562,7 +562,7 @@ public class BorderLayout extends Layout {
 
       setLayoutOnChange(layoutContainer, layoutOnChange);
 
-      if (GXT.isAriaEnabled()) {
+      if (GXT.isFocusManagerEnabled()) {
         cp.el().focus();
       }
       fireEvent(Events.Collapse, createBorderLaoutEvent(panel));
@@ -588,7 +588,7 @@ public class BorderLayout extends Layout {
 
       setLayoutOnChange(layoutContainer, layoutOnChange);
 
-      if (GXT.isAriaEnabled()) {
+      if (GXT.isFocusManagerEnabled()) {
         panel.el().focus();
       }
       fireEvent(Events.Expand, createBorderLaoutEvent(panel));
@@ -609,8 +609,8 @@ public class BorderLayout extends Layout {
   }
 
   private native void setCollapsed(ContentPanel panel, boolean collapse) /*-{
-                                                                         panel.@com.extjs.gxt.ui.client.widget.ContentPanel::collapsed = collapse;
-                                                                         }-*/;
+    panel.@com.extjs.gxt.ui.client.widget.ContentPanel::collapsed = collapse;
+  }-*/;
 
   private void switchPanels(ContentPanel panel) {
     BorderLayoutData data = (BorderLayoutData) getLayoutData(panel);

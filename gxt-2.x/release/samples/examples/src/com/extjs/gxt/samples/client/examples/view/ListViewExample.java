@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -28,6 +28,7 @@ import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.ListView;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -70,6 +71,7 @@ public class ListViewExample extends LayoutContainer {
       protected BeanModel prepareData(BeanModel model) {
         String s = model.get("name");
         model.set("shortName", Format.ellipse(s, 15));
+        model.set("path", GWT.getHostPageBaseURL() + model.get("path"));  
         return model;
       }
 

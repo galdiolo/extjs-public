@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -57,7 +57,7 @@ public class FocusFrame extends BaseObservable {
    *          be applied
    */
   public void frame(Component newComponent, Element newElement) {
-    if (!GXT.isAriaEnabled()) {
+    if (!GXT.isFocusManagerEnabled()) {
       return;
     }
 

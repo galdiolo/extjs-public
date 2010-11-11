@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -465,6 +465,10 @@ ul.x-tab-strip-bottom {
   border-bottom: 1px solid #abc;
   border-right: 1px solid #abc;
   background: transparent !important;
+}
+
+.ext-ie .x-window-plain .x-window-mc {
+    background-color: #dfe3e7;
 }
 
 body.x-body-masked .x-window-mc,body.x-body-masked .x-window-plain .x-window-mc {

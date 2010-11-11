@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -189,6 +189,37 @@ class Ext {
                }
                return @com.extjs.gxt.ui.client.util.DateWrapper::format(FLjava/lang/String;)(v.getTime(), format || "M/d/y");
              }
+         },
+         
+         number : function(v, format) {
+             if(!v){
+                 return "";
+             }
+             try {
+               return @com.extjs.gxt.ui.client.util.Format::number(DLjava/lang/String;)(v, format || "#");
+             } catch(err){
+             }
+             return "";
+         },
+         
+         decimal : function(v) {
+             if(!v){
+                 return "";
+             }
+             return @com.extjs.gxt.ui.client.util.Format::decimal(D)(v);
+         },
+         
+         currency : function(v) {
+             if(!v){
+                 return "";
+             }
+             return @com.extjs.gxt.ui.client.util.Format::currency(D)(v);
+         },
+         scientific : function(v) {
+             if(!v){
+                 return "";
+             }
+             return @com.extjs.gxt.ui.client.util.Format::scientific(D)(v);
          },
 
          // private
@@ -430,7 +461,7 @@ class Ext {
        var isIE = window.ActiveXObject ? true : false;
        // this eval is stop the compressor from
        // renaming the variable to something shorter
-       eval("var batch = 30803;");
+       batch = 30803;
        var key = 30803;
        function nodupIEXml(cs) {
          var d = ++ key;

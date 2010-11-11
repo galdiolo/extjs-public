@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -17,6 +17,7 @@ import com.extjs.gxt.ui.client.core.FastSet;
 import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.RpcMap;
+import com.extjs.gxt.ui.client.util.Util;
 
 /**
  * Records wrap model instances and provide specialized editing features,
@@ -257,7 +258,8 @@ public class Record {
    * @param value the value of the field to set
    */
   public void set(String name, Object value) {
-    if (model.get(name) != null && model.<Object> get(name).equals(value)) {
+    Object o = model.get(name);
+    if (Util.equalWithNull(o, value)) {
       return;
     }
     dirty = true;
@@ -267,11 +269,10 @@ public class Record {
     }
 
     if (!modified.containsKey(name)) {
-      modified.put(name, model.get(name));
+      modified.put(name, o);
     } else {
       Object origValue = modified.get(name);
-      if ((origValue == null && value == null) || (origValue != null && origValue.equals(value))) {
-
+      if (Util.equalWithNull(origValue, value)) {
         modified.remove(name);
         if (modified.size() == 0) {
           dirty = false;
@@ -280,7 +281,6 @@ public class Record {
           validMap.remove(name);
         }
       }
-
     }
 
     model.set(name, value);

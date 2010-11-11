@@ -39,6 +39,7 @@ com.extjs.gxt.ui.client.widget.tips
 com.extjs.gxt.ui.client.widget.toolbar
 com.extjs.gxt.ui.client.widget.tree
 com.extjs.gxt.ui.client.widget.treegrid
+com.extjs.gxt.ui.client.widget.treegrid.filters
 com.extjs.gxt.ui.client.widget.treepanel
 com.extjs.gxt.ui.client.widget.treetable
 com.extjs.gxt.ui.rebind.core

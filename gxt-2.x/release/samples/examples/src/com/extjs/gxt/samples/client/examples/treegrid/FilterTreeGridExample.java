@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -12,21 +12,21 @@ import java.util.Arrays;
 import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
 import com.extjs.gxt.samples.resources.client.model.Folder;
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.data.ModelData;
-import com.extjs.gxt.ui.client.store.Store;
+import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.form.StoreFilterField;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
+import com.extjs.gxt.ui.client.widget.grid.filters.ListFilter;
+import com.extjs.gxt.ui.client.widget.grid.filters.StringFilter;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
-import com.extjs.gxt.ui.client.widget.toolbar.LabelToolItem;
-import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.extjs.gxt.ui.client.widget.treegrid.TreeGrid;
 import com.extjs.gxt.ui.client.widget.treegrid.TreeGridCellRenderer;
+import com.extjs.gxt.ui.client.widget.treegrid.filters.TreeGridFilters;
 import com.google.gwt.user.client.Element;
 
 public class FilterTreeGridExample extends LayoutContainer {
@@ -54,49 +54,49 @@ public class FilterTreeGridExample extends LayoutContainer {
 
     ContentPanel cp = new ContentPanel();
     cp.setBodyBorder(false);
-    cp.setHeading("TreeGrid");
-    cp.setButtonAlign(HorizontalAlignment.CENTER);
+    cp.setHeading("Filter TreeGrid");
     cp.setLayout(new FitLayout());
     cp.setFrame(true);
     cp.setSize(600, 300);
+
+    TreeGridFilters filters = new TreeGridFilters();
+
+    StringFilter nameFilter = new StringFilter("name");
+
+    ListStore<ModelData> authorStore = new ListStore<ModelData>();
+    authorStore.add(type("Beethoven"));
+    authorStore.add(type("Brahms"));
+    authorStore.add(type("Mozart"));
+    ListFilter authorFilter = new ListFilter("author", authorStore);
+    authorFilter.setDisplayProperty("type");
+
+    ListStore<ModelData> genreStore = new ListStore<ModelData>();
+    genreStore.add(type("Quartets"));
+    genreStore.add(type("Sonatas"));
+    genreStore.add(type("Concertos"));
+    genreStore.add(type("Symphonies"));
+    ListFilter genreFilter = new ListFilter("genre", genreStore);
+    genreFilter.setDisplayProperty("type");
+
+    filters.addFilter(nameFilter);
+    filters.addFilter(genreFilter);
+    filters.addFilter(authorFilter);
 
     TreeGrid<ModelData> tree = new TreeGrid<ModelData>(store, cm);
     tree.setBorders(true);
     tree.getStyle().setLeafIcon(Resources.ICONS.music());
     tree.setAutoExpandColumn("name");
     tree.setTrackMouseOver(false);
+    tree.addPlugin(filters);
 
     cp.add(tree);
 
     add(cp);
-    
-    StoreFilterField<ModelData> filter = new StoreFilterField<ModelData>() {
+  }
 
-      @Override
-      protected boolean doSelect(Store<ModelData> store, ModelData parent,
-          ModelData record, String property, String filter) {
-        // only match leaf nodes
-        if (record instanceof Folder) {
-          return false;
-        }
-        String name = record.get("name");
-        name = name.toLowerCase();
-        if (name.startsWith(filter.toLowerCase())) {
-          return true;
-        }
-        return false;
-      }
-
-    };
-    filter.bind(store);
-
-    ToolBar toolBar = new ToolBar();
-    toolBar.setBorders(true);
-    toolBar.add(new LabelToolItem("Filter:"));
-    toolBar.add(filter);
-
-    cp.setTopComponent(toolBar);
-    
-    
+  private ModelData type(String type) {
+    ModelData model = new BaseModelData();
+    model.set("type", type);
+    return model;
   }
 }

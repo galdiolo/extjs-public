@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -33,13 +33,13 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class BufferView extends GridView {
 
-  private int rowHeight = 21;
+  private boolean bufferEnabled = true;
   private int cacheSize = 20;
   private int cleanDelay = 500;
   private DelayedTask cleanTask;
   private DelayedTask renderTask;
+  private int rowHeight = 21;
   private int scrollDelay = 0;
-  private boolean bufferEnabled = true;
 
   /**
    * Returns the amount of rows that should be cached.
@@ -84,12 +84,6 @@ public class BufferView extends GridView {
    */
   public boolean isBufferEnabled() {
     return bufferEnabled;
-  }
-
-  @Override
-  public void layout() {
-    super.layout();
-    update();
   }
 
   /**
@@ -153,6 +147,9 @@ public class BufferView extends GridView {
     cleanTask.delay(cleanDelay);
   }
 
+  protected void cleanModel(ModelData at) {
+  }
+
   @Override
   protected void doAttach() {
     super.doAttach();
@@ -187,9 +184,6 @@ public class BufferView extends GridView {
         }
       }
     }
-  }
-
-  protected void cleanModel(ModelData at) {
   }
 
   @Override
@@ -383,6 +377,12 @@ public class BufferView extends GridView {
   }
 
   @Override
+  protected void layout(boolean skipResize) {
+    super.layout(skipResize);
+    update();
+  }
+
+  @Override
   protected void notifyShow() {
     super.notifyShow();
     update();
@@ -391,7 +391,7 @@ public class BufferView extends GridView {
   @Override
   protected void onAdd(ListStore<ModelData> store, List<ModelData> models, int index) {
     super.onAdd(store, models, index);
-    clean();
+    update();
   }
 
   @Override

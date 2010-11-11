@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.0 - Ext for GWT
+ * Ext GWT 2.2.1 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import com.extjs.gxt.samples.client.Examples;
 import com.extjs.gxt.samples.client.examples.model.Category;
 import com.extjs.gxt.samples.client.examples.model.Entry;
 import com.extjs.gxt.samples.explorer.client.AppEvents;
@@ -65,7 +66,7 @@ public class NavigationView extends View {
   }
 
   protected void initialize() {
-    model = (ExplorerModel) Registry.get(Explorer.MODEL);
+    model = (ExplorerModel) Registry.get(Examples.MODEL);
     SelectionService.get().addListener(new SelectionChangedListener<TreeModel>() {
       public void selectionChanged(SelectionChangedEvent<TreeModel> event) {
         List<TreeModel> sel = event.getSelection();
