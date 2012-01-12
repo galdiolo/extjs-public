@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -201,7 +201,7 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
     if (newCell != null) {
       grid.editSupport.startEditing(newCell.row, newCell.cell);
     } else {
-      if (k == KeyCodes.KEY_ENTER || k == KeyCodes.KEY_TAB || k == KeyCodes.KEY_ESCAPE) {
+      if ((k == KeyCodes.KEY_ENTER || k == KeyCodes.KEY_TAB || k == KeyCodes.KEY_ESCAPE) && editor != null) {
         grid.getView().focusCell(editor.row, editor.col, false);
       }
     }
@@ -425,12 +425,10 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
             grid.getView().focusCell(idx + 1, 0, false);
           } else {
             if (idx + 1 < listStore.getCount()) {
-              select(idx + 1, e.isShiftKey());
+              selectNext(e.isShiftKey());
               grid.getView().focusCell(idx + 1, 0, false);
             }
-
           }
-
         }
       }
     }
@@ -613,7 +611,7 @@ public class GridSelectionModel<M extends ModelData> extends AbstractStoreSelect
           grid.getView().focusCell(idx - 1, 0, false);
         } else {
           if (idx > 0) {
-            select(idx - 1, e.isShiftKey());
+            selectPrevious(e.isShiftKey());
             grid.getView().focusCell(idx - 1, 0, false);
           }
         }

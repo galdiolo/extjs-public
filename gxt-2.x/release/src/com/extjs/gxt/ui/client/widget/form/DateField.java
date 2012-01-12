@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -15,8 +15,6 @@ import com.extjs.gxt.ui.client.event.DomEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.PreviewEvent;
-import com.extjs.gxt.ui.client.util.BaseEventPreview;
 import com.extjs.gxt.ui.client.util.DateWrapper;
 import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.util.KeyNav;
@@ -27,7 +25,6 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Event;
 
 /**
  * Provides a date input field with a {@link DatePicker} dropdown and automatic
@@ -45,6 +42,7 @@ import com.google.gwt.user.client.Event;
  * <dd>TriggerField TriggerClick</dd>
  * </dl>
  */
+@SuppressWarnings("deprecation")
 public class DateField extends TriggerField<Date> {
 
   /**
@@ -142,7 +140,6 @@ public class DateField extends TriggerField<Date> {
   private Date maxValue;
   private DateMenu menu;
   private boolean formatValue;
-  private BaseEventPreview eventPreview;
 
   /**
    * Creates a new date field.
@@ -173,7 +170,6 @@ public class DateField extends TriggerField<Date> {
       });
       menu.addListener(Events.Hide, new Listener<ComponentEvent>() {
         public void handleEvent(ComponentEvent be) {
-          eventPreview.remove();
           focus();
         }
       });
@@ -253,12 +249,6 @@ public class DateField extends TriggerField<Date> {
     this.minValue = minValue;
   }
 
-  protected void collapseIf(PreviewEvent pe) {
-    if (!menu.el().isOrHasChild(pe.getTarget()) && !el().isOrHasChild(pe.getTarget())) {
-      menu.hide();
-    }
-  }
-
   protected void expand() {
     DatePicker picker = getDatePicker();
 
@@ -274,8 +264,6 @@ public class DateField extends TriggerField<Date> {
     picker.setMaxDate(maxValue);
     picker.setValue(d, true);
 
-    eventPreview.add();
-
     // handle case when down arrow is opening menu
     DeferredCommand.addCommand(new Command() {
       public void execute() {
@@ -283,14 +271,6 @@ public class DateField extends TriggerField<Date> {
         menu.getDatePicker().focus();
       }
     });
-  }
-
-  @Override
-  protected void onDetach() {
-    super.onDetach();
-    if (eventPreview != null) {
-      eventPreview.remove();
-    }
   }
 
   @Override
@@ -307,20 +287,6 @@ public class DateField extends TriggerField<Date> {
   @Override
   protected void onRender(Element target, int index) {
     super.onRender(target, index);
-
-    eventPreview = new BaseEventPreview() {
-      @Override
-      protected boolean onPreview(PreviewEvent pe) {
-        switch (pe.getType().getEventCode()) {
-          case Event.ONSCROLL:
-          case Event.ONMOUSEWHEEL:
-          case Event.ONMOUSEDOWN:
-            collapseIf(pe);
-        }
-        return true;
-      }
-    };
-    eventPreview.setAutoHide(false);
 
     new KeyNav<FieldEvent>(this) {
 
@@ -378,6 +344,8 @@ public class DateField extends TriggerField<Date> {
       markInvalid(error);
       return false;
     }
+    
+    date = new DateWrapper(date).resetTime().asDate();
 
     if (minValue != null && date.before(minValue)) {
       String error = null;

@@ -65,6 +65,10 @@
 
 <h1>Ext GWT Library Release Notes</h1>
 <ul>
+  <li><a href="#Release_2.2.5">Release 2.2.5 (9/15/11)</a></li>
+  <li><a href="#Release_2.2.4">Release 2.2.4 (5/25/11)</a></li>
+  <li><a href="#Release_2.2.3">Release 2.2.3 (3/7/11)</a></li>
+  <li><a href="#Release_2.2.2">Release 2.2.2 (2/9/11)</a></li>
   <li><a href="#Release_2.2.1">Release 2.2.1 (11/10/10)</a></li>
   <li><a href="#Release_2.2.0">Release 2.2.0 (8/31/10)</a></li>
   <li><a href="#Release_2.2.0.RC">Release 2.2.0 RC (8/16/2010)</a></li>
@@ -93,6 +97,148 @@
   <li><a href="#Release_1.1">Release 1.1 (9/18/2008)</a></li>
   <li><a href="#Release_1.0">Release 1.0 (7/7/2008)</a></li>
 </ul>
+
+
+<h2><a name="Release_2.2.5">Release 2.2.4 (Released September 15th, 2011)</a></h2>
+
+<h2>General Changes &amp; Enhancements</h2>
+
+<ul>
+  <li>[132549] XMessages_hu.properties updated</li>
+  <li>[s4044] Scroll Issue with RowEditor</li>
+  <li>Fixed docs in DateWrapper resetTime</li>
+  <li>Fixed small issue in javadoc of HtmlContainer</li>
+  <li>Added Util.parseFloat</li>
+</ul>
+
+<h2>API Changes</h2>
+<ul>
+  <li>[s4936] Changed visibility  of selectNext() and selectPrev() in ComboBox</li>
+  <li>Changed visibility of private tip member in Slider.</li>
+</ul>
+
+<h2>Bug Fixes</h2>
+<ul>
+  <li>[112514] Fixed problem with Paging-ComboBox-page-switching in IE and Chrome</li>
+  <li>[s4695]  Fixed problem with DatePicker ToolTip</li>
+  <li>[s4742]  Fixed problem with decimals in NumberField</li>
+  <li>Fixed problem with image paths in css</li>
+  <li>Fixed ColumnFooter not getting refreshed under all circumstances when required.</li>
+  <li>Fixed TreeGridView not working anymore correctly after a refresh</li>
+  <li>[s4044] Scroll Issue with RowEditor</li>
+  <li>[s4712] Text in ListViewDragSource moved to XMessages</li>
+  <li>Fixed BorderLayout expand not working correctly under all circumstances.</li>
+  <li>Fixed ToolBarLayout not showing all items when enough space is there under.</li>
+  <li>Fixed checkbox in FieldSet gets checked/unchecked also the BeforeExpand/BeforeCollapse event got cancelled.</li>
+  <li>Fixed Grid loosing column style of filtered columns when hiding any column.</li>
+  <li>Fixed AbstractGridFilters activating/deactivating the wrong filter under some circumstances.</li>
+  <li>Fixed SpinnerField not allowing copy & paste with keyboard under all circumstances.</li>
+  <li>Fixed possible NPE in GridSelectionModel onEditorKey.</li>
+  <li>Fixed GridView not showing dirty cells / invalid cells when using dataIndex in ColumnConfig</li>
+  <li>Button keeping focus style when the button is disabled.</li>
+  <li>Grid not restoring state if using loader with local sorting.</li>
+  <li>TreePanel.scrollIntoView not working properly.</li>
+  <li>ScriptTagProxy crashing in IE6 under come circumstances.</li>
+  <li>[s5124] Problem with cascading in checkbox tree.</li>
+  <li>Fixed EditorTreeGrid reconfigure not rebinding EditorSupport.</li>
+  <li>[145982] Popup show fires BeforeShowEvent twice.</li>
+  <li>[136179] IE9 is not changing cursor after using Draggable and Resizable.</li>
+  <li>ColumnHeader might crash IE6.</li>
+  <li>[127983] FileUploadField setValue(null) not working correctly.</li>
+  <li>[133684] ComboBox forceSelection not working if ComboBox was never expanded.</li>
+  <li>Fixed BufferView not setting unselectable correctly.</li>
+  <li>Fixed EditorSupport not always starting editing correctly.</li>
+  <li>Fixed several rendering issues with LiveGridView.</li>
+  <li>[121464] Fixed BaseNumericFilterConfig working differently than local number filter.</li>
+  <li>Fixed small issue with SummaryType.MIN and SummaryType.MAX.</li>
+  <li>Fixed several issues in RowEditor.</li>
+  <li>Fixed an issue with PagingToolBar when the active page does not exist anymore and a reload is required.</li>
+  <li>Fixed tabbing in EditorGrid does not work correctly under all circumstances.</li>
+  <li>Fixed Util.parseInt not always returning the correct value.</li>
+  <li>Fixed El getFrameSize, getFrameWidth, getBorderWidth, getMargins and getPadding could return the wrong values when zoomed in some browsers.</li>
+  <li>Fixed FileUploadField not opening file dialog on first click under all circumstances.</li>
+  <li>Fixed El getConstrainToXY not talking scrollbars on document level into account under all circumstances.</li>
+  <li>Fixed GXT init throwing a NullPointerException if configured theme cannot be found.</li>
+  <li>Fixed IE8/9 browser detection for intranet sites.</li>
+  <li>Fixed Slider sometimes shows two tooltips.</li>
+  <li>Fixed BorderLayout hide, show, collapse and expand do not work under all circumstances.</li> 
+  <li>Fixed QuickTip sometimes show up empty.</li>
+  <li>Fixed GridView showing empty column menu when all columns are fixed.</li>
+  <li>Fixed IE6 Rich Text Editor ToolBar hidden when editor not focused.</li>
+  <li>Fixed TreePanelDropTarget and TreeGridDropTarget not appending item if dropped on the widget directly.</li>
+  <li>Fixed null pointer in grid binding examples when clearing Change column.</li>
+  <li>Fixed service configuration for Mail demo.</li>
+</ul>
+
+
+<h2><a name="Release_2.2.4">Release 2.2.4 (Released May 25th, 2011)</a></h2>
+
+<h2>General Changes &amp; Enhancements</h2>
+
+<ul>
+  <li>Increased fields visibility in StartMenu to from private to protected.</li>
+  <li>Added support for GWT 2.3 and IE9.</li>
+</ul>  
+
+<h2>Bug Fixes</h2>
+<ul>
+  <li>Fixed ToolTip to call doAutoWidth on update</li>
+  <li>Changed GridSelectionModel to use selectNext and selectPrevious were applicable.</li>
+  <li>[s3996] Desktop StartMenu keyboard nav not working.</li>
+  <li>[s4114] Live Grid with aggregation rows issue.</li>
+  <li>[125051] Fixed vertical slider issue.</li>
+  <li>[128610] Fixed RowEditor focus issue with hidden columns</li>
+</ul>
+
+<h2><a name="Release_2.2.3">Release 2.2.3 (Released March 7th, 2011)</a></h2>
+
+<h2>General Changes &amp; Enhancements</h2>
+
+<ul>
+  <li>Added support for GWT 2.2.0 (GWT build was not binary compatible with previous releases)</li>
+  <li>Modified build to a single build with 3 jars for GWT 1.7,2.0, and 2.2.</li>
+</ul>
+
+<h2><a name="Release_2.2.2">Release 2.2.2 (Released February 9th, 2011)</a></h2>
+
+<h2>General Changes &amp; Enhancements</h2>
+<ul>
+  <li>Fixed deprecated compiler warnings when using GWT 2.1.1</li>
+</ul>
+
+<h2>API Changes</h2>
+<ul>
+  <li>Changed visibility from private to protected for drag source, drop target in DualListField.</li>
+  <li>Added getDragSourceFromField, getDragSourceToField, getDropTargetFromField, getDropTargetToField to DualListField.</li>
+  <li>Made DualListField buttons accessible to subclasses.</li>
+</ul>
+
+<h2>Bug Fixes</h2>
+<ul>
+  <li>Fixed Menu hiding automatically when scrolling inside menu.</li>
+  <li>Fixed ToolBarLayout not showing text of SplitButton in overflow menu.</li>
+  <li>Fixed ConcurrentModificationException in ChangeEventSupport notify.</li>
+  <li>Fixed ListView throwing an exception if rendered without store.</li>
+  <li>Fixed LiveGridView isCached returns true if cache is empty.</li>
+  <li>Fixed DatePicker ignoring startDay if startDay set to 0.</li>
+  <li>Fixed Chart gets not displayed if style of title not defined.</li>
+  <li>Fixed DateField not validating minValue and maxValue correctly.</li>
+  <li>Fixed GridView not constraining focus element on reconfigure.</li>
+  <li>Fixed AbstractGridFilters removeAll throwing a ConcurrentModificationException.</li>
+  <li>Fixed QuickTip not showing correct title under all circumstances.</li>
+  <li>Fixed QuickTip now showing at all under some circumstances.</li>
+  <li>Fixed CheckBox not showing boxlabel correctly under all circumstances.</li>
+  <li>Fixed MessageBoxEvent not holding the native browser event.</li>
+  <li>Fixed GridView widget rendering not working anymore after one refresh if reusing Widgets inside the GridCellRenderer.</li>
+  <li>Fixed CookieProvider clear and clearKey not working properly.</li>
+  <li>Fixed Layout trying to set margins on not yet rendered components.</li>
+  <li>[s3097] Holding the mouse down and dragging out of buttons can cause other content to be selected.</li>
+  <li>[s3769] TabItem moving out of when clicking with scrolling enabled in IE 7.</li>
+  <li>Fixed Grid column resizing not working when moving from right to left.</li>
+  <li>Fixed Grid not removing highlight style when selection removed.</li>
+  <li>Fixed ToolTip splitting text into 2 lines in some cases.</li>
+</ul>
+
 
 <h2><a name="Release_2.2.1">Release 2.2.1 (Released November 10th, 2010)</a></h2>
 

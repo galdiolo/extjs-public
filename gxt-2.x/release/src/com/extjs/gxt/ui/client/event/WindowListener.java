@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -42,7 +42,7 @@ public class WindowListener implements Listener<WindowEvent> {
   }
 
   /**
-   * Fires after the window is deactivate.
+   * Fires after the window is deactivated.
    * 
    * @param we the window event
    */

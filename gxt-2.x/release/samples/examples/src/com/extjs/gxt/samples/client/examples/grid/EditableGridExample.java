@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -40,7 +40,6 @@ import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Element;
-
 public class EditableGridExample extends LayoutContainer {
 
   @Override
@@ -121,7 +120,7 @@ public class EditableGridExample extends LayoutContainer {
     column.setHeader("Available");
     column.setWidth(95);
     column.setEditor(new CellEditor(dateField));
-    column.setDateTimeFormat(DateTimeFormat.getMediumDateFormat());
+    column.setDateTimeFormat(DateTimeFormat.getFormat("yyyy MMM dd"));
     configs.add(column);
 
     CheckColumnConfig checkColumn = new CheckColumnConfig("indoor", "Indoor?", 55);

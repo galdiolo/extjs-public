@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -77,7 +77,7 @@ import com.google.gwt.user.client.ui.Accessibility;
  * 
  * </dl>
  */
-
+@SuppressWarnings("deprecation")
 public class Button extends BoxComponent implements IconSupport {
 
   private static Template buttonTemplate;
@@ -111,6 +111,9 @@ public class Button extends BoxComponent implements IconSupport {
         return true;
       }
     };
+    // if the user holds down the mouse button on menu and split
+    // buttons, content on the page is selected
+    disableTextSelection(true);
   }
 
   /**
@@ -630,6 +633,7 @@ public class Button extends BoxComponent implements IconSupport {
       addStyleName(disabledStyle);
     }
     removeStyleName(baseStyle + "-over");
+    removeStyleName(baseStyle + "-focus");
     el().disable();
     buttonEl.dom.setAttribute("aria-disabled", "true");
   }

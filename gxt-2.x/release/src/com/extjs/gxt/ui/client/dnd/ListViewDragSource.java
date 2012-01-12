@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -38,7 +38,7 @@ public class ListViewDragSource extends DragSource {
   public ListViewDragSource(ListView listView) {
     super(listView);
     this.listView = listView;
-    setStatusText("{0} items selected");
+    setStatusText(GXT.MESSAGES.listField_itemsSelected());
     
     listView.addListener(Events.OnMouseDown, new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent be) {

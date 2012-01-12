@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -9,6 +9,7 @@ package com.extjs.gxt.ui.client.widget.layout;
 
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.Component;
@@ -89,7 +90,7 @@ public class RowLayout extends Layout {
   protected void layoutHorizontal(El target) {
     Size size = target.getStyleSize();
 
-    int w = size.width - (adjustForScroll ? 19 : 0);
+    int w = size.width - (adjustForScroll ? XDOM.getScrollBarWidth() : 0);
     int h = size.height;
     int pw = w;
 
@@ -99,9 +100,9 @@ public class RowLayout extends Layout {
     // so we need to make 2 passes
     for (int i = 0; i < count; i++) {
       Component c = container.getItem(i);
-      if(!c.isVisible(false)){
-        continue;
-      }
+      // if(!c.isVisible(false)){
+      // continue;
+      // }
       c.el().makePositionable(true);
       c.el().setStyleAttribute("margin", "0px");
 
@@ -133,9 +134,9 @@ public class RowLayout extends Layout {
 
     for (int i = 0; i < count; i++) {
       Component c = container.getItem(i);
-      if(!c.isVisible(false)){
-        continue;
-      }
+      // if(!c.isVisible(false)){
+      // continue;
+      // }
       RowData data = null;
       LayoutData d = getLayoutData(c);
       if (d != null && d instanceof RowData) {
@@ -186,7 +187,7 @@ public class RowLayout extends Layout {
   protected void layoutVertical(El target) {
     Size size = target.getStyleSize();
 
-    int w = size.width - (adjustForScroll ? 19 : 0);
+    int w = size.width - (adjustForScroll ? XDOM.getScrollBarWidth() : 0);
     int h = size.height;
     int ph = h;
 
@@ -196,9 +197,9 @@ public class RowLayout extends Layout {
     // so we need to make 2 passes
     for (int i = 0; i < count; i++) {
       Component c = container.getItem(i);
-      if(!c.isVisible(false)){
-        continue;
-      }
+      // if(!c.isVisible(false)){
+      // continue;
+      // }
       RowData data = null;
       LayoutData d = getLayoutData(c);
       if (d != null && d instanceof RowData) {
@@ -222,9 +223,9 @@ public class RowLayout extends Layout {
 
     for (int i = 0; i < count; i++) {
       Component c = container.getItem(i);
-      if(!c.isVisible(false)){
-        continue;
-      }
+      // if(!c.isVisible(false)){
+      // continue;
+      // }
       RowData data = null;
       LayoutData d = getLayoutData(c);
       if (d != null && d instanceof RowData) {

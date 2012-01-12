@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -10,7 +10,6 @@ package com.extjs.gxt.ui.client.widget.treegrid;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.GridEvent;
-import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.widget.grid.CellEditor;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
@@ -108,7 +107,7 @@ public class EditorTreeGrid<M extends ModelData> extends TreeGrid<M> {
   }
 
   @Override
-  public void reconfigure(ListStore<M> store, ColumnModel cm) {
+  public void reconfigure(TreeStore<M> store, ColumnModel cm) {
     super.reconfigure(store, cm);
     editSupport.bind(this);
   }

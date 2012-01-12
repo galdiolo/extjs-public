@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -132,6 +132,7 @@ public class Tip extends ContentPanel {
     }
     setPagePosition(p.x + XDOM.getBodyScrollLeft(), p.y + XDOM.getBodyScrollTop());
     setStyleAttribute("visibility", "visible");
+    sync(true);
   }
 
   /**
@@ -150,7 +151,8 @@ public class Tip extends ContentPanel {
       if (getHeading() != null) {
         bw = Math.max(bw, head.el().child("span").getTextWidth());
       }
-      bw += getFrameWidth() + (closable ? 20 : 0) + fly(body).getPadding("lr");
+      // added 2px adjustment to stop word wrap
+      bw += getFrameWidth() + (closable ? 20 : 2) + fly(body).getPadding("lr");
 
       setWidth(Util.constrain(bw, minWidth, maxWidth));
     }

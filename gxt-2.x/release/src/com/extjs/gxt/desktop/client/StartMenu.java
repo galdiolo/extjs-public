@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -29,11 +29,11 @@ import com.google.gwt.user.client.Event;
  */
 public class StartMenu extends Menu {
 
-  private El header, headerText, menuBWrap, menuPanel, toolsPanel;;
-  private String heading;
-  private String iconStyle;
-  private List<Item> tools = new ArrayList<Item>();
-  private int toolWidth = 100;
+  protected El header, headerText, menuBWrap, menuPanel, toolsPanel;;
+  protected String heading;
+  protected String iconStyle;
+  protected List<Item> tools = new ArrayList<Item>();
+  protected int toolWidth = 100;
 
   public StartMenu() {
     addStyleName("ux-start-menu");
@@ -53,7 +53,7 @@ public class StartMenu extends Menu {
   }
 
   /**
-   * Adds a seperator to the "too" area.
+   * Adds a separator to the "too" area.
    */
   public void addToolSeperator() {
     SeparatorMenuItem sep = new SeparatorMenuItem();
@@ -196,9 +196,12 @@ public class StartMenu extends Menu {
     for (Item tool : tools) {
       renderTool(tool);
     }
+    
+    el().setTabIndex(0);
+    el().setElementAttribute("hideFocus", "true");
 
     eventPreview.getIgnoreList().add(getElement());
-    sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS | Event.KEYEVENTS);
+    sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS | Event.KEYEVENTS | Event.FOCUSEVENTS);
     el().addStyleName("x-ignore");
   }
 

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -276,7 +276,7 @@ class Ext {
        var trimRe = /^\s+|\s+$/g;
        var tplRe = /\{(\d+)\}/g;
        var modeRe = /^(\s?[\/>+~]\s?|\s|$)/;
-       var tagTokenRe = /^(#)?([\w-\*]+)/;
+       var tagTokenRe = /^(#)?([\-\w\*]+)/;
        var nthRe = /(\d*)n\+?(\d*)/, nthRe2 = /\D/;
        var document = $doc;
        function child(p, index) {
@@ -1440,7 +1440,7 @@ class Ext {
 
     Ext.extend(Ext.XTemplate, Ext.Template, {
      // private
-     re : /\{([\w-\.\#]+)(?:\:([\w\.]*)(?:\((.*?)?\))?)?(\s?[\+\-\*\\]\s?[\d\.\+\-\*\\\(\)]+)?\}/g,
+     re : /\{([\w\-\.\#]+)(?:\:([\w\.]*)(?:\((.*?)?\))?)?(\s?[\+\-\*\\]\s?[\d\.\+\-\*\\\(\)]+)?\}/g,
      // private
      codeRe : /\{\[((?:\\\]|.|\n)*?)\]\}/g,
 

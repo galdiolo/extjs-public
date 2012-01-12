@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -89,7 +89,7 @@ public class AggregationGridExample extends LayoutContainer {
 
     column = new ColumnConfig("date", "Last Updated", 100);
     column.setAlignment(HorizontalAlignment.RIGHT);
-    column.setDateTimeFormat(DateTimeFormat.getShortDateFormat());
+    column.setDateTimeFormat(DateTimeFormat.getFormat("MM/dd/yyyy"));
     configs.add(column);
 
     final ListStore<Stock> store = new ListStore<Stock>();

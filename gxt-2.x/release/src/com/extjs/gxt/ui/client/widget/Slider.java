@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -82,22 +82,22 @@ public class Slider extends BoxComponent {
 
   }
 
+  protected El innerEl;
+  protected El targetEl;
+  protected Tip tip;
+  protected boolean vertical;
   private boolean clickToChange = true;
   private Draggable drag;
   private boolean draggable = true;
   private El endEl;
   private int halfThumb;
   private int increment = 10;
-  protected El innerEl;
   private int maxValue = 100;
   private String message = "{0}";
   private int minValue = 0;
   private Thumb thumb;
-  private Tip tip;
   private boolean useTip = true;
   private int value = 0;
-  protected boolean vertical;
-  protected El targetEl;
 
   /**
    * Creates a new slider.
@@ -479,6 +479,7 @@ public class Slider extends BoxComponent {
     thumb.el().removeStyleName("x-slider-thumb-drag");
     if (useTip) {
       tip.hide();
+      thumb.getToolTip().enable();
     }
   }
 
@@ -496,6 +497,7 @@ public class Slider extends BoxComponent {
     thumb.el().addStyleName("x-slider-thumb-drag");
     thumb.el().setStyleAttribute("position", "");
     if (useTip) {
+      thumb.getToolTip().disable();
       thumb.getToolTip().hide();
       updateTip();
     }
@@ -624,7 +626,7 @@ public class Slider extends BoxComponent {
   protected int reverseValue(int pos) {
     double ratio = getRatio();
     if (vertical) {
-      return (int) ((minValue + innerEl.getHeight() - pos) / ratio);
+      return (int) (((minValue*ratio) + innerEl.getHeight() - pos) / ratio);
     } else {
       return (int) ((pos + halfThumb + (minValue * ratio)) / ratio);
     }

@@ -1,11 +1,4 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-/*
  * Ext JS Library 2.1
  * Copyright(c) 2006-2008, Ext JS, LLC.
  * licensing@extjs.com
@@ -242,15 +235,15 @@ html,body {
 }
 
 .add {
-  background-image: url(../../shared/icons/fam/add.gif) !important;
+  background-image: url(../images/add.gif) !important;
 }
 
 .option {
-  background-image: url(../../shared/icons/fam/plugin.gif) !important;
+  background-image: url(../images/plugin.gif) !important;
 }
 
 .remove {
-  background-image: url(../../shared/icons/fam/delete.gif) !important;
+  background-image: url(../images/delete.gif) !important;
 }
 
 .tabs {

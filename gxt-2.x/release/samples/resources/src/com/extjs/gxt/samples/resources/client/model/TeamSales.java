@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -24,15 +24,15 @@ public class TeamSales extends BaseModel {
   }
 
   public int getAlphaSales() {
-    return (Integer) get("alphasales");
+    return get("alphasales") == null ? 0 : (Integer) get("alphasales");
   }
 
   public int getBetaSales() {
-    return (Integer) get("betasales");
+    return get("betasales") == null ? 0 : (Integer) get("betasales");
   }
 
   public int getGammaSales() {
-    return (Integer) get("gammasales");
+    return get("gammasales") == null ? 0 : (Integer) get("gammasales");
   }
 
   public String getMonth() {
@@ -54,11 +54,8 @@ public class TeamSales extends BaseModel {
   }
 
   public void setAvgSales() {
-    if (get("alphasales") != null && get("gammasales") != null
-        && get("betasales") != null) {
-      double avg = (getAlphaSales() + getBetaSales() + getGammaSales()) / 3.0;
-      set("avgsales", avg);
-    }
+    double avg = (getAlphaSales() + getBetaSales() + getGammaSales()) / 3.0;
+    set("avgsales", avg);
   }
 
   public void setBetaSales(int sales) {

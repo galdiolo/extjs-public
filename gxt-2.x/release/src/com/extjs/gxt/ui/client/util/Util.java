@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -26,19 +26,6 @@ import com.google.gwt.user.client.Element;
  * Various utility functions.
  */
 public class Util {
-
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  public static List subList(List list, int start, int end) {
-    List temp = new ArrayList();
-    for (int i = start; i < end; i++) {
-      temp.add(list.get(i));
-    }
-    return temp;
-  }
-
-  public static native <E> E or(E s1, E s2) /*-{
-    return s1 || s2;
-  }-*/;
 
   /**
    * Constrains the value by a minimum and max value.
@@ -155,62 +142,6 @@ public class Util {
     return jsObj.getJsObject();
   }
 
-  @SuppressWarnings("rawtypes")
-  private static void internalProcessObject(JsObject jsObj, int maxDepth, Object value, String key) {
-    if (value instanceof Collection) {
-      jsObj.set(key, processArray(((Collection) value).toArray(), maxDepth - 1).getJsObject());
-    } else if (value instanceof Object[]) {
-      jsObj.set(key, processArray((Object[]) value, maxDepth - 1).getJsObject());
-    } else if (value instanceof ModelData) {
-      jsObj.set(key, getJsObject((ModelData) value, maxDepth - 1));
-    } else if (value instanceof Map<?, ?>) {
-      jsObj.set(key, processMap((Map) value, maxDepth - 1).getJsObject());
-    } else {
-      jsObj.set(key, value);
-    }
-  }
-
-  @SuppressWarnings("rawtypes")
-  private static void internalProcessArray(JsArray jsArray, int maxDepth, Object value) {
-    if (value instanceof ModelData) {
-      jsArray.add(getJsObject((ModelData) value, maxDepth - 1));
-    } else if (value instanceof Collection) {
-      jsArray.add(processArray(((Collection) value).toArray(), maxDepth - 1).getJsObject());
-    } else if (value instanceof Object[]) {
-      jsArray.add(processArray((Object[]) value, maxDepth - 1).getJsObject());
-    } else if (value instanceof Map) {
-      jsArray.add(processMap((Map) value, maxDepth - 1).getJsObject());
-    } else {
-      jsArray.add(value);
-    }
-  }
-
-  private static JsArray processMap(Map<?, ?> map, int maxDepth) {
-    JsArray jsArray = new JsArray();
-    if (maxDepth > 0) {
-      for (Entry<?, ?> o : map.entrySet()) {
-        JsObject jsObj = new JsObject();
-        internalProcessObject(jsObj, maxDepth, o.getKey(), "key");
-        internalProcessObject(jsObj, maxDepth, o.getValue(), "value");
-        jsArray.add(jsObj.getJsObject());
-      }
-    }
-    return jsArray;
-  }
-
-  /**
-   * Iterates down into Object[], producing the required JsArray
-   */
-  private static JsArray processArray(Object[] c, int maxDepth) {
-    JsArray jsArray = new JsArray();
-    if (maxDepth > 0) {
-      for (Object obj : c) {
-        internalProcessArray(jsArray, maxDepth, obj);
-      }
-    }
-    return jsArray;
-  }
-
   /**
    * Returns the list of models as a javascript array.
    * 
@@ -277,9 +208,34 @@ public class Util {
     }
   }
 
-  public static native int parseInt(String value, int defaultValue) /*-{
-    return parseInt(value, 10) || defaultValue;
+  public static native <E> E or(E s1, E s2) /*-{
+		return s1 || s2;
   }-*/;
+
+  public static native float parseFloat(String value, float defaultValue) /*-{
+		var n = parseFloat(value, 10);
+		if (n === 0) {
+			return 0;
+		}
+		return n || defaultValue;
+  }-*/;
+
+  public static native int parseInt(String value, int defaultValue) /*-{
+		var n = parseInt(value, 10);
+		if (n === 0) {
+			return 0;
+		}
+		return n || defaultValue;
+  }-*/;
+
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  public static List subList(List list, int start, int end) {
+    List temp = new ArrayList();
+    for (int i = start; i < end; i++) {
+      temp.add(list.get(i));
+    }
+    return temp;
+  }
 
   public static Element[] toElementArray(NodeList<Element> nodes) {
     Element[] e = new Element[nodes.getLength()];
@@ -287,6 +243,62 @@ public class Util {
       e[i] = nodes.getItem(i);
     }
     return e;
+  }
+
+  @SuppressWarnings("rawtypes")
+  private static void internalProcessArray(JsArray jsArray, int maxDepth, Object value) {
+    if (value instanceof ModelData) {
+      jsArray.add(getJsObject((ModelData) value, maxDepth - 1));
+    } else if (value instanceof Collection) {
+      jsArray.add(processArray(((Collection) value).toArray(), maxDepth - 1).getJsObject());
+    } else if (value instanceof Object[]) {
+      jsArray.add(processArray((Object[]) value, maxDepth - 1).getJsObject());
+    } else if (value instanceof Map) {
+      jsArray.add(processMap((Map) value, maxDepth - 1).getJsObject());
+    } else {
+      jsArray.add(value);
+    }
+  }
+
+  @SuppressWarnings("rawtypes")
+  private static void internalProcessObject(JsObject jsObj, int maxDepth, Object value, String key) {
+    if (value instanceof Collection) {
+      jsObj.set(key, processArray(((Collection) value).toArray(), maxDepth - 1).getJsObject());
+    } else if (value instanceof Object[]) {
+      jsObj.set(key, processArray((Object[]) value, maxDepth - 1).getJsObject());
+    } else if (value instanceof ModelData) {
+      jsObj.set(key, getJsObject((ModelData) value, maxDepth - 1));
+    } else if (value instanceof Map<?, ?>) {
+      jsObj.set(key, processMap((Map) value, maxDepth - 1).getJsObject());
+    } else {
+      jsObj.set(key, value);
+    }
+  }
+
+  /**
+   * Iterates down into Object[], producing the required JsArray
+   */
+  private static JsArray processArray(Object[] c, int maxDepth) {
+    JsArray jsArray = new JsArray();
+    if (maxDepth > 0) {
+      for (Object obj : c) {
+        internalProcessArray(jsArray, maxDepth, obj);
+      }
+    }
+    return jsArray;
+  }
+
+  private static JsArray processMap(Map<?, ?> map, int maxDepth) {
+    JsArray jsArray = new JsArray();
+    if (maxDepth > 0) {
+      for (Entry<?, ?> o : map.entrySet()) {
+        JsObject jsObj = new JsObject();
+        internalProcessObject(jsObj, maxDepth, o.getKey(), "key");
+        internalProcessObject(jsObj, maxDepth, o.getValue(), "value");
+        jsArray.add(jsObj.getJsObject());
+      }
+    }
+    return jsArray;
   }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -161,7 +161,7 @@ public class TreePanelView<M extends ModelData> {
       sb.append("<img src=\"");
       sb.append(GXT.BLANK_IMAGE_URL);
       sb.append("\" style=\"height: 18px; width: ");
-      sb.append(level * getIndenting(tree.findNode((M) m)));
+      sb.append(level * getIndenting(findNode((M) m)));
       sb.append("px;\" />");
       sb.append(jointElement == null ? "<img src=\"" + GXT.BLANK_IMAGE_URL
           + "\" style=\"width: 16px\" class=\"x-tree3-node-joint\" />" : DOM.toString(jointElement));
@@ -202,7 +202,7 @@ public class TreePanelView<M extends ModelData> {
   }
 
   public boolean isSelectableTarget(M m, Element target) {
-    TreeNode n = tree.findNode(m);
+    TreeNode n = findNode(m);
     if (n == null) {
       return false;
     }
@@ -218,7 +218,7 @@ public class TreePanelView<M extends ModelData> {
     }
     return isNotJointTarget;
   }
-
+  
   public void onCheckChange(TreeNode node, boolean checkable, boolean check) {
     Element checkEl = (Element) getCheckElement(node);
     if (checkEl != null) {
@@ -318,7 +318,7 @@ public class TreePanelView<M extends ModelData> {
     if (select) {
       tree.setExpanded(treeStore.getParent(model), true);
     }
-    TreeNode node = tree.findNode(model);
+    TreeNode node = findNode(model);
     if (node != null) {
       Element e = getElementContainer(node);
       if (e != null) {
@@ -348,6 +348,10 @@ public class TreePanelView<M extends ModelData> {
 
   public void setScrollDelay(int scrollDelay) {
     this.scrollDelay = scrollDelay;
+  }
+
+  protected TreeNode findNode(M m){
+    return tree.findNode(m);
   }
 
   protected int getCalculatedRowHeight() {

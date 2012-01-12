@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -22,19 +22,23 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.Timer;
 
+@SuppressWarnings("deprecation")
 public class EditorSupport<M extends ModelData> {
 
-  protected Grid<M> grid;
-  protected ListStore<M> store;
-  protected ColumnModel cm;
   protected CellEditor activeEditor;
-  protected Listener<DomEvent> editorListener;
   protected Record activeRecord;
-  protected boolean editing;
-  protected boolean ignoreScroll;
   protected ClicksToEdit clicksToEdit = ClicksToEdit.ONE;
+  protected ColumnModel cm;
+  protected boolean editing;
+  protected Listener<DomEvent> editorListener;
+  protected Grid<M> grid;
   protected Listener<GridEvent<M>> gridListener;
+  protected boolean ignoreScroll;
+  protected ListStore<M> store;
+
+  private Timer startEditTimer;
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   public void bind(Grid grid) {
@@ -132,13 +136,21 @@ public class EditorSupport<M extends ModelData> {
       e.setColIndex(col);
       e.setValue(m.get(field));
       if (grid.fireEvent(Events.BeforeEdit, e)) {
+        ignoreScroll = true;
         grid.getView().ensureVisible(row, col, false);
 
-        DeferredCommand.addCommand(new Command() {
-          public void execute() {
+        // required because of triggerfields
+        startEditTimer = new Timer() {
+
+          @Override
+          public void run() {
+            startEditTimer = null;
             deferStartEditing(m, field, row, col);
+
           }
-        });
+        };
+        startEditTimer.schedule(10);
+
       }
     }
   }
@@ -160,6 +172,11 @@ public class EditorSupport<M extends ModelData> {
         activeEditor.completeEdit();
       }
     }
+    if (startEditTimer != null) {
+      startEditTimer.cancel();
+      startEditTimer = null;
+    }
+    ignoreScroll = false;
   }
 
   protected void deferStartEditing(M m, String field, int row, int col) {
@@ -196,7 +213,7 @@ public class EditorSupport<M extends ModelData> {
     activeEditor = ed;
     // when inserting the editor into the last row, the body is
     // scrolling and edit is being cancelled
-    ignoreScroll = true;
+
     ed.startEdit((Element) grid.getView().getCell(row, col), m.get(field));
     DeferredCommand.addCommand(new Command() {
       public void execute() {

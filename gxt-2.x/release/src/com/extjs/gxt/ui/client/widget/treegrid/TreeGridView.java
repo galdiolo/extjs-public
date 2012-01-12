@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -79,7 +79,7 @@ public class TreeGridView extends BufferView {
     }
 
     for (ModelData child : children) {
-      TreeNode cn = tree.findNode(child);
+      TreeNode cn = findNode(child);
       if (cn.isExpanded()) {
         expand(cn);
       }
@@ -106,7 +106,7 @@ public class TreeGridView extends BufferView {
     }
     return node.joint;
   }
-  
+
   public String getTemplate(ModelData m, String id, String text, AbstractImagePrototype icon, boolean checkable,
       Joint joint, int level) {
 
@@ -145,7 +145,7 @@ public class TreeGridView extends BufferView {
     sb.append("<img src=\"");
     sb.append(GXT.BLANK_IMAGE_URL);
     sb.append("\" style=\"height: 18px; width: ");
-    sb.append(level * getIndenting(tree.findNode(m)));
+    sb.append(level * getIndenting(findNode(m)));
     sb.append("px;\" />");
     sb.append(jointElement == null ? "<img src=\"" + GXT.BLANK_IMAGE_URL
         + "\" style=\"width: 16px\" class=\"x-tree3-node-joint\" />" : DOM.toString(jointElement));
@@ -202,12 +202,12 @@ public class TreeGridView extends BufferView {
     sb.append("</td><td><img src=\"");
     sb.append(GXT.BLANK_IMAGE_URL);
     sb.append("\" style=\"height: 18px; width: ");
-    sb.append(level * getIndenting(tree.findNode(m)));
+    sb.append(level * getIndenting(findNode(m)));
     sb.append("px;\" /></td><td  class='x-tree3-el-jnt'>");
-    
+
     sb.append(jointElement == null ? "<img src=\"" + GXT.BLANK_IMAGE_URL
         + "\" style=\"width: 16px\" class=\"x-tree3-node-joint\" />" : DOM.toString(jointElement));
-    
+
     if (checkable) {
       Element e = (Element) GXT.IMAGES.unchecked().createElement().cast();
       El.fly(e).addStyleName("x-tree3-node-check");
@@ -215,9 +215,9 @@ public class TreeGridView extends BufferView {
     } else {
       sb.append("<span class=\"x-tree3-node-check\"></span>");
     }
-    
+
     sb.append("</td><td>");
-    
+
     if (icon != null) {
       Element e = icon.createElement().cast();
       El.fly(e).addStyleName("x-tree3-node-icon");
@@ -225,7 +225,7 @@ public class TreeGridView extends BufferView {
     } else {
       sb.append("<span class=\"x-tree3-node-icon\"></span>");
     }
-    
+
     sb.append("</td><td>");
     sb.append("<span unselectable=\"on\" class=\"x-tree3-node-text\">");
     sb.append(text);
@@ -239,7 +239,7 @@ public class TreeGridView extends BufferView {
   }
 
   public boolean isSelectableTarget(ModelData model, Element target) {
-    TreeNode node = tree.findNode(model);
+    TreeNode node = findNode(model);
     if (node != null) {
 
       Element j = getJointElement(node);
@@ -248,6 +248,18 @@ public class TreeGridView extends BufferView {
       }
     }
     return true;
+  }
+
+  @Override
+  public void refresh(boolean headerToo) {
+    if (grid != null && grid.isViewReady()) {
+      for (Object node : tree.nodes.values()) {
+        if (node instanceof TreeNode) {
+          ((TreeNode) node).clearElements();
+        }
+      }
+    }
+    super.refresh(headerToo);
   }
 
   public void onIconStyleChange(TreeNode node, AbstractImagePrototype icon) {
@@ -304,7 +316,7 @@ public class TreeGridView extends BufferView {
 
   @Override
   protected void cleanModel(ModelData at) {
-    TreeNode node = tree.findNode(at);
+    TreeNode node = findNode(at);
     if (node != null) {
       node.clearElements();
     }
@@ -313,6 +325,10 @@ public class TreeGridView extends BufferView {
   @Override
   protected void doSort(int colIndex, SortDir sortDir) {
     treeStore.sort(cm.getDataIndex(colIndex), sortDir);
+  }
+
+  protected TreeNode findNode(ModelData m) {
+    return tree.findNode(m);
   }
 
   protected int getIndenting(TreeNode node) {
@@ -379,7 +395,7 @@ public class TreeGridView extends BufferView {
       Element cell = (Element) getCell(row, col);
       if (cell != null) {
         cell = El.fly(cell).selectNode(".x-tree3-node-text").dom;
-        cell.setAttribute(GXT.isIE ? "className" : "class", "x-tree3-node-text x-tree3-node-text-widget");
+        cell.setClassName("x-tree3-node-text x-tree3-node-text-widget");
         cell.getParentElement().getStyle().setProperty("padding", "2px 0px 2px 4px");
         return cell;
       }
@@ -433,7 +449,7 @@ public class TreeGridView extends BufferView {
   @Override
   protected void onRemove(ListStore<ModelData> ds, ModelData m, int index, boolean isUpdate) {
     super.onRemove(ds, m, index, isUpdate);
-    TreeNode node = tree.findNode(m);
+    TreeNode node = findNode(m);
     if (node != null) {
       node.clearElements();
     }

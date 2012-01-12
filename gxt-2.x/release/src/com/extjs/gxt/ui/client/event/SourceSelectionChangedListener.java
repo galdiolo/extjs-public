@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -18,6 +18,7 @@ import com.google.gwt.user.client.DeferredCommand;
  * events. Useful when registering the provider with the
  * <code>SelectionService</code>.
  */
+@SuppressWarnings("deprecation")
 public class SourceSelectionChangedListener extends SelectionChangedListener<ModelData> {
   private SelectionProvider<? extends ModelData> provider;
 

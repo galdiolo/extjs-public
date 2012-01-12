@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -155,7 +155,6 @@ public class Menu extends Container<Component> {
   private int scrollIncrement = 24;
   private int scrollerHeight = 8;
   private int activeMax;
-  private boolean hasScrollers;
 
   /**
    * Creates a new menu.
@@ -172,16 +171,8 @@ public class Menu extends Container<Component> {
     eventPreview = new BaseEventPreview() {
 
       @Override
-      protected boolean onAutoHide(PreviewEvent pe) {
-        return Menu.this.onAutoHide(pe);
-      }
-
-      @Override
       protected boolean onPreview(PreviewEvent pe) {
-        int type = pe.getEventTypeInt();
-        if (type == Event.ONSCROLL || type == Event.ONMOUSEWHEEL && !hasScrollers) {
-          Menu.this.hide(true);
-        }
+        Menu.this.onAutoHide(pe);
         return super.onPreview(pe);
       }
 
@@ -191,6 +182,7 @@ public class Menu extends Container<Component> {
         onEscape(pe);
       }
     };
+    eventPreview.setAutoHide(false);
   }
 
   /**
@@ -585,6 +577,61 @@ public class Menu extends Container<Component> {
     }
   }
 
+  @Override
+  protected void afterRender() {
+    super.afterRender();
+
+    keyNav = new KeyNav<ComponentEvent>(this) {
+      public void onDown(ComponentEvent ce) {
+        onKeyDown(ce);
+      }
+
+      public void onEnter(ComponentEvent be) {
+        if (activeItem != null) {
+          be.cancelBubble();
+          activeItem.onClick(be);
+        }
+      }
+
+      public void onLeft(ComponentEvent be) {
+        hide();
+        if (parentItem != null) {
+          parentItem.parentMenu.focus();
+          if (GXT.isFocusManagerEnabled()) {
+            FocusFrame.get().frame(parentItem);
+          }
+        } else {
+          Menu menu = Menu.this;
+          while (menu.parentItem != null) {
+            menu = menu.parentItem.parentMenu;
+          }
+          menu.fireEvent(Events.Minimize);
+        }
+      }
+
+      public void onRight(ComponentEvent be) {
+        if (activeItem != null) {
+          activeItem.expandMenu(true);
+        }
+        if (activeItem instanceof MenuItem) {
+          MenuItem mi = (MenuItem) activeItem;
+          if (mi.subMenu != null && mi.subMenu.isVisible()) {
+            return;
+          }
+        }
+        Menu menu = Menu.this;
+        while (menu.parentItem != null) {
+          menu = menu.parentItem.parentMenu;
+        }
+        menu.fireEvent(Events.Maximize);
+      }
+
+      public void onUp(ComponentEvent ce) {
+        onKeyUp(ce);
+      }
+    };
+  }
+
   protected void constrainScroll(int y) {
     int full = ul.setHeight("auto").getHeight();
 
@@ -620,8 +667,6 @@ public class Menu extends Container<Component> {
           onScroll(be);
         }
       };
-
-      hasScrollers = true;
 
       El scroller;
 
@@ -666,7 +711,8 @@ public class Menu extends Container<Component> {
   }
 
   protected boolean onAutoHide(PreviewEvent pe) {
-    if (pe.getEventTypeInt() == Event.ONMOUSEDOWN
+    if ((pe.getEventTypeInt() == Event.ONMOUSEDOWN || pe.getEventTypeInt() == Event.ONMOUSEWHEEL
+        || pe.getEventTypeInt() == Event.ONSCROLL || pe.getEventTypeInt() == Event.ONKEYPRESS)
         && !(pe.within(getElement()) || (fly(pe.getTarget()).findParent(".x-ignore", -1) != null))) {
       MenuEvent me = new MenuEvent(this);
       me.setEvent(pe.getEvent());
@@ -736,6 +782,16 @@ public class Menu extends Container<Component> {
     doAutoSize();
   }
 
+  protected void onMouseMove(ComponentEvent ce) {
+    Component c = findItem(ce.getTarget());
+    if (c != null && c instanceof Item) {
+      Item item = (Item) c;
+      if (activeItem != item && item.canActivate && item.isEnabled()) {
+        setActiveItem(item, true);
+      }
+    }
+  }
+
   protected void onMouseOut(ComponentEvent ce) {
     EventTarget to = ce.getEvent().getRelatedEventTarget();
     if (activeItem != null
@@ -758,16 +814,6 @@ public class Menu extends Container<Component> {
     }
   }
 
-  protected void onMouseMove(ComponentEvent ce) {
-    Component c = findItem(ce.getTarget());
-    if (c != null && c instanceof Item) {
-      Item item = (Item) c;
-      if (activeItem != item && item.canActivate && item.isEnabled()) {
-        setActiveItem(item, true);
-      }
-    }
-  }
-
   @Override
   protected void onRemove(Component item) {
     super.onRemove(item);
@@ -781,56 +827,6 @@ public class Menu extends Container<Component> {
     setElement(DOM.createDiv(), target, index);
     el().makePositionable(true);
     super.onRender(target, index);
-
-    keyNav = new KeyNav<ComponentEvent>(this) {
-      public void onDown(ComponentEvent ce) {
-        onKeyDown(ce);
-      }
-
-      public void onEnter(ComponentEvent be) {
-        if (activeItem != null) {
-          be.cancelBubble();
-          activeItem.onClick(be);
-        }
-      }
-
-      public void onLeft(ComponentEvent be) {
-        hide();
-        if (parentItem != null) {
-          parentItem.parentMenu.focus();
-          if (GXT.isFocusManagerEnabled()) {
-            FocusFrame.get().frame(parentItem);
-          }
-        } else {
-          Menu menu = Menu.this;
-          while (menu.parentItem != null) {
-            menu = menu.parentItem.parentMenu;
-          }
-          menu.fireEvent(Events.Minimize);
-        }
-      }
-
-      public void onRight(ComponentEvent be) {
-        if (activeItem != null) {
-          activeItem.expandMenu(true);
-        }
-        if (activeItem instanceof MenuItem) {
-          MenuItem mi = (MenuItem) activeItem;
-          if (mi.subMenu != null && mi.subMenu.isVisible()) {
-            return;
-          }
-        }
-        Menu menu = Menu.this;
-        while (menu.parentItem != null) {
-          menu = menu.parentItem.parentMenu;
-        }
-        menu.fireEvent(Events.Maximize);
-      }
-
-      public void onUp(ComponentEvent ce) {
-        onKeyUp(ce);
-      }
-    };
 
     ul = new El(DOM.createDiv());
     ul.addStyleName(baseStyle + "-list");

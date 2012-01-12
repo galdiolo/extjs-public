@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -10,7 +10,9 @@ package com.extjs.gxt.ui.client.widget.grid;
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.core.El;
+import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.data.ModelKeyProvider;
 import com.extjs.gxt.ui.client.data.PagingLoadResult;
 import com.extjs.gxt.ui.client.data.PagingLoader;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -19,16 +21,20 @@ import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.LiveGridEvent;
 import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.store.Record;
 import com.extjs.gxt.ui.client.store.StoreEvent;
 import com.extjs.gxt.ui.client.store.StoreListener;
 import com.extjs.gxt.ui.client.util.DelayedTask;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Event;
 
 /**
  * LiveGridView for displaying large amount of data. Data is loaded on demand as
  * the user scrolls the grid.
  */
+@SuppressWarnings("deprecation")
 public class LiveGridView extends GridView {
 
   protected El liveScroller;
@@ -38,6 +44,7 @@ public class LiveGridView extends GridView {
   protected int viewIndex;
 
   private int cacheSize = 200;
+  private boolean ignoreScroll;
   private boolean isLoading;
   // to prevent flickering
   private boolean isMasked;
@@ -102,7 +109,7 @@ public class LiveGridView extends GridView {
     super.handleComponentEvent(ge);
     int type = ge.getEventTypeInt();
     Element target = ge.getTarget();
-    if ((type == Event.ONSCROLL && liveScroller.dom.isOrHasChild(target))
+    if (!ignoreScroll && (type == Event.ONSCROLL && liveScroller.dom.isOrHasChild(target))
         || (type == Event.ONMOUSEWHEEL && mainBody.dom.isOrHasChild(target))) {
       ge.stopEvent();
       if (type == Event.ONMOUSEWHEEL) {
@@ -118,6 +125,7 @@ public class LiveGridView extends GridView {
    * Refreshed the view. Reloads the store based on the current settings
    */
   public void refresh() {
+    maskView();
     loadLiveStore(liveStoreOffset);
   }
 
@@ -260,24 +268,33 @@ public class LiveGridView extends GridView {
               h = height / count;
 
               for (int i = 0; i < count; i++) {
-                sb.append("<div style=\"height:");
+                sb.append("<div style=\"width: ");
+                sb.append(XDOM.getScrollBarWidth());
+                sb.append("px; height:");
                 sb.append(h);
-                sb.append("px;\"></div>");
+                sb.append("px;\">&nbsp;</div>");
               }
             }
             int diff = height - count * h;
             if (diff != 0) {
-              sb.append("<div style=\"height:");
+              sb.append("<div style=\"width: ");
+              sb.append(XDOM.getScrollBarWidth());
+              sb.append("px; height:");
               sb.append(diff);
               sb.append("px;\"></div>");
             }
             liveScroller.setInnerHtml(sb.toString());
 
           }
-          if (viewIndexReload != -1 && !isCached(viewIndexReload)) {
+          if (totalCount > 0 && viewIndexReload != -1 && !isCached(viewIndexReload)) {
             loadLiveStore(getLiveStoreCalculatedIndex(viewIndexReload));
           } else {
             viewIndexReload = -1;
+            ignoreScroll = true;
+            int scrollTop = liveScroller.getScrollTop();
+            liveScroller.setScrollTop(scrollTop - 1);
+            liveScroller.setScrollTop(scrollTop);
+            ignoreScroll = false;
             updateRows(viewIndex, true);
             isLoading = false;
             if (isMasked) {
@@ -286,6 +303,10 @@ public class LiveGridView extends GridView {
             }
           }
 
+        }
+
+        public void storeUpdate(StoreEvent<ModelData> se) {
+          LiveGridView.this.ds.update(se.getModel());
         }
       };
     }
@@ -297,6 +318,21 @@ public class LiveGridView extends GridView {
       @Override
       public boolean equals(ModelData model1, ModelData model2) {
         return LiveGridView.this.liveStore.equals(model1, model2);
+      }
+
+      @Override
+      public ModelKeyProvider getKeyProvider() {
+        return LiveGridView.this.liveStore.getKeyProvider();
+      }
+
+      @Override
+      public Record getRecord(ModelData model) {
+        return LiveGridView.this.liveStore.getRecord(model);
+      }
+
+      @Override
+      public boolean hasRecord(ModelData model) {
+        return LiveGridView.this.liveStore.hasRecord(model);
       }
 
       @Override
@@ -312,14 +348,15 @@ public class LiveGridView extends GridView {
   }
 
   protected boolean isCached(int index) {
-    if ((index < liveStoreOffset) || (index > (liveStoreOffset + getCacheSize() - getVisibleRowCount()))) {
+    if ((liveStore.getCount() == 0 && totalCount > 0) || (index < liveStoreOffset)
+        || (index > (liveStoreOffset + getCacheSize() - getVisibleRowCount()))) {
       return false;
     }
     return true;
   }
 
   protected boolean isHorizontalScrollBarShowing() {
-    return cm.getTotalWidth() > scroller.getStyleWidth();
+    return cm.getTotalWidth() + getScrollAdjust() > scroller.dom.getOffsetWidth();
   }
 
   protected boolean loadLiveStore(int offset) {
@@ -343,21 +380,24 @@ public class LiveGridView extends GridView {
   @Override
   protected void notifyShow() {
     super.notifyShow();
-    updateRows(viewIndex, true);
+    updateRows((int) Math.ceil((double) liveScroller.getScrollTop() / getCalculatedRowHeight()), true);
   }
 
   @Override
-  protected void onColumnWidthChange(int column, int width) {
-    super.onColumnWidthChange(column, width);
-    updateRows(viewIndex, false);
+  protected void onRemove(ListStore<ModelData> ds, ModelData m, int index, boolean isUpdate) {
+    super.onRemove(ds, m, index, isUpdate);
+    if (!isUpdate && liveStore.hasRecord(m)) {
+      liveStore.getRecord(m).reject(false);
+    }
   }
 
   @Override
   protected void renderUI() {
     super.renderUI();
     scroller.setStyleAttribute("overflowY", "hidden");
-    liveScroller = grid.el().insertFirst("<div class=\"x-livegrid-scroller\"></div>");
-
+    liveScroller = grid.el().insertFirst(
+        "<div class=\"x-livegrid-scroller\"><div style=\"width: " + XDOM.getScrollBarWidth()
+            + "px;\">&nbsp;</div></div>");
     positionLiveScroller();
 
     liveScroller.addEventsSunk(Event.ONSCROLL);
@@ -366,19 +406,18 @@ public class LiveGridView extends GridView {
 
   @Override
   protected void resize() {
-    int oldCount = getVisibleRowCount();
+    final int oldCount = getVisibleRowCount();
     super.resize();
     if (mainBody != null) {
-      int h = grid.getHeight(true) - mainHd.getHeight(true);
-      if (isHorizontalScrollBarShowing()) {
-        h -= 19;
-      }
-      liveScroller.setHeight(h, true);
+      resizeLiveScroller();
       scroller.setWidth(grid.getWidth() - getScrollAdjust(), true);
-
-      if (oldCount != getVisibleRowCount()) {
-        updateRows(viewIndex, true);
-      }
+      DeferredCommand.addCommand(new Command() {
+        public void execute() {
+          if (oldCount != getVisibleRowCount()) {
+            updateRows(LiveGridView.this.viewIndex, true);
+          }
+        }
+      });
     }
   }
 
@@ -391,6 +430,27 @@ public class LiveGridView extends GridView {
       return true;
     }
     return false;
+  }
+
+  @Override
+  protected void updateAllColumnWidths() {
+    super.updateAllColumnWidths();
+    resizeLiveScroller();
+    updateRows(viewIndex, true);
+  }
+
+  @Override
+  protected void updateColumnHidden(int index, boolean hidden) {
+    super.updateColumnHidden(index, hidden);
+    resizeLiveScroller();
+    updateRows(viewIndex, true);
+  }
+
+  @Override
+  protected void updateColumnWidth(int col, int width) {
+    super.updateColumnWidth(col, width);
+    resizeLiveScroller();
+    updateRows(viewIndex, true);
   }
 
   @SuppressWarnings("unchecked")
@@ -412,10 +472,7 @@ public class LiveGridView extends GridView {
 
     // load data if not already cached
     if (!isCached(viewIndex)) {
-      if (!isMasked && grid.isLoadMask()) {
-        scroller.mask(GXT.MESSAGES.loadMask_msg());
-        isMasked = true;
-      }
+      maskView();
       if (loadLiveStore(getLiveStoreCalculatedIndex(viewIndex))) {
         viewIndexReload = viewIndex;
       }
@@ -448,14 +505,14 @@ public class LiveGridView extends GridView {
     if (diff > 0) {
       // rolling forward
       for (int c = 0; c < delta && c < count; c++) {
-        ds.remove(ds.getAt(0));
+        ds.remove(0);
       }
       count = ds.getCount();
       ds.add(liveStore.getRange(liveStoreIndex + count, liveStoreIndex + count + delta - 1));
     } else {
       // rolling back
       for (int c = 0; c < delta && c < count; c++) {
-        ds.remove(ds.getAt(ds.getCount() - 1));
+        ds.remove(count - c - 1);
       }
 
       ds.insert(liveStore.getRange(liveStoreIndex, liveStoreIndex + delta - 1), 0);
@@ -465,7 +522,26 @@ public class LiveGridView extends GridView {
     fireEvent(Events.LiveGridViewUpdate, event);
   }
 
+  private void maskView() {
+    if (!isMasked && grid.isLoadMask()) {
+      scroller.mask(GXT.MESSAGES.loadMask_msg());
+      isMasked = true;
+    }
+  }
+
   private void positionLiveScroller() {
     liveScroller.setTop(mainHd.getHeight());
+  }
+
+  private void resizeLiveScroller() {
+    int h = grid.getHeight(true) - mainHd.getHeight(true);
+    if (isHorizontalScrollBarShowing()) {
+      h -= XDOM.getScrollBarWidth();
+    }
+    if (footer != null) {
+      h -= footer.getHeight();
+    }
+    liveScroller.setHeight(h, true);
+
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -29,7 +29,6 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.fx.Draggable;
 import com.extjs.gxt.ui.client.util.Region;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
-import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.ComponentManager;
 import com.extjs.gxt.ui.client.widget.Html;
@@ -143,14 +142,13 @@ public class ColumnHeader extends BoxComponent {
 
       Style ss = getElement().getStyle();
 
-      if (x - r.left <= hw && before != -1 && cm.isResizable(activeHdIndex - before)
-          && cm.isFixed(activeHdIndex - before)) {
+      if (x - r.left <= hw && before != -1 && cm.isResizable(before) && !cm.isFixed(before)) {
         bar.el().setVisibility(true);
-        el().setX(r.left);
+        el().setX(r.left - (hw / 2));
         ss.setProperty("cursor", GXT.isSafari ? "e-resize" : "col-resize");
       } else if (r.right - x <= hw && cm.isResizable(activeHdIndex) && !cm.isFixed(activeHdIndex)) {
-        el().setX(r.right - (hw / 2));
         bar.el().setVisibility(true);
+        el().setX(r.right - (hw / 2));
         ss.setProperty("cursor", GXT.isSafari ? "w-resize" : "col-resize");
       } else {
         bar.el().setVisibility(false);
@@ -350,20 +348,9 @@ public class ColumnHeader extends BoxComponent {
 
       if (config.getWidget() != null) {
         Element span = Document.get().createSpanElement().cast();
-        getElement().appendChild(span);
-
         widget = config.getWidget();
-        if (widget instanceof Component) {
-          Component c = (Component) widget;
-          if (!c.isRendered()) {
-            c.render(span);
-          } else {
-            span.appendChild(c.getElement());
-          }
-
-        } else {
-          el().dom.appendChild(widget.getElement());
-        }
+        span.appendChild(widget.getElement());
+        getElement().appendChild(span);
       } else {
         text = new Html(config.getHeader());
         text.setTagName("span");

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -93,6 +93,7 @@ import com.google.gwt.user.client.Element;
  * 
  * @see Time
  */
+@SuppressWarnings("deprecation")
 public class TimeField extends ComboBox<Time> {
 
   /**
@@ -384,7 +385,6 @@ public class TimeField extends ComboBox<Time> {
     }
   }
 
-  @SuppressWarnings("deprecation")
   private Date resetDate(Date date) {
     return new DateWrapper(1970, 0, 1).clearTime().addHours(date.getHours()).addMinutes(date.getMinutes()).addSeconds(date.getSeconds()).asDate();
   }

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -15,6 +15,7 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Accessibility;
 
 /**
@@ -54,6 +55,7 @@ public class CheckBox extends Field<Boolean> {
   protected El wrap, input, boxLabelEl;
   private String boxLabel;
   private String valueAttribute;
+  private Timer t;
 
   public CheckBox() {
     setFireChangeEventOnSetValue(true);
@@ -127,10 +129,10 @@ public class CheckBox extends Field<Boolean> {
       value = false;
     }
     focusValue = value;
-    super.setValue(value);
     if (rendered) {
       ((InputElement) input.dom.cast()).setDefaultChecked(value);
     }
+    super.setValue(value);
   }
 
   /**
@@ -146,22 +148,42 @@ public class CheckBox extends Field<Boolean> {
   }
 
   protected void alignElements() {
-    if (boxLabel == null) {
-      input.alignTo(getElement(), "c-c", null);
-      if (GXT.isIE || GXT.isOpera) {
-        input.alignTo(getElement(), "c-c", null);
-      }
-    } else {
-      input.alignTo(getElement(), "l-l", new int[] {0, 0});
-      if (GXT.isIE || GXT.isOpera) {
-        input.alignTo(getElement(), "l-l", new int[] {0, 0});
-      }
-
-      boxLabelEl.alignTo(input.dom, "l-r", new int[] {5, GXT.isIE ? -1 : 0});
-      if (GXT.isIE || GXT.isOpera) {
-        boxLabelEl.alignTo(input.dom, "l-r", new int[] {5, GXT.isIE ? -1 : 0});
-      }
+    input.dom.getStyle().setProperty("left", "");
+    input.dom.getStyle().setProperty("top", "");
+    if (boxLabelEl != null) {
+      boxLabelEl.dom.getStyle().setProperty("left", "");
+      boxLabelEl.dom.getStyle().setProperty("top", "");
     }
+    if (t != null) {
+      t.cancel();
+      t = null;
+    }
+    t = new Timer() {
+
+      @Override
+      public void run() {
+        if (boxLabel == null) {
+          input.alignTo(getElement(), "c-c", null);
+          if (GXT.isIE || GXT.isOpera) {
+            input.alignTo(getElement(), "c-c", null);
+          }
+        } else {
+          input.alignTo(getElement(), "l-l", new int[] {0, 0});
+          if (GXT.isIE || GXT.isOpera) {
+            input.alignTo(getElement(), "l-l", new int[] {0, 0});
+          }
+
+          boxLabelEl.alignTo(input.dom, "l-r", new int[] {5, GXT.isIE ? -1 : 0});
+          if (GXT.isIE || GXT.isOpera) {
+            boxLabelEl.alignTo(input.dom, "l-r", new int[] {5, GXT.isIE ? -1 : 0});
+          }
+        }
+        el().repaint();
+        t = null;
+      }
+    };
+    t.schedule(1);
+
   }
 
   @Override

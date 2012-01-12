@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -10,8 +10,10 @@ package com.extjs.gxt.ui.client.widget.grid;
 import java.util.Map;
 
 import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.FastMap;
+import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -31,6 +33,7 @@ import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.ComponentManager;
 import com.extjs.gxt.ui.client.widget.ComponentPlugin;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
+import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.LabelField;
@@ -87,6 +90,7 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * @param <M> the model type
  */
+@SuppressWarnings("deprecation")
 public class RowEditor<M extends ModelData> extends ContentPanel implements ComponentPlugin {
   public class RowEditorMessages {
 
@@ -190,6 +194,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   private boolean monitorValid = true;
   private Record record;
   private ToolTip tooltip;
+  protected Html toolTipAlignWidget;
 
   public RowEditor() {
     super();
@@ -265,6 +270,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     grid.addListener(Events.BodyScroll, listener);
     grid.addListener(Events.Detach, listener);
     grid.addListener(Events.Reconfigure, listener);
+
     grid.getColumnModel().addListener(Events.HiddenChange, new Listener<ColumnModelEvent>() {
       public void handleEvent(ColumnModelEvent be) {
         verifyLayout(false);
@@ -568,7 +574,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
     });
     saveBtn.setMinWidth(getMinButtonWidth());
     btns.add(saveBtn);
-    
+
     cancelBtn.getFocusSupport().setNextId(saveBtn.getId());
     saveBtn.getFocusSupport().setPreviousId(cancelBtn.getId());
 
@@ -577,6 +583,14 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
 
     btns.getElement().removeAttribute("tabindex");
     btns.getFocusSupport().setIgnore(true);
+  }
+
+  protected void deferFocus(final int colIndex) {
+    DeferredCommand.addCommand(new Command() {
+      public void execute() {
+        doFocus(colIndex);
+      }
+    });
   }
 
   protected void deferFocus(final Point pt) {
@@ -591,12 +605,14 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   protected void doAttachChildren() {
     super.doAttachChildren();
     ComponentHelper.doAttach(btns);
+    ComponentHelper.doAttach(toolTipAlignWidget);
   }
 
   @Override
   protected void doDetachChildren() {
     super.doDetachChildren();
     ComponentHelper.doDetach(btns);
+    ComponentHelper.doDetach(toolTipAlignWidget);
   }
 
   protected void doFocus(Point pt) {
@@ -605,8 +621,16 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       if (pt != null) {
         index = getTargetColumnIndex(pt);
       }
+      if (index >= 0) {
+        doFocus(index);
+      }
+    }
+  }
+
+  protected void doFocus(int colIndex) {
+    if (isVisible()) {
       ColumnModel cm = this.grid.getColumnModel();
-      for (int i = index, len = cm.getColumnCount(); i < len; i++) {
+      for (int i = colIndex, len = cm.getColumnCount(); i < len && i >= 0; i++) {
         ColumnConfig c = cm.getColumn(i);
         if (!c.isHidden() && c.getEditor() != null) {
           c.getEditor().getField().focus();
@@ -657,18 +681,16 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   }
 
   protected int getTargetColumnIndex(Point pt) {
-    int x = pt.x;
-    int match = -1;
-    for (int i = 0; i < grid.getColumnModel().getColumnCount(); i++) {
+    for (int i = 0, j = 0; i < grid.getColumnModel().getColumnCount(); i++) {
       ColumnConfig c = grid.getColumnModel().getColumn(i);
       if (!c.isHidden()) {
-        if (El.fly(grid.getView().getHeaderCell(i)).getRegion().right >= x) {
-          match = i;
-          break;
+        if (El.fly(grid.getView().getHeaderCell(i)).getRegion().right >= pt.x) {
+          return j;
         }
+        j++;
       }
     }
-    return match;
+    return -1;
   }
 
   protected void hideTooltip() {
@@ -771,20 +793,22 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       createButtons();
       ComponentHelper.setParent(this, btns);
     }
+    toolTipAlignWidget = new Html();
+    toolTipAlignWidget.render(getElement("bwrap"), 0);
 
   }
 
   protected void onRowClick(GridEvent<M> e) {
     if (clicksToEdit != ClicksToEdit.TWO) {
       startEditing(e.getRowIndex(), false);
-      deferFocus(e.getXY());
+      deferFocus(e.getColIndex());
     }
   }
 
   protected void onRowDblClick(GridEvent<M> e) {
     if (clicksToEdit == ClicksToEdit.TWO) {
       startEditing(e.getRowIndex(), false);
-      deferFocus(e.getXY());
+      deferFocus(e.getColIndex());
     }
   }
 
@@ -806,15 +830,24 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   }
 
   protected void positionButtons() {
+
+    GridView view = grid.getView();
+    int scroll = view.getScrollState().x;
+    int mainBodyWidth = view.scroller.getWidth(true);
+    int h = el().getClientHeight();
     if (btns != null) {
-      int h = el().getClientHeight();
-      GridView view = grid.getView();
-      int scroll = view.getScrollState().x;
-      int mainBodyWidth = view.scroller.getWidth(true);
+
       int columnWidth = view.getTotalWidth();
       int width = columnWidth < mainBodyWidth ? columnWidth : mainBodyWidth;
+
       int bw = btns.getWidth(true);
       this.btns.setPosition((width / 2) - (bw / 2) + scroll, h - 2);
+    }
+
+    if (toolTipAlignWidget != null) {
+      toolTipAlignWidget.setStyleAttribute("position", "absolute");
+      toolTipAlignWidget.setSize(mainBodyWidth - (view.scroller.isScrollableY() ? XDOM.getScrollBarWidth() : 0), h);
+      toolTipAlignWidget.setPosition(scroll, Style.DEFAULT);
     }
   }
 
@@ -825,7 +858,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       config.setMouseOffset(new int[] {0, 0});
       config.setTitle(getMessages().getErrorTipTitleText());
       config.setAnchor("left");
-      tooltip = new ToolTip(this, config);
+      tooltip = new ToolTip(toolTipAlignWidget, config);
       tooltip.setMaxWidth(600);
     }
     ToolTipConfig config = tooltip.getToolTipConfig();
@@ -887,6 +920,6 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   }
 
   private native void clearParent(Widget parent) /*-{
-    parent.@com.google.gwt.user.client.ui.Widget::parent=null;
+		parent.@com.google.gwt.user.client.ui.Widget::parent = null;
   }-*/;
 }

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -48,7 +48,7 @@ public class ContextMenuTreePanelExample extends LayoutContainer {
     final TreePanel<ModelData> tree = new TreePanel<ModelData>(store);
     tree.setDisplayProperty("name");
     tree.getStyle().setLeafIcon(Resources.ICONS.music());
-    tree.setWidth(250);
+    tree.setWidth(260);
 
     Menu contextMenu = new Menu();
 

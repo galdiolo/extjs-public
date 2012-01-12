@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -26,6 +26,7 @@ import com.google.gwt.json.client.JSONValue;
  * Helper class to decode and encode objects to and from Json. Converter handles
  * simple data types (strings, numbers, booleans) and lists and maps.
  */
+@SuppressWarnings("deprecation")
 public class JsonConverter {
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -58,6 +58,7 @@ import com.google.gwt.user.client.ui.Accessibility;
  * 
  * @param <M> the model type
  */
+@SuppressWarnings("deprecation")
 public class TreeGrid<M extends ModelData> extends Grid<M> {
   public class TreeNode {
 

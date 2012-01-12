@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -34,7 +34,6 @@ import com.extjs.gxt.ui.client.widget.toolbar.PagingToolBar;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Element;
-
 public class MemoryPagingGridExample extends LayoutContainer {
 
   @Override
@@ -106,7 +105,7 @@ public class MemoryPagingGridExample extends LayoutContainer {
 
     column = new ColumnConfig("date", "Last Updated", 100);
     column.setAlignment(HorizontalAlignment.RIGHT);
-    column.setDateTimeFormat(DateTimeFormat.getShortDateFormat());
+    column.setDateTimeFormat(DateTimeFormat.getFormat("MM/dd/yyyy"));
     configs.add(column);
 
     ColumnModel cm = new ColumnModel(configs);

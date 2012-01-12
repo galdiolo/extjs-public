@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -147,6 +147,19 @@ public class FileUploadField extends TextField<String> {
           file.focus();
         }
         break;
+      case Event.ONMOUSEDOWN:
+        if (!hasFocus) {
+          focus();
+        }
+        break;
+    }
+  }
+
+  @Override
+  public void setValue(String value) {
+    super.setValue(value);
+    if (value == null) {
+      createFileInput();
     }
   }
 

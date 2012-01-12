@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -25,7 +25,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.GWT.UncaughtExceptionHandler;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 public class Explorer implements EntryPoint {
 
@@ -41,15 +40,9 @@ public class Explorer implements EntryPoint {
       });
     }
     ExampleServiceAsync service = (ExampleServiceAsync) GWT.create(ExampleService.class);
-    ServiceDefTarget endpoint = (ServiceDefTarget) service;
-    String moduleRelativeURL = Examples.SERVICE;
-    endpoint.setServiceEntryPoint(moduleRelativeURL);
     Registry.register(Examples.SERVICE, service);
 
     FileServiceAsync fileservice = (FileServiceAsync) GWT.create(FileService.class);
-    endpoint = (ServiceDefTarget) fileservice;
-    moduleRelativeURL = Examples.FILE_SERVICE;
-    endpoint.setServiceEntryPoint(moduleRelativeURL);
     Registry.register(Examples.FILE_SERVICE, fileservice);
 
     model = new ExplorerModel();

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -97,19 +97,7 @@ import com.google.gwt.user.client.ui.RootPanel;
  */
 public class Popup extends LayoutContainer {
 
-  private int yOffset = 15;
-  private int xOffset = 10;
-  private boolean animate;
-  private boolean autoFocus = true;
-  private boolean autoHide = true;
-  private boolean constrainViewport = true;
-  private String defaultAlign = "tl-bl?";
-
-  private Element alignElem;
-  private String alignPos;
-  private int[] alignOffsets;
-  private Point alignPoint;
-  private BaseEventPreview preview = new BaseEventPreview() {
+  protected BaseEventPreview preview = new BaseEventPreview() {
     @Override
     protected boolean onAutoHide(PreviewEvent ce) {
       if (Popup.this.onAutoHide(ce.getEvent())) {
@@ -120,6 +108,18 @@ public class Popup extends LayoutContainer {
     }
 
   };
+  private Element alignElem;
+  private int[] alignOffsets;
+  private Point alignPoint;
+  private String alignPos;
+  private boolean animate;
+  private boolean autoFocus = true;
+
+  private boolean autoHide = true;
+  private boolean constrainViewport = true;
+  private String defaultAlign = "tl-bl?";
+  private int xOffset = 10;
+  private int yOffset = 15;
 
   /**
    * Creates a new popup panel.
@@ -301,7 +301,6 @@ public class Popup extends LayoutContainer {
    * Displays the popup.
    */
   public void show() {
-    if (!fireEvent(Events.BeforeShow, new ComponentEvent(this))) return;
     Point p = new Point((int) Window.getClientWidth() / 2, (int) Window.getClientHeight() / 2);
     showAt(p.x, p.y);
   }

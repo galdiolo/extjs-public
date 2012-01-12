@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -431,6 +431,7 @@ public class MessageBox {
           if (ce instanceof WindowEvent) {
             WindowEvent we = (WindowEvent) ce;
             MessageBoxEvent e = new MessageBoxEvent(MessageBox.this, this, we.getButtonClicked());
+            e.setEvent(ce.getEvent());
             if (type == Events.Hide || type == Events.BeforeHide) {
               if (textBox != null) {
                 e.setValue(textBox.getValue());

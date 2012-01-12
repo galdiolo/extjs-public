@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -46,19 +46,24 @@ public class FxExample extends LayoutContainer {
     }));
     buttonBar.add(new Button("Move", new SelectionListener<ButtonEvent>() {
       public void componentSelected(ButtonEvent ce) {
-        Rectangle rect = cp.el().getBounds();
-        cp.el().setXY(rect.x + 50, rect.y + 50, FxConfig.NONE);
+        if (cp.isVisible()) {
+          Rectangle rect = cp.el().getBounds();
+          cp.el().setXY(rect.x + 50, rect.y + 50, FxConfig.NONE);
+        }
       }
     }));
 
     buttonBar.add(new Button("Blink", new SelectionListener<ButtonEvent>() {
       public void componentSelected(ButtonEvent ce) {
-        cp.el().blink(FxConfig.NONE);
+        if (cp.isVisible()) {
+          cp.el().blink(FxConfig.NONE);
+        }
       }
     }));
 
     buttonBar.add(new Button("Reset", new SelectionListener<ButtonEvent>() {
       public void componentSelected(ButtonEvent ce) {
+        cp.el().show();
         cp.setPosition(10, 10);
       }
     }));

@@ -1,10 +1,3 @@
-/*
- * Ext GWT 2.2.1 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
 html,body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,p,blockquote,th,td{margin:0;padding:0;}img,body,html{border:0;}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal;}ol,ul {list-style:none;}caption,th {text-align:left;}h1,h2,h3,h4,h5,h6{font-size:100%;}q:before,q:after{content:'';}
 .x-contrast-test {
   background: url(../images/default/s.gif);
@@ -1539,7 +1532,7 @@ fieldset.x-panel-collapsed .x-fieldset-bwrap {
 }
 
 /* make top of checkbox/tools visible in webkit */
-.ext-webkit .x-fieldset-header {
+.ext-webkit .x-fieldset-header, .ext-ie .x-fieldset-header {
   padding-top: 1px;
 }
 
@@ -2971,7 +2964,6 @@ a.x-grid3-hd-btn:hover {
   z-index: 1;
   position: absolute;
   right: 0px;
-  width: 18px;
   overflow-y: scroll;
   overflow-x: hidden;
 }
@@ -3457,6 +3449,10 @@ a.x-grid3-hd-btn:hover {
 	padding: 0 0 0 3px;
 	position: relative;
 	top: -4px;
+}
+
+.ext-ie9 .x-tree3-node-text-widget  {
+  display: block;	
 }
 
 .x-tree3-node-ct {

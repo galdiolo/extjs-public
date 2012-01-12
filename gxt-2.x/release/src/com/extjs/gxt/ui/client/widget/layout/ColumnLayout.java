@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -84,7 +84,7 @@ public class ColumnLayout extends Layout {
 
     Size size = target.getStyleSize();
 
-    int w = size.width - (adjustForScroll ? Math.max(19, XDOM.getScrollBarWidth()) : 0);
+    int w = size.width - (adjustForScroll ? XDOM.getScrollBarWidth() : 0);
     int pw = w;
 
     int count = container.getItemCount();

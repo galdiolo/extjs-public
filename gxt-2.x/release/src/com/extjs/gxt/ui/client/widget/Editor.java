@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -115,14 +115,17 @@ import com.google.gwt.user.client.ui.RootPanel;
  * <dd>Component SaveState</dd>
  * </dl>
  */
-@SuppressWarnings({"unchecked","rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class Editor extends BoxComponent {
 
   private String alignment = "c-c";
   private boolean allowBlur;
   private AutoSizeMode autoSizeMode = AutoSizeMode.BOTH;
+
   private El boundEl;
+
   private boolean cancelOnEsc;
+
   private boolean completeOnEnter;
   private boolean constrain;
   private boolean editing;
@@ -169,6 +172,15 @@ public class Editor extends BoxComponent {
    */
   public String getAlignment() {
     return alignment;
+  }
+
+  /**
+   * Returns the auto size mode.
+   * 
+   * @return the autoSizeMode
+   */
+  public AutoSizeMode getAutoSizeMode() {
+    return autoSizeMode;
   }
 
   /**
@@ -310,6 +322,15 @@ public class Editor extends BoxComponent {
    */
   public void setAllowBlur(boolean allowBlur) {
     this.allowBlur = allowBlur;
+  }
+
+  /**
+   * Sets the mode the editor gets sized by (defaults to AutoSizeMode.BOTH).
+   * 
+   * @param autoSizeMode the autoSizeMode to set
+   */
+  public void setAutoSizeMode(AutoSizeMode autoSizeMode) {
+    this.autoSizeMode = autoSizeMode;
   }
 
   /**
@@ -544,8 +565,9 @@ public class Editor extends BoxComponent {
     setElement(DOM.createDiv(), target, index);
 
     setStyleName("x-editor");
+    addStyleName("x-ignore");
     el().makePositionable(true);
-    setStyleAttribute("overflow", GXT.isGecko && !GXT.isStrict? "auto" : "hidden");
+    setStyleAttribute("overflow", GXT.isGecko && !GXT.isStrict ? "auto" : "hidden");
 
     field.setMessageTarget("tooltip");
 

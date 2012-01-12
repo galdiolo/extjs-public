@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -96,6 +96,7 @@ import com.google.gwt.user.client.ui.impl.FormPanelImplHost;
  * <dd>Component SaveState</dd>
  * </dl>
  */
+@SuppressWarnings("deprecation")
 public class FormPanel extends ContentPanel implements FormPanelImplHost {
 
   /**

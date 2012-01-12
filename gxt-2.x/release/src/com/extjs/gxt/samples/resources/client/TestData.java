@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -375,7 +375,7 @@ public class TestData {
     states.add(new State("VA", "Virginia", "Mother of States"));
     states.add(new State("WA", "Washington", "Green Tree State"));
     states.add(new State("WV", "West Virginia", "Mountain State"));
-    states.add(new State("WI", "Wisconsin", "Americas Dairyland"));
+    states.add(new State("WI", "Wisconsin", "America's Dairyland"));
     states.add(new State("WY", "Wyoming", "Like No Place on Earth"));
     return states;
   }

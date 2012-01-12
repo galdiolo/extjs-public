@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -33,69 +33,30 @@ import com.google.gwt.user.client.ui.Accessibility;
 public class GXT {
 
   /**
+   * URL to a 1x1 transparent gif image used by GXT to create inline icons with
+   * CSS background images. Default value is '/images/default/shared/clear.gif';
+   */
+  public static String BLANK_IMAGE_URL;
+
+  /**
    * GXT images.
    */
   public static XImages IMAGES = (XImages) GWT.create(XImages.class);
 
   /**
-   * GXT messages.
+   * <code>true</code> if is air.
    */
-  public static XMessages MESSAGES = (XMessages) GWT.create(XMessages.class);
+  public static boolean isAir;
 
   /**
-   * <code>true</code> if the browser uses the webkit engine.
+   * <code>true</code> if is borderbox.
    */
-  public static boolean isWebKit;
-
-  /**
-   * <code>true</code> if the browser is safari.
-   */
-  public static boolean isSafari;
-
-  /**
-   * <code>true</code> if the browser is safari2.
-   */
-  public static boolean isSafari2;
-
-  /**
-   * <code>true</code> if the browser is safari3.
-   */
-  public static boolean isSafari3;
-
-  /**
-   * <code>true</code> if the browser is safari4.
-   */
-  public static boolean isSafari4;
+  public static boolean isBorderBox;
 
   /**
    * <code>true</code> if the browser is chrome.
    */
   public static boolean isChrome;
-
-  /**
-   * <code>true</code> if the browser is opera.
-   */
-  public static boolean isOpera;
-
-  /**
-   * <code>true</code> if the browser is ie.
-   */
-  public static boolean isIE;
-
-  /**
-   * <code>true</code> if the browser is ie6.
-   */
-  public static boolean isIE6;
-
-  /**
-   * <code>true</code> if the browser is ie7.
-   */
-  public static boolean isIE7;
-
-  /**
-   * <code>true</code> if the browser is ie8.
-   */
-  public static boolean isIE8;
 
   /**
    * <code>true</code> if the browser is gecko.
@@ -118,19 +79,34 @@ public class GXT {
   public static boolean isGecko35;
 
   /**
-   * <code>true</code> if the browser is in strict mode.
+   * True if the OS high contrast mode is enabled.
    */
-  public static boolean isStrict;
+  public static boolean isHighContrastMode = false;
 
   /**
-   * <code>true</code> if using https.
+   * <code>true</code> if the browser is ie.
    */
-  public static boolean isSecure;
+  public static boolean isIE;
 
   /**
-   * <code>true</code> if mac os.
+   * <code>true</code> if the browser is ie6.
    */
-  public static boolean isMac;
+  public static boolean isIE6;
+
+  /**
+   * <code>true</code> if the browser is ie7.
+   */
+  public static boolean isIE7;
+
+  /**
+   * <code>true</code> if the browser is ie8.
+   */
+  public static boolean isIE8;
+
+  /**
+   * <code>true</code> if the browser is ie8.
+   */
+  public static boolean isIE9;
 
   /**
    * <code>true</code> if linux os.
@@ -138,24 +114,64 @@ public class GXT {
   public static boolean isLinux;
 
   /**
+   * <code>true</code> if mac os.
+   */
+  public static boolean isMac;
+
+  /**
+   * <code>true</code> if the browser is opera.
+   */
+  public static boolean isOpera;
+
+  /**
+   * <code>true</code> if the browser is safari.
+   */
+  public static boolean isSafari;
+
+  /**
+   * <code>true</code> if the browser is safari2.
+   */
+  public static boolean isSafari2;
+
+  /**
+   * <code>true</code> if the browser is safari3.
+   */
+  public static boolean isSafari3;
+
+  /**
+   * <code>true</code> if the browser is safari4.
+   */
+  public static boolean isSafari4;
+
+  /**
+   * <code>true</code> if using https.
+   */
+  public static boolean isSecure;
+
+  /**
+   * <code>true</code> if the browser is in strict mode.
+   */
+  public static boolean isStrict;
+
+  /**
+   * <code>true</code> if the browser uses the webkit engine.
+   */
+  public static boolean isWebKit;
+
+  /**
    * <code>true</code> if windows os.
    */
   public static boolean isWindows;
 
   /**
-   * <code>true</code> if is air.
+   * GXT messages.
    */
-  public static boolean isAir;
+  public static XMessages MESSAGES = (XMessages) GWT.create(XMessages.class);
 
   /**
-   * <code>true</code> if is borderbox.
+   * Path to GXT resources (defaults to 'gxt').
    */
-  public static boolean isBorderBox;
-
-  /**
-   * <code>true</code> if the browser uses shims.
-   */
-  public static boolean useShims;
+  public static String RESOURCES_URL = "gxt";
 
   /**
    * URL to a blank file used by GXT when in secure mode for iframe src to
@@ -164,26 +180,15 @@ public class GXT {
   public static String SSL_SECURE_URL = GWT.getModuleBaseURL() + "blank.html";
 
   /**
-   * URL to a 1x1 transparent gif image used by GXT to create inline icons with
-   * CSS background images. Default value is '/images/default/shared/clear.gif';
+   * <code>true</code> if the browser uses shims.
    */
-  public static String BLANK_IMAGE_URL;
-  
-  /**
-   * Path to GXT resources (defaults to 'gxt').
-   */
-  public static String RESOURCES_URL = "gxt";
-
-  private static boolean initialized;
+  public static boolean useShims;
+  private static boolean ariaEnabled, focusManagerEnabled;
   private static Theme defaultTheme;
   private static boolean forceTheme;
-  private static Version version;
-  private static boolean ariaEnabled, focusManagerEnabled;
+  private static boolean initialized;
 
-  /**
-   * True if the OS high contrast mode is enabled.
-   */
-  public static boolean isHighContrastMode = false;
+  private static Version version;
 
   /**
    * Returns the auto id prefix.
@@ -213,7 +218,7 @@ public class GXT {
    * @return the user agent
    */
   public native static String getUserAgent() /*-{
-    return $wnd.navigator.userAgent.toLowerCase();
+		return $wnd.navigator.userAgent.toLowerCase();
   }-*/;
 
   /**
@@ -227,7 +232,7 @@ public class GXT {
     }
     return version;
   }
-  
+
   /**
    * Hides the loading panel.
    * 
@@ -254,7 +259,7 @@ public class GXT {
       return;
     }
     initialized = true;
-    
+
     Element div = DOM.createDiv();
     div.setClassName("x-contrast-test");
     XDOM.getBody().appendChild(div);
@@ -265,12 +270,21 @@ public class GXT {
     XDOM.getBody().removeChild(div);
 
     String ua = getUserAgent();
+    System.out.println(ua);
 
     isOpera = ua.indexOf("opera") != -1;
+
     isIE = !isOpera && ua.indexOf("msie") != -1;
-    isIE7 = !isOpera && ua.indexOf("msie 7") != -1;
-    isIE8 = !isOpera && ua.indexOf("msie 8") != -1;
-    isIE6 = isIE && !isIE7 && !isIE8;
+    if (!isOpera && isIE) {
+      if (getDocumentMode() >= 9) {
+        isIE9 = true;
+      } else if (getDocumentMode() == 8) {
+        isIE8 = true;
+      } else {
+        isIE6 = !isOpera && ua.indexOf("msie 6") != -1;
+        isIE7 = !isOpera && ua.indexOf("msie 7") != -1;
+      }
+    }
 
     isChrome = !isIE && ua.indexOf("chrome") != -1;
 
@@ -286,7 +300,7 @@ public class GXT {
     isGecko35 = isGecko && ua.indexOf("rv:1.9.1") != -1;
     isGecko3 = isGecko && ua.indexOf("rv:1.9.") != -1;
 
-    isGecko2 = isGecko && !isGecko3;
+    isGecko2 = isGecko && ua.indexOf("rv:1.8.") != -1;
 
     isWindows = (ua.indexOf("windows") != -1 || ua.indexOf("win32") != -1);
     isMac = (ua.indexOf("macintosh") != -1 || ua.indexOf("mac os x") != -1);
@@ -319,14 +333,15 @@ public class GXT {
 
     if (isIE) {
       bodyEl.addStyleName("ext-ie");
-      String cls = (isIE6 ? "ext-ie6" : (isIE7 ? "ext-ie7" : "ext-ie8"));
+      String cls = (isIE6 ? "ext-ie6" : (isIE7 ? "ext-ie7" : (isIE8 ? "ext-ie8" : (isIE9 ? "ext-ie9" : null))));
+
       bodyEl.addStyleName(cls);
       if (isIE7 && isIE8compatibility()) {
         bodyEl.addStyleName("ext-ie8-compatibility");
       }
     } else if (isGecko) {
       bodyEl.addStyleName("ext-gecko");
-      String cls = (isGecko2 ? "ext-gecko2" : "ext-gecko3");
+      String cls = (isGecko2 ? "ext-gecko2" : (isGecko3 ? "ext-gecko3" : null));
       bodyEl.addStyleName(cls);
     } else if (isOpera) {
       bodyEl.addStyleName("ext-opera");
@@ -355,16 +370,16 @@ public class GXT {
       theme = defaultTheme.asMap();
     }
     if (theme != null) {
-      final String themeId = theme.get("id").toString();
-      String fileName = theme.get("file").toString();
-      if (!fileName.contains("gxt-all.css")) {
-        CSS.addStyleSheet(themeId, fileName);
-      }
-      bodyEl.addStyleName("x-theme-" + themeId);
-
+      final String themeId = String.valueOf(theme.get("id"));
       Theme t = ThemeManager.findTheme(themeId);
-      t.init();
-
+      if (t != null) {
+        t.init();
+        String fileName = theme.get("file").toString();
+        if (!fileName.contains("gxt-all.css")) {
+          CSS.addStyleSheet(themeId, fileName);
+        }
+        bodyEl.addStyleName("x-theme-" + themeId);
+      }
       StateManager.get().set(GWT.getModuleBaseURL() + "theme", theme);
     }
 
@@ -389,7 +404,7 @@ public class GXT {
   public static boolean isAriaEnabled() {
     return ariaEnabled;
   }
-  
+
   /**
    * Returns the focus managed enabled state.
    * 
@@ -400,7 +415,8 @@ public class GXT {
   }
 
   /**
-   * True to enable ARIA functionality. Enabling ARIA will also cause the focus manager to enabled.
+   * True to enable ARIA functionality. Enabling ARIA will also cause the focus
+   * manager to enabled.
    * 
    * @param enable true to enable
    */
@@ -408,20 +424,6 @@ public class GXT {
     ariaEnabled = enable;
     Accessibility.setRole(XDOM.getBody(), enable ? "application" : "");
     setFocusManagerEnabled(enable);
-  }
-  
-  /**
-   * True to enable the focus manager.
-   * 
-   * @param enable true to enable
-   */
-  public static void setFocusManagerEnabled(boolean enable) {
-    focusManagerEnabled = enable;
-    if (enable) {
-      FocusManager.get().enable();
-    } else {
-      FocusManager.get().disable();
-    }
   }
 
   /**
@@ -448,6 +450,20 @@ public class GXT {
   }
 
   /**
+   * True to enable the focus manager.
+   * 
+   * @param enable true to enable
+   */
+  public static void setFocusManagerEnabled(boolean enable) {
+    focusManagerEnabled = enable;
+    if (enable) {
+      FocusManager.get().enable();
+    } else {
+      FocusManager.get().disable();
+    }
+  }
+
+  /**
    * Changes the theme. A theme's stylehseets should be given a class = to the
    * theme id. Any stylesheets that have a class that do not match the id be
    * removed (stylesheets with no class specified are ignored). The method will
@@ -460,19 +476,24 @@ public class GXT {
     XDOM.reload();
   }
 
+  private static native int getDocumentMode() /*-{
+		return $doc.documentMode || -1
+  }-*/;
+
   private native static boolean isIE8compatibility() /*-{
-    if(@com.extjs.gxt.ui.client.GXT::isIE7){
-    if($doc.documentMode){
-    return true;
-    }
-    }
-    return false;
+		if (@com.extjs.gxt.ui.client.GXT::isIE7) {
+			if ($doc.documentMode) {
+				return true;
+			}
+		}
+		return false;
   }-*/;
 
   private native static void removeBackgroundFlicker() /*-{
-    try{
-    $doc.execCommand("BackgroundImageCache", false, true);
-    }catch(e){}
+		try {
+			$doc.execCommand("BackgroundImageCache", false, true);
+		} catch (e) {
+		}
   }-*/;
 
 }

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -12,6 +12,7 @@ import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Element;
 
 public class ToolTipsExample extends LayoutContainer {
@@ -57,7 +58,7 @@ public class ToolTipsExample extends LayoutContainer {
     config.setTitle("Template Tip");
     config.setMouseOffset(new int[] {0, 0});
     config.setAnchor("left");
-    config.setTemplate(new Template(getTemplate()));
+    config.setTemplate(new Template(getTemplate(GWT.getHostPageBaseURL())));
     config.setCloseable(true);
     config.setMaxWidth(415);
     btn.setToolTip(config);
@@ -66,7 +67,7 @@ public class ToolTipsExample extends LayoutContainer {
     add(hp);
   }
 
-  private native String getTemplate() /*-{
+  private native String getTemplate(String base) /*-{
     var html = [
     '<div><ul style="list-style: disc; margin: 0px 0px 5px 15px">',
     '<li>5 bedrooms</li>',
@@ -74,7 +75,7 @@ public class ToolTipsExample extends LayoutContainer {
     '<li>Large backyard</li>',
     '<li>Close to metro</li>',
     '</ul>',
-    '<img width="400" height="300" src="../../samples/images/examples/house.jpg" style="border: 1px solid #ddd">',
+    '<img width="400" height="300" src="' + base + 'samples/images/examples/house.jpg" style="border: 1px solid #ddd">',
     '</div>'
     ];
     return html.join("");

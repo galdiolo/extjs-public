@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -56,7 +56,7 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Image;
-
+@SuppressWarnings("deprecation")
 public class ImageChooserExample extends LayoutContainer {
 
   private ListStore<BeanModel> store;
@@ -173,7 +173,7 @@ public class ImageChooserExample extends LayoutContainer {
         model.set("shortName", Format.ellipse(photo.getName(), 15));
         model.set("sizeString", NumberFormat.getFormat("#0").format(size) + "k");
         model.set("dateString", DateTimeFormat.getMediumDateTimeFormat().format(photo.getDate()));
-        model.set("path", GWT.getHostPageBaseURL() + photo.getPath());
+        model.set("modPath", GWT.getHostPageBaseURL() + photo.getPath());
         return model;
       }
     };
@@ -242,7 +242,7 @@ public class ImageChooserExample extends LayoutContainer {
   private native String getTemplate() /*-{
     return ['<tpl for=".">',
     '<div class="thumb-wrap" id="{name}" style="border: 1px solid white">',
-    '<div class="thumb"><img src="{path}" title="{name}"></div>',
+    '<div class="thumb"><img src="{modPath}" title="{name}"></div>',
     '<span class="x-editable">{shortName}</span></div>',
     '</tpl>',
     '<div class="x-clear"></div>'].join("");
@@ -251,7 +251,7 @@ public class ImageChooserExample extends LayoutContainer {
   public native String getDetailTemplate() /*-{
     return ['<div class="details">',
     '<tpl for=".">',
-    '<img src="{path}"><div class="details-info">',
+    '<img src="{modPath}"><div class="details-info">',
     '<b>Image Name:</b>',
     '<span>{name}</span>',
     '<b>Size:</b>',

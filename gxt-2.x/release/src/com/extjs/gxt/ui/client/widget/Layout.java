@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -318,7 +318,7 @@ public abstract class Layout extends BaseObservable {
     renderAll(container, target);
     for (Component component : container.getItems()) {
       LayoutData data = getLayoutData(component);
-      if (data != null && data instanceof MarginData) {
+      if (data != null && data instanceof MarginData && component.isRendered()) {
         MarginData ld = (MarginData) data;
         applyMargins(component.el(), ld.getMargins());
       }

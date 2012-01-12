@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -37,7 +37,7 @@ public class OverviewPage extends LayoutContainer {
 
     StringBuffer sb = new StringBuffer();
     sb.append("<tpl for=\".\">");
-    sb.append("<div class='sample-box' style='padding-top: 4px'>");
+    sb.append("<div class='sample-box' style='padding-top: 4px;border: none'>");
     sb.append("<div class='thumbd'>{image}</div>");
     sb.append("<div>{name}</div>");
     sb.append("</div></tpl>");

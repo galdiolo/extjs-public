@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -34,7 +34,6 @@ import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.ui.RootPanel;
 
 public class Examples implements EntryPoint {
@@ -62,15 +61,9 @@ public class Examples implements EntryPoint {
       return;
     }
     ExampleServiceAsync service = (ExampleServiceAsync) GWT.create(ExampleService.class);
-    ServiceDefTarget endpoint = (ServiceDefTarget) service;
-    String moduleRelativeURL = SERVICE;
-    endpoint.setServiceEntryPoint(moduleRelativeURL);
     Registry.register(SERVICE, service);
 
     FileServiceAsync fileservice = (FileServiceAsync) GWT.create(FileService.class);
-    endpoint = (ServiceDefTarget) fileservice;
-    moduleRelativeURL = FILE_SERVICE;
-    endpoint.setServiceEntryPoint(moduleRelativeURL);
     Registry.register(FILE_SERVICE, fileservice);
 
     Map<String, Entry> examples = new FastMap<Entry>();

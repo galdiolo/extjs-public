@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -139,9 +139,7 @@ public class ToolBarLayout extends Layout {
       item.setEnabled(c.isEnabled());
       item.setItemId(c.getItemId());
       if (sb.getData("gxt-menutext") != null) {
-        item.setText((String) sb.getData("gxt-menutext"));
-      } else {
-        item.setText("&nbsp;");
+        item.setText(sb.getData("gxt-menutext").toString());
       }
       if (sb.getMenu() != null) {
         item.setSubMenu(sb.getMenu());
@@ -164,7 +162,7 @@ public class ToolBarLayout extends Layout {
       item.setItemId(c.getItemId());
 
       if (b.getData("gxt-menutext") != null) {
-        item.setText((String) b.getData("gxt-menutext"));
+        item.setText(b.getData("gxt-menutext").toString());
       }
       if (b.getMenu() != null) {
         item.setHideOnClick(false);
@@ -276,7 +274,7 @@ public class ToolBarLayout extends Layout {
 
   protected void hideComponent(Component c) {
     c.setData("xtbWidth", c.el().getParent().getWidth());
-    c.setData("xtbIsVisible", c.isVisible(false));
+    c.setData("xtbIsVisible", c.isRendered() && !c.el().isStyleAttribute("display", "none"));
     hiddens.add(c);
     c.hide();
   }

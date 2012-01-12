@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -935,6 +935,11 @@ public class HtmlEditor extends Field<String> {
   protected void onRender(Element target, int index) {
     setElement(DOM.createDiv(), target, index);
     addStyleName("x-html-editor-wrap");
+    
+    if (GXT.isIE6) {
+      getElement().getStyle().setProperty("position", "relative");
+    }
+ 
     rte = new rte();
 
     textarea = new El(DOM.createTextArea());

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -372,10 +372,10 @@ public class DateWrapper {
 
   /**
    * Returns a new instance with the time portion
-   * (hours/minutes/seconds/milliseconds) reseted to 12am. This keeps the date
+   * (hours/minutes/seconds/milliseconds) reseted to 12pm. This keeps the date
    * the same also during daylight saving times.
    * 
-   * @return a new instance with the time portion reseted to 12am
+   * @return a new instance with the time portion reseted to 12pm
    */
   public DateWrapper resetTime() {
     Date date = asDate();
@@ -384,7 +384,7 @@ public class DateWrapper {
     msec = (msec / 1000) * 1000;
     date.setTime(msec);
 
-    // reset time to 12am
+    // reset time to 12pm
     date.setHours(12);
     date.setMinutes(0);
     date.setSeconds(0);

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -207,7 +207,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
    * @return the count
    */
   public int getItemCount() {
-    return store.getCount();
+    return store == null ? 0 : store.getCount();
   }
 
   /**
@@ -406,7 +406,7 @@ public class ListView<M extends ModelData> extends BoxComponent {
     }
     el().setInnerHtml("");
     repaint();
-    List<M> models = store.getModels();
+    List<M> models = store == null ? new ArrayList<M>() : store.getModels();
     all.removeAll();
     template.overwrite(getElement(), Util.getJsObjects(collectData(models, 0), template.getMaxDepth()));
     all = new CompositeElement(Util.toElementArray(el().select(itemSelector)));
@@ -659,9 +659,9 @@ public class ListView<M extends ModelData> extends BoxComponent {
       NodeList<Element> nodes = bufferRender(models);
       Element[] elements = Util.toElementArray(nodes);
       all.insert(elements, index);
-      
+
       Element ref = index == 0 ? all.getElement(elements.length) : all.getElement(index - 1);
-      
+
       for (int i = elements.length - 1; i >= 0; i--) {
         Node n = ref.getParentNode();
         if (index == 0) {

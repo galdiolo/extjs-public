@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -42,7 +42,6 @@ import com.extjs.gxt.ui.client.widget.table.NumberCellRenderer;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Element;
-
 public class GridStoreBindingExample extends LayoutContainer {
 
   private FormBinding formBindings;
@@ -139,7 +138,10 @@ public class GridStoreBindingExample extends LayoutContainer {
 
       public String render(Stock model, String property, ColumnData config, int rowIndex,
           int colIndex, ListStore<Stock> store, Grid<Stock> grid) {
-        double val = (Double) model.get(property);
+        Double val = (Double) model.get(property);
+        if (val == null) {
+          val = 0d;
+        }
         String style = val < 0 ? "red" : "green";
         return "<span style='color:" + style + "'>" + number.format(val) + "</span>";
       }
@@ -181,7 +183,7 @@ public class GridStoreBindingExample extends LayoutContainer {
 
     column = new ColumnConfig("date", "Last Updated", 90);
     column.setAlignment(HorizontalAlignment.RIGHT);
-    column.setDateTimeFormat(DateTimeFormat.getShortDateFormat());
+    column.setDateTimeFormat(DateTimeFormat.getFormat("MM/dd/yyyy"));
     configs.add(column);
 
     ListStore<Stock> store = new ListStore<Stock>();

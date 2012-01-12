@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -196,6 +196,7 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * @see ComponentManager
  */
+@SuppressWarnings("deprecation")
 public abstract class Component extends Widget implements Observable {
 
   static {
@@ -1699,20 +1700,24 @@ public abstract class Component extends Widget implements Observable {
       disableTextSelection(disableTextSelection == 1);
     }
 
-    if (monitorWindowResize) {
-      if (windowResizeTask == null) {
-        windowResizeTask = new DelayedTask(new Listener<BaseEvent>() {
-          public void handleEvent(BaseEvent be) {
-            onWindowResize(Window.getClientWidth(), Window.getClientHeight());
+    DeferredCommand.addCommand(new Command() {
+      public void execute() {
+        if (monitorWindowResize && isAttached()) {
+          if (windowResizeTask == null) {
+            windowResizeTask = new DelayedTask(new Listener<BaseEvent>() {
+              public void handleEvent(BaseEvent be) {
+                onWindowResize(Window.getClientWidth(), Window.getClientHeight());
+              }
+            });
           }
-        });
-      }
-      resizeHandler = Window.addResizeHandler(new ResizeHandler() {
-        public void onResize(ResizeEvent event) {
-          windowResizeTask.delay(windowResizeDelay);
+          resizeHandler = Window.addResizeHandler(new ResizeHandler() {
+            public void onResize(ResizeEvent event) {
+              windowResizeTask.delay(windowResizeDelay);
+            }
+          });
         }
-      });
-    }
+      }
+    });
     fireEvent(Events.Attach);
     ComponentManager.get().register(this);
   }
@@ -1818,7 +1823,7 @@ public abstract class Component extends Widget implements Observable {
   }
 
   protected native void setParent(Widget parent) /*-{
-    this.@com.google.gwt.user.client.ui.Widget::parent=parent;
+		this.@com.google.gwt.user.client.ui.Widget::parent = parent;
   }-*/;
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -21,7 +21,6 @@ public class Text extends BaseModel {
    */
   public Text(String text) {
     setText(text);
-    setStyle(null);
   }
 
   /**
@@ -33,7 +32,9 @@ public class Text extends BaseModel {
    */
   public Text(String text, String style) {
     setText(text);
-    setStyle(style);
+    if (style != null) {
+      setStyle(style);
+    }
   }
 
   /**
@@ -51,7 +52,7 @@ public class Text extends BaseModel {
    * @return String text
    */
   public String getText() {
-    return (String)get("text");
+    return (String) get("text");
   }
 
   /**

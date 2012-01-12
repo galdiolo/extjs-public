@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -604,7 +604,10 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
   public void scrollIntoView(M model) {
     TreeNode node = findNode(model);
     if (node != null) {
-      node.getElement().scrollIntoView();
+      Element c = getView().getElementContainer(node);
+      if (c != null) {
+        c.scrollIntoView();
+      }
     }
   }
 
@@ -672,6 +675,7 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     TreeNode node = findNode(item);
     if (node != null) {
       if (node.checked == checked) {
+        onCheckCascade(item, checked);
         return;
       }
 
@@ -1069,6 +1073,23 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
       return true;
     }
     return false;
+  }
+
+  protected boolean isCheckable(TreeNode node) {
+    boolean leaf = node.isLeaf();
+    boolean check = checkable;
+    switch (checkNodes) {
+      case LEAF:
+        if (!leaf) {
+          check = false;
+        }
+        break;
+      case PARENT:
+        if (leaf) {
+          check = false;
+        }
+    }
+    return check;
   }
 
   @Override
@@ -1571,23 +1592,6 @@ public class TreePanel<M extends ModelData> extends BoxComponent implements Chec
     int first = Math.max(start, 0);
     int last = Math.min(start + count + 2, visible.size() - 1);
     return new int[] {first, last};
-  }
-
-  private boolean isCheckable(TreeNode node) {
-    boolean leaf = node.isLeaf();
-    boolean check = checkable;
-    switch (checkNodes) {
-      case LEAF:
-        if (!leaf) {
-          check = false;
-        }
-        break;
-      case PARENT:
-        if (leaf) {
-          check = false;
-        }
-    }
-    return check;
   }
 
   private boolean isRowRendered(int i, List<M> visible) {

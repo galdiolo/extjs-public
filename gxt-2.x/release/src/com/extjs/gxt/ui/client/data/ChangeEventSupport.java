@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -33,8 +33,10 @@ public class ChangeEventSupport implements ChangeEventSource {
 
   public void notify(ChangeEvent event) {
     if (!silent && listeners != null) {
-      for (int i = 0, len = listeners.size(); i< len; i++) {
-        ChangeListener listener = listeners.get(i);
+      //make a copy of it because of ConcurrentModificationException
+      List<ChangeListener> l = new ArrayList<ChangeListener>(listeners);
+      for (int i = 0, len = l.size(); i< len; i++) {
+        ChangeListener listener = l.get(i);
         listener.modelChanged(event);
       }
     }

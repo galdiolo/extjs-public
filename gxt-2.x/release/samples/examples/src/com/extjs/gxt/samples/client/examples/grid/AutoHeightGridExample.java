@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -138,7 +138,7 @@ public class AutoHeightGridExample extends LayoutContainer {
     column.setHeader("Available");
     column.setWidth(95);
     column.setEditor(new CellEditor(dateField));
-    column.setDateTimeFormat(DateTimeFormat.getMediumDateFormat());
+    column.setDateTimeFormat(DateTimeFormat.getFormat("MMM dd yyyy"));
     configs.add(column);
 
     CheckColumnConfig checkColumn = new CheckColumnConfig("indoor", "Indoor?", 55);

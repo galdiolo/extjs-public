@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -27,7 +27,9 @@ import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ComponentHelper;
 import com.extjs.gxt.ui.client.widget.Shim;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -57,8 +59,8 @@ import com.google.gwt.user.client.ui.RootPanel;
  * <dt><b>Events:</b></dt>
  * 
  * <dd><b>ResizeStart</b> : (source, widget, event) <br>
- * <div>Fires before a resize operation start. Listeners can cancel the action by
- * calling {@link BaseEvent#setCancelled(boolean)}.</div>
+ * <div>Fires before a resize operation start. Listeners can cancel the action
+ * by calling {@link BaseEvent#setCancelled(boolean)}.</div>
  * <ul>
  * <li>source : this</li>
  * <li>component : resize widget</li>
@@ -76,6 +78,7 @@ import com.google.gwt.user.client.ui.RootPanel;
  * </dd>
  * </dl>
  */
+@SuppressWarnings("deprecation")
 public class Resizable extends BaseObservable {
 
   protected enum Dir {
@@ -104,24 +107,24 @@ public class Resizable extends BaseObservable {
     }
   }
 
-  private Dir dir;
+  protected Dir dir;
+  protected boolean enabled = true;
+  protected List<ResizeHandle> handleList;
+  protected String handles;
+  protected BaseEventPreview preview;
+  protected El proxyEl;
+  protected BoxComponent resize;
+  protected Rectangle startBox;
+  protected Point startPoint;
   private boolean dynamic;
-  private boolean enabled = true;
-  private List<ResizeHandle> handleList;
-  private String handles;
   private Listener<ComponentEvent> listener;
   private int maxHeight = 2000;
   private int maxWidth = 2000;
   private int minHeight = 50;
   private int minWidth = 50;
   private boolean preserveRatio = false;
-  private BaseEventPreview preview;
-  private El proxyEl;
   private String proxyStyle = "x-resizable-proxy";
-  private BoxComponent resize;
   private boolean resizing;
-  private Rectangle startBox;
-  private Point startPoint;
 
   /**
    * Creates a new resizable instance with 8-way resizing.
@@ -374,88 +377,7 @@ public class Resizable extends BaseObservable {
     }
   }
 
-  protected Element createProxy() {
-    Element elem = DOM.createDiv();
-    El.fly(elem).setStyleName(proxyStyle, true);
-    El.fly(elem).disableTextSelection(true);
-    return elem;
-  }
-
-  protected void init() {
-    resize.el().makePositionable();
-    if (handleList == null) {
-      handleList = new ArrayList<ResizeHandle>();
-      if ("all".equals(handles)) {
-        handles = "n s e w ne nw se sw";
-      }
-      String[] temp = handles.split(" ");
-      for (int i = 0; i < temp.length; i++) {
-        if ("n".equals(temp[i])) {
-          create(Dir.N, "north");
-        } else if ("nw".equals(temp[i])) {
-          create(Dir.NW, "northwest");
-        } else if ("e".equals(temp[i])) {
-          create(Dir.E, "east");
-        } else if ("w".equals(temp[i])) {
-          create(Dir.W, "west");
-        } else if ("se".equals(temp[i])) {
-          create(Dir.SE, "southeast");
-        } else if ("s".equals(temp[i])) {
-          create(Dir.S, "south");
-        } else if ("ne".equals(temp[i])) {
-          create(Dir.NE, "northeast");
-        } else if ("sw".equals(temp[i])) {
-          create(Dir.SW, "southwest");
-        }
-      }
-
-      preview = new BaseEventPreview() {
-
-        @Override
-        public boolean onPreview(PreviewEvent event) {
-          event.preventDefault();
-          switch (event.getEventTypeInt()) {
-            case Event.ONMOUSEMOVE:
-              int x = event.getClientX();
-              int y = event.getClientY();
-              handleMouseMove(x, y);
-              break;
-            case Event.ONMOUSEUP:
-              handleMouseUp(event.getEvent());
-              break;
-          }
-          return true;
-        }
-
-      };
-      preview.setAutoHide(false);
-    }
-
-    syncHandleHeight();
-    setEnabled(enabled);
-  }
-
-  protected void onAttach() {
-    if (handleList != null) {
-      for (ResizeHandle handle : handleList) {
-        ComponentHelper.doAttach(handle);
-      }
-    }
-  }
-
-  protected void onComponentResize() {
-    syncHandleHeight();
-  }
-
-  protected void onDetach() {
-    if (handleList != null) {
-      for (ResizeHandle handle : handleList) {
-        ComponentHelper.doDetach(handle);
-      }
-    }
-  }
-
-  private int constrain(int v, int diff, int m, int mx) {
+  protected int constrain(int v, int diff, int m, int mx) {
     if (v - diff < m) {
       diff = v - m;
     } else if (v - diff > mx) {
@@ -464,7 +386,7 @@ public class Resizable extends BaseObservable {
     return diff;
   }
 
-  private ResizeHandle create(Dir dir, String cls) {
+  protected ResizeHandle create(Dir dir, String cls) {
     ResizeHandle rh = new ResizeHandle();
     rh.setStyleName("x-resizable-handle " + "x-resizable-handle-" + cls);
     rh.dir = dir;
@@ -473,7 +395,14 @@ public class Resizable extends BaseObservable {
     return rh;
   }
 
-  private void handleMouseDown(Event event, ResizeHandle handle) {
+  protected Element createProxy() {
+    Element elem = DOM.createDiv();
+    El.fly(elem).setStyleName(proxyStyle, true);
+    El.fly(elem).disableTextSelection(true);
+    return elem;
+  }
+
+  protected void handleMouseDown(Event event, ResizeHandle handle) {
     if (!enabled || !fireEvent(Events.ResizeStart, new ResizeEvent(this, resize, event))) {
       return;
     }
@@ -511,7 +440,7 @@ public class Resizable extends BaseObservable {
     Shim.get().setStyleAttribute("cursor", handle.el().getStyleAttribute("cursor"));
   }
 
-  private void handleMouseMove(int xin, int yin) {
+  protected void handleMouseMove(int xin, int yin) {
     if (resizing) {
       int x = startBox.x;
       int y = startBox.y;
@@ -644,7 +573,7 @@ public class Resizable extends BaseObservable {
     }
   }
 
-  private void handleMouseUp(Event event) {
+  protected void handleMouseUp(Event event) {
     resizing = false;
     preview.remove();
     Shim.get().uncover();
@@ -654,16 +583,95 @@ public class Resizable extends BaseObservable {
 
       rect.width = Math.min(rect.width, maxWidth);
       rect.height = Math.min(rect.height, maxHeight);
-
-      proxyEl.disableTextSelection(false);
       proxyEl.setVisible(false);
-      proxyEl.remove();
+      proxyEl.disableTextSelection(false);
+      DeferredCommand.addCommand(new Command() {
+        public void execute() {
+          if (proxyEl != null) {
+            proxyEl.remove();
+          }
+        }
+      });
+
       resize.setBounds(rect);
     }
 
-    syncHandleHeight();
-
     fireEvent(Events.ResizeEnd, new ResizeEvent(this, resize, event));
+
+  }
+
+  protected void init() {
+    resize.el().makePositionable();
+    if (handleList == null) {
+      handleList = new ArrayList<ResizeHandle>();
+      if ("all".equals(handles)) {
+        handles = "n s e w ne nw se sw";
+      }
+      String[] temp = handles.split(" ");
+      for (int i = 0; i < temp.length; i++) {
+        if ("n".equals(temp[i])) {
+          create(Dir.N, "north");
+        } else if ("nw".equals(temp[i])) {
+          create(Dir.NW, "northwest");
+        } else if ("e".equals(temp[i])) {
+          create(Dir.E, "east");
+        } else if ("w".equals(temp[i])) {
+          create(Dir.W, "west");
+        } else if ("se".equals(temp[i])) {
+          create(Dir.SE, "southeast");
+        } else if ("s".equals(temp[i])) {
+          create(Dir.S, "south");
+        } else if ("ne".equals(temp[i])) {
+          create(Dir.NE, "northeast");
+        } else if ("sw".equals(temp[i])) {
+          create(Dir.SW, "southwest");
+        }
+      }
+
+      preview = new BaseEventPreview() {
+
+        @Override
+        public boolean onPreview(PreviewEvent event) {
+          event.preventDefault();
+          switch (event.getEventTypeInt()) {
+            case Event.ONMOUSEMOVE:
+              int x = event.getClientX();
+              int y = event.getClientY();
+              handleMouseMove(x, y);
+              break;
+            case Event.ONMOUSEUP:
+              handleMouseUp(event.getEvent());
+              break;
+          }
+          return true;
+        }
+
+      };
+      preview.setAutoHide(false);
+    }
+
+    syncHandleHeight();
+    setEnabled(enabled);
+  }
+
+  protected void onAttach() {
+    if (handleList != null) {
+      for (ResizeHandle handle : handleList) {
+        ComponentHelper.doAttach(handle);
+      }
+    }
+  }
+
+  protected void onComponentResize() {
+    syncHandleHeight();
+  }
+
+  protected void onDetach() {
+    if (handleList != null) {
+      for (ResizeHandle handle : handleList) {
+        ComponentHelper.doDetach(handle);
+      }
+    }
   }
 
 }

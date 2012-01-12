@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -12,7 +12,9 @@ import java.util.List;
 import com.extjs.gxt.samples.resources.client.model.Folder;
 import com.extjs.gxt.samples.resources.client.model.MailItem;
 import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
+@RemoteServiceRelativePath("mailservice")
 public interface MailService extends RemoteService {
 
   public Folder getMailFolders(String userId);

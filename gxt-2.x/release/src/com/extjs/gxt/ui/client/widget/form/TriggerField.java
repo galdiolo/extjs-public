@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -50,6 +50,7 @@ import com.google.gwt.user.client.Event;
  * <dd>Field SpecialKey</dd>
  * </dl>
  */
+@SuppressWarnings("deprecation")
 public class TriggerField<D> extends TextField<D> {
 
   protected BaseEventPreview focusEventPreview;
@@ -99,15 +100,6 @@ public class TriggerField<D> extends TextField<D> {
    */
   public boolean isMonitorTab() {
     return monitorTab;
-  }
-
-  @Override
-  public void onComponentEvent(ComponentEvent ce) {
-    super.onComponentEvent(ce);
-    int type = ce.getEventTypeInt();
-    if (ce.getTarget() == trigger.dom && type == Event.ONCLICK && !readOnly) {
-      onTriggerClick(ce);
-    }
   }
 
   /**
@@ -205,9 +197,9 @@ public class TriggerField<D> extends TextField<D> {
 
   @Override
   protected void onClick(ComponentEvent ce) {
-    if (!readOnly && !editable && getInputEl().dom.isOrHasChild(ce.getTarget())) {
+    if (!readOnly
+        && ((!editable && getInputEl().dom.isOrHasChild(ce.getTarget())) || (trigger.dom.isOrHasChild(ce.getTarget())))) {
       onTriggerClick(ce);
-      return;
     }
     super.onClick(ce);
   }
@@ -287,7 +279,7 @@ public class TriggerField<D> extends TextField<D> {
   @Override
   protected void onResize(int width, int height) {
     super.onResize(width, height);
-    if (GXT.isIE && !GXT.isIE8 && !hideTrigger) {
+    if ((GXT.isIE6 || GXT.isIE7) && !hideTrigger) {
       int y;
       if ((y = input.getY()) != trigger.getY()) {
         trigger.setY(y);

@@ -1,6 +1,6 @@
 /*
- * Ext GWT - Ext for GWT
- * Copyright(c) 2007-2009, Ext JS, LLC.
+ * Ext GWT 2.2.5 - Ext for GWT
+ * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
  * http://extjs.com/license
@@ -256,7 +256,7 @@ public class Events {
    * ColumnClick event type.
    */
   public static final EventType ColumnClick = new EventType();
-  
+
   /**
    * ColumnMove event type.
    */
@@ -425,12 +425,12 @@ public class Events {
   /**
    * KeyUp event type.
    */
-  public static final EventType KeyUp = new EventType();
+  public static final EventType KeyUp = new EventType();;
 
   /**
    * LiveGridViewUpdate event type.
    */
-  public static final EventType LiveGridViewUpdate = new EventType();;
+  public static final EventType LiveGridViewUpdate = new EventType();
 
   /**
    * Minimize event type.
@@ -548,6 +548,11 @@ public class Events {
   public static final EventType OnMouseWheel = new EventType(Event.ONMOUSEWHEEL);
 
   /**
+   * DOM ONPASTE event type.
+   */
+  public static final EventType OnPaste = new EventType(Event.ONPASTE);
+
+  /**
    * DOM ONSCROLL event type.
    */
   public static final EventType OnScroll = new EventType(Event.ONSCROLL);
@@ -566,7 +571,7 @@ public class Events {
    * Ready event type.
    */
   public static final EventType Ready = new EventType();
-  
+
   /**
    * Reconfigure event type.
    */
@@ -651,7 +656,7 @@ public class Events {
    * SelectionChange event type.
    */
   public static final EventType SelectionChange = new EventType();
-  
+
   /**
    * Serialize event type.
    */
@@ -773,6 +778,7 @@ public class Events {
     browserEvents.put(String.valueOf(Event.ONMOUSEOUT), OnMouseOut);
     browserEvents.put(String.valueOf(Event.ONMOUSEMOVE), OnMouseMove);
     browserEvents.put(String.valueOf(Event.ONMOUSEWHEEL), OnMouseWheel);
+    browserEvents.put(String.valueOf(Event.ONPASTE), OnPaste);
     browserEvents.put(String.valueOf(Event.ONSCROLL), OnScroll);
 
   }

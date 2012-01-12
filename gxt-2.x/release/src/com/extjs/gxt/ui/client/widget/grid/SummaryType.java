@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -60,14 +60,15 @@ public abstract class SummaryType<N extends Number> {
     @Override
     public Double render(Object v, ModelData m, String field, Map<String, Object> data) {
       Double max = (Double) data.get(field + "max");
-      if (max == null) {
-        max = new Double(0);
-      }
+      
       Object obj = m.get(field);
-      if (obj != null) {
-        Double current = ((Number) obj).doubleValue();
+      Double current = obj == null ? 0d : ((Number) obj).doubleValue();
+      if (max == null) {
+        max = current;
+      } else {
         max = Math.max(max, current);
       }
+
       data.put(field + "max", max);
       return max;
     }
@@ -77,12 +78,12 @@ public abstract class SummaryType<N extends Number> {
     @Override
     public Double render(Object v, ModelData m, String field, Map<String, Object> data) {
       Double min = (Double) data.get(field + "min");
-      if (min == null) {
-        min = new Double(0);
-      }
+
       Object obj = m.get(field);
-      if (obj != null) {
-        Double current = ((Number) obj).doubleValue();
+      Double current = obj == null ? 0d : ((Number) obj).doubleValue();
+      if (min == null) {
+        min = current;
+      } else {
         min = Math.min(min, current);
       }
 

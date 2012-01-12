@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -330,10 +330,10 @@ public final class XTemplate extends JavaScriptObject {
   }
 
   /**
-   * Specifies the maxiumum number of nested models to search when preparing the
+   * Specifies the maximum number of nested models to search when preparing the
    * templates data (defaults to 4).
    * 
-   * @param maxDepth the maximum number of nested childen
+   * @param maxDepth the maximum number of nested children
    */
   public final native void setMaxDepth(int maxDepth) /*-{
     this.maxDepth = maxDepth;

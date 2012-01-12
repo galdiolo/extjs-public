@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -36,7 +36,7 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * <pre>
    HtmlContainer hc = new HtmlContainer("&lt;div>&lt;table>&lt;tr>&lt;td id='foo'>&lt;/td>&lt;/tr>&lt;/div>");
-   hc.add(new Button("Test"), ".foo");
+   hc.add(new Button("Test"), "#foo");
    hc.setBorders(true);
    hc.setSize(200, 100);
    hc.setPosition(10, 10);

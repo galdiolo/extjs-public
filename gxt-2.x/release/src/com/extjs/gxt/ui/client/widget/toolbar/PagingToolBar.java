@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -57,6 +57,7 @@ import com.google.gwt.user.client.ui.TextBox;
  * <dd>Component SaveState</dd>
  * </dl>
  */
+@SuppressWarnings("deprecation")
 public class PagingToolBar extends ToolBar {
 
   /**
@@ -595,9 +596,11 @@ public class PagingToolBar extends ToolBar {
    * Moves to the last page.
    */
   public void last() {
-    int extra = totalLength % pageSize;
-    int lastStart = extra > 0 ? (totalLength - extra) : totalLength - pageSize;
-    doLoadRequest(lastStart, pageSize);
+    if (totalLength > 0) {
+      int extra = totalLength % pageSize;
+      int lastStart = extra > 0 ? (totalLength - extra) : totalLength - pageSize;
+      doLoadRequest(lastStart, pageSize);
+    }
   }
 
   /**
@@ -728,13 +731,18 @@ public class PagingToolBar extends ToolBar {
     start = result.getOffset();
     totalLength = result.getTotalLength();
     activePage = (int) Math.ceil((double) (start + pageSize) / pageSize);
-    pageText.setText(String.valueOf((int) activePage));
+
     pages = totalLength < pageSize ? 1 : (int) Math.ceil((double) totalLength / pageSize);
 
-    if (activePage > pages) {
+    if (activePage > pages && totalLength > 0) {
       last();
       return;
+    } else if (activePage > pages) {
+      start = 0;
+      activePage = 1;
     }
+    
+    pageText.setText(String.valueOf((int) activePage));
 
     String after = null, display = null;
     if (msgs.getAfterPageText() != null) {

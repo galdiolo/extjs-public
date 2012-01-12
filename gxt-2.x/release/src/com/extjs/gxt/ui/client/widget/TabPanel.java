@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -138,6 +138,7 @@ import com.google.gwt.user.client.ui.Accessibility;
  * <dd>Component SaveState</dd>
  * </dl>
  */
+@SuppressWarnings("deprecation")
 public class TabPanel extends Container<TabItem> {
 
   /**
@@ -1216,11 +1217,10 @@ public class TabPanel extends Container<TabItem> {
   }
 
   private void focusTab(TabItem item, boolean setFocus) {
-    if (setFocus) {
+    if (setFocus  && !GXT.isIE7) {
       item.getHeader().el().focus();
     }
     if (GXT.isFocusManagerEnabled()) {
-      item.getHeader().el().focus();
       FocusFrame.get().frame(this);
     }
   }

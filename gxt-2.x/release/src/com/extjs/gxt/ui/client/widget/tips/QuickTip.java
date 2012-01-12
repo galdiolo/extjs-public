@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -139,7 +139,7 @@ public class QuickTip extends ToolTip {
     }
     initialized = true;
 
-    if (targetElem == null && hasTip) {
+    if ((targetElem == null || !isAttached()) && hasTip) {
       updateTargetElement(t);
     } else {
       if (hasTip && targetElem != t) {
@@ -151,7 +151,6 @@ public class QuickTip extends ToolTip {
         return;
       }
     }
-
     clearTimers();
     targetXY = ce.getXY();
     delayShow();
@@ -167,15 +166,14 @@ public class QuickTip extends ToolTip {
   }
 
   private boolean hasTip(Element target) {
-    return hasAttributeValue(target.getAttribute("qtip")) || (interceptTitles && hasAttributeValue(target.getAttribute("title")));
+    return hasAttributeValue(target.getAttribute("qtip"))
+        || (interceptTitles && hasAttributeValue(target.getAttribute("title")));
   }
 
   private void updateTargetElement(Element target) {
     targetElem = target;
     text = getAttributeValue(target, interceptTitles ? "title" : "qtip");
-    if (!interceptTitles) {
-      title = getAttributeValue(target, "qtitle");
-    }
+    title = interceptTitles ? null : getAttributeValue(target, "qtitle");
 
     String width = getAttributeValue(target, "qwidth");
     if (width != null && !"".equals(width)) {

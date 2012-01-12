@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -223,7 +223,7 @@ public class BorderLayout extends Layout {
   @Override
   protected void onComponentHide(Component component) {
     super.onComponentHide(component);
-    if (component != null && component.isRendered()) {
+    if (component != null) {
       BorderLayoutData data = (BorderLayoutData) getLayoutData(component);
       data.setHidden(true);
       layout();
@@ -233,11 +233,16 @@ public class BorderLayout extends Layout {
   @Override
   protected void onComponentShow(Component component) {
     super.onComponentShow(component);
-    if (component != null && component.isRendered()) {
+    if (component != null) {
       BorderLayoutData data = (BorderLayoutData) getLayoutData(component);
       data.setHidden(false);
       layout();
     }
+  }
+
+  protected void onExpandClick(CollapsePanel cp) {
+    ContentPanel panel = cp.getContentPanel();
+    onExpand(panel);
   }
 
   @Override
@@ -540,12 +545,14 @@ public class BorderLayout extends Layout {
   }
 
   private void onCollapse(ContentPanel panel) {
-    if (layoutContainer.getItems().contains(panel) && fireEvent(Events.BeforeCollapse, createBorderLaoutEvent(panel))) {
+    if (panel.getParent() == layoutContainer && fireEvent(Events.BeforeCollapse, createBorderLaoutEvent(panel))) {
 
       BorderLayoutData data = (BorderLayoutData) getLayoutData(panel);
 
       boolean layoutOnChange = layoutContainer.isLayoutOnChange();
       setLayoutOnChange(layoutContainer, false);
+
+      boolean isVisible = panel.isVisible();
 
       layoutContainer.remove(panel);
       Map<String, Object> st = panel.getState();
@@ -557,7 +564,9 @@ public class BorderLayout extends Layout {
       if (cp == null) {
         cp = createCollapsePanel(panel, data);
       }
+
       layoutContainer.add(cp);
+      cp.setVisible(isVisible);
       layout();
 
       setLayoutOnChange(layoutContainer, layoutOnChange);
@@ -571,12 +580,13 @@ public class BorderLayout extends Layout {
 
   private void onExpand(ContentPanel panel) {
     CollapsePanel cp = panel.getData("collapse");
-    if (cp != null && layoutContainer.getItems().contains(cp)
+    if (cp != null && cp.getParent() == layoutContainer
         && fireEvent(Events.BeforeExpand, createBorderLaoutEvent(panel))) {
       boolean layoutOnChange = layoutContainer.isLayoutOnChange();
       setLayoutOnChange(layoutContainer, false);
-
+      cp.setExpanded(false);
       setCollapsed(panel, false);
+      boolean isVisible = cp.isVisible();
 
       Map<String, Object> st = panel.getState();
       st.remove("collapsed");
@@ -584,6 +594,7 @@ public class BorderLayout extends Layout {
 
       layoutContainer.remove(cp);
       layoutContainer.add(panel);
+      panel.setVisible(isVisible);
       layout();
 
       setLayoutOnChange(layoutContainer, layoutOnChange);
@@ -595,11 +606,6 @@ public class BorderLayout extends Layout {
     }
   }
 
-  private void onExpandClick(CollapsePanel cp) {
-    ContentPanel panel = cp.getContentPanel();
-    onExpand(panel);
-  }
-
   private void removeSplitBar(Component c) {
     SplitBar splitBar = c.getData("splitBar");
     if (splitBar != null) {
@@ -609,7 +615,7 @@ public class BorderLayout extends Layout {
   }
 
   private native void setCollapsed(ContentPanel panel, boolean collapse) /*-{
-    panel.@com.extjs.gxt.ui.client.widget.ContentPanel::collapsed = collapse;
+		panel.@com.extjs.gxt.ui.client.widget.ContentPanel::collapsed = collapse;
   }-*/;
 
   private void switchPanels(ContentPanel panel) {

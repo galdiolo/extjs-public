@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -294,6 +294,9 @@ public class FieldSet extends LayoutContainer {
   protected void onClick(ComponentEvent ce) {
     if (checkboxToggle && ce.getTarget() == (Element) checkbox.cast()) {
       setExpanded(!isExpanded());
+      boolean isExpanded = isExpanded();
+      checkbox.setChecked(isExpanded);
+      checkbox.setDefaultChecked(isExpanded);
     }
   }
 
@@ -361,9 +364,9 @@ public class FieldSet extends LayoutContainer {
   protected void onFocus(ComponentEvent ce) {
     super.onFocus(ce);
     if (GXT.isFocusManagerEnabled()) {
-      if (checkboxToggle) {
+      if (checkboxToggle && checkbox != null) {
         checkbox.focus();
-      } else {
+      } else if (collapseBtn != null) {
         collapseBtn.focus();
       }
     }
@@ -459,15 +462,15 @@ public class FieldSet extends LayoutContainer {
   }
 
   private native void doNotify(Component c, boolean show) /*-{
-    if(show){
-      c.@com.extjs.gxt.ui.client.widget.Component::notifyShow()()
-    } else {
-      c.@com.extjs.gxt.ui.client.widget.Component::notifyHide()();
-    }
+		if (show) {
+			c.@com.extjs.gxt.ui.client.widget.Component::notifyShow()()
+		} else {
+			c.@com.extjs.gxt.ui.client.widget.Component::notifyHide()();
+		}
   }-*/;
 
   private native boolean isComponentHidden(Component c) /*-{
-    return c.@com.extjs.gxt.ui.client.widget.Component::hidden;
+		return c.@com.extjs.gxt.ui.client.widget.Component::hidden;
   }-*/;
 
 }

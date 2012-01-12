@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -135,7 +135,7 @@ public class GridView extends BaseObservable {
 
   protected Element overRow;
   protected boolean preventScrollToTopOnRefresh;
-  protected int scrollOffset = 19;
+  protected int scrollOffset = XDOM.getScrollBarWidth();
   protected boolean selectable = false;
   protected SortInfo sortState;
   protected int splitterWidth = 5;
@@ -580,6 +580,8 @@ public class GridView extends BaseObservable {
       updateHeaderSortState();
 
       applyEmptyText();
+      constrainFocusElement();
+
       fireEvent(Events.Refresh);
     }
   }
@@ -698,10 +700,14 @@ public class GridView extends BaseObservable {
   }
 
   protected void afterRender() {
-
     mainBody.setInnerHtml(renderRows(0, -1));
     renderWidgets(0, -1);
     processRows(0, true);
+
+    if (footer != null && grid.getLazyRowRender() > 0) {
+      footer.refresh();
+    }
+
     int sh = scroller.getHeight();
     int dh = mainBody.getHeight();
     boolean vbar = dh < sh;
@@ -820,7 +826,7 @@ public class GridView extends BaseObservable {
     }
 
     restrictMenu(columnMenu);
-
+    columns.setEnabled(columnMenu.getItemCount() > 0);
     columns.setSubMenu(columnMenu);
     menu.add(columns);
     return menu;
@@ -831,6 +837,9 @@ public class GridView extends BaseObservable {
     if (m != null) {
       for (Widget w : m) {
         ComponentHelper.doDetach(w);
+        if (w != null) {
+          El.fly(w.getElement()).removeFromParent();
+        }
       }
       if (remove) {
         widgetList.remove(rowIndex);
@@ -916,6 +925,8 @@ public class GridView extends BaseObservable {
       buf.append(grid.getId());
       buf.append("_");
       buf.append(ds.getKeyProvider() != null ? ds.getKeyProvider().getKey(model) : XDOM.getUniqueId());
+      buf.append("\" unselectable=\"");
+      buf.append(selectable ? "off" : "on");
       buf.append("\"><table class=x-grid3-row-table role=presentation border=0 cellspacing=0 cellpadding=0 style=\"");
 
       buf.append(tstyle);
@@ -944,10 +955,10 @@ public class GridView extends BaseObservable {
         if (c.css != null) {
           buf.append(c.css);
         }
-        if (showInvalidCells && r != null && !r.isValid(c.id)) {
+        if (showInvalidCells && r != null && !r.isValid(c.name)) {
           buf.append(" x-grid3-invalid-cell");
         }
-        if (showDirtyCells && r != null && r.getChanges().containsKey(c.id)) {
+        if (showDirtyCells && r != null && r.getChanges().containsKey(c.name)) {
           buf.append(" x-grid3-dirty-cell");
         }
 
@@ -1571,8 +1582,6 @@ public class GridView extends BaseObservable {
       state.put("limit", config.getLimit());
       grid.saveState();
     }
-
-    constrainFocusElement();
   }
 
   protected void onHeaderChange(int column, String text) {
@@ -1631,6 +1640,7 @@ public class GridView extends BaseObservable {
     Element row = getRow(rowIndex);
     if (row != null) {
       removeRowStyle(row, "x-grid3-row-selected");
+      removeRowStyle(row, "x-grid3-highlightrow ");
       if (GXT.isAriaEnabled()) {
         row.setAttribute("aria-selected", "false");
       }
@@ -1918,9 +1928,12 @@ public class GridView extends BaseObservable {
   @SuppressWarnings("unchecked")
   protected void syncScroll() {
     syncHeaderScroll();
+    int scrollLeft = scroller.getScrollLeft();
+    int scrollTop = scroller.getScrollTop();
     GridEvent<ModelData> ge = (GridEvent<ModelData>) createComponentEvent(null);
-    ge.setScrollLeft(scroller.getScrollLeft());
-    ge.setScrollTop(scroller.getScrollTop());
+    ge.setScrollLeft(scrollLeft);
+    ge.setScrollTop(scrollTop);
+    constrainFocusElement();
     grid.fireEvent(Events.BodyScroll, ge);
   }
 
@@ -2070,16 +2083,18 @@ public class GridView extends BaseObservable {
   }
 
   private native String getCellIndexId(Element elem) /*-{
-    if (!@com.extjs.gxt.ui.client.widget.grid.GridView::colRe) {
-    @com.extjs.gxt.ui.client.widget.grid.GridView::colRe = new RegExp("x-grid3-td-([^\\s]+)");
-    }
-    if (elem) {
-    var m = elem.className.match(@com.extjs.gxt.ui.client.widget.grid.GridView::colRe);
-    if(m && m[1]){
-    return m[1];
-    }
-    }
-    return null;
+		if (!@com.extjs.gxt.ui.client.widget.grid.GridView::colRe) {
+			@com.extjs.gxt.ui.client.widget.grid.GridView::colRe = new RegExp(
+					"x-grid3-td-([^\\s]+)");
+		}
+		if (elem) {
+			var m = elem.className
+					.match(@com.extjs.gxt.ui.client.widget.grid.GridView::colRe);
+			if (m && m[1]) {
+				return m[1];
+			}
+		}
+		return null;
   }-*/;
 
   private void refreshFooterData() {
@@ -2116,15 +2131,11 @@ public class GridView extends BaseObservable {
   }
 
   private void constrainFocusElement() {
-    Point p = focusEl.getXY();
-    Point p2 = new Point(scroller.getScrollLeft() + scroller.getWidth(), scroller.getScrollTop() + scroller.getHeight());
-    if (p2.x < p.x && p2.y < p.y) {
-      focusEl.setXY(p2);
-    } else if (p2.x < p.x) {
-      focusEl.setX(p2.x);
-    } else if (p2.y < p.y) {
-      focusEl.setY(p2.y);
-    }
+    int scrollLeft = scroller.dom.getScrollLeft();
+    int scrollTop = scroller.dom.getScrollTop();
+    int left = scroller.getWidth(true) / 2 + scrollLeft;
+    int top = scroller.getHeight(true) / 2 + scrollTop;
+    focusEl.setLeftTop(left, top);
   }
 
 }

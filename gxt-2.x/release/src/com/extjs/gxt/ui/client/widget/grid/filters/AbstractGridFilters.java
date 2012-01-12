@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -8,7 +8,6 @@
 package com.extjs.gxt.ui.client.widget.grid.filters;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +19,7 @@ import com.extjs.gxt.ui.client.data.LoadEvent;
 import com.extjs.gxt.ui.client.data.Loader;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseEvent;
+import com.extjs.gxt.ui.client.event.ColumnModelEvent;
 import com.extjs.gxt.ui.client.event.EventType;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FilterEvent;
@@ -34,12 +34,16 @@ import com.extjs.gxt.ui.client.widget.ComponentPlugin;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnHeader;
 import com.extjs.gxt.ui.client.widget.grid.ColumnHeader.Head;
+import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.menu.CheckMenuItem;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.menu.SeparatorMenuItem;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 
+@SuppressWarnings("deprecation")
 public abstract class AbstractGridFilters implements ComponentPlugin {
   public static class GridFiltersMessages {
     private String filterText = GXT.MESSAGES.gridFilters_filterText();
@@ -59,8 +63,18 @@ public abstract class AbstractGridFilters implements ComponentPlugin {
     }
   }
 
-  protected Grid<ModelData> grid;
+  protected ColumnModel columnModel;
 
+  protected Listener<ColumnModelEvent> columnModelListener = new Listener<ColumnModelEvent>() {
+    public void handleEvent(ColumnModelEvent be) {
+      DeferredCommand.addCommand(new Command() {
+        public void execute() {
+          updateColumnHeadings();
+        }
+      });
+    }
+  };
+  protected Grid<ModelData> grid;
   private boolean autoReload = true;
   private CheckMenuItem checkFilterItem;
   private StoreFilter<ModelData> currentFilter;
@@ -87,7 +101,9 @@ public abstract class AbstractGridFilters implements ComponentPlugin {
       }
     }
   };
+
   private boolean local = false;
+
   private GridFiltersMessages msgs;
 
   private SeparatorMenuItem seperatorItem;
@@ -199,6 +215,7 @@ public abstract class AbstractGridFilters implements ComponentPlugin {
     });
 
     bindStore(getStore());
+    bindColumnModel(grid.getColumnModel());
   }
 
   /**
@@ -214,7 +231,7 @@ public abstract class AbstractGridFilters implements ComponentPlugin {
    * Removes all filters.
    */
   public void removeAll() {
-    Collection<Filter> temp = filters.values();
+    List<Filter> temp = new ArrayList<Filter>(filters.values());
     for (Filter f : temp) {
       removeFilter(f);
     }
@@ -277,6 +294,17 @@ public abstract class AbstractGridFilters implements ComponentPlugin {
         }
       }
     }
+  }
+
+  protected void bindColumnModel(ColumnModel columnModel) {
+    if (this.columnModel != null) {
+      this.columnModel.removeListener(Events.HiddenChange, columnModelListener);
+    }
+    if (columnModel != null) {
+      columnModel.addListener(Events.HiddenChange, columnModelListener);
+    }
+    this.columnModel = columnModel;
+
   }
 
   protected void bindStore(Store<ModelData> store) {
@@ -382,18 +410,13 @@ public abstract class AbstractGridFilters implements ComponentPlugin {
       checkFilterItem.show();
 
       filterMenu = f.getMenu();
-      checkFilterItem.setChecked(f.isActive());
+      checkFilterItem.setChecked(f.isActive(), true);
       checkFilterItem.setSubMenu(filterMenu);
-    } else {
-      checkFilterItem.hide();
-      return;
+
+      Menu menu = be.getMenu();
+      menu.add(seperatorItem);
+      menu.add(checkFilterItem);
     }
-
-    Menu menu = be.getMenu();
-    menu.add(seperatorItem);
-    menu.add(checkFilterItem);
-
-    updateColumnHeadings();
   }
 
   protected void onLoad(LoadEvent le) {
@@ -402,6 +425,7 @@ public abstract class AbstractGridFilters implements ComponentPlugin {
 
   protected void onReconfigure() {
     bindStore(getStore());
+    bindColumnModel(grid.getColumnModel());
     updateColumnHeadings();
 
     if ((autoReload || local)) {
@@ -410,8 +434,8 @@ public abstract class AbstractGridFilters implements ComponentPlugin {
   }
 
   protected void onStateChange(Filter filter) {
-    if (checkFilterItem != null) {
-      checkFilterItem.setChecked(filter.isActive());
+    if (checkFilterItem != null && checkFilterItem.isAttached()) {
+      checkFilterItem.setChecked(filter.isActive(), true);
     }
     if ((autoReload || local)) {
       deferredUpdate.delay(updateBuffer);

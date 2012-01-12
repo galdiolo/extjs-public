@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -22,7 +22,9 @@ import com.extjs.gxt.ui.client.util.Rectangle;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Shim;
 import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Window;
@@ -52,8 +54,7 @@ import com.google.gwt.user.client.Window;
  * <li>draggable : this</li>
  * <li>component : drag component</li>
  * <li>event : the dom event</li>
- * </ul>
- * </dd>
+ * </ul></dd>
  * 
  * <dd><b>DragCancel</b> : DragEvent(draggable, component, event)<br>
  * <div>Fires after a drag has been cancelled.</div>
@@ -74,6 +75,7 @@ import com.google.gwt.user.client.Window;
  * </dd>
  * </dl>
  */
+@SuppressWarnings("deprecation")
 public class Draggable extends BaseObservable {
 
   protected int conX, conY, conWidth, conHeight;
@@ -506,7 +508,7 @@ public class Draggable extends BaseObservable {
     }
 
     startBounds = dragWidget.el().getBounds();
-    
+
     startElement = ce.getTarget();
 
     dragStartX = ce.getClientX();
@@ -695,7 +697,13 @@ public class Draggable extends BaseObservable {
         }
         proxyEl.setVisibility(false);
         proxyEl.disableTextSelection(false);
-        proxyEl.remove();
+        DeferredCommand.addCommand(new Command() {
+          public void execute() {
+            if (proxyEl != null) {
+              proxyEl.remove();
+            }
+          }
+        });
       }
       DragEvent de = new DragEvent(this);
       de.setStartElement(startElement);
@@ -710,7 +718,7 @@ public class Draggable extends BaseObservable {
   }
 
   private native boolean hasAttribute(Element elem, String name) /*-{
-    return elem.hasAttribute ? elem.hasAttribute(name) : true;
-  }-*/;
+                                                                 return elem.hasAttribute ? elem.hasAttribute(name) : true;
+                                                                 }-*/;
 
 }

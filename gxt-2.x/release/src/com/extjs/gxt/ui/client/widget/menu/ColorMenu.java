@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -14,7 +14,7 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.widget.ColorPalette;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-
+@SuppressWarnings("deprecation")
 public class ColorMenu extends Menu {
 
   protected ColorPalette palette;

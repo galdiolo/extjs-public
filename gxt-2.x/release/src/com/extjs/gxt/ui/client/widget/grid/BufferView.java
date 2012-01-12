@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -258,7 +258,9 @@ public class BufferView extends GridView {
           cb.append(c.style);
           cb.append("\" ");
           cb.append(cellAttr);
-          cb.append("><div unselectable=\"on\" class=\"x-grid3-cell-inner x-grid3-col-");
+          cb.append("><div unselectable=\"");
+          cb.append(selectable ? "off" : "on");
+          cb.append("\" class=\"x-grid3-cell-inner x-grid3-col-");
           cb.append(c.id);
           cb.append("\" ");
           cb.append(attr);
@@ -294,6 +296,8 @@ public class BufferView extends GridView {
         buf.append(grid.getId());
         buf.append("_");
         buf.append(ds.getKeyProvider() != null ? ds.getKeyProvider().getKey(model) : XDOM.getUniqueId());
+        buf.append("\" unselectable=\"");
+        buf.append(selectable ? "off" : "on");
         buf.append("\">");
       }
       if (visible) {

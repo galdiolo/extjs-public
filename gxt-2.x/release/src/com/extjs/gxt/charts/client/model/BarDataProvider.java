@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -9,8 +9,8 @@ package com.extjs.gxt.charts.client.model;
 
 import com.extjs.gxt.charts.client.model.axis.XAxis;
 import com.extjs.gxt.charts.client.model.charts.BarChart;
-import com.extjs.gxt.charts.client.model.charts.ChartConfig;
 import com.extjs.gxt.charts.client.model.charts.BarChart.Bar;
+import com.extjs.gxt.charts.client.model.charts.ChartConfig;
 import com.extjs.gxt.ui.client.data.ModelData;
 
 /**
@@ -41,8 +41,9 @@ public class BarDataProvider extends PieDataProvider {
       if (xAxis == null) {
         xAxis = new XAxis();
         chart.getModel().setXAxis(xAxis);
+      } else {
+        xAxis.getLabels().getLabels().clear();
       }
-      xAxis.getLabels().getLabels().clear();
     }
     for (ModelData m : store.getModels()) {
       Number n = getValue(m);

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -17,7 +17,6 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Element;
-
 public class DatePickerExample extends LayoutContainer {
 
   @Override
@@ -29,7 +28,8 @@ public class DatePickerExample extends LayoutContainer {
     picker.addListener(Events.Select, new Listener<ComponentEvent>() {
 
       public void handleEvent(ComponentEvent be) {
-        String d = DateTimeFormat.getShortDateFormat().format(picker.getValue());
+        //String d = DateTimeFormat.getShortDateFormat().format(picker.getValue());
+        String d = DateTimeFormat.getFormat("MM/dd/yyyy").format(picker.getValue());
         Info.display("Date Selected", "You selected {0}.", new Params(d));
       }
 

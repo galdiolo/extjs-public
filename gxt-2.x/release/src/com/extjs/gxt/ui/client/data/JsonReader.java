@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -30,6 +30,7 @@ import com.google.gwt.json.client.JSONValue;
  * 
  * @param <D> the <code>ListLoadResult</code> type being returned by the reader
  */
+@SuppressWarnings("deprecation")
 public class JsonReader<D> implements DataReader<D> {
 
   private ModelType modelType;

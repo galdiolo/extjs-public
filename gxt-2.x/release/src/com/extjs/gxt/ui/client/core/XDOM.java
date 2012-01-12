@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -294,24 +294,24 @@ public final class XDOM {
     scr.style.top = '-1000px';
     scr.style.left = '-1000px';
     scr.style.width = '100px';
-    scr.style.height = '50px';
+    scr.style.height = '100px';
     scr.style.overflow = 'hidden';
     inn = $doc.createElement('div');
-    inn.style.height = '200px';
+    inn.style.height = '50px';
+    inn.style.width = '100%';
     scr.appendChild(inn);
     $doc.body.appendChild(scr);
-    wNoScroll = inn.offsetWidth;
-    scr.style.overflow = 'auto';
-    if (inn.clientWidth != 'undefined') {
-    wScroll = inn.clientWidth;
-    } else {
-    wScroll = inn.offsetWidth;
-    }
-
-    $doc.body.removeChild(
-    $doc.body.lastChild);
-
-    return (wNoScroll - wScroll);
+    
+    wNoScroll = inn.offsetWidth;  
+    scr.style.overflow = 'scroll';  
+    wScroll = inn.offsetWidth;  
+    if (wNoScroll == wScroll) {
+      wScroll = scr.clientWidth;
+    } 
+  
+    $doc.body.removeChild(scr);
+    //2 px next to the scrollbar cannot be used
+    return (wNoScroll - wScroll) + 2;
   }-*/;
 
   private XDOM() {

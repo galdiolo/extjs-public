@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -753,7 +753,7 @@ public class Grid<M extends ModelData> extends BoxComponent {
 
   protected void doApplyStoreState(Map<String, Object> state) {
     String sortField = (String) state.get("sortField");
-    if (store.getLoader() == null && sortField != null) {
+    if ((store.getLoader() == null || !store.getLoader().isRemoteSort()) && sortField != null) {
       String sortDir = (String) state.get("sortDir");
       SortDir dir = SortDir.findDir(sortDir);
       store.sort(sortField, dir);

@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -149,6 +149,7 @@ public class SpinnerField extends TwinTriggerField<Number> {
   private boolean allowNegative = true;
   private String baseChars = "0123456789";
   private Number increment = 1d;
+  private int lastKeyCode;
   private Number maxValue = Double.MAX_VALUE;
   private Number minValue = Double.NEGATIVE_INFINITY;
 
@@ -353,14 +354,20 @@ public class SpinnerField extends TwinTriggerField<Number> {
   }
 
   @Override
+  protected void onKeyDown(FieldEvent fe) {
+    super.onKeyDown(fe);
+    // must key code in key code as character returned in key press
+    lastKeyCode = getKeyCode(fe.getEvent());
+  }
+
+  @Override
   protected void onKeyPress(FieldEvent fe) {
     super.onKeyPress(fe);
+    char key = getChar(fe.getEvent());
 
-    if (fe.isSpecialKey(getKeyCode(fe.getEvent()))) {
+    if (fe.isSpecialKey(lastKeyCode) || fe.isControlKey()) {
       return;
     }
-
-    char key = getChar(fe.getEvent());
 
     if (!allowed.contains(key)) {
       fe.stopEvent();
@@ -537,11 +544,11 @@ public class SpinnerField extends TwinTriggerField<Number> {
 
   // needed due to GWT 2.1 changes
   private native char getChar(NativeEvent e) /*-{
-    return e.which || e.charCode || e.keyCode || 0;
+		return e.which || e.charCode || e.keyCode || 0;
   }-*/;
 
   // needed due to GWT 2.1 changes
   private native int getKeyCode(NativeEvent e) /*-{
-    return e.keyCode || 0;
+		return e.keyCode || 0;
   }-*/;
 }

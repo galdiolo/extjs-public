@@ -1,5 +1,5 @@
 /*
- * Ext GWT 2.2.1 - Ext for GWT
+ * Ext GWT 2.2.5 - Ext for GWT
  * Copyright(c) 2007-2010, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -14,6 +14,8 @@ import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.util.Rectangle;
 import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 
@@ -23,6 +25,7 @@ import com.google.gwt.user.client.Window;
  * <p/>
  * Used by Draggable, Resizable and SplitBar
  */
+@SuppressWarnings("deprecation")
 public class Shim {
 
   private static Shim instance;
@@ -71,10 +74,14 @@ public class Shim {
    * Uncovers and removes the shim.
    */
   public void uncover() {
-    while (!shims.isEmpty()) {
-      shims.get(0).remove();
-      shims.remove(0);
-    }
+    DeferredCommand.addCommand(new Command() {
+      public void execute() {
+        while (!shims.isEmpty()) {
+          shims.get(0).remove();
+          shims.remove(0);
+        }
+      }
+    });
   }
 
   protected El createShim(Element element, int left, int top, int width, int height) {
