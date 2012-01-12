@@ -1,11 +1,9 @@
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
+/*!
+ * Ext JS Library 3.4.0
+ * Copyright(c) 2006-2011 Sencha Inc.
+ * licensing@sencha.com
+ * http://www.sencha.com/license
  */
-
 Ext.onReady(function(){
 
     Ext.QuickTips.init();
@@ -42,10 +40,12 @@ Ext.onReady(function(){
                 defaultType: 'textfield',
                 items: [{
                         fieldLabel: 'First Name',
+                        emptyText: 'First Name',
                         name: 'first',
                         width:190
                     }, {
                         fieldLabel: 'Last Name',
+                        emptyText: 'Last Name',
                         name: 'last',
                         width:190
                     }, {
@@ -62,7 +62,7 @@ Ext.onReady(function(){
                     new Ext.form.ComboBox({
                         fieldLabel: 'State',
                         hiddenName:'state',
-                        store: new Ext.data.SimpleStore({
+                        store: new Ext.data.ArrayStore({
                             fields: ['abbr', 'state'],
                             data : Ext.exampledata.states // from states.js
                         }),
@@ -97,7 +97,7 @@ Ext.onReady(function(){
         text: 'Submit',
         disabled:true,
         handler: function(){
-            fs.getForm().submit({url:'xml-errors.xml', waitMsg:'Saving Data...'});
+            fs.getForm().submit({url:'xml-errors.xml', waitMsg:'Saving Data...', submitEmptyText: false});
         }
     });
 

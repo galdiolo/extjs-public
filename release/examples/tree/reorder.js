@@ -1,35 +1,32 @@
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
+/*!
+ * Ext JS Library 3.4.0
+ * Copyright(c) 2006-2011 Sencha Inc.
+ * licensing@sencha.com
+ * http://www.sencha.com/license
  */
-
 Ext.onReady(function(){
     // shorthand
     var Tree = Ext.tree;
-    
-    var tree = new Tree.TreePanel({
-        el:'tree-div',
-        useArrows:true,
-        autoScroll:true,
-        animate:true,
-        enableDD:true,
-        containerScroll: true,
 
+    var tree = new Tree.TreePanel({
+        useArrows: true,
+        autoScroll: true,
+        animate: true,
+        enableDD: true,
+        containerScroll: true,
+        border: false,
         // auto create TreeLoader
         dataUrl: 'get-nodes.php',
 
         root: {
             nodeType: 'async',
             text: 'Ext JS',
-            draggable:false,
-            id:'source'
+            draggable: false,
+            id: 'src'
         }
     });
 
     // render the tree
-    tree.render();
+    tree.render('tree-div');
     tree.getRootNode().expand();
 });

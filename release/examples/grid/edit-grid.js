@@ -1,103 +1,108 @@
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
+/*!
+ * Ext JS Library 3.4.0
+ * Copyright(c) 2006-2011 Sencha Inc.
+ * licensing@sencha.com
+ * http://www.sencha.com/license
  */
-
 Ext.onReady(function(){
-    Ext.QuickTips.init();
 
+    /**
+     * Handler specified for the 'Available' column renderer
+     * @param {Object} value
+     */
     function formatDate(value){
         return value ? value.dateFormat('M d, Y') : '';
-    };
+    }
+
     // shorthand alias
     var fm = Ext.form;
-
-    // custom column plugin example
-    var checkColumn = new Ext.grid.CheckColumn({
-       header: "Indoor?",
-       dataIndex: 'indoor',
-       width: 55
-    });
 
     // the column model has information about grid columns
     // dataIndex maps the column to the specific data field in
     // the data store (created below)
-    var cm = new Ext.grid.ColumnModel([{
-           id:'common',
-           header: "Common Name",
-           dataIndex: 'common',
-           width: 220,
-           editor: new fm.TextField({
-               allowBlank: false
-           })
-        },{
-           header: "Light",
-           dataIndex: 'light',
-           width: 130,
-           editor: new Ext.form.ComboBox({
-               typeAhead: true,
-               triggerAction: 'all',
-               transform:'light',
-               lazyRender:true,
-               listClass: 'x-combo-list-small'
+    var cm = new Ext.grid.ColumnModel({
+        // specify any defaults for each column
+        defaults: {
+            sortable: true // columns are not sortable by default           
+        },
+        columns: [{
+            id: 'common',
+            header: 'Common Name',
+            dataIndex: 'common',
+            width: 220,
+            // use shorthand alias defined above
+            editor: new fm.TextField({
+                allowBlank: false
             })
-        },{
-           header: "Price",
-           dataIndex: 'price',
-           width: 70,
-           align: 'right',
-           renderer: 'usMoney',
-           editor: new fm.NumberField({
-               allowBlank: false,
-               allowNegative: false,
-               maxValue: 100000
-           })
-        },{
-           header: "Available",
-           dataIndex: 'availDate',
-           width: 95,
-           renderer: formatDate,
-           editor: new fm.DateField({
+        }, {
+            header: 'Light',
+            dataIndex: 'light',
+            width: 130,
+            editor: new fm.ComboBox({
+                typeAhead: true,
+                triggerAction: 'all',
+                // transform the data already specified in html
+                transform: 'light',
+                lazyRender: true,
+                listClass: 'x-combo-list-small'
+            })
+        }, {
+            header: 'Price',
+            dataIndex: 'price',
+            width: 70,
+            align: 'right',
+            renderer: 'usMoney',
+            editor: new fm.NumberField({
+                allowBlank: false,
+                allowNegative: false,
+                maxValue: 100000
+            })
+        }, {
+            header: 'Available',
+            dataIndex: 'availDate',
+            width: 95,
+            renderer: formatDate,
+            editor: new fm.DateField({
                 format: 'm/d/y',
                 minValue: '01/01/06',
                 disabledDays: [0, 6],
                 disabledDaysText: 'Plants are not available on the weekends'
             })
-        },
-        checkColumn
-    ]);
-
-    // by default columns are sortable
-    cm.defaultSortable = true;
-
-    // this could be inline, but we want to define the Plant record
-    // type so we can add records dynamically
-    var Plant = Ext.data.Record.create([
-           // the "name" below matches the tag name to read, except "availDate"
-           // which is mapped to the tag "availability"
-           {name: 'common', type: 'string'},
-           {name: 'botanical', type: 'string'},
-           {name: 'light'},
-           {name: 'price', type: 'float'},             // automatic date conversions
-           {name: 'availDate', mapping: 'availability', type: 'date', dateFormat: 'm/d/Y'},
-           {name: 'indoor', type: 'bool'}
-      ]);
+        }, {
+            xtype: 'checkcolumn',
+            header: 'Indoor?',
+            dataIndex: 'indoor',
+            width: 55
+        }]
+    });
 
     // create the Data Store
     var store = new Ext.data.Store({
-        // load using HTTP
+        // destroy the store if the grid is destroyed
+        autoDestroy: true,
+
+        // load remote data using HTTP
         url: 'plants.xml',
 
-        // the return will be XML, so lets set up a reader
+        // specify a XmlReader (coincides with the XML format of the returned data)
         reader: new Ext.data.XmlReader({
-               // records will have a "plant" tag
-               record: 'plant'
-           }, Plant),
+            // records will have a 'plant' tag
+            record: 'plant',
+            // use an Array of field definition objects to implicitly create a Record constructor
+            fields: [
+                // the 'name' below matches the tag name to read, except 'availDate'
+                // which is mapped to the tag 'availability'
+                {name: 'common', type: 'string'},
+                {name: 'botanical', type: 'string'},
+                {name: 'light'},
+                {name: 'price', type: 'float'},             
+                // dates can be automatically converted by specifying dateFormat
+                {name: 'availDate', mapping: 'availability', type: 'date', dateFormat: 'm/d/Y'},
+                {name: 'indoor', type: 'bool'}
+            ]
+        }),
 
-        sortInfo:{field:'common', direction:'ASC'}
+        sortInfo: {field:'common', direction:'ASC'}
     });
 
     // create the editor grid
@@ -105,17 +110,17 @@ Ext.onReady(function(){
         store: store,
         cm: cm,
         renderTo: 'editor-grid',
-        width:600,
-        height:300,
-        autoExpandColumn:'common',
-        title:'Edit Plants?',
-        frame:true,
-        plugins:checkColumn,
-        clicksToEdit:1,
-
+        width: 600,
+        height: 300,
+        autoExpandColumn: 'common', // column with this id will be expanded
+        title: 'Edit Plants?',
+        frame: true,
+        clicksToEdit: 1,
         tbar: [{
             text: 'Add Plant',
             handler : function(){
+                // access the Record constructor through the grid's store
+                var Plant = grid.getStore().recordType;
                 var p = new Plant({
                     common: 'New Plant 1',
                     light: 'Mostly Shade',
@@ -130,38 +135,17 @@ Ext.onReady(function(){
         }]
     });
 
-    // trigger the data store load
-    store.load();
-});
-
-Ext.grid.CheckColumn = function(config){
-    Ext.apply(this, config);
-    if(!this.id){
-        this.id = Ext.id();
-    }
-    this.renderer = this.renderer.createDelegate(this);
-};
-
-Ext.grid.CheckColumn.prototype ={
-    init : function(grid){
-        this.grid = grid;
-        this.grid.on('render', function(){
-            var view = this.grid.getView();
-            view.mainBody.on('mousedown', this.onMouseDown, this);
-        }, this);
-    },
-
-    onMouseDown : function(e, t){
-        if(t.className && t.className.indexOf('x-grid3-cc-'+this.id) != -1){
-            e.stopEvent();
-            var index = this.grid.getView().findRowIndex(t);
-            var record = this.grid.store.getAt(index);
-            record.set(this.dataIndex, !record.data[this.dataIndex]);
+    // manually trigger the data store load
+    store.load({
+        // store loading is asynchronous, use a load listener or callback to handle results
+        callback: function(){
+            Ext.Msg.show({
+                title: 'Store Load Callback',
+                msg: 'store was loaded, data available for processing',
+                modal: false,
+                icon: Ext.Msg.INFO,
+                buttons: Ext.Msg.OK
+            });
         }
-    },
-
-    renderer : function(v, p, record){
-        p.css += ' x-grid3-check-col-td'; 
-        return '<div class="x-grid3-check-col'+(v?'-on':'')+' x-grid3-cc-'+this.id+'">&#160;</div>';
-    }
-};
+    });
+});

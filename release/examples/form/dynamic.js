@@ -1,11 +1,9 @@
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
+/*!
+ * Ext JS Library 3.4.0
+ * Copyright(c) 2006-2011 Sencha Inc.
+ * licensing@sencha.com
+ * http://www.sencha.com/license
  */
-
 Ext.onReady(function(){
 
     Ext.QuickTips.init();
@@ -319,6 +317,12 @@ Ext.onReady(function(){
             plain:true,
             activeTab: 0,
             height:235,
+            /*
+              By turning off deferred rendering we are guaranteeing that the
+              form fields within tabs that are not activated will still be rendered.
+              This is often important when creating multi-tabbed forms.
+            */
+            deferredRender: false,
             defaults:{bodyStyle:'padding:10px'},
             items:[{
                 title:'Personal Details',

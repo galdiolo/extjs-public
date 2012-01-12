@@ -1,11 +1,9 @@
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
+/*!
+ * Ext JS Library 3.4.0
+ * Copyright(c) 2006-2011 Sencha Inc.
+ * licensing@sencha.com
+ * http://www.sencha.com/license
  */
-
 /**
  * @class Ext.ux.TaskBar
  * @extends Ext.util.Observable
@@ -17,65 +15,69 @@ Ext.ux.TaskBar = function(app){
 
 Ext.extend(Ext.ux.TaskBar, Ext.util.Observable, {
     init : function(){
-		this.startMenu = new Ext.ux.StartMenu(Ext.apply({
-			iconCls: 'user',
-			height: 300,
-			shadow: true,
-			title: 'Jack Slocum',
-			width: 300
-		}, this.app.startConfig));
-		
-		this.startBtn = new Ext.Button({
+        this.startMenu = new Ext.ux.StartMenu(Ext.apply({
+            iconCls: 'user',
+            height: 300,
+            shadow: true,
+            title: 'Jack Slocum',
+            width: 300
+        }, this.app.startConfig));
+
+        this.startBtn = new Ext.Button({
             text: 'Start',
             id: 'ux-startbutton',
             iconCls:'start',
             menu: this.startMenu,
             menuAlign: 'bl-tl',
             renderTo: 'ux-taskbar-start',
-            clickEvent:'mousedown',
+            clickEvent: 'mousedown',
             template: new Ext.Template(
-				'<table border="0" cellpadding="0" cellspacing="0" class="x-btn-wrap"><tbody><tr>',
-				'<td class="ux-startbutton-left"><i>&#160;</i></td><td class="ux-startbutton-center"><em unselectable="on"><button class="x-btn-text" type="{1}" style="height:30px;">{0}</button></em></td><td class="ux-startbutton-right"><i>&#160;</i></td>',
-				"</tr></tbody></table>")
+                '<table cellspacing="0" class="x-btn"><tbody class="{1}"><tr>',
+                '<td class="ux-startbutton-left"><i>&#160;</i></td>',
+                '<td class="ux-startbutton-center"><em class="{2} unselectable="on">',
+                    '<button class="x-btn-text" type="{0}" style="height:30px;"></button>',
+                '</em></td>',
+                '<td class="ux-startbutton-right"><i>&#160;</i></td>',
+                '</tr></tbody></table>')
         });
-        
-        var width = Ext.get('ux-startbutton').getWidth()+10;
-        
+
+        var width = this.startBtn.getEl().getWidth()+10;
+
         var sbBox = new Ext.BoxComponent({
-			el: 'ux-taskbar-start',
-	        id: 'TaskBarStart',
-	        minWidth: width,
-			region:'west',
-			split: true,
-			width: width
-		});
-		
-		this.tbPanel = new Ext.ux.TaskButtonsPanel({
-			el: 'ux-taskbuttons-panel',
-			id: 'TaskBarButtons',
-			region:'center'
-		});
-				
+            el: 'ux-taskbar-start',
+            id: 'TaskBarStart',
+            minWidth: width,
+            region:'west',
+            split: true,
+            width: width
+        });
+
+        this.tbPanel = new Ext.ux.TaskButtonsPanel({
+            el: 'ux-taskbuttons-panel',
+            id: 'TaskBarButtons',
+            region:'center'
+        });
+
         var container = new Ext.ux.TaskBarContainer({
-			el: 'ux-taskbar',
-			layout: 'border',
-			items: [sbBox,this.tbPanel]
-		});
-		
-		return this;
+            el: 'ux-taskbar',
+            layout: 'border',
+            items: [sbBox,this.tbPanel]
+        });
+
+        return this;
     },
-    
+
     addTaskButton : function(win){
-		return this.tbPanel.addButton(win, 'ux-taskbuttons-panel');
-	},
-	
-	removeTaskButton : function(btn){
-		this.tbPanel.removeButton(btn);
-	},
-	
-	setActiveButton : function(btn){
-		this.tbPanel.setActiveButton(btn);
-	}
+        return this.tbPanel.addButton(win, 'ux-taskbuttons-panel');
+    },
+
+    removeTaskButton : function(btn){
+        this.tbPanel.removeButton(btn);
+    },
+
+    setActiveButton : function(btn){
+        this.tbPanel.setActiveButton(btn);
+    }
 });
 
 
@@ -87,7 +89,7 @@ Ext.extend(Ext.ux.TaskBar, Ext.util.Observable, {
 Ext.ux.TaskBarContainer = Ext.extend(Ext.Container, {
     initComponent : function() {
         Ext.ux.TaskBarContainer.superclass.initComponent.call(this);
-        
+
         this.el = Ext.get(this.el) || Ext.getBody();
         this.el.setHeight = Ext.emptyFn;
         this.el.setWidth = Ext.emptyFn;
@@ -106,6 +108,7 @@ Ext.ux.TaskBarContainer = Ext.extend(Ext.Container, {
     },
 
     fireResize : function(w, h){
+        this.onResize(w, h, w, h);
         this.fireEvent('resize', this, w, h, w, h);
     }
 });
@@ -117,9 +120,9 @@ Ext.ux.TaskBarContainer = Ext.extend(Ext.Container, {
  * @extends Ext.BoxComponent
  */
 Ext.ux.TaskButtonsPanel = Ext.extend(Ext.BoxComponent, {
-	activeButton: null,
-	enableScroll: true,
-	scrollIncrement: 0,
+    activeButton: null,
+    enableScroll: true,
+    scrollIncrement: 0,
     scrollRepeatInterval: 400,
     scrollDuration: .35,
     animScroll: true,
@@ -128,69 +131,69 @@ Ext.ux.TaskButtonsPanel = Ext.extend(Ext.BoxComponent, {
     minButtonWidth: 118,
     buttonMargin: 2,
     buttonWidthSet: false,
-	
-	initComponent : function() {
+
+    initComponent : function() {
         Ext.ux.TaskButtonsPanel.superclass.initComponent.call(this);
         this.on('resize', this.delegateUpdates);
         this.items = [];
-        
+
         this.stripWrap = Ext.get(this.el).createChild({
-        	cls: 'ux-taskbuttons-strip-wrap',
-        	cn: {
-            	tag:'ul', cls:'ux-taskbuttons-strip'
+            cls: 'ux-taskbuttons-strip-wrap',
+            cn: {
+                tag:'ul', cls:'ux-taskbuttons-strip'
             }
-		});
+        });
         this.stripSpacer = Ext.get(this.el).createChild({
-        	cls:'ux-taskbuttons-strip-spacer'
+            cls:'ux-taskbuttons-strip-spacer'
         });
         this.strip = new Ext.Element(this.stripWrap.dom.firstChild);
-        
+
         this.edge = this.strip.createChild({
-        	tag:'li',
-        	cls:'ux-taskbuttons-edge'
+            tag:'li',
+            cls:'ux-taskbuttons-edge'
         });
         this.strip.createChild({
-        	cls:'x-clear'
+            cls:'x-clear'
         });
-	},
-	
-	addButton : function(win){
-		var li = this.strip.createChild({tag:'li'}, this.edge); // insert before the edge
+    },
+
+    addButton : function(win){
+        var li = this.strip.createChild({tag:'li'}, this.edge); // insert before the edge
         var btn = new Ext.ux.TaskBar.TaskButton(win, li);
-		
-		this.items.push(btn);
-		
-		if(!this.buttonWidthSet){
-			this.lastButtonWidth = btn.container.getWidth();
-		}
-		
-		this.setActiveButton(btn);
-		return btn;
-	},
-	
-	removeButton : function(btn){
-		var li = document.getElementById(btn.container.id);
-		btn.destroy();
-		li.parentNode.removeChild(li);
-		
-		var s = [];
-		for(var i = 0, len = this.items.length; i < len; i++) {
-			if(this.items[i] != btn){
-				s.push(this.items[i]);
-			}
-		}
-		this.items = s;
-		
-		this.delegateUpdates();
-	},
-	
-	setActiveButton : function(btn){
-		this.activeButton = btn;
-		this.delegateUpdates();
-	},
-	
-	delegateUpdates : function(){
-		/*if(this.suspendUpdates){
+
+        this.items.push(btn);
+
+        if(!this.buttonWidthSet){
+            this.lastButtonWidth = btn.container.getWidth();
+        }
+
+        this.setActiveButton(btn);
+        return btn;
+    },
+
+    removeButton : function(btn){
+        var li = document.getElementById(btn.container.id);
+        btn.destroy();
+        li.parentNode.removeChild(li);
+
+        var s = [];
+        for(var i = 0, len = this.items.length; i < len; i++) {
+            if(this.items[i] != btn){
+                s.push(this.items[i]);
+            }
+        }
+        this.items = s;
+
+        this.delegateUpdates();
+    },
+
+    setActiveButton : function(btn){
+        this.activeButton = btn;
+        this.delegateUpdates();
+    },
+
+    delegateUpdates : function(){
+        /*if(this.suspendUpdates){
             return;
         }*/
         if(this.resizeButtons && this.rendered){
@@ -200,7 +203,7 @@ Ext.ux.TaskButtonsPanel = Ext.extend(Ext.BoxComponent, {
             this.autoScroll();
         }
     },
-    
+
     autoSize : function(){
         var count = this.items.length;
         var ow = this.el.dom.offsetWidth;
@@ -209,38 +212,38 @@ Ext.ux.TaskButtonsPanel = Ext.extend(Ext.BoxComponent, {
         if(!this.resizeButtons || count < 1 || !aw){ // !aw for display:none
             return;
         }
-        
+
         var each = Math.max(Math.min(Math.floor((aw-4) / count) - this.buttonMargin, this.buttonWidth), this.minButtonWidth); // -4 for float errors in IE
         var btns = this.stripWrap.dom.getElementsByTagName('button');
-        
+
         this.lastButtonWidth = Ext.get(btns[0].id).findParent('li').offsetWidth;
-        
-        for(var i = 0, len = btns.length; i < len; i++) {            
+
+        for(var i = 0, len = btns.length; i < len; i++) {
             var btn = btns[i];
-            
+
             var tw = Ext.get(btns[i].id).findParent('li').offsetWidth;
             var iw = btn.offsetWidth;
-            
+
             btn.style.width = (each - (tw-iw)) + 'px';
         }
     },
-    
+
     autoScroll : function(){
-    	var count = this.items.length;
+        var count = this.items.length;
         var ow = this.el.dom.offsetWidth;
         var tw = this.el.dom.clientWidth;
-        
+
         var wrap = this.stripWrap;
         var cw = wrap.dom.offsetWidth;
         var pos = this.getScrollPos();
         var l = this.edge.getOffsetsTo(this.stripWrap)[0] + pos;
-        
+
         if(!this.enableScroll || count < 1 || cw < 20){ // 20 to prevent display:none issues
             return;
         }
-        
+
         wrap.setWidth(tw); // moved to here because of problem in Safari
-        
+
         if(l <= tw){
             wrap.dom.scrollLeft = 0;
             //wrap.setWidth(tw); moved from here because of problem in Safari
@@ -268,7 +271,7 @@ Ext.ux.TaskButtonsPanel = Ext.extend(Ext.BoxComponent, {
             if(pos > (l-tw)){ // ensure it stays within bounds
                 wrap.dom.scrollLeft = l-tw;
             }else{ // otherwise, make sure the active button is still visible
-				this.scrollToButton(this.activeButton, true); // true to animate
+                this.scrollToButton(this.activeButton, true); // true to animate
             }
             this.updateScrollButtons();
         }
@@ -276,7 +279,7 @@ Ext.ux.TaskButtonsPanel = Ext.extend(Ext.BoxComponent, {
 
     createScrollers : function(){
         var h = this.el.dom.offsetHeight; //var h = this.stripWrap.dom.offsetHeight;
-		
+
         // left
         var sl = this.el.insertFirst({
             cls:'ux-taskbuttons-scroller-left'
@@ -303,7 +306,7 @@ Ext.ux.TaskButtonsPanel = Ext.extend(Ext.BoxComponent, {
         });
         this.scrollRight = sr;
     },
-    
+
     getScrollWidth : function(){
         return this.edge.getOffsetsTo(this.stripWrap)[0] + this.getScrollPos();
     },
@@ -318,22 +321,22 @@ Ext.ux.TaskButtonsPanel = Ext.extend(Ext.BoxComponent, {
 
     getScrollAnim : function(){
         return {
-        	duration: this.scrollDuration,
-        	callback: this.updateScrollButtons,
-        	scope: this
+            duration: this.scrollDuration,
+            callback: this.updateScrollButtons,
+            scope: this
         };
     },
 
     getScrollIncrement : function(){
-    	return (this.scrollIncrement || this.lastButtonWidth+2);
+        return (this.scrollIncrement || this.lastButtonWidth+2);
     },
-    
+
     /* getBtnEl : function(item){
         return document.getElementById(item.id);
     }, */
-    
+
     scrollToButton : function(item, animate){
-    	item = item.el.dom.parentNode; // li
+        item = item.el.dom.parentNode; // li
         if(!item){ return; }
         var el = item; //this.getBtnEl(item);
         var pos = this.getScrollPos(), area = this.getScrollArea();
@@ -345,21 +348,21 @@ Ext.ux.TaskButtonsPanel = Ext.extend(Ext.BoxComponent, {
             this.scrollTo(right - area, animate);
         }
     },
-    
+
     scrollTo : function(pos, animate){
         this.stripWrap.scrollTo('left', pos, animate ? this.getScrollAnim() : false);
         if(!animate){
             this.updateScrollButtons();
         }
     },
-    
+
     onScrollRight : function(){
         var sw = this.getScrollWidth()-this.getScrollArea();
         var pos = this.getScrollPos();
         var s = Math.min(sw, pos + this.getScrollIncrement());
         if(s != pos){
-        	this.scrollTo(s, this.animScroll);
-        }        
+            this.scrollTo(s, this.animScroll);
+        }
     },
 
     onScrollLeft : function(){
@@ -369,7 +372,7 @@ Ext.ux.TaskButtonsPanel = Ext.extend(Ext.BoxComponent, {
             this.scrollTo(s, this.animScroll);
         }
     },
-    
+
     updateScrollButtons : function(){
         var pos = this.getScrollPos();
         this.scrollLeft[pos == 0 ? 'addClass' : 'removeClass']('ux-taskbuttons-scroller-left-disabled');
@@ -384,7 +387,7 @@ Ext.ux.TaskButtonsPanel = Ext.extend(Ext.BoxComponent, {
  * @extends Ext.Button
  */
 Ext.ux.TaskBar.TaskButton = function(win, el){
-	this.win = win;
+    this.win = win;
     Ext.ux.TaskBar.TaskButton.superclass.constructor.call(this, {
         iconCls: win.iconCls,
         text: Ext.util.Format.ellipsis(win.title, 12),
@@ -400,9 +403,13 @@ Ext.ux.TaskBar.TaskButton = function(win, el){
         },
         clickEvent:'mousedown',
         template: new Ext.Template(
-			'<table border="0" cellpadding="0" cellspacing="0" class="x-btn-wrap"><tbody><tr>',
-			'<td class="ux-taskbutton-left"><i>&#160;</i></td><td class="ux-taskbutton-center"><em unselectable="on"><button class="x-btn-text" type="{1}" style="height:28px;">{0}</button></em></td><td class="ux-taskbutton-right"><i>&#160;</i></td>',
-			"</tr></tbody></table>")
+            '<table cellspacing="0" class="x-btn {3}"><tbody><tr>',
+            '<td class="ux-taskbutton-left"><i>&#160;</i></td>',
+            '<td class="ux-taskbutton-center"><em class="{5} unselectable="on">',
+                '<button class="x-btn-text {2}" type="{1}" style="height:28px;">{0}</button>',
+            '</em></td>',
+            '<td class="ux-taskbutton-right"><i>&#160;</i></td>',
+            "</tr></tbody></table>")
     });
 };
 
@@ -454,13 +461,13 @@ Ext.extend(Ext.ux.TaskBar.TaskButton, Ext.Button, {
             this.cmenu.showAt(xy);
         }, this);
     },
-    
+
     closeWin : function(cMenu, e, win){
-		if(!win.isVisible()){
-			win.show();
-		}else{
-			win.restore();
-		}
-		win.close();
-	}
+        if(!win.isVisible()){
+            win.show();
+        }else{
+            win.restore();
+        }
+        win.close();
+    }
 });

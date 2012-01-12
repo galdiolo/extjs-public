@@ -1,12 +1,9 @@
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
+/*!
+ * Ext JS Library 3.4.0
+ * Copyright(c) 2006-2011 Sencha Inc.
+ * licensing@sencha.com
+ * http://www.sencha.com/license
  */
-
-
 Ext.QuickTips.init();
 
 Ext.onReady(function(){
@@ -45,7 +42,7 @@ Ext.onReady(function(){
                         url: 'fake.php',
                         success: function(){
                             sb.setStatus({
-                                text:'Form saved!', 
+                                text:'Form saved!',
                                 iconCls:'',
                                 clear: true
                             });
@@ -56,7 +53,7 @@ Ext.onReady(function(){
             }
         }]
     });
-    
+
     new Ext.Panel({
         title: 'StatusBar with Integrated Form Validation',
         renderTo: Ext.getBody(),
@@ -64,11 +61,11 @@ Ext.onReady(function(){
         autoHeight: true,
         layout: 'fit',
         items: fp,
-        bbar: new Ext.StatusBar({
+        bbar: new Ext.ux.StatusBar({
             id: 'form-statusbar',
             defaultText: 'Ready',
             plugins: new Ext.ux.ValidationStatus({form:'status-form'})
         })
     });
-    
+
 });

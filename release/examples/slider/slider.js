@@ -1,11 +1,9 @@
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
+/*!
+ * Ext JS Library 3.4.0
+ * Copyright(c) 2006-2011 Sencha Inc.
+ * licensing@sencha.com
+ * http://www.sencha.com/license
  */
-
 Ext.onReady(function(){
 
     new Ext.Slider({
@@ -37,12 +35,12 @@ Ext.onReady(function(){
         width: 214,
         minValue: 0,
         maxValue: 100,
-        plugins: new Ext.ux.SliderTip()
+        plugins: new Ext.slider.Tip()
     });
 
-    var tip = new Ext.ux.SliderTip({
-        getText: function(slider){
-            return String.format('<b>{0}% complete</b>', slider.getValue());
+    var tip = new Ext.slider.Tip({
+        getText: function(thumb){
+            return String.format('<b>{0}% complete</b>', thumb.value);
         }
     });
 
@@ -61,6 +59,25 @@ Ext.onReady(function(){
         increment: 10,
         minValue: 0,
         maxValue: 100,
-        plugins: new Ext.ux.SliderTip()
+        plugins: new Ext.slider.Tip()
+    });
+    
+    new Ext.slider.MultiSlider({
+        renderTo: 'multi-slider-horizontal',
+        width   : 214,
+        minValue: 0,
+        maxValue: 100,
+        values  : [10, 50, 90],
+        plugins : new Ext.slider.Tip()
+    });
+    
+    new Ext.slider.MultiSlider({
+        renderTo : 'multi-slider-vertical',
+        vertical : true,
+        height   : 214,
+        minValue: 0,
+        maxValue: 100,
+        values  : [10, 50, 90],
+        plugins : new Ext.slider.Tip()
     });
 });
