@@ -1,19 +1,19 @@
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
+Ext.require([
+    'Ext.form.field.File',
+    'Ext.form.Panel',
+    'Ext.window.MessageBox'
+]);
 
+Ext.onReady(function() {
 
-Ext.onReady(function(){
+//  Class which shows invisible file input field.
+    if (window.location.href.indexOf('debug') !== -1) {
+        Ext.getBody().addCls('x-debug');
+    }
 
-    Ext.QuickTips.init();
-    
-    var msg = function(title, msg){
+    var msg = function(title, msg) {
         Ext.Msg.show({
-            title: title, 
+            title: title,
             msg: msg,
             minWidth: 200,
             modal: true,
@@ -21,13 +21,14 @@ Ext.onReady(function(){
             buttons: Ext.Msg.OK
         });
     };
-    
-    var fibasic = new Ext.form.FileUploadField({
+
+    var fibasic = Ext.create('Ext.form.field.File', {
         renderTo: 'fi-basic',
-        width: 400
+        width: 400,
+        hideLabel: true
     });
- 
-    new Ext.Button({
+
+    Ext.create('Ext.button.Button', {
         text: 'Get File Path',
         renderTo: 'fi-basic-btn',
         handler: function(){
@@ -35,20 +36,24 @@ Ext.onReady(function(){
             msg('Selected File', v && v != '' ? v : 'None');
         }
     });
-    
-    var fbutton = new Ext.form.FileUploadField({
+
+    Ext.create('Ext.form.field.File', {
         renderTo: 'fi-button',
         buttonOnly: true,
+        hideLabel: true,
         listeners: {
-            'fileselected': function(fb, v){
-                var el = Ext.fly('fi-button-msg');
+            'change': function(fb, v){
+                var el = Ext.get('fi-button-msg');
                 el.update('<b>Selected:</b> '+v);
                 if(!el.isVisible()){
                     el.slideIn('t', {
-                        duration: .2,
+                        duration: 200,
                         easing: 'easeIn',
-                        callback: function(){
-                            el.highlight();
+                        listeners: {
+                            afteranimate: function() {
+                                el.highlight();
+                                el.setWidth(null);
+                            }
                         }
                     });
                 }else{
@@ -57,54 +62,56 @@ Ext.onReady(function(){
             }
         }
     });
-    
-    var fp = new Ext.FormPanel({
+
+    Ext.create('Ext.form.Panel', {
         renderTo: 'fi-form',
-        fileUpload: true,
         width: 500,
         frame: true,
         title: 'File Upload Form',
-        autoHeight: true,
-        bodyStyle: 'padding: 10px 10px 0 10px;',
-        labelWidth: 50,
+        bodyPadding: '10 10 0',
+
         defaults: {
-            anchor: '95%',
+            anchor: '100%',
             allowBlank: false,
-            msgTarget: 'side'
+            msgTarget: 'side',
+            labelWidth: 50
         },
+
         items: [{
             xtype: 'textfield',
             fieldLabel: 'Name'
         },{
-            xtype: 'fileuploadfield',
+            xtype: 'filefield',
             id: 'form-file',
             emptyText: 'Select an image',
             fieldLabel: 'Photo',
             name: 'photo-path',
-            buttonCfg: {
-                text: '',
+            buttonText: '',
+            buttonConfig: {
                 iconCls: 'upload-icon'
             }
         }],
+
         buttons: [{
             text: 'Save',
             handler: function(){
-                if(fp.getForm().isValid()){
-	                fp.getForm().submit({
-	                    url: 'file-upload.php',
-	                    waitMsg: 'Uploading your photo...',
-	                    success: function(fp, o){
-	                        msg('Success', 'Processed file "'+o.result.file+'" on the server');
-	                    }
-	                });
+                var form = this.up('form').getForm();
+                if(form.isValid()){
+                    form.submit({
+                        url: 'file-upload.php',
+                        waitMsg: 'Uploading your photo...',
+                        success: function(fp, o) {
+                            msg('Success', 'Processed file "' + o.result.file + '" on the server');
+                        }
+                    });
                 }
             }
         },{
             text: 'Reset',
-            handler: function(){
-                fp.getForm().reset();
+            handler: function() {
+                this.up('form').getForm().reset();
             }
         }]
     });
-    
+
 });

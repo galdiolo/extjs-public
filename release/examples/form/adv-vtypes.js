@@ -1,113 +1,117 @@
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
+Ext.require([
+    'Ext.form.*',
+    'Ext.tip.QuickTipManager'
+]);
 
-// Add the additional 'advanced' VTypes
-Ext.apply(Ext.form.VTypes, {
-    daterange : function(val, field) {
-        var date = field.parseDate(val);
+Ext.onReady(function() {
 
-        if(!date){
-            return;
-        }
-        if (field.startDateField && (!this.dateRangeMax || (date.getTime() != this.dateRangeMax.getTime()))) {
-            var start = Ext.getCmp(field.startDateField);
-            start.setMaxValue(date);
-            start.validate();
-            this.dateRangeMax = date;
-        } 
-        else if (field.endDateField && (!this.dateRangeMin || (date.getTime() != this.dateRangeMin.getTime()))) {
-            var end = Ext.getCmp(field.endDateField);
-            end.setMinValue(date);
-            end.validate();
-            this.dateRangeMin = date;
-        }
-        /*
-         * Always return true since we're only using this vtype to set the
-         * min/max allowed values (these are tested for after the vtype test)
-         */
-        return true;
-    },
+    // Add the additional 'advanced' VTypes
+    Ext.apply(Ext.form.field.VTypes, {
+        daterange: function(val, field) {
+            var date = field.parseDate(val);
 
-    password : function(val, field) {
-        if (field.initialPassField) {
-            var pwd = Ext.getCmp(field.initialPassField);
-            return (val == pwd.getValue());
-        }
-        return true;
-    },
+            if (!date) {
+                return false;
+            }
+            if (field.startDateField && (!this.dateRangeMax || (date.getTime() != this.dateRangeMax.getTime()))) {
+                var start = field.up('form').down('#' + field.startDateField);
+                start.setMaxValue(date);
+                start.validate();
+                this.dateRangeMax = date;
+            }
+            else if (field.endDateField && (!this.dateRangeMin || (date.getTime() != this.dateRangeMin.getTime()))) {
+                var end = field.up('form').down('#' + field.endDateField);
+                end.setMinValue(date);
+                end.validate();
+                this.dateRangeMin = date;
+            }
+            /*
+             * Always return true since we're only using this vtype to set the
+             * min/max allowed values (these are tested for after the vtype test)
+             */
+            return true;
+        },
 
-    passwordText : 'Passwords do not match'
-});
+        daterangeText: 'Start date must be less than end date',
 
-Ext.onReady(function(){
+        password: function(val, field) {
+            if (field.initialPassField) {
+                var pwd = field.up('form').down('#' + field.initialPassField);
+                return (val == pwd.getValue());
+            }
+            return true;
+        },
 
-    Ext.QuickTips.init();
-
-    // turn on validation errors beside the field globally
-    Ext.form.Field.prototype.msgTarget = 'side';
-
-    var bd = Ext.getBody();
-
-		/*
-		 * ================  Date Range  =======================
-		 */
+        passwordText: 'Passwords do not match'
+    });
     
-    var dr = new Ext.FormPanel({
-      labelWidth: 125,
-      frame: true,
-      title: 'Date Range',
-	  bodyStyle:'padding:5px 5px 0',
-	  width: 350,
-      defaults: {width: 175},
-      defaultType: 'datefield',
-      items: [{
-        fieldLabel: 'Start Date',
-        name: 'startdt',
-        id: 'startdt',
-        vtype: 'daterange',
-        endDateField: 'enddt' // id of the end date field
-      },{
-        fieldLabel: 'End Date',
-        name: 'enddt',
-        id: 'enddt',
-        vtype: 'daterange',
-        startDateField: 'startdt' // id of the start date field
-      }]
+    Ext.tip.QuickTipManager.init();
+
+    /*
+     * ================  Date Range  =======================
+     */
+
+    var dr = Ext.create('Ext.form.Panel', {
+        renderTo: 'dr',
+        frame: true,
+        title: 'Date Range',
+        bodyPadding: '5 5 0',
+        width: 350,
+        fieldDefaults: {
+            labelWidth: 125,
+            msgTarget: 'side',
+            autoFitErrors: false
+        },
+        defaults: {
+            width: 300
+        },
+        defaultType: 'datefield',
+        items: [{
+            fieldLabel: 'Start Date',
+            name: 'startdt',
+            itemId: 'startdt',
+            vtype: 'daterange',
+            endDateField: 'enddt' // id of the end date field
+        }, {
+            fieldLabel: 'End Date',
+            name: 'enddt',
+            itemId: 'enddt',
+            vtype: 'daterange',
+            startDateField: 'startdt' // id of the start date field
+        }]
     });
 
-    dr.render('dr');
-    
+
     /*
      * ================  Password Verification =======================
      */
-        
-    var pwd = new Ext.FormPanel({
-      labelWidth: 125,
-      frame: true,
-      title: 'Password Verification',
-      bodyStyle:'padding:5px 5px 0',
-      width: 350,
-      defaults: {
-        width: 175,
-        inputType: 'password'
-      },
-      defaultType: 'textfield',
-      items: [{
-        fieldLabel: 'Password',
-        name: 'pass',
-        id: 'pass'
-      },{
-        fieldLabel: 'Confirm Password',
-        name: 'pass-cfrm',
-        vtype: 'password',
-        initialPassField: 'pass' // id of the initial password field
-      }]
+
+    var pwd = Ext.create('Ext.form.Panel', {
+        renderTo: 'pw',
+        frame: true,
+        title: 'Password Verification',
+        bodyPadding: '5 5 0',
+        width: 350,
+        fieldDefaults: {
+            labelWidth: 125,
+            msgTarget: 'side',
+            autoFitErrors: false
+        },
+        defaults: {
+            width: 300,
+            inputType: 'password'
+        },
+        defaultType: 'textfield',
+        items: [{
+            fieldLabel: 'Password',
+            name: 'pass',
+            itemId: 'pass'
+        }, {
+            fieldLabel: 'Confirm Password',
+            name: 'pass-cfrm',
+            vtype: 'password',
+            initialPassField: 'pass' // id of the initial password field
+        }]
     });
 
-    pwd.render('pw');
 });

@@ -1,43 +1,99 @@
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
+Ext.Loader.setConfig({enabled: true});
 
-Ext.onReady(function(){
+Ext.Loader.setPath('Ext.ux', '../ux/');
 
-    var tabs = new Ext.TabPanel({
-        renderTo:'tabs',
-        resizeTabs:true, // turn on tab resizing
-        minTabWidth: 115,
-        tabWidth:135,
-        enableTabScroll:true,
-        width:600,
-        height:250,
-        defaults: {autoScroll:true},
-        plugins: new Ext.ux.TabCloseMenu()
+Ext.require([
+    'Ext.tab.*',
+    'Ext.ux.TabCloseMenu'
+]);
+
+Ext.onReady(function() {
+    var currentItem;
+
+    var tabs = Ext.widget('tabpanel', {
+        renderTo: 'tabs',
+        resizeTabs: true,
+        enableTabScroll: true,
+        width: 600,
+        height: 250,
+        defaults: {
+            autoScroll: true,
+            bodyPadding: 10
+        },
+        items: [{
+            title: 'Tab 1',
+            iconCls: 'tabs',
+            html: 'Tab Body<br/><br/>' + Ext.example.bogusMarkup,
+            closable: true
+        }],
+        plugins: Ext.create('Ext.ux.TabCloseMenu', {
+            extraItemsTail: [
+                '-',
+                {
+                    text: 'Closable',
+                    checked: true,
+                    hideOnClick: true,
+                    handler: function (item) {
+                        currentItem.tab.setClosable(item.checked);
+                    }
+                },
+                '-',
+                {
+                    text: 'Enabled',
+                    checked: true,
+                    hideOnClick: true,
+                    handler: function(item) {
+                        currentItem.tab.setDisabled(!item.checked);
+                    }
+                }
+            ],
+            listeners: {
+                aftermenu: function () {
+                    currentItem = null;
+                },
+                beforemenu: function (menu, item) {
+                    menu.child('[text="Closable"]').setChecked(item.closable);
+                    menu.child('[text="Enabled"]').setChecked(!item.tab.isDisabled());
+
+                    currentItem = item;
+                }
+            }
+        })
     });
 
     // tab generation code
     var index = 0;
-    while(index < 7){
-        addTab();
+
+    while(index < 3) {
+        addTab(index % 2);
     }
-    function addTab(){
+
+    function addTab (closable) {
+        ++index;
         tabs.add({
-            title: 'New Tab ' + (++index),
+            closable: !!closable,
+            html: 'Tab Body ' + index + '<br/><br/>' + Ext.example.bogusMarkup,
             iconCls: 'tabs',
-            html: 'Tab Body ' + (index) + '<br/><br/>'
-                    + Ext.example.bogusMarkup,
-            closable:true
+            title: 'New Tab ' + index
         }).show();
     }
 
-    new Ext.Button({
-        text: 'Add Tab',
-        handler: addTab,
-        iconCls:'new-tab'
-    }).render(document.body, 'tabs');
+    Ext.widget('button', {
+        iconCls: 'new-tab',
+        renderTo: 'addButtonCt',
+        text: 'Add Closable Tab',
+        handler: function () {
+            addTab(true);
+        }
+    });
+
+    Ext.widget('button', {
+        iconCls:'new-tab',
+        renderTo: 'addButtonCt',
+        style: 'margin-left: 8px;',
+        text: 'Add Unclosable Tab',
+        handler: function () {
+            addTab(false);
+        }
+    });
 });

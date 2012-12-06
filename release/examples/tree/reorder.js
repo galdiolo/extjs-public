@@ -1,35 +1,66 @@
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
+Ext.require([
+    'Ext.tree.*',
+    'Ext.data.*',
+    'Ext.tip.*'
+]);
 
-Ext.onReady(function(){
-    // shorthand
-    var Tree = Ext.tree;
+Ext.onReady(function() {
+    Ext.QuickTips.init();
     
-    var tree = new Tree.TreePanel({
-        el:'tree-div',
-        useArrows:true,
-        autoScroll:true,
-        animate:true,
-        enableDD:true,
-        containerScroll: true,
-
-        // auto create TreeLoader
-        dataUrl: 'get-nodes.php',
-
+    var store = Ext.create('Ext.data.TreeStore', {
+        proxy: {
+            type: 'ajax',
+            url: 'get-nodes.php'
+        },
         root: {
-            nodeType: 'async',
             text: 'Ext JS',
-            draggable:false,
-            id:'source'
-        }
+            id: 'src',
+            expanded: true
+        },
+        folderSort: true,
+        sorters: [{
+            property: 'text',
+            direction: 'ASC'
+        }]
     });
 
-    // render the tree
-    tree.render();
-    tree.getRootNode().expand();
+    var tree = Ext.create('Ext.tree.Panel', {
+        store: store,
+        viewConfig: {
+            plugins: {
+                ptype: 'treeviewdragdrop'
+            }
+        },
+        renderTo: 'tree-div',
+        height: 300,
+        width: 250,
+        title: 'Files',
+        useArrows: true,
+        dockedItems: [{
+            xtype: 'toolbar',
+            items: [{
+                text: 'Expand All',
+                handler: function(){
+                    tree.getEl().mask('Expanding tree...');
+                    var toolbar = this.up('toolbar');
+                    toolbar.disable();
+                    
+                    tree.expandAll(function() {
+                        tree.getEl().unmask();
+                        toolbar.enable();
+                    });
+                }
+            }, {
+                text: 'Collapse All',
+                handler: function(){
+                    var toolbar = this.up('toolbar');
+                    toolbar.disable();
+                    
+                    tree.collapseAll(function() {
+                        toolbar.enable();
+                    });
+                }
+            }]
+        }]
+    });
 });
