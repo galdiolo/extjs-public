@@ -1,0 +1,5 @@
+com.sencha.gxt.legacy.client.binding
+com.sencha.gxt.legacy.client.core
+com.sencha.gxt.legacy.client.core.js
+com.sencha.gxt.legacy.client.data
+com.sencha.gxt.legacy.client.mvc

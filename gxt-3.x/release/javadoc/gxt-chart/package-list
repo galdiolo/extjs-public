@@ -1,0 +1,8 @@
+com.sencha.gxt.chart.client.chart
+com.sencha.gxt.chart.client.chart.axis
+com.sencha.gxt.chart.client.chart.event
+com.sencha.gxt.chart.client.chart.series
+com.sencha.gxt.chart.client.draw
+com.sencha.gxt.chart.client.draw.engine
+com.sencha.gxt.chart.client.draw.path
+com.sencha.gxt.chart.client.draw.sprite
