@@ -1,0 +1,63 @@
+Quick Setup for Sencha GXT 3.X
+===========================
+
+Note: GXT 3.X requires GWT 2.4+.
+
+STEP 1 -> Create a Google Web Application Project project within Eclipse.
+
+STEP 2 -> Make the following changes to your host HTML page
+
+2a. GXT 3.X requires a strict dtd. Add either of these as the first line in the host page:
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+or
+
+<!DOCTYPE html>
+
+2b. Add a stylesheet link to reset.css and ensure it is the first referenced stylesheet:
+
+<link rel="stylesheet" type="text/css" href="{module name}/reset.css" />
+
+STEP 3 -> Add the following entry to your project's module xml file.
+
+<inherits name='com.sencha.gxt.ui.GXT'/>
+
+This inherits all GXT modules. As an alternative, individual GXT modules can be inherited rather than inheriting all modules,
+but this is the easiest way to get started, and covers most of the default cases.
+
+STEP 4 -> Eclipse Setup (should be similar for other development environments)
+These instructions assume you have an existing project and launch configuration.
+
+4a. Add gxt-3.X.X.jar to the project directly from the downloaded zip.
+	a. Right click on project name in 'Package Explorer'.
+	b. Select 'Properties' from the content menu.
+	c. Select 'Java Build Path'.
+	d. Select 'Libraries' tab.
+	e. Add the gxt-3.X.X.jar either with 'Add JARs...' or 'Add External JARs...'.
+
+4b. Add GXT jar to launch configuration.
+	a. Choose Run / Open Run Dialog.
+	b. Select your appropriate launch configuration under 'Java Application'.
+	c. Select the 'Classpath' tab.
+	d. Add the gxt-3.X.X.jar to the classpath under 'User Entries'.
+
+
+If using Maven for project and dependency management, Sencha GXT artifacts are available in several ways. To get the commercially
+licensed releases, you will need to add the following repository section to your pom.xml:
+	
+	<repository>
+	  <id>sencha-commercial-release</id>
+	  <name>Sencha commercial releases</name>
+	  <url>https://maven.sencha.com/repo/commercial-release/</url>
+	</repository>
+	
+For GPLv3 licensed jars, you may use maven central.
+
+There are several artifacts available:
+
+  a. gxt-release - A zip of the release, similar to how GXT was released before 3.0
+  b. gxt - The core component and data classes
+  c. gxt-charts - The new drawing and charting API
+  d. gxt-legacy - Classes to ease porting projects from earlier GXT versions
+  c. uibinder-bridge - Optional support to allow complete construction of non Widget types using <ui:with> in UiBinder XML. Will not be required when Google releases 2.5

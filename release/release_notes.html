@@ -1,0 +1,1035 @@
+<html> 
+<head> 
+    <title>Sencha GXT Release Notes</title> 
+    <link rel="stylesheet" type="text/css" href="welcome/release-notes.css" />
+</head> 
+ 
+<body> 
+<p>
+  <a href="http://www.sencha.com/" id="logo" name="logo">Sencha GXT - GWT Framework</a>
+</p>
+
+<h1>GXT Library Release Notes</h1>
+<ul>
+  <li><a class="link" href="#Release_3.0.1">Release 3.0.1 (8/13/12 - tag 3.0.1)</a></li>
+  <li><a class="link" href="#Release_3.0.0">Release 3.0 (4/30/12 - tag 3.0.0)</a></li>
+  <li><a class="link" href="#Release_3.0.0-rc2">Release 3.0 RC2 (4/12/12 - tag 3.0.0-rc2)</a></li>
+  <li><a class="link" href="#Release_3.0.0-rc">Release 3.0 RC (3/27/12 - tag 3.0.0-rc)</a></li>
+  <li><a class="link" href="#Release_3.0.0-beta4">Release 3.0 Beta 4 (2/29/12 - tag 3.0.0-beta4)</a></li>
+  <li><a class="link" href="#Release_3.0.0-beta3">Release 3.0 Beta 3 (2/14/12 - tag 3.0.0-beta3)</a></li>
+  <li><a class="link" href="#Release_3.0.0-beta2">Release 3.0 Beta 2 (1/5/12 - tag 3.0.0-beta2)</a></li>
+  <li><a class="link" href="#Release_3.0.0-beta1">Release 3.0 Beta 1 (12/7/11 - rev 1987)</a></li>
+  <li><a class="link" href="#Release_3.0.0-dp5">Release 3.0 DP5 (10/18/11 - rev 1806)</a></li>
+  <li><a class="link" href="#Release_3.0.0-dp4">Release 3.0 DP4 (9/7/11 - rev 1461)</a></li>
+</ul>
+
+
+
+<h2><a name="Release_3.0.1">Release 3.0.1 (8/13/12 - tag 3.0.1)</a></h2>
+
+<h3>General Changes &amp; Enhancements</h3>
+<ul>
+  <li>[EXTGWT-1146] - Provide examples on how to observe model updates</li>
+  <li>[EXTGWT-1517] - Chart example using store filters.</li>
+  <li>[EXTGWT-1764] - Incremental enhancements to Desktop Example</li>
+  <li>[EXTGWT-1914] - Implement Gray theme</li>
+  <li>[EXTGWT-2044] - Change docs ModelKeyProvider getKey to document nulls values are not supported</li>
+  <li>[EXTGWT-2065] - No select-all check box in header</li>
+  <li>[EXTGWT-2072] - Add Bar series selection in Dashboard example.</li>
+  <li>[EXTGWT-2073] - Opening Explorer demo with invalid fragment fails</li>
+  <li>[EXTGWT-2142] - Chart example with dynamic fields.</li>
+  <li>[EXTGWT-2178] - Additional step options for CartesianAxis.</li>
+  <li>[EXTGWT-2184] - Line chart example with gaps in data.</li>
+  <li>[EXTGWT-2301] - Bar series that displays positive and negative values simultaneously.</li>
+</ul>
+
+<h3>API Changes</h3>
+<ul>
+  <li>Added tip() method to TipDefaultAppearance.TipStyle and modified default tip HTML template.</li>
+  <li>Removed columnLines() from GridBaseAppearance.GridStyle.</li>
+  <li>Added columnLines() to GridView.GridDataTableStyles.</li>
+  <li>Added isSelectAllCheckBox setSelectAllChecked to CheckBoxSelectionModel</li>
+  <li>Moved setAnimated and isAnimated methods from DrawComponent to Chart.</li>
+  <li>Removed protected CellBeforeSelectionEvent(T item) constructor from CellBeforeSelectionEvent</li>
+  <li>Removed protected CellSelectionEvent(T item) constructor from CellSelectionEvent</li>
+  <li>Added new constructors to GroupingView</li>
+  <li>IMPORTANT Selections models now fire the SelectionChangeEvent deferred. It is important to note this change as it could
+  effect application logic if code expects event to fire synchronously.</li>
+  <li>Renamed HtmlEditor.isShowToolbar(boolean) to HtmlEditor.isShowToolBar(boolean)</li>
+</ul>
+
+<h3>Bug Fixes</h3>
+<ul>
+  <li>[EXTGWT-1461] - JSONObject can't be found without manual intervention for project dependencies</li>
+  <li>[EXTGWT-1681] - Layouts -> LayoutPanel Integration:“Center” and “East” panels are coming out of main panel</li>
+  <li>[EXTGWT-1769] - Cancelling selection event on TextButton doesn't prevent button from appearing pressed</li>
+  <li>[EXTGWT-1787] - Tooltip headings are not visible</li>
+  <li>[EXTGWT-1798] - List property binding example: save button doesn't commit edits</li>
+  <li>[EXTGWT-1819] - Possible ComboBox-as-editor bug</li>
+  <li>[EXTGWT-1855] - Tab key navigation doesn't work after modifying a field in IE9</li>
+  <li>[EXTGWT-1898] - Resizing collapsed content panel moves header off-screen</li>
+  <li>[EXTGWT-1942] - History token flicker on Explorer load puts unnecessary entries into history</li>
+  <li>[EXTGWT-1957] - Text field in wrong place when editing tree grid with hidden columns</li>
+  <li>[EXTGWT-1966] - In chrome SVG text jumps on reload.</li>
+  <li>[EXTGWT-1967] - Can't focus another field after entering text in IE9</li>
+  <li>[EXTGWT-1974] - Charts -> Column Renderer Chart: Clicking on 'Shadow' button reloads the chart bars.</li>
+  <li>[EXTGWT-1989] - Charts: Area, AreaRenderer, StackedBar,Mixed Charts: Text on x-axis oy y-axis disappears when legend items are turned off.</li>
+  <li>[EXTGWT-1994] - In VML view box does not work with transformed text.</li>
+  <li>[EXTGWT-2017] - Charts – Dashboard: Revisiting the example making the graph bars overlap with all the Names</li>
+  <li>[EXTGWT-2019] - TreeGrid: value in editor not {set?,redrawn?} if clicking on another cell in same row</li>
+  <li>[EXTGWT-2020] - Grid column header width changes on sort</li>
+  <li>[EXTGWT-2035] - Area chart breaks when all series hidden</li>
+  <li>[EXTGWT-2036] - DatePicker todayBtn visibility should be protected not private</li>
+  <li>[EXTGWT-2037] - Radial axis rendering error.</li>
+  <li>[EXTGWT-2039] - Tree findNode(Element target) should not URL.decode id</li>
+  <li>[EXTGWT-2054] - [s7966] Resizing a container with LiveGridView caused stac</li>
+  <li>[EXTGWT-2061] - [s7989] SideErrorHandler should not constrain to viewport</li>
+  <li>[EXTGWT-2071] - Error icon is displayed in wrong location when its corresponding widget is offscreen</li>
+  <li>[EXTGWT-2080] - Remote sorting in GXT 3.0 Grid</li>
+  <li>[EXTGWT-2081] - Bar series shadows do not refresh properly on changed store size.</li>
+  <li>[EXTGWT-2086] - Grouping grid can't group with null values</li>
+  <li>[EXTGWT-2109] - Content of a tab doesn't display if it includes a FileUploadField</li>
+  <li>[EXTGWT-2111] - ToolBar Button onClick override not invoked when Button is in ToolBar overflow menu</li>
+  <li>[EXTGWT-2115] - PortalLayoutContainer does not handle clear properly, throws on subsequent add</li>
+  <li>[EXTGWT-2118] - Grid displays hidden column values after grid state is restored in IE8</li>
+  <li>[EXTGWT-2126] - Chrome 19 fixed layout tables now behave as border boxes</li>
+  <li>[EXTGWT-2127] - Label ratio does not render correctly when changing number of items.</li>
+  <li>[EXTGWT-2131] - Problem with private access to Sprites in Surface</li>
+  <li>[EXTGWT-2141] - [s7998] Grid setAllowTextSelection(true) does not enable text selections</li>
+  <li>[EXTGWT-2143] - [s8018] Incorrect header sort rendering after hide a colum</li>
+  <li>[EXTGWT-2144] - Label rotation issue in time axis on Firefox.</li>
+  <li>[EXTGWT-2145] - Time axis label alignment is off.</li>
+  <li>[EXTGWT-2154] - Incorrect wording in DateField error tip</li>
+  <li>[EXTGWT-2155] - Disabled radio buttons can be selected by clicking their labels</li>
+  <li>[EXTGWT-2160] - No custom GridAppearance in GroupingView constructor</li>
+  <li>[EXTGWT-2161] - Bar series rendering artifacts.</li>
+  <li>[EXTGWT-2162] - Localization for LiveGridView/Mask loading text</li>
+  <li>[EXTGWT-2164] - Error when displaying scatter items larger than the width of the chart allows.</li>
+  <li>[EXTGWT-2165] - Could we have a getter for EditorConverterAdapter converter?</li>
+  <li>[EXTGWT-2167] - IE8 TextArea GXT 3.0 GA critical performance issue</li>
+  <li>[EXTGWT-2170] - Legacy XTemplate issue</li>
+  <li>[EXTGWT-2171] - ComboBoxCell queryDelay member variable has no Accessor or Mutator Methods</li>
+  <li>[EXTGWT-2174] - [s8179] Remove draw component attached check on render.</li>
+  <li>[EXTGWT-2176] - Tool tip issues in area series.</li>
+  <li>[EXTGWT-2177] - Area series axis scaling issue.</li>
+  <li>[EXTGWT-2179] - Series throws a null pointer exception when ValueProvider getPath is null.</li>
+  <li>[EXTGWT-2181] - Checkbox selection model does not clear header checkbox when paging</li>
+  <li>[EXTGWT-2182] - Null pointer exception in ScatterHighlighter when using gapped line series.</li>
+  <li>[EXTGWT-2183] - Inline grid editor: value not committed if application focus changes in IE8</li>
+  <li>[EXTGWT-2185] - Labels do not redraw correctly in bar series when changing the store size.</li>
+  <li>[EXTGWT-2189] - When changing the store size of scatter series shadows are not removed.</li>
+  <li>[EXTGWT-2190] - VML throws an exception when rendering a TextSprite with the text as null.</li>
+  <li>[EXTGWT-2191] - Account for any exceptions caused by setting sprite properties to null.</li>
+  <li>[EXTGWT-2193] - Line series scaling is off when using an axis with AdjustMaximumByMajorUnit turned on.</li>
+  <li>[EXTGWT-2197] - Axis performance.</li>
+  <li>[EXTGWT-2198] - Charts : Filter Charts : Displaying error message popup upon deleting the data in spinner fields in a specific scenario</li>
+  <li>[EXTGWT-2200] - Draw : Logos : Sencha logo is not displaying under sencha tab in logos example.</li>
+  <li>[EXTGWT-2212] - [s8391] ColumnHeader groups widths wrong when text greater than column width</li>
+  <li>[EXTGWT-2214] - Context is null for CellSelectionEvent and CellBeforeSelectionEvent</li>
+  <li>[EXTGWT-2216] - Charts– Area chart – UI disturbed when all legend items are unchecked and minimize the chart</li>
+  <li>[EXTGWT-2217] - Charts : Dashboard: Entering filter value under equal(=) option displaying an exception error</li>
+  <li>[EXTGWT-2221] - Cells firing SelectionEvent / BeforeSelectionEvent rather than CellSelectionEvent / CellBeforeSelectionEvent</li>
+  <li>[EXTGWT-2223] - ColumnTextClassName applied too often</li>
+  <li>[EXTGWT-2227] - Aggregation Grid throwing an exception</li>
+  <li>[EXTGWT-2228] - Charts : Dynamic Line Chart: Combo box drop down is not responding from second time once after removing any item</li>
+  <li>[EXTGWT-2229] - Charts : Dynamic Line Chart: “Add” field is accepting spaces as legend names</li>
+  <li>[EXTGWT-2230] - Charts: Filter Chart: Spinner value is not editable when tapped on center of button</li>
+  <li>[EXTGWT-2241] - Grids : All Grids : The column alignment get disturbed when first column in the grid is hide.</li>
+  <li>[EXTGWT-2242] - ListView trackMouseOver set to false by default</li>
+  <li>[EXTGWT-2251] - Charts : Filter Chart: “Reload Data” button and “Xmax” field are missing when chart window is resized</li>
+  <li>[EXTGWT-2264] - Charts : Dynamic Line Chart: Clicking on “Add” button raises exception when Add field value is empty</li>
+  <li>[EXTGWT-2265] - Charts : Dashboard: Data is not shown, when valid equal value is given under filter</li>
+  <li>[EXTGWT-2268] - Dashboard: Getting error when correct data is submitted for second time, after submitting nonexisting data in < and > fields</li>
+  <li>[EXTGWT-2269] - Tabs in TabPanel cannot have html, even when using SafeHtml</li>
+  <li>[EXTGWT-2271] - TextField.setTabIndex - wrong implementation</li>
+  <li>[EXTGWT-2272] - HSV and HSL do not work in SVG.</li>
+  <li>[EXTGWT-2275] - ImageSprite retains its old values when the resource is set to null.</li>
+  <li>[EXTGWT-2281] - Charts: Dashboard: Validation alert is seen even after data in the fields is populated</li>
+  <li>[EXTGWT-2294] - Binding: List Property Binding: Edited data not getting saved</li>
+  <li>[EXTGWT-2309] - Grid Binding : Symbol field is not cleared even after click on Save button</li>
+  <li>[EXTGWT-2320] - Clearing the surface of sprites throws an exception.</li>
+  <li>[EXTGWT-2323] - Charts : Filter Chart: Y Max and X Max spinner fields are displaying invalid error message when zero is entered</li>
+  <li>[EXTGWT-2324] - Charts : Scatter Renderer Chart: Graph circles are overlapping with toolbar buttons when max radius is selected in IE 9</li>
+  <li>[EXTGWT-2326] - Dynamic Chart –Invalid text is displaying near origin when no legend items to display</li>
+  <li>[EXTGWT-2352] - Grouped bars used in the series labels throw a null pointer exception.</li>
+  <li>[EXTGWT-2123] - Grid columnLines not working</li>
+  <li>[EXTGWT-2126] - Chrome 19 fixed layout tables now behave as border boxes</li>
+  <li>[EXTGWT-2166] - IE8 Grid first column takes up all space when first rendered</li>
+</ul>
+
+<h2><a name="Release_3.0.0">Release 3.0 (4/30/12 - tag 3.0.0)</a></h2>
+
+<h3>General Changes &amp; Enhancements</h3>
+<ul>
+  <li>[EXTGWT-886] - Complex chart example with grid.</li>
+  <li>[EXTGWT-1019] - Review all examples for rendering and display issues per browser and os</li>
+  <li>[EXTGWT-1182] - Performance improvements especially for VML and BarSeries.</li>
+  <li>[EXTGWT-1652] - Review use of HasClickHandlers</li>
+  <li>[EXTGWT-1731] - Pie series label call out.</li>
+  <li>[EXTGWT-1894] - FileUploadField has no events to handle</li>
+  <li>[EXTGWT-1907] - Component should implements HasEnabled</li>
+  <li>[EXTGWT-1928] - ColumnConfig's should support the ability to specify if the column can be hidden via the context menu</li>
+</ul>
+
+<h3>API Changes</h3>
+<ul>
+  <li>Breaking - Removed clearOpacity() from XElement</li>
+  <li>Breaking - Removed HasClickHandlers from IconButton, changed constructor to use select handler</li>
+  <li>Breaking - Refactor of Appearance and Appearance related classes</li>
+  <li>Added getter / setter for clearValueOnParseError to ValueBaseField and ValueBaseInputCell</li>
+  <li>RequestFactoryProxy - Added a helper method to the proxy to make it easier to send FilterConfig instances over the wire</li>
+  <li>NumericFilter - Factored out numeric comparisons for easy custom behavior when comparing numbers</li>
+</ul>
+
+<h3>Bug Fixes</h3>
+<ul>
+  <li>[EXTGWT-1108] - IE6 / 7 List to list: Insertion bar is misplaced (appended to item text)</li>
+  <li>[EXTGWT-1109] - IE6 / 7 TreeGrid not hiding overflow text</li>
+  <li>[EXTGWT-1325] - Maven source artifacts are missing copyright comments</li>
+  <li>[EXTGWT-1420] - Can't create/compile projects from the contents in the download zip</li>
+  <li>[EXTGWT-1423] - Hello World example has broken window frame in IE8</li>
+  <li>[EXTGWT-1425] - Paging toolbar doesn't grey out icons when at first or last page (IE7, IE8)</li>
+  <li>[EXTGWT-1453] - NumericFilter compares floating point numbers for equality</li>
+  <li>[EXTGWT-1458] - Bad SafeHtml usage in TriggerFieldDefaultAppearance.render</li>
+  <li>[EXTGWT-1460] - Button's do not receive and show focus</li>
+  <li>[EXTGWT-1547] - Border layout showing and hiding apply to only one state of expansion</li>
+  <li>[EXTGWT-1606] - File upload field example does not ensure a file has been selected</li>
+  <li>[EXTGWT-1624] - First shown tooltip on combo box dropdown is blank</li>
+  <li>[EXTGWT-1626] - Changing the width of a hidden grid causes horizontal scroll bar to disappear when shown</li>
+  <li>[EXTGWT-1650] - two - symbols in a number field are parsed as a positive value</li>
+  <li>[EXTGWT-1657] - Clicking on Checkbox label doesn't focus/change the checkbox</li>
+  <li>[EXTGWT-1696] - StretchMax longest button cut off</li>
+  <li>[EXTGWT-1704] - TextFields crash when local is iw (Hebrew)</li>
+  <li>[EXTGWT-1706] - Forms : Advanced Forms: Displaying invalid argument error message while switching the tabs.</li>
+  <li>[EXTGWT-1727] - Assertion failure when TreeStore.getParent or remove is passed a child that is not in the store</li>
+  <li>[EXTGWT-1730] - XElement.getAlignToXY creates extra margin when constrainViewport is true</li>
+  <li>[EXTGWT-1740] - [Beta4] BorderLayout and BorderLayoutData ignoring splitter</li>
+  <li>[EXTGWT-1742] - DateCell List View : Previously selected dates in the calendar are highlighted.</li>
+  <li>[EXTGWT-1756] - Pointer finger cursor over disabled button</li>
+  <li>[EXTGWT-1758] - Disabled buttons don't look disabled in IE8</li>
+  <li>[EXTGWT-1774] - Inline editor disappears before DOM update</li>
+  <li>[EXTGWT-1780] - Blue ButtonCell appearance's client bundle doesn't reference own CssResource</li>
+  <li>[EXTGWT-1784] - dialog.setHeaderVisible(boolean) always hides header</li>
+  <li>[EXTGWT-1795] - Legend does not reflow when chart is resized</li>
+  <li>[EXTGWT-1800] - Inline editable grid example accepts blank dates</li>
+  <li>[EXTGWT-1801] - Rotate text example: slider does not respond to keyboard</li>
+  <li>[EXTGWT-1802] - Binding ‚ÜíRequest Factory Binding : Validation error is not disappearing</li>
+  <li>[EXTGWT-1805] - Can't expand groups in grouping grid in IE7</li>
+  <li>[EXTGWT-1809] - Menu item icons do not appear in IE7</li>
+  <li>[EXTGWT-1818] - GridInlineEditing and Expander don't work together</li>
+  <li>[EXTGWT-1825] - Keyboard selection in combo box in Opera causes exception</li>
+  <li>[EXTGWT-1826] - Opera: List view dnd causes exception</li>
+  <li>[EXTGWT-1828] - First node in reordering tree not draggable</li>
+  <li>[EXTGWT-1829] - Forms example validation</li>
+  <li>[EXTGWT-1832] - Opera: File upload field browse button is mispositioned</li>
+  <li>[EXTGWT-1834] - Grouping grid contents disappear when sorting when only grouped column visible</li>
+  <li>[EXTGWT-1841] - Inconsistent naming of Appearances</li>
+  <li>[EXTGWT-1856] - PortalLayoutContainer API review</li>
+  <li>[EXTGWT-1860] - TabPanel appearance hierarchy API review</li>
+  <li>[EXTGWT-1864] - Binding : Basic Binding : Field validation is not happening properly.</li>
+  <li>[EXTGWT-1867] - Sorting an editable tree grid that is currently being edited can cause exceptions</li>
+  <li>[EXTGWT-1868] - Grid: Row Editable Grid : Displaying "Error" message pop-up upon click on a free space in the grid.</li>
+  <li>[EXTGWT-1870] - Combo box editor in grid leaves dropdown list after invalid input</li>
+  <li>[EXTGWT-1871] - Moving columns in grid causes content area size to be incorrect</li>
+  <li>[EXTGWT-1885] - Clicking row expander column header shows error</li>
+  <li>[EXTGWT-1887] - The first click on a tree node of a tree scrolls the page to the top</li>
+  <li>[EXTGWT-1889] - Inline Editable Grid example shows an exception when editing with name column hidden</li>
+  <li>[EXTGWT-1902] - MessageBox constructor don't use appearance argument</li>
+  <li>[EXTGWT-1903] - Progress bar status text unreadable at low values</li>
+  <li>[EXTGWT-1904] - Grid does not display horizontal scroll bar after reconfigure() or refresh()</li>
+  <li>[EXTGWT-1905] - ComboBox shows toString'd model on blur</li>
+  <li>[EXTGWT-1906] - Passing null status text to progress bar shows string "&#160;"</li>
+  <li>[EXTGWT-1908] - Issue when expanding a CombobBox while an other ComboBox is already expanded.</li>
+  <li>[EXTGWT-1910] - Pie series examples default label config incorrect.</li>
+  <li>[EXTGWT-1913] - CommonStyles can't have its clientbundle overridden, consider appearance-like api here</li>
+  <li>[EXTGWT-1915] - DateField trigger doesn't trigger validation</li>
+  <li>[EXTGWT-1918] - Resizing a grid header past the right edge of the grid causes exception in IE</li>
+  <li>[EXTGWT-1921] - Window header has thin blue borders</li>
+  <li>[EXTGWT-1922] - When file upload field value is changed, two notifications appear</li>
+  <li>[EXTGWT-1923] - Showing the drop-down list of a combo box in a row editor, then clicking another row, causes exception</li>
+  <li>[EXTGWT-1926] - Can't select text in input cells in ListView</li>
+  <li>[EXTGWT-1931] - Certain chart examples produce NaN parsing warnings in Firefox.</li>
+  <li>[EXTGWT-1933] - Progress bar scales, but its value does not</li>
+  <li>[EXTGWT-1938] - Chart legends are not clickable in IE</li>
+  <li>[EXTGWT-1939] - When all but one column is hidden, all data is shown in that single column</li>
+  <li>[EXTGWT-1940] - RowEditable Grid: Exception when starting edit with hidden columns</li>
+  <li>[EXTGWT-1958] - Chart elements have wrong z-ordering</li>
+  <li>[EXTGWT-1965] - GXT 3 RC HttpProxy: Add &quot;PUT&quot; to load method.</li>
+  <li>[EXTGWT-1967] - Can't focus another field after entering text in IE9</li>
+  <li>[EXTGWT-1968] - IconConfig disabled style</li>
+  <li>[EXTGWT-1971] - ToolButton Expand disappears after mouseover</li>
+  <li>[EXTGWT-1972] - GXT3 RowNumberer extremely slows down grid rendering</li>
+  <li>[EXTGWT-1995] - Chrome throwing exception when switching DateCell in same column in Grid</li>
+  <li>[EXTGWT-2027] - Inline Grid Editing Field placement does not take hidden column into account</li>
+  <li>[EXTGWT-2028] - Resizing a Grid column does not complete active inline edit</li>
+  <li>[EXTGWT-1934] - Add the ability to enable / disable mouse over effects in ListView</li>
+</ul>
+
+<h2><a name="Release_3.0.0-rc2">Release 3.0 RC2 (3/27/12 - tag 3.0.0-rc2)</a></h2>
+
+<h3>General Changes &amp; Enhancements</h3>
+<ul>
+  <li>[EXTGWT-1489] - JavaDocs - Review and update for Bindings</li>
+  <li>[EXTGWT-1501] - Unit Tests - Review and update for Containers and Layouts</li>
+  <li>[EXTGWT-1691] - Chart zoom.</li>
+  <li>[EXTGWT-1712] - Repair obvious doc comment errors</li>
+  <li>[EXTGWT-1715] - Improve line smoothing function.</li>
+  <li>[EXTGWT-1750] - XTemplates should guard against null values when calling formaters</li>
+  <li>[EXTGWT-1751] - IE7 crashes in TreeGrid to TreeGrid example when root folder is dragged</li>
+  <li>[EXTGWT-1754] - Look into sprite drag and drop.</li>
+  <li>[EXTGWT-1755] - Replace use of GWT BeforeSelectionEvent and SelectionEvent with new GXT versions</li>
+  <li>[EXTGWT-1762] - CellSelectionModel should fire cell selection events</li>
+  <li>[EXTGWT-1767] - Shadow customization.</li>
+  <li>[EXTGWT-1771] - GridView enabling row bodies and row body row span should be exposed through getters and setters</li>
+  <li>[EXTGWT-1773] - Rename and change BeforeSelectionEvent and SelectionEvent to extend the GWT versions</li>
+  <li>[EXTGWT-1781] - SpinnerField should not update value on "spin" and should fire BeforeSelectionEvent and SelectionEvent's</li>
+  <li>[EXTGWT-1813] - ProgressBar should use value defined in CellComponent</li>
+  <li>[EXTGWT-1816] - Update visual style of chart examples.</li>
+  <li>[EXTGWT-1847] - TextSprite align and baseline.</li>
+  <li>[EXTGWT-1882] - Line series initial animation.</li>
+</ul>
+
+<h3>API Changes</h3>
+<ul>
+  <li>Breaking - Moved CellSelection from CellSelectionModel to new public class.</li>
+  <li>Breaking - Changed GridView boolean enableRowBodyRowSpan to int rowBodyRowSpan.</li>
+  <li>Breaking - Added get / sets for GridView enableRowBody and rowBodyRowSpan.</li>
+  <li>Breaking - BeforeSelectionEvent and SelectionEvent renamed to CellBeforeSelectionEvent and CellSelectionEvent.</li>
+  <li>Breaking - CellBeforeSelectionEvent and CellSelectionEvent extend the GWT BeforeSelectionEvent and SelectionEvent.</li>
+  <li>Breaking - ProgressBarCell and ProgressBarAppearance updated</li>
+  <li>RowExpander added new constructor with appearance parameter and added public expandRow method.</li>
+  <li>XTemplates - Formatters now do not receive null values unless @FormatterFactory.acceptsNull() is set to true.</li>
+  <li>RequestFactoryProxy - added a new helper method to the proxy to make it easier to wrap up sort info instances in RF proxies.</li>
+  <li>Breaking - Added value provider parameter to onFocus in FieldCell</li>
+</ul>
+
+<h3>Bug Fixes</h3>
+<ul>
+  <li>[EXTGWT-1444] - ProgressBarCell does not work correctly if no width set</li>
+  <li>[EXTGWT-1470] - Grid/TreeGrid row numberer doesn't update after dnd reorder</li>
+  <li>[EXTGWT-1474] - bug in gwt 3 listview binding</li>
+  <li>[EXTGWT-1483] - Editor driver can't get parse errors</li>
+  <li>[EXTGWT-1528] - ComboBox trigger works even when field is disabled</li>
+  <li>[EXTGWT-1603] - Selected font name not displayed in toolbar of rich text editor</li>
+  <li>[EXTGWT-1646] - Spinners do not respond to keyboard arrow keys</li>
+  <li>[EXTGWT-1667] - Can't remote sort Grid with RequestFactory</li>
+  <li>[EXTGWT-1716] - Setting series tooltip config to closable does not allow mouse tracking.</li>
+  <li>[EXTGWT-1717] - Area Chart:Clicking on 'Reload Data' button makes ‚ÄúNumber of Hits‚Äù scale missing on graph</li>
+  <li>[EXTGWT-1737] - Inconsistency between area and stacked bar on how they treat excluded aggregated data.</li>
+  <li>[EXTGWT-1745] - Mixed Chart: ‚ÄùScatter‚Äù legend item graph circles are displayed out of the graph area</li>
+  <li>[EXTGWT-1746] - In Live Chart Example, Shadow button does nothing</li>
+  <li>[EXTGWT-1761] - TabPanel.add doesn't support IsWidget</li>
+  <li>[EXTGWT-1763] - (RC) Overriding getValue()</li>
+  <li>[EXTGWT-1765] - Can't deselect selected cell with CellSelectionModel</li>
+  <li>[EXTGWT-1766] - Switching Grid selection models should clear current selections</li>
+  <li>[EXTGWT-1779] - DatePicker setMin/MaxDate throws null exception</li>
+  <li>[EXTGWT-1782] - TimeField does not fire parse errors</li>
+  <li>[EXTGWT-1783] - Firefox text height is off.</li>
+  <li>[EXTGWT-1785] - Clicking spinner up/down triggers causes field to never blur</li>
+  <li>[EXTGWT-1786] - On first reload markers animates over gaps in line series with gaps.</li>
+  <li>[EXTGWT-1807] - List Property Binding: Switching to another example while age field is in editable mode causes an error</li>
+  <li>[EXTGWT-1814] - Store not yet updated when onCompleteEdit fired GridInlineEditing</li>
+  <li>[EXTGWT-1815] - Automated spacing around charts is too large.</li>
+  <li>[EXTGWT-1817] - DatePicker does not accept null values</li>
+  <li>[EXTGWT-1822] - Grid odd config is producing NaN values in area example.
+  <li>[EXTGWT-1824] - Tspan height for text sprites is not the same between between VML and SVG.</li>
+  <li>[EXTGWT-1827] - Charts: Issue in Mixed Chart and Scatter Chart</li>
+  <li>[EXTGWT-1830] - Grids: SelectionMode option and the grid functionality are not in sync</li>
+  <li>[EXTGWT-1835] - Async Json Tree renders incorrectly on expand all</li>
+  <li>[EXTGWT-1837] - In Fx demo, sliding in and out too rapidly causes panel to disappear</li>
+  <li>[EXTGWT-1839] - Clicking into rich text area does not blur focused field</li>
+  <li>[EXTGWT-1842] - GridStyles should extend CssResource</li>
+  <li>[EXTGWT-1843] - Axes positioned on the top do not render correctly.</li>
+  <li>[EXTGWT-1844] - IE8 Radios in ToggleGroup not working on label clicks</li>
+  <li>[EXTGWT-1849] - IE9 Destination field not receiving focus when clicking out of TriggerField (Combo, DateField, etc)</li>
+  <li>[EXTGWT-1851] - Add RowExpander constructor to accept appearance</li>
+  <li>[EXTGWT-1852] - Custom legend markers positioning is off.</li>
+  <li>[EXTGWT-1857] - Grid drag and drop reordering with Feedback.BOTH throws IndexOutOfBoundsException</li>
+  <li>[EXTGWT-1858] - Tooltip index is incorrect for line series with gaps.</li>
+  <li>[EXTGWT-1859] - Inline grid editor prevents value change events on external radio buttons in IE8</li>
+  <li>[EXTGWT-1861] - Numeric Axis in Explorer is incorrect</li>
+  <li>[EXTGWT-1863] - Animating between two path sprites with different total move to commands causes an exception.</li>
+  <li>[EXTGWT-1865] - Errors due to rects given negative height</li>
+  <li>[EXTGWT-1869] - Forms ‚Äì Advanced Forms: Closing and reopening the example displaying an ‚Äúinvalid argument‚Äù error in a particular scenario</li>
+  <li>[EXTGWT-1876] - Legend item out event sometimes does not fire.</li>
+  <li>[EXTGWT-1877] - Redrawing axes in Area and Stacked Bar can cause the text labels to be misaligned.</li>
+  <li>[EXTGWT-1881] - TreeSelectionModel stopping selections if a before selection handler is used</li>
+  <li>[EXTGWT-1892] - When using stroke on a gauge series setting the max or min value causes a line to extrude from the chart.</li>
+  <li>[EXTGWT-1895] - TreeGrid does not implement HasExpandItemHandlers and HasCollapseItemHandlers</li>
+  <li>[EXTGWT-1896] - TreeGrid not completing active edit on expand / collapse</li>
+</ul>
+
+
+<h2><a name="Release_3.0.0-rc">Release 3.0 RC (3/27/12 - tag 3.0.0-rc)</a></h2>
+
+<h3>General Changes &amp; Enhancements</h3>
+<ul>
+  <li>ValueProvider generics changed, we now support ValueProvider&lt;SuperClass, String> to be passed into a ColumnConfig&lt;SubClass, String></li>
+  <li>Performance optimizations in layouts</li>
+  <li>Redraw optimizations in CellComponent</li>
+  <li>[EXTGWT-749] - JavaDocs - Review and update for Containers & Layouts</li>
+  <li>[EXTGWT-868] - Charts currently appear from off screen. Instead they should appear to sprout from the axis.</li>
+  <li>[EXTGWT-881] - Investigate split GXT module into submodules</li>
+  <li>[EXTGWT-885] - Custom area chart example.</li>
+  <li>[EXTGWT-909] - Chart resizing.</li>
+  <li>[EXTGWT-942] - Unit tests need to be scrubbed and cleanup</li>
+  <li>[EXTGWT-958] - Label text falls behind the circle animation in Scatter Renderer.</li>
+  <li>[EXTGWT-985] - Add and port Desktop example</li>
+  <li>[EXTGWT-1005] - Review and optimize GWT image spriting (repeat mode, preventInline, etc)</li>
+  <li>[EXTGWT-1011] - Review all appearance, resource, style class names for consistency</li>
+  <li>[EXTGWT-1098] - Area and Line series shrinking</li>
+  <li>[EXTGWT-1100] - Scatter series shadows.</li>
+  <li>[EXTGWT-1276] - Change unintentional protected access to private for instance variables</li>
+  <li>[EXTGWT-1293] - Investigate and start to implement test based performance metrics</li>
+  <li>[EXTGWT-1296] - Review Brendan's 2.X to 3.X event comparison</li>
+  <li>[EXTGWT-1311] - Modify StorageReadProxy to use the writer approach used by HttpProxy and ScriptTagProxy</li>
+  <li>[EXTGWT-1401] - Add support for multiple length fields in pie series.</li>
+  <li>[EXTGWT-1428] - GXT class shouldn't add body styles for browser, os properties</li>
+  <li>[EXTGWT-1429] - Audit, clean up @NotStrict annotations and @external in CSS, and unobfuscated class names in code</li>
+  <li>[EXTGWT-1441] - Investigate making IconButton easier to use in UiBinder</li>
+  <li>[EXTGWT-1442] - Automatically create scrolling support when requested</li>
+  <li>[EXTGWT-1443] - Investigate making PagingToolBar easier to use with UiBinder</li>
+  <li>[EXTGWT-1479] - Draw benchmarks.</li>
+  <li>[EXTGWT-1518] - Bar series shadows.</li>
+  <li>[EXTGWT-1519] - Remove FieldLabel option for Right aligned labels</li>
+  <li>[EXTGWT-1524] - Appearance coupling review for Mask</li>
+  <li>[EXTGWT-1532] - DatePicker Appearance & CSS need to be refactored to match current design</li>
+  <li>[EXTGWT-1540] - FieldSet expand/collapse API review</li>
+  <li>[EXTGWT-1541] - Setting step maximum should not be accessible to all axis types.</li>
+  <li>[EXTGWT-1558] - Add Grid & Paging Grid UIBinder examples</li>
+  <li>[EXTGWT-1566] - Chart benchmarks.</li>
+  <li>[EXTGWT-1578] - Gauge and Radar series shadows.</li>
+  <li>[EXTGWT-1579] - Improved line series highlighting.</li>
+  <li>[EXTGWT-1602] - AccordionLayoutContainer does not support multiple expanded items</li>
+  <li>[EXTGWT-1637] - Consider adding appearance constructor to ComboBoxCell</li>
+  <li>[EXTGWT-1692] - Set limit on resizable in examples to avoid ruining the chart.</li>
+  <li>[EXTGWT-1711] - Replace package.html with package-info.java for package comments</li>
+  <li>[EXTGWT-1739] - CellComponent needs to optimize redraw calls so that the component is only redrawn when needed</li>
+</ul>
+
+
+<h3>API Changes</h3>
+<ul>
+  <li>Removed isStrict from GXT</li>
+  <li>Removed isBorderBox from GXT</li>
+  <li>Removed RIGHT from LabelAlign</li>
+  <li>Moved AutoScrollSupport from DND to Core</li>
+  <li>ColumnConfig style and class names changes: columnHeaderClassName, columnClassSuffix, columnClassName, columnStyle, columnTextClassName, columnTextStyle</li>
+  <li>Removed hide config from AccordionLayoutContainer and added ExpandMode enumeration</li>
+  <li>Removed HasOneWidget interface from AccordionLayoutContainer, CardLayoutContainer and TabPanel</li>
+  <li>Added HasActiveWidget. Implemented by AccordioanLayoutContainer, CardLayoutContainer and TabPanel</li>
+  <li>FieldSet isCollapsed changed to isExpanded</li>
+  <li>Added expand() and isExanded() to Collapsible interface</li>
+  <li>Window setHeaderVisible now throws UnsupportedOperationException</li>
+  <li>Added decimalSeparator and baseChars getters and setters to NumberField and NumberFieldCell</li>
+  <li>Removed setPlain isPlain from Window as not supported</li>
+  <li>Added ability to set vertical and horizontal spacing independently to ToolBar / ButtonBar</li>
+  <li>Removed ComboBox / ComboBoxCell clearSelections, use clear</li>
+  <li>Added onNavigationKey to Field</li>
+</ul>
+
+<h3>Bug Fixes</h3>
+<ul>
+  <li>[EXTGWT-947] - Rich tooltip example does not work Firefox 3.</li>
+  <li>[EXTGWT-1304] - Axis grid lines move to the front when hiding and showing.</li>
+  <li>[EXTGWT-1328] - Reconfigure grid throws null exception</li>
+  <li>[EXTGWT-1351] - Stacked bar totals are not as accurate as area totals.</li>
+  <li>[EXTGWT-1366] - PieSeries labels sometimes animate 360 degrees.</li>
+  <li>[EXTGWT-1389] - Axis grid does not draw on the last index.</li>
+  <li>[EXTGWT-1397] - Calling Grid.reconfigure after creating the grid causes an NPE</li>
+  <li>[EXTGWT-1412] - Complex grid columnconfigs that use IdentityValueProvider can't easily be sorted</li>
+  <li>[EXTGWT-1421] - Binding examples: values not updating after edit and selection change with no save</li>
+  <li>[EXTGWT-1422] - Fading does not work in IE8</li>
+  <li>[EXTGWT-1426] - Items in HtmlLayoutContainer jump when first moused-over in IE8</li>
+  <li>[EXTGWT-1430] - Grid column separators leave white artifact after header mouse-over in IE7, IE8</li>
+  <li>[EXTGWT-1436] - Window.setPlain has no effect</li>
+  <li>[EXTGWT-1437] - setEnabled on fields should prevent text entry</li>
+  <li>[EXTGWT-1460] - Button's do not receive and show focus</li>
+  <li>[EXTGWT-1462] - FieldLabel - LabelAlign can not be changed from TOP to any other</li>
+  <li>[EXTGWT-1464] - NullPointerException when collapsing a BorderLayoutContainer</li>
+  <li>[EXTGWT-1477] - TextButtonCell in Grid is clickable other than just in the body of the button</li>
+  <li>[EXTGWT-1478] - TreeGrid throws exception when expanding empty "folder" node</li>
+  <li>[EXTGWT-1484] - Button doesn't render contents until it has text (or size)</li>
+  <li>[EXTGWT-1521] - Beta3: TreeStore corruption with an AsyncTree implementation.</li>
+  <li>[EXTGWT-1522] - Beta3: TreeStore.removeChildren fires the wrong event.</li>
+  <li>[EXTGWT-1523] - StoreFilterField doesn't clear the filter when the built-in TriggerClick occurs</li>
+  <li>[EXTGWT-1525] - FieldSet needs to size its container target element.</li>
+  <li>[EXTGWT-1526] - A Button does not respect the width set to it if the text is longer</li>
+  <li>[EXTGWT-1527] - Remove returning Fx from FxElement.</li>
+  <li>[EXTGWT-1529] - Binary sort not working in SVG.</li>
+  <li>[EXTGWT-1533] - When step size is fewer than the store size all labels are still shown.</li>
+  <li>[EXTGWT-1534] - Wrong error mark position in TextField after tabbing</li>
+  <li>[EXTGWT-1535] - TextButton setHeight/setWidth has no effect</li>
+  <li>[EXTGWT-1537] - TabPanel.setResizeTabs(true) does not resize tabs to fill tab strip</li>
+  <li>[EXTGWT-1539] - Exception in ListView example when deselecting</li>
+  <li>[EXTGWT-1542] - Setting expanded in FieldSet in UiBinder causes exception</li>
+  <li>[EXTGWT-1550] - Horizontal Layout not stable when containing ContentPanel is collapsed, hidden, shown, then expanded</li>
+  <li>[EXTGWT-1553] - Error tip is empty for Symbol in Basic Binding Example</li>
+  <li>[EXTGWT-1554] - Example content area does not scroll horizontally</li>
+  <li>[EXTGWT-1555] - List View Binding example throws exception when revisited</li>
+  <li>[EXTGWT-1556] - Charts All Charts: UI is disturbed, once collapse/expand operation is performed for all chart examples</li>
+  <li>[EXTGWT-1557] - MinLengthValidator showing value length rather than validation length</li>
+  <li>[EXTGWT-1559] - Header API waffles between Component and Widget</li>
+  <li>[EXTGWT-1560] - ToolButton.REFRESH should not be ToolButton.QUESTION</li>
+  <li>[EXTGWT-1561] - Minor typos in Tree source</li>
+  <li>[EXTGWT-1562] - ButtonCell markup assumptions constrain custom appearances</li>
+  <li>[EXTGWT-1565] - GridEvenConfig does not draw.</li>
+  <li>[EXTGWT-1567] - In some cases legend text does not render.</li>
+  <li>[EXTGWT-1568] - Refreshing a grid duplicates the grid header</li>
+  <li>[EXTGWT-1569] - Grid inline editing updates value inconsistently</li>
+  <li>[EXTGWT-1570] - Missing addKeyDownHandler in ValueBaseField</li>
+  <li>[EXTGWT-1571] - setActiveOnTop on AccordionLayoutContainer don't work before layout</li>
+  <li>[EXTGWT-1572] - AccordionLayoutContainer setWidget does not honor AcceptsOneWidget or HasOneWidget contract</li>
+  <li>[EXTGWT-1573] - All panels are expanded in AccordionLayoutContainer if no activeWidget is set</li>
+  <li>[EXTGWT-1574] - AccordionLayoutContainer setWidget(panel) don't collapse old activeWidget</li>
+  <li>[EXTGWT-1576] - Shadows are not removed if first drawn on and then drawn off.</li>
+  <li>[EXTGWT-1581] - Can't break line with return/enter in TextArea</li>
+  <li>[EXTGWT-1582] - Aggregation Grid Example throws exception on load</li>
+  <li>[EXTGWT-1583] - Grid reordering not working after grid refactor</li>
+  <li>[EXTGWT-1584] - Stacked bar shadows render far outside of the bar.</li>
+  <li>[EXTGWT-1585] - Rich text area controls do not limit text size</li>
+  <li>[EXTGWT-1586] - TabPanel context menu close item only works for first tab so closed</li>
+  <li>[EXTGWT-1587] - Add BigDecimalPropertyEditor</li>
+  <li>[EXTGWT-1588] - Donut chart displays as pie chart when there is only one slice</li>
+  <li>[EXTGWT-1589] - Selecting past the end of a ListView with keyboard controls results in an exception</li>
+  <li>[EXTGWT-1590] - In VML rapidly mousing over legend items in Pie Series pushes labels out of place.</li>
+  <li>[EXTGWT-1591] - Navigating to a Date input in a Grid and activating the popup with the down arrow key causes exception</li>
+  <li>[EXTGWT-1592] - Basic Binding Example doesn't validate Updated field for correctness on save</li>
+  <li>[EXTGWT-1594] - Pagination controls do not update list view content in advanced combo box example</li>
+  <li>[EXTGWT-1595] - Grid Binding Example throws exception when edited, saved, closed, and reopened</li>
+  <li>[EXTGWT-1596] - Rich text area does not have source editing</li>
+  <li>[EXTGWT-1597] - For a combo box in a menu, using the combo box scroll bar dismisses the menu</li>
+  <li>[EXTGWT-1598] - Grid never shows horizontal scroll bar</li>
+  <li>[EXTGWT-1599] - In radar series turning off rendered markers does not remove them.</li>
+  <li>[EXTGWT-1600] - Combo box in Basic Binding Example doesn't do anything</li>
+  <li>[EXTGWT-1601] - Donut-mode pie chart labels are not constrained to their slice sizes</li>
+  <li>[EXTGWT-1607] - UiBinder Forms Example: able to select multiple radio buttons</li>
+  <li>[EXTGWT-1608] - Disabled shadows do not follow their data points in radar chart</li>
+  <li>[EXTGWT-1609] - Move Ext.util.Format to legacy</li>
+  <li>[EXTGWT-1610] - Remove GXT.Ext from global window object</li>
+  <li>[EXTGWT-1612] - Sorting is broken and displays error in Async Tree Grid example</li>
+  <li>[EXTGWT-1614] - ToggleButton showing text as "false" when icon only</li>
+  <li>[EXTGWT-1615] - HBoxLayoutContainer overflow menu does not add ToggleButtons</li>
+  <li>[EXTGWT-1616] - NumberField and setAllowNegative() java.lang.IndexOutOfBoundsException</li>
+  <li>[EXTGWT-1619] - Grouping grid fails when choosing a column to group by</li>
+  <li>[EXTGWT-1620] - Shadows are not hidden when their associated bars are hidden</li>
+  <li>[EXTGWT-1621] - TypeError on Advanced Combo Box after list view dismissed</li>
+  <li>[EXTGWT-1622] - Disabling animation causes bar renderer chart to render all bars in the same colour</li>
+  <li>[EXTGWT-1623] - Forms example text area overflows incorrectly</li>
+  <li>[EXTGWT-1625] - Buttons not focusing when focus() called programatically</li>
+  <li>[EXTGWT-1628] - Clicking input element area on non editable ComboBox should open drop down</li>
+  <li>[EXTGWT-1630] - In VML when removing and reinserting elements from the DOM they do not redraw correctly.</li>
+  <li>[EXTGWT-1631] - Shadows animate independently of their series items</li>
+  <li>[EXTGWT-1632] - Decide what to do with Window.setHeaderVisible</li>
+  <li>[EXTGWT-1634] - When a VML Surface is used in a window it does not render properly on the first show call.</li>
+  <li>[EXTGWT-1636] - SVG zindex is not accurate when adding sprites after the initial sorting.</li>
+  <li>[EXTGWT-1640] - Paging UiBinder Grid crashes IE</li>
+  <li>[EXTGWT-1643] - Row expander does not work ie6 ie7</li>
+  <li>[EXTGWT-1645] - Hiding and showing area series repeatedly darkens the series</li>
+  <li>[EXTGWT-1647] - BorderLayout UiBinder with attributes throws TypeError when clicking collapsed header</li>
+  <li>[EXTGWT-1649] - Shadows are not hidden when bars are hidden in legend.</li>
+  <li>[EXTGWT-1651] - Legend can go out of sync when toggling shadows on series.</li>
+  <li>[EXTGWT-1653] - Tree selection occurs when expanding/collapsing nodes</li>
+  <li>[EXTGWT-1656] - PortalLayoutContainer add(Widget)</li>
+  <li>[EXTGWT-1658] - Clicking on a cell doesn't bring up editor if the current cell being edited is dirty.</li>
+  <li>[EXTGWT-1659] - Can't type decimal separator in locales where separator is not a period</li>
+  <li>[EXTGWT-1660] - ListView examples are broken on staging examples-dev</li>
+  <li>[EXTGWT-1661] - Reloading data shows hidden bar series</li>
+  <li>[EXTGWT-1663] - Request factory binding: closing and reopening</li>
+  <li>[EXTGWT-1664] - Collapsible field sets are not collapsible when first displayed</li>
+  <li>[EXTGWT-1666] - Clicking CheckBox label text does not select CheckBox</li>
+  <li>[EXTGWT-1668] - Menu appearance classes are not named in the standard pattern</li>
+  <li>[EXTGWT-1670] - Cannot tab out of ComboBox if editable is false</li>
+  <li>[EXTGWT-1671] - Area series shrink method sometimes causes null pointer exception.</li>
+  <li>[EXTGWT-1676] - Grid ColumnHeader showing blue (mouseover image) for ie6 ie7 normal state</li>
+  <li>[EXTGWT-1677] - In pie series enabling and then disabling shadows, on including a legend item the hidden shadow is shown.</li>
+  <li>[EXTGWT-1680] - Forms -> File Upload:‚ÄúReset‚Äù and ‚ÄúSubmit‚Äù buttons are overlapping</li>
+  <li>[EXTGWT-1682] - Binding -> Basic Binding:Clicking on ‚ÄúSave‚Äù button causes an exception when ‚ÄúChange‚Äù field value is empty</li>
+  <li>[EXTGWT-1683] - Charts -> Area Renderer Chart:Clicking ‚ÄúArea Renderer Chart‚Äù causes an exception and not opening the example</li>
+  <li>[EXTGWT-1684] - TreeGrid's internal ListStore has assertion failure on update of item that is not expanded</li>
+  <li>[EXTGWT-1685] - Button icons not centered vertically when height manually set</li>
+  <li>[EXTGWT-1686] - Button text element too wide with left and right aligned icon when button given pixel width</li>
+  <li>[EXTGWT-1687] - Compiled area render throws an exception when parsing json.</li>
+  <li>[EXTGWT-1688] - With new VML text anchoring system text is overlapping in legend.</li>
+  <li>[EXTGWT-1696] - StretchMax longest button cut off</li>
+  <li>[EXTGWT-1697] - Bug on hiding and showing scatter, line and radar shadows.</li>
+  <li>[EXTGWT-1699] - Combos : Combo Box : Country flag images are not displayed beside the country names in the third drop down menu.</li>
+  <li>[EXTGWT-1700] - Combos : Combo Box : Displaying error message when user type country name manually in the combo box.</li>
+  <li>[EXTGWT-1705] - Template & Lists : Advance List View: Displaying error message upon clicking on Choose button .</li>
+  <li>[EXTGWT-1706] - Forms : Advanced Forms: Displaying invalid argument error message while switching the tabs.</li>
+  <li>[EXTGWT-1707] - Binding : Basic Binding: Validation error is not disappearing even after the valid text (capital letters) appeared in 'Symbol‚Äù field</li>
+  <li>[EXTGWT-1708] - Layouts : Center Layout: Center Layout's UI is disturbed</li>
+  <li>[EXTGWT-1709] - Layouts : Hbox and Vbox Layout: Buttons are not properly displayed</li>
+  <li>[EXTGWT-1710] - Layouts : Portal Layout and Portal Layout UiBinder: All layout's title bars are displayed empty and panel became non-dragable</li>
+  <li>[EXTGWT-1713] - XDOM.getAutoIdPrefix executes with infinite recursion</li>
+  <li>[EXTGWT-1714] - AccessStack should use type parameter everywhere</li>
+  <li>[EXTGWT-1718] - Request Factory Binding throws exception with invalid values and clicking Save too rapidly</li>
+  <li>[EXTGWT-1722] - Radio fields cannot be selected in IE6 and IE7</li>
+  <li>[EXTGWT-1728] - Inline Grid Editing throws exception on parsing / validation error</li>
+  <li>[EXTGWT-1729] - Grid Row Editor throws exception on parse error</li>
+  <li>[EXTGWT-1732] - Safari cell widths not correct when loading data (Json / Xml Grid)</li>
+  <li>[EXTGWT-1733] - Safari Grid cell widths wrong when hiding / showing columns</li>
+  <li>[EXTGWT-1734] - Checkbox Tree not reporting checked items that have not been rendered</li>
+  <li>[EXTGWT-1735] - ComboBox forceSelection not properly updating value on force</li>
+  <li>[EXTGWT-1736] - ToggleButton not blurring and removing focus style</li>
+  <li>[EXTGWT-1738] - Can't make changes to null properties of Store record</li>
+  <li>[EXTGWT-1743] - Toolbars and Menu -> Overflow Toolbar - Blank menu is displayed clicking on more menu button.</li>
+  <li>[EXTGWT-1744] - Grid -> RowExpander Grid, after row is expanded collape button is not displaying clearly.</li>
+  <li>[EXTGWT-1747] - Binding : Basic Binding: Clicking on ‚ÄúSave‚Äù button causes an exception when ‚ÄúUpdated‚Äù field value is empty</li>
+  <li>[EXTGWT-1748] - Binding : Basic Binding (UiBinder): Both field labels are displayed as ‚ÄúName‚Äù</li>
+</ul>
+
+<h2><a name="Release_3.0.0-beta4">Release 3.0 Beta 4 (2/29/12 - tag 3.0.0-beta4)</a></h2>
+
+<h3>General Changes &amp; Enhancements</h3>
+<ul>
+    <li>[EXTGWT-884] - Implement label automatic color swap based on background.</li>
+    <li>[EXTGWT-1056] - Apply Appearance pattern to Grid and TreeGrid</li>
+    <li>[EXTGWT-1275] - Move widget events into events package</li>
+    <li>[EXTGWT-1316] - Grid Binding examples</li>
+    <li>[EXTGWT-1361] - ComboBox API review</li>
+    <li>[EXTGWT-1388] - All series should be able to be used without axes.</li>
+    <li>[EXTGWT-1411] - Breaks in the line series.</li>
+    <li>[EXTGWT-1424] - Add support for image sprite translations in VML.</li>
+    <li>[EXTGWT-1449] - Review redraw API.</li>
+    <li>[EXTGWT-1450] - Look into setting a range for line series.</li>
+    <li>[EXTGWT-1452] - Add two default behaviors for data that cannot be represented in LineSeries.</li>
+    <li>[EXTGWT-1455] - Surface sprite set ID.</li>
+    <li>[EXTGWT-1456] - Grid: Replace HTML Table per row to single Table</li>
+    <li>[EXTGWT-1457] - Create test that minimally exercises each Explorer example</li>
+    <li>[EXTGWT-1459] - Add mouse tracking option to chart tool tips.</li>
+    <li>[EXTGWT-1469] - Update DomHelper to support inserting HTML fragment arrays</li>
+    <li>[EXTGWT-1476] - Implement disabling support for all fields and add unit tests</li>
+    <li>[EXTGWT-1481] - Implement DOM based resize in Fields</li>
+    <li>[EXTGWT-1482] - Move Resizable to widget package</li>
+</ul>
+
+<h3>API Changes</h3>
+<ul>
+  <li>Removed Component.removeHandler</li>
+  <li>Added getters / setters to ColumnData</li>
+  <li>ColumnData renamed CSS config to ClassNames</li>
+  <li>Moved LiveGridViewEvent into new package</li>
+  <li>LiveGridViewEvent now fired from LiveGridView, not Grid</li>
+  <li>Renamed ValueBaseFieldCell to ValueBaseInputCell</li>
+</ul>
+
+<h3>Bug Fixes</h3>
+<ul>
+    <li>[EXTGWT-1284] - Word count not working in StatusToolBar</li>
+    <li>[EXTGWT-1382] - Image sprites do not display in VML.</li>
+    <li>[EXTGWT-1385] - ContentPanel animation should be customizable</li>
+    <li>[EXTGWT-1392] - HtmlEditor in Window will not accept focus after another Window is moved</li>
+    <li>[EXTGWT-1416] - ComboBox throwing exception if drop down collapsed and hidden quickly in IE</li>
+    <li>[EXTGWT-1419] - TextButton.setHTML(String) doesn't set html, draws as text instead</li>
+    <li>[EXTGWT-1431] - BorderLayout misplaces its "show" thumb</li>
+    <li>[EXTGWT-1433] - SpinnerField allows editing when disabled</li>
+    <li>[EXTGWT-1434] - newline chars from windows can break xtemplates</li>
+    <li>[EXTGWT-1435] - Editor field binding returns false from driver.hasErrors() even if GXT validation errors are present</li>
+    <li>[EXTGWT-1438] - AccordionLayoutContainer.setHideCollapseTool not working</li>
+    <li>[EXTGWT-1439] - In SVG sprite is not inserted in the DOM if its previous sprite has not been inserted.</li>
+    <li>[EXTGWT-1440] - setAutoValidate is pointless on fields</li>
+    <li>[EXTGWT-1446] - Null numeric value attribute values in xml cause exceptions when reading other properties</li>
+    <li>[EXTGWT-1451] - Can't create PlainTabPanel with GWT.create'd BluePlainTabPanelBottomAppearance</li>
+    <li>[EXTGWT-1454] - AbstractGridFilters.handleBeforeLaod is misspelled</li>
+    <li>[EXTGWT-1463] - TreeGrid programmatic expand throws exception</li>
+    <li>[EXTGWT-1466] - Series mouse events break on charts with gaps.</li>
+    <li>[EXTGWT-1468] - Markers no longer hidden on redraw if series hidden from legend.</li>
+    <li>[EXTGWT-1480] - DateField throws exception when given non-date text value</li>
+    <li>[EXTGWT-1477] - TextButtonCell in Grid is clickable other than just in the body of the button</li>
+</ul>
+
+<h2><a name="Release_3.0.0-beta3">Release 3.0 Beta 3 (2/14/12 - tag 3.0.0-beta3)</a></h2>
+
+<h3>General Changes &amp; Enhancements</h3>
+<ul>
+    <li>Added paging support to RemoteFilterGridExample</li>
+    <li>[EXTGWT-908] - Bar series sometimes no longer properly moves the axis on negative data.</li>
+    <li>[EXTGWT-1174] - TabPanel.setPlain doesn't work</li>
+    <li>[EXTGWT-1238] - Improve the bounding box calculations on sprites.</li>
+    <li>[EXTGWT-1272] - Example using image labels.</li>
+    <li>[EXTGWT-1273] - Recalculate axes on hiding areas and stacked and grouped bar.</li>
+    <li>[EXTGWT-1274] - Take advantage of the line, radar and scatter hierarchy.</li>
+    <li>[EXTGWT-1285] - Tooltips should support word wrapping</li>
+    <li>[EXTGWT-1286] - Review TextArea to support configurable scroll bars</li>
+    <li>[EXTGWT-1295] - Adding growing support to TextArea</li>
+    <li>[EXTGWT-1320] - add Record.revert(ValueProvider)</li>
+    <li>[EXTGWT-1323] - Resizable should support Widget, as Draggable does</li>
+    <li>[EXTGWT-1331] - Border customization for legend.</li>
+    <li>[EXTGWT-1339] - Add the original browser event as a variable in chart events.</li>
+    <li>[EXTGWT-1342] - Change WidgetComponent to extend Composite</li>
+    <li>[EXTGWT-749] - Add and update JavaDocs for our new Layouts</li>
+    <li>[EXTGWT-828] - Effects needs to be replacable by a GWT.create</li>
+    <li>[EXTGWT-832] - We need to have a AutoProgressBar component</li>
+    <li>[EXTGWT-948] - Ensure all of the tooltip configuration options are implemented.</li>
+    <li>[EXTGWT-961] - Overriding of equals does not implement hashcode.</li>
+    <li>[EXTGWT-966] - Create and port FlashComponent</li>
+    <li>[EXTGWT-984] - Add and port Mail demo</li>
+    <li>[EXTGWT-985] - Add and port Desktop example</li>
+    <li>[EXTGWT-1005] - Review and optimize GWT image spriting (repeat mode, preventInline, etc)</li>
+    <li>[EXTGWT-1019] - Review all examples is IE6 and IE7 to find all rendering issues</li>
+    <li>[EXTGWT-1052] - Ensure we have 2 builds of GXT with the 2 different licenses: Commercial and GPL license.</li>
+    <li>[EXTGWT-1056] - Apply Appearance pattern to Grid and TreeGrid</li>
+    <li>[EXTGWT-1073] - Add state to Grid</li>
+    <li>[EXTGWT-1144] - Add Slider and CustomSlider examples</li>
+    <li>[EXTGWT-1146] - Provide examples on how to observe model updates</li>
+    <li>[EXTGWT-1167] - Add state behavior to BorderLayoutConatiner</li>
+    <li>[EXTGWT-1172] - Implement readonly support in Field and field css</li>
+    <li>[EXTGWT-1184] - Clip rectangle removal.</li>
+    <li>[EXTGWT-1276] - Change unintentional protected access to private for instance variables</li>
+    <li>[EXTGWT-1279] - Add keyboard support to DatePicker</li>
+    <li>[EXTGWT-1283] - Cells should ignore events that originate from the parent element as in data widgets</li>
+    <li>[EXTGWT-1293] - Investigate and start to implement test based performance metrics</li>
+    <li>[EXTGWT-1294] - Investigate and look into auotomatic our build deploy process</li>
+    <li>[EXTGWT-1296] - Review Brendan's 2.X to 3.X event comparison</li>
+    <li>[EXTGWT-1297] - Add missing JavaDoc and examples for data widgets</li>
+    <li>[EXTGWT-1306] - Determine logging strategy and design for logging in library code</li>
+    <li>[EXTGWT-1311] - Modify StorageReadProxy to use the writer approach used by HttpProxy and ScriptTagProxy</li>
+    <li>[EXTGWT-1316] - Grid Binding examples</li>
+    <li>[EXTGWT-1361] - ComboBox API review</li>
+    <li>[EXTGWT-1373] - Create unit tests to test for readonly state of fields in grids</li>
+    <li>[EXTGWT-1375] - Replace the current area highlighting with a system that snaps to the indices.</li>
+    <li>[EXTGWT-1377] - DateField not expanding and closing with down and escape keys</li>
+    <li>[EXTGWT-1398] - Add events to State API: BeforeRestoreState, RestoreState, BeforeSaveState, SaveState</li>
+    <li>[EXTGWT-1399] - Eliminate SafeStyles warnings</li>
+    <li>[EXTGWT-1408] - Improve series tooltip api.</li>
+    <li>[EXTGWT-1409] - Improve series event api.</li>
+    <li>[EXTGWT-1411] - Look into supporting breaks in the line series.</li>
+</ul>
+
+<h3>API Changes</h3>
+<ul>
+  <li>Renamed TreeNode.getElContainer to TreeNode.getElementContainer</li>
+  <li>Renamed SplitBarDragStartHandler to SplitBarDragHandler</li>
+  <li>Moved auto progress bar functionality from ProgressBar to AutoProgressBar (same with cells)</li>
+  <li>Changed PagingToolBar bind method to accept subclasses of PagingLoadingConfig as in FilterPagingLoadConfig</li>
+  <li>Added HeaderMenuMouseDown event to Grid and ColumnHeader</li>
+  <li>GridView removed getHeaderCell method, use ColumnHeader</li>
+  <li>GridView removed addRowStyle and removeRowStyle</li>
+  <li>In SeriesToolTipConfig and SeriesLabelConfig custom label provider and numeric label provider have been replaced with a single SeriesLabelProvider that utilizes the associated store item and value provider</li>
+  <li>Series events now provide the associated store item and value provider instead of simply the value</li>
+  <li>FieldLabelAppearance now takes an options object that encapsulates its config parameters</li>
+</ul>
+
+<h3>Bug Fixes</h3>
+<ul>
+    <li>[EXTGWT-869] - Native SVG text bounding box calls produce an error when the chart is not visible.</li>
+    <li>[EXTGWT-904] - Possible bug in matrix where the position of a rotation is not properly applied.</li>
+    <li>[EXTGWT-1081] - Text spacing is slightly low in firefox.</li>
+    <li>[EXTGWT-1105] - Cell Action Tree: Scrolling with the arrow keys causes the scroll bar to jump if already scrolled down.</li>
+    <li>[EXTGWT-1232] - In VML elliptical arcs greater than 180 degrees do not convert correctly.</li>
+    <li>[EXTGWT-1264] - Tree doesn't handle update event from the store correctly</li>
+    <li>[EXTGWT-1266] - Error message/icons drawn incorrectly</li>
+    <li>[EXTGWT-1267] - FieldLabel with multi-line label renders following fields wrong</li>
+    <li>[EXTGWT-1281] - ComboBox ListView not hiding on scroll</li>
+    <li>[EXTGWT-1288] - FramedPanel.setHeaderVisible doesn't work</li>
+    <li>[EXTGWT-1315] - Paging toolbar appears greyed out if clicked too fast, still responsive</li>
+    <li>[EXTGWT-1321] - Label alignment on axes is off.</li>
+    <li>[EXTGWT-1327] - LiveGrid has no scrollbars</li>
+    <li>[EXTGWT-1332] - Pathing issue in the triangle primitive.</li>
+    <li>[EXTGWT-1334] - GridRowEditing + TextField in Chrome doesn't save changes correctly</li>
+    <li>[EXTGWT-1335] - Grouped Bar series does not properly re-size when excluding data points.</li>
+    <li>[EXTGWT-1337] - In pie series, after exluding a field, slices are randomly hidden on highlight.</li>
+    <li>[EXTGWT-1340] - In the Mixed Chart example hiding both series and showing the scatter series causes an exception.</li>
+    <li>[EXTGWT-1343] - ToolTips do not constrain to viewport after the 1st time they are displayed</li>
+    <li>[EXTGWT-1349] - Change default legend labeling to take into account all possible ValueProviders.</li>
+    <li>[EXTGWT-1353] - FramedPanel setBodyBorder not working</li>
+    <li>[EXTGWT-1358] - RequestFactoryBindingExample saves do not work after first one on a node</li>
+    <li>[EXTGWT-1359] - NumericalAxis does not aggregate its fields if used with AreaSeries.</li>
+    <li>[EXTGWT-1360] - Containers not disabling and enabling children when disabled and enabled</li>
+    <li>[EXTGWT-683] - Having multiple length fields in PieSeries reduces the size of the chart.</li>
+    <li>[EXTGWT-786] - Area series highlighting is less than accurate.</li>
+    <li>[EXTGWT-983] - Line series does not render properly with two numerical axes.</li>
+    <li>[EXTGWT-1013] - Problem with FX examples with clicking too fast</li>
+    <li>[EXTGWT-1103] - ComboBox: Flags are missing from the third combobox.</li>
+    <li>[EXTGWT-1104] - HtmlEditor bugs</li>
+    <li>[EXTGWT-1108] - IE6 List to list: Insertion bar is misplaced (appended to item text)</li>
+    <li>[EXTGWT-1109] - IE6 (maybe others) TreeGrid not hiding overflow text</li>
+    <li>[EXTGWT-1124] - IE8 Fx: Fade In/Out not working</li>
+    <li>[EXTGWT-1132] - Async TreeGrid Example breaks when client requests are distributed between two servers</li>
+    <li>[EXTGWT-1177] - Advanced path example does not display properly in vml.</li>
+    <li>[EXTGWT-1186] - Remove NaN values from series and labels.</li>
+    <li>[EXTGWT-1217] - FieldLabel setLabelWidth has no effect.</li>
+    <li>[EXTGWT-1233] - In VML hiding and showing sprites warps its properties.</li>
+    <li>[EXTGWT-1265] - SpinnerField lets you keep clicking up/down past the invalid values, look into focus issue</li>
+    <li>[EXTGWT-1282] - AggregationGridExample date column should be formatted</li>
+    <li>[EXTGWT-1284] - Word count not working in StatusToolBar</li>
+    <li>[EXTGWT-1298] - Grid lines are misaligned when axis is positioned right.</li>
+    <li>[EXTGWT-1305] - Hiding a series element and then redrawing will cause its highlighting color to go out of sync.</li>
+    <li>[EXTGWT-1322] - AreaSeries highlighting continues until the path is whited out.</li>
+    <li>[EXTGWT-1325] - Maven source artifacts are missing copyright comments</li>
+    <li>[EXTGWT-1348] - Can't navigate past visibile rows in LiveGrid</li>
+    <li>[EXTGWT-1350] - Exception is thrown when setting allow decimals to false on a NumberField</li>
+    <li>[EXTGWT-1363] - Window with NorthSouthContainer requires additional forceLayout or resize after load</li>
+    <li>[EXTGWT-1364] - FieldLabel.setLabelSeparator doesnt work (unless explicitly calling setText)</li>
+    <li>[EXTGWT-1365] - ComboBoxCell.minListWidth is not customizable</li>
+    <li>[EXTGWT-1367] - PieSeries labels do not animate on slice popout.</li>
+    <li>[EXTGWT-1369] - PropertyAccess generics don't work well when inheriting from another DTO</li>
+    <li>[EXTGWT-1370] - Pie slices jump to the end of the animation on un-highlight.</li>
+    <li>[EXTGWT-1374] - SpinnerField missing getter / setters for allowDecimals and allowNegative</li>
+    <li>[EXTGWT-1376] - TriggerFieldCell not setting name on field options during render call</li>
+    <li>[EXTGWT-1378] - MessageBoxExample ProgressBar ending with 105% rather than 100%</li>
+    <li>[EXTGWT-1381] - PagingToolbar generics are unnecessarily specific</li>
+    <li>[EXTGWT-1383] - X-axis does not update on minimum and maximum values changed.</li>
+    <li>[EXTGWT-1384] - SelectionChangedEvent.getSource() returns Component, causes ClassCastException</li>
+    <li>[EXTGWT-1385] - ContentPanel animation should be customizable</li>
+    <li>[EXTGWT-1387] - Z-index sorting is incorrect.</li>
+    <li>[EXTGWT-1392] - HtmlEditor in Window will not accept focus after another Window is moved</li>
+    <li>[EXTGWT-1393] - Items in toolbar overflow drop-down display as #160;</li>
+    <li>[EXTGWT-1394] - TreeGrid inline editing completes on space, left arrow causes navigation without complete</li>
+    <li>[EXTGWT-1395] - TreeGrid empty text is not displayed</li>
+    <li>[EXTGWT-1396] - ToolBar overflow drop-down button may cause layout loop with certain ToolBar widths</li>
+    <li>[EXTGWT-1400] - Tooltips do not display in pie series.</li>
+    <li>[EXTGWT-1402] - Remove implementation of DndDropEvent.getSource</li>
+    <li>[EXTGWT-1403] - Setting a custom label provider for tooltips on grouped and stacked bar series cause a null pointer exception.</li>
+    <li>[EXTGWT-1410] - In the explorer demo hide the navigation pane and then clicking an example causes an exception.</li>
+    <li>[EXTGWT-1412] - Complex grid columnconfigs that use IdentityValueProvider can't easily be sorted</li>
+    <li>[EXTGWT-1413] - Backspace causes back navigaiton in IE8 when field is read only or not editable</li>
+    <li>[EXTGWT-1415] - Paging and query parameters not being sent to server AdvancedComboExample</li>
+    <li>[EXTGWT-1416] - ComboBox throwing exception if drop down collapsed and hidden quickly in IE</li>
+</ul>
+
+
+
+<h2><a name="Release_3.0.0-beta2">Release 3.0 Beta 2 (1/5/12 tag 3.0.0-beta2)</a></h2>
+
+<h3>General Changes &amp; Enhancements</h3>
+<ul>
+    <li>[EXTGWT-987] - Add tri-state feature to Tree</li>
+    <li>[EXTGWT-1041] - Add ability to cancel DataProxy requests</li>
+    <li>[EXTGWT-1065] - Review instances of statically-included images and remove where appropriate</li>
+    <li>[EXTGWT-1153] - Add new tooltip appearance for errors</li>
+    <li>[EXTGWT-1220] - UiBinder example: BasicBinding</li>
+    <li>[EXTGWT-1235] - Fix JavaDoc compilation warnings</li>
+    <li>[EXTGWT-1259] - Add missing JavaDoc and examples for data package</li>
+    <li>[EXTGWT-1270] - Implement column reordering in ColumnHeader</li>
+    <li>[EXTGWT-1271] - Example using multiple axes and ensure axes color coordination.</li>
+    <li>[EXTGWT-1275] - Move widget events into events package</li>
+    <li>[EXTGWT-1277] - Refactor the way cells handle focus, blur, and editing</li>
+    <li>[EXTGWT-1278] - Refactor grid inline and editing based on new cell changes</li>
+    <li>[EXTGWT-1289] - Add displaygrid option to radial and gauge axis.</li>
+    <li>[EXTGWT-1290] - Axis position detached should not be public.</li>
+    <li>[EXTGWT-1308] - Add missing functionality for controlling fields in multi-field series.</li>
+    <li>[EXTGWT-1314] - Update existing UiBinder examples to match changes in programmatic ones</li>
+    <li>[EXTGWT-1317] - UiBinder example: OverflowToolBarUiBinderExample</li>
+
+</ul>
+
+<h3>Bug Fixes</h3>
+<ul>
+    <li>[EXTGWT-784] - Some Legend items are not aligned properly.</li>
+    <li>[EXTGWT-890] - Radial axis does not properly re-size when no width is set and sometime does not draw all of its pinwheel lines.</li>
+    <li>[EXTGWT-1017] - IE6 and IE7 ContentPanel header tools not rendering correctly</li>
+    <li>[EXTGWT-1045] - ListStore.addAll doesnt correctly insert at the right location when filtered</li>
+    <li>[EXTGWT-1072] - Left and right side of buttons are sometimes cut off (see button aligning uibinder example)</li>
+    <li>[EXTGWT-1111] - IE6 File Upload: Click submit. "You file was uploaded" message box has typo and is huge.</li>
+    <li>[EXTGWT-1122] - IE8 (maybe others) HBoxLayout: stretch, stretchmax, flex + stretch not working</li>
+    <li>[EXTGWT-1129] - IE7 Advanced Forms: "Phone Numbers" tab -> text field is too wide</li>
+    <li>[EXTGWT-1175] - Markers are behind the line in series.</li>
+    <li>[EXTGWT-1195] - Removing filters from a Store leaves items still filtered out after calling replaceAll</li>
+    <li>[EXTGWT-1263] - PropertyEditors need to throw parse exceptions</li>
+    <li>[EXTGWT-1287] - ValueBaseField setPropertyEditor is mispelled</li>
+    <li>[EXTGWT-1299] - Validation issues in some browsers on enter key</li>
+    <li>[EXTGWT-1300] - Series throw an error on zero store items.</li>
+    <li>[EXTGWT-1301] - Legend items do not properly report the index on events.</li>
+    <li>[EXTGWT-1302] - CellSelectionModel not preseving selected state if selected cell updated / refreshed</li>
+    <li>[EXTGWT-1303] - Axis title does not display when positioned on the right.</li>
+    <li>[EXTGWT-1307] - TriggerFieldCell width wrong when size changes after first render</li>
+    <li>[EXTGWT-1312] - Drilling down a bar series does not redraw correctly.</li>
+    <li>[EXTGWT-1313] - PieSeries and ScatterSeries do not redraw correctly when the number of store items is reduced.</li>
+
+</ul>
+
+<h2><a name="Release_3.0.0-beta1">Release 3.0 Beta 1 (12/7/11)(rev 1987)</a></h2>
+
+<h3>General Changes &amp; Enhancements</h3>
+<ul>
+  <li>[EXTGWT-920] - Add row editor</li>
+  <li>[EXTGWT-956] - Add basic expression support to XTemplate</li>
+  <li>[EXTGWT-967] - Add TimeField</li>
+  <li>[EXTGWT-969] - Add advanced from example</li>
+  <li>[EXTGWT-1038] - Add GroupSummaryView</li>
+  <li>[EXTGWT-1049] - UiBinder example: PortalLayoutContainer</li>
+  <li>[EXTGWT-1099] - Implement tick marks for Gauge Axis.</li>
+  <li>[EXTGWT-1157] - Add advanced grid filters</li>
+  <li>[EXTGWT-1162] - Add RowNumberer to Grid</li>
+  <li>[EXTGWT-1163] - Add check box selection model</li>
+  <li>[EXTGWT-1164] - Add RowExpander</li>
+  <li>[EXTGWT-1168] - Loaders need to expose remote filtering</li>
+  <li>[EXTGWT-1196] - Update WidgetComponent to pass resize calls to wrapped widget</li>
+  <li>[EXTGWT-1208] - UiBinder example: DualListField</li>
+  <li>[EXTGWT-1218] - Add ComonentPlugin interface and change code to use it</li>
+  <li>[EXTGWT-1260] - Add reordering dnd tree / treegrid examples</li>
+  <li>Added widget support to MenuItem</li>
+</ul>
+
+<h3>API Changes</h3>
+<ul>
+  <li>Added getCurrentValid(preventMark) to ValueBaseField</li>
+  <li>Added getCurrentValue() to ValueBaseField</li>
+  <li>Added joint configs to TreeStyle</li>
+  <li>Added getModifiedRecords() to Store</li>
+  <li>Renamed NumberCell to NumberInputCell.</li>
+  <li>Renamed TopBottomComponent to NorthSouthContainer</li>
+  <li>Added expand / collapse / hide / show methods to BorderLayoutContainer</li>
+  <li>Add RequiresResize to ResizeContainer</li>
+</ul>
+
+<h3>Bug Fixes</h3>
+<ul>
+  <li>[EXTGWT-789] - Chart mouse over and leave do not fire properly.</li>
+  <li>[EXTGWT-923] - Tabs don't appear to be connected to their content area "sheet"</li>
+  <li>[EXTGWT-1016] - IE6 and IE7 ToolBar has several rendering issues including overflow calcs</li>
+  <li>[EXTGWT-1045] - ListStore.addAll doesnt correctly insert at the right location when filtered</li>
+  <li>[EXTGWT-1061] - IE6 Slider shows extra border on top, and tooltip has extra vertical space with gray background</li>
+  <li>[EXTGWT-1094] - Adding 60+ tabs to a tabpanel causes it to wrap instead of continuing to use the scroll buttons</li>
+  <li>[EXTGWT-1102] - Advanced ComboBox: Paging controls do not change content.</li>
+  <li>[EXTGWT-1106] - MenuBar: on focus menu bar is surrounded by orange line (focus box, chrome)</li>
+  <li>[EXTGWT-1107] - List to List: Dragging from the insert list to append sorted causes an exception.</li>
+  <li>[EXTGWT-1110] - IE6 (maybe others) DualListField: "Add all" only adds Alabama. Appears to be right list mis-sized</li>
+  <li>[EXTGWT-1111] - IE6 File Upload: Click submit. "You file was uploaded" message box has typo and is huge.</li>
+  <li>[EXTGWT-1112] - IE6 (maybe others) Simple Form Example: DatePicker shows red line when valid</li>
+  <li>[EXTGWT-1113] - IE6 TabPanel context menu not working (could be all context menus)</li>
+  <li>[EXTGWT-1114] - IE6 Basic Toolbar: Menu arrow (for menus with submenus) has slate gray background (opacity issue)</li>
+  <li>[EXTGWT-1115] - IE6 MessageBox: Spans width of browser viewport</li>
+  <li>[EXTGWT-1116] - IE6 MessageBox: Progress does not appear</li>
+  <li>[EXTGWT-1117] - IE6 / IE8 (maybe others) Context Menu Tree: Right click results in error "Member not found"</li>
+  <li>[EXTGWT-1118] - IE6 IE8 Can't drag windows, "Can't move focus to the window because it is invisible, not enabled..."</li>
+  <li>[EXTGWT-1119] - List to List: dragging multiple items results in too man entries</li>
+  <li>[EXTGWT-1120] - IE8, Safari Window (maybe others) Advanced Forms: icons blinking</li>
+  <li>[EXTGWT-1121] - IE8 IE9 (maybe others) XML Grid Example: all rows are blank</li>
+  <li>[EXTGWT-1122] - IE8 (maybe others) HBoxLayout: stretch, stretchmax, flex + stretch not working</li>
+  <li>[EXTGWT-1125] - IE8 (maybe others) Tooltips: Closeable tooltips cannot be closed</li>
+  <li>[EXTGWT-1126] - Advanced Forms: Color picker shifts explorer to the left ie9, overhidden in ff (constrain viewport issue)</li>
+  <li>[EXTGWT-1127] - IE9 When in focus CheckBox and Radio buttons losing theming.</li>
+  <li>[EXTGWT-1128] - IE6 Advanced Toolbar, Overflow Toolbar: All toolbars other than Standard overflow</li>
+  <li>[EXTGWT-1129] - IE7 Advanced Forms: "Phone Numbers" tab -> text field is too wide</li>
+  <li>[EXTGWT-1130] - IE6 File Upload: "Browse..." button not working</li>
+  <li>[EXTGWT-1131] - IE6 Fx: Panel images missing</li>
+  <li>[EXTGWT-1137] - TextArea.setValue doesn't have an effect (at least pre-render)</li>
+  <li>[EXTGWT-1139] - Viewport default ctor throws an error</li>
+  <li>[EXTGWT-1143] - Several Slider bugs: No default size, hardcoded size, vertical value reversed, no keyboard support, no snapping</li>
+  <li>[EXTGWT-1165] - XmlReader is unable to treat a tag as an object, with the text contents as a property</li>
+  <li>[EXTGWT-1166] - Setup.txt instructs users to incorrectly load the reset.css file</li>
+  <li>[EXTGWT-1171] - Default vertical grids on axis produce an error on render.</li>
+  <li>[EXTGWT-1173] - User reported ComboBox issues</li>
+  <li>[EXTGWT-1178] - TextField.setName doesnt set the name in the dom</li>
+  <li>[EXTGWT-1181] - Clicking inside of the tabpanel of the logo example causes an exception.</li>
+  <li>[EXTGWT-1194] - TabPanel config update removes styling</li>
+  <li>[EXTGWT-1195] - Removing filters from a Store leaves items still filtered out after calling replaceAll</li>
+  <li>[EXTGWT-1207] - SpinnerField throwing null pointer when clicking spinner triggers</li>
+  <li>[EXTGWT-1209] - Sorting on GroupingView does not work</li>
+  <li>[EXTGWT-1224] - ComboBoxCell requires a propertyeditor to go from string to model</li>
+  <li>[EXTGWT-1234] - Minimum and maximum values on DateField not working properly.</li>
+  <li>[EXTGWT-1237] - VBoxLayoutContainer's contents positioned wrong</li>
+  <li>[EXTGWT-1239] - ContentPanel/BorderLayoutContainer issues when calling expand/collapse/setExpanded</li>
+  <li>[EXTGWT-1240] - Possible issue with TextField in editable grid</li>
+  <li>[EXTGWT-1241] - TreeDragSource does not allow moving both the leafs and the nodes in the same tree</li>
+  <li>[EXTGWT-1242] - TreeDropTarget mistakenly references TreeGrid</li>
+  <li>[EXTGWT-1243] - Checkboxes can't be selected/deselected, nor can Radio label text</li>
+  <li>[EXTGWT-1244] - Adding an item to a sorted TreeStore can cause an assertion error</li>
+  <li>[EXTGWT-1245] - TreeGrid appearance can't be set in a setter or constructor</li>
+  <li>[EXTGWT-1246] - Tree dnd doesn't allow dropping a child on a child</li>
+  <li>[EXTGWT-1247] - Keys are not properly encoded when used as an id in Tree node</li>
+  <li>[EXTGWT-1248] - Selection and scrolling issues in GroupingView</li>
+  <li>[EXTGWT-1255] - Text on buttons can be selected</li>
+  <li>[EXTGWT-1256] - Grid unselecable being applied to fields in edit grid</li>
+  <li>[EXTGWT-1257] - Reopening AdvancedTabsExample throws an exception.</li>
+  <li>[EXTGWT-1258] - Request factory binding example throws an exception (seen on load, and clicking save button)</li>
+  <li>[EXTGWT-1261] - Check boxes and radios disapear when mousede over in IE6</li>
+  <li>[EXTGWT-1262] - Validation issues with fields/cells</li>
+  <li>[EXTGWT-1263] - PropertyEditors need to throw parse exceptions</li>
+  <li>[EXTGWT-1251] - Sorting not implemented in TreeGrid</li>
+  <li>[EXTGWT-1152] - SideErrorHandler: Adjust target widget width when showing error</li>
+  <li>Store not firing event when reject changes called</li>
+  <li>Clicking label in FieldLabel not focusing field</li>
+  <li>Fixed multi select on macs with selection models</li>
+
+
+</ul>
+
+<h2><a name="Release_3.0.0-dp5">Release 3.0 DP5 (10/18/11)(rev 1806)</a></h2>
+
+<h3>General Changes &amp; Enhancements</h3>
+<ul>
+  <li>Added Grid and related classes</li>
+  <li>Added Grid GroupingView & LiveGridView</li>
+  <li>Added EditableGrid</li>
+  <li>Added PagingToolBar</li>
+  <li>Added TreeGrid and related class</li>
+  <li>Applied Cell support to Tree, ListView, Grid, TreeGrid</li>
+  <li>Added ColorPalette & ColorMenu</li>
+  <li>Added MenuBar</li>
+  <li>Added FieldSet and FileUploadField</li>
+  <li>Added ButtonGroup</li>
+  <li>Added CenterLayoutContainer</li>
+  <li>Added HtmlLayoutContainer</li>
+  <li>Added PortalLayoutContainer</li>
+  <li>Added AccordionLayoutContainer</li>
+  <li>Implemented CssFloatLayoutContainer</li>
+  <li>Added AdapterField, ListField, & DualListField</li>
+  <li>Added Slider</li>
+  <li>Added Tree and Grid DND</li>
+  <li>Add Writer API to Loading and Store API</li>
+  <li>Added CommonStyles & ThemeStyle</li>
+  <li>Added many more examples to Explorer</li>
+</ul>
+
+<h3>API Changes</h3>
+<ul>
+  <li>Split GXT module into several modules</li>
+  <li>Collapsed all Handler and HasHandler interfaces as inner classes in Event</li>
+  <li>Added missing features to BorderLayoutContainer</li>
+  <li>Removed ComponentAttachable as Widgets now fire attach / detach event</li>
+  <li>Removed Html and Text in favor of GWT HTML and Label</li>
+  <li>Refactored GXT class</li>
+  <li>Moved overflow support from ToolBar to HBoxLayoutContainer</li>
+  <li>Added AutoScrolSupport and ScrollSupoprt classes</li>
+  <li>Added HandlerManagerContext and DefaultHandlerManagerContext</li>
+</ul>
+
+<h3>Bug Fixes</h3>
+<ul>
+	<li>[EXTGWT-873] - Charts do not render in safari 3.</li>
+    <li>[EXTGWT-893] - Unable to scroll in main panel in examples</li>
+    <li>[EXTGWT-931] - Several Menu bugs (using old appearance, key board nav not working, items moving on mouse over, check an radio items not working)</li>
+    <li>[EXTGWT-915] - Too many tabs wrap to a new line instead of scrolling</li>
+    <li>[EXTGWT-923] - Tabs don't appear to be connected to their content area "sheet"</li>
+    <li>[EXTGWT-1007] - Menu height is wrong first time a menu is displayed.</li>
+    <li>[EXTGWT-1008] - Layer keeps creating new shims rather than pulling from stack</li>
+    <li>[EXTGWT-1009] - Window ghost styles not appearance based, and ghost not rendering properly</li>
+    <li>[EXTGWT-1015] - IE6 and IE7 buttons have several rendering issues</li>
+    <li>[EXTGWT-1018] - IE6 and IE7 content not scrolling in many places</li>
+    <li>[EXTGWT-1028] - At least TabPanel does not check before injecting its styles multiple times.</li>
+    <li>[EXTGWT-1029] - Field error marker (red line in field) no filling width</li>
+    <li>[EXTGWT-1054] - Menu not auto hiding on escape and click outside of menu region</li>
+    <li>[EXTGWT-1057] - ListStore on load fires add event, not data changed event</li>
+    <li>[EXTGWT-1060] - RequestFactoryBinding example is throwing an exception</li>
+    <li>[EXTGWT-1067] - VBox & HBox UiBinder examples fail in production mode</li>
+    <li>[EXTGWT-1068] - Clicking on scroll bar in ListView causes ComboBox to collapse</li>
+    <li>[EXTGWT-1074] - Pie example labels appear outside of pie chart.</li>
+    <li>[EXTGWT-1085] - Grid scroll into view not working when navigation rows</li>
+    <li>[EXTGWT-1087] - Component unselectable not working, text can be selected</li>
+    <li>[EXTGWT-1088] - TabPanel is disabling context menu for entire container, rather than header alone</li>
+    <li>[EXTGWT-1091] - ButtonExample is crashing browser in IE6</li>
+    <li>[EXTGWT-1092] - There is no way to disable a tab item in TabPanel</li>
+</ul>
+
+<h2><a name="Release_3.0.0-dp4">Release 3.0 DP4 (9/7/11)(rev 1461)</a></h2>
+
+<h3>General Changes &amp; Enhancements</h3>
+<ul>
+  <li>Converted fields to be cell based</li>
+  <li>Refactored field validation and error handling</li>
+  <li>Refactored how buttons are configured in dialogs</li>
+  <li>New async based state management</li>
+  <li>Added ListView DND code and examples</li>
+  <li>Added chart tootips</li>
+  <li>Added chart series labels</li>
+  <li>Added several new examples</li>
+</ul>
+
+
+
+</body>
+</html>
