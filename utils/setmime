@@ -1,6 +1,6 @@
 #!/bin/sh
-svn stat | grep ^\? | sed -e "s/^\? \+//" | xargs svn add
-svn stat | grep ^\! | sed -e "s/^\! \+//" | xargs svn delete
+svn stat | grep ^\? | sed -e "s/^\? *//" | xargs svn add
+svn stat | grep ^\! | sed -e "s/^\! *//" | xargs svn delete
 
 find . -name *.html -exec svn propset svn:mime-type text/html {} +
 find . -name *.htm -exec svn propset svn:mime-type text/html {} +

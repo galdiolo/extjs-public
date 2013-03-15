@@ -1,7 +1,7 @@
 #!/bin/sh
 if test -d "$1"
 then
-  find "$1" -type f -print0 | grep -z -v .svn | grep -z -v clean.sh | grep -z -v setmime | xargs -0 rm -f
+  find "$1" -path '*/.svn' -prune -o -type f -exec rm {} +
 else
   echo "Please specify a directory to clean"
 fi
