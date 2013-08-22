@@ -1,186 +1,4 @@
 /*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
-Ext.onReady(function() {
-
-    var patients = [{
-        insuranceCode: '11111',
-        name: 'Fred Bloggs',
-        address: 'Main Street',
-        telephone: '555 1234 123'
-    }, {
-        insuranceCode: '22222',
-        name: 'Fred West',
-        address: 'Cromwell Street',
-        telephone: '616 555 222'
-    }, {
-        insuranceCode: '33333',
-        name: 'Fred Mercury',
-        address: 'Over The Rainbow',
-        telephone: '555 321 0987'
-    }, {
-        insuranceCode: '44444',
-        name: 'Fred Forsyth',
-        address: 'Blimp Street',
-        telephone: '555 111 2222'
-    }, {
-        insuranceCode: '55555',
-        name: 'Fred Douglass',
-        address: 'Talbot County, Maryland',
-        telephone: 'N/A'
-    }];
-
-    var PatientRecord = Ext.data.Record.create([{
-        name: 'name'
-    }, {
-        name: 'address'
-    }, {
-        name: 'telephone'
-    }]);
-
-    var patientStore = new Ext.data.Store({
-        data: patients,
-        reader: new Ext.data.JsonReader({
-            id: 'insuranceCode'
-        }, PatientRecord)
-    });
-
-    var hospitals = [{
-        code: 'AAAAA',
-        name: 'Saint Thomas',
-        address: 'Westminster Bridge Road, SE1 7EH',
-        telephone: '020 7188 7188'
-    }, {
-        code: 'BBBBB',
-        name: 'Queen\'s Medical Centre',
-        address: 'Derby Road, NG7 2UH',
-        telephone: '0115 924 9924'
-    }, {
-        code: 'CCCCC',
-        name: 'Saint Bartholomew',
-        address: 'West Smithfield, EC1A 7BE',
-        telephone: '020 7377 7000'
-    }, {
-        code: 'DDDDD',
-        name: 'Royal London',
-        address: 'Whitechapel, E1 1BB',
-        telephone: '020 7377 7000'
-    }];
-    
-    var HospitalRecord = Ext.data.Record.create([{
-        name: 'name'
-    }, {
-        name: 'address'
-    }, {
-        name: 'telephone'
-    }]);
-
-    var hospitalStore = new Ext.data.Store({
-        data: hospitals,
-        reader: new Ext.data.JsonReader({
-            id: 'code'
-        }, HospitalRecord)
-    });
-    
-    var patientView = new Ext.DataView({
-        cls: 'patient-view',
-        tpl: '<tpl for=".">' +
-                '<div class="patient-source"><table><tbody>' +
-                    '<tr><td class="patient-label">Name</td><td class="patient-name">{name}</td></tr>' +
-                    '<tr><td class="patient-label">Address</td><td class="patient-name">{address}</td></tr>' +
-                    '<tr><td class="patient-label">Telephone</td><td class="patient-name">{telephone}</td></tr>' +
-                '</tbody></table></div>' +
-             '</tpl>',
-        itemSelector: 'div.patient-source',
-        store: patientStore,
-        listeners: {
-            render: initializePatientDragZone
-        }
-    });
-
-    var helpWindow = new Ext.Window({
-        title: 'Source code',
-        width: 920,
-        height: 500,
-        closeAction: 'hide',
-        bodyCfg: {tag: 'textarea', readonly: true},
-        bodyStyle: {
-            backgroundColor: 'white',
-            margin: '0px',
-            border: '0px none'
-        },
-        listeners: {
-            render: function(w) {
-                Ext.Ajax.request({
-                    url: 'dragdropzones.js',
-                    success: function(r) {
-                        w.body.dom.value = r.responseText;
-                    }
-                });
-            }
-        }
-    });
-
-    var hospitalGrid = new Ext.grid.GridPanel({
-        title: 'Hospitals',
-        region: 'center',
-        margins: '0 5 5 0',
-        bbar: [{
-            text: 'View Source',
-            handler: function() {
-                helpWindow.show();
-            }
-        }],
-        columns: [{
-            dataIndex: 'name',
-            header: 'Name',
-            width: 200
-        }, {
-            dataIndex: 'address',
-            header: 'Address',
-            width: 300
-        }, {
-            dataIndex: 'telephone',
-            header: 'Telephone',
-            width: 100
-        }],
-        viewConfig: {
-            tpl: new Ext.XTemplate('<div class="hospital-target"></div>'),
-            enableRowBody: true,
-            getRowClass: function(rec, idx, p, store) {
-                p.body = this.tpl.apply(rec.data);
-            }
-        },
-        store: hospitalStore,
-        listeners: {
-            render: initializeHospitalDropZone
-        }
-    });
-
-    new Ext.Viewport({
-        layout: 'border',
-        items: [{
-            cls: 'app-header',
-            region: 'north',
-            height: 100,
-            html: '<h1>Patient Hospital Assignment</h1>',
-            margins: '5 5 5 5'
-        }, {
-            title: 'Patients',
-            region: 'west',
-            width: 300,
-            margins: '0 5 5 5',
-            items: patientView
-        }, hospitalGrid ]
-    });
-});
-
-/*
  * Here is where we "activate" the DataView.
  * We have decided that each node with the class "patient-source" encapsulates a single draggable
  * object.
@@ -196,23 +14,23 @@ Ext.onReady(function() {
  * to perform the drop operation.
  */
 function initializePatientDragZone(v) {
-    v.dragZone = new Ext.dd.DragZone(v.getEl(), {
+    v.dragZone = Ext.create('Ext.dd.DragZone', v.getEl(), {
 
 //      On receipt of a mousedown event, see if it is within a draggable element.
 //      Return a drag data object if so. The data object can contain arbitrary application
 //      data, but it should also contain a DOM element in the ddel property to provide
 //      a proxy to drag.
         getDragData: function(e) {
-            var sourceEl = e.getTarget(v.itemSelector, 10);
+            var sourceEl = e.getTarget(v.itemSelector, 10), d;
             if (sourceEl) {
                 d = sourceEl.cloneNode(true);
                 d.id = Ext.id();
-                return v.dragData = {
+                return (v.dragData = {
                     sourceEl: sourceEl,
                     repairXY: Ext.fly(sourceEl).getXY(),
                     ddel: d,
                     patientData: v.getRecord(sourceEl).data
-                }
+                });
             }
         },
 
@@ -241,8 +59,11 @@ function initializePatientDragZone(v) {
  *
  * We provide implementations of each of these to provide behaviour for these events.
  */
-function initializeHospitalDropZone(g) {
-    g.dropZone = new Ext.dd.DropZone(g.getView().scroller, {
+function initializeHospitalDropZone(v) {
+    var gridView = v,
+        grid = gridView.up('gridpanel');
+
+    grid.dropZone = Ext.create('Ext.dd.DropZone', v.el, {
 
 //      If the mouse is over a target node, return that node. This is
 //      provided as the "target" parameter in all "onNodeXXXX" node event handling functions
@@ -251,18 +72,18 @@ function initializeHospitalDropZone(g) {
         },
 
 //      On entry into a target node, highlight that node.
-        onNodeEnter : function(target, dd, e, data){ 
-            Ext.fly(target).addClass('hospital-target-hover');
+        onNodeEnter : function(target, dd, e, data){
+            Ext.fly(target).addCls('hospital-target-hover');
         },
 
 //      On exit from a target node, unhighlight that node.
-        onNodeOut : function(target, dd, e, data){ 
-            Ext.fly(target).removeClass('hospital-target-hover');
+        onNodeOut : function(target, dd, e, data){
+            Ext.fly(target).removeCls('hospital-target-hover');
         },
 
 //      While over a target node, return the default drop allowed class which
 //      places a "tick" icon into the drag proxy.
-        onNodeOver : function(target, dd, e, data){ 
+        onNodeOver : function(target, dd, e, data){
             return Ext.dd.DropZone.prototype.dropAllowed;
         },
 
@@ -272,11 +93,211 @@ function initializeHospitalDropZone(g) {
 //      We can use the data set up by the DragZone's getDragData method to read
 //      any data we decided to attach.
         onNodeDrop : function(target, dd, e, data){
-            var rowIndex = g.getView().findRowIndex(target);
-            var h = g.getStore().getAt(rowIndex);
+            var rowBody = Ext.fly(target).findParent('.x-grid-rowbody-tr', null, false),
+                mainRow = rowBody.previousSibling,
+                h = gridView.getRecord(mainRow),
+                targetEl = Ext.get(target),
+                html = targetEl.dom.innerHTML;
+                
+            if (html == 'Drop Patient Here') {
+                html = data.patientData.name
+            } else {
+                html = data.patientData.name + ', ' + targetEl.dom.innerHTML;
+            }
+
+            targetEl.update(html);
             Ext.Msg.alert('Drop gesture', 'Dropped patient ' + data.patientData.name +
                 ' on hospital ' + h.data.name);
             return true;
         }
     });
 }
+
+
+Ext.require(['*']);
+
+Ext.onReady(function() {
+
+    var patients = [{
+        insuranceCode: '11111',
+        name: 'Fred Bloggs',
+        address: 'Main Street',
+        telephone: '555 1234 123'
+    }, {
+        insuranceCode: '22222',
+        name: 'Fred Bansod',
+        address: 'Van Ness',
+        telephone: '666 666 666'
+    }, {
+        insuranceCode: '33333',
+        name: 'Fred Mercury',
+        address: 'Over The Rainbow',
+        telephone: '555 321 0987'
+    }, {
+        insuranceCode: '44444',
+        name: 'Fred Forsyth',
+        address: 'Blimp Street',
+        telephone: '555 111 2222'
+    }, {
+        insuranceCode: '55555',
+        name: 'Fred Douglass',
+        address: 'Talbot County, Maryland',
+        telephone: 'N/A'
+    }];
+
+    Ext.define('Patient', {
+        extend: 'Ext.data.Model',
+        idProperty: 'insuranceCode',
+        fields: [{
+                name: 'name'
+            }, {
+                name: 'address'
+            }, {
+                name: 'telephone'
+            }]
+    });
+
+    var patientStore = Ext.create('Ext.data.Store', {
+        model: 'Patient',
+        data: patients
+    });
+
+    var hospitals = [{
+        code: 'AAAAA',
+        name: 'Saint Thomas',
+        address: 'Westminster Bridge Road, SE1 7EH',
+        telephone: '020 7188 7188'
+    }, {
+        code: 'BBBBB',
+        name: 'Queen\'s Medical Centre',
+        address: 'Derby Road, NG7 2UH',
+        telephone: '0115 924 9924'
+    }, {
+        code: 'CCCCC',
+        name: 'Saint Bartholomew',
+        address: 'West Smithfield, EC1A 7BE',
+        telephone: '020 7377 7000'
+    }, {
+        code: 'DDDDD',
+        name: 'Royal London',
+        address: 'Whitechapel, E1 1BB',
+        telephone: '020 7377 7000'
+    }];
+
+    Ext.define('Hospital', {
+        extend: 'Ext.data.Model',
+        idProperty: 'code',
+        fields: [{
+            name: 'name'
+        }, {
+            name: 'address'
+        }, {
+            name: 'telephone'
+        }]
+    });
+
+    var hospitalStore = Ext.create('Ext.data.Store', {
+        model: 'Hospital',
+        data: hospitals
+    });
+
+    var patientView = Ext.create('Ext.view.View', {
+        cls: 'patient-view',
+        tpl: '<tpl for=".">' +
+                '<div class="patient-source"><table><tbody>' +
+                    '<tr><td class="patient-label">Name</td><td class="patient-name">{name}</td></tr>' +
+                    '<tr><td class="patient-label">Address</td><td class="patient-name">{address}</td></tr>' +
+                    '<tr><td class="patient-label">Telephone</td><td class="patient-name">{telephone}</td></tr>' +
+                '</tbody></table></div>' +
+             '</tpl>',
+        itemSelector: 'div.patient-source',
+        overItemCls: 'patient-over',
+        selectedItemClass: 'patient-selected',
+        singleSelect: true,
+        store: patientStore,
+        listeners: {
+            render: initializePatientDragZone
+        }
+    });
+
+    var helpWindow = Ext.create('Ext.Window', {
+        title: 'Source code',
+        width: 920,
+        height: 500,
+        closeAction: 'hide',
+        layout: 'fit',
+        items: [
+            {
+                xtype: 'textarea',
+                itemId: 'srcTextArea'
+            }
+        ],
+        listeners: {
+            render: function(w) {
+                Ext.Ajax.request({
+                    url: 'dragdropzones.js',
+                    success: function(r) {
+                        w.down('#srcTextArea').setValue(r.responseText);
+                    }
+                });
+            }
+        }
+    });
+
+    var hospitalGrid = Ext.create('Ext.grid.Panel', {
+        title: 'Hospitals',
+        region: 'center',
+        margins: '0 5 5 0',
+        bbar: [{
+            text: 'View Source',
+            handler: function() {
+                helpWindow.show();
+            }
+        }],
+        sortableColumns: false,
+        columns: [{
+            dataIndex: 'name',
+            header: 'Name',
+            width: 200
+        }, {
+            dataIndex: 'address',
+            header: 'Address',
+            width: 300
+        }, {
+            dataIndex: 'telephone',
+            header: 'Telephone',
+            width: 100
+        }],
+        features: [{
+            ftype:'rowbody',
+            setup: function(rows, rowValues) {
+                Ext.grid.feature.RowBody.prototype.setup.apply(this, arguments);
+                rowValues.rowBody = 'Drop Patient Here';
+                rowValues.rowBodyDivCls = 'hospital-target';
+            }
+        }],
+        viewConfig: {
+            listeners: {
+                render: initializeHospitalDropZone
+            }
+        },
+        store: hospitalStore
+    });
+
+    Ext.create('Ext.Viewport', {
+        layout: 'border',
+        items: [{
+            cls: 'app-header',
+            region: 'north',
+            height: 30,
+            html: '<h1>Patient Hospital Assignment</h1>',
+            margins: '5 5 5 5'
+        }, {
+            title: 'Patients',
+            region: 'west',
+            width: 300,
+            margins: '0 5 5 5',
+            items: patientView
+        }, hospitalGrid ]
+    });
+});

@@ -1,61 +1,50 @@
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
+Ext.Loader.setConfig({enabled: true});
+Ext.Loader.setPath('Ext.ux', '../ux');
+Ext.require([
+    'Ext.window.*',
+    'Ext.ux.GMapPanel'
+]);
 
 Ext.onReady(function(){
-
     var mapwin;
-    var button = Ext.get('show-btn');
-
-    button.on('click', function(){
+    Ext.get('show-btn').on('click', function() {
         // create the window on the first click and reuse on subsequent clicks
-        if(!mapwin){
-
-            mapwin = new Ext.Window({
+        if(mapwin) {
+            mapwin.show();
+        } else {
+            mapwin = Ext.create('Ext.window.Window', {
+                autoShow: true,
                 layout: 'fit',
                 title: 'GMap Window',
                 closeAction: 'hide',
-                width:400,
-                height:400,
+                width:450,
+                height:450,
+                border: false,
                 x: 40,
                 y: 60,
                 items: {
                     xtype: 'gmappanel',
-                    region: 'center',
-                    zoomLevel: 14,
-                    gmapType: 'map',
-                    mapConfOpts: ['enableScrollWheelZoom','enableDoubleClickZoom','enableDragging'],
-                    mapControls: ['GSmallMapControl','GMapTypeControl','NonExistantControl'],
-                    setCenter: {
+                    center: {
                         geoCodeAddr: '4 Yawkey Way, Boston, MA, 02215-3409, USA',
                         marker: {title: 'Fenway Park'}
                     },
                     markers: [{
                         lat: 42.339641,
                         lng: -71.094224,
-                        marker: {title: 'Boston Museum of Fine Arts'},
+                        title: 'Boston Museum of Fine Arts',
                         listeners: {
                             click: function(e){
-                                Ext.Msg.alert('Its fine', 'and its art.');
+                                Ext.Msg.alert('It\'s fine', 'and it\'s art.');
                             }
                         }
                     },{
                         lat: 42.339419,
                         lng: -71.09077,
-                        marker: {title: 'Northeastern University'}
+                        title: 'Northeastern University'
                     }]
                 }
             });
             
-        }
-        
-        mapwin.show();
-        
+        }        
     });
-    
  });

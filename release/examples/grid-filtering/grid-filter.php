@@ -1,64 +1,110 @@
 <?php
-mysql_pconnect("localhost", "root", "") or die("Could not connect");
-mysql_select_db("demo") or die("Could not select database");
 
-$start = ($_REQUEST["start"] == null)? 0 : $_REQUEST["start"];
-$count = ($_REQUEST["limit"] == null)? 20 : $_REQUEST["limit"];
-$sort = ($_REQUEST["sort"] == null)? "" : $_REQUEST["sort"];
-$dir = ($_REQUEST["dir"] == "desc")? "DESC" : "";
-$filter = $_REQUEST["filter"];
+function getDB() {
+    $dbFile = "filter-demo.db";
+    $hasDB = file_exists($dbFile);
 
-$where = " 0 = 0 ";
-if (is_array($filter)) {
-	for ($i=0;$i<count($filter);$i++){
-		switch($filter[$i]['data']['type']){
-			case 'string' : $qs .= " AND ".$filter[$i]['field']." LIKE '%".$filter[$i]['data']['value']."%'"; Break;
-			case 'list' : 
-				if (strstr($filter[$i]['data']['value'],',')){
-					$fi = explode(',',$filter[$i]['data']['value']);
-					for ($q=0;$q<count($fi);$q++){
-						$fi[$q] = "'".$fi[$q]."'";
-					}
-					$filter[$i]['data']['value'] = implode(',',$fi);
-					$qs .= " AND ".$filter[$i]['field']." IN (".$filter[$i]['data']['value'].")"; 
-				}else{
-					$qs .= " AND ".$filter[$i]['field']." = '".$filter[$i]['data']['value']."'"; 
-				}
-			Break;
-			case 'boolean' : $qs .= " AND ".$filter[$i]['field']." = ".($filter[$i]['data']['value']); Break;
-			case 'numeric' : 
-				switch ($filter[$i]['data']['comparison']) {
-					case 'eq' : $qs .= " AND ".$filter[$i]['field']." = ".$filter[$i]['data']['value']; Break;
-					case 'lt' : $qs .= " AND ".$filter[$i]['field']." < ".$filter[$i]['data']['value']; Break;
-					case 'gt' : $qs .= " AND ".$filter[$i]['field']." > ".$filter[$i]['data']['value']; Break;
-				}
-			Break;
-			case 'date' : 
-				switch ($filter[$i]['data']['comparison']) {
-					case 'eq' : $qs .= " AND ".$filter[$i]['field']." = '".date('Y-m-d',strtotime($filter[$i]['data']['value']))."'"; Break;
-					case 'lt' : $qs .= " AND ".$filter[$i]['field']." < '".date('Y-m-d',strtotime($filter[$i]['data']['value']))."'"; Break;
-					case 'gt' : $qs .= " AND ".$filter[$i]['field']." > '".date('Y-m-d',strtotime($filter[$i]['data']['value']))."'"; Break;
-				}
-			Break;
-		}
-	}	
-	$where .= $qs;
+    $db = new SQLiteDatabase($dbFile);
+    if (!$hasDB) {
+        $db->query(readCreateSql());
+    }
+    return $db;
+}
+
+function readCreateSql() {
+    $filename = "grid-demo.sql";
+    $file = fopen($filename, 'r');
+    $data = fread($file, filesize($filename));
+    fclose($file);
+    return $data;
+}
+
+// collect request parameters
+$start  = isset($_REQUEST['start'])  ? $_REQUEST['start']  :  0;
+$count  = isset($_REQUEST['limit'])  ? $_REQUEST['limit']  : 50;
+$sort   = isset($_REQUEST['sort'])   ? json_decode($_REQUEST['sort'])   : null;
+$filters = isset($_REQUEST['filter']) ? $_REQUEST['filter'] : null;
+
+$sortProperty = $sort[0]->property; 
+$sortDirection = $sort[0]->direction;
+
+// GridFilters sends filters as an Array if not json encoded
+if (is_array($filters)) {
+    $encoded = false;
+} else {
+    $encoded = true;
+    $filters = json_decode($filters);
+}
+
+$where = ' 0 = 0 ';
+$qs = '';
+
+// loop through filters sent by client
+if (is_array($filters)) {
+    for ($i=0;$i<count($filters);$i++){
+        $filter = $filters[$i];
+
+        // assign filter data (location depends if encoded or not)
+        if ($encoded) {
+            $field = $filter->field;
+            $value = $filter->value;
+            $compare = isset($filter->comparison) ? $filter->comparison : null;
+            $filterType = $filter->type;
+        } else {
+            $field = $filter['field'];
+            $value = $filter['data']['value'];
+            $compare = isset($filter['data']['comparison']) ? $filter['data']['comparison'] : null;
+            $filterType = $filter['data']['type'];
+        }
+
+        switch($filterType){
+            case 'string' : $qs .= " AND ".$field." LIKE '%".$value."%'"; Break;
+            case 'list' :
+                if (strstr($value,',')){
+                    $fi = explode(',',$value);
+                    for ($q=0;$q<count($fi);$q++){
+                        $fi[$q] = "'".$fi[$q]."'";
+                    }
+                    $value = implode(',',$fi);
+                    $qs .= " AND ".$field." IN (".$value.")";
+                }else{
+                    $qs .= " AND ".$field." = '".$value."'";
+                }
+            Break;
+            case 'boolean' : $qs .= " AND ".$field." = ".($value); Break;
+            case 'numeric' :
+                switch ($compare) {
+                    case 'eq' : $qs .= " AND ".$field." = ".$value; Break;
+                    case 'lt' : $qs .= " AND ".$field." < ".$value; Break;
+                    case 'gt' : $qs .= " AND ".$field." > ".$value; Break;
+                }
+            Break;
+            case 'date' :
+                switch ($compare) {
+                    case 'eq' : $qs .= " AND ".$field." = '".date('Y-m-d',strtotime($value))."'"; Break;
+                    case 'lt' : $qs .= " AND ".$field." < '".date('Y-m-d',strtotime($value))."'"; Break;
+                    case 'gt' : $qs .= " AND ".$field." > '".date('Y-m-d',strtotime($value))."'"; Break;
+                }
+            Break;
+        }
+    }
+    $where .= $qs;
 }
 
 $query = "SELECT * FROM demo WHERE ".$where;
-if ($sort != "") {
-	$query .= " ORDER BY ".$sort." ".$dir;
-}
+$query .= " ORDER BY ".$sortProperty." ".$sortDirection;
 $query .= " LIMIT ".$start.",".$count;
 
-$rs = mysql_query($query);
-$total = mysql_query("SELECT COUNT(id) FROM demo WHERE ".$where);
-$total = mysql_result($total, 0, 0);
-
-$arr = array();
-while($obj = mysql_fetch_object($rs)) {
-	$arr[] = $obj;
+$db = getDB();
+$count = $db->singleQuery("SELECT COUNT(id) FROM demo WHERE ".$where);
+$result = $db->query($query);
+$rows = Array();
+while($row = $result->fetch(SQLITE_ASSOC)) {
+    array_push($rows, $row);
 }
+echo json_encode(Array(
+    "total"=>$count,
+    "data"=>$rows
+));
 
-echo '{"total":"'.$total.'","data":'.json_encode($arr).'}';
 ?>

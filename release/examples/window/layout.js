@@ -1,63 +1,67 @@
-/*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
+Ext.require([
+    'Ext.tab.*',
+    'Ext.window.*',
+    'Ext.tip.*',
+    'Ext.layout.container.Border'
+]);
 Ext.onReady(function(){
-    
-    Ext.state.Manager.setProvider(
-            new Ext.state.SessionProvider({state: Ext.appState}));
-
-    var button = Ext.get('show-btn');
+    var win,
+        button = Ext.get('show-btn');
 
     button.on('click', function(){
 
-        // tabs for the center
-        var tabs = new Ext.TabPanel({
-            region    : 'center',
-            margins   : '3 3 3 0', 
-            activeTab : 0,
-            defaults  : {
-				autoScroll : true
-			},
-            items     : [{
-                title    : 'Bogus Tab',
-                html     : Ext.example.bogusMarkup
-             },{
-                title    : 'Another Tab',
-                html     : Ext.example.bogusMarkup
-             },{ 
-                title    : 'Closable Tab',
-                html     : Ext.example.bogusMarkup,
-                closable : true
-            }]
-        });
-
-        // Panel for the west
-        var nav = new Ext.Panel({
-            title       : 'Navigation',
-            region      : 'west',
-            split       : true,
-            width       : 200,
-            collapsible : true,
-            margins     : '3 0 3 3',
-            cmargins    : '3 3 3 3'
-        }); 
-
-        var win = new Ext.Window({
-            title    : 'Layout Window',
-            closable : true,
-            width    : 600,
-            height   : 350,
-            //border : false,
-            plain    : true,
-            layout   : 'border',
-            items    : [nav, tabs]
-        });
-
-        win.show(button);
+        if (!win) {
+            win = Ext.create('widget.window', {
+                title: 'Layout Window with title <em>after</em> tools',
+                header: {
+                    titlePosition: 2,
+                    titleAlign: 'center'
+                },
+                closable: true,
+                closeAction: 'hide',
+                width: 600,
+                minWidth: 350,
+                height: 350,
+                tools: [{type: 'pin'}],
+                layout: {
+                    type: 'border',
+                    padding: 5
+                },
+                items: [{
+                    region: 'west',
+                    title: 'Navigation',
+                    width: 200,
+                    split: true,
+                    collapsible: true,
+                    floatable: false
+                }, {
+                    region: 'center',
+                    xtype: 'tabpanel',
+                    items: [{
+                        // LTR even when example is RTL so that the code can be read
+                        rtl: false,
+                        title: 'Bogus Tab',
+                        html: '<p>Window configured with:</p><pre style="margin-left:20px"><code>header: {\n    titlePosition: 2,\n    titleAlign: "center"\n},\ntools: [{type: "pin"}],\nclosable: true</code></pre>'
+                    }, {
+                        title: 'Another Tab',
+                        html: 'Hello world 2'
+                    }, {
+                        title: 'Closable Tab',
+                        html: 'Hello world 3',
+                        closable: true
+                    }]
+                }]
+            });
+        }
+        button.dom.disabled = true;
+        if (win.isVisible()) {
+            win.hide(this, function() {
+                button.dom.disabled = false;
+            });
+        } else {
+            win.show(this, function() {
+                button.dom.disabled = false;
+            });
+        }
     });
 });
