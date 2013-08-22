@@ -1,18 +1,30 @@
 /*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
+This file is part of Ext JS 3.4
 
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 Ext.onReady(function(){
-    
-    var spot = new Ext.Spotlight({
+
+    var spot = new Ext.ux.Spotlight({
         easing: 'easeOut',
         duration: .3
     });
-    
+
     var DemoPanel = Ext.extend(Ext.Panel, {
         title: 'Demo Panel',
         frame: true,
@@ -20,12 +32,12 @@ Ext.onReady(function(){
         height: 150,
         html: 'Some panel content goes here!',
         bodyStyle: 'padding:10px 15px;',
-        
+
         toggle: function(on){
             this.buttons[0].setDisabled(!on);
         }
     });
-    
+
     var p1, p2, p3;
     var updateSpot = function(id){
         if(typeof id == 'string'){
@@ -37,7 +49,7 @@ Ext.onReady(function(){
         p2.toggle(id==p2.id);
         p3.toggle(id==p3.id);
     };
-    
+
     new Ext.Panel({
         renderTo: Ext.getBody(),
         layout: 'table',
@@ -68,12 +80,12 @@ Ext.onReady(function(){
             }]
         })]
     });
-    
+
     new Ext.Button({
         text: 'Start',
         renderTo: 'start-ct',
         handler: updateSpot.createDelegate(this, ['panel1'])
     });
-    
+
     updateSpot(false);
 });

@@ -1,11 +1,23 @@
 /*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
+This file is part of Ext JS 3.4
 
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 
 // Asbtract base class for SqlDB classes
 Ext.data.SqlDB = function(config){
@@ -51,24 +63,26 @@ Ext.extend(Ext.data.SqlDB, Ext.util.Observable, {
 	},
 
 	createTable : function(o){
-		var tableName = o.name;
-		var keyName = o.key;
-		var fs = o.fields;
-		var cb = o.callback;
-		var scope = o.scope;
+		var tableName = o.name,
+		    keyName = o.key,
+		    fs = o.fields,
+		    cb = o.callback,
+		    scope = o.scope,
+            buf = [],
+            types = Ext.data.Types;
+            
 		if(!(fs instanceof Array)){ // Ext fields collection
 			fs = fs.items;
 		}
-		var buf = [];
 		for(var i = 0, len = fs.length; i < len; i++){
-			var f = fs[i], s = f.name;
+			var f = fs[i], 
+                s = f.name;
 			switch(f.type){
-	            case "int":
-	            case "bool":
-	            case "boolean":
+	            case types.INT:
+	            case types.BOOL:
 	                s += ' INTEGER';
 	                break;
-	            case "float":
+	            case types.FLOAT:
 	                s += ' REAL';
 	                break;
 	            default:
@@ -225,14 +239,15 @@ Ext.extend(Ext.data.SqlDB.Proxy, Ext.data.DataProxy, {
     },
 
     processData : function(o){
-    	var fs = this.store.fields;
-    	var r = {};
+    	var fs = this.store.fields,
+    	    r = {},
+            types = Ext.data.Types;
     	for(var key in o){
     		var f = fs.key(key), v = o[key];
 			if(f){
-				if(f.type == 'date'){
+				if(f.type == types.DATE){
 					r[key] = v ? v.format('Y-m-d H:i:s') : '';
-				}else if(f.type == 'boolean'){
+				}else if(f.type == types.BOOL){
 					r[key] = v ? 1 : 0;
 				}else{
 					r[key] = v;

@@ -1,11 +1,23 @@
 /*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
+This file is part of Ext JS 3.4
 
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 /*
  * ================  TabPanel with nested layouts  =======================
  */
@@ -41,7 +53,7 @@ var myData = [
     ['Verizon Communications',35.57,0.39,1.11,'9/1 12:00am'],
     ['Wal-Mart Stores, Inc.',45.45,0.73,1.63,'9/1 12:00am']
 ];
-    
+
 var tabsNestedLayouts = {
 	xtype: 'tabpanel',
 	id: 'tabs-nested-layouts-panel',
@@ -75,7 +87,7 @@ var tabsNestedLayouts = {
 				layout: 'border',
                 // Make sure IE can still calculate dimensions after a resize when the tab is not active.
                 // With display mode, if the tab is rendered but hidden, IE will mess up the layout on show:
-                hideMode: Ext.isIE ? 'offsets' : 'display', 
+                hideMode: Ext.isIE ? 'offsets' : 'display',
 				items: [{
 					title: 'West',
 					region: 'west',
@@ -116,7 +128,7 @@ var tabsNestedLayouts = {
 						title: 'Nested Grid',
 						xtype: 'grid',
 						layout: 'fit',
-				        store: new Ext.data.SimpleStore({
+				        store: new Ext.data.ArrayStore({
 					        fields: [
 					           {name: 'company'},
 					           {name: 'price', type: 'float'},
@@ -126,15 +138,15 @@ var tabsNestedLayouts = {
 					        ]
 					    }),
 				        columns: [
-				            {id:'company',header: "Company", width: 160, sortable: true, dataIndex: 'company'},
-				            {header: "Price", width: 75, sortable: true, renderer: 'usMoney', dataIndex: 'price'},
-				            {header: "Change", width: 75, sortable: true, dataIndex: 'change'},
-				            {header: "% Change", width: 75, sortable: true, dataIndex: 'pctChange'},
-				            {header: "Last Updated", width: 85, sortable: true, renderer: Ext.util.Format.dateRenderer('m/d/Y'), dataIndex: 'lastChange'}
+				            {id:'company',header: 'Company', width: 160, sortable: true, dataIndex: 'company'},
+				            {header: 'Price', width: 75, sortable: true, renderer: 'usMoney', dataIndex: 'price'},
+				            {header: 'Change', width: 75, sortable: true, dataIndex: 'change'},
+				            {header: '% Change', width: 75, sortable: true, dataIndex: 'pctChange'},
+				            {header: 'Last Updated', width: 85, sortable: true, renderer: Ext.util.Format.dateRenderer('m/d/Y'), dataIndex: 'lastChange'}
 				        ],
 				        stripeRows: true,
 				        autoExpandColumn: 'company',
-				        
+
 				        // Add a listener to load the data only after the grid is rendered:
 				        listeners: {
 				        	render: function(){
@@ -178,7 +190,7 @@ var absform = new Ext.form.FormPanel({
         xtype: 'label',
         text: 'To:'
     },{
-    	// The button is not a Field subclass, so it must be 
+    	// The button is not a Field subclass, so it must be
     	// wrapped in a panel for proper positioning to work
     	xtype: 'panel',
     	x: 55,
@@ -223,7 +235,7 @@ var absoluteForm = {
 	    frame: true,
 	    bodyStyle: 'padding:10px 5px 5px;',
 	    items: absform,
-	    
+
 	    tbar: [{
 	    	text: 'Send',
 	    	iconCls: 'icon-send'

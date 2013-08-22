@@ -1,14 +1,23 @@
 /*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
+This file is part of Ext JS 3.4
 
-/*===================================
-/*   Basic page styles
-/*===================================*/
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 body {
     font-family:'lucida grande',tahoma,arial,sans-serif;
     font-size:11px;
@@ -62,23 +71,17 @@ a:hover {
     color:#555;
     background: #f9f9f9;
 }
-
-/*===================================
-/*   Customized layout styles
-/*===================================*/
-
-/* Remove the border around the tabs and override the default white background: */
 .x-tab-panel-header-plain .x-tab-strip-top {
-    background: #DFE8F6 url(../images/default/tabs/tab-strip-bg.gif) repeat-x scroll center bottom !important;
+    background: #DFE8F6 url(../../resources/images/default/tabs/tab-strip-bg.gif) repeat-x scroll center bottom !important;
 }
-
-/* Custom CSS applied to a single panel in an accordion: */
-.custom-accordion .x-panel-body {
+.custom-accordion .x-panel-body{
+    background:#ffe;
+    text-align:center;
+}
+.custom-accordion .x-panel-body p {
     font-family:georgia,serif;
     padding:20px 80px !important;
-    background:#ffe;
     font-size:18px;
-    text-align:center;
     color:#15428B;
 }
 .custom-accordion .x-panel-header-text {
@@ -86,16 +89,12 @@ a:hover {
     font-style:italic;
     color:#555;
 }
-
-/* Custom style for the FormLayout footer so that it integrates into the border layout nicely: */
 #form-panel .x-panel-footer {
     background:#DFE8F6;
     border-color:#99BBE8;
     border-style:none solid solid;
     border-width:0pt 1px 1px;
 }
-
-/* Customize the TableLayout html using standard CSS rules: */
 #table-panel .x-table-layout {
     padding:5px;
 }
@@ -104,8 +103,6 @@ a:hover {
     padding:5px;
     font-size: 11px;
 }
-
-/* Toolbar icons for absolute form example: */
 .icon-send {
     background-image:url(images/email_go.png) !important;
 }
@@ -121,30 +118,12 @@ a:hover {
 .icon-attach {
     background-image:url(images/page_attach.png) !important;
 }
-/* Custom rule to make the toolbar fit within a framed panel with no margin: */
 .email-form .x-panel-mc .x-panel-tbar .x-toolbar {
     border-top:1px solid #C2D6EF;
     border-left:1px solid #C2D6EF;
     border-bottom:1px solid #99BBE8;
     margin:-5px -4px 0;
 }
-
-/* Custom styles for the "Tabs with nested layouts" example: */
 .inner-tab-custom .x-border-layout-ct {
     background: #fff;
-}
-
-/*===================================
-/*  Rules for custom ux layouts
-/*====================================*/
-/* 
- * Ext.ux.layout.CenterLayout
- */
-.ux-layout-center-item {
-    margin:0 auto;
-    text-align:left;
-}
-.ux-layout-center .x-panel-body,  /* if the container is a panel */
-body.ux-layout-center {           /* if the container is the doc body (for viewport) */
-    text-align:center;
 }

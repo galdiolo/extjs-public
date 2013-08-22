@@ -1,76 +1,91 @@
 /*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
+This file is part of Ext JS 3.4
 
-FeedPanel = function() {
-    FeedPanel.superclass.constructor.call(this, {
-        id:'feed-tree',
-        region:'west',
-        title:'Feeds',
-        split:true,
-        width: 225,
-        minSize: 175,
-        maxSize: 400,
-        collapsible: true,
-        margins:'0 0 5 5',
-        cmargins:'0 5 5 5',
-        rootVisible:false,
-        lines:false,
-        autoScroll:true,
-        root: new Ext.tree.TreeNode('Feed Viewer'),
-        collapseFirst:false,
+Copyright (c) 2011-2013 Sencha Inc
 
-        tbar: [{
-            iconCls:'add-feed',
-            text:'Add Feed',
-            handler: this.showWindow,
-            scope: this
-        },{
-            id:'delete',
-            iconCls:'delete-icon',
-            text:'Remove',
-            handler: function(){
-                var s = this.getSelectionModel().getSelectedNode();
-                if(s){
-                    this.removeFeed(s.attributes.url);
-                }
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
+Ext.define('FeedPanel', {
+    
+    extend: 'Ext.tree.TreePanel',
+
+    xtype: 'appfeedpanel',
+
+    constructor: function() {
+        this.callParent([{
+            id:'feed-tree',
+            region:'west',
+            title:'Feeds',
+            split:true,
+            width: 225,
+            minSize: 175,
+            maxSize: 400,
+            collapsible: true,
+            margins:'0 0 5 5',
+            cmargins:'0 5 5 5',
+            rootVisible:false,
+            lines:false,
+            autoScroll:true,
+            root: new Ext.tree.TreeNode('My Feeds'),
+            collapseFirst:false,
+            tbar: [{
+                iconCls:'add-feed',
+                text:'Add Feed',
+                handler: this.showWindow,
+                scope: this
+            },{
+                id:'delete',
+                iconCls:'delete-icon',
+                text:'Remove',
+                handler: function(){
+                    var s = this.getSelectionModel().getSelectedNode();
+                    if(s){
+                        this.removeFeed(s.attributes.url);
+                    }
+                },
+                scope: this
+            }]
+        }]);
+
+        this.feeds = this.root.appendChild(
+            new Ext.tree.TreeNode({
+                text:'My Feeds',
+                cls:'feeds-node',
+                expanded:true
+            })
+        );
+
+        this.getSelectionModel().on({
+            'beforeselect' : function(sm, node){
+                return node.isLeaf();
             },
-            scope: this
-        }]
-    });
+            'selectionchange' : function(sm, node){
+                if(node){
+                    this.fireEvent('feedselect', node.attributes);
+                }
+                this.getTopToolbar().items.get('delete').setDisabled(!node);
+            },
+            scope:this
+        });
 
-    this.feeds = this.root.appendChild(
-        new Ext.tree.TreeNode({
-            text:'My Feeds',
-            cls:'feeds-node',
-            expanded:true
-        })
-    );
+        this.addEvents({feedselect:true});
 
-    this.getSelectionModel().on({
-        'beforeselect' : function(sm, node){
-             return node.isLeaf();
-        },
-        'selectionchange' : function(sm, node){
-            if(node){
-                this.fireEvent('feedselect', node.attributes);
-            }
-            this.getTopToolbar().items.get('delete').setDisabled(!node);
-        },
-        scope:this
-    });
-
-    this.addEvents({feedselect:true});
-
-    this.on('contextmenu', this.onContextMenu, this);
-};
-
-Ext.extend(FeedPanel, Ext.tree.TreePanel, {
-
+        this.on('contextmenu', this.onContextMenu, this);
+    },
+    
     onContextMenu : function(node, e){
         if(!this.menu){ // create context menu on first right click
             this.menu = new Ext.menu.Menu({

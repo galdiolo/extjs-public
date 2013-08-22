@@ -1,16 +1,28 @@
 /*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
+This file is part of Ext JS 3.4
 
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 Ext.onReady(function(){
     Ext.QuickTips.init();
 
     // simple array store
-    var store = new Ext.data.SimpleStore({
+    var store = new Ext.data.ArrayStore({
         fields: ['abbr', 'state', 'nick'],
         data : Ext.exampledata.states // from states.js
     });
@@ -32,15 +44,15 @@ Ext.onReady(function(){
     //to be the value, while the value at index 1 is assumed to be the text.  For example,
     //[['AL', 'Alabama'],['AK', 'Alaska'], etc.]. Any other values beyond index 1 within
     //each item will be ignored using this approach.
-	var comboFromArray = new Ext.form.ComboBox({
-	    store: Ext.exampledata.states,
-	    typeAhead: true,
+    var comboFromArray = new Ext.form.ComboBox({
+        store: Ext.exampledata.states,
+        typeAhead: true,
         forceSelection: true,
-	    triggerAction: 'all',
-	    emptyText:'Select a state...',
-	    selectOnFocus:true,
-	    applyTo: 'array-states'
-	});
+        triggerAction: 'all',
+        emptyText:'Select a state...',
+        selectOnFocus:true,
+        applyTo: 'array-states'
+    });
 
     var comboWithTooltip = new Ext.form.ComboBox({
         tpl: '<tpl for="."><div ext:qtip="{state}. {nick}" class="x-combo-list-item">{state}</div></tpl>',

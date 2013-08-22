@@ -1,11 +1,23 @@
 /*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
+This file is part of Ext JS 3.4
 
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 Ext.onReady(function(){
 
     // create the Data Store
@@ -41,29 +53,7 @@ Ext.onReady(function(){
         return String.format('{0}<br/>by {1}', value.dateFormat('M j, Y, g:i a'), r.data['lastposter']);
     }
 
-    var pagingBar = new Ext.PagingToolbar({
-        pageSize: 25,
-        store: store,
-        displayInfo: true,
-        displayMsg: 'Displaying topics {0} - {1} of {2}',
-        emptyMsg: "No topics to display",
-        
-        items:[
-            '-', {
-            pressed: true,
-            enableToggle:true,
-            text: 'Show Preview',
-            cls: 'x-btn-text-icon details',
-            toggleHandler: function(btn, pressed){
-                var view = grid.getView();
-                view.showPreview = pressed;
-                view.refresh();
-            }
-        }]
-    });
-
     var grid = new Ext.grid.GridPanel({
-        el:'topic-grid',
         width:700,
         height:500,
         title:'ExtJS.com - Browse Forums',
@@ -116,41 +106,30 @@ Ext.onReady(function(){
         },
 
         // paging bar on the bottom
-        bbar: pagingBar
+        bbar: new Ext.PagingToolbar({
+            pageSize: 25,
+            store: store,
+            displayInfo: true,
+            displayMsg: 'Displaying topics {0} - {1} of {2}',
+            emptyMsg: "No topics to display",
+            items:[
+                '-', {
+                pressed: true,
+                enableToggle:true,
+                text: 'Show Preview',
+                cls: 'x-btn-text-icon details',
+                toggleHandler: function(btn, pressed){
+                    var view = grid.getView();
+                    view.showPreview = pressed;
+                    view.refresh();
+                }
+            }]
+        })
     });
 
     // render it
-    grid.render();
+    grid.render('topic-grid');
 
     // trigger the data store load
     store.load({params:{start:0, limit:25}});
-});
-
-
-
-/**
- * @class Ext.ux.SliderTip
- * @extends Ext.Tip
- * Simple plugin for using an Ext.Tip with a slider to show the slider value
- */
-Ext.ux.SliderTip = Ext.extend(Ext.Tip, {
-    minWidth: 10,
-    offsets : [0, -10],
-    init : function(slider){
-        slider.on('dragstart', this.onSlide, this);
-        slider.on('drag', this.onSlide, this);
-        slider.on('dragend', this.hide, this);
-        slider.on('destroy', this.destroy, this);
-    },
-
-    onSlide : function(slider){
-        this.show();
-        this.body.update(this.getText(slider));
-        this.doAutoWidth();
-        this.el.alignTo(slider.thumb, 'b-t?', this.offsets);
-    },
-
-    getText : function(slider){
-        return slider.getValue();
-    }
 });

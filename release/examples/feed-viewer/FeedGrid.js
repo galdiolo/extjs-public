@@ -1,70 +1,84 @@
 /*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
+This file is part of Ext JS 3.4
 
-FeedGrid = function(viewer, config) {
-    this.viewer = viewer;
-    Ext.apply(this, config);
+Copyright (c) 2011-2013 Sencha Inc
 
-    this.store = new Ext.data.Store({
-        proxy: new Ext.data.HttpProxy({
-            url: 'feed-proxy.php'
-        }),
+Contact:  http://www.sencha.com/contact
 
-        reader: new Ext.data.XmlReader(
-            {record: 'item'},
-            ['title', 'author', {name:'pubDate', type:'date'}, 'link', 'description', 'content']
-        )
-    });
-    this.store.setDefaultSort('pubDate', "DESC");
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
 
-    this.columns = [{
-        id: 'title',
-        header: "Title",
-        dataIndex: 'title',
-        sortable:true,
-        width: 420,
-        renderer: this.formatTitle
-      },{
-        header: "Author",
-        dataIndex: 'author',
-        width: 100,
-        hidden: true,
-        sortable:true
-      },{
-        id: 'last',
-        header: "Date",
-        dataIndex: 'pubDate',
-        width: 150,
-        renderer:  this.formatDate,
-        sortable:true
-    }];
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
 
-    FeedGrid.superclass.constructor.call(this, {
-        region: 'center',
-        id: 'topic-grid',
-        loadMask: {msg:'Loading Feed...'},
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
 
-        sm: new Ext.grid.RowSelectionModel({
-            singleSelect:true
-        }),
+Build date: 2013-04-03 15:07:25
+*/
+Ext.define('FeedGrid', {
+    extend: 'Ext.grid.GridPanel',
+    
+    xtype: 'appfeedgrid',
+    
+    constructor: function(config) {
+        Ext.apply(this, config);
 
-        viewConfig: {
-            forceFit:true,
-            enableRowBody:true,
-            showPreview:true,
-            getRowClass : this.applyRowClass
-        }
-    });
+        this.store = new Ext.data.Store({
+            proxy: new Ext.data.HttpProxy({
+                url: 'feed-proxy.php'
+            }),
 
-    this.on('rowcontextmenu', this.onContextClick, this);
-};
+            reader: new Ext.data.XmlReader(
+                {record: 'item'},
+                ['title', 'author', {name:'pubDate', type:'date'}, 'link', 'description', 'content']
+            )
+        });
+        this.store.setDefaultSort('pubDate', "DESC");
 
-Ext.extend(FeedGrid, Ext.grid.GridPanel, {
+        this.columns = [{
+            id: 'title',
+            header: "Title",
+            dataIndex: 'title',
+            sortable:true,
+            width: 420,
+            renderer: this.formatTitle
+        },{
+            header: "Author",
+            dataIndex: 'author',
+            width: 100,
+            hidden: true,
+            sortable:true
+        },{
+            id: 'last',
+            header: "Date",
+            dataIndex: 'pubDate',
+            width: 150,
+            renderer:  this.formatDate,
+            sortable:true
+        }];
+
+        this.callParent([{
+            region: 'center',
+            id: 'topic-grid',
+            loadMask: {msg:'Loading Feed...'},
+
+            sm: new Ext.grid.RowSelectionModel({
+                singleSelect:true
+            }),
+
+            viewConfig: {
+                forceFit:true,
+                enableRowBody:true,
+                showPreview:true,
+                getRowClass : this.applyRowClass
+            }
+        }]);
+
+        this.on('rowcontextmenu', this.onContextClick, this);
+    },
 
     onContextClick : function(grid, index, e){
         if(!this.menu){ // create context menu on first right click

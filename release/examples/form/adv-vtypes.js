@@ -1,30 +1,44 @@
 /*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
+This file is part of Ext JS 3.4
 
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 // Add the additional 'advanced' VTypes
 Ext.apply(Ext.form.VTypes, {
     daterange : function(val, field) {
         var date = field.parseDate(val);
 
         if(!date){
-            return;
+            return false;
         }
-        if (field.startDateField && (!this.dateRangeMax || (date.getTime() != this.dateRangeMax.getTime()))) {
+        if (field.startDateField) {
             var start = Ext.getCmp(field.startDateField);
-            start.setMaxValue(date);
-            start.validate();
-            this.dateRangeMax = date;
-        } 
-        else if (field.endDateField && (!this.dateRangeMin || (date.getTime() != this.dateRangeMin.getTime()))) {
+            if (!start.maxValue || (date.getTime() != start.maxValue.getTime())) {
+                start.setMaxValue(date);
+                start.validate();
+            }
+        }
+        else if (field.endDateField) {
             var end = Ext.getCmp(field.endDateField);
-            end.setMinValue(date);
-            end.validate();
-            this.dateRangeMin = date;
+            if (!end.minValue || (date.getTime() != end.minValue.getTime())) {
+                end.setMinValue(date);
+                end.validate();
+            }
         }
         /*
          * Always return true since we're only using this vtype to set the
@@ -44,6 +58,7 @@ Ext.apply(Ext.form.VTypes, {
     passwordText : 'Passwords do not match'
 });
 
+
 Ext.onReady(function(){
 
     Ext.QuickTips.init();
@@ -53,16 +68,16 @@ Ext.onReady(function(){
 
     var bd = Ext.getBody();
 
-		/*
-		 * ================  Date Range  =======================
-		 */
-    
+    /*
+     * ================  Date Range  =======================
+     */
+
     var dr = new Ext.FormPanel({
       labelWidth: 125,
       frame: true,
       title: 'Date Range',
-	  bodyStyle:'padding:5px 5px 0',
-	  width: 350,
+      bodyStyle:'padding:5px 5px 0',
+      width: 350,
       defaults: {width: 175},
       defaultType: 'datefield',
       items: [{
@@ -81,11 +96,11 @@ Ext.onReady(function(){
     });
 
     dr.render('dr');
-    
+
     /*
      * ================  Password Verification =======================
      */
-        
+
     var pwd = new Ext.FormPanel({
       labelWidth: 125,
       frame: true,

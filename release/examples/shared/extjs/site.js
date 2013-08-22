@@ -1,84 +1,24 @@
 /*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
+This file is part of Ext JS 3.4
 
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 Ext.onReady(function(){
-
-	var activeMenu;
-
-	function createMenu(name){
-		var el = Ext.get(name+'-link');
-		var tid = 0, menu, doc = Ext.getDoc();
-
-		var handleOver = function(e, t){
-			if(t != el.dom && t != menu.dom && !e.within(el) && !e.within(menu)){
-				hideMenu();
-			}
-		};
-
-		var hideMenu = function(){
-			if(menu){
-				menu.hide();
-				el.setStyle('text-decoration', '');
-				doc.un('mouseover', handleOver);
-				doc.un('mousedown', handleDown);
-			}
-		}
-
-		var handleDown = function(e){
-			if(!e.within(menu)){
-				hideMenu();
-			}
-		}
-
-		var showMenu = function(){
-			clearTimeout(tid);
-			tid = 0;
-
-			if (!menu) {
-				menu = new Ext.Layer({shadow:'sides',hideMode: 'display'}, name+'-menu');
-			}
-			menu.hideMenu = hideMenu;
-
-			menu.el = el;
-			if(activeMenu && menu != activeMenu){
-				activeMenu.hideMenu();
-			}
-			activeMenu = menu;
-
-			if (!menu.isVisible()) {
-				menu.show();
-				menu.alignTo(el, 'tl-bl?');
-				menu.sync();
-				el.setStyle('text-decoration', 'underline');
-
-				doc.on('mouseover', handleOver, null, {buffer:150});
-				doc.on('mousedown', handleDown);
-			}
-		}
-
-		el.on('mouseover', function(e){
-			if(!tid){
-				tid = showMenu.defer(150);
-			}
-		});
-
-		el.on('mouseout', function(e){
-			if(tid && !e.within(el, true)){
-				clearTimeout(tid);
-				tid = 0;
-			}
-		});
-	}
-
-	createMenu('products');
-	createMenu('support');
-	createMenu('store');
-
 	// expanders
 	Ext.getBody().on('click', function(e, t){
 		t = Ext.get(t);
@@ -94,7 +34,7 @@ Ext.onReady(function(){
 		}else{
 			bdi.hide();
 			bd.show();
-			bdi.slideIn('l', {duration:.2, stopFx: true, easing:'easeOut'});
+			bdi.slideIn('l', {duration:0.2, stopFx: true, easing:'easeOut'});
 		}
 
 		t.update(!expanded ? 'Hide details' : 'Show details');

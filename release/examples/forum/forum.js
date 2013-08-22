@@ -1,11 +1,23 @@
 /*
- * Ext JS Library 2.2.1
- * Copyright(c) 2006-2009, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
+This file is part of Ext JS 3.4
 
+Copyright (c) 2011-2013 Sencha Inc
+
+Contact:  http://www.sencha.com/contact
+
+GNU General Public License Usage
+This file may be used under the terms of the GNU General Public License version 3.0 as
+published by the Free Software Foundation and appearing in the file LICENSE included in the
+packaging of this file.
+
+Please review the following information to ensure the GNU General Public License version 3.0
+requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+
+If you are unsure which license is appropriate for your use, please contact the sales department
+at http://www.sencha.com/contact.
+
+Build date: 2013-04-03 15:07:25
+*/
 var Forum = {};
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,7 +87,7 @@ Forum.SearchView = function(search){
     this.store = new Ext.data.Store({
         remoteSort: true,
         proxy: new Ext.data.ScriptTagProxy({
-            url: 'http://extjs.com/forum/topics-remote.php'
+            url: 'http://extjs.com/forum/topics-browse-remote.php'
         }),
         reader: new Ext.data.JsonReader({
             root: 'topics',
@@ -204,7 +216,7 @@ Ext.onReady(function(){
                 region:'west',
                 title:'Forums',
                 split:true,
-                width: 225,
+                width: 325,
                 minSize: 175,
                 maxSize: 400,
                 collapsible: true,
@@ -235,7 +247,17 @@ Ext.onReady(function(){
                             id:'topic-grid',
                             store: ds,
                             cm: cm,
-                            sm:new Ext.grid.RowSelectionModel({singleSelect:true}),
+                            sm:new Ext.grid.RowSelectionModel({
+                                singleSelect:true,
+                                listeners: {
+                                    selectionchange: function(sel){
+                                        var rec = sel.getSelected();
+                                        if(rec){
+                                            Ext.getCmp('preview').body.update('<b><u>' + rec.get('title') + '</u></b><br /><br />Post details here.');
+                                        }
+                                    }
+                                }
+                            }),
                             trackMouseOver:false,
                             loadMask: {msg:'Loading Topics...'},
                             viewConfig: {
@@ -287,7 +309,8 @@ Ext.onReady(function(){
                             region:'south',
                             height:250,
                             title:'View Topic',
-                            split:true
+                            split:true,
+                            bodyStyle: 'padding: 10px; font-family: Arial; font-size: 12px;'
                         }
                      ]
                  }
@@ -297,7 +320,7 @@ Ext.onReady(function(){
 
     var tree = Ext.getCmp('forum-tree');
     tree.on('append', function(tree, p, node){
-       if(node.id == 5){
+       if(node.id == 40){
            node.select.defer(100, node);
        }
     });
@@ -313,31 +336,28 @@ Ext.onReady(function(){
 
      var searchStore = new Ext.data.Store({
         proxy: new Ext.data.ScriptTagProxy({
-            url: 'http://extjs.com/forum/topics-remote.php'
+            url: 'http://extjs.com/forum/topics-browse-remote.php'
         }),
         reader: new Ext.data.JsonReader({
             root: 'topics',
             totalProperty: 'totalCount',
-            id: 'post_id'
+            id: 'threadid'
         }, [
-            {name: 'title', mapping: 'topic_title'},
-            {name: 'topicId', mapping: 'topic_id'},
-            {name: 'author', mapping: 'author'},
-            {name: 'lastPost', mapping: 'post_time', type: 'date', dateFormat: 'timestamp'},
-            {name: 'excerpt', mapping: 'post_text'}
+            'title', 'author',
+            {name: 'lastpost', type: 'date', dateFormat: 'timestamp'}
         ])
     });
 
     // Custom rendering Template
-    var resultTpl = new Ext.Template(
-        '<div class="search-item">',
-            '<h3><span>{lastPost:date("M j, Y")}<br />by {author}</span>{title}</h3>',
-            '{excerpt}',
-        '</div>'
+    var resultTpl = new Ext.XTemplate(
+        '<tpl for=".">',
+            '<div class="x-combo-list-item search-item">{title} by <b>{author}</b></div>',
+        '</tpl>'
     );
 
     var search = new Ext.form.ComboBox({
         store: searchStore,
+        applyTo: 'search',
         displayField:'title',
         typeAhead: false,
         loadingText: 'Searching...',
@@ -354,7 +374,7 @@ Ext.onReady(function(){
         }
     });
     // apply it to the exsting input element
-    search.applyTo('search');
+    //search.applyTo('search');
 
 
 
@@ -380,7 +400,7 @@ Forum.TreeLoader = function(){
 Ext.extend(Forum.TreeLoader, Ext.tree.TreeLoader, {
     dataUrl: 'http://extjs.com/forum/forums-remote.php',
     requestData : function(node, cb){
-        this.proxy.load({}, {
+        this.proxy.request('read', null, {}, {
             readRecords : function(o){
                 return o;
             }

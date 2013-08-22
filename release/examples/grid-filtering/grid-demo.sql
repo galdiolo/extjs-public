@@ -1,25 +1,5 @@
--- MySQL Administrator dump 1.4
---
--- ------------------------------------------------------
--- Server version	5.0.45-Debian_1ubuntu3.1-log
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-
-
---
--- Create schema demo
---
-
-CREATE DATABASE IF NOT EXISTS demo;
-USE demo;
+CREATE DATABASE IF NOT EXISTS GridfiltersDemo;
+USE GridfiltersDemo;
 
 --
 -- Definition of table `demo`
@@ -40,7 +20,6 @@ CREATE TABLE `demo` (
 -- Dumping data for table `demo`
 --
 
-/*!40000 ALTER TABLE `demo` DISABLE KEYS */;
 INSERT INTO `demo` (`id`,`price`,`company`,`date`,`size`,`visible`) VALUES 
  (1,71.72,'3m Co','2007-09-01 00:00:00','large',1),
  (2,29.01,'Aloca Inc','2007-08-01 00:00:00','medium',0),
@@ -69,15 +48,3 @@ INSERT INTO `demo` (`id`,`price`,`company`,`date`,`size`,`visible`) VALUES
  (25,63.26,'United Technologies Corporation','2006-06-04 00:00:00','medium',1),
  (26,35.57,'Verizon Communications','2005-07-09 00:00:00','small',0),
  (27,45.45,'Wal-Mart Stores, Inc','2006-09-09 00:00:00','large',1);
-/*!40000 ALTER TABLE `demo` ENABLE KEYS */;
-
-
-
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
