@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget;
+ package com.extjs.gxt.ui.client.widget;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -96,7 +96,7 @@ public class MessageBox {
    */
   public static MessageBox alert(String title, String msg, Listener<MessageBoxEvent> callback) {
     MessageBox box = new MessageBox();
-    box.setTitle(title);
+    box.setTitleHtml(title);
     box.setMessage(msg);
     box.callback = callback;
     box.setButtons(OK);
@@ -116,7 +116,7 @@ public class MessageBox {
    */
   public static MessageBox confirm(String title, String msg, Listener<MessageBoxEvent> callback) {
     MessageBox box = new MessageBox();
-    box.setTitle(title);
+    box.setTitleHtml(title);
     box.setMessage(msg);
     box.callback = callback;
     box.icon = QUESTION;
@@ -136,7 +136,7 @@ public class MessageBox {
    */
   public static MessageBox info(String title, String msg, Listener<MessageBoxEvent> callback) {
     MessageBox box = new MessageBox();
-    box.setTitle(title);
+    box.setTitleHtml(title);
     box.setMessage(msg);
     box.callback = callback;
     box.setButtons(OK);
@@ -157,10 +157,10 @@ public class MessageBox {
    */
   public static MessageBox progress(String title, String msg, String progressText) {
     MessageBox box = new MessageBox();
-    box.setTitle(title);
+    box.setTitleHtml(title);
     box.setMessage(msg);
     box.setType(MessageBoxType.PROGRESSS);
-    box.setProgressText(progressText);
+    box.setProgressHtml(progressText);
     box.setButtons("");
     box.setClosable(false);
     box.show();
@@ -203,7 +203,7 @@ public class MessageBox {
    */
   public static MessageBox prompt(String title, String msg, boolean multiline, Listener<MessageBoxEvent> callback) {
     MessageBox box = new MessageBox();
-    box.setTitle(title);
+    box.setTitleHtml(title);
     box.setMessage(msg);
     box.setType(MessageBoxType.PROMPT);
     box.setButtons(Dialog.OKCANCEL);
@@ -241,10 +241,10 @@ public class MessageBox {
    */
   public static MessageBox wait(String title, String msg, String progressText) {
     MessageBox box = new MessageBox();
-    box.setTitle(title);
+    box.setTitleHtml(title);
     box.setMessage(msg);
     box.setType(MessageBoxType.WAIT);
-    box.setProgressText(progressText);
+    box.setProgressHtml(progressText);
     box.setButtons("");
     box.setClosable(false);
     box.show();
@@ -258,11 +258,11 @@ public class MessageBox {
   private int maxWidth = 600;
   private int minWidth = 100;
   private boolean modal = true;
-  private String progressText = "";
+  private String progressHtml = "";
   private int minProgressWidth = 250;
   private String message = "&#160;";
   private boolean closable;
-  private String title;
+  private String titleHtml;
   private String buttons = OK;
   private Dialog dialog;
   private Element iconEl;
@@ -384,8 +384,8 @@ public class MessageBox {
             if (type == MessageBoxType.WAIT) {
               progressBar.auto();
             }
-            if (getProgressText() != null) {
-              progressBar.updateText(getProgressText());
+            if (getProgressHtml() != null) {
+              progressBar.updateText(getProgressHtml());
             }
             icon = null;
           }
@@ -447,7 +447,7 @@ public class MessageBox {
 
       };
       dialog.setData("messageBox", true);
-      dialog.setHeading(getTitle());
+      dialog.setHeadingHtml(getTitleHtml());
       dialog.setResizable(false);
       dialog.setConstrain(true);
       dialog.setMinimizable(false);
@@ -520,12 +520,12 @@ public class MessageBox {
   }
 
   /**
-   * Returns the progress text.
+   * Returns the progress text as HTML.
    * 
    * @return the progress text
    */
-  public String getProgressText() {
-    return progressText;
+  public String getProgressHtml() {
+    return progressHtml;
   }
 
   /**
@@ -551,8 +551,8 @@ public class MessageBox {
    * 
    * @return the title text
    */
-  public String getTitle() {
-    return title;
+  public String getTitleHtml() {
+    return titleHtml;
   }
 
   /**
@@ -562,15 +562,6 @@ public class MessageBox {
    */
   public MessageBoxType getType() {
     return type;
-  }
-
-  /**
-   * Hides the message box if it is displayed.
-   * 
-   * @deprecated use {@link #close()}
-   */
-  public void hide() {
-    close();
   }
 
   /**
@@ -715,19 +706,19 @@ public class MessageBox {
    * The text to display inside the progress bar if progress = true (defaults to
    * "", pre-render).
    * 
-   * @param progressText the progress text
+   * @param progressHtml the progress text as HTML
    */
-  public void setProgressText(String progressText) {
-    this.progressText = progressText;
+  public void setProgressHtml(String progressHtml) {
+    this.progressHtml = progressHtml;
   }
 
   /**
    * Sets the title text (pre-render).
    * 
-   * @param title the title text
+   * @param titleHtml the title text
    */
-  public void setTitle(String title) {
-    this.title = title;
+  public void setTitleHtml(String titleHtml) {
+    this.titleHtml = titleHtml;
   }
 
   /**

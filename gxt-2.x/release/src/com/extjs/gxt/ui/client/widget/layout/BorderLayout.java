@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.layout;
+ package com.extjs.gxt.ui.client.widget.layout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -544,6 +544,10 @@ public class BorderLayout extends Layout {
     }
   }
 
+  private native boolean isComponentHidden(Component c) /*-{
+		return c.@com.extjs.gxt.ui.client.widget.Component::hidden;
+  }-*/;
+
   private void onCollapse(ContentPanel panel) {
     if (panel.getParent() == layoutContainer && fireEvent(Events.BeforeCollapse, createBorderLaoutEvent(panel))) {
 
@@ -552,7 +556,7 @@ public class BorderLayout extends Layout {
       boolean layoutOnChange = layoutContainer.isLayoutOnChange();
       setLayoutOnChange(layoutContainer, false);
 
-      boolean isVisible = panel.isVisible();
+      boolean isVisible = !isComponentHidden(panel);
 
       layoutContainer.remove(panel);
       Map<String, Object> st = panel.getState();
@@ -586,7 +590,7 @@ public class BorderLayout extends Layout {
       setLayoutOnChange(layoutContainer, false);
       cp.setExpanded(false);
       setCollapsed(panel, false);
-      boolean isVisible = cp.isVisible();
+      boolean isVisible = !isComponentHidden(cp);
 
       Map<String, Object> st = panel.getState();
       st.remove("collapsed");

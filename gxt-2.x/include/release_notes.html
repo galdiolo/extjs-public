@@ -61,10 +61,12 @@
 </head> 
  
 <body> 
-<h1><img src="http://www.extjs.com/assets/images/avatar.gif" alt="Ext JS" /></h1> 
+<h1><a href="http://www.sencha.com/" id="logo" name="logo">Sencha GXT - GWT Framework</a></h1> 
 
 <h1>Ext GWT Library Release Notes</h1>
 <ul>
+  <li><a href="#Release_2.3.0">Release 2.3.0 (4/24/13)</a></li>
+  <li><a href="#Release_2.2.6">Release 2.2.6 (6/4/12)</a></li>
   <li><a href="#Release_2.2.5">Release 2.2.5 (9/15/11)</a></li>
   <li><a href="#Release_2.2.4">Release 2.2.4 (5/25/11)</a></li>
   <li><a href="#Release_2.2.3">Release 2.2.3 (3/7/11)</a></li>
@@ -98,8 +100,113 @@
   <li><a href="#Release_1.0">Release 1.0 (7/7/2008)</a></li>
 </ul>
 
+<h2><a name="Release_2.3.0">Release 2.3.0 (Released April 24th, 2013)</a></h2>
 
-<h2><a name="Release_2.2.5">Release 2.2.4 (Released September 15th, 2011)</a></h2>
+<h2>General Changes &amp; Enhancements</h2>
+
+<ul>
+  <li>Refactored API to make it clear when values are and are not treated as HTML. Previously, it was not 
+  always clear that certain methods were using values in an HTML context. See the API changes section to see a
+  list of API changes.</li>
+  <li>[EXTGWT-2483] - Refactor API (XSS) for proper handling of text vs html</li>
+  <li>[EXTGWT-2794] - Add support for IE10 (GXT.isIE10)</li>
+</ul>
+
+<h2>API Changes</h2>
+<ul>
+  <li>Added toSafeHtml(String text) to El</li>
+  <li>Button added getHtml, setHtml. Removed getText</li>
+  <li>LabelField added removed getText, setText and added getUseHtml, setUseHtml to specify if value is treated as HTML</li>
+  <li>HeaderMenuItem added getHtml, setHtml. Removed getText</li>
+  <li>MenuBarItem added getHtml, setHtml. Removed getText</li>
+  <li>MenuItem added getHtml, setHtml. Removed getText</li>
+  <li>ToolTip added html / titleHtml public fields. Removed text, title fields</li>
+  <li>ToolTipConfig added getHtml / getTitleHtml. Removed getText, getTitle</li>
+  <li>ContentPanel removed getTitleText</li>
+  <li>ContentPanel renamed setHeading, getHeading to setHeadingHtml, getHeadingHtml</li>
+  <li>ContentPanel add setHeadingText</li>
+  <li>Header added getHtml, setHtml. Removed getText</li>
+  <li>InfoConfig added html, titleHtml public fields. Removed text, title fields</li>
+  <li>ProgressBar added updateHtml(String html)</li>
+  <li>ProgressBar renamed setTitle, getTitle to setTitleHtml, getTitleHtml</li>
+  <li>MessageBox renamed setProgressText, getProgressText to setProgressHtml, getProgressHtml</li>
+  <li>Status added setHtml, getHtml. Removed getText</li>
+  <li>TabItem added getHtml, setHtml. Removed getText</li>
+  <li>ColumnConfig renamed getHeader, setHeader to getHeaderHtml, setHeaderHtml</li>
+  <li>ColumnHeader / ColumnHeader.Head setHeader renamed to setHeaderText. Added setHeaderHtml</li>
+  <li>ColumnHeader.Head added setHeaderText</li>
+  <li>ColumnHeader.Group setText renamed to setHtml</li>
+  <li>LabelToolItem extends BoxComponent changed to extend Html</li>
+  <li>LabelToolItem getLabel, setLabel changed to getHtml, setHtml</li>
+  <li>FieldSet setHeading, getHeading renamed to setHeadingHtml, getHeadingHtml</li>
+</ul>
+
+<ul>
+  <li>[EXTGWT-793] - ComboBox button missaligned in IE9 on example page</li></li>
+  <li>[EXTGWT-923] - Tabs don't appear to be connected to their content area "sheet"</li>
+  <li>[EXTGWT-1094] - Adding 60+ tabs to a tabpanel causes it to wrap instead of continuing to use the scroll buttons</li>
+  <li>[EXTGWT-2212] - [s8391] ColumnHeader groups widths wrong when text greater than column width</li>
+  <li>[EXTGWT-2348] - DatePicker picks "wrong" date for Russia in 1950-1979</li>
+  <li>[EXTGWT-2407] - Can't add multiple check columns as plugins</li>
+  <li>[EXTGWT-2452] - Widgets disappear from GXT 2.x BufferView after repeated scroll up / down</li>
+  <li>[EXTGWT-2567] - Memory leak in ScriptTagProxy</li>
+  <li>[EXTGWT-2586] - Dark gray border to the top and left of GXT Windows in IE 10 on both GXT 2.2.5 and GXT 3</li>
+  <li>[EXTGWT-2602] - Portuguese / Brazil (pt_BR) messages file is not UTF-8 encoded</li>
+  <li>[EXTGWT-2631] - FocusManager throwing exception in certain cases</li>
+  <li>[EXTGWT-2649] - Buttons do not show focus in IE</li>
+  <li>[EXTGWT-2741] - IE10 Windows not rendering correctly</li>
+  <li>[EXTGWT-2742] - Adding to a filtered TreeStore causes ArrayIndexOutOfBounds</li>
+  <li>[EXTGWT-2810] - IE10 fixes (windows, shadows, editing, etc)</li>
+  <li>[EXTGWT-2865] - LiveGridExample displays a JS error after loading in IE</li>
+  <li>[EXTGWT-2866] - No data is displaying while loading the examples</li>
+  <li>[EXTGWT-2867] - Grid Example - Alignment wrong after unchecking the columns</li>
+  <li>[EXTGWT-2870] - Drag and Drop not working all examples</li>
+  <li>[EXTGWT-2871] - FilterGrid - Change column equals numeric filter not returning rows</li>
+  <li>[EXTGWT-2875] - Grouping Grid - Column widths wrong with force fit</li>
+  <li>[EXTGWT-2876] - RowEditor Grid - Edited values are getting saved even after selecting “Cancel” button using keyboard support</li>
+  <li>[EXTGWT-2882] - AutoHeightGrid Wrong row edited when grid is sorted on add</li>
+  <li>[EXTGWT-2884] - Advanced Combo Box not opening selected post</li>
+  <li>[EXTGWT-2896] - Live Group Summary - Displaying JS error when ENTER pressed after clearing Rate or Estimate</li>
+  <li>[EXTGWT-2908] - AsyncTreeGrid Filter issue (looped loading after filter application)</li>
+  <li>[EXTGWT-1196] - Update WidgetComponent to pass resize calls to wrapped widget</li>
+  <li>[EXTGWT-2211] - Scrolling a BufferView grid can cause widgets in cells not to render</li>
+  <li>[EXTGWT-2263] - [s8552] Unable to select the checkboxes in EditorGrid</li>
+  <li>[EXTGWT-2304] - Widgets not rendered when BufferView scrolled</li>
+  <li>[EXTGWT-2362] - ListStore.insert can throw exception with BeforeAdd listener</li>
+  <li>[EXTGWT-2364] - ListStore.insert can throw exceptions</li>
+  <li>[EXTGWT-2399] - Investigate international sorting options</li>
+  <li>[EXTGWT-2969] - Add SafeHtml example to Explorer and clean up Examples</li>
+  <li>[EXTGWT-287] - Handling HTTP errors in ScriptTagProxy</li>
+  <li>[EXTGWT-310] - Async Tree Doesnt load children if filtered</li>
+  <li>[EXTGWT-438] - CheckMenuItem issue with IE9</li>
+  <li>[EXTGWT-1531] - [s7363] Combo box problem related to window height</li>
+</ul>
+
+<h2><a name="Release_2.2.6">Release 2.2.6 (Released June 4th, 2012)</a></h2>
+
+<h2>General Changes &amp; Enhancements</h2>
+
+<ul>
+  <li>Dutch and Japanese locals messages added</li>
+</ul>
+
+<h2>API Changes</h2>
+<ul>
+  <li>Customization of MonthButton text in DatePicker added</li>
+</ul>
+
+<h2>Bug Fixes</h2>
+<ul>
+  <li>Fixed Portal drag and drop not working correctly if spacing is set to 0.</li>
+  <li>Fixed RowEditor positionButtons throwing an exception when RowEditor not visible.</li>
+  <li>Fixed GridView forceFit not working correctly under all circumstances.</li>
+  <li>Fixed DoubleClick in GridHeader did not work.</li>
+  <li>Fixed PagingToolbar buttons not working correctly under all circumstances.</li>
+  <li>Chrome 19 fixed layout tables now behave as border boxes</li>
+</ul>
+
+
+<h2><a name="Release_2.2.5">Release 2.2.5 (Released September 15th, 2011)</a></h2>
 
 <h2>General Changes &amp; Enhancements</h2>
 

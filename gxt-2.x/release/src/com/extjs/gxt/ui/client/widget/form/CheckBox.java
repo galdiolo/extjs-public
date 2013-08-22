@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.form;
+ package com.extjs.gxt.ui.client.widget.form;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.aria.FocusFrame;
@@ -57,6 +57,9 @@ public class CheckBox extends Field<Boolean> {
   private String valueAttribute;
   private Timer t;
 
+  /**
+   * Creates a new checkbox.
+   */
   public CheckBox() {
     setFireChangeEventOnSetValue(true);
     value = false;
@@ -69,6 +72,11 @@ public class CheckBox extends Field<Boolean> {
     // do nothing
   }
 
+  /**
+   * Returns the text displayed next to the checkbox.
+   * 
+   * @return the box label
+   */
   public String getBoxLabel() {
     return boxLabel;
   }
@@ -108,10 +116,10 @@ public class CheckBox extends Field<Boolean> {
   /**
    * The text that appears beside the checkbox (defaults to null).
    * 
-   * @param boxLabel the box label
+   * @param boxLabelHtml the box label treated as HTML
    */
-  public void setBoxLabel(String boxLabel) {
-    this.boxLabel = boxLabel;
+  public void setBoxLabel(String boxLabelHtml) {
+    this.boxLabel = boxLabelHtml;
     if (rendered) {
       boxLabelEl.update(getBoxLabel());
     }

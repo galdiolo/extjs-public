@@ -1,26 +1,35 @@
-Ext GWT - Widget Library
-Copyright (c) 2006-2009, Ext JS, LLC
+Sencha GXT Library
+Copyright (c) 2006-2013, Sencha Inc.
 All rights reserved.
-licensing@extjs.com
+licensing@sencha.com
 
-http://extjs.com/license
+www.sencha.com/products/gxt/license/
 
 Open Source License
 ------------------------------------------------------------------------------------------
-Ext is licensed under the terms of the Open Source GPL 3.0 license. 
+This version of Sencha GXT is licensed under the terms of the Open Source GPL 3.0 license. 
 
 http://www.gnu.org/licenses/gpl.html
+
+There are several FLOSS exceptions available for use with this release for
+open source applications that are distributed under a license other than GPL.
+
+* Open Source License Exception for Applications
+
+  http://www.sencha.com/products/floss-exception.php
+
+* Open Source License Exception for Development
+
+  http://www.sencha.com/products/ux-exception.php
 
 
 Commercial License
 ------------------------------------------------------------------------------------------
-If you are using this library for commercial purposes, we encourage you to purchase
-a commercial license. Please visit http://extjs.com/license for more details.
+This version of Sencha GXT is licensed commercially. 
+This is the appropriate option if you are creating proprietary applications and you are 
+not prepared to distribute and share the source code of your application under the 
+GPL v3 license. Please visit www.sencha.com/products/gxt/license/ for more details.
 
-
-OEM / Reseller License
-------------------------------------------------------------------------------------------
-For more details, please visit: http://extjs.com/license.
 
 Third Party Content
 The following third party software is distributed with Ext GWT and is 
@@ -40,7 +49,6 @@ Location: http://teethgrinder.co.uk/open-flash-chart-2/
 
 --
 
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-General Public License for more details.
+This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+without the implied warranty of MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND 
+NON-INFRINGEMENT OF THIRD-PARTY INTELLECTUAL PROPERTY RIGHTS.  

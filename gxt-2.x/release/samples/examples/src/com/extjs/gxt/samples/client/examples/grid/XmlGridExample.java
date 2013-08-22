@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.grid;
+ package com.extjs.gxt.samples.client.examples.grid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,7 +87,7 @@ public class XmlGridExample extends LayoutContainer {
     panel.setAnimCollapse(false);
     panel.setButtonAlign(HorizontalAlignment.CENTER);
     panel.setIcon(Resources.ICONS.table());
-    panel.setHeading("XML Table Demo");
+    panel.setHeadingHtml("XML Table Demo");
     panel.setLayout(new FitLayout());
     panel.add(grid);
     panel.setSize(575, 350);

@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.dnd;
+ package com.extjs.gxt.samples.client.examples.dnd;
 
 import java.util.Arrays;
 
@@ -66,7 +66,7 @@ public class MultiComponentExample extends LayoutContainer {
     grid.setTrackMouseOver(false);
 
     ContentPanel cp = new ContentPanel();
-    cp.setHeading("Grid");
+    cp.setHeadingHtml("Grid");
     cp.setSize(400, 300);
     cp.setLayout(new FitLayout());
     cp.add(grid);
@@ -97,7 +97,7 @@ public class MultiComponentExample extends LayoutContainer {
     new TreeGridDragSource(tree);
 
     ContentPanel cp = new ContentPanel();
-    cp.setHeading("TreeGrid");
+    cp.setHeadingHtml("TreeGrid");
     cp.setSize(400, 300);
     cp.setLayout(new FitLayout());
     cp.add(tree);
@@ -116,7 +116,7 @@ public class MultiComponentExample extends LayoutContainer {
     tree.getStyle().setLeafIcon(Resources.ICONS.music());
 
     ContentPanel cp = new ContentPanel();
-    cp.setHeading("TreePanel");
+    cp.setHeadingHtml("TreePanel");
     cp.setSize(400, 200);
     cp.add(tree);
     cp.setLayout(new FitLayout());
@@ -135,7 +135,7 @@ public class MultiComponentExample extends LayoutContainer {
     view.setDisplayProperty("name");
 
     ContentPanel cp = new ContentPanel();
-    cp.setHeading("ListView");
+    cp.setHeadingHtml("ListView");
     cp.setSize(400, 200);
     cp.add(view);
     cp.setLayout(new FitLayout());

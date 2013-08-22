@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.mail.client.mvc;
+ package com.extjs.gxt.samples.mail.client.mvc;
 
 import java.util.List;
 
@@ -50,7 +50,7 @@ public class MailFolderView extends View {
     ContentPanel west = (ContentPanel) Registry.get(AppView.WEST_PANEL);
     ContentPanel mail = new ContentPanel();
     mail.setAnimCollapse(false);
-    mail.setHeading("Mail");
+    mail.setHeadingHtml("Mail");
     mail.addListener(Events.Expand, new Listener<ComponentEvent>() {
       public void handleEvent(ComponentEvent be) {
         Dispatcher.get().dispatch(AppEvents.NavMail);

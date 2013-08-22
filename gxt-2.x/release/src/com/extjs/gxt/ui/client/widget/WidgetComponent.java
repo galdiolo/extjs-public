@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget;
+ package com.extjs.gxt.ui.client.widget;
 
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -88,6 +88,26 @@ public class WidgetComponent extends BoxComponent {
     widget.onBrowserEvent(event);
   }
 
+  @Override
+  public void setHeight(int height) {
+    widget.setHeight(height + "px");
+  }
+  
+  @Override
+  public void setPixelSize(int width, int height) {
+    widget.setPixelSize(width, height);
+  }
+  
+  @Override
+  public void setSize(int width, int height) {
+    widget.setPixelSize(width, height);
+  }
+  
+  @Override
+  public void setWidth(int width) {
+    widget.setWidth(width + "px");
+  }
+  
   @Override
   protected void onAttach() {
     ComponentHelper.doAttach(widget);

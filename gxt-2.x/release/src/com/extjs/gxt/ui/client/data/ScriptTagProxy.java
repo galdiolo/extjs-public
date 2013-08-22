@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.data;
+ package com.extjs.gxt.ui.client.data;
 
 import java.util.Map;
 
@@ -14,6 +14,7 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.ScriptElement;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -39,6 +40,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 @SuppressWarnings("deprecation")
 public class ScriptTagProxy<D> implements DataProxy<D> {
 
+  private static final String CALLBACK_CONTAINER = "__gxt_jsonp_callbacks";
   private static int ID = 0;
   private AsyncCallback<D> callback;
   private Object config;
@@ -57,9 +59,9 @@ public class ScriptTagProxy<D> implements DataProxy<D> {
 
     String transId = "transId" + ID++;
     String prepend = url.indexOf("?") != -1 ? "&" : "?";
-    String u = url + prepend + "callback=" + transId + generateUrl(loadConfig);
+    String u = url + prepend + "callback=" + CALLBACK_CONTAINER + "." + transId + generateUrl(loadConfig);
 
-    createCallback(this, transId);
+    createCallback(this, CALLBACK_CONTAINER, transId);
 
     ScriptElement script = Document.get().createScriptElement();
     script.setId(transId);
@@ -70,7 +72,7 @@ public class ScriptTagProxy<D> implements DataProxy<D> {
   }
 
   /**
-   * Sets the proxies url.
+   * Sets the proxy's url.
    * 
    * @param url the url
    */
@@ -79,10 +81,10 @@ public class ScriptTagProxy<D> implements DataProxy<D> {
   }
 
   protected void destroyTrans(final String id) {
-    head.removeChild(XDOM.getElementById(id));
+    head.removeChild(DOM.getElementById(id));
     DeferredCommand.addCommand(new Command() {
       public void execute() {
-        removeCallback(id);
+        removeCallback(CALLBACK_CONTAINER, id);
       }
     });
   }
@@ -114,14 +116,17 @@ public class ScriptTagProxy<D> implements DataProxy<D> {
     destroyTrans(transId);
   }
 
-  private native void createCallback(ScriptTagProxy<D> proxy, String transId) /*-{
+  private native void createCallback(ScriptTagProxy<D> proxy, String callbacks, String transId) /*-{
+		if (!$wnd[callbacks]) {
+			$wnd[callbacks] = {};
+		}
 		var cb = function(j) {
 			proxy.@com.extjs.gxt.ui.client.data.ScriptTagProxy::onReceivedData(Ljava/lang/String;Lcom/google/gwt/core/client/JavaScriptObject;)(transId, j);
 		};
-		$wnd[transId] = cb;
+		$wnd[callbacks][transId] = cb;
   }-*/;
 
-  private native void removeCallback(String transId) /*-{
-		$wnd[transId] = null;
+  private native void removeCallback(String callbacks, String transId) /*-{
+		delete $wnd[callbacks][transId];
   }-*/;
 }

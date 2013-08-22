@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.resources.client.model;
+ package com.extjs.gxt.samples.resources.client.model;
 
 import java.util.Date;
 
@@ -34,7 +34,7 @@ public class Stock extends BaseModel {
     set("open", open);
     set("last", last);
     set("date", new DateWrapper().addDays(-(int)(Math.random() * 100)).asDate());
-    set("change", last - open);
+    set("change", roundToDecimals(last - open, 2));
     set("split", new Boolean(Math.random() > .5));
     set("type", getType());
   }
@@ -81,7 +81,7 @@ public class Stock extends BaseModel {
     return getName();
   }
 
-  private String getType() {
+  private static String getType() {
     double r = Math.random();
     if (r <= .25) {
       return "Auto";
@@ -92,6 +92,11 @@ public class Stock extends BaseModel {
     } else {
       return "Tech";
     }
+  }
+
+  private static double roundToDecimals(double d, int c) {
+    int temp = (int) ((d * Math.pow(10, c)));
+    return (((double) temp) / Math.pow(10, c));
   }
 
 }

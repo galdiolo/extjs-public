@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget;
+ package com.extjs.gxt.ui.client.widget;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,10 +28,10 @@ public class Header extends Component implements IconSupport {
   protected AbstractImagePrototype icon;
 
   private String textStyle;
-  private El textEl;
+  private El contentEl;
   private List<Component> tools = new ArrayList<Component>();
   private HorizontalPanel widgetPanel;
-  private String text, altIconText;
+  private String html, altIconText;
 
   public Header() {
     getFocusSupport().setIgnore(true);
@@ -46,17 +46,20 @@ public class Header extends Component implements IconSupport {
     insertTool(tool, getToolCount());
   }
 
+  /* (non-Javadoc)
+   * @see com.extjs.gxt.ui.client.widget.IconSupport#getIcon()
+   */
   public AbstractImagePrototype getIcon() {
     return icon;
   }
 
   /**
-   * Returns the header's text.
+   * Returns the header's HTML.
    * 
-   * @return the text
+   * @return the html drawn in the header
    */
-  public String getText() {
-    return text;
+  public String getHtml() {
+    return html;
   }
 
   /**
@@ -190,15 +193,24 @@ public class Header extends Component implements IconSupport {
   }
 
   /**
+   * Sets the header's HTML content.
+   * 
+   * @param html the new html content
+   */
+  public void setHtml(String html) {
+    this.html = html;
+    if (rendered) {
+      contentEl.update(html == null ? "&#160;" : html);
+    }
+  }
+
+  /**
    * Sets the header's text.
    * 
-   * @param text the new text
+   * @param text the text
    */
   public void setText(String text) {
-    this.text = text;
-    if (rendered) {
-      textEl.update(text == null ? "&#160;" : text);
-    }
+    setHtml(El.toSafeHTML(text));
   }
 
   /**
@@ -209,7 +221,7 @@ public class Header extends Component implements IconSupport {
   public void setTextStyle(String textStyle) {
     this.textStyle = textStyle;
     if (rendered) {
-      textEl.dom.setClassName(textStyle);
+      contentEl.dom.setClassName(textStyle);
     }
   }
 
@@ -250,17 +262,17 @@ public class Header extends Component implements IconSupport {
     widgetPanel.render(getElement());
     widgetPanel.setParent(this);
 
-    textEl = new El(DOM.createSpan());
-    textEl.setId(getId() + "-label");
-    Accessibility.setRole(textEl.dom, "heading");
-    Accessibility.setState(textEl.dom, "aria-level", "1");
-    getElement().appendChild(textEl.dom);
+    contentEl = new El(DOM.createSpan());
+    contentEl.setId(getId() + "-label");
+    Accessibility.setRole(contentEl.dom, "heading");
+    Accessibility.setState(contentEl.dom, "aria-level", "1");
+    getElement().appendChild(contentEl.dom);
 
     if (textStyle != null) {
       setTextStyle(textStyle);
     }
 
-    setText(text);
+    setHtml(html);
 
     if (icon != null) {
       setIcon(icon);

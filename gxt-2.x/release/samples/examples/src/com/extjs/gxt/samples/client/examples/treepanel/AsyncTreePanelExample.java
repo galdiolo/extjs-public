@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.treepanel;
+ package com.extjs.gxt.samples.client.examples.treepanel;
 
 import java.util.List;
 
@@ -114,7 +114,7 @@ public class AsyncTreePanelExample extends LayoutContainer {
     });
 
     ContentPanel cp = new ContentPanel();
-    cp.setHeading("Async TreePanel");
+    cp.setHeadingHtml("Async TreePanel");
     cp.setLayout(new FitLayout());
     cp.add(tree);
     cp.setSize(315, 400);

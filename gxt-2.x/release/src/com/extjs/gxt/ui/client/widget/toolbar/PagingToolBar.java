@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.toolbar;
+ package com.extjs.gxt.ui.client.widget.toolbar;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.data.ListLoader;
@@ -519,8 +519,8 @@ public class PagingToolBar extends ToolBar {
   public void clear() {
     if (rendered) {
       pageText.setText("");
-      afterText.setLabel("");
-      displayText.setLabel("");
+      afterText.setHtml("");
+      displayText.setHtml("");
     }
   }
 
@@ -677,7 +677,7 @@ public class PagingToolBar extends ToolBar {
       last.getAriaSupport().setLabel(msgs.getLastText());
       refresh.getAriaSupport().setLabel(msgs.getRefreshText());
     }
-    beforePage.setLabel(msgs.getBeforePageText());
+    beforePage.setHtml(msgs.getBeforePageText());
   }
 
   /**
@@ -751,7 +751,7 @@ public class PagingToolBar extends ToolBar {
       after = GXT.MESSAGES.pagingToolBar_afterPageText(pages);
     }
 
-    afterText.setLabel(after);
+    afterText.setHtml(after);
 
     first.setEnabled(activePage != 1);
     prev.setEnabled(activePage != 1);
@@ -771,7 +771,7 @@ public class PagingToolBar extends ToolBar {
     if (totalLength == 0) {
       msg = msgs.getEmptyMsg();
     }
-    displayText.setLabel(msg);
+    displayText.setHtml(msg);
   }
 
   protected void onPageChange() {

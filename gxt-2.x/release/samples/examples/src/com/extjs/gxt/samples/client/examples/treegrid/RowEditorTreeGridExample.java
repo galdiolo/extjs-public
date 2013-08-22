@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.treegrid;
+ package com.extjs.gxt.samples.client.examples.treegrid;
 
 import java.util.Arrays;
 
@@ -56,7 +56,7 @@ public class RowEditorTreeGridExample extends LayoutContainer {
 
     ContentPanel cp = new ContentPanel();
     cp.setBodyBorder(false);
-    cp.setHeading("RowEditor TreeGrid");
+    cp.setHeadingHtml("RowEditor TreeGrid");
     cp.setButtonAlign(HorizontalAlignment.CENTER);
     cp.setLayout(new FitLayout());
     cp.setFrame(true);

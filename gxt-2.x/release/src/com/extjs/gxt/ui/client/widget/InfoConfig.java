@@ -1,30 +1,30 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget;
+ package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.Params;
 
 /**
- * Configuation settings for {@link Info}.
+ * Configuration settings for {@link Info}.
  */
 public class InfoConfig {
 
   /**
-   * The info title (defaults to null).
+   * The info title as HTML (defaults to null).
    */
-  public String title;
+  public String titleHtml;
 
   /**
-   * The info text (defaults to null).
+   * The info text as HTML (defaults to null).
    */
-  public String text;
+  public String html;
 
   /**
    * The index or key based substitution values.
@@ -51,14 +51,27 @@ public class InfoConfig {
    */
   public Listener<ComponentEvent> listener;
 
-  public InfoConfig(String title, String text) {
-    this.title = title;
-    this.text = text;
+  /**
+   * Creates a new instance.
+   * 
+   * @param titleHtml the title as HTML
+   * @param html the text as HTML
+   */
+  public InfoConfig(String titleHtml, String html) {
+    this.titleHtml = titleHtml;
+    this.html = html;
   }
 
-  public InfoConfig(String title, String text, Params params) {
-    this.title = title;
-    this.text = text;
+  /**
+   * Creates a new instance.
+   * 
+   * @param titleHtml the title as HTML
+   * @param html the text as HTML
+   * @param params the params
+   */
+  public InfoConfig(String titleHtml, String html, Params params) {
+    this.titleHtml = titleHtml;
+    this.html = html;
     this.params = params;
   }
 }

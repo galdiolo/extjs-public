@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.forms;
+ package com.extjs.gxt.samples.client.examples.forms;
 
 import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.ui.client.GXT;
@@ -141,7 +141,7 @@ public class AdvancedFormsExample extends LayoutContainer {
     FormPanel panel = new FormPanel();
     panel.setFrame(true);
     panel.setIcon(Resources.ICONS.form());
-    panel.setHeading("FormPanel");
+    panel.setHeadingHtml("FormPanel");
     panel.setSize(600, -1);
     panel.setLabelAlign(LabelAlign.TOP);
     panel.setButtonAlign(HorizontalAlignment.CENTER);

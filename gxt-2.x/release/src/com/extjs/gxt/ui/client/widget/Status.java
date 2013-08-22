@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget;
+ package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
@@ -18,7 +18,7 @@ import com.google.gwt.user.client.Element;
  */
 public class Status extends BoxComponent {
 
-  private String text;
+  private String html;
   private String iconStyle;
   private boolean box;
   private El textEl;
@@ -30,11 +30,11 @@ public class Status extends BoxComponent {
   /**
    * Clears the current status by removing the current icon and change the text.
    * 
-   * @param text the new text value
+   * @param html the new text value as HTML
    */
-  public void clearStatus(String text) {
+  public void clearStatus(String html) {
     setIconStyle(null);
-    setText(text);
+    setHtml(html);
   }
 
   /**
@@ -51,8 +51,8 @@ public class Status extends BoxComponent {
    * 
    * @return the text
    */
-  public String getText() {
-    return text;
+  public String getHtml() {
+    return html;
   }
 
   /**
@@ -83,11 +83,11 @@ public class Status extends BoxComponent {
   /**
    * Enables a busy icon and displays the given text.
    * 
-   * @param text the text to display
+   * @param html the text to display as HTML
    */
-  public void setBusy(String text) {
+  public void setBusy(String html) {
     setIconStyle("x-status-busy");
-    setText(text);
+    setHtml(html);
   }
 
   /**
@@ -129,10 +129,18 @@ public class Status extends BoxComponent {
    * @param text the text
    */
   public void setText(String text) {
-    if (this.text != text) {
-      this.text = text;
+    setHtml(El.toSafeHTML(text));
+  }
+  
+  /**
+   * Sets the html of the status.
+   * @param html the html content to draw in the status
+   */
+  public void setHtml(String html) {
+    if (this.html != html) {
+      this.html = html;
       if (rendered) {
-        textEl.update((text == null || text.length() == 0) ? "&nbsp;" : text);
+        textEl.update((html == null || html.length() == 0) ? "&nbsp;" : html);
         autoWidth();
       }
     }
@@ -146,7 +154,7 @@ public class Status extends BoxComponent {
           textEl.clip();
           TextMetrics.get().bind(textEl.dom);
           int adj = iconStyle != null ? 25 : 0;
-          int w = TextMetrics.get().getWidth(text) + adj + 5;
+          int w = TextMetrics.get().getWidth(html) + adj + 5;
           textEl.setWidth(w, true);
         }
       }
@@ -162,9 +170,9 @@ public class Status extends BoxComponent {
     disableTextSelection(true);
     setBox(box);
     
-    String text = this.text;
+    String text = this.html;
     String iconStyle = this.iconStyle;
-    this.text = null;
+    this.html = null;
     this.iconStyle = null;
     setStatus(text, iconStyle);
   }

@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.grid;
+ package com.extjs.gxt.samples.client.examples.grid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,10 +48,12 @@ import com.google.gwt.user.client.Element;
 public class AutoHeightGridExample extends LayoutContainer {
   private EditorGrid<Plant> grid;
   private ContentPanel cp;
+  
+  private int count = 1;
 
   protected Plant createPlant() {
     Plant plant = new Plant();
-    plant.setName("New Plant 1");
+    plant.setName("New Plant " + count++);
     plant.setLight("Mostly Shady");
     plant.setPrice(0);
     plant.setAvailable(new DateWrapper().clearTime().asDate());
@@ -78,7 +80,7 @@ public class AutoHeightGridExample extends LayoutContainer {
 
     ColumnConfig column = new ColumnConfig();
     column.setId("name");
-    column.setHeader("Common Name");
+    column.setHeaderHtml("Common Name");
     column.setWidth(220);
 
     TextField<String> text = new TextField<String>();
@@ -115,14 +117,14 @@ public class AutoHeightGridExample extends LayoutContainer {
 
     column = new ColumnConfig();
     column.setId("light");
-    column.setHeader("Light");
+    column.setHeaderHtml("Light");
     column.setWidth(130);
     column.setEditor(editor);
     configs.add(column);
 
     column = new ColumnConfig();
     column.setId("price");
-    column.setHeader("Price");
+    column.setHeaderHtml("Price");
     column.setAlignment(HorizontalAlignment.RIGHT);
     column.setWidth(70);
     column.setNumberFormat(NumberFormat.getCurrencyFormat());
@@ -135,7 +137,7 @@ public class AutoHeightGridExample extends LayoutContainer {
 
     column = new ColumnConfig();
     column.setId("available");
-    column.setHeader("Available");
+    column.setHeaderHtml("Available");
     column.setWidth(95);
     column.setEditor(new CellEditor(dateField));
     column.setDateTimeFormat(DateTimeFormat.getFormat("MMM dd yyyy"));
@@ -151,7 +153,7 @@ public class AutoHeightGridExample extends LayoutContainer {
     ColumnModel cm = new ColumnModel(configs);
 
     cp = new ContentPanel();
-    cp.setHeading("Auto Height Edit Plants");
+    cp.setHeadingHtml("Auto Height Edit Plants");
     cp.setFrame(true);
     cp.setIcon(Resources.ICONS.table());
     cp.setWidth(600);
@@ -169,10 +171,11 @@ public class AutoHeightGridExample extends LayoutContainer {
 
       @Override
       public void componentSelected(ButtonEvent ce) {
-
         grid.stopEditing();
-        store.insert(createPlant(), 0);
-        grid.startEditing(0, 0);
+        
+        Plant p = createPlant();
+        store.insert(p, 0);
+        grid.startEditing(store.indexOf(p), 0);
 
       }
 

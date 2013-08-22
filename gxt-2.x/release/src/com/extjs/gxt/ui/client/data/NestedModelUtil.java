@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.data;
+ package com.extjs.gxt.ui.client.data;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,16 +16,6 @@ public class NestedModelUtil {
   @SuppressWarnings("unchecked")
   public static <X> X getNestedValue(ModelData model, String property) {
     return (X) getNestedValue(model, getPath(property));
-  }
-
-  @Deprecated
-  public static Object convertIfNecessary(Object obj) {
-    if (obj == null || obj instanceof ModelData) {
-      return obj;
-    }
-    BeanModelLookup lookup = BeanModelLookup.get();
-    BeanModelFactory factory = lookup != null ? lookup.getFactory(obj.getClass()) : null;
-    return factory != null ? factory.createModel(obj) : null;
   }
 
   @SuppressWarnings("unchecked")

@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.view;
+ package com.extjs.gxt.samples.client.examples.view;
 
 import java.util.List;
 
@@ -89,7 +89,7 @@ public class ImageChooserExample extends LayoutContainer {
 
     chooser = new Dialog();
     chooser.setId("img-chooser-dlg");
-    chooser.setHeading("Choose an Image");
+    chooser.setHeadingHtml("Choose an Image");
     chooser.setMinWidth(500);
     chooser.setMinHeight(300);
     chooser.setModal(true);

@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.mail.client.widget;
+ package com.extjs.gxt.samples.mail.client.widget;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -38,7 +38,7 @@ public class LoginDialog extends Dialog {
     setButtonAlign(HorizontalAlignment.LEFT);
     setButtons("");
     setIcon(IconHelper.createStyle("user"));
-    setHeading("GXT Mail Demo Login");
+    setHeadingHtml("GXT Mail Demo Login");
     setModal(true);
     setBodyBorder(true);
     setBodyStyle("padding: 8px;background: none");

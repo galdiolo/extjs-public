@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.desktop.client;
+ package com.extjs.gxt.samples.desktop.client;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -173,7 +173,7 @@ public class DesktopApp implements EntryPoint {
     w.setMinimizable(true);
     w.setMaximizable(true);
     w.setIcon(IconHelper.createStyle("accordion"));
-    w.setHeading("Accordion Window");
+    w.setHeadingHtml("Accordion Window");
     w.setWidth(200);
     w.setHeight(350);
 
@@ -197,7 +197,7 @@ public class DesktopApp implements EntryPoint {
 
     ContentPanel cp = new ContentPanel();
     cp.setAnimCollapse(false);
-    cp.setHeading("Online Users");
+    cp.setHeadingHtml("Online Users");
     cp.setScrollMode(Scroll.AUTO);
     cp.getHeader().addTool(new ToolButton("x-tool-refresh"));
 
@@ -240,21 +240,21 @@ public class DesktopApp implements EntryPoint {
 
     cp = new ContentPanel();
     cp.setAnimCollapse(false);
-    cp.setHeading("Settings");
+    cp.setHeadingHtml("Settings");
     cp.setBodyStyleName("pad-text");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     w.add(cp);
 
     cp = new ContentPanel();
     cp.setAnimCollapse(false);
-    cp.setHeading("Stuff");
+    cp.setHeadingHtml("Stuff");
     cp.setBodyStyleName("pad-text");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     w.add(cp);
 
     cp = new ContentPanel();
     cp.setAnimCollapse(false);
-    cp.setHeading("More Stuff");
+    cp.setHeadingHtml("More Stuff");
     cp.setBodyStyleName("pad-text");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     w.add(cp);
@@ -266,7 +266,7 @@ public class DesktopApp implements EntryPoint {
     w.setIcon(IconHelper.createStyle("icon-grid"));
     w.setMinimizable(true);
     w.setMaximizable(true);
-    w.setHeading("Grid Window");
+    w.setHeadingHtml("Grid Window");
     w.setSize(500, 400);
     w.setLayout(new FitLayout());
 
@@ -295,7 +295,7 @@ public class DesktopApp implements EntryPoint {
     view.setForceFit(true);
     view.setGroupRenderer(new GridGroupRenderer() {
       public String render(GroupColumnData data) {
-        String f = cm.getColumnById(data.field).getHeader();
+        String f = cm.getColumnById(data.field).getHeaderHtml();
         String l = data.models.size() == 1 ? "Item" : "Items";
         return f + ": " + data.group + " (" + data.models.size() + " " + l + ")";
       }
@@ -315,7 +315,7 @@ public class DesktopApp implements EntryPoint {
     w.setMaximizable(true);
     w.setSize(740, 480);
     w.setIcon(IconHelper.createStyle("tabs"));
-    w.setHeading("Tab Window");
+    w.setHeadingHtml("Tab Window");
 
     w.setLayout(new FitLayout());
 
@@ -336,7 +336,7 @@ public class DesktopApp implements EntryPoint {
     w.setIcon(IconHelper.createStyle("bogus"));
     w.setMinimizable(true);
     w.setMaximizable(true);
-    w.setHeading("Bogus Window " + ++index);
+    w.setHeadingHtml("Bogus Window " + ++index);
     w.setSize(400, 300);
     return w;
   }

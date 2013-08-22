@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget;
+ package com.extjs.gxt.ui.client.widget;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -181,7 +181,7 @@ public abstract class Container<T extends Component> extends BoxComponent {
    * Returns the item with the specified item id.
    * 
    * @param itemId the item id
-   * @return the button or <code>null</code> if no match
+   * @return the item or <code>null</code> if no match
    */
   public T getItemByItemId(String itemId) {
     for (T item : getItems()) {

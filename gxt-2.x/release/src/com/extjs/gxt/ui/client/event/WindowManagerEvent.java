@@ -1,30 +1,20 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.event;
+ package com.extjs.gxt.ui.client.event;
 
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.WindowManager;
 
 public class WindowManagerEvent extends BaseEvent {
 
-  /**
-   * The window manager.
-   * 
-   * @deprecated use methods
-   */
-  public WindowManager manager;
+  private WindowManager manager;
 
-  /**
-   * The window.
-   * 
-   * @deprecated use methods
-   */
-  public Window window;
+  private Window window;
 
   public WindowManagerEvent(WindowManager manager) {
     super(manager);

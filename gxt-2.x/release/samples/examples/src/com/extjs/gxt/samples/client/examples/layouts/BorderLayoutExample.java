@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.layouts;
+ package com.extjs.gxt.samples.client.examples.layouts;
 
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
 import com.extjs.gxt.ui.client.Style.Scroll;
@@ -31,7 +31,7 @@ public class BorderLayoutExample extends LayoutContainer {
     ContentPanel north = new ContentPanel();
     ContentPanel west = new ContentPanel();
     ContentPanel center = new ContentPanel();
-    center.setHeading("BorderLayout Example");
+    center.setHeadingHtml("BorderLayout Example");
     center.setScrollMode(Scroll.AUTOX);
 
     FlexTable table = new FlexTable();
@@ -48,7 +48,7 @@ public class BorderLayoutExample extends LayoutContainer {
 
         @Override
         public void componentSelected(ButtonEvent ce) {
-          String txt = ce.getButton().getText();
+          String txt = ce.getButton().getHtml();
           if (txt.equals("Expand")) {
             layout.expand(r);
           } else if (txt.equals("Collapse")) {

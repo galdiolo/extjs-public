@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.forms;
+ package com.extjs.gxt.samples.client.examples.forms;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -59,7 +59,7 @@ public class FormsExample extends LayoutContainer {
 
   private void createForm1() {
     FormPanel simple = new FormPanel();
-    simple.setHeading("Simple Form");
+    simple.setHeadingHtml("Simple Form");
     simple.setFrame(true);
     simple.setWidth(350);
 
@@ -181,12 +181,12 @@ public class FormsExample extends LayoutContainer {
   private void createForm2() {
     FormPanel form2 = new FormPanel();
     form2.setFrame(true);
-    form2.setHeading("Simple Form with FieldSets");
+    form2.setHeadingHtml("Simple Form with FieldSets");
     form2.setWidth(350);
     form2.setLayout(new FlowLayout());
 
     FieldSet fieldSet = new FieldSet();
-    fieldSet.setHeading("User Information");
+    fieldSet.setHeadingHtml("User Information");
     fieldSet.setCheckboxToggle(true);
 
     FormLayout layout = new FormLayout();
@@ -213,7 +213,7 @@ public class FormsExample extends LayoutContainer {
     form2.add(fieldSet);
 
     fieldSet = new FieldSet();
-    fieldSet.setHeading("Phone Numbers");
+    fieldSet.setHeadingHtml("Phone Numbers");
     fieldSet.setCollapsible(true);
 
     layout = new FormLayout();

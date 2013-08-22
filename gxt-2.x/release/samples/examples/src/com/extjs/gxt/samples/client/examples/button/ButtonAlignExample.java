@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.button;
+ package com.extjs.gxt.samples.client.examples.button;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -26,7 +26,7 @@ public class ButtonAlignExample extends LayoutContainer {
 
       @Override
       public void componentSelected(ButtonEvent ce) {
-        Info.display("Click", ce.getButton().getText() + " clicked");
+        Info.display("Click", ce.getButton().getHtml() + " clicked");
 
       }
 
@@ -34,7 +34,7 @@ public class ButtonAlignExample extends LayoutContainer {
     int i = 1;
     for (HorizontalAlignment align : HorizontalAlignment.values()) {
       ContentPanel cp = new ContentPanel();
-      cp.setHeading("ButtonAligning Example: " + align.name().toLowerCase());
+      cp.setHeadingHtml("ButtonAligning Example: " + align.name().toLowerCase());
       for (int j = 0; j < 3; i++, j++) {
         cp.addButton(new Button("Button " + i, l));
       }

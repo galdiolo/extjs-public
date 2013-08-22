@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.util;
+ package com.extjs.gxt.ui.client.util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,22 +86,22 @@ public class TextMetrics {
    * Returns the measured height of the specified text. For multiline text, be
    * sure to call {@link #setFixedWidth} if necessary.
    * 
-   * @param text the text to be measured
+   * @param html the html content to be measured
    * @return the height in pixels
    */
-  public int getHeight(String text) {
-    return getSize(text).height;
+  public int getHeight(String html) {
+    return getSize(html).height;
   }
 
   /**
    * Returns the size of the specified text based on the internal element's
    * style and width properties.
    * 
-   * @param text the text to measure
+   * @param html the html string to measure
    * @return the size
    */
-  public Size getSize(String text) {
-    el.update(text);
+  public Size getSize(String html) {
+    el.update(html);
     Size size = el.getSize();
     el.update("");
     return size;
@@ -110,12 +110,12 @@ public class TextMetrics {
   /**
    * Returns the measured width of the specified text.
    * 
-   * @param text the text to measure
+   * @param html the html content to measure
    * @return the width in pixels
    */
-  public int getWidth(String text) {
+  public int getWidth(String html) {
     el.setStyleAttribute("width", "auto");
-    return getSize(text).width;
+    return getSize(html).width;
   }
 
   /**

@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.windows;
+ package com.extjs.gxt.samples.client.examples.windows;
 
 import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
@@ -31,7 +31,7 @@ public class DialogExample extends LayoutContainer {
     super.onRender(parent, pos);
 
     final Dialog simple = new Dialog();
-    simple.setHeading("Dialog Test");
+    simple.setHeadingHtml("Dialog Test");
     simple.setButtons(Dialog.YESNO);
     simple.setBodyStyleName("pad-text");
     simple.addText(TestData.DUMMY_TEXT_SHORT);
@@ -42,7 +42,7 @@ public class DialogExample extends LayoutContainer {
     final Dialog complex = new Dialog();
     complex.setBodyBorder(false);
     complex.setIcon(Resources.ICONS.side_list());
-    complex.setHeading("BorderLayout Dialog");
+    complex.setHeadingHtml("BorderLayout Dialog");
     complex.setWidth(400);
     complex.setHeight(225);
     complex.setHideOnButtonClick(true);
@@ -52,7 +52,7 @@ public class DialogExample extends LayoutContainer {
 
     // west
     ContentPanel panel = new ContentPanel();
-    panel.setHeading("West");
+    panel.setHeadingHtml("West");
     BorderLayoutData data = new BorderLayoutData(LayoutRegion.WEST, 150, 100, 250);
     data.setMargins(new Margins(0, 5, 0, 0));
     data.setSplit(true);
@@ -61,7 +61,7 @@ public class DialogExample extends LayoutContainer {
 
     // center
     panel = new ContentPanel();
-    panel.setHeading("Center");
+    panel.setHeadingHtml("Center");
     data = new BorderLayoutData(LayoutRegion.CENTER);
     complex.add(panel, data);
 

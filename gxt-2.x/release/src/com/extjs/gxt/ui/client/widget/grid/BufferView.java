@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.grid;
+ package com.extjs.gxt.ui.client.widget.grid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -243,7 +243,7 @@ public class BufferView extends GridView {
           String cellAttr = c.cellAttr != null ? c.cellAttr : "";
 
           if (isShowInvalidCells() && r != null && !r.isValid(c.id)) {
-            buf.append(" x-grid3-invalid-cell");
+            css += " x-grid3-invalid-cell";
           }
           if (isShowDirtyCells() && r != null && r.getChanges().containsKey(c.id)) {
             css += " x-grid3-dirty-cell";
@@ -325,7 +325,7 @@ public class BufferView extends GridView {
   }
 
   protected void doUpdate() {
-    if (grid == null || !grid.isViewReady() || !bufferEnabled) {
+    if (grid == null || !grid.isViewReady() || !isBufferEnabled()) {
       return;
     }
     int count = getVisibleRowCount();
@@ -342,7 +342,11 @@ public class BufferView extends GridView {
         if (!isRowRendered(i)) {
           List<ModelData> list = new ArrayList<ModelData>();
           list.add(store.getAt(i));
-          widgetList.add(i, new ArrayList<Widget>());
+          if (widgetList.size() > i) {
+            widgetList.set(i, new ArrayList<Widget>());
+          } else {
+            widgetList.add(i, new ArrayList<Widget>());
+          }
           String html = doRender(cs, list, i, cc, stripe, true);
           getRow(i).setInnerHTML(html);
           renderWidgets(i, i);

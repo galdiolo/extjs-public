@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.toolbar;
+ package com.extjs.gxt.ui.client.widget.toolbar;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.event.Events;
@@ -54,6 +54,6 @@ public class LiveToolItem extends LabelToolItem {
     if (i > totalCount) {
       i = totalCount;
     }
-    setLabel(GXT.MESSAGES.pagingToolBar_displayMsg((totalCount == 0 ? 0 : viewIndex + 1), i, (int) totalCount));
+    setHtml(GXT.MESSAGES.pagingToolBar_displayMsg((totalCount == 0 ? 0 : viewIndex + 1), i, (int) totalCount));
   }
 }

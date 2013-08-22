@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client;
+ package com.extjs.gxt.ui.client;
 
 import java.util.Map;
 
@@ -104,9 +104,14 @@ public class GXT {
   public static boolean isIE8;
 
   /**
-   * <code>true</code> if the browser is ie8.
+   * <code>true</code> if the browser is ie9.
    */
   public static boolean isIE9;
+
+  /**
+   * <code>true</code> if the browser is ie10.
+   */
+  public static boolean isIE10;
 
   /**
    * <code>true</code> if linux os.
@@ -270,15 +275,18 @@ public class GXT {
     XDOM.getBody().removeChild(div);
 
     String ua = getUserAgent();
-    System.out.println(ua);
 
     isOpera = ua.indexOf("opera") != -1;
 
     isIE = !isOpera && ua.indexOf("msie") != -1;
+    int docMode = getDocumentMode();
+    
     if (!isOpera && isIE) {
-      if (getDocumentMode() >= 9) {
+      if (docMode >= 10) {
+        isIE10 = true;
+      } else if (docMode == 9) {
         isIE9 = true;
-      } else if (getDocumentMode() == 8) {
+      } else if (docMode == 8) {
         isIE8 = true;
       } else {
         isIE6 = !isOpera && ua.indexOf("msie 6") != -1;

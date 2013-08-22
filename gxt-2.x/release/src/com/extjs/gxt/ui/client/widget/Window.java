@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget;
+ package com.extjs.gxt.ui.client.widget;
 
 import java.util.ArrayList;
 
@@ -214,8 +214,8 @@ public class Window extends ContentPanel {
   }
 
   @Override
-  public void setHeading(String text) {
-    super.setHeading(text);
+  public void setHeadingHtml(String text) {
+    super.setHeadingHtml(text);
     if (ghost != null) {
       ghost.selectNode(".x-window-header-text").setInnerHtml(text);
     }
@@ -228,16 +228,6 @@ public class Window extends ContentPanel {
   public void center() {
     Point p = el().getAlignToXY(XDOM.getBody(), "c-c", null);
     setPagePosition(p.x, p.y);
-  }
-
-  @Deprecated
-  public void close() {
-    hide(null);
-  }
-
-  @Deprecated
-  public void close(Button b) {
-    hide(b);
   }
 
   /**
@@ -1103,6 +1093,11 @@ public class Window extends ContentPanel {
     g.setBounds(box, true);
     int h = bwrap.getHeight();
     g.getChild(1).setHeight(h - 1, true);
+
+    if (ghost != null) {
+      ghost.selectNode(".x-window-header-text").setInnerHtml(getHeader().getHtml());
+    }
+
     return g;
   }
 

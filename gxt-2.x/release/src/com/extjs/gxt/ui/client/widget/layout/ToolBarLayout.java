@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.layout;
+ package com.extjs.gxt.ui.client.widget.layout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -135,11 +135,11 @@ public class ToolBarLayout extends Layout {
       menu.add(new SeparatorMenuItem());
     } else if (c instanceof SplitButton) {
       final SplitButton sb = (SplitButton) c;
-      MenuItem item = new MenuItem(sb.getText(), sb.getIcon());
+      MenuItem item = new MenuItem(sb.getHtml(), sb.getIcon());
       item.setEnabled(c.isEnabled());
       item.setItemId(c.getItemId());
       if (sb.getData("gxt-menutext") != null) {
-        item.setText(sb.getData("gxt-menutext").toString());
+        item.setHtml(sb.getData("gxt-menutext").toString());
       }
       if (sb.getMenu() != null) {
         item.setSubMenu(sb.getMenu());
@@ -158,11 +158,11 @@ public class ToolBarLayout extends Layout {
 
     } else if (c instanceof Button) {
       final Button b = (Button) c;
-      MenuItem item = new MenuItem(b.getText(), b.getIcon());
+      MenuItem item = new MenuItem(b.getHtml(), b.getIcon());
       item.setItemId(c.getItemId());
 
       if (b.getData("gxt-menutext") != null) {
-        item.setText(b.getData("gxt-menutext").toString());
+        item.setHtml(b.getData("gxt-menutext").toString());
       }
       if (b.getMenu() != null) {
         item.setHideOnClick(false);
@@ -184,9 +184,9 @@ public class ToolBarLayout extends Layout {
       ButtonGroup g = (ButtonGroup) c;
       g.setItemId(c.getItemId());
       menu.add(new SeparatorMenuItem());
-      String heading = g.getHeading();
+      String heading = g.getHeadingHtml();
       if (heading != null && heading.length() > 0 && !heading.equals("&#160;")) {
-        menu.add(new HeaderMenuItem(g.getHeading()));
+        menu.add(new HeaderMenuItem(g.getHeadingHtml()));
       }
       for (Component c2 : g.getItems()) {
         addComponentToMenu(menu, c2);

@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.layouts;
+ package com.extjs.gxt.samples.client.examples.layouts;
 
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
 import com.extjs.gxt.ui.client.Style.Scroll;
@@ -47,7 +47,7 @@ public class HBoxLayoutExample extends LayoutContainer {
     super.onRender(parent, index);
     setScrollMode(Scroll.AUTO);
     ContentPanel panel = new ContentPanel();
-    panel.setHeading("HorizontalBox Example");
+    panel.setHeadingHtml("HorizontalBox Example");
     panel.setSize(600, 500);
     panel.setLayout(new BorderLayout());
 

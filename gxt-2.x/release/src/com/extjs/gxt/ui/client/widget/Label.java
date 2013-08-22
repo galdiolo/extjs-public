@@ -1,17 +1,16 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget;
+ package com.extjs.gxt.ui.client.widget;
 
 import com.google.gwt.user.client.Element;
 
 /**
- * A component that contains text in a HTML label element. The text value is not
- * treated as HTML.
+ * A component that contains text in a HTML label element.
  * 
  * <dl>
  * <dt>Inherited Events:</dt>
@@ -34,7 +33,7 @@ import com.google.gwt.user.client.Element;
  * <dd>Component SaveState</dd>
  * </dl>
  */
-public class Label extends Text {
+public class Label extends Html {
 
   private String labelFor;
 
@@ -48,11 +47,11 @@ public class Label extends Text {
   /**
    * Creates a new label.
    * 
-   * @param text the label's text
+   * @param html the label's text
    */
-  public Label(String text) {
+  public Label(String html) {
     this();
-    setText(text);
+    setHtml(html);
   }
 
   /**

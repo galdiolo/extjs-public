@@ -1,12 +1,13 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget;
+ package com.extjs.gxt.ui.client.widget;
 
+import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.util.Util;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -54,7 +55,7 @@ public class Text extends BoxComponent {
    * @param text the text
    */
   public Text(String text) {
-    this.text = text;
+    setText(text);
   }
 
   /**
@@ -65,7 +66,7 @@ public class Text extends BoxComponent {
   }
 
   /**
-   * Returns the current text.
+   * Returns the current text
    * 
    * @return the text
    */
@@ -91,7 +92,7 @@ public class Text extends BoxComponent {
   public void setText(String text) {
     this.text = text;
     if (rendered) {
-      el().update(Util.isEmptyString(text) ? "&#160;" : text);
+      el().update(Util.isEmptyString(text) ? "&#160;" : El.toSafeHTML(text));
     }
   }
 

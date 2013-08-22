@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.grid;
+ package com.extjs.gxt.samples.client.examples.grid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +24,12 @@ import com.extjs.gxt.ui.client.widget.grid.GroupColumnData;
 import com.extjs.gxt.ui.client.widget.grid.GroupingView;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
+import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.RootPanel;
 
-public class GroupingGridExample extends LayoutContainer {
+public class GroupingGridExample extends LayoutContainer implements EntryPoint {
 
   @Override
   protected void onRender(Element parent, int index) {
@@ -59,7 +61,7 @@ public class GroupingGridExample extends LayoutContainer {
     view.setForceFit(true);
     view.setGroupRenderer(new GridGroupRenderer() {
       public String render(GroupColumnData data) {
-        String f = cm.getColumnById(data.field).getHeader();
+        String f = cm.getColumnById(data.field).getHeaderHtml();
         String l = data.models.size() == 1 ? "Item" : "Items";
         return f + ": " + data.group + " (" + data.models.size() + " " + l + ")";
       }
@@ -70,7 +72,7 @@ public class GroupingGridExample extends LayoutContainer {
     grid.setBorders(true);
 
     ContentPanel panel = new ContentPanel();
-    panel.setHeading("Grouping Example");
+    panel.setHeadingHtml("Grouping Example");
     panel.setIcon(Resources.ICONS.table());
     panel.setCollapsible(true);
     panel.setFrame(true);
@@ -79,6 +81,10 @@ public class GroupingGridExample extends LayoutContainer {
     panel.add(grid);
     grid.getAriaSupport().setLabelledBy(panel.getHeader().getId() + "-label");
     add(panel);
+  }
+
+  public void onModuleLoad() {
+    RootPanel.get().add(this);
   }
 
 }

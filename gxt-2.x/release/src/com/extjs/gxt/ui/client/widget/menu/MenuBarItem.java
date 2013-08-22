@@ -1,15 +1,15 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.menu;
+ package com.extjs.gxt.ui.client.widget.menu;
 
 import com.extjs.gxt.ui.client.GXT;
+import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
-import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.util.Util;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.google.gwt.user.client.Command;
@@ -27,27 +27,19 @@ public class MenuBarItem extends Component {
   protected Menu menu;
   protected boolean expanded;
   protected MenuBar bar;
-  private String text;
+  private String html;
 
   /**
    * Creates a new menu bar item.
    * 
-   * @param text the item's text
+   * @param html the item's text as HTML
    * @param menu the item's sub menu
    */
-  public MenuBarItem(String text, Menu menu) {
+  public MenuBarItem(String html, Menu menu) {
     baseStyle = "x-menubar-item";
-    this.text = text;
+    this.html = html;
     this.menu = menu;
     assert (menu != null);
-
-    new KeyNav<ComponentEvent>(menu) {
-      @Override
-      public void onLeft(ComponentEvent ce) {
-//        onMenuKeyLeft(ce);
-      }
-
-    };
   }
 
   protected void onMenuKeyLeft(ComponentEvent ce) {
@@ -77,8 +69,8 @@ public class MenuBarItem extends Component {
    * 
    * @return the text
    */
-  public String getText() {
-    return text;
+  public String getHtml() {
+    return html;
   }
 
   /**
@@ -96,9 +88,18 @@ public class MenuBarItem extends Component {
    * @param text the text
    */
   public void setText(String text) {
-    this.text = text;
+    setHtml(El.toSafeHTML(text));
+  }
+  
+  /**
+   * Sets the item's text as HTML.
+   * 
+   * @param html the new html content
+   */
+  public void setHtml(String html) {
+    this.html = html;
     if (rendered) {
-      el().update(Util.isEmptyString(text) ? "&#160;" : text);
+      el().update(Util.isEmptyString(html) ? "&#160;" : html);
     }
   }
 
@@ -107,7 +108,7 @@ public class MenuBarItem extends Component {
     super.onRender(target, index);
     setElement(DOM.createDiv(), target, index);
     setStyleAttribute("display", "inline");
-    setText(text);
+    setHtml(html);
 
     if (GXT.isAriaEnabled()) {
       if (menu != null) {

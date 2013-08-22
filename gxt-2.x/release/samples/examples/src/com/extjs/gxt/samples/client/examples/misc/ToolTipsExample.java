@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.misc;
+ package com.extjs.gxt.samples.client.examples.misc;
 
 import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
@@ -45,7 +45,7 @@ public class ToolTipsExample extends LayoutContainer {
 
     btn = new Button("Anchor");
     config = new ToolTipConfig();
-    config.setTitle("Information");
+    config.setTitleHtml("Information");
     config.setText("Prints the current document");
     config.setMouseOffset(new int[] {0, 0});
     config.setAnchor("left");

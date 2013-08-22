@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.button;
+ package com.extjs.gxt.ui.client.widget.button;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.aria.FocusFrame;
@@ -43,15 +43,6 @@ public class IconButton extends BoxComponent {
 
   protected String style;
   protected boolean cancelBubble = true;
-
-  /**
-   * Creates a new icon button. When using the default constructor,
-   * {@link #changeStyle(String)} must be called to initialize the button.
-   */
-  @Deprecated
-  public IconButton() {
-    this("");
-  }
 
   /**
    * Creates a new icon button. The 'over' style and 'disabled' style names

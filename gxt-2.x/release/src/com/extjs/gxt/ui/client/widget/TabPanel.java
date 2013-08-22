@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget;
+ package com.extjs.gxt.ui.client.widget;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -285,7 +285,7 @@ public class TabPanel extends Container<TabItem> {
     int count = getItemCount();
     for (int i = 0; i < count; i++) {
       TabItem item = getItem(i);
-      if (item.getItemId().equals(id) || item.getId().equals(id) || (checkText && item.getText().equals(id))) {
+      if (item.getItemId().equals(id) || item.getId().equals(id) || (checkText && item.getHtml().equals(id))) {
         return item;
       }
     }
@@ -1119,7 +1119,7 @@ public class TabPanel extends Container<TabItem> {
     }
     Params p = new Params();
     p.set("id", getId() + "__" + item.getId());
-    p.set("text", item.getText());
+    p.set("text", item.getHtml());
     p.set("style", style);
     p.set("textStyle", item.getTextStyle());
     if (item.template == null) {

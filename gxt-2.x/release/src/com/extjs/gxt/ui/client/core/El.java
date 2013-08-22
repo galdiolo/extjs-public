@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.core;
+ package com.extjs.gxt.ui.client.core;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,6 +62,8 @@ public class El {
   }
 
   private static Map<String, Boolean> borderBoxMap = new FastMap<Boolean>();
+  private static Boolean borderBoxTableFixed = null;
+  private static Element textDiv = DOM.createDiv();
 
   /**
    * The globally shared El instance.
@@ -74,6 +76,17 @@ public class El {
 
   static {
     GXT.init();
+  }
+
+  /**
+   * Returns a string that is safe to be used in a HTML context.
+   * 
+   * @param text the target text
+   * @return the safe value
+   */
+  public static String toSafeHTML(String text) {
+    textDiv.setInnerText(text);
+    return textDiv.getInnerHTML();
   }
 
   /**
@@ -140,6 +153,26 @@ public class El {
     }
     g.dom = (Element) element;
     return g;
+  }
+
+  /**
+   * Returns true if table cells in a fixed table layout are border boxes.
+   * 
+   * @return true if border box
+   */
+  public static boolean isBorderBoxTableFixed() {
+    if (borderBoxTableFixed == null) {
+      Element testElement = XDOM.create("<table style='table-layout:fixed; width: 100px'><tr><td></td></tr></table>");
+      Element td = (Element) testElement.getFirstChildElement().getFirstChildElement().getFirstChildElement();
+      td.getStyle().setPropertyPx("padding", 1);
+      td.getStyle().setPropertyPx("width", 100);
+      testElement.getStyle().setProperty("visibility", "hidden");
+      testElement.getStyle().setProperty("position", "absolute");
+      XDOM.getBody().appendChild(testElement);
+      borderBoxTableFixed = td.getOffsetWidth() == 100;
+      XDOM.getBody().removeChild(testElement);
+    }
+    return borderBoxTableFixed;
   }
 
   /**

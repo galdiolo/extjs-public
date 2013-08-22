@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.grid.filters;
+ package com.extjs.gxt.ui.client.widget.grid.filters;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -263,7 +263,7 @@ public abstract class AbstractGridFilters implements ComponentPlugin {
   public void setMessages(GridFiltersMessages messages) {
     msgs = messages;
     if (checkFilterItem != null) {
-      checkFilterItem.setText(getMessages().getFilterText());
+      checkFilterItem.setHtml(getMessages().getFilterText());
     }
   }
 
@@ -350,6 +350,11 @@ public abstract class AbstractGridFilters implements ComponentPlugin {
         return true;
       }
     };
+    for (Filter filter : filters.values()) {
+      if (!filter.isActivatable() || !filter.isActive()) {
+        return null;
+      }
+    }
     return storeFilter;
   }
 
@@ -420,7 +425,9 @@ public abstract class AbstractGridFilters implements ComponentPlugin {
   }
 
   protected void onLoad(LoadEvent le) {
-    store.filter("");
+    if (currentFilter != null) {
+      store.filter("");
+    }
   }
 
   protected void onReconfigure() {
@@ -449,9 +456,11 @@ public abstract class AbstractGridFilters implements ComponentPlugin {
         store.removeFilter(currentFilter);
       }
       currentFilter = getModelFilter();
-      store.addFilter(currentFilter);
-      if (!store.isFiltered()) {
-        store.applyFilters("");
+      if (currentFilter != null) {
+        store.addFilter(currentFilter);
+        if (!store.isFiltered()) {
+          store.applyFilters("");
+        }
       }
     } else {
       deferredUpdate.cancel();

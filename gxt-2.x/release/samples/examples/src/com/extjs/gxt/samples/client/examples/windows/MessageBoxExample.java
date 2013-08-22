@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.windows;
+ package com.extjs.gxt.samples.client.examples.windows;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Listener;
@@ -31,7 +31,7 @@ public class MessageBoxExample extends LayoutContainer {
     final Listener<MessageBoxEvent> l = new Listener<MessageBoxEvent>() {
       public void handleEvent(MessageBoxEvent ce) {
         Button btn = ce.getButtonClicked();
-        Info.display("MessageBox", "The '{0}' button was pressed", btn.getText());
+        Info.display("MessageBox", "The '{0}' button was pressed", btn.getHtml());
       }
     };
 
@@ -72,7 +72,7 @@ public class MessageBoxExample extends LayoutContainer {
         MessageBox box = new MessageBox();
         box.setButtons(MessageBox.YESNOCANCEL);
         box.setIcon(MessageBox.QUESTION);
-        box.setTitle("Save Changes?");
+        box.setTitleHtml("Save Changes?");
         box.addCallback(l);
         box.setMessage("You are closing a tab that has unsaved changes. Would you like to save your changes?");
         box.show();

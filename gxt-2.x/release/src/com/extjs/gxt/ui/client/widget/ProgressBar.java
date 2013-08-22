@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget;
+ package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
@@ -68,8 +68,8 @@ public class ProgressBar extends BoxComponent {
   private int interval = 300;
   private El progressBar;
   private boolean running;
-  private String text = "";
-  private CompositeElement textEl;
+  private String html = "";
+  private CompositeElement contentEl;
   private El textTopElem, textBackElem;
   private Timer timer;
   private double value;
@@ -245,9 +245,18 @@ public class ProgressBar extends BoxComponent {
    * @param text The string to display in the progress text element
    */
   public void updateText(String text) {
-    this.text = text;
+    updateHtml(El.toSafeHTML(text));
+  }
+
+  /**
+   * Updates the contents of the progress bar with the specified HTML.
+   * 
+   * @param html the HTML string to render in the progress bar
+   */
+  public void updateHtml(String html) {
+    this.html = html;
     if (rendered) {
-      textEl.setInnerHtml(Util.isEmptyString(text) ? "&#160;" : text);
+      contentEl.setInnerHtml(Util.isEmptyString(html) ? "&#160;" : html);
     }
   }
 
@@ -281,12 +290,12 @@ public class ProgressBar extends BoxComponent {
     textBackElem = inner.childNode(1);
     textTopElem.setStyleAttribute("zIndex", 99).addStyleName("x-hidden");
 
-    textEl = new CompositeElement();
-    textEl.add(textTopElem.firstChild().dom);
-    textEl.add(textBackElem.firstChild().dom);
+    contentEl = new CompositeElement();
+    contentEl.add(textTopElem.firstChild().dom);
+    contentEl.add(textBackElem.firstChild().dom);
 
     if (GXT.isHighContrastMode) {
-      textEl.getElement(0).getStyle().setProperty("backgroundColor", "#ffffff");
+      contentEl.getElement(0).getStyle().setProperty("backgroundColor", "#ffffff");
     }
 
     if (GXT.isAriaEnabled()) {
@@ -305,8 +314,8 @@ public class ProgressBar extends BoxComponent {
   }
 
   private void update() {
-    textEl.setWidth(el().firstChild().getWidth());
-    updateProgress(value, text);
+    contentEl.setWidth(el().firstChild().getWidth());
+    updateProgress(value, html);
   }
 
 }

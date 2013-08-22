@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.toolbar;
+ package com.extjs.gxt.samples.client.examples.toolbar;
 
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.Events;
@@ -62,7 +62,7 @@ public class StatusToolBarExample extends LayoutContainer {
     toolBar.add(wordCount);
 
     FormPanel form = new FormPanel();
-    form.setHeading("Status Toolbar");
+    form.setHeadingHtml("Status Toolbar");
     form.setSize(450, 300);
     form.setPadding(5);
     

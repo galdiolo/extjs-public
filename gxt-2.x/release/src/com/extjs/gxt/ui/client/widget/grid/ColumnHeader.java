@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.grid;
+ package com.extjs.gxt.ui.client.widget.grid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +39,7 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.Style;
+import com.google.gwt.dom.client.TableCellElement;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
@@ -191,8 +192,8 @@ public class ColumnHeader extends BoxComponent {
       groups.add(this);
     }
 
-    public void setText(String text) {
-      el().setInnerHtml(text);
+    public void setHtml(String html) {
+      el().setInnerHtml(html);
     }
 
     @Override
@@ -284,8 +285,12 @@ public class ColumnHeader extends BoxComponent {
       }
     }
 
-    public void setHeader(String header) {
+    public void setHeaderHtml(String header) {
       if (text != null) text.setHtml(header);
+    }
+    
+    public void setHeaderText(String text) {
+      setHeaderHtml(El.toSafeHTML(text));
     }
 
     public void updateWidth(int width) {
@@ -352,7 +357,7 @@ public class ColumnHeader extends BoxComponent {
         span.appendChild(widget.getElement());
         getElement().appendChild(span);
       } else {
-        text = new Html(config.getHeader());
+        text = new Html(config.getHeaderHtml());
         text.setTagName("span");
         text.render(el().dom);
       }
@@ -368,7 +373,7 @@ public class ColumnHeader extends BoxComponent {
       setAriaState("aria-haspopup", "true");
       setAriaState("aria-owns", getId() + "-menu");
 
-      sinkEvents(Event.ONCLICK | Event.MOUSEEVENTS | Event.FOCUSEVENTS | Event.ONKEYPRESS);
+      sinkEvents(Event.ONCLICK | Event.ONDBLCLICK | Event.MOUSEEVENTS | Event.FOCUSEVENTS | Event.ONKEYPRESS);
     }
 
     private void onClick(ComponentEvent ce) {
@@ -424,15 +429,6 @@ public class ColumnHeader extends BoxComponent {
     this.container = container;
     this.cm = cm;
     disableTextSelection(true);
-  }
-
-  /**
-   * Enables column resizing.
-   * 
-   * @deprecated See {@link #setEnableColumnResizing(boolean)}
-   */
-  public void enableColumnResizing() {
-    setEnableColumnResizing(true);
   }
 
   /**
@@ -618,6 +614,7 @@ public class ColumnHeader extends BoxComponent {
       }
       updateColumnWidth(i, cm.getColumnWidth(i));
     }
+
     if (container instanceof Grid) {
       Grid<?> grid = (Grid) container;
       SortInfo sortInfo = grid.getStore().getSortState();
@@ -625,9 +622,37 @@ public class ColumnHeader extends BoxComponent {
         updateSortIcon(grid.getColumnModel().findColumnIndex(sortInfo.getSortField()), sortInfo.getSortDir());
       }
     }
-    cleanCells();
+
+    adjustWidths();
+
     if (isAttached()) {
       adjustHeights();
+    }
+  }
+  
+  private void adjustWidths() {
+    cleanCells();
+    for (int i = 0; i < rows; i++) {
+      int columns = table.getCellCount(i);
+      int mark = 0;
+      for (int j= 0; j < columns; j++) {
+        TableCellElement cell = table.getCellFormatter().getElement(i, j).cast();
+        int colspan = cell.getColSpan();
+        int w = 0;
+        for (int k = mark; k < (mark + colspan); k++) {
+          if (cm.isHidden(k)) {
+            mark++;
+            continue;
+          }
+          w += cm.getColumnWidth(k);
+        }
+        mark += colspan;
+        
+        cell.getStyle().setPropertyPx("width", w);
+        int adj = El.fly(cell).getFrameWidth("lr");
+        El inner = El.fly(cell.getFirstChildElement());
+        inner.setWidth(w - adj, true);
+      }
     }
   }
 
@@ -742,7 +767,7 @@ public class ColumnHeader extends BoxComponent {
 
             start = h;
             statusProxy.setStatus(false);
-            statusProxy.update(start.config.getHeader());
+            statusProxy.update(start.config.getHeaderHtml());
           } else {
             de.setCancelled(true);
           }
@@ -809,13 +834,23 @@ public class ColumnHeader extends BoxComponent {
   }
 
   /**
+   * Sets the column's header HTML.
+   * 
+   * @param column the column index
+   * @param headerHtml the header text as HTML
+   */
+  public void setHeaderHtml(int column, String headerHtml) {
+    getHead(column).setHeaderHtml(headerHtml);
+  }
+  
+  /**
    * Sets the column's header text.
    * 
    * @param column the column index
-   * @param header the header text
+   * @param text the header text
    */
-  public void setHeader(int column, String header) {
-    getHead(column).setHeader(header);
+  public void setHeaderText(int column, String text) {
+    getHead(column).setHeaderText(text);
   }
 
   /**
@@ -889,6 +924,8 @@ public class ColumnHeader extends BoxComponent {
     if (h != null) {
       h.updateWidth(width);
     }
+    
+    adjustWidths();
   }
 
   public void updateSortIcon(int colIndex, SortDir dir) {

@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.toolbar;
+ package com.extjs.gxt.samples.client.examples.toolbar;
 
 import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -29,7 +29,7 @@ public class ToolBarOverflowExample extends LayoutContainer {
     super.onRender(parent, pos);
     final Window window = new Window();
 
-    window.setHeading("Overflow Example");
+    window.setHeadingHtml("Overflow Example");
     window.setSize(400, 200);
     window.setMinWidth(50);
     window.setFrame(true);
@@ -37,7 +37,7 @@ public class ToolBarOverflowExample extends LayoutContainer {
     ToolBar toolBar = new ToolBar();
 
     ButtonGroup group = new ButtonGroup(2);
-    group.setHeading("Clipboard");
+    group.setHeadingHtml("Clipboard");
 
     Button btn = new Button("Cool", Resources.ICONS.add16());
     group.add(btn);
@@ -59,7 +59,7 @@ public class ToolBarOverflowExample extends LayoutContainer {
     toolBar.add(new FillToolItem());
 
     group = new ButtonGroup(2);
-    group.setHeading("Other Bugus Actions");
+    group.setHeadingHtml("Other Bugus Actions");
 
     btn = new Button("Cool", Resources.ICONS.add16());
     group.add(btn);

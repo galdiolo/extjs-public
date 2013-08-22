@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.tips;
+ package com.extjs.gxt.ui.client.widget.tips;
 
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.EventType;
@@ -104,8 +104,8 @@ public class QuickTip extends ToolTip {
   protected void onHide() {
     super.onHide();
     targetElem = null;
-    text = null;
-    title = null;
+    html = null;
+    titleHtml = null;
   }
 
   @Override
@@ -172,8 +172,8 @@ public class QuickTip extends ToolTip {
 
   private void updateTargetElement(Element target) {
     targetElem = target;
-    text = getAttributeValue(target, interceptTitles ? "title" : "qtip");
-    title = interceptTitles ? null : getAttributeValue(target, "qtitle");
+    html = getAttributeValue(target, interceptTitles ? "title" : "qtip");
+    titleHtml = interceptTitles ? null : getAttributeValue(target, "qtitle");
 
     String width = getAttributeValue(target, "qwidth");
     if (width != null && !"".equals(width)) {

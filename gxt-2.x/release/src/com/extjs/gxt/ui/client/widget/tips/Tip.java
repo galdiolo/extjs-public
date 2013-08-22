@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.tips;
+ package com.extjs.gxt.ui.client.widget.tips;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.XDOM;
@@ -148,7 +148,7 @@ public class Tip extends ContentPanel {
     if (width == null) {
       Element body = getElement("body");
       int bw = fly(body).getTextWidth();
-      if (getHeading() != null) {
+      if (getHeadingHtml() != null) {
         bw = Math.max(bw, head.el().child("span").getTextWidth());
       }
       // added 2px adjustment to stop word wrap

@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client;
+ package com.extjs.gxt.ui.client;
 
 import java.util.Date;
 
@@ -17,11 +17,11 @@ import com.google.gwt.i18n.client.DateTimeFormat;
  */
 public final class Version {
 
-  private static final String release = "2.2.5";
+  private static final String release = "2.3.0";
   private static final int major = 2;
-  private static final int minor = 2;
-  private static final int revision = 5;
-  private static final String buildTime = "09/15/2011 02:18";
+  private static final int minor = 3;
+  private static final int revision = 0;
+  private static final String buildTime = "04/24/2013 12:54";
 
   Version() {
 

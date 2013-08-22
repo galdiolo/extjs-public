@@ -1,15 +1,16 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.fx;
+ package com.extjs.gxt.ui.client.fx;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.BaseObservable;
@@ -436,7 +437,7 @@ public class Resizable extends BaseObservable {
 
     preview.add();
 
-    Shim.get().cover(false);
+    Shim.get().cover(GXT.useShims);
     Shim.get().setStyleAttribute("cursor", handle.el().getStyleAttribute("cursor"));
   }
 

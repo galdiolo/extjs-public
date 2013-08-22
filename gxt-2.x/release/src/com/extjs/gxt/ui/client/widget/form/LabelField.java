@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.form;
+ package com.extjs.gxt.ui.client.widget.form;
 
 import com.extjs.gxt.ui.client.util.Util;
 import com.google.gwt.user.client.DOM;
@@ -44,7 +44,9 @@ import com.google.gwt.user.client.Element;
  */
 public class LabelField extends Field<Object> {
 
-  private String text;
+  private String value;
+
+  private boolean useHtml = true;
 
   /**
    * Creates a new label field.
@@ -58,30 +60,31 @@ public class LabelField extends Field<Object> {
   /**
    * Creates a new label field.
    * 
-   * @param text the label text
+   * @param html the label text as HTML
    */
-  public LabelField(String text) {
+  public LabelField(String html) {
     this();
-    setText(text);
-  }
-
-  /**
-   * Returns the field's text.
-   * 
-   * @return the text
-   */
-  public String getText() {
-    return text;
+    setValue(html);
   }
 
   @Override
   public Object getValue() {
-    return getText();
+    return value;
   }
 
   @Override
   public boolean isDirty() {
     return false;
+  }
+
+  /**
+   * Returns {@code true} if the field's value is treated as HTML (defaults to
+   * true).
+   * 
+   * @return the use HTML state
+   */
+  public boolean isUseHtml() {
+    return useHtml;
   }
 
   @Override
@@ -94,35 +97,41 @@ public class LabelField extends Field<Object> {
 
   }
 
-  /**
-   * Sets the lable's text.
-   * 
-   * @param text the text as HTML
-   */
-  public void setText(String text) {
-    this.text = text;
-    if (rendered) {
-      el().update(Util.isEmptyString(text) ? "&#160;" : text);
+  @Override
+  protected void onRender(Element parent, int index) {
+    setElement(DOM.createDiv(), parent, index);
+    if (value != null) {
+      originalValue = value;
+      setValue(value);
     }
+  }
+
+  /**
+   * Sets whether the field's value is treated as HTML (defaults to true,
+   * pre-render).
+   * 
+   * @param useHtml {@code true} to treat value as HTML
+   */
+  public void setUseHtml(boolean useHtml) {
+    assertPreRender();
+    this.useHtml = useHtml;
   }
 
   @Override
   public void setValue(Object value) {
-    setText(value != null ? value.toString() : null);
+    this.value = value.toString();
+    if (rendered) {
+      if (useHtml) {
+        el().update(Util.isEmptyString(this.value) ? "&#160;" : this.value);
+      } else {
+        getElement().setInnerText(this.value);
+      }
+    }
   }
 
   @Override
   public boolean validate(boolean silent) {
     return true;
-  }
-
-  @Override
-  protected void onRender(Element parent, int index) {
-    setElement(DOM.createDiv(), parent, index);
-    if (text != null) {
-      originalValue = text;
-      setText(text);
-    }
   }
 
   @Override

@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.chart;
+ package com.extjs.gxt.samples.client.examples.chart;
 
 import com.extjs.gxt.charts.client.Chart;
 import com.extjs.gxt.charts.client.event.ChartEvent;
@@ -37,7 +37,7 @@ public class BasicChartExample extends LayoutContainer {
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
     ContentPanel cp = new ContentPanel();
-    cp.setHeading("Pie chart");
+    cp.setHeadingHtml("Pie chart");
     cp.setFrame(true);
     cp.setSize(400, 400);
     cp.setLayout(new FitLayout());

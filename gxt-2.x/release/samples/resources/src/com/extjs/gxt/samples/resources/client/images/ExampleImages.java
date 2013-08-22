@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.resources.client.images;
+ package com.extjs.gxt.samples.resources.client.images;
 
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.ImageBundle;
@@ -163,6 +163,8 @@ public interface ExampleImages extends ImageBundle {
   AbstractImagePrototype rowlayout();
 
   AbstractImagePrototype rownumbertreegrid();
+  
+  AbstractImagePrototype safehtml();
 
   AbstractImagePrototype slider();
 

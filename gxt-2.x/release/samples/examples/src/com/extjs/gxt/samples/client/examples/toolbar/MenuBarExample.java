@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.toolbar;
+ package com.extjs.gxt.samples.client.examples.toolbar;
 
 import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
@@ -94,7 +94,7 @@ public class MenuBarExample extends LayoutContainer {
     bar.add(item4);
 
     ContentPanel panel = new ContentPanel();
-    panel.setHeading("MenuBar Example");
+    panel.setHeadingHtml("MenuBar Example");
     panel.setTopComponent(bar);
     panel.setSize(400, 300);
 

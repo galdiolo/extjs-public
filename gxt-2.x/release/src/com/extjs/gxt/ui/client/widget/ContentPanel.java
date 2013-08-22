@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget;
+ package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.Direction;
@@ -403,8 +403,8 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
    * 
    * @return the heading
    */
-  public String getHeading() {
-    return head.getText();
+  public String getHeadingHtml() {
+    return head.getHtml();
   }
 
   /**
@@ -450,16 +450,6 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
    */
   public boolean getTitleCollapse() {
     return titleCollapse;
-  }
-
-  /**
-   * Returns the panel's title text.
-   * 
-   * @return the title text
-   * @deprecated use {@link #getHeading()}
-   */
-  public String getTitleText() {
-    return head.getText();
   }
 
   /**
@@ -651,7 +641,7 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
   /**
    * True to create the header element explicitly, false to skip creating it
    * (defaults to true, pre-render). By default, when header is not specified,
-   * if a {@link #setHeading(String)} is set the header will be created
+   * if a {@link #setHeadingHtml(String)} is set the header will be created
    * automatically, otherwise it will not. If a title is set but header is
    * explicitly set to false, the header will not be rendered.
    * 
@@ -663,11 +653,20 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
   }
 
   /**
-   * Sets the title text for the panel.
+   * Sets the title text for the panel as HTML.
+   * 
+   * @param html the title text as HTML
+   */
+  public void setHeadingHtml(String html) {
+    head.setHtml(html);
+  }
+  
+  /**
+   * Sets the title text for the panel as HTML.
    * 
    * @param text the title text
    */
-  public void setHeading(String text) {
+  public void setHeadingText(String text) {
     head.setText(text);
   }
 
@@ -701,18 +700,6 @@ public class ContentPanel extends LayoutContainer implements IconSupport {
 
   public void setIconStyle(String icon) {
     setIcon(IconHelper.create(icon));
-  }
-
-  /**
-   * True to display an interior border on the body element of the panel, false
-   * to hide it (defaults to true, pre-render). This only applies when
-   * {@link #setBodyBorder(boolean)} == true.
-   * 
-   * @param insetBorder true to display the interior border
-   * @deprecated behavior not implemented
-   */
-  public void setInsetBorder(boolean insetBorder) {
-    assertPreRender();
   }
 
   public void setMinButtonWidth(int minButtonWidth) {

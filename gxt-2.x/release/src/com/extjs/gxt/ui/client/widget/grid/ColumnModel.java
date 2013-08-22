@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.grid;
+ package com.extjs.gxt.ui.client.widget.grid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -200,7 +200,7 @@ public class ColumnModel extends BaseObservable {
    */
   public String getColumnHeader(int colIndex) {
     ColumnConfig c = getColumn(colIndex);
-    return c != null ? c.getHeader() : null;
+    return c != null ? c.getHeaderHtml() : null;
   }
 
   /**
@@ -450,7 +450,7 @@ public class ColumnModel extends BaseObservable {
   public void setColumnHeader(int colIndex, String header) {
     ColumnConfig c = getColumn(colIndex);
     if (c != null) {
-      c.setHeader(header);
+      c.setHeaderHtml(header);
       ColumnModelEvent e = new ColumnModelEvent(this, colIndex);
       e.setHeader(header);
       fireEvent(Events.HeaderChange, e);

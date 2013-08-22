@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.tips;
+ package com.extjs.gxt.ui.client.widget.tips;
 
 import java.util.Date;
 
@@ -43,7 +43,7 @@ public class ToolTip extends Tip {
   protected Timer showTimer;
   protected Component target;
   protected Point targetXY = new Point(0, 0);
-  protected String title, text;
+  protected String titleHtml, html;
   protected ToolTipConfig toolTipConfig;
 
   private Date lastActive;
@@ -446,18 +446,18 @@ public class ToolTip extends Tip {
 
   @Override
   protected void updateContent() {
-    getHeader().setText(title);
+    getHeader().setHtml(titleHtml);
     // show header or not
-    getHeader().el().selectNode("#" + getHeader().getId() + "-label").setVisible(title != null && !"".equals(title));
+    getHeader().el().selectNode("#" + getHeader().getId() + "-label").setVisible(titleHtml != null && !"".equals(titleHtml));
 
     if (toolTipConfig.getTemplate() != null) {
       Params p = toolTipConfig.getParams();
       if (p == null) p = new Params();
-      p.set("text", text);
-      p.set("title", title);
+      p.set("text", html);
+      p.set("title", titleHtml);
       toolTipConfig.getTemplate().overwrite(getBody().dom, p);
     } else {
-      getBody().update(Util.isEmptyString(text) ? "&#160;" : text);
+      getBody().update(Util.isEmptyString(html) ? "&#160;" : html);
     }
   }
 
@@ -530,8 +530,8 @@ public class ToolTip extends Tip {
     setMinWidth(config.getMinWidth());
     setMaxWidth(config.getMaxWidth());
     setClosable(config.isCloseable());
-    text = config.getText();
-    title = config.getTitle();
+    html = config.getHtml();
+    titleHtml = config.getTitleHtml();
   }
 
 }

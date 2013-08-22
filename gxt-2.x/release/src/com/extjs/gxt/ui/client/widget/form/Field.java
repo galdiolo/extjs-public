@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.form;
+ package com.extjs.gxt.ui.client.widget.form;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.HideMode;
@@ -547,7 +547,7 @@ public abstract class Field<D> extends BoxComponent {
    * error message that will not be cleared until manually cleared see
    * {@link #forceInvalid(String)}
    * 
-   * @param msg the validation message
+   * @param msg the validation message treated as HTML
    */
   public void markInvalid(String msg) {
     msg = Format.htmlEncode(msg == null ? getMessages().getInvalidText() : msg);
@@ -741,14 +741,14 @@ public abstract class Field<D> extends BoxComponent {
   /**
    * Sets the field's label.
    * 
-   * @param fieldLabel the label
+   * @param fieldLabelHtml the label treated as HTML
    */
-  public void setFieldLabel(String fieldLabel) {
-    this.fieldLabel = fieldLabel;
+  public void setFieldLabel(String fieldLabelHtml) {
+    this.fieldLabel = fieldLabelHtml;
     if (rendered) {
       El elem = findLabelElement();
       if (elem != null) {
-        elem.setInnerHtml(fieldLabel + labelSeparator);
+        elem.setInnerHtml(fieldLabelHtml + labelSeparator);
       }
     }
   }

@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.view;
+ package com.extjs.gxt.samples.client.examples.view;
 
 import java.util.List;
 
@@ -61,7 +61,7 @@ public class ListViewExample extends LayoutContainer {
     panel.setAnimCollapse(false);
     panel.setFrame(true);
     panel.setId("images-view");
-    panel.setHeading("Simple ListView (0 items selected)");
+    panel.setHeadingHtml("Simple ListView (0 items selected)");
     panel.setWidth(535);
     panel.setAutoHeight(true);
     panel.setBodyBorder(false);
@@ -84,7 +84,7 @@ public class ListViewExample extends LayoutContainer {
         new Listener<SelectionChangedEvent<BeanModel>>() {
 
           public void handleEvent(SelectionChangedEvent<BeanModel> be) {
-            panel.setHeading("Simple ListView (" + be.getSelection().size()
+            panel.setHeadingHtml("Simple ListView (" + be.getSelection().size()
                 + " items selected)");
           }
 

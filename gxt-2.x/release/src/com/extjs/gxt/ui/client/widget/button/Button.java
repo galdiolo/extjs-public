@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.button;
+ package com.extjs.gxt.ui.client.widget.button;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style;
@@ -88,7 +88,7 @@ public class Button extends BoxComponent implements IconSupport {
   protected Menu menu;
   protected ButtonScale scale = ButtonScale.SMALL;
   protected Template template;
-  protected String text;
+  protected String html;
   private ButtonArrowAlign arrowAlign = ButtonArrowAlign.RIGHT;
   private boolean handleMouseEvents = true;
   private IconAlign iconAlign = IconAlign.LEFT;
@@ -117,47 +117,47 @@ public class Button extends BoxComponent implements IconSupport {
   }
 
   /**
-   * Creates a new button with the given text.
+   * Creates a new button with the given HTML.
    * 
-   * @param text the button text
+   * @param html the button text as HTML
    */
-  public Button(String text) {
+  public Button(String html) {
     this();
-    setText(text);
+    setHtml(html);
   }
 
   /**
-   * Creates a new button with the given text and iconStyle.
+   * Creates a new button with the given HTML and icon.
    * 
-   * @param text the button text
+   * @param html the button text as HTML
    * @param icon the icon
    */
-  public Button(String text, AbstractImagePrototype icon) {
-    this(text);
+  public Button(String html, AbstractImagePrototype icon) {
+    this(html);
     setIcon(icon);
   }
 
   /**
-   * Creates a new button with the given text, iconStyle and specified selection
+   * Creates a new button with the given HTML, icon and specified selection
    * listener.
    * 
-   * @param text the button text
+   * @param html the button text as HTML
    * @param icon the icon
    * @param listener the selection listener
    */
-  public Button(String text, AbstractImagePrototype icon, SelectionListener<ButtonEvent> listener) {
-    this(text, icon);
+  public Button(String html, AbstractImagePrototype icon, SelectionListener<ButtonEvent> listener) {
+    this(html, icon);
     addSelectionListener(listener);
   }
 
   /**
-   * Creates a new button with the given text and specified selection listener.
+   * Creates a new button with the given HTML and specified selection listener.
    * 
-   * @param text the button's text
+   * @param html the button's text as HTML
    * @param listener the selection listener
    */
-  public Button(String text, SelectionListener<ButtonEvent> listener) {
-    this(text);
+  public Button(String html, SelectionListener<ButtonEvent> listener) {
+    this(html);
     addSelectionListener(listener);
   }
 
@@ -180,9 +180,9 @@ public class Button extends BoxComponent implements IconSupport {
   }
 
   /**
-   * Returns the button's icon style.
+   * Returns the button's icon.
    * 
-   * @return the icon style
+   * @return the icon
    */
   public AbstractImagePrototype getIcon() {
     return icon;
@@ -243,12 +243,12 @@ public class Button extends BoxComponent implements IconSupport {
   }
 
   /**
-   * Returns the button's text.
+   * Returns the button's HTML content.
    * 
-   * @return the button text
+   * @return the button html content
    */
-  public String getText() {
-    return text;
+  public String getHtml() {
+    return html;
   }
 
   /**
@@ -338,7 +338,7 @@ public class Button extends BoxComponent implements IconSupport {
         el().removeStyleName(baseStyle + "-text-icon", baseStyle + "-icon", baseStyle + "-noicon");
       }
       el().addStyleName(
-          (icon != null ? (!Util.isEmptyString(text) ? " " + baseStyle + "-text-icon" : " " + baseStyle + "-icon")
+          (icon != null ? (!Util.isEmptyString(html) ? " " + baseStyle + "-text-icon" : " " + baseStyle + "-icon")
               : " " + baseStyle + "-noicon"));
       Element e = null;
 
@@ -461,9 +461,18 @@ public class Button extends BoxComponent implements IconSupport {
    * @param text the new text
    */
   public void setText(String text) {
-    this.text = text;
+    setHtml(El.toSafeHTML(text));
+  }
+
+  /**
+   * Sets the button's text as HTML.
+   * 
+   * @param html the new html content
+   */
+  public void setHtml(String html) {
+    this.html = html;
     if (rendered) {
-      buttonEl.update(Util.isEmptyString(text) ? "&#160;" : text);
+      buttonEl.update(Util.isEmptyString(html) ? "&#160;" : html);
       setIcon(icon);
     }
   }
@@ -534,9 +543,9 @@ public class Button extends BoxComponent implements IconSupport {
   protected void autoWidth() {
     if (rendered && width == null && buttonEl != null) {
       int w = 0;
-      if (!Util.isEmptyString(text)) {
+      if (!Util.isEmptyString(html)) {
         TextMetrics.get().bind(buttonEl);
-        w = TextMetrics.get().getWidth(text);
+        w = TextMetrics.get().getWidth(html);
         w += buttonEl.getFrameWidth("lr");
         if (GXT.isGecko || GXT.isWebKit) {
           w += 6;
@@ -548,14 +557,14 @@ public class Button extends BoxComponent implements IconSupport {
 
       int adj = 0;
       if (GXT.isAriaEnabled()) {
-        adj += text == null ? 10 : 25;
+        adj += html == null ? 10 : 25;
       }
 
       w += adj;
-
+      
       if (w < minWidth - 6) {
         buttonEl.setWidth(minWidth - 6, true);
-      } else {
+      } else if (w > 0) {
         buttonEl.setWidth(w, true);
       }
     }
@@ -629,7 +638,7 @@ public class Button extends BoxComponent implements IconSupport {
 
   @Override
   protected void onDisable() {
-    if (!GXT.isIE6 || text == null) {
+    if (!GXT.isIE6 || html == null) {
       addStyleName(disabledStyle);
     }
     removeStyleName(baseStyle + "-over");
@@ -724,7 +733,7 @@ public class Button extends BoxComponent implements IconSupport {
     }
 
     setElement(
-        template.create((text != null && text.length() > 0) ? text : "&nbsp;", getType(), baseStyle + "-"
+        template.create((html != null && html.length() > 0) ? html : "&nbsp;", getType(), baseStyle + "-"
             + scale.name().toLowerCase() + " " + baseStyle + "-icon-" + scale.name().toLowerCase() + "-"
             + iconAlign.name().toLowerCase(), getMenuClass(), baseStyle), target, index);
 
@@ -757,7 +766,7 @@ public class Button extends BoxComponent implements IconSupport {
     super.onResize(width, height);
     int adj = 0;
     if (GXT.isAriaEnabled()) {
-      adj += text == null ? 10 : 25;
+      adj += html == null ? 10 : 25;
     }
     buttonEl.setSize(adj + width - 6, height - 6, true);
   }

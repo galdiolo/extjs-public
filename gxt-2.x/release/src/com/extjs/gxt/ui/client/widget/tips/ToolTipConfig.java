@@ -1,12 +1,13 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.tips;
+ package com.extjs.gxt.ui.client.widget.tips;
 
+import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.util.Params;
 
@@ -28,8 +29,8 @@ public class ToolTipConfig {
   private Params params;
   private int showDelay = 500;
   private Template template;
-  private String text;
-  private String title;
+  private String html;
+  private String titleHtml;
   private boolean trackMouse;
   private boolean closeable;
 
@@ -43,21 +44,21 @@ public class ToolTipConfig {
   /**
    * Creates a new tool tip config with the given text.
    * 
-   * @param text the tool tip text
+   * @param html the tool tip text as HTML
    */
-  public ToolTipConfig(String text) {
-    this.setText(text);
+  public ToolTipConfig(String html) {
+    this.setHtml(html);
   }
 
   /**
    * Creates a new tool tip config with the given title and text.
    * 
-   * @param title the tool tip title
-   * @param text the tool tip text
+   * @param titleHtml the tool tip title
+   * @param html the tool tip text
    */
-  public ToolTipConfig(String title, String text) {
-    this.setTitle(title);
-    this.setText(text);
+  public ToolTipConfig(String titleHtml, String html) {
+    this.setTitleHtml(titleHtml);
+    this.setHtml(html);
   }
 
   /**
@@ -151,12 +152,12 @@ public class ToolTipConfig {
   }
 
   /**
-   * Returns the tool tip text.
+   * Returns the tool tip text as HTML.
    * 
-   * @return the text
+   * @return the text as HTML
    */
-  public String getText() {
-    return text;
+  public String getHtml() {
+    return html;
   }
 
   /**
@@ -164,8 +165,8 @@ public class ToolTipConfig {
    * 
    * @return the title
    */
-  public String getTitle() {
-    return title;
+  public String getTitleHtml() {
+    return titleHtml;
   }
 
   /**
@@ -238,7 +239,7 @@ public class ToolTipConfig {
 
   /**
    * True to anchor the tooltip to the target element, false to anchor it
-   * relative to the mouse coordinates (defaults to true). 
+   * relative to the mouse coordinates (defaults to true).
    * 
    * @param anchorToTarget true to anchor the tooltip to the target element
    */
@@ -346,8 +347,8 @@ public class ToolTipConfig {
 
   /**
    * A optional template to be used to render the tool tip. The {@link #params}
-   * will be applied to the template. If specified, {@link #title} and
-   * {@link #text} will be added to the params before being applied to the
+   * will be applied to the template. If specified, {@link #titleHtml} and
+   * {@link #html} will be added to the params before being applied to the
    * template.
    * 
    * @param template the template
@@ -357,21 +358,39 @@ public class ToolTipConfig {
   }
 
   /**
-   * The tool tip text.
+   * Sets the tool tips text as HTML.
+   * 
+   * @param html the text as HTML
+   */
+  public void setHtml(String html) {
+    this.html = html;
+  }
+
+  /**
+   * Sets the tool tips text.
    * 
    * @param text the text
    */
   public void setText(String text) {
-    this.text = text;
+    setHtml(El.toSafeHTML(text));
   }
 
   /**
-   * Sets the tool tip title.
+   * Sets the tool tips title as text.
    * 
-   * @param title the title
+   * @param title the title as text
    */
   public void setTitle(String title) {
-    this.title = title;
+    setTitleHtml(El.toSafeHTML(title));
+  }
+
+  /**
+   * Sets the tool tip title as HTML.
+   * 
+   * @param titleHtml the title as HTML
+   */
+  public void setTitleHtml(String titleHtml) {
+    this.titleHtml = titleHtml;
   }
 
   /**

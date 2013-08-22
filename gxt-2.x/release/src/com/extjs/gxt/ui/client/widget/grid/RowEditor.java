@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.grid;
+ package com.extjs.gxt.ui.client.widget.grid;
 
 import java.util.Map;
 
@@ -662,7 +662,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       Field<?> f = (Field<?>) getItem(i);
       if (!f.isValid(true)) {
         sb.append("<li><b>");
-        sb.append(grid.getColumnModel().getColumn(i).getHeader());
+        sb.append(grid.getColumnModel().getColumn(i).getHeaderHtml());
         sb.append("</b>: ");
         sb.append(f.getErrorMessage());
         sb.append("</li>");
@@ -830,24 +830,25 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   }
 
   protected void positionButtons() {
+    if (isVisible()) {
+      GridView view = grid.getView();
+      int scroll = view.getScrollState().x;
+      int mainBodyWidth = view.scroller.getWidth(true);
+      int h = el().getClientHeight();
+      if (btns != null) {
 
-    GridView view = grid.getView();
-    int scroll = view.getScrollState().x;
-    int mainBodyWidth = view.scroller.getWidth(true);
-    int h = el().getClientHeight();
-    if (btns != null) {
+        int columnWidth = view.getTotalWidth();
+        int width = columnWidth < mainBodyWidth ? columnWidth : mainBodyWidth;
 
-      int columnWidth = view.getTotalWidth();
-      int width = columnWidth < mainBodyWidth ? columnWidth : mainBodyWidth;
+        int bw = btns.getWidth(true);
+        this.btns.setPosition((width / 2) - (bw / 2) + scroll, h - 2);
+      }
 
-      int bw = btns.getWidth(true);
-      this.btns.setPosition((width / 2) - (bw / 2) + scroll, h - 2);
-    }
-
-    if (toolTipAlignWidget != null) {
-      toolTipAlignWidget.setStyleAttribute("position", "absolute");
-      toolTipAlignWidget.setSize(mainBodyWidth - (view.scroller.isScrollableY() ? XDOM.getScrollBarWidth() : 0), h);
-      toolTipAlignWidget.setPosition(scroll, Style.DEFAULT);
+      if (toolTipAlignWidget != null) {
+        toolTipAlignWidget.setStyleAttribute("position", "absolute");
+        toolTipAlignWidget.setSize(mainBodyWidth - (view.scroller.isScrollableY() ? XDOM.getScrollBarWidth() : 0), h);
+        toolTipAlignWidget.setPosition(scroll, Style.DEFAULT);
+      }
     }
   }
 
@@ -862,7 +863,7 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
       tooltip.setMaxWidth(600);
     }
     ToolTipConfig config = tooltip.getToolTipConfig();
-    config.setText(msg);
+    config.setHtml(msg);
     tooltip.update(config);
     tooltip.enable();
     if (!tooltip.isAttached()) {
@@ -920,6 +921,6 @@ public class RowEditor<M extends ModelData> extends ContentPanel implements Comp
   }
 
   private native void clearParent(Widget parent) /*-{
-		parent.@com.google.gwt.user.client.ui.Widget::parent = null;
-  }-*/;
+                                                 parent.@com.google.gwt.user.client.ui.Widget::parent = null;
+                                                 }-*/;
 }

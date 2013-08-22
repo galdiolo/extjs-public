@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.util;
+ package com.extjs.gxt.ui.client.util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,19 +28,9 @@ public class Params {
   private List<Object> values;
   private Map<String, Object> mapValues;
 
-  /**
-   * True if the parameters are a list of values.
-   * 
-   * @deprecated see {@link #isList()}.
-   */
-  public boolean isList = false;
-  
-  /**
-   * True if the parameters are a map of key / value pairs.
-   * 
-   * @deprecated see {@link #isMap()}
-   */
-  public boolean isMap = false;
+  private boolean isList = false;
+
+  private boolean isMap = false;
 
   /**
    * Creates a new params instance.

@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.grid.filters;
+ package com.extjs.gxt.ui.client.widget.grid.filters;
 
 import java.util.List;
 
@@ -111,10 +111,10 @@ public class BooleanFilter extends Filter {
   public void setMessages(FilterMessages messages) {
     super.setMessages(messages);
     if (yesItem != null) {
-      yesItem.setText(getMessages().getYesText());
+      yesItem.setHtml(getMessages().getYesText());
     }
     if (noItem != null) {
-      noItem.setText(getMessages().getNoText());
+      noItem.setHtml(getMessages().getNoText());
     }
   }
 

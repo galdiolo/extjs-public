@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.binding;
+ package com.extjs.gxt.samples.client.examples.binding;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,6 @@ import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
-import com.extjs.gxt.ui.client.widget.table.NumberCellRenderer;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Element;
@@ -54,7 +53,7 @@ public class GridStoreBindingExample extends LayoutContainer {
 
     ContentPanel cp = new ContentPanel();
 
-    cp.setHeading("Form Bindings");
+    cp.setHeadingHtml("Form Bindings");
     cp.setFrame(true);
     cp.setSize(800, 400);
     cp.setLayout(new RowLayout(Orientation.HORIZONTAL));
@@ -131,8 +130,6 @@ public class GridStoreBindingExample extends LayoutContainer {
   private Grid<Stock> createGrid() {
     final NumberFormat currency = NumberFormat.getCurrencyFormat();
     final NumberFormat number = NumberFormat.getFormat("0.00");
-    final NumberCellRenderer<Grid<Stock>> numberRenderer = new NumberCellRenderer<Grid<Stock>>(
-        currency);
 
     GridCellRenderer<Stock> change = new GridCellRenderer<Stock>() {
 
@@ -150,7 +147,8 @@ public class GridStoreBindingExample extends LayoutContainer {
     GridCellRenderer<Stock> gridNumber = new GridCellRenderer<Stock>() {
       public String render(Stock model, String property, ColumnData config, int rowIndex,
           int colIndex, ListStore<Stock> store, Grid<Stock> grid) {
-        return numberRenderer.render(null, property, model.get(property));
+        Number value = model.<Number>get(property);
+        return value == null ? null : currency.format(model.<Number>get(property));
       }
     };
 
@@ -158,19 +156,19 @@ public class GridStoreBindingExample extends LayoutContainer {
 
     ColumnConfig column = new ColumnConfig();
     column.setId("name");
-    column.setHeader("Company");
+    column.setHeaderHtml("Company");
     column.setWidth(200);
     configs.add(column);
 
     column = new ColumnConfig();
     column.setId("symbol");
-    column.setHeader("Symbol");
+    column.setHeaderHtml("Symbol");
     column.setWidth(75);
     configs.add(column);
 
     column = new ColumnConfig();
     column.setId("last");
-    column.setHeader("Last");
+    column.setHeaderHtml("Last");
     column.setAlignment(HorizontalAlignment.RIGHT);
     column.setWidth(75);
     column.setRenderer(gridNumber);

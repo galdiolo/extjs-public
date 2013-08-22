@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.core;
+ package com.extjs.gxt.samples.client.examples.core;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -68,7 +68,7 @@ public class TemplateExample extends LayoutContainer {
     vp.setSpacing(10);
 
     final ContentPanel panel = new ContentPanel();
-    panel.setHeading("Basic Template");
+    panel.setHeadingHtml("Basic Template");
     panel.setWidth(300);
     panel.setBodyStyleName("pad-text");
 
@@ -85,7 +85,7 @@ public class TemplateExample extends LayoutContainer {
     panel.setTopComponent(toolbar);
 
     final ContentPanel xpanel = new ContentPanel();
-    xpanel.setHeading("XTemplate Playground");
+    xpanel.setHeadingHtml("XTemplate Playground");
     xpanel.setWidth(300);
     xpanel.setBodyStyleName("pad-text");
 
@@ -102,7 +102,7 @@ public class TemplateExample extends LayoutContainer {
     xpanel.setTopComponent(toolBar);
     
     final ContentPanel cpanel = new ContentPanel();
-    cpanel.setHeading("XTemplate Test");
+    cpanel.setHeadingHtml("XTemplate Test");
     cpanel.setWidth(500);
     cpanel.setBodyStyleName("pad-text");
     

@@ -1,12 +1,13 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.menu;
+ package com.extjs.gxt.ui.client.widget.menu;
 
+import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.util.Util;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -16,19 +17,24 @@ import com.google.gwt.user.client.Element;
  */
 public class HeaderMenuItem extends Item {
   private String itemStyle = "x-menu-text";
-  private String text;
+  private String html;
 
   /**
-   * Creates a new text menu item.
+   * Creates a new header menu item.
    */
   public HeaderMenuItem() {
     super();
     setHideOnClick(false);
   }
 
-  public HeaderMenuItem(String text) {
+  /**
+   * Creates a new header menu item.
+   * 
+   * @param html the header text as HTML
+   */
+  public HeaderMenuItem(String html) {
     this();
-    this.text = text;
+    this.html = html;
   }
 
   /**
@@ -36,8 +42,8 @@ public class HeaderMenuItem extends Item {
    * 
    * @return the item text
    */
-  public String getText() {
-    return text;
+  public String getHtml() {
+    return html;
   }
 
   /**
@@ -46,10 +52,20 @@ public class HeaderMenuItem extends Item {
    * @param text the item's text
    */
   public void setText(String text) {
-    this.text = text;
+    setHtml(El.toSafeHTML(text));
+  }
+
+  /**
+   * Sets the item's text as HTML.
+   * 
+   * @param html html the text as HTML
+   */
+  public void setHtml(String html) {
+    this.html = html;
     if (rendered) {
-      el().update(Util.isEmptyString(text) ? "&#160;" : text);
+      el().update(Util.isEmptyString(html) ? "&#160;" : html);
     }
+
   }
 
   @Override
@@ -58,7 +74,7 @@ public class HeaderMenuItem extends Item {
     span.setClassName(itemStyle);
     setElement(span, target, index);
     super.onRender(target, index);
-    setText(text);
+    setHtml(html);
   }
 
 }

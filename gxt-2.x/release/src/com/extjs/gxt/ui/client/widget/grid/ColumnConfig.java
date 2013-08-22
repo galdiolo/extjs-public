@@ -1,13 +1,14 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.grid;
+ package com.extjs.gxt.ui.client.widget.grid;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseObservable;
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -34,7 +35,7 @@ public class ColumnConfig extends BaseObservable {
   private String toolTip;
   private String style;
   private String dataIndex;
-  private String header;
+  private String headerHtml;
   private boolean sortable = true;
   private boolean fixed;
   private boolean resizable = true;
@@ -78,7 +79,7 @@ public class ColumnConfig extends BaseObservable {
   public ColumnConfig(String id, String name, int width) {
     this.id = id;
     this.width = width;
-    this.header = name;
+    this.headerHtml = name;
   }
 
   /**
@@ -130,12 +131,12 @@ public class ColumnConfig extends BaseObservable {
   }
 
   /**
-   * Returns the column's header text.
+   * Returns the column's header text as HTML.
    * 
    * @return the header text
    */
-  public String getHeader() {
-    return header;
+  public String getHeaderHtml() {
+    return headerHtml;
   }
 
   /**
@@ -333,12 +334,21 @@ public class ColumnConfig extends BaseObservable {
   }
 
   /**
+   * Sets the column's header text as HTML.
+   * 
+   * @param headerHtml the header text as HTML
+   */
+  public void setHeaderHtml(String headerHtml) {
+    this.headerHtml = headerHtml;
+  }
+
+  /**
    * Sets the column's header text.
    * 
-   * @param header the header text
+   * @param headerText the header text
    */
-  public void setHeader(String header) {
-    this.header = header;
+  public void setHeaderText(String headerText) {
+    setHeaderHtml(El.toSafeHTML(headerText));
   }
 
   /**
@@ -448,7 +458,7 @@ public class ColumnConfig extends BaseObservable {
    */
   public void setWidget(Widget widget, String header) {
     this.widget = widget;
-    this.header = header;
+    this.headerHtml = header;
   }
 
   /**

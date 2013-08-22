@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.grid;
+ package com.extjs.gxt.ui.client.widget.grid;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -778,7 +778,7 @@ public class GridView extends BaseObservable {
 
     if (cm.isSortable(colIndex)) {
       MenuItem item = new MenuItem();
-      item.setText(GXT.MESSAGES.gridView_sortAscText());
+      item.setHtml(GXT.MESSAGES.gridView_sortAscText());
       item.setIcon(getImages().getSortAsc());
       item.addSelectionListener(new SelectionListener<MenuEvent>() {
         public void componentSelected(MenuEvent ce) {
@@ -789,7 +789,7 @@ public class GridView extends BaseObservable {
       menu.add(item);
 
       item = new MenuItem();
-      item.setText(GXT.MESSAGES.gridView_sortDescText());
+      item.setHtml(GXT.MESSAGES.gridView_sortDescText());
       item.setIcon(getImages().getSortDesc());
       item.addSelectionListener(new SelectionListener<MenuEvent>() {
         public void componentSelected(MenuEvent ce) {
@@ -800,7 +800,7 @@ public class GridView extends BaseObservable {
     }
 
     MenuItem columns = new MenuItem();
-    columns.setText(GXT.MESSAGES.gridView_columnsText());
+    columns.setHtml(GXT.MESSAGES.gridView_columnsText());
     columns.setIcon(getImages().getColumns());
     columns.setData("gxt-columns", "true");
 
@@ -814,7 +814,7 @@ public class GridView extends BaseObservable {
       final int fcol = i;
       final CheckMenuItem check = new CheckMenuItem();
       check.setHideOnClick(false);
-      check.setText(cm.getColumnHeader(i));
+      check.setHtml(cm.getColumnHeader(i));
       check.setChecked(!cm.isHidden(i));
       check.addSelectionListener(new SelectionListener<MenuEvent>() {
         public void componentSelected(MenuEvent ce) {
@@ -995,7 +995,7 @@ public class GridView extends BaseObservable {
 
   protected void fitColumns(boolean preventRefresh, boolean onlyExpand, int omitColumn) {
     int tw = cm.getTotalWidth(false);
-    double aw = grid.el().getWidth(true) - getScrollAdjust();
+    int aw = grid.el().getWidth(true) - getScrollAdjust();
     if (aw <= 0) {
       aw = grid.el().getStyleWidth();
     }
@@ -1009,14 +1009,6 @@ public class GridView extends BaseObservable {
 
     if (extra == 0) {
       return;
-    }
-
-    int vc = cm.getColumnCount(true);
-    int ac = vc - (omitColumn != -1 ? 1 : 0);
-
-    if (ac == 0) {
-      ac = 1;
-      omitColumn = -1;
     }
 
     int colCount = cm.getColumnCount();
@@ -1033,12 +1025,26 @@ public class GridView extends BaseObservable {
       }
     }
 
-    double frac = (aw - cm.getTotalWidth()) / width;
+    double frac = ((double) (aw - cm.getTotalWidth())) / width;
     while (cols.size() > 0) {
       w = cols.pop();
       int i = cols.pop();
       int ww = Math.max(grid.getMinColumnWidth(), (int) Math.floor(w + w * frac));
       cm.setColumnWidth(i, ww, true);
+    }
+
+    int adj = aw - cm.getTotalWidth();
+    if (adj != 0) {
+      int ac = cm.getColumnCount() - 1;
+      while ((ac == omitColumn || cm.isHidden(ac) || cm.isFixed(ac)) && ac >= 0) {
+        ac--;
+      }
+      if (ac > 0) {
+        w = cm.getColumnWidth(ac);
+        w += adj;
+
+        cm.setColumnWidth(ac, w, true);
+      }
     }
 
     if (!preventRefresh) {
@@ -1082,8 +1088,7 @@ public class GridView extends BaseObservable {
   protected String getColumnStyle(int colIndex, boolean isHeader) {
     String style = !isHeader ? cm.getColumnStyle(colIndex) : "";
     if (style == null) style = "";
-    int adj = GXT.isWebKit ? 2 : 0;
-    style += "width:" + (getColumnWidth(colIndex) + adj) + "px;";
+    style += "width:" + (getColumnWidth(colIndex)) + "px;";
     if (cm.isHidden(colIndex)) {
       style += "display:none;";
     }
@@ -1096,7 +1101,7 @@ public class GridView extends BaseObservable {
 
   protected int getColumnWidth(int col) {
     int w = cm.getColumnWidth(col);
-    return (GXT.isBorderBox ? w : (w - borderWidth > 0 ? w - borderWidth : 0));
+    return (El.isBorderBoxTableFixed() ? w : (w - borderWidth > 0 ? w - borderWidth : 0));
   }
 
   protected int getOffsetWidth() {
@@ -1585,7 +1590,7 @@ public class GridView extends BaseObservable {
   }
 
   protected void onHeaderChange(int column, String text) {
-    header.setHeader(column, text);
+    header.setHeaderHtml(column, text);
   }
 
   protected void onHeaderClick(Grid<ModelData> grid, int column) {

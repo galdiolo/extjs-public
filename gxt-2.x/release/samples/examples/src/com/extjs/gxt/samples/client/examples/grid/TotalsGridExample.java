@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.grid;
+ package com.extjs.gxt.samples.client.examples.grid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +66,7 @@ public class TotalsGridExample extends LayoutContainer {
     estimate.setRenderer(new GridCellRenderer<Task>() {
       public String render(Task model, String property, ColumnData config, int rowIndex, int colIndex,
           ListStore<Task> store, Grid<Task> grid) {
-        return model.get(property) + " hours";
+        return model.get(property, 0.0) + " hours";
       }
     });
     estimate.setSummaryType(SummaryType.SUM);
@@ -78,7 +78,14 @@ public class TotalsGridExample extends LayoutContainer {
     estimate.setEditor(new CellEditor(new NumberField()));
 
     SummaryColumnConfig<Double> rate = new SummaryColumnConfig<Double>("rate", "Rate", 20);
-    rate.setNumberFormat(NumberFormat.getCurrencyFormat());
+    rate.setRenderer(new GridCellRenderer<Task>() {
+      public String render(Task model, String property, ColumnData config, int rowIndex, int colIndex,
+          ListStore<Task> store, Grid<Task> grid) {
+        Double v = model.getRate();
+        return NumberFormat.getCurrencyFormat().format(v);
+      }
+    });
+
     rate.setSummaryFormat(NumberFormat.getCurrencyFormat());
     rate.setSummaryType(SummaryType.AVG);
     rate.setAlignment(HorizontalAlignment.RIGHT);
@@ -129,7 +136,7 @@ public class TotalsGridExample extends LayoutContainer {
     grid.getView().setShowDirtyCells(false);
 
     ContentPanel panel = new ContentPanel();
-    panel.setHeading("Sponsored Projects");
+    panel.setHeadingHtml("Sponsored Projects");
     panel.setIcon(Resources.ICONS.table());
     panel.setCollapsible(true);
     panel.setFrame(true);

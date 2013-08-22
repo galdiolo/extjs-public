@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.button;
+ package com.extjs.gxt.ui.client.widget.button;
 
 import com.extjs.gxt.ui.client.util.TextMetrics;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
@@ -41,7 +41,7 @@ public class ButtonGroup extends ContentPanel {
     if (bodyWidth > 0) { // display none
       TextMetrics.get().bind(head.el().selectNode("span"));
       int frameWidth = getFrameWidth();
-      int tw = TextMetrics.get().getWidth(getHeading()) + frameWidth;
+      int tw = TextMetrics.get().getWidth(getHeadingHtml()) + frameWidth;
       if (tw > bodyWidth) {
         bodyWidth = tw;
       }
@@ -53,7 +53,7 @@ public class ButtonGroup extends ContentPanel {
   @Override
   protected void onRender(Element parent, int pos) {
     super.onRender(parent, pos);
-    if (getHeading() == null || (getHeading() != null && getHeading().equals("&#160;"))) {
+    if (getHeadingHtml() == null || (getHeadingHtml() != null && getHeadingHtml().equals("&#160;"))) {
       addStyleName("x-btn-group-notitle");
     }
   }

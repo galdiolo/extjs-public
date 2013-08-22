@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.grid;
+ package com.extjs.gxt.samples.client.examples.grid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,6 @@ import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
 import com.extjs.gxt.ui.client.widget.grid.HeaderGroupConfig;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.extjs.gxt.ui.client.widget.table.NumberCellRenderer;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Element;
@@ -39,7 +38,6 @@ public class ColumnGroupingExample extends LayoutContainer {
 
   private NumberFormat currency = NumberFormat.getCurrencyFormat();
   private NumberFormat number = NumberFormat.getFormat("0.00");
-  private NumberCellRenderer<Grid<Stock>> numberRenderer;
   private GridCellRenderer<Stock> change;
   private GridCellRenderer<Stock> gridNumber;
   private VerticalPanel vp;
@@ -47,7 +45,6 @@ public class ColumnGroupingExample extends LayoutContainer {
   @Override
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
-    numberRenderer = new NumberCellRenderer<Grid<Stock>>(currency);
     change = new GridCellRenderer<Stock>() {
       public String render(Stock model, String property, ColumnData config, int rowIndex, int colIndex,
           ListStore<Stock> store, Grid<Stock> grid) {
@@ -60,7 +57,8 @@ public class ColumnGroupingExample extends LayoutContainer {
     gridNumber = new GridCellRenderer<Stock>() {
       public String render(Stock model, String property, ColumnData config, int rowIndex, int colIndex,
           ListStore<Stock> store, Grid<Stock> grid) {
-        return numberRenderer.render(null, property, model.get(property));
+        Number value = model.<Number>get(property);
+        return value == null ? null : currency.format(model.<Number>get(property));
       }
     };
 
@@ -78,19 +76,19 @@ public class ColumnGroupingExample extends LayoutContainer {
 
     ColumnConfig column = new ColumnConfig();
     column.setId("name");
-    column.setHeader("Company");
+    column.setHeaderHtml("Company");
     column.setWidth(200);
     configs.add(column);
 
     column = new ColumnConfig();
     column.setId("symbol");
-    column.setHeader("Symbol");
+    column.setHeaderHtml("Symbol");
     column.setWidth(100);
     configs.add(column);
 
     column = new ColumnConfig();
     column.setId("last");
-    column.setHeader("Last");
+    column.setHeaderHtml("Last");
     column.setAlignment(HorizontalAlignment.RIGHT);
     column.setWidth(75);
     column.setRenderer(gridNumber);
@@ -114,7 +112,7 @@ public class ColumnGroupingExample extends LayoutContainer {
       column.setWidget(btn, "Last Updated");
     } else {
       column.setAlignment(HorizontalAlignment.RIGHT);
-      column.setHeader("Last Updated");
+      column.setHeaderHtml("Last Updated");
     }
 
     column.setDateTimeFormat(DateTimeFormat.getFormat("MM/dd/yyyy"));
@@ -149,7 +147,7 @@ public class ColumnGroupingExample extends LayoutContainer {
     ContentPanel cp = new ContentPanel();
     cp.setBodyBorder(false);
     cp.setIcon(Resources.ICONS.table());
-    cp.setHeading(widget ? "Column Grouping with Widget" : "Column Grouping");
+    cp.setHeadingHtml(widget ? "Column Grouping with Widget" : "Column Grouping");
     cp.setButtonAlign(HorizontalAlignment.CENTER);
     cp.setLayout(new FitLayout());
     cp.setSize(600, 300);

@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget;
+ package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.aria.FocusFrame;
@@ -252,10 +252,10 @@ public class Slider extends BoxComponent {
    * Sets the tool tip message (defaults to '{0}'). "{0} will be substituted
    * with the current slider value.
    * 
-   * @param message the tool tip message
+   * @param htmlMessage the tool tip message as an html string
    */
-  public void setMessage(String message) {
-    this.message = message;
+  public void setMessage(String htmlMessage) {
+    this.message = htmlMessage;
   }
 
   /**
@@ -604,7 +604,7 @@ public class Slider extends BoxComponent {
 
     if (useTip) {
       tip = new Tip();
-      tip.setHeading("");
+      tip.setHeadingHtml("");
       tip.setMinWidth(0);
     }
   }

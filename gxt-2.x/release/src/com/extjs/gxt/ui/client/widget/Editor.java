@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget;
+ package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.AutoSizeMode;
@@ -15,9 +15,11 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.KeyNav;
+import com.extjs.gxt.ui.client.widget.form.CheckBox;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.TriggerField;
+import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -220,17 +222,6 @@ public class Editor extends BoxComponent {
   }
 
   /**
-   * Returns true of the editor reverts the value to the start value on invalid.
-   * 
-   * @return true if the edit is canceled
-   * 
-   * @deprecated duplicate method see {@link #isRevertInvalid()}
-   */
-  public boolean isCancelOnInvalid() {
-    return revertInvalid;
-  }
-
-  /**
    * Returns true if complete on enter is enabled.
    * 
    * @return the complete on enter state
@@ -340,18 +331,6 @@ public class Editor extends BoxComponent {
    */
   public void setCancelOnEsc(boolean cancelOnEsc) {
     this.cancelOnEsc = cancelOnEsc;
-  }
-
-  /**
-   * True to automatically revert the field value and cancel the edit when the
-   * user completes an edit and the field validation fails (defaults to true).
-   * 
-   * @param cancelOnInvalid true to cancel on invalid
-   * 
-   * @deprecated duplicate method see {@link #setRevertInvalid(boolean)}
-   */
-  public void setCancelOnInvalid(boolean cancelOnInvalid) {
-    this.revertInvalid = cancelOnInvalid;
   }
 
   /**
@@ -586,15 +565,30 @@ public class Editor extends BoxComponent {
           onBlur(fe);
         } else if (fe.getType() == KeyNav.getKeyEvent() && swallowKeys) {
           fe.cancelBubble();
+        } else if (fe.getType() == Events.OnMouseDown) {
+          onMouseDown(fe);
         }
       }
     };
 
     field.addListener(Events.SpecialKey, listener);
     field.addListener(Events.Blur, listener);
+    field.addListener(Events.OnMouseDown, listener);
     field.addListener(KeyNav.getKeyEvent(), listener);
 
     field.show();
+  }
+
+  protected void onMouseDown(FieldEvent fe) {
+    if (field instanceof CheckBox && !GXT.isIE) {
+      // blur is firing before check box is changed
+      // mouse down on input fires before blur so stop event to prevent blur
+      Element target = fe.getEvent().getEventTarget().cast();
+      InputElement input = field.el().selectNode("input").dom.cast();
+      if (target == input.cast()) {
+        fe.stopEvent();
+      }
+    }
   }
 
   @Override
@@ -629,7 +623,7 @@ public class Editor extends BoxComponent {
   }
 
   protected native void triggerBlur(TriggerField field) /*-{
-    field.@com.extjs.gxt.ui.client.widget.form.TriggerField::triggerBlur(Lcom/extjs/gxt/ui/client/event/ComponentEvent;)(null);
+		field.@com.extjs.gxt.ui.client.widget.form.TriggerField::triggerBlur(Lcom/extjs/gxt/ui/client/event/ComponentEvent;)(null);
   }-*/;
 
   private void hide(boolean remainVisible) {

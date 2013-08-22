@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.form;
+ package com.extjs.gxt.ui.client.widget.form;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
@@ -99,7 +99,7 @@ public class FieldSet extends LayoutContainer {
   private boolean collapsible;
   private Element heading;
   private El legend;
-  private String text;
+  private String html;
 
   /**
    * Creates a new fieldset.
@@ -154,8 +154,8 @@ public class FieldSet extends LayoutContainer {
    * 
    * @return the heading
    */
-  public String getHeading() {
-    return text;
+  public String getHeadingHtml() {
+    return html;
   }
 
   @Override
@@ -249,14 +249,14 @@ public class FieldSet extends LayoutContainer {
   }
 
   /**
-   * Sets the panel heading.
+   * Sets the panel heading as HTML.
    * 
-   * @param text the heading text
+   * @param html the heading text as HTML
    */
-  public void setHeading(String text) {
-    this.text = text;
+  public void setHeadingHtml(String html) {
+    this.html = html;
     if (rendered) {
-      heading.setInnerHTML(text);
+      heading.setInnerHTML(html);
     }
   }
 
@@ -389,7 +389,7 @@ public class FieldSet extends LayoutContainer {
       checkbox.setDefaultChecked(!collapsed);
       checkbox.setChecked(!collapsed);
       if (GXT.isAriaEnabled()) {
-        checkbox.setTitle("Expand " + text);
+        checkbox.setTitle("Expand " + html);
       }
     } else if (!checkboxToggle && collapsible) {
       collapseBtn = new ToolButton("x-tool-toggle");
@@ -401,7 +401,7 @@ public class FieldSet extends LayoutContainer {
       collapseBtn.render(legend.dom);
       collapseBtn.getAriaSupport().setRole("checkbox");
       if (GXT.isAriaEnabled()) {
-        collapseBtn.setTitle("Expand " + text);
+        collapseBtn.setTitle("Expand " + html);
       }
       ComponentHelper.setParent(this, collapseBtn);
     }
@@ -413,8 +413,8 @@ public class FieldSet extends LayoutContainer {
 
     body = el().appendChild(DOM.createDiv());
 
-    if (text != null) {
-      setHeading(text);
+    if (html != null) {
+      setHeadingHtml(html);
     }
 
     if (collapsed) {
@@ -450,7 +450,7 @@ public class FieldSet extends LayoutContainer {
 
   protected void updateIconTitles() {
     if (GXT.isAriaEnabled()) {
-      String txt = "Expand " + text;
+      String txt = "Expand " + html;
       if (checkbox != null) {
         checkbox.setTitle(txt);
       }

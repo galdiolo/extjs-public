@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.windows;
+ package com.extjs.gxt.samples.client.examples.windows;
 
 import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
@@ -39,7 +39,7 @@ public class AccordionWindowExample extends LayoutContainer {
 
     final Window complex = new Window();
     complex.setMaximizable(true);
-    complex.setHeading("Accordion Window");
+    complex.setHeadingHtml("Accordion Window");
     complex.setWidth(200);
     complex.setHeight(350);
 
@@ -64,7 +64,7 @@ public class AccordionWindowExample extends LayoutContainer {
 
     ContentPanel cp = new ContentPanel();
     cp.setAnimCollapse(false);
-    cp.setHeading("Online Users");
+    cp.setHeadingHtml("Online Users");
     cp.setLayout(new FitLayout());
     cp.getHeader().addTool(new ToolButton("x-tool-refresh"));
 
@@ -107,21 +107,21 @@ public class AccordionWindowExample extends LayoutContainer {
 
     cp = new ContentPanel();
     cp.setAnimCollapse(false);
-    cp.setHeading("Settings");
+    cp.setHeadingHtml("Settings");
     cp.setBodyStyleName("pad-text");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     complex.add(cp);
 
     cp = new ContentPanel();
     cp.setAnimCollapse(false);
-    cp.setHeading("Stuff");
+    cp.setHeadingHtml("Stuff");
     cp.setBodyStyleName("pad-text");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     complex.add(cp);
 
     cp = new ContentPanel();
     cp.setAnimCollapse(false);
-    cp.setHeading("More Stuff");
+    cp.setHeadingHtml("More Stuff");
     cp.setBodyStyleName("pad-text");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     complex.add(cp);

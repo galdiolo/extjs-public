@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget;
+ package com.extjs.gxt.ui.client.widget;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -97,8 +97,6 @@ public class AriaSupport {
     return states;
   }
 
-
-
   /**
    * Returns true if the component is a presentation element.
    * 
@@ -119,7 +117,7 @@ public class AriaSupport {
       c.setAriaState("aria-describedby", describedBy);
     }
   }
-  
+
   /**
    * Sets the ARIA description. This method creates a hidden div, assigns it an
    * id and then sets the aria-describedby value. Should not be called if
@@ -137,13 +135,11 @@ public class AriaSupport {
       div.setLeft(-10000);
       div.setTop(-10000);
       div.setId(id);
-      div.setInnerHtml(description);
+      div.dom.setInnerText(description);
       XDOM.getBody().appendChild(div.dom);
       c.setAriaState("aria-describedby", id);
     }
   }
-
-
 
   /**
    * Sets the ARIA label attribute on the component.

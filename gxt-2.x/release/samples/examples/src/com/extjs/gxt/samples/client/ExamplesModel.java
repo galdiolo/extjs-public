@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client;
+ package com.extjs.gxt.samples.client;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +70,7 @@ import com.extjs.gxt.samples.client.examples.misc.DatePickerExample;
 import com.extjs.gxt.samples.client.examples.misc.DraggableExample;
 import com.extjs.gxt.samples.client.examples.misc.FxExample;
 import com.extjs.gxt.samples.client.examples.misc.ResizableExample;
+import com.extjs.gxt.samples.client.examples.misc.SafeHtmlExample;
 import com.extjs.gxt.samples.client.examples.misc.SliderExample;
 import com.extjs.gxt.samples.client.examples.misc.ToolTipsExample;
 import com.extjs.gxt.samples.client.examples.model.Category;
@@ -255,6 +256,7 @@ public class ExamplesModel extends BaseTreeModel {
     misc.add("Slider", new SliderExample(), g.slider().getHTML());
     misc.add("Custom Slider", new CustomSliderExample(), g.customslider().getHTML());
     misc.add("Fx", new FxExample(), g.fx().getHTML(), true);
+    misc.add("SafeHtml", new SafeHtmlExample(), g.safehtml().getHTML());
     add(misc);
 
     loadEntries(this);

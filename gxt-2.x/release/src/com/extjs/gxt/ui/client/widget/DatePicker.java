@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget;
+ package com.extjs.gxt.ui.client.widget;
 
 import java.util.Date;
 
@@ -330,9 +330,9 @@ public class DatePicker extends BoxComponent {
 
   protected Button todayBtn;
 
-  private DateWrapper activeDate, value;
+  protected DateWrapper activeDate, value;
   private Element[] cells;
-  private DateTimeConstants constants;
+  protected DateTimeConstants constants;
   private Grid days, grid;
   private int firstDOW;
   private com.google.gwt.user.client.ui.HorizontalPanel footer;
@@ -341,7 +341,7 @@ public class DatePicker extends BoxComponent {
   private Date maxDate;
   private DatePickerMessages messages;
   private Date minDate;
-  private Button monthBtn;
+  protected Button monthBtn;
   private El monthPicker;
   private CompositeElement mpMonths, mpYears;
   private int mpSelMonth, mpSelYear;
@@ -350,6 +350,7 @@ public class DatePicker extends BoxComponent {
   private int startDay = Integer.MIN_VALUE;
   private Element[] textNodes;
   private long today;
+  private DateTimeFormat monthButtonFormat = DateTimeFormat.getFormat("MMMM yyy");
 
   /**
    * Creates a new date picker.
@@ -391,6 +392,14 @@ public class DatePicker extends BoxComponent {
    */
   public Date getMinDate() {
     return minDate;
+  }
+
+  /**
+   * Returns the monthbutton DateTimeFormat
+   * @return the datetimeformat
+   */
+  public DateTimeFormat getMonthButtonFormat() {
+    return monthButtonFormat;
   }
 
   /**
@@ -469,6 +478,14 @@ public class DatePicker extends BoxComponent {
     }
   }
 
+  /**
+   * Sets the monthbutton DateTimeFormat
+   * @param monthButtonFormat the DateTimeFormat
+   */
+  public void setMonthButtonFormat(DateTimeFormat monthButtonFormat) {
+    this.monthButtonFormat = monthButtonFormat;
+  }
+  
   /**
    * Sets the picker's start day
    * 
@@ -980,7 +997,7 @@ public class DatePicker extends BoxComponent {
         cell.setTitle(messages.getMinText());        
     }
   }
-
+  
   private void showMonthPicker() {
     createMonthPicker();
 
@@ -1018,7 +1035,7 @@ public class DatePicker extends BoxComponent {
     update(activeDate.addMonths(-1));
   }
 
-  private void update(DateWrapper date) {
+  protected void update(DateWrapper date) {
     DateWrapper vd = activeDate;
     activeDate = date;
     if (vd != null && el() != null) {
@@ -1070,9 +1087,7 @@ public class DatePicker extends BoxComponent {
         setCellStyle(cells[i], d.asDate(), sel, min, max);
       }
 
-      int month = activeDate.getMonth();
-
-      String t = constants.standaloneMonths()[month] + " " + activeDate.getFullYear();
+      String t = monthButtonFormat.format(activeDate.asDate());
       monthBtn.setText(t);
     }
   }
@@ -1099,6 +1114,6 @@ public class DatePicker extends BoxComponent {
       td.dom.setPropertyInt("xyear", y2);
       td.setStyleName("x-date-mp-sel", y2 == mpSelYear);
     }
-
   }
+ 
 }

@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.desktop.client;
+ package com.extjs.gxt.desktop.client;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
@@ -44,8 +44,8 @@ public class Shortcut extends Component implements IconSupport {
 
   private AbstractImagePrototype icon;
   private El iconEl;
-  private String text;
-  private El textEl;
+  private String html;
+  private El contentEl;
 
   /**
    * Creates a new shortcut.
@@ -79,12 +79,12 @@ public class Shortcut extends Component implements IconSupport {
   }
 
   /**
-   * Returns the shortcuts text.
+   * Returns the shortcut's HTML content.
    * 
-   * @return the text
+   * @return the HTML content drawn in this widget
    */
-  public String getText() {
-    return text;
+  public String getHtml() {
+    return html;
   }
 
   @Override
@@ -121,12 +121,21 @@ public class Shortcut extends Component implements IconSupport {
   /**
    * Sets the shortcuts text.
    * 
-   * @param text the text
+   * @param text the text to draw in the shortcut
    */
   public void setText(String text) {
-    this.text = text;
-    if(textEl != null){
-      textEl.update(Util.isEmptyString(text) ? "&#160;" : text);
+    setHtml(El.toSafeHTML(text));
+  }
+
+  /**
+   * Sets the shortcut's html content.
+   * 
+   * @param html the html to draw in the shortcut
+   */
+  public void setHtml(String html) {
+    this.html = html;
+    if(contentEl != null){
+      contentEl.update(Util.isEmptyString(html) ? "&#160;" : html);
     }
   }
 
@@ -141,7 +150,7 @@ public class Shortcut extends Component implements IconSupport {
     setElement(DOM.createElement("dt"), target, index);
     El a = el().createChild("<a href='#'></a>");
     iconEl = a.createChild("<div><img src='" + GXT.BLANK_IMAGE_URL + "' /></div>");
-    textEl = a.createChild("<div></div>");
+    contentEl = a.createChild("<div></div>");
 
     
     el().updateZIndex(0);
@@ -149,7 +158,7 @@ public class Shortcut extends Component implements IconSupport {
     if (icon != null) {
       setIcon(icon);
     }
-    setText(text);
+    setText(html);
   }
 
 }

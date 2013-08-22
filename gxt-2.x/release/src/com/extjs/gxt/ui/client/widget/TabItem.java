@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget;
+ package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
@@ -76,7 +76,7 @@ public class TabItem extends LayoutContainer implements IconSupport {
       disableContextMenu(true);
     }
 
-    protected String text;
+    protected String html;
     protected AbstractImagePrototype icon;
 
     /**
@@ -89,12 +89,12 @@ public class TabItem extends LayoutContainer implements IconSupport {
     }
 
     /**
-     * Returns the header's text.
+     * Returns the header's html content.
      * 
      * @return the text
      */
-    public String getText() {
-      return text;
+    public String getHtml() {
+      return html;
     }
 
     @Override
@@ -144,10 +144,19 @@ public class TabItem extends LayoutContainer implements IconSupport {
      * @param text the text
      */
     public void setText(String text) {
-      this.text = text;
+      setHtml(El.toSafeHTML(text));
+    }
+
+    /**
+     * Sets the header's HTML content.
+     * 
+     * @param html the html to set
+     */
+    public void setHtml(String html) {
+      this.html = html;
       if (rendered) {
-        el().child(".x-tab-strip-text").dom.setInnerHTML(Util.isEmptyString(text) ? "&#160;" : text);
-        tabPanel.onItemTextChange(TabItem.this, this.text, text);
+        el().child(".x-tab-strip-text").dom.setInnerHTML(Util.isEmptyString(html) ? "&#160;" : html);
+        tabPanel.onItemTextChange(TabItem.this, this.html, html);
       }
     }
 
@@ -255,12 +264,12 @@ public class TabItem extends LayoutContainer implements IconSupport {
   }
 
   /**
-   * Returns the item's text.
+   * Returns the HTML content of the item's header.
    * 
-   * @return the text
+   * @return the HTML of the header
    */
-  public String getText() {
-    return header.getText();
+  public String getHtml() {
+    return header.getHtml();
   }
 
   /**
@@ -319,6 +328,15 @@ public class TabItem extends LayoutContainer implements IconSupport {
    */
   public void setText(String text) {
     header.setText(text);
+  }
+
+  /**
+   * Sets the item's header's HTML content
+   * 
+   * @param html the new html content to draw in the header
+   */
+  public void setHtml(String html) {
+    header.setHtml(html);
   }
 
   /**

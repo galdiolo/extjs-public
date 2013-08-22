@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.grid.filters;
+ package com.extjs.gxt.ui.client.widget.grid.filters;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -206,13 +206,13 @@ public class DateFilter extends Filter {
   public void setMessages(FilterMessages messages) {
     super.setMessages(messages);
     if (onItem != null) {
-      onItem.setText(getMessages().getOnText());
+      onItem.setHtml(getMessages().getOnText());
     }
     if (afterItem != null) {
-      afterItem.setText(getMessages().getAfterText());
+      afterItem.setHtml(getMessages().getAfterText());
     }
     if (beforeItem != null) {
-      beforeItem.setText(getMessages().getBeforeText());
+      beforeItem.setHtml(getMessages().getBeforeText());
     }
   }
 

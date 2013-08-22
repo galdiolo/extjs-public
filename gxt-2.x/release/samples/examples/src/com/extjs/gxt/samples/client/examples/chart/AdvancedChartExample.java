@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.chart;
+ package com.extjs.gxt.samples.client.examples.chart;
 
 import java.util.ArrayList;
 
@@ -189,13 +189,13 @@ public class AdvancedChartExample extends LayoutContainer {
     RowData data;
     data = new RowData(1, 300, new Margins(10));
     ContentPanel cp = new ContentPanel(new FitLayout());
-    cp.setHeading("Chart");
+    cp.setHeadingHtml("Chart");
     cp.add(chart);
     lc.add(cp, data);
 
     data = new RowData(1, 1, new Margins(10));
     cp = new ContentPanel(new FitLayout());
-    cp.setHeading("Teams Sales");
+    cp.setHeadingHtml("Teams Sales");
     cp.add(teamSalesGrid);
     lc.add(cp, data);
 

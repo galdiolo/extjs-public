@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget;
+ package com.extjs.gxt.ui.client.widget;
 
 import java.util.ArrayList;
 import java.util.Stack;
@@ -76,10 +76,10 @@ public class Info extends ContentPanel {
    * Displays a message with the given title and text.
    * 
    * @param title the title
-   * @param text the text
+   * @param html the text
    */
-  public static void display(String title, String text) {
-    display(new InfoConfig(title, text));
+  public static void display(String title, String html) {
+    display(new InfoConfig(title, html));
   }
 
   /**
@@ -87,11 +87,11 @@ public class Info extends ContentPanel {
    * will be applied to both the title and text before being displayed.
    * 
    * @param title the info title
-   * @param text the info text
+   * @param html the info text as HTML
    * @param params the parameters to be applied to the title and text
    */
-  public static void display(String title, String text, Params params) {
-    InfoConfig config = new InfoConfig(title, text, params);
+  public static void display(String title, String html, Params params) {
+    InfoConfig config = new InfoConfig(title, html, params);
     display(config);
   }
 
@@ -206,22 +206,22 @@ public class Info extends ContentPanel {
   }
 
   private void setText() {
-    if (config.text != null) {
+    if (config.html != null) {
       if (config.params != null) {
-        config.text = Format.substitute(config.text, config.params);
+        config.html = Format.substitute(config.html, config.params);
       }
       removeAll();
-      addText(config.text);
+      addText(config.html);
     }
   }
 
   private void setTitle() {
-    if (config.title != null) {
+    if (config.titleHtml != null) {
       head.setVisible(true);
       if (config.params != null) {
-        config.title = Format.substitute(config.title, config.params);
+        config.titleHtml = Format.substitute(config.titleHtml, config.params);
       }
-      setHeading(config.title);
+      setHeadingHtml(config.titleHtml);
     } else {
       head.setVisible(false);
     }

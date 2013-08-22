@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.dnd;
+ package com.extjs.gxt.samples.client.examples.dnd;
 
 import com.extjs.gxt.samples.client.Examples;
 import com.extjs.gxt.samples.client.ExamplesModel;
@@ -82,7 +82,6 @@ public class ReorderingTreePanelExample extends LayoutContainer {
     TreePanelDropTarget target = new TreePanelDropTarget(tree);
     target.setAllowSelfAsSource(true);
     target.setFeedback(Feedback.BOTH);
-    target.setScrollElementId(container.getId());
 
     container.add(tree);
     add(container);

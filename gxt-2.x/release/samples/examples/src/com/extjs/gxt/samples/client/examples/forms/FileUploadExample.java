@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.forms;
+ package com.extjs.gxt.samples.client.examples.forms;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ public class FileUploadExample extends LayoutContainer {
     setStyleAttribute("margin", "10px");
 
     final FormPanel panel = new FormPanel();
-    panel.setHeading("File Upload Example");
+    panel.setHeadingHtml("File Upload Example");
     panel.setFrame(true);
     panel.setAction("myurl");
     panel.setEncoding(Encoding.MULTIPART);

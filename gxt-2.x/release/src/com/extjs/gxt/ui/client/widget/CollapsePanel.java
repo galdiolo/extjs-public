@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget;
+ package com.extjs.gxt.ui.client.widget;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
@@ -196,16 +196,16 @@ public class CollapsePanel extends ContentPanel {
   @Override
   protected void onRender(Element target, int index) {
     setElement(DOM.createDiv(), target, index);
-    String text = null;
+    String html = null;
 
     LayoutRegion r = parentData.getRegion();
 
     if (r == LayoutRegion.NORTH || r == LayoutRegion.SOUTH) {
-      text = panel.getHeader().getText();
+      html = panel.getHeader().getHtml();
     }
     headerEl = el().createChild(
         "<div class=\"x-panel-header\"><span class=\"x-panel-header-text\">"
-            + (Util.isEmptyString(text) ? "&#160;" : text) + "</span></div>");
+            + (Util.isEmptyString(html) ? "&#160;" : html) + "</span></div>");
 
     String icon = null;
     adj = new int[] {0, 0};

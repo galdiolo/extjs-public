@@ -1,16 +1,21 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.messages;
+ package com.extjs.gxt.ui.client.messages;
 
+import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.Messages;
 
 /**
  * GXT messages.
+ * 
+ * <p />
+ * NOTE: All messages are treated as HTML. HTML encode any characters that need
+ * to be "displayed" in a message ({@link URL#encode(String)}).
  */
 public interface XMessages extends Messages {
 
@@ -131,7 +136,7 @@ public interface XMessages extends Messages {
   String listField_removeAll();
 
   String listField_removeSelected();
-  
+
   String listField_itemsSelected();
 
   String htmlEditor_boldTipText();
@@ -225,15 +230,15 @@ public interface XMessages extends Messages {
   String themeSelector_grayTheme();
 
   String desktop_startButton();
-  
+
   String window_ariaResize();
-  
+
   String window_ariaMove();
-  
+
   String window_ariaResizeDescription();
-  
+
   String window_ariaMoveDescription();
-  
+
   String aria_leaveApplication();
 
   String stringFilter_emptyText();

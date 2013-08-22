@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.treegrid;
+ package com.extjs.gxt.ui.client.widget.treegrid;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -789,6 +789,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
   }
 
   protected void onFilter(TreeStoreEvent<M> se) {
+    filtering = treeStore.isFiltered();
     onDataChanged(se);
     if (expandOnFilter && treeStore.isFiltered()) {
       expandAll();
@@ -851,11 +852,12 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
         useKeyProvider = true;
       }
     }
+    String id;
     if (!useKeyProvider) {
       if (cache == null) {
         cache = new HashMap<M, String>();
       }
-      String id = cache.get(m);
+      id = cache.get(m);
       if (id == null) {
         id = generateModelId(m);
         cache.put(m, id);
@@ -863,7 +865,7 @@ public class TreeGrid<M extends ModelData> extends Grid<M> {
       }
       return id;
     }
-    String id = generateModelId(m);
+    id = generateModelId(m);
     if (!nodes.containsKey(id)) {
       nodes.put(id, new TreeNode(id, m));
     }

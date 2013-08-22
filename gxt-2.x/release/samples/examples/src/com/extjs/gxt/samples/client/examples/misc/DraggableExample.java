@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.misc;
+ package com.extjs.gxt.samples.client.examples.misc;
 
 import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
@@ -31,7 +31,7 @@ public class DraggableExample extends LayoutContainer {
     cp.setCollapsible(true);
     cp.setIcon(Resources.ICONS.text());
     cp.setBodyStyleName("pad-text");
-    cp.setHeading("Proxy Drag");
+    cp.setHeadingHtml("Proxy Drag");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     cp.setWidth(200);
 
@@ -42,7 +42,7 @@ public class DraggableExample extends LayoutContainer {
     cp = new ContentPanel();
     cp.setCollapsible(true);
     cp.setBodyStyleName("pad-text");
-    cp.setHeading("Direct Drag");
+    cp.setHeadingHtml("Direct Drag");
     cp.setIcon(Resources.ICONS.text());
     cp.addText("Drags can only be started from the header.");
     cp.setWidth(200);
@@ -54,7 +54,7 @@ public class DraggableExample extends LayoutContainer {
 
     cp = new ContentPanel();
     cp.setBodyStyleName("pad-text");
-    cp.setHeading("Constrain");
+    cp.setHeadingHtml("Constrain");
     cp.setIcon(Resources.ICONS.text());
     cp.addText("Can only be dragged vertically.");
     cp.setWidth(200);

@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.store;
+ package com.extjs.gxt.ui.client.store;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -508,23 +508,22 @@ public class ListStore<M extends ModelData> extends Store<M> {
           fireEvent(Add, evt);
         }
       } else {
-        for (int i = 0, j = 0; i < items.size(); i++) {
-          M m = items.get(i);
+        for (int listIndex = 0, addedIndex = 0; listIndex < items.size(); listIndex++) {
+          M m = items.get(listIndex);
           StoreEvent evt = createStoreEvent();
           evt.setModels(Util.createList(m));
-          evt.setIndex(index + j);
+          evt.setIndex(index + addedIndex);
           if (m == null || (!supressEvent && !fireEvent(BeforeAdd, evt))) {
             continue;
           }
           if (isFiltered()) {
-            snapshot.add(index + i, m);
+            snapshot.add(index + listIndex, m);
             if (!isFiltered(m, filterProperty)) {
-              all.add(index + j, m);
-              j++;
+              all.add(index + (addedIndex++), m);
               added.add(m);
             }
           } else {
-            all.add(index + i, m);
+            all.add(index + (addedIndex++), m);
             added.add(m);
           }
           registerModel(m);

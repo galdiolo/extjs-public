@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.chart;
+ package com.extjs.gxt.samples.client.examples.chart;
 
 import com.extjs.gxt.charts.client.Chart;
 import com.extjs.gxt.charts.client.model.ChartModel;
@@ -67,7 +67,7 @@ public class ChartGalleryExample extends LayoutContainer {
   protected void onRender(Element parent, int index) {
     super.onRender(parent, index);
     ContentPanel cp = new ContentPanel();
-    cp.setHeading("Charts Gallery");
+    cp.setHeadingHtml("Charts Gallery");
     cp.setFrame(true);
     cp.setSize(700, 350);
     cp.setLayout(new BorderLayout());
@@ -91,7 +91,7 @@ public class ChartGalleryExample extends LayoutContainer {
     lc.setLayout(vLayout);
 
     FieldSet controls = new FieldSet();
-    controls.setHeading("Controls");
+    controls.setHeadingHtml("Controls");
     FormLayout fl = new FormLayout();
     fl.setLabelWidth(125);
     controls.setLayout(fl);
@@ -135,7 +135,7 @@ public class ChartGalleryExample extends LayoutContainer {
     lc.add(controls);
 
     FieldSet gallery = new FieldSet();
-    gallery.setHeading("Gallery");
+    gallery.setHeadingHtml("Gallery");
     gallery.setLayout(new FitLayout());
 
     ListStore<GalleryChartModel> store = new ListStore<GalleryChartModel>();
@@ -182,7 +182,7 @@ public class ChartGalleryExample extends LayoutContainer {
 
   private LayoutContainer getChart() {
     FieldSet fs = new FieldSet();
-    fs.setHeading("Chart");
+    fs.setHeadingHtml("Chart");
     fs.setLayout(new FitLayout());
 
     String url = !Examples.isExplorer() ? "../../" : "";

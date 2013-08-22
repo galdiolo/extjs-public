@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.organizer;
+ package com.extjs.gxt.samples.client.examples.organizer;
 
 import java.util.List;
 
@@ -70,7 +70,7 @@ public class ImageOrganizerExample extends LayoutContainer {
     container.setLayout(new BorderLayout());
 
     ContentPanel west = new ContentPanel();
-    west.setHeading("My Albums");
+    west.setHeadingHtml("My Albums");
 
     ToolBar toolBar = new ToolBar();
     Button newAlbum = new Button("New Album");
@@ -110,7 +110,7 @@ public class ImageOrganizerExample extends LayoutContainer {
     container.add(west, westData);
 
     ContentPanel center = new ContentPanel();
-    center.setHeading("My Images");
+    center.setHeadingHtml("My Images");
 //    center.setScrollMode(Scroll.AUTO);
     center.setLayout(new FitLayout());
 

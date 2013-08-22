@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget;
+ package com.extjs.gxt.ui.client.widget;
 
 import java.util.Stack;
 
@@ -40,6 +40,7 @@ public class Layer extends El {
   private El shim;
 
   private boolean shimEnabled;
+  private boolean isLegacyIELayer = GXT.isIE6 || GXT.isIE7 || GXT.isIE8 || GXT.isIE9;
 
   /**
    * Creates a new layer instance.
@@ -254,7 +255,7 @@ public class Layer extends El {
         shadowAdjusts.width = shadowOffset * 2;
         shadowAdjusts.x = -shadowOffset;
         shadowAdjusts.y = shadowOffset - 1;
-        if (GXT.isIE) {
+        if (isLegacyIELayer) {
           shadowAdjusts.x -= (shadowOffset - radius);
           shadowAdjusts.y -= (shadowOffset + radius);
           shadowAdjusts.x += 1;
@@ -268,7 +269,7 @@ public class Layer extends El {
         shadowAdjusts.x = shadowAdjusts.y = -shadowOffset;
         shadowAdjusts.y += 1;
         shadowAdjusts.height -= 2;
-        if (GXT.isIE) {
+        if (isLegacyIELayer) {
           shadowAdjusts.x -= (shadowOffset - radius);
           shadowAdjusts.y -= (shadowOffset - radius);
           shadowAdjusts.width -= (shadowOffset + radius);
@@ -281,7 +282,7 @@ public class Layer extends El {
         shadowAdjusts.width = 0;
         shadowAdjusts.x = shadowAdjusts.y = shadowOffset;
         shadowAdjusts.y -= 1;
-        if (GXT.isIE) {
+        if (isLegacyIELayer) {
           shadowAdjusts.x -= shadowOffset + radius;
           shadowAdjusts.y -= shadowOffset + radius;
           shadowAdjusts.width -= radius;
@@ -375,7 +376,7 @@ public class Layer extends El {
         int sh = h + shadowAdjusts.height;
         if (shadow.getWidth() != sw || shadow.getHeight() != sh) {
           shadow.setSize(sw, sh);
-          if (!GXT.isIE) {
+          if (!isLegacyIELayer) {
             int width = Math.max(0, sw - 12);
             fly((Element) shadow.dom.getChildNodes().getItem(0).getChildNodes().getItem(1)).setWidth(width);
             fly((Element) shadow.dom.getChildNodes().getItem(1).getChildNodes().getItem(1)).setWidth(width);
@@ -394,7 +395,7 @@ public class Layer extends El {
         }
         Rectangle a = shadow == null ? new Rectangle(0, 0, 0, 0) : shadowAdjusts;
 
-        if (GXT.isIE && shadow != null && shadow.isVisible()) {
+        if (isLegacyIELayer && shadow != null && shadow.isVisible()) {
           w += shadowOffset * 2;
           l -= shadowOffset;
           t -= shadowOffset;
@@ -417,7 +418,7 @@ public class Layer extends El {
 
   private El createShadow() {
     El el;
-    if (GXT.isIE) {
+    if (isLegacyIELayer) {
       el = new El(DOM.createDiv());
       el.setStyleName("x-ie-shadow");
       el.setStyleAttribute("filter", "progid:DXImageTransform.Microsoft.alpha("

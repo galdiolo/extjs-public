@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.layouts;
+ package com.extjs.gxt.samples.client.examples.layouts;
 
 import com.extjs.gxt.ui.client.Style.Orientation;
 import com.extjs.gxt.ui.client.Style.Scroll;
@@ -25,7 +25,7 @@ public class RowLayoutExample extends LayoutContainer {
     super.onRender(parent, index);
     setScrollMode(Scroll.AUTOY);
     ContentPanel panel = new ContentPanel();
-    panel.setHeading("RowLayout: Orientation set to vertical");
+    panel.setHeadingHtml("RowLayout: Orientation set to vertical");
     panel.setLayout(new RowLayout(Orientation.VERTICAL));
     panel.setSize(400, 300);
     panel.setFrame(true);
@@ -53,7 +53,7 @@ public class RowLayoutExample extends LayoutContainer {
     add(panel, new FlowData(10));
 
     panel = new ContentPanel();
-    panel.setHeading("RowLayout: Orientation set to horizontal");
+    panel.setHeadingHtml("RowLayout: Orientation set to horizontal");
     panel.setLayout(new RowLayout(Orientation.HORIZONTAL));
     panel.setSize(400, 300);
     panel.setFrame(true);

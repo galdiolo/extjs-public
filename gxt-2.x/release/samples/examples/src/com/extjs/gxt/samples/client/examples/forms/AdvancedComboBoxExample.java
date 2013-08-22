@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.forms;
+ package com.extjs.gxt.samples.client.examples.forms;
 
 import java.util.Date;
 
@@ -20,11 +20,14 @@ import com.extjs.gxt.ui.client.data.PagingLoadResult;
 import com.extjs.gxt.ui.client.data.PagingLoader;
 import com.extjs.gxt.ui.client.data.ScriptTagProxy;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
+import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Window;
 
 public class AdvancedComboBoxExample extends LayoutContainer {
 
@@ -41,6 +44,7 @@ public class AdvancedComboBoxExample extends LayoutContainer {
     type.addField("topicId", "topic_id");
     type.addField("author", "author");
     type.addField("excerpt", "post_text");
+    type.addField("postId", "post_id");
 
     DataField date = new DataField("lastPost", "post_time");
     date.setType(Date.class);
@@ -68,6 +72,17 @@ public class AdvancedComboBoxExample extends LayoutContainer {
     combo.setStore(store);
     combo.setHideTrigger(true);
     combo.setPageSize(10);
+    
+    combo.addSelectionChangedListener(new SelectionChangedListener<ModelData>() {
+      
+      @Override
+      public void selectionChanged(SelectionChangedEvent<ModelData> se) {
+        ModelData f = se.getSelectedItem();
+        if (f != null) {
+          Window.open("http://sencha.com/forum/showthread.php?t=" + f.get("topicId") + "&p=" + f.get("postId"), null, null);
+        }
+      }
+    });
 
     VerticalPanel vp = new VerticalPanel();
     vp.setSpacing(10);

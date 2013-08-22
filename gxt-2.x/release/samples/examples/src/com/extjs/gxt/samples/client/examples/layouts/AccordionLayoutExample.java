@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.samples.client.examples.layouts;
+ package com.extjs.gxt.samples.client.examples.layouts;
 
 import com.extjs.gxt.samples.resources.client.Resources;
 import com.extjs.gxt.samples.resources.client.TestData;
@@ -31,7 +31,7 @@ public class AccordionLayoutExample extends LayoutContainer {
     setLayout(new FlowLayout(10));
 
     ContentPanel panel = new ContentPanel();
-    panel.setHeading("AccordionLayout");
+    panel.setHeadingHtml("AccordionLayout");
     panel.setBodyBorder(false);
 
     panel.setLayout(new AccordionLayout());
@@ -39,7 +39,7 @@ public class AccordionLayoutExample extends LayoutContainer {
 
     ContentPanel cp = new ContentPanel();
     cp.setAnimCollapse(false);
-    cp.setHeading("Online Users");
+    cp.setHeadingHtml("Online Users");
     cp.setLayout(new FitLayout());
     panel.add(cp);
 
@@ -83,21 +83,21 @@ public class AccordionLayoutExample extends LayoutContainer {
     cp = new ContentPanel();
     cp.setAnimCollapse(false);
     cp.setBodyStyleName("pad-text");
-    cp.setHeading("Settings");
+    cp.setHeadingHtml("Settings");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     panel.add(cp);
 
     cp = new ContentPanel();
     cp.setAnimCollapse(false);
     cp.setBodyStyleName("pad-text");
-    cp.setHeading("Stuff");
+    cp.setHeadingHtml("Stuff");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     panel.add(cp);
 
     cp = new ContentPanel();
     cp.setAnimCollapse(false);
     cp.setBodyStyleName("pad-text");
-    cp.setHeading("More Stuff");
+    cp.setHeadingHtml("More Stuff");
     cp.addText(TestData.DUMMY_TEXT_SHORT);
     panel.add(cp);
     panel.setSize(200, 325);

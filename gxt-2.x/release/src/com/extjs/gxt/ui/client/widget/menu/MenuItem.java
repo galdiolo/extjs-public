@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.menu;
+ package com.extjs.gxt.ui.client.widget.menu;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.core.El;
@@ -38,7 +38,7 @@ public class MenuItem extends Item implements IconSupport {
   protected Menu subMenu;
   protected String itemStyle = "x-menu-item";
   protected AbstractImagePrototype icon;
-  protected String text;
+  protected String html;
   protected Widget widget;
 
   /**
@@ -51,21 +51,21 @@ public class MenuItem extends Item implements IconSupport {
   /**
    * Creates a new item with the given text.
    * 
-   * @param text the item's text
+   * @param html the item's text as HTML
    */
-  public MenuItem(String text) {
+  public MenuItem(String html) {
     this();
-    this.text = text;
+    this.html = html;
   }
 
   /**
    * Creates a new item.
    * 
-   * @param text the item's text
+   * @param html the item's text as HTML
    * @param icon the item's icon
    */
-  public MenuItem(String text, AbstractImagePrototype icon) {
-    this(text);
+  public MenuItem(String html, AbstractImagePrototype icon) {
+    this(html);
     setIcon(icon);
   }
 
@@ -125,8 +125,8 @@ public class MenuItem extends Item implements IconSupport {
    * 
    * @return the text
    */
-  public String getText() {
-    return text;
+  public String getHtml() {
+    return html;
   }
 
   /**
@@ -188,9 +188,18 @@ public class MenuItem extends Item implements IconSupport {
    * @param text the text
    */
   public void setText(String text) {
-    this.text = text;
+    setHtml(El.toSafeHTML(text));
+  }
+
+  /**
+   * Sets the item's text as HTML.
+   * 
+   * @param html the text as HTML
+   */
+  public void setHtml(String html) {
+    this.html = html;
     if (rendered) {
-      el().update(Util.isEmptyString(text) ? "&#160;" : text);
+      el().update(Util.isEmptyString(html) ? "&#160;" : html);
       setIcon(icon);
     }
   }
@@ -227,7 +236,7 @@ public class MenuItem extends Item implements IconSupport {
   @Override
   protected void afterRender() {
     super.afterRender();
-    if (text != null) setText(text);
+    if (html != null) setHtml(html);
   }
 
   @Override
@@ -297,7 +306,7 @@ public class MenuItem extends Item implements IconSupport {
     if (widget != null) {
       setWidget(widget);
     } else {
-      setText(text);
+      setHtml(html);
     }
 
     if (subMenu != null) {

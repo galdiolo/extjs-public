@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.custom;
+ package com.extjs.gxt.ui.client.widget.custom;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -424,7 +424,7 @@ public class Portal extends ScrollContainer<LayoutContainer> {
   private int getColumn(int x) {
     x += XDOM.getBodyScrollLeft();
     for (int i = startColumns.size() - 1; i >= 0; i--) {
-      if (x > startColumns.get(i)) {
+      if (x >= startColumns.get(i)) {
         return i;
       }
     }

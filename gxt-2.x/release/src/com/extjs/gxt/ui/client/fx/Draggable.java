@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.fx;
+ package com.extjs.gxt.ui.client.fx;
 
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.core.El;
@@ -83,6 +83,7 @@ public class Draggable extends BaseObservable {
   protected int lastX, lastY;
   protected El proxyEl;
   protected Rectangle startBounds;
+  protected boolean shimIFrames = true;
 
   private int clientWidth, clientHeight;
   private boolean constrainClient = true;
@@ -294,6 +295,15 @@ public class Draggable extends BaseObservable {
   }
 
   /**
+   * Returns true if shimming for dragging is enabled.
+   * 
+   * @return the shim state
+   */
+  public boolean isShimIFrames() {
+    return shimIFrames;
+  }
+
+  /**
    * Returns true if the proxy element is sized to match the drag widget.
    * 
    * @return the size proxy to source state
@@ -413,6 +423,16 @@ public class Draggable extends BaseObservable {
    */
   public void setProxyStyle(String proxyStyle) {
     this.proxyStyle = proxyStyle;
+  }
+
+  /**
+   * True to shim iframes, applets, and objects while dragging (defaults to
+   * true).
+   * 
+   * @param shimIFrames true to shim
+   */
+  public void setShimIFrames(boolean shimIFrames) {
+    this.shimIFrames = shimIFrames;
   }
 
   /**
@@ -642,7 +662,10 @@ public class Draggable extends BaseObservable {
       dragWidget.el().makePositionable();
 
       event.preventDefault();
-      Shim.get().cover(true);
+
+      if (shimIFrames) {
+        Shim.get().cover(true);
+      }
 
       lastX = startBounds.x;
       lastY = startBounds.y;
@@ -718,7 +741,7 @@ public class Draggable extends BaseObservable {
   }
 
   private native boolean hasAttribute(Element elem, String name) /*-{
-                                                                 return elem.hasAttribute ? elem.hasAttribute(name) : true;
-                                                                 }-*/;
+        return elem.hasAttribute ? elem.hasAttribute(name) : true;
+  }-*/;
 
 }

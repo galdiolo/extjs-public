@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.grid;
+ package com.extjs.gxt.ui.client.widget.grid;
 
 import com.extjs.gxt.ui.client.core.DomQuery;
 import com.extjs.gxt.ui.client.core.El;
@@ -88,7 +88,7 @@ public class RowExpander extends ColumnConfig implements ComponentPlugin {
    * Creates a new row expander.
    */
   public RowExpander() {
-    setHeader("");
+    setHeaderHtml("");
     setWidth(20);
     setSortable(false);
     setResizable(false);

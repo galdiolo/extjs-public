@@ -1,11 +1,11 @@
 /*
- * Ext GWT 2.2.5 - Ext for GWT
- * Copyright(c) 2007-2010, Ext JS, LLC.
- * licensing@extjs.com
+ * Sencha GXT 2.3.0 - Sencha for GWT
+ * Copyright(c) 2007-2013, Sencha, Inc.
+ * licensing@sencha.com
  * 
- * http://extjs.com/license
+ * http://www.sencha.com/products/gxt/license/
  */
-package com.extjs.gxt.ui.client.widget.menu;
+ package com.extjs.gxt.ui.client.widget.menu;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -64,11 +64,11 @@ public class CheckMenuItem extends MenuItem {
   /**
    * Creates a new check menu item.
    * 
-   * @param text the text
+   * @param html the text as HTML
    */
-  public CheckMenuItem(String text) {
+  public CheckMenuItem(String html) {
     this();
-    setText(text);
+    setHtml(html);
   }
 
   /**
